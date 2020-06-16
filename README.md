@@ -1,0 +1,2 @@
+# sgkit
+Statistical genetics toolkit
