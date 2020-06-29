@@ -28,3 +28,9 @@ black .
 flake8
 mypy --strict .
 ```
+
+You can use [pre-commit](https://pre-commit.com/) to check or enforce the coding standards when you commit your code. Install the git hook using:
+
+```bash
+pre-commit install
+```

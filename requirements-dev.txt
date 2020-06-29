@@ -2,5 +2,6 @@ black
 flake8
 isort
 mypy
+pre-commit
 pytest
 pytest-cov
