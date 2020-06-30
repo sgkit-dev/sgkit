@@ -24,15 +24,15 @@ def create_genotype_call_dataset(
 
     Parameters
     ----------
-    variant_contig : array_like, np.int8
+    variant_contig : array_like, int
         The (index of the) contig for each variant.
-    variant_pos : array_like, np.int32
+    variant_pos : array_like, int
         The reference position of the variant.
     variant_alleles : array_like, S1
         The possible alleles for the variant.
     sample_id : array_like, str
         The unique identifier of the sample.
-    call_gt : array_like, np.int8
+    call_gt : array_like, int
         Genotype, encoded as allele values (0 for the reference, 1 for
         the first allele, 2 for the second allele), or -1 to indicate a
         missing value.
