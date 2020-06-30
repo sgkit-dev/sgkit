@@ -1,4 +1,4 @@
-from typing import Any, Hashable, Mapping
+from typing import Any, Hashable, List, Mapping
 
 import xarray as xr
 
@@ -12,6 +12,7 @@ DIM_GENOTYPE = "genotype"
 
 
 def create_genotype_call_dataset(
+    variant_contig_names: List[str],
     variant_contig: Any,
     variant_pos: Any,
     variant_alleles: Any,
@@ -24,6 +25,8 @@ def create_genotype_call_dataset(
 
     Parameters
     ----------
+    variant_contig_names : list of str
+        The contig names.
     variant_contig : array_like, int
         The (index of the) contig for each variant.
     variant_pos : array_like, int
@@ -67,4 +70,5 @@ def create_genotype_call_dataset(
     if variant_id is not None:
         check_array_like(variant_id, kind="U", ndim=1)
         data_vars["variant/ID"] = ([DIM_VARIANT], variant_id)
-    return xr.Dataset(data_vars)
+    attrs = {"contigs": variant_contig_names}
+    return xr.Dataset(data_vars=data_vars, attrs=attrs)

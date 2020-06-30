@@ -11,6 +11,7 @@ from sgkit import (
 
 
 def test_create_genotype_call_dataset():
+    variant_contig_names = ["chr1"]
     variant_contig = np.array([0, 0], dtype="i1")
     variant_pos = np.array([1000, 2000], dtype="i4")
     variant_alleles = np.array([["A", "C"], ["G", "A"]], dtype="S1")
@@ -21,6 +22,7 @@ def test_create_genotype_call_dataset():
     )
     call_gt_phased = np.array([[True, True, False], [True, False, False]], dtype=bool)
     ds = create_genotype_call_dataset(
+        variant_contig_names,
         variant_contig,
         variant_pos,
         variant_alleles,
@@ -35,6 +37,7 @@ def test_create_genotype_call_dataset():
     assert DIM_PLOIDY in ds.dims
     assert DIM_ALLELE in ds.dims
 
+    assert ds.attrs["contigs"] == variant_contig_names
     assert_array_equal(ds["variant/CONTIG"], variant_contig)
     assert_array_equal(ds["variant/POS"], variant_pos)
     assert_array_equal(ds["variant/ALLELES"], variant_alleles)
