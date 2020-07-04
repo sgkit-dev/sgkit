@@ -10,7 +10,7 @@ from xarray import Dataset
 from ..api import DIM_PLOIDY, DIM_VARIANT
 
 LinearRegressionResult = collections.namedtuple(
-    "LinearRegressionResult", ["betas", "t_values", "p_values"]
+    "LinearRegressionResult", ["beta", "t_value", "p_value"]
 )
 
 
@@ -30,13 +30,16 @@ def _linear_regression(G, X, y) -> LinearRegressionResult:
 
     Returns
     -------
-    tuple
-        [description]
+    LinearRegressionResult
+        Regression statistics and coefficient estimates
     """
     G, X = da.asarray(G), da.asarray(X)
 
     # Apply orthogonal projection to eliminate core covariates
-    # Note: dask lstsq will not work with numpy arrays
+    # Note: QR factorization or SVD should be used here to find
+    # what are effectively OLS residuals rather than matrix inverse
+    # to avoid need for MxM array; additionally, dask.lstsq will not
+    # work with numpy arrays
     Gp = G - X @ da.linalg.lstsq(X, G)[0]
     yp = y - X @ da.linalg.lstsq(X, y)[0]
 
@@ -50,18 +53,20 @@ def _linear_regression(G, X, y) -> LinearRegressionResult:
 
     # Compute statistics and p values for each regression separately
     # Note: dof w/ -2 includes loop covariate
-    dof = y.shape[0] - X.shape[1] - 2
+    dof = y.shape[0] - X.shape[1] - 1
     y_resid = yp[:, np.newaxis] - Gp * b
     rss = (y_resid ** 2).sum(axis=0)
     t_val = b / np.sqrt((rss / dof) / Gps)
     p_val = 2 * stats.distributions.t.sf(np.abs(t_val), dof)
 
-    return LinearRegressionResult(betas=b, t_values=t_val, p_values=p_val)
+    return LinearRegressionResult(beta=b, t_value=t_val, p_value=p_val)
 
 
 def _get_loop_covariates(ds: Dataset, dosage: str = None):
     if dosage is None:
-        G = ds["call/genotype"].sum(dim=DIM_PLOIDY)
+        # TODO: This should be (probably gwas-specific) allele
+        # count with sex chromosome considerations
+        G = ds["call/genotype"].sum(dim=DIM_PLOIDY)  # pragma: no cover
     else:
         G = ds[dosage]
     return da.asarray(G.data)
@@ -112,18 +117,18 @@ def linear_regression(
         - Recessive or dominant allele encodings
         - True dosages as computed from imputed or probabilistic variant calls
     trait : str
-        Trait (e.g. phenotype) variable name; must be continuous
+        Trait (e.g. phenotype) variable name, must be continuous
     add_intercept : bool, optional
-        Add intercept term to covariate set, by default True.
+        Add intercept term to covariate set, by default True
 
     Returns
     -------
     Dataset
         Regression result containing:
-        - betas: beta values associated with each independent variant regressed
+        - beta: beta values associated with each independent variant regressed
             against the trait
-        - t_values: T-test statistic for beta estimate
-        - p_values: P-value for beta estimate (float in [0, 1])
+        - t_value: T-test statistic for beta estimate
+        - p_value: P-value for beta estimate (unscaled float in [0, 1])
     """
     G = _get_loop_covariates(ds, dosage=dosage)
     Z = _get_core_covariates(ds, covariates, add_intercept=add_intercept)
@@ -131,8 +136,8 @@ def linear_regression(
     res = _linear_regression(G.T, Z, y)
     return xr.Dataset(
         dict(
-            betas=(DIM_VARIANT, res.betas),
-            t_values=(DIM_VARIANT, res.t_values),
-            p_values=(DIM_VARIANT, res.p_values),
+            beta=(DIM_VARIANT, res.beta),
+            t_value=(DIM_VARIANT, res.t_value),
+            p_value=(DIM_VARIANT, res.p_value),
         )
     )

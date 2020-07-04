@@ -5,3 +5,4 @@ mypy
 pre-commit
 pytest
 pytest-cov
+statsmodels
