@@ -44,7 +44,7 @@ def _linear_regression(G, X, y) -> LinearRegressionResult:
     yp = y - X @ da.linalg.lstsq(X, y)[0]
 
     # Estimate coefficients for each loop covariate
-    # Note: a key assumption here is that 0-mean residuals
+    # Note: A key assumption here is that 0-mean residuals
     # from projection require no extra terms in variance
     # estimate for loop covariates (columns of G), which is
     # only true when an intercept is present.
@@ -52,11 +52,10 @@ def _linear_regression(G, X, y) -> LinearRegressionResult:
     b = (Gp.T @ yp) / Gps
 
     # Compute statistics and p values for each regression separately
-    # Note: dof w/ -2 includes loop covariate
     dof = y.shape[0] - X.shape[1] - 1
     y_resid = yp[:, np.newaxis] - Gp * b
     rss = (y_resid ** 2).sum(axis=0)
-    t_val = b / np.sqrt((rss / dof) / Gps)
+    t_val = b / np.sqrt(rss / dof / Gps)
     p_val = 2 * stats.distributions.t.sf(np.abs(t_val), dof)
 
     return LinearRegressionResult(beta=b, t_value=t_val, p_value=p_val)
@@ -96,13 +95,19 @@ def linear_regression(
     trait: str,
     add_intercept: bool = True,
 ):
-    """Run linear regression to identify trait associations with genetic variation data
+    """Run linear regression to identify continuous trait associations with genetic variants
 
-    TODO: Explain vectorization scheme and add references
+    This method solves OLS regressions for each variant simultaneously and reports
+    effect statistics as defined in [1]. This is facilitated by the removal of
+    sample (i.e. person/individual) covariates through orthogonal projection
+    of both the genetic variant and phenotype data [2]. A consequence of this
+    rotation is that effect sizes and significances cannot be reported for
+    covariates, only variants.
 
-    Warning: Regression statistics from this implementation are only valid when an intercept
-        is present. The `add_intercept` flag is a convenience for adding one when not
-        already present, but there is currently no parameterization for intercept-free regression.
+    Warning: Regression statistics from this implementation are only valid when an
+    intercept is present. The `add_intercept` flag is a convenience for adding one
+    when not already present, but there is currently no parameterization for
+    intercept-free regression.
 
     Parameters
     ----------
@@ -120,6 +125,15 @@ def linear_regression(
         Trait (e.g. phenotype) variable name, must be continuous
     add_intercept : bool, optional
         Add intercept term to covariate set, by default True
+
+    References
+    ----------
+    - [1] Friedman, Jerome, Trevor Hastie, and Robert Tibshirani. 2001. The Elements
+        of Statistical Learning. Vol. 1. Springer series in statistics New York.
+    - [2] Loh, Po-Ru, George Tucker, Brendan K. Bulik-Sullivan, Bjarni J. Vilhjálmsson,
+        Hilary K. Finucane, Rany M. Salem, Daniel I. Chasman, et al. 2015. “Efficient
+        Bayesian Mixed-Model Analysis Increases Association Power in Large Cohorts.”
+        Nature Genetics 47 (3): 284–90.
 
     Returns
     -------
