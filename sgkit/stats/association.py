@@ -128,8 +128,9 @@ def linear_regression(
 
     References
     ----------
-    - [1] Friedman, Jerome, Trevor Hastie, and Robert Tibshirani. 2001. The Elements
-        of Statistical Learning. Vol. 1. Springer series in statistics New York.
+    - [1] Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2009. The Elements
+        of Statistical Learning: Data Mining, Inference, and Prediction, Second Edition.
+        Springer Science & Business Media.
     - [2] Loh, Po-Ru, George Tucker, Brendan K. Bulik-Sullivan, Bjarni J. Vilhjálmsson,
         Hilary K. Finucane, Rany M. Salem, Daniel I. Chasman, et al. 2015. “Efficient
         Bayesian Mixed-Model Analysis Increases Association Power in Large Cohorts.”
