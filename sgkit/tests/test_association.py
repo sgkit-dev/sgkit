@@ -7,7 +7,7 @@ import xarray as xr
 from sgkit.stats.association import linear_regression
 
 
-def _generate_test_data(n=100, m=10, p=3, e_std=0.001, b_zero_slice=None, seed=None):
+def _generate_test_data(n=100, m=10, p=3, e_std=0.001, b_zero_slice=None, seed=1):
     """Test data simulator for multiple variant associations to a continuous outcome
 
     Outcomes for each variant are simulated separately based on linear combinations
@@ -51,13 +51,13 @@ def _generate_test_data(n=100, m=10, p=3, e_std=0.001, b_zero_slice=None, seed=N
     """
     if b_zero_slice is None:
         b_zero_slice = slice(m // 2)
-    np.random.seed(seed)
-    g = np.random.uniform(size=(n, m), low=0, high=2)
-    x = np.random.normal(size=(n, p))
-    bg = np.random.normal(size=m)
+    rs = np.random.RandomState(seed)
+    g = rs.uniform(size=(n, m), low=0, high=2)
+    x = rs.normal(size=(n, p))
+    bg = rs.normal(size=m)
     bg[b_zero_slice or slice(m // 2)] = 0
-    bx = np.random.normal(size=p)
-    e = np.random.normal(size=n, scale=e_std)
+    bx = rs.normal(size=p)
+    e = rs.normal(size=n, scale=e_std)
 
     # Simulate y values using each variant independently
     ys = np.array([g[:, i] * bg[i] + x @ bx + e for i in range(m)])
@@ -114,7 +114,6 @@ def _get_statistics(ds, add_intercept, **kwargs):
 
 def test_linear_regression_statistics(ds):
     def validate(dfp, dft):
-        # TODO: should we standardize on printing useful debugging info in the event of failures?
         print(dfp)
         print(dft)
 
