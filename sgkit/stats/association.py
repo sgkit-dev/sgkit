@@ -4,7 +4,7 @@ from typing import Sequence
 import dask.array as da
 import numpy as np
 import xarray as xr
-from dask.array import stats
+from dask.array import Array, stats
 from xarray import Dataset
 
 from ..api import DIM_PLOIDY, DIM_VARIANT
@@ -61,7 +61,7 @@ def _linear_regression(G, X, y) -> LinearRegressionResult:
     return LinearRegressionResult(beta=b, t_value=t_val, p_value=p_val)
 
 
-def _get_loop_covariates(ds: Dataset, dosage: str = None):
+def _get_loop_covariates(ds: Dataset, dosage: str = None) -> Array:
     if dosage is None:
         # TODO: This should be (probably gwas-specific) allele
         # count with sex chromosome considerations
@@ -73,7 +73,7 @@ def _get_loop_covariates(ds: Dataset, dosage: str = None):
 
 def _get_core_covariates(
     ds: Dataset, covariates: Sequence[str], add_intercept: bool = False
-):
+) -> Array:
     if not add_intercept and not covariates:
         raise ValueError(
             "At least one covariate must be provided when `add_intercept`=False"
@@ -94,7 +94,7 @@ def linear_regression(
     dosage: str,
     trait: str,
     add_intercept: bool = True,
-):
+) -> Dataset:
     """Run linear regression to identify continuous trait associations with genetic variants
 
     This method solves OLS regressions for each variant simultaneously and reports
