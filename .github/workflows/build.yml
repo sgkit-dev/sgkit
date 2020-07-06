@@ -21,4 +21,4 @@ jobs:
       uses: pre-commit/action@v2.0.0
     - name: Test with pytest and coverage
       run: |
-        pytest -v --cov=sgkit
+        pytest -v --cov=sgkit --cov-report term-missing
