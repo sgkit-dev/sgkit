@@ -15,6 +15,34 @@ def get_obs_gt_cts():
     return np.concatenate((n_het, n_hom), axis=1)
 
 
+def test_hwep_against_reference_impl():
+    args = get_obs_gt_cts()
+    p = [hwep(*arg) for arg in args]
+    np.testing.assert_allclose(p, EXPECTED_P_VAL)
+
+
+def test_hwep_raise_on_negative():
+    args = [[-1, 0, 0], [0, -1, 0], [0, 0, -1]]
+    for arg in args:
+        with pytest.raises(ValueError):
+            hwep(*arg)
+
+
+def test_hwep_zeros():
+    assert np.isnan(hwep(0, 0, 0))
+
+
+def test_hwep_large_counts():
+    # Note: use jit-compiled function for large counts to avoid slowing build down
+    for n_het in 10 ** np.arange(3, 8):
+        # Test case in perfect equilibrium
+        p = hwep_jit(n_het, n_het // 2, n_het // 2)
+        assert np.isclose(p, 1.0, atol=1e-8)
+        # Test case way out of equilibrium
+        p = hwep_jit(n_het, n_het // 10, n_het // 2 + n_het // 10)
+        assert np.isclose(p, 0, atol=1e-8)
+
+
 # Export from execution of C/C++ code at http://csg.sph.umich.edu/abecasis/Exact/snp_hwe.c
 EXPECTED_P_VAL = [
     1.00000000e000,
@@ -218,31 +246,3 @@ EXPECTED_P_VAL = [
     6.97911818e-017,
     6.09976723e-137,
 ]
-
-
-def test_hwep_against_reference_impl():
-    args = get_obs_gt_cts()
-    p = [hwep(*arg) for arg in args]
-    np.testing.assert_allclose(p, EXPECTED_P_VAL)
-
-
-def test_hwep_raise_on_negative():
-    args = [[-1, 0, 0], [0, -1, 0], [0, 0, -1]]
-    for arg in args:
-        with pytest.raises(ValueError):
-            hwep(*arg)
-
-
-def test_hwep_zeros():
-    assert np.isnan(hwep(0, 0, 0))
-
-
-def test_hwep_large_counts():
-    # Note: use jit-compiled function for large counts to avoid slowing build down
-    for n_het in 10 ** np.arange(3, 8):
-        # Test case in perfect equilibrium
-        p = hwep_jit(n_het, n_het // 2, n_het // 2)
-        assert np.isclose(p, 1.0, atol=1e-8)
-        # Test case way out of equilibrium
-        p = hwep_jit(n_het, n_het // 10, n_het // 2 + n_het // 10)
-        assert np.isclose(p, 0, atol=1e-8)
