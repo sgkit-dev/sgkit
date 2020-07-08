@@ -1,7 +1,11 @@
+import dask.array as da
 import numpy as np
+import xarray as xr
 from numba import njit
+from numpy import ndarray
+from xarray import Dataset
 
-# TODO: Is there a way to get coverage on jit functions?
+# TODO: Is there a way to get coverage on jit-compiled functions?
 
 
 def hardy_weinberg_p_value(
@@ -95,4 +99,42 @@ def hardy_weinberg_p_value(
     return p
 
 
-hardy_weinberg_p_value_jit = njit(hardy_weinberg_p_value)
+# Benchmarks show ~25% improvement w/ fastmath on large (~10M) counts
+hardy_weinberg_p_value_jit = njit(hardy_weinberg_p_value, fastmath=True)
+
+
+def hardy_weinberg_p_value_vec(
+    obs_hets: ndarray, obs_hom1: ndarray, obs_hom2: ndarray
+) -> ndarray:
+    arrs = [obs_hets, obs_hom1, obs_hom2]
+    if len(set(map(len, arrs))) != 1:
+        raise ValueError("All arrays must have same length")
+    if list(set(map(lambda x: x.ndim, arrs))) != [1]:
+        raise ValueError("All arrays must be 1D")
+    n = len(obs_hets)
+    p = np.empty(n, dtype=np.float64)
+    for i in range(n):
+        p[i] = hardy_weinberg_p_value_jit(obs_hets[i], obs_hom1[i], obs_hom2[i])
+    return p
+
+
+hardy_weinberg_p_value_vec_jit = njit(hardy_weinberg_p_value_vec, fastmath=True)
+
+
+def hardy_weinberg_test(ds: Dataset):
+    if ds.dims["ploidy"] != 2:
+        raise NotImplementedError("HWE test only implemented for diploid genotypes")
+    if ds.dims["alleles"] != 2:
+        raise NotImplementedError("HWE test only implemented for biallelic genotypes")
+    if "call/allele_count" in ds:
+        ac = ds["call/allele_count"]
+    else:
+        # TODO: centralize allele counting like this somewhere
+        mask = ds["call/genotype_mask"].any(dim="ploidy")
+        ac = xr.where(mask, -1, ds["call/genotype"].sum(dim="ploidy"))
+    # Split into separate per-variant sums for homozygotes and heterozygotes;
+    # note that negative values will be ignored
+    cts = [1, 0, 2]  # arg order: hets, hom1, hom2
+    obs = [da.asarray((ac == ct).sum(dim="samples")) for ct in cts]
+    p = da.map_blocks(hardy_weinberg_p_value_vec_jit, *obs)
+    return xr.Dataset({"variant/hwe_p_value": ("variants", p)})

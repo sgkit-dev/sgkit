@@ -1,11 +1,82 @@
+from typing import Optional, Tuple
+
 import numpy as np
 import pytest
 
+from sgkit.api import create_genotype_call_dataset
 from sgkit.stats.hwe import hardy_weinberg_p_value as hwep
 from sgkit.stats.hwe import hardy_weinberg_p_value_jit as hwep_jit
+from sgkit.stats.hwe import hardy_weinberg_p_value_vec as hwep_vec
+from sgkit.stats.hwe import hardy_weinberg_p_value_vec_jit as hwep_vec_jit
+from sgkit.stats.hwe import hardy_weinberg_test as hwep_test
 
 
-def get_obs_gt_cts():
+def to_genotype_call_dataset(
+    call_genotype, n_contig: int = 1, seed: Optional[int] = None
+):
+    """Wrap a genotype call array in a Dataset instance
+
+    Parameters
+    ----------
+    call_genotype : (M, N, P) array-like
+        Genotype call array
+    n_contig : int, optional
+        Number of contigs to create in result, by default 1
+    seed : int, optional
+        Seed for random number generation
+
+    Returns
+    -------
+    Dataset
+        Dataset from `sgkit.create_genotype_call_dataset`
+    """
+    rs = np.random.RandomState(seed=seed)
+    m, n = call_genotype.shape[:2]
+    contig_size = np.ceil(m / n_contig).astype(int)
+    contig = np.arange(m) % contig_size
+    contig_names = np.unique(contig)
+    position = np.concatenate([np.arange(contig_size) for i in range(n_contig)])[:m]
+    alleles = rs.choice(["A", "C", "G", "T"], size=(m, 2)).astype("S")
+    sample_id = np.array([f"S{i}" for i in range(n)])
+    return create_genotype_call_dataset(
+        variant_contig_names=list(contig_names),
+        variant_contig=contig,
+        variant_position=position,
+        variant_alleles=alleles,
+        sample_id=sample_id,
+        call_genotype=call_genotype,
+    )
+
+
+def simulate_genotype_calls(m: int, n: int, p: Tuple[float, float, float]):
+    """Get dataset with diploid calls simulated from genotype distribution
+
+    Parameters
+    ----------
+    m : int
+        Number of variants
+    n : int
+        Number of samples
+    p : Tuple[float, float, float]
+        Genotype distribution as float in [0, 1] with order
+        homozygous ref, heterozygous, homozygous alt
+
+    Returns
+    -------
+    call_genotype: array-like
+        Dataset from `sgkit.create_genotype_call_dataset`
+    """
+    rs = np.random.RandomState(1)
+    # Draw genotype codes with provided distribution
+    gt = np.stack([rs.choice([0, 1, 2], size=n, replace=True, p=p) for i in range(m)])
+    # Expand 3rd dimenion with calls matching genotypes
+    return np.stack([np.where(gt == 0, 0, 1), np.where(gt == 2, 1, 0)], axis=-1)
+
+
+def get_genotype_counts():
+    # Arguments for hwe calculations generated here
+    # match those generated externally for validation
+    # against C implementation (i.e. do not parameterize)
     n, step = 10_000, 50
     rs = np.random.RandomState(0)
     n_het = np.expand_dims(np.arange(n, step=step) + 1, -1)
@@ -16,7 +87,7 @@ def get_obs_gt_cts():
 
 
 def test_hwep_against_reference_impl():
-    args = get_obs_gt_cts()
+    args = get_genotype_counts()
     p = [hwep(*arg) for arg in args]
     np.testing.assert_allclose(p, EXPECTED_P_VAL)
 
@@ -41,6 +112,28 @@ def test_hwep_large_counts():
         # Test case way out of equilibrium
         p = hwep_jit(n_het, n_het // 10, n_het // 2 + n_het // 10)
         assert np.isclose(p, 0, atol=1e-8)
+
+
+def test_hwep_vec():
+    args = get_genotype_counts()
+    p = hwep_vec(*args.T)
+    np.testing.assert_allclose(p, EXPECTED_P_VAL)
+    p = hwep_vec_jit(*args.T)
+    np.testing.assert_allclose(p, EXPECTED_P_VAL)
+
+
+def test_hwep_dataset():
+    gt_dist = [0.25, 0.5, 0.25]
+    call_genotype = simulate_genotype_calls(50, 1000, p=gt_dist)
+    ds = to_genotype_call_dataset(call_genotype)
+    p = hwep_test(ds)["variant/hwe_p_value"].values
+    assert np.all(p > 1e-8)
+
+    gt_dist = [0.9, 0.05, 0.05]
+    call_genotype = simulate_genotype_calls(50, 1000, p=gt_dist)
+    ds = to_genotype_call_dataset(call_genotype)
+    p = hwep_test(ds)["variant/hwe_p_value"].values
+    assert np.all(p < 1e-8)
 
 
 # Export from execution of C/C++ code at http://csg.sph.umich.edu/abecasis/Exact/snp_hwe.c
