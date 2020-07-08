@@ -2,6 +2,7 @@ from typing import Optional, Tuple
 
 import numpy as np
 import pytest
+import xarray as xr
 
 from sgkit.api import create_genotype_call_dataset
 from sgkit.stats.hwe import hardy_weinberg_p_value as hwep
@@ -33,7 +34,7 @@ def to_genotype_call_dataset(
     rs = np.random.RandomState(seed=seed)
     m, n = call_genotype.shape[:2]
     contig_size = np.ceil(m / n_contig).astype(int)
-    contig = np.arange(m) % contig_size
+    contig = np.arange(m) // contig_size
     contig_names = np.unique(contig)
     position = np.concatenate([np.arange(contig_size) for i in range(n_contig)])[:m]
     alleles = rs.choice(["A", "C", "G", "T"], size=(m, 2)).astype("S")
@@ -122,18 +123,41 @@ def test_hwep_vec():
     np.testing.assert_allclose(p, EXPECTED_P_VAL)
 
 
+def test_hwep_vec_bad_args():
+    with pytest.raises(ValueError):
+        hwep_vec(np.zeros(2), np.zeros(1), np.zeros(1))
+    with pytest.raises(ValueError):
+        hwep_vec(np.zeros((2, 2)), np.zeros(2), np.zeros(2))
+
+
 def test_hwep_dataset():
+    # Test cases in equilibrium
     gt_dist = [0.25, 0.5, 0.25]
     call_genotype = simulate_genotype_calls(50, 1000, p=gt_dist)
     ds = to_genotype_call_dataset(call_genotype)
     p = hwep_test(ds)["variant/hwe_p_value"].values
     assert np.all(p > 1e-8)
 
+    # Test cases out of equilibrium
     gt_dist = [0.9, 0.05, 0.05]
     call_genotype = simulate_genotype_calls(50, 1000, p=gt_dist)
     ds = to_genotype_call_dataset(call_genotype)
     p = hwep_test(ds)["variant/hwe_p_value"].values
     assert np.all(p < 1e-8)
+
+    # Test with pre-assigned counts
+    ds = ds.assign(**{"call/allele_count": ds["call/genotype"].sum(dim="ploidy")})
+    p = hwep_test(ds)
+    assert np.all(p < 1e-8)
+
+
+def test_hwep_dataset_bad_args():
+    with pytest.raises(NotImplementedError):
+        ds = xr.Dataset({"x": (("ploidy", "alleles"), np.zeros((3, 2)))})
+        hwep_test(ds)
+    with pytest.raises(NotImplementedError):
+        ds = xr.Dataset({"x": (("ploidy", "alleles"), np.zeros((2, 3)))})
+        hwep_test(ds)
 
 
 # Export from execution of C/C++ code at http://csg.sph.umich.edu/abecasis/Exact/snp_hwe.c
