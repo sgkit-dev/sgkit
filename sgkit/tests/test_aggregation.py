@@ -10,10 +10,9 @@ def get_dataset(calls, **kwargs):
     ds = simulate_genotype_call_dataset(
         n_variant=calls.shape[0], n_sample=calls.shape[1], **kwargs
     )
-    if calls is not None:
-        dims = ds["call/genotype"].dims
-        ds["call/genotype"] = xr.DataArray(calls, dims=dims)
-        ds["call/genotype_mask"] = xr.DataArray(calls < 0, dims=dims)
+    dims = ds["call/genotype"].dims
+    ds["call/genotype"] = xr.DataArray(calls, dims=dims)
+    ds["call/genotype_mask"] = xr.DataArray(calls < 0, dims=dims)
     return ds
 
 
