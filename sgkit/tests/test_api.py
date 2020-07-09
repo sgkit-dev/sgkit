@@ -24,12 +24,12 @@ def test_create_genotype_call_dataset():
         [[True, True, False], [True, False, False]], dtype=bool
     )
     ds = create_genotype_call_dataset(
-        variant_contig_names,
-        variant_contig,
-        variant_position,
-        variant_alleles,
-        sample_id,
-        call_genotype,
+        variant_contig_names=variant_contig_names,
+        variant_contig=variant_contig,
+        variant_position=variant_position,
+        variant_alleles=variant_alleles,
+        sample_id=sample_id,
+        call_genotype=call_genotype,
         call_genotype_phased=call_genotype_phased,
         variant_id=variant_id,
     )

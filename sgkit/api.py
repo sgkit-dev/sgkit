@@ -12,6 +12,7 @@ DIM_GENOTYPE = "genotypes"
 
 
 def create_genotype_call_dataset(
+    *,
     variant_contig_names: List[str],
     variant_contig: Any,
     variant_position: Any,
