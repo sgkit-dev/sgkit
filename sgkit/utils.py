@@ -1,7 +1,14 @@
+from typing import Any, Set, Union
+
 import numpy as np
 
 
-def check_array_like(a, dtype=None, kind=None, ndim=None):
+def check_array_like(
+    a: Any,
+    dtype: Union[None, str, Set[str]] = None,
+    kind: Union[None, str, Set[str]] = None,
+    ndim: Union[None, int, Set[int]] = None,
+) -> None:
     array_attrs = "ndim", "dtype", "shape"
     for k in array_attrs:
         if not hasattr(a, k):
