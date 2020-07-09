@@ -1,10 +1,18 @@
+import warnings
+
 import numpy as np
 import pandas as pd
 import pytest
-import statsmodels.api as sm
 import xarray as xr
 
 from sgkit.stats.association import linear_regression
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", DeprecationWarning)
+    # Ignore: DeprecationWarning: Using or importing the ABCs from 'collections'
+    # instead of from 'collections.abc' is deprecated since Python 3.3,
+    # and in 3.9 it will stop working
+    import statsmodels.api as sm
 
 
 def _generate_test_data(n=100, m=10, p=3, e_std=0.001, b_zero_slice=None, seed=1):
@@ -107,7 +115,12 @@ def _get_statistics(ds, add_intercept, **kwargs):
             **kwargs,
         )
         res = _sm_statistics(ds, i, add_intercept)
-        df_pred.append(dsr.to_dataframe().iloc[i].to_dict())
+        df_pred.append(
+            dsr.to_dataframe()
+            .rename(columns=lambda c: c.replace("variant/", ""))
+            .iloc[i]
+            .to_dict()
+        )
         df_true.append(dict(t_value=res.tvalues[0], p_value=res.pvalues[0]))
     return pd.DataFrame(df_pred), pd.DataFrame(df_true)
 

@@ -7,8 +7,6 @@ import xarray as xr
 from dask.array import Array, stats
 from xarray import Dataset
 
-from ..api import DIM_PLOIDY, DIM_VARIANT
-
 LinearRegressionResult = collections.namedtuple(
     "LinearRegressionResult", ["beta", "t_value", "p_value"]
 )
@@ -65,7 +63,7 @@ def _get_loop_covariates(ds: Dataset, dosage: str = None) -> Array:
     if dosage is None:
         # TODO: This should be (probably gwas-specific) allele
         # count with sex chromosome considerations
-        G = ds["call/genotype"].sum(dim=DIM_PLOIDY)  # pragma: no cover
+        G = ds["call/genotype"].sum(dim="ploidy")  # pragma: no cover
     else:
         G = ds[dosage]
     return da.asarray(G.data)
@@ -150,9 +148,9 @@ def linear_regression(
     y = da.asarray(ds[trait].data)
     res = _linear_regression(G.T, Z, y)
     return xr.Dataset(
-        dict(
-            beta=(DIM_VARIANT, res.beta),
-            t_value=(DIM_VARIANT, res.t_value),
-            p_value=(DIM_VARIANT, res.p_value),
-        )
+        {
+            "variant/beta": ("variants", res.beta),
+            "variant/t_value": ("variants", res.t_value),
+            "variant/p_value": ("variants", res.p_value),
+        }
     )
