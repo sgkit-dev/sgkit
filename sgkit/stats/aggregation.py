@@ -3,20 +3,20 @@ from xarray import DataArray, Dataset
 
 
 def allele_count(ds: Dataset) -> DataArray:
-    """Compute allele count from genotype calls
+    """Compute allele count from genotype calls.
 
     Parameters
     ----------
     ds : Dataset
         Genotype call dataset such as from
-        `sgkit.create_genotype_call_dataset`
+        `sgkit.create_genotype_call_dataset`.
 
     Returns
     -------
-    DataArray
+    variant/allele_count : DataArray
         Allele counts with shape (variants, alleles) and values
         corresponding to the number of non-missing occurrences
-        of each allele
+        of each allele.
 
     Examples
     --------
