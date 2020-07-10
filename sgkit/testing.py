@@ -13,7 +13,15 @@ def simulate_genotype_call_dataset(
     n_contig: int = 1,
     seed: Optional[int] = None,
 ):
-    """Simulate genotype calls and variant/sample data
+    """Simulate genotype calls and variant/sample data.
+
+    Note that the data simulated by this function has no
+    biological interpretation and that summary statistics
+    or other methods applied to it will produce meaningless
+    results.  This function is primarily a convenience on
+    generating `Dataset` containers so quantities of interest
+    should be overwritten, where appropriate, within the
+    context of a more specific application.
 
     Parameters
     ----------
@@ -33,7 +41,7 @@ def simulate_genotype_call_dataset(
     Returns
     -------
     Dataset
-        Dataset from `sgkit.create_genotype_call_dataset`
+        Dataset from `sgkit.create_genotype_call_dataset`.
     """
     rs = np.random.RandomState(seed=seed)
     call_genotype = rs.randint(
