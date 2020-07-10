@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-from sgkit.stats.association import linear_regression
+from sgkit.stats.association import gwas_linear_regression
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore", DeprecationWarning)
@@ -107,7 +107,7 @@ def _sm_statistics(ds, i, add_intercept):
 def _get_statistics(ds, add_intercept, **kwargs):
     df_pred, df_true = [], []
     for i in range(ds.dims["variant"]):
-        dsr = linear_regression(
+        dsr = gwas_linear_regression(
             ds,
             dosage="dosage",
             trait=f"trait_{i}",
@@ -156,6 +156,6 @@ def test_linear_regression_statistics(ds):
 
 def test_linear_regression_raise_on_no_covars(ds):
     with pytest.raises(ValueError):
-        linear_regression(
+        gwas_linear_regression(
             ds, covariates=[], dosage="dosage", trait="trait_0", add_intercept=False
         )

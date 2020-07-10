@@ -12,7 +12,7 @@ LinearRegressionResult = collections.namedtuple(
 )
 
 
-def _linear_regression(G, X, y) -> LinearRegressionResult:
+def _gwas_linear_regression(G, X, y) -> LinearRegressionResult:
     """Efficient linear regression estimation for multiple covariate sets
 
     Parameters
@@ -86,7 +86,7 @@ def _get_core_covariates(
     return X.rechunk((None, -1))
 
 
-def linear_regression(
+def gwas_linear_regression(
     ds: Dataset,
     covariates: Sequence[str],
     dosage: str,
@@ -146,7 +146,7 @@ def linear_regression(
     G = _get_loop_covariates(ds, dosage=dosage)
     Z = _get_core_covariates(ds, covariates, add_intercept=add_intercept)
     y = da.asarray(ds[trait].data)
-    res = _linear_regression(G.T, Z, y)
+    res = _gwas_linear_regression(G.T, Z, y)
     return xr.Dataset(
         {
             "variant/beta": ("variants", res.beta),
