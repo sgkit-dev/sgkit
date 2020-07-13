@@ -5,7 +5,7 @@ import numpy as np
 
 def check_array_like(
     a: Any,
-    dtype: Union[None, str, Set[str]] = None,
+    dtype: Any = None,
     kind: Union[None, str, Set[str]] = None,
     ndim: Union[None, int, Set[int]] = None,
 ) -> None:
