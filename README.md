@@ -34,3 +34,5 @@ You can use [pre-commit](https://pre-commit.com/) to check or enforce the coding
 ```bash
 pre-commit install
 ```
+
+Note that pre-commit does not run the `mypy` check, so you will need to run that manually before submitting a pull request.
