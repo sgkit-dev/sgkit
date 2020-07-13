@@ -2,10 +2,12 @@ from typing import Any, Set, Union
 
 import numpy as np
 
+from .typing import DType
+
 
 def check_array_like(
     a: Any,
-    dtype: Any = None,
+    dtype: DType = None,
     kind: Union[None, str, Set[str]] = None,
     ndim: Union[None, int, Set[int]] = None,
 ) -> None:
