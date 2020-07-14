@@ -33,7 +33,7 @@ def create_genotype_call_dataset(
         The (index of the) contig for each variant.
     variant_position : array_like, int
         The reference position of the variant.
-    variant_alleles : array_like, S1
+    variant_alleles : array_like, zero-terminated bytes, e.g. "S1"
         The possible alleles for the variant.
     sample_id : array_like, str
         The unique identifier of the sample.
