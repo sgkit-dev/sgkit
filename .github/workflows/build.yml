@@ -26,5 +26,7 @@ jobs:
       run: |
         pytest -v --cov=sgkit
     - name: Upload coverage to Codecov
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |
         codecov
