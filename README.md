@@ -30,15 +30,13 @@ To manually enforce (or check) the source code adheres to our coding standards:
 
 ```bash
 pre-commit run --all-files
-mypy --strict .
 ```
 
-To run specific tool (black/flake8/isort etc):
+To run specific tool (`black`/`flake8`/`isort`/`mypy` etc):
 
 ```bash
 pre-commit run black --all-files
 ```
 
 Notes:
- * pre-commit does not run the `mypy` check, so you will need to run that manually before submitting a pull request
- * if you skip `--all-files` checks are incremental 
+ * if you skip `--all-files` checks are incremental

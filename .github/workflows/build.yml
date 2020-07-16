@@ -19,9 +19,6 @@ jobs:
         pip install -r requirements.txt -r requirements-dev.txt
     - name: Run pre-commit
       uses: pre-commit/action@v2.0.0
-    - name: Check types with mypy
-      run: |
-        mypy --strict .
     - name: Test with pytest and coverage
       run: |
         pytest -v --cov=sgkit
