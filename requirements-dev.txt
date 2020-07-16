@@ -1,5 +1,4 @@
 codecov
-mypy
 pre-commit
 pytest
 pytest-cov
