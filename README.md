@@ -20,19 +20,25 @@ pytest --cov=sgkit
 
 ### Code standards
 
-Run the following to enforce (or check) the source code adheres to our coding standards.
-
-```bash
-isort -rc .
-black .
-flake8
-mypy --strict .
-```
-
-You can use [pre-commit](https://pre-commit.com/) to check or enforce the coding standards when you commit your code. Install the git hook using:
+Use [pre-commit](https://pre-commit.com/) to check or enforce the coding standards. Install the git hook using:
 
 ```bash
 pre-commit install
 ```
 
-Note that pre-commit does not run the `mypy` check, so you will need to run that manually before submitting a pull request.
+To manually enforce (or check) the source code adheres to our coding standards:
+
+```bash
+pre-commit run --all-files
+mypy --strict .
+```
+
+To run specific tool (black/flake8/isort etc):
+
+```bash
+pre-commit run black --all-files
+```
+
+Notes:
+ * pre-commit does not run the `mypy` check, so you will need to run that manually before submitting a pull request
+ * if you skip `--all-files` checks are incremental 
