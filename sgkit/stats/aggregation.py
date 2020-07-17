@@ -2,7 +2,7 @@ import xarray as xr
 from xarray import DataArray, Dataset
 
 
-def allele_count(ds: Dataset) -> DataArray:
+def count_alleles(ds: Dataset) -> DataArray:
     """Compute allele count from genotype calls.
 
     Parameters
@@ -32,7 +32,7 @@ def allele_count(ds: Dataset) -> DataArray:
     2       0/1	1/0
     3       0/0	0/0
 
-    >>> allele_count(ds)
+    >>> sg.allele_count(ds)
     <xarray.DataArray 'variant/allele_count' (variants: 4, alleles: 2)>
     array([[2, 2],
         [1, 3],

@@ -1,6 +1,7 @@
 from typing import Optional
 
 import numpy as np
+from xarray import Dataset
 
 from .api import create_genotype_call_dataset
 
@@ -12,7 +13,7 @@ def simulate_genotype_call_dataset(
     n_allele: int = 2,
     n_contig: int = 1,
     seed: Optional[int] = None,
-):
+) -> Dataset:
     """Simulate genotype calls and variant/sample data.
 
     Note that the data simulated by this function has no
@@ -31,6 +32,8 @@ def simulate_genotype_call_dataset(
         Number of samples to simulate
     n_ploidy : int
         Number of chromosome copies in each sample
+    n_allele: int
+        Number of alleles to simulate
     n_contig : int, optional
         Number of contigs to partition variants with,
         controlling values in `variant/contig`. Values
