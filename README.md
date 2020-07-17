@@ -15,7 +15,7 @@ pytest
 To check code coverage and get a coverage report, run
 
 ```bash
-pytest --cov=sgkit
+pytest --cov=sgkit --cov-report term-missing
 ```
 
 ### Code standards
