@@ -1,7 +1,5 @@
-black
-flake8
-isort
-mypy
+codecov
 pre-commit
 pytest
 pytest-cov
+statsmodels
