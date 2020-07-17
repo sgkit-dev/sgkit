@@ -24,7 +24,6 @@ def allele_count(ds: Dataset) -> DataArray:
     >>> import sgkit as sg
     >>> from sgkit.testing import simulate_genotype_call_dataset
     >>> ds = simulate_genotype_call_dataset(n_variant=3, n_sample=2, seed=1)
-    # TODO: Use solution for https://github.com/pystatgen/sgkit/issues/37 here instead
     >>> ds['call/genotype'].to_series().unstack().astype(str).apply('/'.join, axis=1).unstack()
     samples 0   1
     variants
@@ -45,9 +44,9 @@ def allele_count(ds: Dataset) -> DataArray:
     # restack into new alleles dimension with same order
     gt, mask = ds["call/genotype"], ds["call/genotype_mask"]
     acs = [
-        xr.where(mask, 0, gt == i).sum(dim=("samples", "ploidy"))
+        xr.where(mask, 0, gt == i).sum(dim=("samples", "ploidy"))  # type: ignore[no-untyped-call]
         for i in range(ds.dims["alleles"])
     ]
-    ac = xr.concat(acs, dim="alleles")
+    ac = xr.concat(acs, dim="alleles")  # type: ignore[no-untyped-call]
     ac = ac.T.rename("variant/allele_count")
-    return ac
+    return ac  # type: ignore[no-any-return]

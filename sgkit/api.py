@@ -1,4 +1,4 @@
-from typing import Any, Hashable, List, Mapping
+from typing import Any, Dict, Hashable, List
 
 import xarray as xr
 
@@ -57,7 +57,7 @@ def create_genotype_call_dataset(
     check_array_like(variant_alleles, kind="S", ndim=2)
     check_array_like(sample_id, kind="U", ndim=1)
     check_array_like(call_genotype, kind="i", ndim=3)
-    data_vars: Mapping[Hashable, Any] = {
+    data_vars: Dict[Hashable, Any] = {
         "variant/contig": ([DIM_VARIANT], variant_contig),
         "variant/position": ([DIM_VARIANT], variant_position),
         "variant/alleles": ([DIM_VARIANT, DIM_ALLELE], variant_alleles),
@@ -77,5 +77,5 @@ def create_genotype_call_dataset(
     if variant_id is not None:
         check_array_like(variant_id, kind="U", ndim=1)
         data_vars["variant/id"] = ([DIM_VARIANT], variant_id)
-    attrs = {"contigs": variant_contig_names}
+    attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
     return xr.Dataset(data_vars=data_vars, attrs=attrs)
