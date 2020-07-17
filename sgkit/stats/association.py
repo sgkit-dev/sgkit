@@ -127,9 +127,10 @@ def _get_core_covariates(
 
 def gwas_linear_regression(
     ds: Dataset,
-    covariates: Sequence[str],
+    *,
     dosage: str,
-    trait: str,
+    covariates: Sequence[str],
+    traits: Sequence[str],
     add_intercept: bool = True,
 ) -> Dataset:
     """Run linear regression to identify continuous trait associations with genetic variants
@@ -158,8 +159,8 @@ def gwas_linear_regression(
         - Alternate allele counts
         - Recessive or dominant allele encodings
         - True dosages as computed from imputed or probabilistic variant calls
-    trait : str
-        Trait (e.g. phenotype) variable name, must be continuous
+    traits : Sequence[str]
+        Trait (e.g. phenotype) variable names, must all be continuous
     add_intercept : bool, optional
         Add intercept term to covariate set, by default True
 
@@ -186,12 +187,14 @@ def gwas_linear_regression(
     """
     G = _get_loop_covariates(ds, dosage=dosage)
     Z = _get_core_covariates(ds, covariates, add_intercept=add_intercept)
-    y = da.asarray(ds[trait].data)
-    res = linear_regression(G.T, Z, y)
+    Y = da.concatenate(
+        [ds[t].expand_dims(dim="outcomes", axis=1) for t in traits], axis=1
+    )
+    res = linear_regression(G.T, Z, Y)
     return xr.Dataset(
         {
-            "variant/beta": ("variants", res.beta),
-            "variant/t_value": ("variants", res.t_value),
-            "variant/p_value": ("variants", res.p_value),
+            "variant/beta": (("variants", "outcomes"), res.beta),
+            "variant/t_value": (("variants", "outcomes"), res.t_value),
+            "variant/p_value": (("variants", "outcomes"), res.p_value),
         }
     )

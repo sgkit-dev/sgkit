@@ -118,7 +118,7 @@ def _get_statistics(
         dsr = gwas_linear_regression(
             ds,
             dosage="dosage",
-            trait=f"trait_{i}",
+            traits=[f"trait_{i}"],
             add_intercept=add_intercept,
             **kwargs,
         )
@@ -165,5 +165,5 @@ def test_linear_regression_statistics(ds):
 def test_linear_regression_raise_on_no_covars(ds):
     with pytest.raises(ValueError, match="At least one covariate must be provided"):
         gwas_linear_regression(
-            ds, covariates=[], dosage="dosage", trait="trait_0", add_intercept=False
+            ds, covariates=[], dosage="dosage", traits=["trait_0"], add_intercept=False
         )
