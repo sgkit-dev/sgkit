@@ -1,5 +1,5 @@
 import collections
-from typing import Sequence
+from typing import Optional, Sequence
 
 import dask.array as da
 import numpy as np
@@ -7,12 +7,16 @@ import xarray as xr
 from dask.array import Array, stats
 from xarray import Dataset
 
+from ..typing import ArrayLike
+
 LinearRegressionResult = collections.namedtuple(
     "LinearRegressionResult", ["beta", "t_value", "p_value"]
 )
 
 
-def _gwas_linear_regression(G, X, y) -> LinearRegressionResult:
+def _gwas_linear_regression(
+    G: ArrayLike, X: ArrayLike, y: ArrayLike
+) -> LinearRegressionResult:
     """Efficient linear regression estimation for multiple covariate sets
 
     Parameters
@@ -59,7 +63,7 @@ def _gwas_linear_regression(G, X, y) -> LinearRegressionResult:
     return LinearRegressionResult(beta=b, t_value=t_val, p_value=p_val)
 
 
-def _get_loop_covariates(ds: Dataset, dosage: str = None) -> Array:
+def _get_loop_covariates(ds: Dataset, dosage: Optional[str] = None) -> Array:
     if dosage is None:
         # TODO: This should be (probably gwas-specific) allele
         # count with sex chromosome considerations

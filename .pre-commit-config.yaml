@@ -29,5 +29,5 @@ repos:
     rev: v0.782
     hooks:
       - id: mypy
-        args: ["--strict"]
+        args: ["--strict", "--show-error-codes"]
         additional_dependencies: ["numpy", "xarray"]

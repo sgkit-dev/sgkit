@@ -1,11 +1,15 @@
 import warnings
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from pandas import DataFrame
+from xarray import Dataset
 
 from sgkit.stats.association import gwas_linear_regression
+from sgkit.typing import ArrayLike
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore", DeprecationWarning)
@@ -13,9 +17,17 @@ with warnings.catch_warnings():
     # instead of from 'collections.abc' is deprecated since Python 3.3,
     # and in 3.9 it will stop working
     import statsmodels.api as sm
+    from statsmodels.regression.linear_model import RegressionResultsWrapper
 
 
-def _generate_test_data(n=100, m=10, p=3, e_std=0.001, b_zero_slice=None, seed=1):
+def _generate_test_data(
+    n: int = 100,
+    m: int = 10,
+    p: int = 3,
+    e_std: float = 0.001,
+    b_zero_slice: Optional[slice] = None,
+    seed: Optional[int] = 1,
+) -> Tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
     """Test data simulator for multiple variant associations to a continuous outcome
 
     Outcomes for each variant are simulated separately based on linear combinations
@@ -40,20 +52,12 @@ def _generate_test_data(n=100, m=10, p=3, e_std=0.001, b_zero_slice=None, seed=1
 
     Returns
     -------
-    n : int
-        Number of samples
-    m : int
-        Number of variants
-    p : int
-        Number of covariates
     g : (n, m) array-like
         Simulated genotype dosage
     x : (n, p) array-like
         Simulated covariates
     bg : (m,) array-like
         Variant betas
-    bx : (p,) array-like
-        Covariate betas
     ys : (m, n) array-like
         Outcomes for each column in genotypes i.e. variant
     """
@@ -69,28 +73,29 @@ def _generate_test_data(n=100, m=10, p=3, e_std=0.001, b_zero_slice=None, seed=1
 
     # Simulate y values using each variant independently
     ys = np.array([g[:, i] * bg[i] + x @ bx + e for i in range(m)])
-    return n, m, p, g, x, bg, bx, ys
+    return g, x, bg, ys
 
 
-def _generate_test_dataset(**kwargs):
-    n, m, p, g, x, bg, bx, ys = _generate_test_data(**kwargs)
+def _generate_test_dataset(**kwargs: Any) -> Dataset:
+    g, x, bg, ys = _generate_test_data(**kwargs)
     data_vars = {}
-    # TODO: use literals or constants for dimension names?
     data_vars["dosage"] = (["variant", "sample"], g.T)
     for i in range(x.shape[1]):
         data_vars[f"covar_{i}"] = (["sample"], x[:, i])
     for i in range(len(ys)):
         data_vars[f"trait_{i}"] = (["sample"], ys[i])
     attrs = dict(beta=bg)
-    return xr.Dataset(data_vars, attrs=attrs)
+    return xr.Dataset(data_vars, attrs=attrs)  # type: ignore[arg-type]
 
 
-@pytest.fixture
-def ds():
+@pytest.fixture  # type: ignore[misc]
+def ds() -> Dataset:
     return _generate_test_dataset()
 
 
-def _sm_statistics(ds, i, add_intercept):
+def _sm_statistics(
+    ds: Dataset, i: int, add_intercept: bool
+) -> RegressionResultsWrapper:
     X = []
     # Make sure first independent variable is variant
     X.append(ds["dosage"].values[i])
@@ -104,8 +109,11 @@ def _sm_statistics(ds, i, add_intercept):
     return sm.OLS(y, X, hasconst=True).fit()
 
 
-def _get_statistics(ds, add_intercept, **kwargs):
-    df_pred, df_true = [], []
+def _get_statistics(
+    ds: Dataset, add_intercept: bool, **kwargs: Any
+) -> Tuple[DataFrame, DataFrame]:
+    df_pred: List[Dict[str, Any]] = []
+    df_true: List[Dict[str, Any]] = []
     for i in range(ds.dims["variant"]):
         dsr = gwas_linear_regression(
             ds,
@@ -116,7 +124,7 @@ def _get_statistics(ds, add_intercept, **kwargs):
         )
         res = _sm_statistics(ds, i, add_intercept)
         df_pred.append(
-            dsr.to_dataframe()
+            dsr.to_dataframe()  # type: ignore[no-untyped-call]
             .rename(columns=lambda c: c.replace("variant/", ""))
             .iloc[i]
             .to_dict()
@@ -126,7 +134,7 @@ def _get_statistics(ds, add_intercept, **kwargs):
 
 
 def test_linear_regression_statistics(ds):
-    def validate(dfp, dft):
+    def validate(dfp: DataFrame, dft: DataFrame) -> None:
         print(dfp)
         print(dft)
 
