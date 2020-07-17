@@ -17,53 +17,85 @@ class LinearRegressionResult:
     p_value: ArrayLike
 
 
-def _gwas_linear_regression(
-    G: ArrayLike, X: ArrayLike, y: ArrayLike
+def linear_regression(
+    XL: ArrayLike, XC: ArrayLike, Y: ArrayLike
 ) -> LinearRegressionResult:
     """Efficient linear regression estimation for multiple covariate sets
 
     Parameters
     ----------
-    G : (M, N) array-like
+    XL : (M, N) array-like
         "Loop" covariates for which a separate regression will be fit to
         individual columns
-    X : (M, P) array-like
+    XC : (M, P) array-like
         "Core" covariates that are included in the regressions along
         with each loop covariate
-    y : (M,)
+    Y : (M, O)
         Continuous outcome
 
     Returns
     -------
     LinearRegressionResult
-        Regression statistics and coefficient estimates
+        Dataclass with fields:
+        beta : (N, O) array-like
+            Beta values associated with each loop covariate and outcome regressed
+        t_value : (N, O) array-like
+            T statistics for each beta
+        p_value : (N, O) array-like
+            P values as float in [0, 1]
     """
-    G, X = da.asarray(G), da.asarray(X)
+    XL, XC = da.asarray(XL), da.asarray(XC)  # Coerce for `lstsq`
+    if set([x.ndim for x in [XL, XC, Y]]) != {2}:
+        raise ValueError("All arguments must be two dimensional")
+    n_core_covar, n_loop_covar, n_obs, n_outcome = (
+        XC.shape[1],
+        XL.shape[1],
+        Y.shape[0],
+        Y.shape[1],
+    )
+    dof = n_obs - n_core_covar - 1
+    if dof < 1:
+        raise ValueError(
+            "Number of observations (N) too small to calculate sampling statistics. "
+            "N must be greater than number of core covariates (C) plus one. "
+            f"Arguments provided: N={n_obs}, C={n_core_covar}."
+        )
 
     # Apply orthogonal projection to eliminate core covariates
     # Note: QR factorization or SVD should be used here to find
     # what are effectively OLS residuals rather than matrix inverse
-    # to avoid need for MxM array; additionally, dask.lstsq will not
-    # work with numpy arrays
-    Gp = G - X @ da.linalg.lstsq(X, G)[0]
-    yp = y - X @ da.linalg.lstsq(X, y)[0]
+    # to avoid need for MxM array; additionally, dask.lstsq fails
+    # with numpy arrays
+    XLP = XL - XC @ da.linalg.lstsq(XC, XL)[0]
+    assert XLP.shape == (n_obs, n_loop_covar)
+    YP = Y - XC @ da.linalg.lstsq(XC, Y)[0]
+    assert YP.shape == (n_obs, n_outcome)
 
     # Estimate coefficients for each loop covariate
     # Note: A key assumption here is that 0-mean residuals
     # from projection require no extra terms in variance
     # estimate for loop covariates (columns of G), which is
     # only true when an intercept is present.
-    Gps = (Gp ** 2).sum(axis=0)
-    b = (Gp.T @ yp) / Gps
+    XLPS = (XLP ** 2).sum(axis=0, keepdims=True).T
+    assert XLPS.shape == (n_loop_covar, 1)
+    B = (XLP.T @ YP) / XLPS
+    assert B.shape == (n_loop_covar, n_outcome)
 
-    # Compute statistics and p values for each regression separately
-    dof = y.shape[0] - X.shape[1] - 1
-    y_resid = yp[:, np.newaxis] - Gp * b
-    rss = (y_resid ** 2).sum(axis=0)
-    t_val = b / np.sqrt(rss / dof / Gps)
-    p_val = 2 * stats.distributions.t.sf(np.abs(t_val), dof)
+    # Compute residuals for each loop covariate and outcome separately
+    YR = YP[:, np.newaxis, :] - XLP[..., np.newaxis] * B[np.newaxis, ...]
+    assert YR.shape == (n_obs, n_loop_covar, n_outcome)
+    RSS = (YR ** 2).sum(axis=0)
+    assert RSS.shape == (n_loop_covar, n_outcome)
+    # Get t-statistics for coefficient estimates
+    T = B / np.sqrt(RSS / dof / XLPS)
+    assert T.shape == (n_loop_covar, n_outcome)
+    # Match to p-values
+    # Note: t dist not implemented in Dask so this will
+    # coerce result to numpy (`T` will still be da.Array)
+    P = 2 * stats.distributions.t.sf(np.abs(T), dof)
+    assert P.shape == (n_loop_covar, n_outcome)
 
-    return LinearRegressionResult(beta=b, t_value=t_val, p_value=p_val)
+    return LinearRegressionResult(beta=B, t_value=T, p_value=P)
 
 
 def _get_loop_covariates(ds: Dataset, dosage: Optional[str] = None) -> Array:
@@ -144,16 +176,18 @@ def gwas_linear_regression(
     Returns
     -------
     Dataset
-        Regression result containing:
-        - beta: beta values associated with each independent variant regressed
-            against the trait
-        - t_value: T-test statistic for beta estimate
-        - p_value: P-value for beta estimate (unscaled float in [0, 1])
+        Dataset containing (N = num variants, O = num outcomes):
+        beta : (N, O) array-like
+            Beta values associated with each variant and outcome regressed
+        t_value : (N, O) array-like
+            T statistics for each beta
+        p_value : (N, O) array-like
+            P values as float in [0, 1]
     """
     G = _get_loop_covariates(ds, dosage=dosage)
     Z = _get_core_covariates(ds, covariates, add_intercept=add_intercept)
     y = da.asarray(ds[trait].data)
-    res = _gwas_linear_regression(G.T, Z, y)
+    res = linear_regression(G.T, Z, y)
     return xr.Dataset(
         {
             "variant/beta": ("variants", res.beta),
