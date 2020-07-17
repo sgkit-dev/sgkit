@@ -88,7 +88,7 @@ def _generate_test_dataset(**kwargs: Any) -> Dataset:
     return xr.Dataset(data_vars, attrs=attrs)  # type: ignore[arg-type]
 
 
-@pytest.fixture  # type: ignore[misc]
+@pytest.fixture(scope="module")  # type: ignore[misc]
 def ds() -> Dataset:
     return _generate_test_dataset()
 
@@ -163,7 +163,7 @@ def test_linear_regression_statistics(ds):
 
 
 def test_linear_regression_raise_on_no_covars(ds):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="At least one covariate must be provided"):
         gwas_linear_regression(
             ds, covariates=[], dosage="dosage", trait="trait_0", add_intercept=False
         )

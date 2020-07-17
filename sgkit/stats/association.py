@@ -1,4 +1,4 @@
-import collections
+from dataclasses import dataclass
 from typing import Optional, Sequence
 
 import dask.array as da
@@ -9,9 +9,12 @@ from xarray import Dataset
 
 from ..typing import ArrayLike
 
-LinearRegressionResult = collections.namedtuple(
-    "LinearRegressionResult", ["beta", "t_value", "p_value"]
-)
+
+@dataclass
+class LinearRegressionResult:
+    beta: ArrayLike
+    t_value: ArrayLike
+    p_value: ArrayLike
 
 
 def _gwas_linear_regression(

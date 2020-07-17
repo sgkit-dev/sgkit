@@ -30,4 +30,4 @@ repos:
     hooks:
       - id: mypy
         args: ["--strict", "--show-error-codes"]
-        additional_dependencies: ["numpy", "xarray"]
+        additional_dependencies: ["numpy", "xarray", "dask[array]", "scipy"]
