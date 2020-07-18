@@ -25,20 +25,20 @@ def linear_regression(
     Parameters
     ----------
     XL : (M, N) array-like
-        "Loop" covariates for which a separate regression will be fit to
-        individual columns
+        "Loop" covariates for which N separate regressions will be run
     XC : (M, P) array-like
-        "Core" covariates that are included in the regressions along
-        with each loop covariate
+        "Core" covariates included in the regressions for each loop
+        covariate. All P core covariates are used in each of the N
+        loop covariate regressions.
     Y : (M, O)
-        Continuous outcome
+        Continuous outcomes
 
     Returns
     -------
     LinearRegressionResult
-        Dataclass with fields:
+        Dataclass containing:
         beta : (N, O) array-like
-            Beta values associated with each loop covariate and outcome regressed
+            Beta values associated with each loop covariate and outcome
         t_value : (N, O) array-like
             T statistics for each beta
         p_value : (N, O) array-like
@@ -46,7 +46,7 @@ def linear_regression(
     """
     XL, XC = da.asarray(XL), da.asarray(XC)  # Coerce for `lstsq`
     if set([x.ndim for x in [XL, XC, Y]]) != {2}:
-        raise ValueError("All arguments must be two dimensional")
+        raise ValueError("All arguments must be 2D")
     n_core_covar, n_loop_covar, n_obs, n_outcome = (
         XC.shape[1],
         XL.shape[1],
@@ -115,7 +115,13 @@ def _get_core_covariates(
         raise ValueError(
             "At least one covariate must be provided when `add_intercept`=False"
         )
-    X = da.stack([da.asarray(ds[c].data) for c in covariates]).T
+    for covariate in covariates:
+        if ds[covariate].ndim > 2:
+            raise ValueError(
+                "All covariate arrays must have <= 2 dimensions "
+                f"(covariate {covariate} has shape {ds[covariate].shape})"
+            )
+    X = da.concatenate([da.asarray(ds[c]).reshape(-1, 1) for c in covariates], axis=1)
     if add_intercept:
         X = da.concatenate([da.ones((X.shape[0], 1)), X], axis=1)
     # Note: dask qr decomp (used by lstsq) requires no chunking in one
@@ -123,6 +129,20 @@ def _get_core_covariates(
     # of covariates for the large majority of use cases, chunking
     # should be removed from dim 1
     return X.rechunk((None, -1))
+
+
+def _get_outcomes(ds: Dataset, traits: Sequence[str]) -> Array:
+    if not traits:
+        raise ValueError("At least one trait must be provided")
+    for trait in traits:
+        if ds[trait].ndim > 2:
+            raise ValueError(
+                "All trait arrays must have <= 2 dimensions "
+                f"(trait {trait} has shape {ds[trait].shape})"
+            )
+    Y = da.concatenate([da.asarray(ds[t]).reshape(-1, 1) for t in traits], axis=1)
+    # Like covariates, traits must also be tall-skinny arrays
+    return Y.rechunk((None, -1))
 
 
 def gwas_linear_regression(
@@ -147,20 +167,30 @@ def gwas_linear_regression(
     when not already present, but there is currently no parameterization for
     intercept-free regression.
 
+    Warning: Both covariate and trait arrays will be rechunked to have blocks
+    along the sample (row) dimension but not the column dimension (i.e.
+    they must be tall and skinny).
+
     Parameters
     ----------
     ds : Dataset
         Dataset containing necessary dependent and independent variables
-    covariates : Sequence[str]
-        Covariate variable names
     dosage : str
         Dosage variable name where "dosage" array can contain represent
         one of several possible quantities, e.g.:
         - Alternate allele counts
         - Recessive or dominant allele encodings
         - True dosages as computed from imputed or probabilistic variant calls
+        - Any other custom encoding in a user-defined variable
+    covariates : Sequence[str]
+        Covariate variable names, must correspond to 1 or 2D dataset
+        variables of shape (samples[, covariates]). All covariate arrays
+        will be concatenated along the second axis (columns).
     traits : Sequence[str]
-        Trait (e.g. phenotype) variable names, must all be continuous
+        Trait (e.g. phenotype) variable names, must all be continuous and
+        correspond to 1 or 2D dataset variables of shape (samples[, traits]).
+        2D trait arrays will be assumed to contain separate traits within columns
+        and concatenated to any 1D traits along the second axis (columns).
     add_intercept : bool, optional
         Add intercept term to covariate set, by default True
 
@@ -177,9 +207,9 @@ def gwas_linear_regression(
     Returns
     -------
     Dataset
-        Dataset containing (N = num variants, O = num outcomes):
+        Dataset containing (N = num variants, O = num traits):
         beta : (N, O) array-like
-            Beta values associated with each variant and outcome regressed
+            Beta values associated with each variant and trait
         t_value : (N, O) array-like
             T statistics for each beta
         p_value : (N, O) array-like
@@ -187,14 +217,12 @@ def gwas_linear_regression(
     """
     G = _get_loop_covariates(ds, dosage=dosage)
     Z = _get_core_covariates(ds, covariates, add_intercept=add_intercept)
-    Y = da.concatenate(
-        [ds[t].expand_dims(dim="outcomes", axis=1) for t in traits], axis=1
-    )
+    Y = _get_outcomes(ds, traits)
     res = linear_regression(G.T, Z, Y)
     return xr.Dataset(
         {
-            "variant/beta": (("variants", "outcomes"), res.beta),
-            "variant/t_value": (("variants", "outcomes"), res.t_value),
-            "variant/p_value": (("variants", "outcomes"), res.p_value),
+            "variant/beta": (("variants", "traits"), res.beta),
+            "variant/t_value": (("variants", "traits"), res.t_value),
+            "variant/p_value": (("variants", "traits"), res.p_value),
         }
     )
