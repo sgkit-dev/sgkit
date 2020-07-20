@@ -3,4 +3,6 @@ pre-commit
 pytest
 pytest-cov
 hypothesis
+sphinx
+sphinx_rtd_theme
 statsmodels
