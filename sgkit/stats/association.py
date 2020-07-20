@@ -216,9 +216,9 @@ def gwas_linear_regression(
             P values as float in [0, 1]
     """
     G = _get_loop_covariates(ds, dosage=dosage)
-    Z = _get_core_covariates(ds, covariates, add_intercept=add_intercept)
+    X = _get_core_covariates(ds, covariates, add_intercept=add_intercept)
     Y = _get_outcomes(ds, traits)
-    res = linear_regression(G.T, Z, Y)
+    res = linear_regression(G.T, X, Y)
     return xr.Dataset(
         {
             "variant/beta": (("variants", "traits"), res.beta),
