@@ -10,6 +10,12 @@ from ..typing import ArrayLike, PathType
 from ..utils import encode_array
 
 
+def _ensure_2d(arr: ArrayLike) -> ArrayLike:
+    if arr.ndim == 1:
+        arr = arr.reshape(-1, 1)
+    return arr
+
+
 def read_vcfzarr(path: PathType) -> xr.Dataset:
     """Read a VCF Zarr file.
 
@@ -52,7 +58,7 @@ def read_vcfzarr(path: PathType) -> xr.Dataset:
         da.compute(max_str_len(variants_ref), max_str_len(variants_alt))
     )
     variants_ref_alt = da.concatenate(
-        [variants_ref.reshape(-1, 1), variants_alt], axis=1
+        [_ensure_2d(variants_ref), _ensure_2d(variants_alt)], axis=1
     )
     variant_alleles = variants_ref_alt.astype(f"S{max_allele_length}")
 

@@ -2,6 +2,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 
 from sgkit import read_vcfzarr
+from sgkit.io.vcfzarr_reader import _ensure_2d
 
 
 def test_read_vcfzarr(shared_datadir):
@@ -62,3 +63,8 @@ def test_read_vcfzarr(shared_datadir):
     assert_array_equal(ds["call/genotype"], call_genotype)
     assert_array_equal(ds["call/genotype_mask"], call_genotype < 0)
     assert "call/genotype_phased" not in ds
+
+
+def test_ensure_2d():
+    assert_array_equal(_ensure_2d(np.array([0, 2, 1])), np.array([[0], [2], [1]]))
+    assert_array_equal(_ensure_2d(np.array([[0], [2], [1]])), np.array([[0], [2], [1]]))
