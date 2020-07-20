@@ -33,7 +33,7 @@ def check_array_like(
             raise ValueError
 
 
-def encode_array(x: ArrayLike) -> Tuple[ArrayLike, List[str]]:
+def encode_array(x: ArrayLike) -> Tuple[ArrayLike, List[Any]]:
     """Encode array values as integers indexing unique values
 
     The codes created for each unique element in the array correspond

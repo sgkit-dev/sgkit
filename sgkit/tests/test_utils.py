@@ -1,6 +1,9 @@
+from typing import Any, List
+
 import numpy as np
 import pytest
 
+from sgkit.typing import ArrayLike
 from sgkit.utils import check_array_like, encode_array
 
 
@@ -21,7 +24,7 @@ def test_check_array_like():
 
 
 def test_encode_array():
-    def check(x, values, names):
+    def check(x: ArrayLike, values: ArrayLike, names: List[Any]) -> None:
         v, n = encode_array(x)
         np.testing.assert_equal(v, values)
         np.testing.assert_equal(n, names)
