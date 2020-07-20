@@ -25,7 +25,7 @@ def count_alleles(ds: Dataset) -> DataArray:
 
     >>> import sgkit as sg
     >>> from sgkit.testing import simulate_genotype_call_dataset
-    >>> ds = simulate_genotype_call_dataset(n_variant=3, n_sample=2, seed=1)
+    >>> ds = simulate_genotype_call_dataset(n_variant=4, n_sample=2, seed=1)
     >>> ds['call/genotype'].to_series().unstack().astype(str).apply('/'.join, axis=1).unstack()
     samples 0   1
     variants
@@ -34,13 +34,11 @@ def count_alleles(ds: Dataset) -> DataArray:
     2       0/1	1/0
     3       0/0	0/0
 
-    >>> sg.allele_count(ds)
-    <xarray.DataArray 'variant/allele_count' (variants: 4, alleles: 2)>
+    >>> sg.count_alleles(ds).values
     array([[2, 2],
-        [1, 3],
-        [2, 2],
-        [4, 0]])
-    Dimensions without coordinates: variants, alleles
+           [1, 3],
+           [2, 2],
+           [4, 0]])
     """
     # Count each allele index individually as a 1D vector and
     # restack into new alleles dimension with same order
