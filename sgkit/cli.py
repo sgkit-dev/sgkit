@@ -3,6 +3,7 @@ Command line utilities.
 """
 import argparse
 import os
+import functools
 import pathlib
 import signal
 import sys
@@ -11,6 +12,13 @@ import xarray as xr
 from dask.diagnostics import ProgressBar
 
 format_plugins = []
+
+
+class PluginOption:
+    def __init__(self, name, default, help_text):
+        self.name = name
+        self.default = default
+        self.help_text = help_text
 
 
 # TODO should we use attrs for this sort of stuff?
@@ -51,9 +59,8 @@ try:
             format_name="plink",
             import_func=sgkit_plink.read_plink,
             import_args=[
-                # TODO we'd have another simple dataclass for this.
-                ("bim_sep", "\t", "Separator used when parsing BIM files"),
-                ("fam_sep", "\t", "Separator used when parsing FAM files"),
+                PluginOption("bim_sep", "\t", "Separator used when parsing BIM files"),
+                PluginOption("fam_sep", "\t", "Separator used when parsing FAM files"),
             ],
         )
     )
@@ -61,8 +68,6 @@ try:
 except ImportError:
     # TODO logging.info("plink module not found")
     pass
-
-# from . import read_plink
 
 
 def set_sigpipe_handler():
@@ -101,29 +106,40 @@ def run_list(args):
     print(ds)
 
 
+def run_import(plugin, args):
+    import_args = {
+        option.name: getattr(args, option.name) for option in plugin.import_args
+    }
+    # TODO progress bar here - there will be formats where this
+    # is a lot of work.
+    ds = plugin.import_func(args.input, **import_args)
+
+    # We want to be able to have different types of store,
+    # but it looks like this doesn't work, as zarr doesn't
+    # have some of the functionality we'd need.
+    # store = zarr.ZipStore(args.output, mode="w")
+    # store = zarr.DirectoryStore(args.output, mode="w")
+
+    with ProgressBar():
+        # We can call this with a pre-created zarr store, which
+        # would give us a lot of flexibility.
+        ds.to_zarr(args.output, mode="w")
+
+
 def add_import_command(subparsers, plugin):
 
     parser = subparsers.add_parser(
         f"import-{plugin.format_name}",
         help=f"Convert data in {plugin.format_name} to sgkit",
     )
-    parser.add_argument("input", help="The input data in {plugin.format_name} format")
+    parser.add_argument("input", help=f"The input data in {plugin.format_name} format")
     parser.add_argument("output", help="The path to store the converted dataset")
-    for name, default, help_text in plugin.import_args:
+    for option in plugin.import_args:
         # TODO might be nice to define short args form as well.
-        parser.add_argument(f"--{name}", default=default, help=help_text)
-
-    def run(args):
-
-        # TODO progress bar here - there will be formats where this
-        # is a lot of work.
-        # Yah, we need a dataclass for args all right, this is horrible!
-        import_args = {name: getattr(args, name) for name, _, _ in plugin.import_args}
-        ds = plugin.import_func(args.input, **import_args)
-        # TODO progress bar here
-        ds.to_zarr(args.output, mode="w")
-
-    parser.set_defaults(runner=run)
+        parser.add_argument(
+            f"--{option.name}", default=option.default, help=option.help_text
+        )
+    parser.set_defaults(runner=functools.partial(run_import, plugin))
 
 
 def add_sgkit_dataset_argument(parser):
