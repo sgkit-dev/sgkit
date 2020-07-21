@@ -17,53 +17,85 @@ class LinearRegressionResult:
     p_value: ArrayLike
 
 
-def _gwas_linear_regression(
-    G: ArrayLike, X: ArrayLike, y: ArrayLike
+def linear_regression(
+    XL: ArrayLike, XC: ArrayLike, Y: ArrayLike
 ) -> LinearRegressionResult:
     """Efficient linear regression estimation for multiple covariate sets
 
     Parameters
     ----------
-    G : (M, N) array-like
-        "Loop" covariates for which a separate regression will be fit to
-        individual columns
-    X : (M, P) array-like
-        "Core" covariates that are included in the regressions along
-        with each loop covariate
-    y : (M,)
-        Continuous outcome
+    XL : (M, N) array-like
+        "Loop" covariates for which N separate regressions will be run
+    XC : (M, P) array-like
+        "Core" covariates included in the regressions for each loop
+        covariate. All P core covariates are used in each of the N
+        loop covariate regressions.
+    Y : (M, O)
+        Continuous outcomes
 
     Returns
     -------
     LinearRegressionResult
-        Regression statistics and coefficient estimates
+        Dataclass containing:
+        beta : (N, O) array-like
+            Beta values associated with each loop covariate and outcome
+        t_value : (N, O) array-like
+            T statistics for each beta
+        p_value : (N, O) array-like
+            P values as float in [0, 1]
     """
-    G, X = da.asarray(G), da.asarray(X)
+    XL, XC = da.asarray(XL), da.asarray(XC)  # Coerce for `lstsq`
+    if set([x.ndim for x in [XL, XC, Y]]) != {2}:
+        raise ValueError("All arguments must be 2D")
+    n_core_covar, n_loop_covar, n_obs, n_outcome = (
+        XC.shape[1],
+        XL.shape[1],
+        Y.shape[0],
+        Y.shape[1],
+    )
+    dof = n_obs - n_core_covar - 1
+    if dof < 1:
+        raise ValueError(
+            "Number of observations (N) too small to calculate sampling statistics. "
+            "N must be greater than number of core covariates (C) plus one. "
+            f"Arguments provided: N={n_obs}, C={n_core_covar}."
+        )
 
     # Apply orthogonal projection to eliminate core covariates
     # Note: QR factorization or SVD should be used here to find
     # what are effectively OLS residuals rather than matrix inverse
-    # to avoid need for MxM array; additionally, dask.lstsq will not
-    # work with numpy arrays
-    Gp = G - X @ da.linalg.lstsq(X, G)[0]
-    yp = y - X @ da.linalg.lstsq(X, y)[0]
+    # to avoid need for MxM array; additionally, dask.lstsq fails
+    # with numpy arrays
+    XLP = XL - XC @ da.linalg.lstsq(XC, XL)[0]
+    assert XLP.shape == (n_obs, n_loop_covar)
+    YP = Y - XC @ da.linalg.lstsq(XC, Y)[0]
+    assert YP.shape == (n_obs, n_outcome)
 
     # Estimate coefficients for each loop covariate
     # Note: A key assumption here is that 0-mean residuals
     # from projection require no extra terms in variance
     # estimate for loop covariates (columns of G), which is
     # only true when an intercept is present.
-    Gps = (Gp ** 2).sum(axis=0)
-    b = (Gp.T @ yp) / Gps
+    XLPS = (XLP ** 2).sum(axis=0, keepdims=True).T
+    assert XLPS.shape == (n_loop_covar, 1)
+    B = (XLP.T @ YP) / XLPS
+    assert B.shape == (n_loop_covar, n_outcome)
 
-    # Compute statistics and p values for each regression separately
-    dof = y.shape[0] - X.shape[1] - 1
-    y_resid = yp[:, np.newaxis] - Gp * b
-    rss = (y_resid ** 2).sum(axis=0)
-    t_val = b / np.sqrt(rss / dof / Gps)
-    p_val = 2 * stats.distributions.t.sf(np.abs(t_val), dof)
+    # Compute residuals for each loop covariate and outcome separately
+    YR = YP[:, np.newaxis, :] - XLP[..., np.newaxis] * B[np.newaxis, ...]
+    assert YR.shape == (n_obs, n_loop_covar, n_outcome)
+    RSS = (YR ** 2).sum(axis=0)
+    assert RSS.shape == (n_loop_covar, n_outcome)
+    # Get t-statistics for coefficient estimates
+    T = B / np.sqrt(RSS / dof / XLPS)
+    assert T.shape == (n_loop_covar, n_outcome)
+    # Match to p-values
+    # Note: t dist not implemented in Dask so this will
+    # coerce result to numpy (`T` will still be da.Array)
+    P = 2 * stats.distributions.t.sf(np.abs(T), dof)
+    assert P.shape == (n_loop_covar, n_outcome)
 
-    return LinearRegressionResult(beta=b, t_value=t_val, p_value=p_val)
+    return LinearRegressionResult(beta=B, t_value=T, p_value=P)
 
 
 def _get_loop_covariates(ds: Dataset, dosage: Optional[str] = None) -> Array:
@@ -83,7 +115,13 @@ def _get_core_covariates(
         raise ValueError(
             "At least one covariate must be provided when `add_intercept`=False"
         )
-    X = da.stack([da.asarray(ds[c].data) for c in covariates]).T
+    for covariate in covariates:
+        if ds[covariate].ndim > 2:
+            raise ValueError(
+                "All covariate arrays must have <= 2 dimensions "
+                f"(covariate {covariate} has shape {ds[covariate].shape})"
+            )
+    X = da.concatenate([da.asarray(ds[c]).reshape(-1, 1) for c in covariates], axis=1)
     if add_intercept:
         X = da.concatenate([da.ones((X.shape[0], 1)), X], axis=1)
     # Note: dask qr decomp (used by lstsq) requires no chunking in one
@@ -93,11 +131,26 @@ def _get_core_covariates(
     return X.rechunk((None, -1))
 
 
+def _get_outcomes(ds: Dataset, traits: Sequence[str]) -> Array:
+    if not traits:
+        raise ValueError("At least one trait must be provided")
+    for trait in traits:
+        if ds[trait].ndim > 2:
+            raise ValueError(
+                "All trait arrays must have <= 2 dimensions "
+                f"(trait {trait} has shape {ds[trait].shape})"
+            )
+    Y = da.concatenate([da.asarray(ds[t]).reshape(-1, 1) for t in traits], axis=1)
+    # Like covariates, traits must also be tall-skinny arrays
+    return Y.rechunk((None, -1))
+
+
 def gwas_linear_regression(
     ds: Dataset,
-    covariates: Sequence[str],
+    *,
     dosage: str,
-    trait: str,
+    covariates: Sequence[str],
+    traits: Sequence[str],
     add_intercept: bool = True,
 ) -> Dataset:
     """Run linear regression to identify continuous trait associations with genetic variants
@@ -109,27 +162,39 @@ def gwas_linear_regression(
     rotation is that effect sizes and significances cannot be reported for
     covariates, only variants.
 
-    Warning: Regression statistics from this implementation are only valid when an
-    intercept is present. The `add_intercept` flag is a convenience for adding one
-    when not already present, but there is currently no parameterization for
-    intercept-free regression.
-
     Parameters
     ----------
     ds : Dataset
         Dataset containing necessary dependent and independent variables
-    covariates : Sequence[str]
-        Covariate variable names
     dosage : str
         Dosage variable name where "dosage" array can contain represent
         one of several possible quantities, e.g.:
         - Alternate allele counts
         - Recessive or dominant allele encodings
         - True dosages as computed from imputed or probabilistic variant calls
-    trait : str
-        Trait (e.g. phenotype) variable name, must be continuous
+        - Any other custom encoding in a user-defined variable
+    covariates : Sequence[str]
+        Covariate variable names, must correspond to 1 or 2D dataset
+        variables of shape (samples[, covariates]). All covariate arrays
+        will be concatenated along the second axis (columns).
+    traits : Sequence[str]
+        Trait (e.g. phenotype) variable names, must all be continuous and
+        correspond to 1 or 2D dataset variables of shape (samples[, traits]).
+        2D trait arrays will be assumed to contain separate traits within columns
+        and concatenated to any 1D traits along the second axis (columns).
     add_intercept : bool, optional
         Add intercept term to covariate set, by default True
+
+    Warnings
+    --------
+    Regression statistics from this implementation are only valid when an
+    intercept is present. The `add_intercept` flag is a convenience for adding one
+    when not already present, but there is currently no parameterization for
+    intercept-free regression.
+
+    Additionally, both covariate and trait arrays will be rechunked to have blocks
+    along the sample (row) dimension but not the column dimension (i.e.
+    they must be tall and skinny).
 
     References
     ----------
@@ -144,20 +209,22 @@ def gwas_linear_regression(
     Returns
     -------
     Dataset
-        Regression result containing:
-        - beta: beta values associated with each independent variant regressed
-            against the trait
-        - t_value: T-test statistic for beta estimate
-        - p_value: P-value for beta estimate (unscaled float in [0, 1])
+        Dataset containing (N = num variants, O = num traits):
+        beta : (N, O) array-like
+            Beta values associated with each variant and trait
+        t_value : (N, O) array-like
+            T statistics for each beta
+        p_value : (N, O) array-like
+            P values as float in [0, 1]
     """
     G = _get_loop_covariates(ds, dosage=dosage)
-    Z = _get_core_covariates(ds, covariates, add_intercept=add_intercept)
-    y = da.asarray(ds[trait].data)
-    res = _gwas_linear_regression(G.T, Z, y)
+    X = _get_core_covariates(ds, covariates, add_intercept=add_intercept)
+    Y = _get_outcomes(ds, traits)
+    res = linear_regression(G.T, X, Y)
     return xr.Dataset(
         {
-            "variant/beta": ("variants", res.beta),
-            "variant/t_value": ("variants", res.t_value),
-            "variant/p_value": ("variants", res.p_value),
+            "variant/beta": (("variants", "traits"), res.beta),
+            "variant/t_value": (("variants", "traits"), res.t_value),
+            "variant/p_value": (("variants", "traits"), res.p_value),
         }
     )
