@@ -162,15 +162,6 @@ def gwas_linear_regression(
     rotation is that effect sizes and significances cannot be reported for
     covariates, only variants.
 
-    Warning: Regression statistics from this implementation are only valid when an
-    intercept is present. The `add_intercept` flag is a convenience for adding one
-    when not already present, but there is currently no parameterization for
-    intercept-free regression.
-
-    Warning: Both covariate and trait arrays will be rechunked to have blocks
-    along the sample (row) dimension but not the column dimension (i.e.
-    they must be tall and skinny).
-
     Parameters
     ----------
     ds : Dataset
@@ -193,6 +184,17 @@ def gwas_linear_regression(
         and concatenated to any 1D traits along the second axis (columns).
     add_intercept : bool, optional
         Add intercept term to covariate set, by default True
+
+    Warnings
+    --------
+    Regression statistics from this implementation are only valid when an
+    intercept is present. The `add_intercept` flag is a convenience for adding one
+    when not already present, but there is currently no parameterization for
+    intercept-free regression.
+
+    Additionally, both covariate and trait arrays will be rechunked to have blocks
+    along the sample (row) dimension but not the column dimension (i.e.
+    they must be tall and skinny).
 
     References
     ----------
