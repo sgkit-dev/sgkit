@@ -8,6 +8,7 @@ from sgkit import (
     DIM_VARIANT,
     create_genotype_call_dataset,
     create_genotype_dosage_dataset,
+    display_genotypes,
 )
 
 
@@ -49,6 +50,49 @@ def test_create_genotype_call_dataset():
     assert_array_equal(ds["call_genotype"], call_genotype)
     assert_array_equal(ds["call_genotype_mask"], call_genotype < 0)
     assert_array_equal(ds["call_genotype_phased"], call_genotype_phased)
+
+    disp = display_genotypes(ds)
+    assert (
+        str(disp)
+        == """
+samples     0    1    2
+variants               
+0         0|0  0|1  1/0
+1         .|0  0/.  ./.
+""".strip()  # noqa: W291
+    )
+
+    expected_html = """<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>samples</th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+    </tr>
+    <tr>
+      <th>variants</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0|0</td>
+      <td>0|1</td>
+      <td>1/0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>.|0</td>
+      <td>0/.</td>
+      <td>./.</td>
+    </tr>
+  </tbody>
+</table>"""
+    assert expected_html in disp._repr_html_()
 
 
 def test_create_genotype_dosage_dataset():
