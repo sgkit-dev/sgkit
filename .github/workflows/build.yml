@@ -19,7 +19,7 @@ jobs:
         pip install -r requirements.txt -r requirements-dev.txt
     - name: Run pre-commit
       uses: pre-commit/action@v2.0.0
-    - name: Check for doc warnings
+    - name: Check for Sphinx doc warnings
       run: |
         cd docs
         make html SPHINXOPTS="-W --keep-going"
