@@ -164,12 +164,12 @@ def gwas_linear_regression(
     -------
     :class:`xarray.Dataset`
         Dataset containing (N = num variants, O = num traits):
-            beta : (N, O) array-like
-                Beta values associated with each variant and trait
-            t_value : (N, O) array-like
-                T statistics for each beta
-            p_value : (N, O) array-like
-                P values as float in [0, 1]
+        beta : (N, O) array-like
+            Beta values associated with each variant and trait
+        t_value : (N, O) array-like
+            T statistics for each beta
+        p_value : (N, O) array-like
+            P values as float in [0, 1]
 
     Warnings
     --------
