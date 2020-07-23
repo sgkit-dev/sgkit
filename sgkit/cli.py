@@ -15,23 +15,6 @@ from dask.diagnostics import ProgressBar
 
 
 @dataclass
-class PluginOption:
-    """
-    An option that we pass to a format plugin function.
-
-    NOTE: We could probably we us a click.Option for this although
-    that does mean the format repos will need to import click also.
-    Probably not a big deal, in reality, and it would save us
-    inventing this wheel.
-    """
-
-    name: str
-    # TODO default probably isn't always a str
-    default: str
-    help_text: str
-
-
-@dataclass
 class FormatPlugin:
     """
     Encapsulates the necessary information for a format plugin to be
@@ -40,9 +23,9 @@ class FormatPlugin:
 
     format_name: str
     import_func: callable
-    import_args: List[PluginOption]
+    import_options: List  # List[click.Option] can we do this?
     export_func: callable = None
-    export_args: List[PluginOption] = None
+    export_options: List = None
     sniff_func: callable = None
 
 
@@ -72,14 +55,24 @@ try:
     # register_format_plugin(sgkit_plink.get_format_plugin())
 
     # For now:
+
+    # NOTE: this means that the format repos will need to import and
+    # depend on click. This seems like a reasonable compromise, as we
+    # don't have to repackage the functionality for representing these
+    # options.
+    options = [
+        click.Option(
+            ["--bim-sep"], default="\t", help="Separator used when parsing BIM files"
+        ),
+        click.Option(
+            ["--fam-sep"], default="\t", help="Separator used when parsing FAM files"
+        ),
+    ]
     register_format_plugin(
         FormatPlugin(
             format_name="plink",
             import_func=sgkit_plink.read_plink,
-            import_args=[
-                PluginOption("bim_sep", "\t", "Separator used when parsing BIM files"),
-                PluginOption("fam_sep", "\t", "Separator used when parsing FAM files"),
-            ],
+            import_options=options,
         )
     )
 
@@ -124,16 +117,9 @@ class ImportCommands(click.MultiCommand):
             click.Argument(["input-path"], required=True),
             click.Argument(["output-path"], required=True),
         ]
-        # TODO add common import options - zarr defails
-        for option in plugin.import_args:
-            params.append(
-                click.Option(
-                    [f"--{option.name}"], default=option.default, help=option.help_text
-                )
-            )
         command = click.Command(
             name=name,
-            params=params,
+            params=params + plugin.import_options,
             callback=functools.partial(run_import, plugin.import_func),
         )
         return command
@@ -152,6 +138,9 @@ def ls(path):
     ds = load_dataset(path)
     # TODO do something more sophisticated.
     click.echo(ds)
+
+
+# TODO add a bunch more commands using standard click decorator syntax.
 
 
 misc_main.add_command(ls)
