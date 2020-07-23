@@ -20,10 +20,9 @@ jobs:
     - name: Run pre-commit
       uses: pre-commit/action@v2.0.0
     - name: Check for doc warnings
-      uses: ammaraskar/sphinx-action@master
-      with:
-        build-command: "make html SPHINXOPTS='-W --keep-going'"
-        docs-folder: "docs/"
+      run: |
+        cd docs
+        make html SPHINXOPTS="-W --keep-going"
     - name: Test with pytest and coverage
       run: |
         pytest -v --cov=sgkit --cov-report=term-missing
