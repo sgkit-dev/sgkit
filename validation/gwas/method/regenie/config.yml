@@ -1,0 +1,44 @@
+datasets:
+  sim_sm_01:
+    n_variants: 250
+    n_samples: 50
+    n_covars: 3
+    n_contigs: 1
+    n_traits: 1
+  sim_sm_02:
+    n_variants: 250
+    n_samples: 50
+    n_covars: 3
+    n_contigs: 10
+    n_traits: 5
+  sim_sm_03:
+    n_variants: 250
+    n_samples: 50
+    n_covars: 3
+    n_contigs: 10
+    n_traits: 1
+  sim_md_01:
+    n_variants: 1000
+    n_samples: 250
+    n_covars: 3
+    n_contigs: 1
+    n_traits: 1
+paramsets:
+  wgr_01:
+    variant_block_size: 10
+    sample_block_size: 10
+    alphas: [1000]
+  wgr_02:
+    variant_block_size: 10
+    sample_block_size: 10
+    alphas: null
+  wgr_03:
+    variant_block_size: 100
+    sample_block_size: 50
+    alphas: [1000]
+runs:
+  - {dataset: sim_sm_01, paramset: wgr_01, name: sim_sm_01-wgr_01}
+  - {dataset: sim_sm_02, paramset: wgr_01, name: sim_sm_02-wgr_01}
+  - {dataset: sim_sm_02, paramset: wgr_02, name: sim_sm_02-wgr_02}
+  - {dataset: sim_sm_03, paramset: wgr_01, name: sim_sm_03-wgr_01}
+  - {dataset: sim_md_01, paramset: wgr_03, name: sim_md_01-wgr_01}
