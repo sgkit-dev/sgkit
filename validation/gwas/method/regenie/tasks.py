@@ -75,7 +75,7 @@ def copy_files(src, dst, patterns):
 
 
 @task(iterable=["runs"])
-def export_test_data(ctx, test_datadir=DEFAULT_TEST_DATADIR, clear=True, runs=None):
+def export(ctx, test_datadir=DEFAULT_TEST_DATADIR, clear=True, runs=None):
     test_datadir = Path(test_datadir).resolve()
     src_datadir = Path("data")
     if clear and test_datadir.exists():
@@ -104,7 +104,6 @@ def export_test_data(ctx, test_datadir=DEFAULT_TEST_DATADIR, clear=True, runs=No
     print("Export complete")
 
 
-# @task(pre=[call(run_simulation, dataset='sim_01')])
 @task(pre=[run_simulations, run_all_glow_wgr, run_plink_to_zarr])
 def build(ctx):
     print("Building")

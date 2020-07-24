@@ -559,7 +559,7 @@ def regenie_transform(
     _glow_adj_alpha: bool = False,
     _glow_adj_scaling: bool = False,
 ) -> Dataset:
-    """Regenie trait transformation
+    """Regenie trait transformation.
 
     Parameters
     ----------
@@ -568,30 +568,25 @@ def regenie_transform(
     X : (M, C) ArrayLike
         Covariate array, `M` samples by `C` covariates.
     Y : (M, O) ArrayLike
-        Outcome array, `M` samples by `O` outcomes
+        Outcome array, `M` samples by `O` outcomes.
     contigs : (N,) ArrayLike
         Variant contigs as monotonic increasting integer contig index.
-    variant_block_size : Optional[Union[int, Tuple[int]]], optional
-        TODO: doc
-    sample_block_size : Optional[Union[int, Tuple[int]]], optional
-        TODO: doc
-    alphas : Optional[Sequence[float]], optional
-        List of alpha values to use for regularization, by default None.
-        If not provided, these will be set automatically based on
-        datasize and apriori heritability assumptions.
-    add_intercept : bool
-        Whether or not to add intercept to covariates, by default True.
-    orthogonalize : bool
-        **Experimental**: Remove covariates through orthogonalization
-        of genotypes and traits, by default False.
-    normalize : bool
-        Rescale genotypes, traits, and covariates to have
-        mean 0 and stdev 1, by default False.
+
+    See the `regenie` function for documentation on remaining fields.
 
     Returns
     -------
     Dataset
-        TODO: doc
+        A dataset containing the following variables:
+        - `base_prediction` (blocks, alphas, samples, outcomes): Stage 1
+            predictions from ridge regression reduction .
+        - `meta_prediction` (samples, outcomes): Stage 2 predictions from
+            the best meta estimator trained on the out-of-sample Stage 1
+            predictions.
+        - `loco_prediction` (contigs, samples, outcomes): LOCO predictions
+            resulting from Stage 2 predictions ignoring effects for variant
+            blocks on held out contigs. This will be absent if the
+            data provided does not contain at least 2 contigs.
 
     Raises
     ------
@@ -682,9 +677,80 @@ def regenie(
     dosage: str,
     covariates: Union[str, Sequence[str]],
     traits: Union[str, Sequence[str]],
+    variant_block_size: Optional[Union[int, Tuple[int, ...]]] = None,
+    sample_block_size: Optional[Union[int, Tuple[int, ...]]] = None,
+    alphas: Optional[Sequence[float]] = None,
     add_intercept: bool = True,
+    normalize: bool = False,
+    orthogonalize: bool = False,
     **kwargs: Any,
 ) -> Dataset:
+    """Regenie trait transformation.
+
+    [REGENIE](https://github.com/rgcgithub/regenie) is a whole-genome
+    regression technique that produces trait estimates for association
+    tests. These estimates are subtracted from trait values and
+    sampling statistics (p-values, standard errors, etc.) are evaluated
+    against the residuals. See the REGENIE preprint [1] for more details.
+
+    [1] - https://www.biorxiv.org/content/10.1101/2020.06.19.162354v2
+
+    Parameters
+    ----------
+    dosage : str
+        Name of genetic dosage variable.
+    covariates : Union[str, Sequence[str]]
+        Names of covariate variables (1D or 2D).
+    traits : Union[str, Sequence[str]]
+        Names of trait variables (1D or 2D).
+    variant_block_size : Optional[Union[int, Tuple[int]]], optional
+        Number of variants in each block.
+        If int, this describes the number of variants in each block
+        but the last which may be smaller.
+        If Tuple[int, ...], this must describe the desired number of
+        variants in each block individually.
+        Defaults to 1000 or num variants // 2, whichever is smaller.
+    sample_block_size : Optional[Union[int, Tuple[int]]], optional
+        Number of samples in each block.
+        If int, this describes the number of samples in each block
+        but the last which may be smaller.
+        If Tuple[int, ...], this must describe the desired number of
+        samples in each block individually.
+        Defaults to 10 sample blocks split roughly across all possible
+        samples or the number of samples, if that number is < 10.
+    alphas : Optional[Sequence[float]], optional
+        List of alpha values to use for regularization, by default None.
+        If not provided, these will be set automatically based on
+        datasize and apriori heritability assumptions.
+    add_intercept : bool
+        Whether or not to add intercept to covariates, by default True.
+    normalize : bool
+        Rescale genotypes, traits, and covariates to have
+        mean 0 and stdev 1, by default False.
+    orthogonalize : bool
+        **Experimental**: Remove covariates through orthogonalization
+        of genotypes and traits, by default False.
+
+    Returns
+    -------
+    Dataset
+        A dataset containing the following variables:
+        - `base_prediction` (blocks, alphas, samples, outcomes): Stage 1
+            predictions from ridge regression reduction .
+        - `meta_prediction` (samples, outcomes): Stage 2 predictions from
+            the best meta estimator trained on the out-of-sample Stage 1
+            predictions.
+        - `loco_prediction` (contigs, samples, outcomes): LOCO predictions
+            resulting from Stage 2 predictions ignoring effects for variant
+            blocks on held out contigs. This will be absent if the
+            data provided does not contain at least 2 contigs.
+
+    Raises
+    ------
+    ValueError
+        If `G`, `X`, and `Y` do not have the same size along
+        the first (samples) dimension.
+    """
     if isinstance(covariates, str):
         covariates = [covariates]
     if isinstance(traits, str):
@@ -693,4 +759,16 @@ def regenie(
     X = get_dask_covariates(ds, covariates, add_intercept=False)
     Y = get_dask_traits(ds, traits)
     contigs = ds["variant/contig"]
-    return regenie_transform(G.T, X, Y, contigs, add_intercept=add_intercept, **kwargs)
+    return regenie_transform(
+        G.T,
+        X,
+        Y,
+        contigs,
+        variant_block_size=variant_block_size,
+        sample_block_size=sample_block_size,
+        alphas=alphas,
+        add_intercept=add_intercept,
+        normalize=normalize,
+        orthogonalize=orthogonalize,
+        **kwargs,
+    )
