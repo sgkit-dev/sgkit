@@ -160,6 +160,17 @@ def gwas_linear_regression(
     along the sample (row) dimension but not the column dimension (i.e.
     they must be tall and skinny).
 
+    Warnings
+    --------
+    Regression statistics from this implementation are only valid when an
+    intercept is present. The `add_intercept` flag is a convenience for adding one
+    when not already present, but there is currently no parameterization for
+    intercept-free regression.
+
+    Additionally, both covariate and trait arrays will be rechunked to have blocks
+    along the sample (row) dimension but not the column dimension (i.e.
+    they must be tall and skinny).
+
     References
     ----------
     - [1] Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2009. The Elements
