@@ -89,13 +89,13 @@ def export(ctx, test_datadir=DEFAULT_TEST_DATADIR, clear=True, runs=None):
     for dataset in config["datasets"]:
         dst = test_datadir / "dataset" / dataset
         src = src_datadir / "dataset" / dataset
-        copy_files(src, dst, ["*.csv", "*.zarr"])
+        copy_files(src, dst, ["*.csv", "*.csv.gz", "*.zarr"])
     # Export results
     for run in config["runs"]:
         name = run["name"]
         dst = test_datadir / "result" / name
         src = src_datadir / "result" / name
-        copy_files(src, dst, ["*.csv"])
+        copy_files(src, dst, ["*.csv", "*.csv.gz"])
     # Export config
     config_path = test_datadir / "config.yml"
     with open(config_path, "w") as fd:

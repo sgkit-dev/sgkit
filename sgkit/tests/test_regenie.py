@@ -151,7 +151,7 @@ def prepare_stage_1_glow_results(df: DataFrame) -> DataFrame:
 def check_stage_1_results(
     X: Array, ds_config: Dict[str, Any], ps_config: Dict[str, Any], result_dir: Path
 ) -> None:
-    df_gl = pd.read_csv(result_dir / "reduced_blocks_flat.csv")
+    df_gl = pd.read_csv(result_dir / "reduced_blocks_flat.csv.gz")
     df_gl = prepare_stage_1_glow_results(df_gl)
     df_sg = prepare_stage_1_sgkit_results(X)
 

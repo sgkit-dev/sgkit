@@ -1,0 +1,11 @@
+channels:
+- conda-forge
+- defaults
+dependencies:
+- numpy
+- xarray
+- dask[complete]
+- dask-ml
+- scipy
+- numba
+- zarr

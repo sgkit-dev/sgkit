@@ -220,7 +220,7 @@ def run(
 
     # Flatten to scalars for more convenient access w/o Spark
     flat_reduced_block_df = spark.read.parquet(str(path))
-    path = output_path / "reduced_blocks_flat.csv"
+    path = output_path / "reduced_blocks_flat.csv.gz"
     flat_reduced_block_df = _flatten_reduced_blocks(flat_reduced_block_df)
     flat_reduced_block_df = flat_reduced_block_df.toPandas()
     flat_reduced_block_df.to_csv(path, index=False)

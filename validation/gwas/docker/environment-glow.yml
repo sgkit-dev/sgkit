@@ -1,0 +1,21 @@
+name: glow
+channels:
+  - conda-forge
+dependencies:
+  - python=3.7
+  - numpy
+  - scipy
+  - nomkl
+  # See: https://spark.apache.org/docs/latest/sql-pyspark-pandas-with-arrow.html#recommended-pandas-and-pyarrow-versions
+  # If conflict occurs, downgrade pandas to 0.24.2 and let it upgrade on glow pip install to 0.25.3
+  - pandas=0.25.3
+  - pyarrow=0.15.1
+  - pyspark=2.4.5
+  - ipython=7.16.1
+  - ipykernel=5.3.3
+  - pyyaml=5.3.1
+  - fire=0.3.1
+  - pip
+  - pip:
+    - typeguard==2.5.0
+    - nptyping==1.1.0
