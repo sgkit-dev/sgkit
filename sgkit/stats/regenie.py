@@ -66,6 +66,8 @@ def index_array_blocks(
         If `x` is not monotonic increasing.
     """
     x = np.asarray(x)
+    if x.size == 0:
+        return np.empty(0, dtype=int), np.empty(0, dtype=int)
     if x.ndim != 1:
         raise ValueError(f"Array shape {x.shape} is not 1D")
     if size <= 0:

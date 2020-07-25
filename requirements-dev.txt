@@ -3,5 +3,6 @@ pre-commit
 pytest
 pytest-cov
 pytest-datadir
+hypothesis
 statsmodels
 zarr

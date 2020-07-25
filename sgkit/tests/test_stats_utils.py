@@ -1,4 +1,7 @@
+from typing import Any, List
+
 import numpy as np
+import pytest
 import xarray as xr
 
 from sgkit.stats.utils import extract_2d_array, r2_score
@@ -33,9 +36,9 @@ def test_r2_score__batch_dims():
     np.testing.assert_allclose(r2_actual.ravel(), r2_expected)
 
 
-def test_r2_score__sklearn_comparison():
-    args = [
-        # predicted, actual, sklearn.metrics.r2_score
+@pytest.mark.parametrize(  # type: ignore[misc]
+    "predicted,actual,expected_r2",  # type: ignore[no-untyped-def]
+    [
         ([1, 1], [1, 2], -1.0),
         ([1, 0], [1, 2], -7.0),
         ([1, -1, 3], [1, 2, 3], -3.5),
@@ -48,10 +51,13 @@ def test_r2_score__sklearn_comparison():
         ([1, 1, 1], [1, 1, 1], 1.0),
         ([1, 1, 1], [1, 2, 3], -1.5),
         ([1, 2, 3], [1, 1, 1], 0.0),
-    ]
-    for arg in args:
-        yp, yt = map(np.array, arg[:2])
-        assert r2_score(yp, yt) == arg[2]
+    ],
+)
+def test_r2_score__sklearn_comparison(
+    predicted: List[Any], actual: List[Any], expected_r2: float
+):
+    yp, yt = np.array(predicted), np.array(actual)
+    assert r2_score(yp, yt) == expected_r2
 
 
 def test_extract_2d_array():

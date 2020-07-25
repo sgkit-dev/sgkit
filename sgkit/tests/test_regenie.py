@@ -9,6 +9,11 @@ import pytest
 import xarray as xr
 import yaml
 from dask.array import Array
+from hypothesis import given, settings
+from hypothesis import strategies as st
+from hypothesis.extra.numpy import arrays as st_arrays
+from hypothesis.strategies import data as st_data
+from numpy import ndarray
 from pandas import DataFrame
 from xarray import Dataset
 
@@ -405,20 +410,24 @@ def test_ridge_regression():
     np.testing.assert_equal(res1, res2)
 
 
-def test_index_array_blocks__basic():
-    def check(x: Any, size: int, expected_index: Any, expected_sizes: Any) -> None:
-        x = np.array(x)
-        index, sizes = index_array_blocks(x, size)
-        np.testing.assert_equal(index, expected_index)
-        np.testing.assert_equal(sizes, expected_sizes)
-
-    check([0], 1, [0], [1])
-    check([0], 2, [0], [1])
-    check([0, 0], 1, [0, 1], [1, 1])
-    check([0, 0, 1, 1], 1, [0, 1, 2, 3], [1, 1, 1, 1])
-    check([0, 0, 1, 1], 2, [0, 2], [2, 2])
-    check([0, 0, 1, 1, 1], 2, [0, 2, 4], [2, 2, 1])
-    check([0, 0, 2, 2, 2], 2, [0, 2, 4], [2, 2, 1])
+@pytest.mark.parametrize(  # type: ignore[misc]
+    "x,size,expected_index,expected_sizes",  # type: ignore[no-untyped-def]
+    [
+        ([0], 1, [0], [1]),
+        ([0], 2, [0], [1]),
+        ([0, 0], 1, [0, 1], [1, 1]),
+        ([0, 0, 1, 1], 1, [0, 1, 2, 3], [1, 1, 1, 1]),
+        ([0, 0, 1, 1], 2, [0, 2], [2, 2]),
+        ([0, 0, 1, 1, 1], 2, [0, 2, 4], [2, 2, 1]),
+        ([0, 0, 2, 2, 2], 2, [0, 2, 4], [2, 2, 1]),
+    ],
+)
+def test_index_array_blocks__basic(
+    x: Any, size: int, expected_index: Any, expected_sizes: Any
+):
+    index, sizes = index_array_blocks(x, size)
+    np.testing.assert_equal(index, expected_index)
+    np.testing.assert_equal(sizes, expected_sizes)
 
 
 def test_index_array_blocks__raise_on_not_1d():
@@ -443,47 +452,54 @@ def test_index_array_blocks__raise_on_not_monotonic_increasing():
         index_array_blocks([0, 1, 1, 1, 0], 3)
 
 
-# TODO: add hypothesis for array generation
-def test_index_array_blocks__coverage():
-    def check(x: Any, size: int) -> None:
-        idx, sizes = index_array_blocks(x, size)
-        assert sizes.sum() == x.size
-        assert idx.ndim == sizes.ndim == 1
-        assert idx.size == sizes.size
-        chunks = []
-        for i in range(idx.size):
-            start, stop = idx[i], idx[i] + sizes[i]
-            chunk = x[slice(start, stop)]
-            assert len(chunk) <= size
-            chunks.append(chunk)
+@st.composite  # type: ignore[misc]
+def monotonic_increasing_ints(draw: Any) -> ndarray:
+    # Draw increasing ints with repeats, e.g. [0, 0, 5, 7, 7, 7]
+    n = draw(st.integers(min_value=0, max_value=5))
+    repeats = draw(
+        st_arrays(dtype=int, shape=n, elements=st.integers(min_value=1, max_value=10))
+    )
+    values = draw(
+        st_arrays(dtype=int, shape=n, elements=st.integers(min_value=0, max_value=10))
+    )
+    values = np.cumsum(values)
+    return np.repeat(values, repeats)
+
+
+@given(st_data(), monotonic_increasing_ints())  # type: ignore[misc]
+@settings(max_examples=50)  # type: ignore[misc]
+def test_index_array_blocks__coverage(data: Any, x: ndarray):  # type: ignore[no-untyped-def]
+    # Draw block size that is no less than 1 but possibly
+    # greater than or equal to the size of the array
+    size = data.draw(st.integers(min_value=1, max_value=len(x) + 1))
+    idx, sizes = index_array_blocks(x, size)
+    assert sizes.sum() == x.size
+    assert idx.ndim == sizes.ndim == 1
+    assert idx.size == sizes.size
+    chunks = []
+    for i in range(idx.size):
+        start, stop = idx[i], idx[i] + sizes[i]
+        chunk = x[slice(start, stop)]
+        assert len(chunk) <= size
+        chunks.append(chunk)
+    if chunks:
         np.testing.assert_equal(np.concatenate(chunks), x)
 
-    arrays = [
-        np.array([0]),
-        np.array([0, 0]),
-        np.array([0, 1]),
-        np.array([0, 1, 1, 1]),
-        np.array([0, 1, 1, 1, 1, 10]),
-        np.array([0, 1, 1, 1, 2, 2, 3, 5]),
-        np.array([0, 1, 1, 2, 2, 2, 5, 5, 5, 5, 5, 8, 8, 8, 8, 10]),
-    ]
-    for x in arrays:
-        for size in [1, 2, 3]:
-            check(x, size)
-        check(x, x.size)
 
-
-def test_index_block_sizes__basic():
-    def check(chunks: Any, expected_index: Any) -> None:
-        index, sizes = index_block_sizes(chunks)
-        np.testing.assert_equal(index, expected_index)
-        np.testing.assert_equal(sizes, chunks)
-
-    check([1], [0])
-    check([1, 1], [0, 1])
-    check([10], [0])
-    check([10, 5, 10], [0, 10, 15])
-    check([10, 1, 1, 10], [0, 10, 11, 12])
+@pytest.mark.parametrize(  # type: ignore[misc]
+    "chunks,expected_index",  # type: ignore[no-untyped-def]
+    [
+        ([1], [0]),
+        ([1, 1], [0, 1]),
+        ([10], [0]),
+        ([10, 5, 10], [0, 10, 15]),
+        ([10, 1, 1, 10], [0, 10, 11, 12]),
+    ],
+)
+def test_index_block_sizes__basic(chunks: Any, expected_index: Any):
+    index, sizes = index_block_sizes(chunks)
+    np.testing.assert_equal(index, expected_index)
+    np.testing.assert_equal(sizes, chunks)
 
 
 def test_index_block_sizes__raise_on_lte_0():
