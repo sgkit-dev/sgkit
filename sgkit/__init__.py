@@ -8,6 +8,7 @@ from .api import (  # noqa: F401
 )
 from .stats.aggregation import count_alleles
 from .stats.association import gwas_linear_regression
+from .stats.regenie import regenie
 
 __all__ = [
     "DIM_ALLELE",
@@ -18,4 +19,5 @@ __all__ = [
     "count_alleles",
     "create_genotype_dosage_dataset",
     "gwas_linear_regression",
+    "regenie",
 ]
