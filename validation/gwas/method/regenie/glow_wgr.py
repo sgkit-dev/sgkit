@@ -313,6 +313,9 @@ def run(
     logger.info(HR)
     logger.info("Done")
 
+    # TODO: Enable this once WGR is fully released
+    # See: https://github.com/projectglow/glow/issues/256)
+
     # Run GWAS w/ LOCO
     # adjusted_phenotypes = reshape_for_gwas(spark, label_df - y_hat_df_loco)
     # wgr_gwas = (
