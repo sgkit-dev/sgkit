@@ -1,10 +1,13 @@
 import dask.array as da
 import numpy as np
 from numba import guvectorize
+from typing_extensions import Literal
 from xarray import Dataset
 
 from sgkit.typing import ArrayLike
 from sgkit.utils import merge_datasets
+
+Dimension = Literal["samples", "variants"]
 
 
 @guvectorize(  # type: ignore
@@ -162,3 +165,59 @@ def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
         }
     )
     return merge_datasets(ds, new_ds) if merge else new_ds
+
+
+def _swap(dim: Dimension) -> Dimension:
+    return "samples" if dim == "variants" else "variants"
+
+
+def call_rate(ds: Dataset, dim: Dimension) -> Dataset:
+    odim = _swap(dim)[:-1]
+    n_called = (~ds["call_genotype_mask"].any(dim="ploidy")).sum(dim=dim)
+    return xr.Dataset(
+        {f"{odim}_n_called": n_called, f"{odim}_call_rate": n_called / ds.dims[dim]}
+    )
+
+
+def genotype_count(ds: Dataset, dim: Dimension) -> Dataset:
+    odim = _swap(dim)[:-1]
+    M, G = ds["call_genotype_mask"].any(dim="ploidy"), ds["call_genotype"]
+    n_het = (G > 0).any(dim="ploidy") & (G == 0).any(dim="ploidy")
+    n_hom_ref = (G == 0).all(dim="ploidy")
+    n_hom_alt = (G > 0).all(dim="ploidy")
+    n_non_ref = (G > 0).any(dim="ploidy")
+    agg = lambda x: xr.where(M, False, x).sum(dim=dim)  # type: ignore[no-untyped-call]
+    return xr.Dataset(
+        {
+            f"{odim}_n_het": agg(n_het),  # type: ignore[no-untyped-call]
+            f"{odim}_n_hom_ref": agg(n_hom_ref),  # type: ignore[no-untyped-call]
+            f"{odim}_n_hom_alt": agg(n_hom_alt),  # type: ignore[no-untyped-call]
+            f"{odim}_n_non_ref": agg(n_non_ref),  # type: ignore[no-untyped-call]
+        }
+    )
+
+
+def allele_frequency(ds: Dataset) -> Dataset:
+    AC = count_alleles(ds)
+
+    M = ds["call_genotype_mask"].stack(calls=("samples", "ploidy"))
+    AN = (~M).sum(dim="calls")  # type: ignore
+    assert AN.shape == (ds.dims["variants"],)
+
+    return xr.Dataset(
+        {
+            "variant_allele_count": AC,
+            "variant_allele_total": AN,
+            "variant_allele_frequency": AC / AN,
+        }
+    )
+
+
+def variant_stats(ds: Dataset) -> Dataset:
+    return xr.merge(
+        [
+            call_rate(ds, dim="samples"),
+            genotype_count(ds, dim="samples"),
+            allele_frequency(ds),
+        ]
+    )

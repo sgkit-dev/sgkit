@@ -4,7 +4,7 @@ import numpy as np
 import xarray as xr
 from xarray import Dataset
 
-from sgkit.stats.aggregation import count_call_alleles, count_variant_alleles
+from sgkit.stats.aggregation import count_call_alleles, count_variant_alleles, variant_stats
 from sgkit.testing import simulate_genotype_call_dataset
 from sgkit.typing import ArrayLike
 
@@ -202,3 +202,26 @@ def test_count_call_alleles__chunked():
     ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))  # type: ignore[arg-type]
     ac2 = count_call_alleles(ds)
     xr.testing.assert_equal(ac1, ac2)  # type: ignore[no-untyped-call]
+
+
+def test_variant_stats():
+    ds = get_dataset(
+        [[[1, 0], [-1, -1]], [[1, 0], [1, 1]], [[0, 1], [1, 0]], [[-1, -1], [0, 0]]]
+    )
+    vs = variant_stats(ds)
+
+    np.testing.assert_equal(vs["variant_n_called"], np.array([1, 2, 2, 1]))
+    np.testing.assert_equal(vs["variant_call_rate"], np.array([0.5, 1.0, 1.0, 0.5]))
+    np.testing.assert_equal(vs["variant_n_hom_ref"], np.array([0, 0, 0, 1]))
+    np.testing.assert_equal(vs["variant_n_hom_alt"], np.array([0, 1, 0, 0]))
+    np.testing.assert_equal(vs["variant_n_het"], np.array([1, 1, 2, 0]))
+    np.testing.assert_equal(vs["variant_n_non_ref"], np.array([1, 2, 2, 0]))
+    np.testing.assert_equal(vs["variant_n_non_ref"], np.array([1, 2, 2, 0]))
+    np.testing.assert_equal(
+        vs["variant_allele_count"], np.array([[1, 1], [1, 3], [2, 2], [2, 0]])
+    )
+    np.testing.assert_equal(vs["variant_allele_total"], np.array([2, 4, 4, 2]))
+    np.testing.assert_equal(
+        vs["variant_allele_frequency"],
+        np.array([[0.5, 0.5], [0.25, 0.75], [0.5, 0.5], [1, 0]]),
+    )
