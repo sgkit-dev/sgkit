@@ -155,7 +155,7 @@ def r2_score(YP: ArrayLike, YT: ArrayLike) -> ArrayLike:
     return np.squeeze(r2, axis=-1)
 
 
-def assert_block_shape(x: Array, *args: int) -> None:  # pragma: no cover
+def assert_block_shape(x: Array, *args: int) -> None:
     """Validate block shape (i.e. x.numblocks)"""
     shape = tuple(args)
     assert x.numblocks == tuple(
@@ -163,13 +163,13 @@ def assert_block_shape(x: Array, *args: int) -> None:  # pragma: no cover
     ), f"Expecting block shape {shape}, found {x.numblocks}"
 
 
-def assert_chunk_shape(x: Array, *args: int) -> None:  # pragma: no cover
+def assert_chunk_shape(x: Array, *args: int) -> None:
     """Validate chunk shape (i.e. x.chunksize)"""
     shape = tuple(args)
     assert x.chunksize == shape, f"Expecting chunk shape {shape}, found {x.chunksize}"
 
 
-def assert_array_shape(x: Array, *args: int) -> None:  # pragma: no cover
+def assert_array_shape(x: Array, *args: int) -> None:
     """Validate array shape (i.e. x.shape)"""
     shape = tuple(args)
     assert x.shape == shape, f"Expecting array shape {shape}, found {x.shape}"

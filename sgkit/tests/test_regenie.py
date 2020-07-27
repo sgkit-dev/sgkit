@@ -89,10 +89,6 @@ def validate_indexes(df_sg: DataFrame, df_gl: DataFrame, cols: List[str]) -> Non
             .sort_index(axis=1)
         )
 
-    # Extract and compare index ranges such as:
-    #      alpha_index  outcome_index  sample_index  variant_block_index
-    # min            0              0             0                    0
-    # max            3              5            49                   24
     idx_sg, idx_gl = index_range(df_sg)[cols], index_range(df_gl)[cols]
     pd.testing.assert_frame_equal(idx_sg, idx_gl)
 
@@ -113,11 +109,6 @@ def prepare_stage_1_sgkit_results(x: Array) -> DataFrame:
         .reset_index()
     )
     return df
-    # > print(df.head())
-    #    variant_block_index  alpha_index  sample_index  outcome_index  sample_value
-    # 0                    0            0             0              0      0.632164
-    # 1                    0            0             1              0      1.064266
-    # 2                    0            0             2              0      0.313868
 
 
 def prepare_stage_1_glow_results(df: DataFrame) -> DataFrame:
@@ -141,11 +132,6 @@ def prepare_stage_1_glow_results(df: DataFrame) -> DataFrame:
     # Drop non-global indexes
     df = df.drop(["contig_variant_block_index", "sample_value_index"], axis=1)
     return df
-    # print(df.filter(regex='sample_value|index').head())
-    #    sample_value  contig_index  alpha_index  outcome_index  variant_block_index  sample_index
-    # 0     -0.040107             1            0              0                   10            30
-    # 1      0.277402             1            0              0                   10            31
-    # 2      0.188505             1            0              0                   10            32
 
 
 def check_stage_1_results(
@@ -170,11 +156,6 @@ def check_stage_1_results(
     assert df.notnull().all().all()
     assert len(df) == len(df_sg) == len(df_gl)
     np.testing.assert_allclose(df["value_sgkit"], df["value_glow"], atol=1e-14)
-    # print(df.reset_index().head())
-    #    variant_block_index  alpha_index  sample_index  outcome_index  value_sgkit  value_glow
-    # 0                    0            0             0              0     0.632164    0.632164
-    # 1                    0            0             1              0     1.064266    1.064266
-    # 2                    0            0             2              0     0.313868    0.313868
 
 
 def check_stage_2_results(X: Array, df_trait: DataFrame, result_dir: Path) -> None:
@@ -192,11 +173,6 @@ def check_stage_2_results(X: Array, df_trait: DataFrame, result_dir: Path) -> No
     assert df.notnull().all().all()
     assert df.shape[0] == df_trait.size
     np.testing.assert_allclose(df["value_sgkit"], df["value_glow"], atol=1e-14)
-    # > print(df.reset_index().head())
-    #   sample_id outcome  value_sgkit  value_glow
-    # 0  S0000001   Y0000     0.671221    0.671221
-    # 1  S0000002   Y0000     1.067523    1.067523
-    # 2  S0000003   Y0000     0.328100    0.328100
 
 
 def prepare_stage_3_sgkit_results(
@@ -212,11 +188,6 @@ def prepare_stage_3_sgkit_results(
     dsr = dsr.assign(outcome=xr.DataArray(df_trait.columns, dims=("outcomes")))
     df = dsr.to_dataframe().reset_index(drop=True)  # type: ignore[no-untyped-call]
     return df
-    # > print(df.head())
-    #        beta   t_value   p_value variant_id outcome
-    # 0  0.088390  0.795571  0.430368    1:1:A:C   Y0000
-    # 1 -0.035834 -0.284177  0.777550    1:2:A:C   Y0000
-    # 2  0.000713  0.006325  0.994981    1:3:A:C   Y0000
 
 
 def prepare_stage_3_glow_results(df: DataFrame) -> DataFrame:
@@ -233,11 +204,6 @@ def prepare_stage_3_glow_results(df: DataFrame) -> DataFrame:
     df["variant_id"] = df["names"].apply(lambda v: v[0])
     df = df.drop(["names"], axis=1)
     return df
-    # > print(df.head())
-    #   outcome variant_id  start      beta  standard_error   p_value
-    # 0   Y0000    1:1:A:C      0  0.019150        0.113763  0.867060
-    # 1   Y0000    1:2:A:C      1 -0.206904        0.124713  0.103910
-    # 2   Y0000    1:3:A:C      2 -0.086762        0.113883  0.450041
 
 
 def check_stage_3_results(
@@ -262,11 +228,6 @@ def check_stage_3_results(
     assert len(df) == ds.dims["variants"] * df_trait.shape[1]
     np.testing.assert_allclose(df["beta_sgkit"], df["beta_glow"], atol=1e-14)
     np.testing.assert_allclose(df["p_value_sgkit"], df["p_value_glow"], atol=1e-14)
-    # > print(df.reset_index().head())
-    #   outcome variant_id  beta_sgkit  p_value_sgkit  beta_glow  p_value_glow
-    # 0   Y0000    1:1:A:C    0.088390       0.430368   0.088390      0.430368
-    # 1   Y0000    1:2:A:C   -0.035834       0.777550  -0.035834      0.777550
-    # 2   Y0000    1:3:A:C    0.000713       0.994981   0.000713      0.994981
 
 
 def check_simulation_result(

@@ -23,3 +23,7 @@ invoke build
 # Export select results to build unit tests against
 invoke export --runs sim_sm_02-wgr_02 --runs sim_sm_01-wgr_01
 ```
+
+### Glow WGR Release
+
+This validation was run for [glow.py==0.5.0](https://pypi.org/project/glow.py/0.5.0/).  At this time, binary traits are not yet supported and the REGENIE implementation hasn't even been officially released.  Support for [binary traits should come in the next release](https://github.com/projectglow/glow/issues/256) along with official support at which time this validation should be updated.  From that point onward, there is little need to update this data unless either implementation (sgkit or Glow) has been shown to be incorrect.
