@@ -169,7 +169,7 @@ def assert_chunk_shape(x: Array, *args: int) -> None:
     assert x.chunksize == shape, f"Expecting chunk shape {shape}, found {x.chunksize}"
 
 
-def assert_array_shape(x: Array, *args: int) -> None:
+def assert_array_shape(x: ArrayLike, *args: int) -> None:
     """Validate array shape (i.e. x.shape)"""
     shape = tuple(args)
     assert x.shape == shape, f"Expecting array shape {shape}, found {x.shape}"

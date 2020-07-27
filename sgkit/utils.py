@@ -87,6 +87,7 @@ def split_array_chunks(n: int, blocks: int) -> List[int]:
     [7]
     >>> split_array_chunks(7, 7)
     [1, 1, 1, 1, 1, 1, 1]
+
     Raises
     ------
     ValueError
