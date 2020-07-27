@@ -64,3 +64,54 @@ def encode_array(x: ArrayLike) -> Tuple[ArrayLike, List[Any]]:
     rank = np.empty_like(index)
     rank[index] = np.arange(len(index))
     return rank[inverse], names[index]
+
+
+def split_array_chunks(n: int, blocks: int) -> List[int]:
+    """Compute chunk sizes for an array split into blocks.
+    This is similar to `numpy.split_array` except that it
+    will compute the sizes of the resulting splits rather
+    than explicitly partitioning an array.
+    Parameters
+    ----------
+    n : int
+        Number of array elements.
+    blocks : int
+        Number of partitions to generate chunk sizes for.
+    Examples
+    --------
+    >>> split_array_chunks(7, 2)
+    [4, 3]
+    >>> split_array_chunks(7, 3)
+    [3, 2, 2]
+    >>> split_array_chunks(7, 1)
+    [7]
+    >>> split_array_chunks(7, 7)
+    [1, 1, 1, 1, 1, 1, 1]
+    Raises
+    ------
+    ValueError
+        If `blocks` > `n`.
+    ValueError
+        If `n` <= 0.
+    ValueError
+        If `blocks` <= 0.
+    Returns
+    -------
+    chunks : List[int]
+        Number of elements associated with each block.
+        This will equal `n//blocks` or `n//blocks + 1` for
+        each block, depending on how many of the latter
+        are necessary to make the partitioning complete.
+    """
+    if blocks > n:
+        raise ValueError(
+            f"Number of blocks ({blocks}) cannot be greater "
+            f"than number of elements ({n})"
+        )
+    if n <= 0:
+        raise ValueError(f"Number of elements ({n}) must be >= 0")
+    if blocks <= 0:
+        raise ValueError(f"Number of blocks ({blocks}) must be >= 0")
+    n_div, n_mod = np.divmod(n, blocks)
+    chunks = n_mod * [n_div + 1] + (blocks - n_mod) * [n_div]
+    return chunks  # type: ignore[no-any-return]

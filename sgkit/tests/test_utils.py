@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from sgkit.typing import ArrayLike
-from sgkit.utils import check_array_like, encode_array
+from sgkit.utils import check_array_like, encode_array, split_array_chunks
 
 
 def test_check_array_like():
@@ -45,3 +45,39 @@ def test_encode_array():
         [0, 0, 1, 2, 1, 3, 3, 1],
         [2.0, 1.0, 3.0, 5.0],
     )
+
+
+@pytest.mark.parametrize(  # type: ignore[misc]
+    "n,blocks,expected_chunks",  # type: ignore[no-untyped-def]
+    [
+        (1, 1, [1]),
+        (2, 1, [2]),
+        (2, 2, [1] * 2),
+        (3, 1, [3]),
+        (3, 3, [1] * 3),
+        (3, 2, [2, 1]),
+        (7, 2, [4, 3]),
+        (7, 3, [3, 2, 2]),
+        (7, 7, [1] * 7),
+    ],
+)
+def test_split_array_chunks(n: int, blocks: int, expected_chunks: List[int]):
+    assert split_array_chunks(n, blocks) == expected_chunks
+
+
+def test_split_array_chunks__raise_on_blocks_gt_n():
+    with pytest.raises(
+        ValueError,
+        match=r"Number of blocks .* cannot be greater than number of elements",
+    ):
+        split_array_chunks(3, 10)
+
+
+def test_split_array_chunks__raise_on_blocks_lte_0():
+    with pytest.raises(ValueError, match=r"Number of blocks .* must be >= 0"):
+        split_array_chunks(3, 0)
+
+
+def test_split_array_chunks__raise_on_n_lte_0():
+    with pytest.raises(ValueError, match=r"Number of elements .* must be >= 0"):
+        split_array_chunks(0, 0)
