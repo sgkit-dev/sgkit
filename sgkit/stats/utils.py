@@ -1,6 +1,5 @@
-from typing import Hashable, Sequence, Tuple
+from typing import Hashable, Tuple
 
-import dask.array as da
 import numpy as np
 import xarray as xr
 from dask.array import Array
@@ -9,77 +8,8 @@ from xarray import DataArray, Dataset
 from ..typing import ArrayLike
 
 
-def get_dask_covariates(
-    ds: Dataset, covariates: Sequence[Hashable], add_intercept: bool = False
-) -> Array:
-    """Get Dask array representing covariates in a Dataset.
-
-    Parameters
-    ----------
-    ds : Dataset
-        Dataset to extract covariates from.
-    covariates : Sequence[Hashable]
-        Names of data variables containing covariates.
-        Can be any 1 or 2D array, they will all be
-        concatenated along the second dimension in
-        the order provided.
-    add_intercept : bool, optional
-        Add 1D array of ones as first covariate,
-        by default False.
-
-    Returns
-    -------
-    Array
-        Concatenated 2D covariate array.
-
-    Raises
-    ------
-    ValueError
-        If `covariates` is empty and `add_intercept` is False.
-    """
-    if not add_intercept and not covariates:
-        raise ValueError(
-            "At least one covariate must be provided when `add_intercept`=False"
-        )
-    X = extract_2d_array(ds[list(covariates)], dims=("samples", "covariates"))
-    X = da.asarray(X)
-    if add_intercept:
-        X = da.concatenate([da.ones((X.shape[0], 1), dtype=X.dtype), X], axis=1)
-    return X
-
-
-def get_dask_traits(ds: Dataset, traits: Sequence[Hashable]) -> Array:
-    """Get Dask array representing traits in a Dataset.
-
-    Parameters
-    ----------
-    ds : Dataset
-        Dataset to extract covariates from.
-    traits : Sequence[Hashable]
-        Names of data variables containing traits.
-        Can be any 1 or 2D array, they will all be
-        concatenated along the second dimension in
-        the order provided.
-
-    Returns
-    -------
-    Array
-        Concatenated 2D trait array.
-
-    Raises
-    ------
-    ValueError
-        If `traits` is empty.
-    """
-    if not traits:
-        raise ValueError("At least one trait must be provided")
-    Y = extract_2d_array(ds[list(traits)], dims=("samples", "traits"))
-    Y = da.asarray(Y)
-    return Y
-
-
-def extract_2d_array(ds: Dataset, dims: Tuple[Hashable, Hashable]) -> DataArray:
-    """Convert Datset with a mixture of <= 2D variables to single DataArray.
+def concat_2d(ds: Dataset, dims: Tuple[Hashable, Hashable]) -> DataArray:
+    """Concatenate dataset with a mixture of <= 2D variables as single DataArray.
 
     Parameters
     ----------
@@ -136,9 +66,6 @@ def r2_score(YP: ArrayLike, YT: ArrayLike) -> ArrayLike:
     R2 : (...) ArrayLike
         R2 scores array with shape equal to all leading
         (i.e. batch) dimensions of the provided arrays.
-        R2 values will be nan for any vector pair in `YP`
-        or `YT` if either vector contains a nan value.
-        Also, R2 values will be -inf if `M` is 1.
     """
     assert YP.shape[-1] == YT.shape[-1]
     YP, YT = np.broadcast_arrays(YP, YT)
@@ -169,7 +96,7 @@ def assert_chunk_shape(x: Array, *args: int) -> None:
     assert x.chunksize == shape, f"Expecting chunk shape {shape}, found {x.chunksize}"
 
 
-def assert_array_shape(x: Array, *args: int) -> None:
+def assert_array_shape(x: ArrayLike, *args: int) -> None:
     """Validate array shape (i.e. x.shape)"""
     shape = tuple(args)
     assert x.shape == shape, f"Expecting array shape {shape}, found {x.shape}"

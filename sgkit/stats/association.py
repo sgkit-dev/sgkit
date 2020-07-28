@@ -8,7 +8,7 @@ from dask.array import Array, stats
 from xarray import Dataset
 
 from ..typing import ArrayLike
-from .utils import get_dask_covariates, get_dask_traits
+from .utils import concat_2d
 
 
 @dataclass
@@ -199,14 +199,16 @@ def gwas_linear_regression(
 
     G = _get_loop_covariates(ds, dosage=dosage)
 
-    X = get_dask_covariates(ds, covariates, add_intercept=add_intercept)
+    X = da.asarray(concat_2d(ds[list(covariates)], dims=("samples", "covariates")))
+    if add_intercept:
+        X = da.concatenate([da.ones((X.shape[0], 1), dtype=X.dtype), X], axis=1)
     # Note: dask qr decomp (used by lstsq) requires no chunking in one
     # dimension, and because dim 0 will be far greater than the number
     # of covariates for the large majority of use cases, chunking
     # should be removed from dim 1
     X = X.rechunk((None, -1))
 
-    Y = get_dask_traits(ds, traits)
+    Y = da.asarray(concat_2d(ds[list(traits)], dims=("samples", "traits")))
     # Like covariates, traits must also be tall-skinny arrays
     Y = Y.rechunk((None, -1))
 

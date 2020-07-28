@@ -1,4 +1,3 @@
-import functools
 import warnings
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
@@ -186,57 +185,14 @@ def test_gwas_linear_regression__multi_trait(ds):
     pd.testing.assert_frame_equal(dfr_single, dfr_multi)
 
 
-def test_gwas_linear_regression__str_args(ds):
-    fn = functools.partial(
-        gwas_linear_regression, ds, dosage="dosage", add_intercept=False
+def test_gwas_linear_regression__scalar_vars(ds):
+    res_scalar = gwas_linear_regression(
+        ds, dosage="dosage", covariates="covar_0", traits="trait_0"
     )
-    res1 = fn(covariates="covar_0", traits="trait_0")
-    res2 = fn(covariates=["covar_0"], traits=["trait_0"])
-    xr.testing.assert_equal(res1, res2)  # type: ignore[no-untyped-call]
-
-
-def test_gwas_linear_regression__raise_on_no_covars(ds):
-    with pytest.raises(ValueError, match="At least one covariate must be provided"):
-        gwas_linear_regression(
-            ds, covariates=[], dosage="dosage", traits=["trait_0"], add_intercept=False
-        )
-
-
-def test_gwas_linear_regression__raise_on_no_traits(ds):
-    with pytest.raises(ValueError, match="At least one trait must be provided"):
-        gwas_linear_regression(
-            ds, covariates=["covar_0"], dosage="dosage", traits=[], add_intercept=False
-        )
-
-
-def test_gwas_linear_regression__raise_on_non_2D_covar(ds):
-    with pytest.raises(ValueError, match="All variables must have <= 2 dimensions"):
-        covar = np.ones((ds.dims["samples"], 1, 1))
-        ds = ds.assign(
-            covar=xr.DataArray(covar, dims=("samples", "covars", "extra_for_error"))
-        )
-        gwas_linear_regression(
-            ds,
-            covariates=["covar"],
-            dosage="dosage",
-            traits=["trait_0"],
-            add_intercept=False,
-        )
-
-
-def test_gwas_linear_regression__raise_on_non_2D_trait(ds):
-    with pytest.raises(ValueError, match="All variables must have <= 2 dimensions"):
-        trait = np.ones((ds.dims["samples"], 1, 1))
-        ds = ds.assign(
-            trait=xr.DataArray(trait, dims=("samples", "traits", "extra_for_error"))
-        )
-        gwas_linear_regression(
-            ds,
-            covariates=["covar_0"],
-            dosage="dosage",
-            traits=["trait"],
-            add_intercept=False,
-        )
+    res_list = gwas_linear_regression(
+        ds, dosage="dosage", covariates=["covar_0"], traits=["trait_0"]
+    )
+    xr.testing.assert_equal(res_scalar, res_list)  # type: ignore[no-untyped-call]
 
 
 def test_linear_regression__raise_on_non_2D():

@@ -13,8 +13,7 @@ from .utils import (
     assert_array_shape,
     assert_block_shape,
     assert_chunk_shape,
-    get_dask_covariates,
-    get_dask_traits,
+    concat_2d,
     r2_score,
 )
 
@@ -758,8 +757,8 @@ def regenie(
     if isinstance(traits, str):
         traits = [traits]
     G = ds[dosage]
-    X = get_dask_covariates(ds, covariates, add_intercept=False)
-    Y = get_dask_traits(ds, traits)
+    X = da.asarray(concat_2d(ds[list(covariates)], dims=("samples", "covariates")))
+    Y = da.asarray(concat_2d(ds[list(traits)], dims=("samples", "traits")))
     contigs = ds["variant/contig"]
     return regenie_transform(
         G.T,
