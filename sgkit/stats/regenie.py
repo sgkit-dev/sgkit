@@ -629,6 +629,9 @@ def regenie_transform(
     if add_intercept:
         X = da.concatenate([da.ones((X.shape[0], 1), dtype=X.dtype), X], axis=1)
 
+    # TODO: Test this after finding out whether or not there was a good reason
+    # it was precluded in glow by unit covariate regularization:
+    # https://github.com/projectglow/glow/issues/266
     if orthogonalize:  # pragma: no cover
         G = G - X @ da.linalg.lstsq(X, G)[0]
         Y = Y - X @ da.linalg.lstsq(X, Y)[0]
