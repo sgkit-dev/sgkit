@@ -8,6 +8,7 @@ import pandas as pd
 import pytest
 import xarray as xr
 import yaml
+import zarr
 from dask.array import Array
 from hypothesis import given, settings
 from hypothesis import strategies as st
@@ -241,48 +242,49 @@ def check_simulation_result(
     result_dir = datadir / "result" / run["name"]
 
     # Load simulated data
-    ds = xr.open_zarr(str(dataset_dir / "genotypes.zarr"))  # type: ignore[no-untyped-call]
-    # Temporary workaround for https://github.com/pystatgen/sgkit/issues/62
-    ds = ds.rename_vars({v: v.replace("-", "/") for v in ds})
-    df_covariate = load_covariates(dataset_dir)
-    df_trait = load_traits(dataset_dir)
-    contigs = ds["variant/contig"].values
-    G = ds["call/genotype"].sum(dim="ploidy").values
-    X = df_covariate.values
-    Y = df_trait.values
+    with zarr.ZipStore(str(dataset_dir / "genotypes.zarr.zip"), mode="r") as store:
+        ds = xr.open_zarr(store)  # type: ignore[no-untyped-call]
+        # Temporary workaround for https://github.com/pystatgen/sgkit/issues/62
+        ds = ds.rename_vars({v: v.replace("-", "/") for v in ds})
+        df_covariate = load_covariates(dataset_dir)
+        df_trait = load_traits(dataset_dir)
+        contigs = ds["variant/contig"].values
+        G = ds["call/genotype"].sum(dim="ploidy").values
+        X = df_covariate.values
+        Y = df_trait.values
 
-    # Define transformed traits
-    res = regenie_transform(
-        G.T,
-        X,
-        Y,
-        contigs,
-        variant_block_size=ps_config["variant_block_size"],
-        sample_block_size=ps_config["sample_block_size"],
-        normalize=True,
-        add_intercept=False,
-        alphas=ps_config["alphas"],
-        orthogonalize=False,
-        # Intentionally make mistakes related to these flags
-        # in order to match Glow results
-        _glow_adj_dof=True,
-        _glow_adj_scaling=True,
-        _glow_adj_alpha=True,
-    )
-    YBP = res["base_prediction"].data
-    YMP = res["meta_prediction"].data
+        # Define transformed traits
+        res = regenie_transform(
+            G.T,
+            X,
+            Y,
+            contigs,
+            variant_block_size=ps_config["variant_block_size"],
+            sample_block_size=ps_config["sample_block_size"],
+            normalize=True,
+            add_intercept=False,
+            alphas=ps_config["alphas"],
+            orthogonalize=False,
+            # Intentionally make mistakes related to these flags
+            # in order to match Glow results
+            _glow_adj_dof=True,
+            _glow_adj_scaling=True,
+            _glow_adj_alpha=True,
+        )
+        YBP = res["base_prediction"].data
+        YMP = res["meta_prediction"].data
 
-    # Check equality of stage 1 and 2 transformations
-    check_stage_1_results(YBP, ds_config, ps_config, result_dir)
-    check_stage_2_results(YMP, df_trait, result_dir)
+        # Check equality of stage 1 and 2 transformations
+        check_stage_1_results(YBP, ds_config, ps_config, result_dir)
+        check_stage_2_results(YMP, df_trait, result_dir)
 
-    # Check equality of GWAS results
-    YR = Y - YMP
-    stats = linear_regression(G.T, X, YR)
-    check_stage_3_results(ds, stats, df_trait, result_dir)
+        # Check equality of GWAS results
+        YR = Y - YMP
+        stats = linear_regression(G.T, X, YR)
+        check_stage_3_results(ds, stats, df_trait, result_dir)
 
-    # TODO: Add LOCO validation after Glow WGR release
-    # See: https://github.com/projectglow/glow/issues/256
+        # TODO: Add LOCO validation after Glow WGR release
+        # See: https://github.com/projectglow/glow/issues/256
 
 
 def test_regenie__glow_comparison(datadir: Path) -> None:

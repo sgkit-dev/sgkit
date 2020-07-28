@@ -89,7 +89,7 @@ def export(ctx, test_datadir=DEFAULT_TEST_DATADIR, clear=True, runs=None):
     for dataset in config["datasets"]:
         dst = test_datadir / "dataset" / dataset
         src = src_datadir / "dataset" / dataset
-        copy_files(src, dst, ["*.csv", "*.csv.gz", "*.zarr"])
+        copy_files(src, dst, ["*.csv", "*.csv.gz", "*.zarr.zip"])
     # Export results
     for run in config["runs"]:
         name = run["name"]

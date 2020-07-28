@@ -6,6 +6,7 @@ from pathlib import Path
 
 import fire
 import yaml
+import zarr
 from sgkit_plink import read_plink
 
 logger = logging.getLogger(__name__)
@@ -18,7 +19,7 @@ logging.basicConfig(
 def run(dataset: str, dataset_dir="data/dataset"):
     dataset_dir = Path(dataset_dir)
     plink_path = dataset_dir / dataset / "genotypes"
-    zarr_path = dataset_dir / dataset / "genotypes.zarr"
+    zarr_path = dataset_dir / dataset / "genotypes.zarr.zip"
     ds = read_plink(plink_path, bim_sep="\t", fam_sep="\t")
     # Temporary workaround for https://github.com/pystatgen/sgkit/issues/62
     ds = ds.rename_vars({v: v.replace("/", "-") for v in ds})
@@ -26,7 +27,9 @@ def run(dataset: str, dataset_dir="data/dataset"):
     ds = ds.compute()
     logger.info(f"Loaded dataset {dataset}:")
     logger.info("\n" + str(ds))
-    ds.to_zarr(zarr_path, mode="w")
+    store = zarr.ZipStore(zarr_path, mode="w")
+    ds.to_zarr(store, mode="w")
+    store.close()
     logger.info(f"Conversion to zarr at {zarr_path} successful")
 
 

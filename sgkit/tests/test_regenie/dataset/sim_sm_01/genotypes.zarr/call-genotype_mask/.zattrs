@@ -1,8 +1,0 @@
-{
-    "_ARRAY_DIMENSIONS": [
-        "variants",
-        "samples",
-        "ploidy"
-    ],
-    "dtype": "bool"
-}
