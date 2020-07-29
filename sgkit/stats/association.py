@@ -183,7 +183,7 @@ def gwas_linear_regression(
         2D trait arrays will be assumed to contain separate traits within columns
         and concatenated to any 1D traits along the second axis (columns).
     add_intercept : bool, optional
-        Add intercept term to covariate set, by default True
+        Add intercept term to covariate set, by default True.
 
     Warnings
     --------
@@ -210,12 +210,12 @@ def gwas_linear_regression(
     -------
     Dataset
         Dataset containing (N = num variants, O = num traits):
-        beta : (N, O) array-like
-            Beta values associated with each variant and trait
-        t_value : (N, O) array-like
-            T statistics for each beta
-        p_value : (N, O) array-like
-            P values as float in [0, 1]
+        variant/beta : (N, O) ArrayLike
+            Beta values associated with each variant and trait.
+        variant/t_value : (N, O) ArrayLike
+            T statistics for each beta.
+        variant/p_value : (N, O) ArrayLike
+            P values as float in [0, 1].
     """
     G = _get_loop_covariates(ds, dosage=dosage)
     X = _get_core_covariates(ds, covariates, add_intercept=add_intercept)

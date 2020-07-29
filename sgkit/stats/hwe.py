@@ -9,16 +9,16 @@ from xarray import Dataset
 
 
 def hardy_weinberg_p_value(obs_hets: int, obs_hom1: int, obs_hom2: int) -> float:
-    """Exact test for HWE as described in Wigginton et al. 2005 [1]
+    """Exact test for HWE as described in Wigginton et al. 2005 [1].
 
     Parameters
     ----------
     obs_hets : int
-        Number of heterozygotes with minor variant
+        Number of heterozygotes with minor variant.
     obs_hom1 : int
-        Number of reference/major homozygotes
+        Number of reference/major homozygotes.
     obs_hom2 : int
-        Number of alternate/minor homozygotes
+        Number of alternate/minor homozygotes.
 
     Returns
     -------
@@ -34,7 +34,7 @@ def hardy_weinberg_p_value(obs_hets: int, obs_hom1: int, obs_hom2: int) -> float
     Raises
     ------
     ValueError
-        If any observed counts are negative
+        If any observed counts are negative.
     """
     if obs_hom1 < 0 or obs_hom2 < 0 or obs_hets < 0:
         raise ValueError("Observed genotype counts must be positive")
@@ -122,14 +122,51 @@ hardy_weinberg_p_value_vec_jit = njit(hardy_weinberg_p_value_vec, fastmath=True)
 def hardy_weinberg_test(
     ds: Dataset, genotype_counts: Optional[Hashable] = None
 ) -> Dataset:
+    """Exact test for HWE as described in Wigginton et al. 2005 [1].
+
+    Parameters
+    ----------
+    ds : Dataset
+        Dataset containing genotype calls or precomputed genotype counts.
+    genotype_counts : Optional[Hashable], optional
+        Name of variable containing precomputed genotype counts, by default
+        None. If not provided, these counts will be computed automatically
+        from genotype calls. If present, must correspond to an (`N`, 3) array
+        where `N` is equal to the number of variants and the 3 columns contain
+        heterozygous, homozygous reference, and homozygous alternate counts
+        (in that order) across all samples for a variant.
+
+    Warnings
+    --------
+    This function is only applicable to diploid, biallelic datasets.
+
+    Returns
+    -------
+    Dataset
+        Dataset containing (N = num variants):
+        variant/hwe_p_value : (N,) ArrayLike
+            P values from HWE test for each variant as float in [0, 1].
+
+    References
+    ----------
+    - [1] Wigginton, Janis E., David J. Cutler, and Goncalo R. Abecasis. 2005.
+        “A Note on Exact Tests of Hardy-Weinberg Equilibrium.” American Journal of
+        Human Genetics 76 (5): 887–93.
+
+    Raises
+    ------
+    NotImplementedError
+        * If ploidy of provided dataset != 2
+        * If maximum number of alleles in provided dataset != 2
+    """
     if ds.dims["ploidy"] != 2:
         raise NotImplementedError("HWE test only implemented for diploid genotypes")
     if ds.dims["alleles"] != 2:
         raise NotImplementedError("HWE test only implemented for biallelic genotypes")
-    # Use precomputed genotype counts, if provided
+    # Use precomputed genotype counts if provided
     if genotype_counts is not None:
         obs = list(da.asarray(ds[genotype_counts]).T)
-    # Otherwise, compute genotype counts from calls
+    # Otherwise compute genotype counts from calls
     else:
         # TODO: Use API genotype counting function instead, e.g.
         # https://github.com/pystatgen/sgkit/issues/29#issuecomment-656691069
