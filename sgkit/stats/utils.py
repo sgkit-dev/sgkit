@@ -48,7 +48,7 @@ def concat_2d(ds: Dataset, dims: Tuple[Hashable, Hashable]) -> DataArray:
 
 
 def r2_score(YP: ArrayLike, YT: ArrayLike) -> ArrayLike:
-    """R2 score calculator for batches of vector pairs
+    """R2 score calculator for batches of vector pairs.
 
     Parameters
     ----------
@@ -67,7 +67,6 @@ def r2_score(YP: ArrayLike, YT: ArrayLike) -> ArrayLike:
         R2 scores array with shape equal to all leading
         (i.e. batch) dimensions of the provided arrays.
     """
-    assert YP.shape[-1] == YT.shape[-1]
     YP, YT = np.broadcast_arrays(YP, YT)
     tot = np.power(YT - YT.mean(axis=-1, keepdims=True), 2)
     tot = tot.sum(axis=-1, keepdims=True)

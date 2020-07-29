@@ -70,9 +70,9 @@ def test_r2_score__sklearn_comparison(
     assert r2_score(yp, yt) == expected_r2
 
 
-@given(st.integers(0, 25))
-@settings(max_examples=10)
-def test_concat_2d__values(n):
+@given(st.integers(0, 25))  # type: ignore[misc]
+@settings(max_examples=10)  # type: ignore[misc]
+def test_concat_2d__values(n: int) -> None:
     x, y = np.arange(n), np.arange(n * n).reshape(n, n)
     z = np.copy(y)
     ds = xr.Dataset(

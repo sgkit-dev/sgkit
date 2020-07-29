@@ -2,6 +2,8 @@ from typing import Any, List
 
 import numpy as np
 import pytest
+from hypothesis import given, settings
+from hypothesis import strategies as st
 
 from sgkit.typing import ArrayLike
 from sgkit.utils import check_array_like, encode_array, split_array_chunks
@@ -61,8 +63,18 @@ def test_encode_array():
         (7, 7, [1] * 7),
     ],
 )
-def test_split_array_chunks(n: int, blocks: int, expected_chunks: List[int]):
-    assert split_array_chunks(n, blocks) == expected_chunks
+def test_split_array_chunks__precomputed(
+    n: int, blocks: int, expected_chunks: List[int]
+):
+    assert split_array_chunks(n, blocks) == tuple(expected_chunks)
+
+
+@given(st.integers(1, 50), st.integers(0, 50))  # type: ignore[misc]
+@settings(max_examples=50)  # type: ignore[misc]
+def test_split_array_chunks__size(a: int, b: int) -> None:
+    res = split_array_chunks(a + b, a)
+    assert sum(res) == a + b
+    assert len(res) == a
 
 
 def test_split_array_chunks__raise_on_blocks_gt_n():
