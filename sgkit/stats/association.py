@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Union
 
 import dask.array as da
 import numpy as np
@@ -8,6 +8,7 @@ from dask.array import Array, stats
 from xarray import Dataset
 
 from ..typing import ArrayLike
+from .utils import concat_2d
 
 
 @dataclass
@@ -108,52 +109,15 @@ def _get_loop_covariates(ds: Dataset, dosage: Optional[str] = None) -> Array:
     return da.asarray(G.data)
 
 
-def _get_core_covariates(
-    ds: Dataset, covariates: Sequence[str], add_intercept: bool = False
-) -> Array:
-    if not add_intercept and not covariates:
-        raise ValueError(
-            "At least one covariate must be provided when `add_intercept`=False"
-        )
-    for covariate in covariates:
-        if ds[covariate].ndim > 2:
-            raise ValueError(
-                "All covariate arrays must have <= 2 dimensions "
-                f"(covariate {covariate} has shape {ds[covariate].shape})"
-            )
-    X = da.concatenate([da.asarray(ds[c]).reshape(-1, 1) for c in covariates], axis=1)
-    if add_intercept:
-        X = da.concatenate([da.ones((X.shape[0], 1)), X], axis=1)
-    # Note: dask qr decomp (used by lstsq) requires no chunking in one
-    # dimension, and because dim 0 will be far greater than the number
-    # of covariates for the large majority of use cases, chunking
-    # should be removed from dim 1
-    return X.rechunk((None, -1))
-
-
-def _get_outcomes(ds: Dataset, traits: Sequence[str]) -> Array:
-    if not traits:
-        raise ValueError("At least one trait must be provided")
-    for trait in traits:
-        if ds[trait].ndim > 2:
-            raise ValueError(
-                "All trait arrays must have <= 2 dimensions "
-                f"(trait {trait} has shape {ds[trait].shape})"
-            )
-    Y = da.concatenate([da.asarray(ds[t]).reshape(-1, 1) for t in traits], axis=1)
-    # Like covariates, traits must also be tall-skinny arrays
-    return Y.rechunk((None, -1))
-
-
 def gwas_linear_regression(
     ds: Dataset,
     *,
     dosage: str,
-    covariates: Sequence[str],
-    traits: Sequence[str],
+    covariates: Union[str, Sequence[str]],
+    traits: Union[str, Sequence[str]],
     add_intercept: bool = True,
 ) -> Dataset:
-    """Run linear regression to identify continuous trait associations with genetic variants
+    """Run linear regression to identify continuous trait associations with genetic variants.
 
     This method solves OLS regressions for each variant simultaneously and reports
     effect statistics as defined in [1]. This is facilitated by the removal of
@@ -165,7 +129,7 @@ def gwas_linear_regression(
     Parameters
     ----------
     ds : Dataset
-        Dataset containing necessary dependent and independent variables
+        Dataset containing necessary dependent and independent variables.
     dosage : str
         Dosage variable name where "dosage" array can contain represent
         one of several possible quantities, e.g.:
@@ -173,11 +137,11 @@ def gwas_linear_regression(
         - Recessive or dominant allele encodings
         - True dosages as computed from imputed or probabilistic variant calls
         - Any other custom encoding in a user-defined variable
-    covariates : Sequence[str]
+    covariates : Union[str, Sequence[str]]
         Covariate variable names, must correspond to 1 or 2D dataset
         variables of shape (samples[, covariates]). All covariate arrays
         will be concatenated along the second axis (columns).
-    traits : Sequence[str]
+    traits : Union[str, Sequence[str]]
         Trait (e.g. phenotype) variable names, must all be continuous and
         correspond to 1 or 2D dataset variables of shape (samples[, traits]).
         2D trait arrays will be assumed to contain separate traits within columns
@@ -217,9 +181,26 @@ def gwas_linear_regression(
         variant/p_value : (N, O) ArrayLike
             P values as float in [0, 1].
     """
+    if isinstance(covariates, str):
+        covariates = [covariates]
+    if isinstance(traits, str):
+        traits = [traits]
+
     G = _get_loop_covariates(ds, dosage=dosage)
-    X = _get_core_covariates(ds, covariates, add_intercept=add_intercept)
-    Y = _get_outcomes(ds, traits)
+
+    X = da.asarray(concat_2d(ds[list(covariates)], dims=("samples", "covariates")))
+    if add_intercept:
+        X = da.concatenate([da.ones((X.shape[0], 1), dtype=X.dtype), X], axis=1)
+    # Note: dask qr decomp (used by lstsq) requires no chunking in one
+    # dimension, and because dim 0 will be far greater than the number
+    # of covariates for the large majority of use cases, chunking
+    # should be removed from dim 1
+    X = X.rechunk((None, -1))
+
+    Y = da.asarray(concat_2d(ds[list(traits)], dims=("samples", "traits")))
+    # Like covariates, traits must also be tall-skinny arrays
+    Y = Y.rechunk((None, -1))
+
     res = linear_regression(G.T, X, Y)
     return xr.Dataset(
         {
