@@ -2,4 +2,5 @@ codecov
 pre-commit
 pytest
 pytest-cov
+hypothesis
 statsmodels
