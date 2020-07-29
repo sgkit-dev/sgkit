@@ -1,62 +1,31 @@
-from typing import Optional, Tuple
+from pathlib import Path
+from typing import Tuple
 
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
+from pandas import DataFrame
+from xarray import DataArray, Dataset
 
-from sgkit.api import create_genotype_call_dataset
 from sgkit.stats.hwe import hardy_weinberg_p_value as hwep
 from sgkit.stats.hwe import hardy_weinberg_p_value_jit as hwep_jit
 from sgkit.stats.hwe import hardy_weinberg_p_value_vec as hwep_vec
 from sgkit.stats.hwe import hardy_weinberg_p_value_vec_jit as hwep_vec_jit
 from sgkit.stats.hwe import hardy_weinberg_test as hwep_test
+from sgkit.testing import simulate_genotype_call_dataset
 
 
-def to_genotype_call_dataset(
-    call_genotype, n_contig: int = 1, seed: Optional[int] = None
-):
-    """Wrap a genotype call array in a Dataset instance
-
-    Parameters
-    ----------
-    call_genotype : (M, N, P) array-like
-        Genotype call array
-    n_contig : int, optional
-        Number of contigs to create in result, by default 1
-    seed : int, optional
-        Seed for random number generation
-
-    Returns
-    -------
-    Dataset
-        Dataset from `sgkit.create_genotype_call_dataset`
-    """
-    rs = np.random.RandomState(seed=seed)
-    m, n = call_genotype.shape[:2]
-    contig_size = np.ceil(m / n_contig).astype(int)
-    contig = np.arange(m) // contig_size
-    contig_names = np.unique(contig)
-    position = np.concatenate([np.arange(contig_size) for i in range(n_contig)])[:m]
-    alleles = rs.choice(["A", "C", "G", "T"], size=(m, 2)).astype("S")
-    sample_id = np.array([f"S{i}" for i in range(n)])
-    return create_genotype_call_dataset(
-        variant_contig_names=list(contig_names),
-        variant_contig=contig,
-        variant_position=position,
-        variant_alleles=alleles,
-        sample_id=sample_id,
-        call_genotype=call_genotype,
-    )
-
-
-def simulate_genotype_calls(m: int, n: int, p: Tuple[float, float, float]):
-    """Get dataset with diploid calls simulated from genotype distribution
+def simulate_genotype_calls(
+    n_variant: int, n_sample: int, p: Tuple[float, float, float], seed: int = 0
+) -> DataArray:
+    """Get dataset with diploid calls simulated from provided genotype distribution
 
     Parameters
     ----------
-    m : int
+    n_variant : int
         Number of variants
-    n : int
+    n_sample : int
         Number of samples
     p : Tuple[float, float, float]
         Genotype distribution as float in [0, 1] with order
@@ -64,47 +33,55 @@ def simulate_genotype_calls(m: int, n: int, p: Tuple[float, float, float]):
 
     Returns
     -------
-    call_genotype: array-like
-        Dataset from `sgkit.create_genotype_call_dataset`
+    call_genotype : (variants, samples, ploidy) DataArray
+        Genotype call matrix as 3D array with ploidy = 2.
     """
-    rs = np.random.RandomState(1)
+    rs = np.random.RandomState(seed)
     # Draw genotype codes with provided distribution
-    gt = np.stack([rs.choice([0, 1, 2], size=n, replace=True, p=p) for i in range(m)])
-    # Expand 3rd dimenion with calls matching genotypes
-    return np.stack([np.where(gt == 0, 0, 1), np.where(gt == 2, 1, 0)], axis=-1)
+    gt = np.stack(
+        [
+            rs.choice([0, 1, 2], size=n_sample, replace=True, p=p)
+            for i in range(n_variant)
+        ]
+    )
+    # Expand 3rd dimension with calls matching genotypes
+    gt = np.stack([np.where(gt == 0, 0, 1), np.where(gt == 2, 1, 0)], axis=-1)
+    return xr.DataArray(gt, dims=("variants", "samples", "ploidy"))
 
 
-def get_genotype_counts():
-    # Arguments for hwe calculations generated here
-    # match those generated externally for validation
-    # against C implementation (i.e. do not parameterize)
-    n, step = 10_000, 50
-    rs = np.random.RandomState(0)
-    n_het = np.expand_dims(np.arange(n, step=step) + 1, -1)
-    frac = rs.uniform(0.3, 0.7, size=(n // step, 2))
-    n_hom = frac * n_het
-    n_hom = n_hom.astype(int)
-    return np.concatenate((n_het, n_hom), axis=1)
+def get_simulation_data(datadir: Path) -> DataFrame:
+    return pd.read_csv(datadir / "sim_01.csv")
 
 
-def test_hwep_against_reference_impl():
-    args = get_genotype_counts()
-    p = [hwep(*arg) for arg in args]
-    np.testing.assert_allclose(p, EXPECTED_P_VAL)
+def test_hwep__reference_impl_comparison(datadir):
+    df = get_simulation_data(datadir)
+    cts = df[["n_het", "n_hom_1", "n_hom_2"]].values
+    p_expected = df["p"].values
+    p_actual = hwep_vec(*cts.T)
+    np.testing.assert_allclose(p_expected, p_actual)
+    p_actual = hwep_vec_jit(*cts.T)
+    np.testing.assert_allclose(p_expected, p_actual)
 
 
-def test_hwep_raise_on_negative():
+def test_hwep__raise_on_negative():
     args = [[-1, 0, 0], [0, -1, 0], [0, 0, -1]]
     for arg in args:
         with pytest.raises(ValueError):
             hwep(*arg)
 
 
-def test_hwep_zeros():
+def test_hwep__zeros():
     assert np.isnan(hwep(0, 0, 0))
 
 
-def test_hwep_large_counts():
+def test_hwep__pass():
+    # These seemingly arbitrary arguments trigger separate conditional
+    # branches based on odd/even midpoints in the Levene-Haldane distribution
+    assert not np.isnan(hwep(1, 1, 1))
+    assert not np.isnan(hwep(1, 2, 2))
+
+
+def test_hwep__large_counts():
     # Note: use jit-compiled function for large counts to avoid slowing build down
     for n_het in 10 ** np.arange(3, 8):
         # Test case in perfect equilibrium
@@ -115,251 +92,69 @@ def test_hwep_large_counts():
         assert np.isclose(p, 0, atol=1e-8)
 
 
-def test_hwep_vec():
-    args = get_genotype_counts()
-    p = hwep_vec(*args.T)
-    np.testing.assert_allclose(p, EXPECTED_P_VAL)
-    p = hwep_vec_jit(*args.T)
-    np.testing.assert_allclose(p, EXPECTED_P_VAL)
-
-
-def test_hwep_vec_bad_args():
-    with pytest.raises(ValueError):
+def test_hwep_vec__raise_on_unequal_dims():
+    with pytest.raises(ValueError, match="All arrays must have same length"):
         hwep_vec(np.zeros(2), np.zeros(1), np.zeros(1))
-    with pytest.raises(ValueError):
+
+
+def test_hwep_vec__raise_on_non1d():
+    with pytest.raises(ValueError, match="All arrays must be 1D"):
         hwep_vec(np.zeros((2, 2)), np.zeros(2), np.zeros(2))
 
 
-def test_hwep_dataset():
-    # Test cases in equilibrium
-    gt_dist = [0.25, 0.5, 0.25]
-    call_genotype = simulate_genotype_calls(50, 1000, p=gt_dist)
-    ds = to_genotype_call_dataset(call_genotype)
-    p = hwep_test(ds)["variant/hwe_p_value"].values
+@pytest.fixture(scope="module")
+def ds_eq():
+    """Dataset with all variants near HWE"""
+    ds = simulate_genotype_call_dataset(n_variant=50, n_sample=1000)
+    gt_dist = (0.25, 0.5, 0.25)
+    ds["call/genotype"] = simulate_genotype_calls(
+        ds.dims["variants"], ds.dims["samples"], p=gt_dist
+    )
+    return ds
+
+
+@pytest.fixture(scope="module")
+def ds_neq():
+    """Dataset with all variants well out of HWE"""
+    ds = simulate_genotype_call_dataset(n_variant=50, n_sample=1000)
+    gt_dist = (0.9, 0.05, 0.05)
+    ds["call/genotype"] = simulate_genotype_calls(
+        ds.dims["variants"], ds.dims["samples"], p=gt_dist
+    )
+    return ds
+
+
+def test_hwep_dataset__in_eq(ds_eq: Dataset) -> None:
+    p = hwep_test(ds_eq)["variant/hwe_p_value"].values
     assert np.all(p > 1e-8)
 
-    # Test cases out of equilibrium
-    gt_dist = [0.9, 0.05, 0.05]
-    call_genotype = simulate_genotype_calls(50, 1000, p=gt_dist)
-    ds = to_genotype_call_dataset(call_genotype)
-    p = hwep_test(ds)["variant/hwe_p_value"].values
-    assert np.all(p < 1e-8)
 
-    # Test with pre-assigned counts
-    ds = ds.assign(**{"call/allele_count": ds["call/genotype"].sum(dim="ploidy")})
-    p = hwep_test(ds)
+def test_hwep_dataset__out_of_eq(ds_neq: Dataset) -> None:
+    p = hwep_test(ds_neq)["variant/hwe_p_value"].values
     assert np.all(p < 1e-8)
 
 
-def test_hwep_dataset_bad_args():
-    with pytest.raises(NotImplementedError):
+def test_hwep_dataset__precomputed_counts(ds_neq: Dataset) -> None:
+    ds = ds_neq
+    ac = ds["call/genotype"].sum(dim="ploidy")
+    cts = [1, 0, 2]  # arg order: hets, hom1, hom2
+    gtc = xr.concat([(ac == ct).sum(dim="samples") for ct in cts], dim="counts").T  # type: ignore[no-untyped-call]
+    ds = ds.assign(**{"variant/genotype_counts": gtc})
+    p = hwep_test(ds, genotype_counts="variant/genotype_counts")
+    assert np.all(p < 1e-8)
+
+
+def test_hwep_dataset__raise_on_nondiploid():
+    with pytest.raises(
+        NotImplementedError, match="HWE test only implemented for diploid genotypes"
+    ):
         ds = xr.Dataset({"x": (("ploidy", "alleles"), np.zeros((3, 2)))})
         hwep_test(ds)
-    with pytest.raises(NotImplementedError):
+
+
+def test_hwep_dataset__raise_on_biallelic():
+    with pytest.raises(
+        NotImplementedError, match="HWE test only implemented for biallelic genotypes"
+    ):
         ds = xr.Dataset({"x": (("ploidy", "alleles"), np.zeros((2, 3)))})
         hwep_test(ds)
-
-
-# Export from execution of C/C++ code at http://csg.sph.umich.edu/abecasis/Exact/snp_hwe.c
-EXPECTED_P_VAL = [
-    1.00000000e000,
-    8.45926829e-001,
-    8.89304245e-001,
-    3.68487492e-001,
-    2.83442131e-001,
-    1.93780506e-001,
-    3.46415612e-002,
-    9.77805142e-007,
-    9.00169099e-002,
-    2.77392776e-004,
-    5.78595078e-006,
-    1.56290046e-001,
-    3.11983705e-002,
-    7.78234779e-001,
-    6.28255056e-001,
-    9.17242816e-001,
-    8.81087089e-001,
-    1.20954751e-004,
-    6.51960684e-002,
-    4.87927509e-007,
-    6.14320396e-002,
-    1.67216769e-003,
-    2.58323982e-003,
-    9.22666204e-012,
-    1.15591803e-003,
-    1.00000000e000,
-    5.21303203e-001,
-    2.40595832e-012,
-    1.79017126e-001,
-    8.50964237e-004,
-    4.08782584e-018,
-    2.65625649e-003,
-    1.73047163e-007,
-    2.61257337e-002,
-    3.40282167e-002,
-    5.57265342e-006,
-    2.28187711e-010,
-    3.71009969e-005,
-    2.02796027e-015,
-    2.85690782e-015,
-    4.43715904e-004,
-    1.24880234e-005,
-    1.39680904e-002,
-    6.69133747e-009,
-    9.43219724e-010,
-    6.10161450e-001,
-    1.93499955e-003,
-    1.44451527e-014,
-    1.15651799e-011,
-    6.16416362e-006,
-    2.18519190e-001,
-    2.67902896e-020,
-    3.81265044e-003,
-    1.87170429e-002,
-    2.87276124e-001,
-    1.46939801e-004,
-    5.90523804e-001,
-    9.00712608e-003,
-    7.82143524e-011,
-    1.55029275e-016,
-    1.00796610e-003,
-    6.51775272e-018,
-    7.22627291e-001,
-    3.50621941e-033,
-    2.15694037e-001,
-    5.36554440e-001,
-    4.98209450e-023,
-    1.00725415e-002,
-    2.83256119e-004,
-    2.31647615e-001,
-    5.40831311e-004,
-    2.28693251e-006,
-    2.33943256e-016,
-    4.63666449e-002,
-    1.95571664e-029,
-    1.32013500e-001,
-    1.93010279e-006,
-    1.72246817e-002,
-    4.44008208e-010,
-    2.64771353e-025,
-    1.42567926e-002,
-    2.34658222e-023,
-    5.14985651e-044,
-    4.48467881e-038,
-    2.38901290e-003,
-    3.00019737e-020,
-    9.91998679e-058,
-    3.85771324e-001,
-    1.19901665e-004,
-    1.09586529e-012,
-    4.52696626e-007,
-    4.52117435e-005,
-    3.74269466e-022,
-    1.84769664e-002,
-    9.01235925e-001,
-    4.71167421e-016,
-    7.26213285e-001,
-    2.68067642e-005,
-    1.95763513e-027,
-    3.44681033e-030,
-    6.72973257e-001,
-    1.90998085e-021,
-    2.71129678e-092,
-    1.33474542e-002,
-    9.42328262e-016,
-    6.04559513e-002,
-    2.73568136e-002,
-    3.45497420e-013,
-    1.85964309e-010,
-    2.25791165e-016,
-    8.88002002e-023,
-    7.31645858e-001,
-    6.20103273e-001,
-    2.02013957e-003,
-    3.26543825e-041,
-    9.55096556e-034,
-    1.58435946e-031,
-    1.67723973e-017,
-    3.01571822e-004,
-    5.94647843e-004,
-    3.50999380e-003,
-    1.42692287e-018,
-    4.40701593e-002,
-    1.02072821e-010,
-    6.12844453e-020,
-    4.01149386e-007,
-    4.52329633e-028,
-    6.36621011e-004,
-    2.40691727e-003,
-    1.51079564e-004,
-    1.46439431e-059,
-    1.19603499e-007,
-    2.30499126e-023,
-    3.90483620e-004,
-    3.00491712e-033,
-    4.67334134e-075,
-    2.14446525e-007,
-    5.74808603e-002,
-    7.54901939e-059,
-    1.00820382e-028,
-    5.45503604e-002,
-    2.00408985e-029,
-    2.60055020e-038,
-    1.37950333e-021,
-    1.67336706e-003,
-    5.11497091e-038,
-    9.63001456e-002,
-    1.85048263e-012,
-    7.60512104e-005,
-    1.90260703e-097,
-    8.41707732e-055,
-    5.02772009e-056,
-    4.74769747e-021,
-    1.53427038e-108,
-    3.65547065e-022,
-    3.59345583e-005,
-    4.29008968e-115,
-    2.29690838e-003,
-    5.12962271e-001,
-    2.82010264e-044,
-    1.25488919e-059,
-    4.26516777e-072,
-    2.92597766e-014,
-    1.13938024e-020,
-    2.65101694e-019,
-    6.39260807e-003,
-    3.44575391e-019,
-    2.46964669e-042,
-    2.18893082e-023,
-    2.32535921e-005,
-    3.67548497e-033,
-    6.28178465e-050,
-    4.01855250e-010,
-    8.14210277e-007,
-    7.19942047e-038,
-    1.23293898e-028,
-    1.04555107e-001,
-    2.80977631e-008,
-    3.38829632e-065,
-    3.67682844e-014,
-    7.97794167e-001,
-    9.88137129e-001,
-    7.83054274e-016,
-    6.10205517e-003,
-    3.54737998e-051,
-    1.00000000e000,
-    1.23015267e-024,
-    7.06536040e-069,
-    2.27403687e-082,
-    2.12853071e-001,
-    2.09868517e-014,
-    4.20835611e-040,
-    1.72349554e-079,
-    1.58828256e-003,
-    6.46108778e-001,
-    1.80557310e-058,
-    2.70043232e-001,
-    1.84978056e-007,
-    6.97911818e-017,
-    6.09976723e-137,
-]

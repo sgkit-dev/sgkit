@@ -1,3 +1,5 @@
+from typing import Hashable, Optional
+
 import dask.array as da
 import numpy as np
 import xarray as xr
@@ -5,12 +7,8 @@ from numba import njit
 from numpy import ndarray
 from xarray import Dataset
 
-# TODO: Is there a way to get coverage on jit-compiled functions?
 
-
-def hardy_weinberg_p_value(
-    obs_hets: int, obs_hom1: int, obs_hom2: int
-) -> float:  # pragma: no cover
+def hardy_weinberg_p_value(obs_hets: int, obs_hom1: int, obs_hom2: int) -> float:
     """Exact test for HWE as described in Wigginton et al. 2005 [1]
 
     Parameters
@@ -48,7 +46,7 @@ def hardy_weinberg_p_value(
     het_probs = np.zeros(obs_mac + 1, dtype=np.float64)
 
     if obs_n == 0:
-        return np.nan
+        return np.nan  # type: ignore[no-any-return]
 
     # Identify distribution midpoint
     mid = int(obs_mac * (2 * obs_n - obs_mac) / (2 * obs_n))
@@ -90,13 +88,13 @@ def hardy_weinberg_p_value(
         curr_homc -= 1
         curr_hets += 2
 
-    if prob_sum <= 0:
-        return np.nan
+    if prob_sum <= 0:  # pragma: no cover
+        return np.nan  # type: ignore[no-any-return]
     het_probs = het_probs / prob_sum
     p = het_probs[het_probs <= het_probs[obs_hets]].sum()
     p = max(min(1.0, p), 0.0)
 
-    return p
+    return p  # type: ignore[no-any-return]
 
 
 # Benchmarks show ~25% improvement w/ fastmath on large (~10M) counts
@@ -121,20 +119,23 @@ def hardy_weinberg_p_value_vec(
 hardy_weinberg_p_value_vec_jit = njit(hardy_weinberg_p_value_vec, fastmath=True)
 
 
-def hardy_weinberg_test(ds: Dataset):
+def hardy_weinberg_test(
+    ds: Dataset, genotype_counts: Optional[Hashable] = None
+) -> Dataset:
     if ds.dims["ploidy"] != 2:
         raise NotImplementedError("HWE test only implemented for diploid genotypes")
     if ds.dims["alleles"] != 2:
         raise NotImplementedError("HWE test only implemented for biallelic genotypes")
-    if "call/allele_count" in ds:
-        ac = ds["call/allele_count"]
+    # Use precomputed genotype counts, if provided
+    if genotype_counts is not None:
+        obs = list(da.asarray(ds[genotype_counts]).T)
+    # Otherwise, compute genotype counts from calls
     else:
-        # TODO: centralize allele counting like this somewhere
+        # TODO: Use API genotype counting function instead, e.g.
+        # https://github.com/pystatgen/sgkit/issues/29#issuecomment-656691069
         mask = ds["call/genotype_mask"].any(dim="ploidy")
-        ac = xr.where(mask, -1, ds["call/genotype"].sum(dim="ploidy"))
-    # Split into separate per-variant sums for homozygotes and heterozygotes;
-    # note that negative values will be ignored
-    cts = [1, 0, 2]  # arg order: hets, hom1, hom2
-    obs = [da.asarray((ac == ct).sum(dim="samples")) for ct in cts]
+        gtc = xr.where(mask, -1, ds["call/genotype"].sum(dim="ploidy"))  # type: ignore[no-untyped-call]
+        cts = [1, 0, 2]  # arg order: hets, hom1, hom2
+        obs = [da.asarray((gtc == ct).sum(dim="samples")) for ct in cts]
     p = da.map_blocks(hardy_weinberg_p_value_vec_jit, *obs)
     return xr.Dataset({"variant/hwe_p_value": ("variants", p)})
