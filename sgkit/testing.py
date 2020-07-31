@@ -1,9 +1,8 @@
 from typing import Optional
 
 import numpy as np
-from xarray import Dataset
 
-from .api import create_genotype_call_dataset
+from .api import GenotypeCall, SgkitDataset
 from .utils import split_array_chunks
 
 
@@ -14,7 +13,7 @@ def simulate_genotype_call_dataset(
     n_allele: int = 2,
     n_contig: int = 1,
     seed: Optional[int] = None,
-) -> Dataset:
+) -> SgkitDataset[GenotypeCall]:
     """Simulate genotype calls and variant/sample data.
 
     Note that the data simulated by this function has no
@@ -58,7 +57,7 @@ def simulate_genotype_call_dataset(
     assert position.size == contig.size
     alleles = rs.choice(["A", "C", "G", "T"], size=(n_variant, n_allele)).astype("S")
     sample_id = np.array([f"S{i}" for i in range(n_sample)])
-    return create_genotype_call_dataset(
+    return SgkitDataset.create_genotype_call_dataset(
         variant_contig_names=list(contig_names),
         variant_contig=contig,
         variant_position=position,

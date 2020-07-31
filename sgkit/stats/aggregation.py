@@ -1,17 +1,20 @@
 import dask.array as da
 import numpy as np
 import xarray as xr
-from xarray import DataArray, Dataset
+from xarray import DataArray
+
+from sgkit import SgkitDataset
+from sgkit.api import GenotypeCall
 
 
-def count_alleles(ds: Dataset) -> DataArray:
+def count_alleles(sds: SgkitDataset[GenotypeCall]) -> DataArray:
     """Compute allele count from genotype calls.
 
     Parameters
     ----------
-    ds : Dataset
-        Genotype call dataset such as from
-        `sgkit.create_genotype_call_dataset`.
+    sds : SgkitDataset
+          Genotype call dataset such as from
+         `sgkit.create_genotype_call_dataset`.
 
     Returns
     -------
@@ -42,6 +45,7 @@ def count_alleles(ds: Dataset) -> DataArray:
     """
     # Count each allele index individually as a 1D vector and
     # restack into new alleles dimension with same order
+    ds = sds.xr_dataset
     G = ds["call_genotype"].stack(calls=("samples", "ploidy"))
     M = ds["call_genotype_mask"].stack(calls=("samples", "ploidy"))
     n_variant, n_allele = G.shape[0], ds.dims["alleles"]

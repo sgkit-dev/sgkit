@@ -2,21 +2,22 @@ from typing import Any
 
 import numpy as np
 import xarray as xr
-from xarray import Dataset
 
+from sgkit import SgkitDataset
+from sgkit.api import GenotypeCall
 from sgkit.stats.aggregation import count_alleles
 from sgkit.testing import simulate_genotype_call_dataset
 from sgkit.typing import ArrayLike
 
 
-def get_dataset(calls: ArrayLike, **kwargs: Any) -> Dataset:
+def get_dataset(calls: ArrayLike, **kwargs: Any) -> SgkitDataset[GenotypeCall]:
     calls = np.asarray(calls)
     ds = simulate_genotype_call_dataset(
         n_variant=calls.shape[0], n_sample=calls.shape[1], **kwargs
     )
-    dims = ds["call_genotype"].dims
-    ds["call_genotype"] = xr.DataArray(calls, dims=dims)
-    ds["call_genotype_mask"] = xr.DataArray(calls < 0, dims=dims)
+    dims = ds.xr_dataset["call_genotype"].dims
+    ds.xr_dataset["call_genotype"] = xr.DataArray(calls, dims=dims)
+    ds.xr_dataset["call_genotype_mask"] = xr.DataArray(calls < 0, dims=dims)
     return ds
 
 
@@ -83,6 +84,6 @@ def test_count_alleles__chunked():
     ds = get_dataset(calls)
     ac1 = count_alleles(ds)
     # Coerce from numpy to multiple chunks in all dimensions
-    ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))  # type: ignore[arg-type]
+    ds.xr_dataset["call_genotype"] = ds.xr_dataset["call_genotype"].chunk(chunks=(5, 5, 1))  # type: ignore[arg-type]
     ac2 = count_alleles(ds)
     xr.testing.assert_equal(ac1, ac2)  # type: ignore[no-untyped-call]
