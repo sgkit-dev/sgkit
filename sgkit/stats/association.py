@@ -103,7 +103,7 @@ def _get_loop_covariates(ds: Dataset, dosage: Optional[str] = None) -> Array:
     if dosage is None:
         # TODO: This should be (probably gwas-specific) allele
         # count with sex chromosome considerations
-        G = ds["call/genotype"].sum(dim="ploidy")  # pragma: no cover
+        G = ds["call_genotype"].sum(dim="ploidy")  # pragma: no cover
     else:
         G = ds[dosage]
     return da.asarray(G.data)
