@@ -9,11 +9,8 @@ import yaml
 import zarr
 from sgkit_plink import read_plink
 
+logging.config.fileConfig("logging.ini")
 logger = logging.getLogger(__name__)
-logging.basicConfig(
-    level=logging.INFO,
-    format="|%(asctime)s|%(levelname)s|%(name)s.%(funcName)s:%(lineno)d| %(message)s",
-)
 
 
 def run(dataset: str, dataset_dir="data/dataset"):
@@ -23,7 +20,8 @@ def run(dataset: str, dataset_dir="data/dataset"):
     ds = read_plink(plink_path, bim_sep="\t", fam_sep="\t")
     # Temporary workaround for https://github.com/pystatgen/sgkit/issues/62
     ds = ds.rename_vars({v: v.replace("/", "-") for v in ds})
-    # TODO: add reference to issue for readers on fixed length strings
+    # Pre-compute string lengths until this is done:
+    # https://github.com/pystatgen/sgkit-plink/issues/12
     ds = ds.compute()
     logger.info(f"Loaded dataset {dataset}:")
     logger.info("\n" + str(ds))

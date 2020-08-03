@@ -11,11 +11,8 @@ import numpy as np
 import pandas as pd
 import yaml
 
+logging.config.fileConfig("logging.ini")
 logger = logging.getLogger(__name__)
-logging.basicConfig(
-    level=logging.INFO,
-    format="|%(asctime)s|%(levelname)s|%(name)s.%(funcName)s:%(lineno)d| %(message)s",
-)
 
 
 def _info(df):

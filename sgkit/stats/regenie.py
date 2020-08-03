@@ -135,7 +135,10 @@ def ridge_regression(
     dtype: Any = None,
 ) -> ArrayLike:
     """Multi-outcome, multi-parameter ridge regression from CV intermediates."""
-    assert XtX.shape[0] == XtX.shape[1] == XtY.shape[0]
+    if XtX.shape[0] != XtX.shape[1]:
+        raise ValueError(f"First argument must be symmetric (shape = {XtX.shape})")
+    if XtX.shape[0] != XtY.shape[0]:
+        raise ValueError("Array arguments must have same size in first dimension")
     diags = []
     for i in range(len(alphas)):
         diag = np.ones(XtX.shape[1]) * alphas[i]

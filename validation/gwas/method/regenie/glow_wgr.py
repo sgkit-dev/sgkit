@@ -1,6 +1,7 @@
 import os
 import sys
 
+# Use same conda environment for spark workers as driver env
 os.environ["PYSPARK_PYTHON"] = sys.executable
 
 import io
@@ -26,11 +27,8 @@ from glow.wgr.linear_model import RidgeReducer, RidgeRegression
 from pyspark.sql import DataFrame
 from pyspark.sql.session import SparkSession
 
+logging.config.fileConfig("logging.ini")
 logger = logging.getLogger(__name__)
-logging.basicConfig(
-    level=logging.INFO,
-    format="|%(asctime)s|%(levelname)s|%(name)s.%(funcName)s:%(lineno)d| %(message)s",
-)
 
 HR = "-" * 50
 

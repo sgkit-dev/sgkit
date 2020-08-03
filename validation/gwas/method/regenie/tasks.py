@@ -1,4 +1,5 @@
 import glob
+import logging
 import os
 import shutil
 from pathlib import Path
@@ -6,10 +7,15 @@ from pathlib import Path
 import yaml
 from invoke import task
 
+logging.config.fileConfig("logging.ini")
+logger = logging.getLogger(__name__)
+
 HAILPY = os.environ.get("HAIL_PYTHON_EXECUTABLE", "/opt/conda/envs/hail/bin/python")
 GLOWPY = os.environ.get("GLOW_PYTHON_EXECUTABLE", "/opt/conda/envs/glow/bin/python")
 BASEPY = os.environ.get("BASE_PYTHON_EXECUTABLE", "/opt/conda/bin/python")
-DEFAULT_TEST_DATADIR = os.getenv("TEST_DATADIR", "../../../../sgkit/tests/test_regenie")
+DEFAULT_TEST_DATADIR = os.getenv(
+    "TEST_DATADIR", str(Path(__file__).parents[4] / "sgkit/tests/test_regenie")
+)
 
 
 def get_config():
@@ -33,7 +39,7 @@ def filter_config(config, runs):
 
 @task
 def run_simulation(ctx, dataset):
-    print(f"Running simulation for dataset {dataset}")
+    logger.info(f"Running simulation for dataset {dataset}")
     ctx.run(f"{HAILPY} hail_sim.py run_from_config {dataset}")
 
 
@@ -46,7 +52,7 @@ def run_simulations(ctx):
 
 @task
 def run_glow_wgr(ctx, dataset, paramset):
-    print(f"Running Glow WGR for dataset {dataset}, paramset {paramset}")
+    logger.info(f"Running Glow WGR for dataset {dataset}, paramset {paramset}")
     ctx.run(f"{GLOWPY} glow_wgr.py run_from_config {dataset} {paramset}")
 
 
@@ -63,11 +69,11 @@ def run_all_glow_wgr(ctx):
 
 
 def copy_files(src, dst, patterns):
-    print(f"Copying files from {src} to {dst}")
+    logger.info(f"Copying files from {src} to {dst}")
     dst.mkdir(parents=True, exist_ok=True)
     files = [Path(f) for pattern in patterns for f in glob.glob(str(src / pattern))]
     for f in files:
-        print("\tCopying path:", f)
+        logger.info("\tCopying path: {f}")
         if f.is_dir():
             shutil.copytree(f, dst / f.name)
         else:
@@ -79,7 +85,7 @@ def export(ctx, test_datadir=DEFAULT_TEST_DATADIR, clear=True, runs=None):
     test_datadir = Path(test_datadir).resolve()
     src_datadir = Path("data")
     if clear and test_datadir.exists():
-        print(f"Clearing test datadir at {test_datadir}")
+        logger.info(f"Clearing test datadir at {test_datadir}")
         shutil.rmtree(test_datadir)
     test_datadir.mkdir(exist_ok=True)
     config = get_config()
@@ -100,10 +106,10 @@ def export(ctx, test_datadir=DEFAULT_TEST_DATADIR, clear=True, runs=None):
     config_path = test_datadir / "config.yml"
     with open(config_path, "w") as fd:
         yaml.dump(config, fd)
-    print(f"Config written to {config_path}")
-    print("Export complete")
+    logger.info(f"Config written to {config_path}")
+    logger.info("Export complete")
 
 
 @task(pre=[run_simulations, run_all_glow_wgr, run_plink_to_zarr])
 def build(ctx):
-    print("Building")
+    logger.info("Test data generation complete")
