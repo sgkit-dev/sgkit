@@ -1,7 +1,6 @@
 from typing import Any, Dict, Hashable, List
 
 import numpy as np
-import pandas as pd
 import xarray as xr
 
 from .utils import check_array_like
@@ -137,53 +136,3 @@ def create_genotype_dosage_dataset(
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
     return xr.Dataset(data_vars=data_vars, attrs=attrs)
-
-
-class GenotypeDisplay:
-    """
-    A printable object to display genotype information.
-    """
-
-    def __init__(self, df: pd.DataFrame):
-        self.df = df
-
-    def __repr__(self) -> Any:
-        return self.df.__repr__()
-
-    def _repr_html_(self) -> Any:
-        return self.df._repr_html_()
-
-
-def display_genotypes(ds: xr.Dataset) -> GenotypeDisplay:
-    """Display genotype calls.
-
-    Display genotype calls in a tabular format, with rows for variants,
-    and columns for samples. Genotypes are displayed in the same manner
-    as in VCF. For example, `1/0` is a diploid call of the first alternate
-    allele and the reference allele (0). Phased calls are denoted by a `|`
-    separator. Missing values are denoted by `.`.
-
-    Parameters
-    ----------
-    ds : Dataset
-        The dataset containing genotype calls in the `call/genotype`
-        variable, and (optionally) phasing information in the
-        `call/genotype_phased` variable. If no phasing information is
-        present genotypes are assumed to be unphased.
-
-    Returns
-    -------
-    GenotypeDisplay
-        A printable object to display genotype information.
-    """
-    calls = ds["call/genotype"].to_series().unstack().astype(str)
-    missing = ds["call/genotype_mask"].to_series().unstack()
-    calls[missing] = "."
-    df = calls.apply("/".join, axis=1).unstack()
-
-    if "call/genotype_phased" in ds:
-        is_phased = ds["call/genotype_phased"].to_series().unstack()
-        df_phased = calls.apply("|".join, axis=1).unstack()
-        df[is_phased] = df_phased
-
-    return GenotypeDisplay(df)

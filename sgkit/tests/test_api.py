@@ -55,44 +55,12 @@ def test_create_genotype_call_dataset():
     assert (
         str(disp)
         == """
-samples     0    1    2
-variants               
-0         0|0  0|1  1/0
-1         .|0  0/.  ./.
+samples  sample_1 sample_2 sample_3
+variants                           
+rs1           0|0      0|1      1/0
+rs2           .|0      0/.      ./.
 """.strip()  # noqa: W291
     )
-
-    expected_html = """<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th>samples</th>
-      <th>0</th>
-      <th>1</th>
-      <th>2</th>
-    </tr>
-    <tr>
-      <th>variants</th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0|0</td>
-      <td>0|1</td>
-      <td>1/0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>.|0</td>
-      <td>0/.</td>
-      <td>./.</td>
-    </tr>
-  </tbody>
-</table>"""
-    assert expected_html in disp._repr_html_()
 
 
 def test_create_genotype_dosage_dataset():
