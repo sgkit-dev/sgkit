@@ -18,6 +18,13 @@ To check code coverage and get a coverage report, run
 pytest --cov=sgkit --cov-report term-missing
 ```
 
+To check that the documentation builds without warnings, run
+
+```bash
+cd docs
+make clean html SPHINXOPTS="-W --keep-going"
+```
+
 ### Code standards
 
 Use [pre-commit](https://pre-commit.com/) to check or enforce the coding standards. Install the git hook using:

@@ -49,7 +49,7 @@ def create_genotype_call_dataset(
 
     Returns
     -------
-    xr.Dataset
+    :class:`xarray.Dataset`
         The dataset of genotype calls.
 
     """
