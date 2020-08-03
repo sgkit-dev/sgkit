@@ -15,7 +15,7 @@ def count_alleles(ds: Dataset) -> DataArray:
 
     Returns
     -------
-    variant/allele_count : DataArray
+    variant_allele_count : DataArray
         Allele counts with shape (variants, alleles) and values
         corresponding to the number of non-missing occurrences
         of each allele.
@@ -68,4 +68,4 @@ def count_alleles(ds: Dataset) -> DataArray:
     AC = CTS.sum(axis=0)[:, :n_allele]
     assert AC.shape == (n_variant, n_allele)
 
-    return DataArray(data=AC, dims=("variants", "alleles"), name="variant/allele_count")
+    return DataArray(data=AC, dims=("variants", "alleles"), name="variant_allele_count")
