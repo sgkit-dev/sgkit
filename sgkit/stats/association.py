@@ -215,8 +215,8 @@ def gwas_linear_regression(
     res = linear_regression(G.T, X, Y)
     return xr.Dataset(
         {
-            "variant/beta": (("variants", "traits"), res.beta),
-            "variant/t_value": (("variants", "traits"), res.t_value),
-            "variant/p_value": (("variants", "traits"), res.p_value),
+            "variant_beta": (("variants", "traits"), res.beta),
+            "variant_t_value": (("variants", "traits"), res.t_value),
+            "variant_p_value": (("variants", "traits"), res.p_value),
         }
     )
