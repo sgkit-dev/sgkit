@@ -36,7 +36,7 @@ def simulate_genotype_call_dataset(
         Number of alleles to simulate
     n_contig : int, optional
         Number of contigs to partition variants with,
-        controlling values in `variant/contig`. Values
+        controlling values in `variant_contig`. Values
         will all be 0 by default with `n_contig` == 1.
     seed : int, optional
         Seed for random number generation
