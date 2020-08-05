@@ -1,9 +1,7 @@
-from typing import Any, Tuple
+from typing import Any, Hashable, Mapping, Tuple
 
 import pandas as pd
 import xarray as xr
-
-from .typing import ArrayLike
 
 
 class GenotypeDisplay:
@@ -58,59 +56,75 @@ class GenotypeDisplay:
             return self.df._repr_html_()
 
 
-def _truncate(
-    arr: xr.DataArray,
-    variants: xr.DataArray,
-    samples: xr.DataArray,
-    max_variants: int,
-    max_samples: int,
-) -> xr.DataArray:
-    """Truncate the given array so it is of size (at most) `(max_variants + 1, max_samples + 1)`.
+def truncate(ds: xr.Dataset, max_sizes: Mapping[Hashable, int]) -> xr.Dataset:
+    """Truncate a dataset along two dimensions into a form suitable for display.
 
-    The reason the size may exceed `(max_variants, max_samples)` is so that pandas can be used to
-    display the array as a table, and correctly truncate rows or columns (shown as ellipses ...).
+    Truncation involves taking four rectangles from each corner of the dataset array
+    (or arrays) and combining them into a smaller dataset array (or arrays).
+
+    Parameters
+    ----------
+    ds : Dataset
+        The dataset to be truncated.
+    max_sizes : Mapping[Hashable, int]
+        A dict with keys matching dimensions and integer values indicating
+        the maximum size of the dimension after truncation.
+
+    Returns
+    -------
+    Dataset
+        A truncated dataset.
+
+    Warnings
+    --------
+    A maximum size of `n` may result in the array having size `n + 2` (and not `n`).
+    The reason for this is so that pandas can be used to display the array as a table,
+    and correctly truncate rows or columns (shown as ellipses ...).
     """
 
-    n_variant = arr.sizes["variants"]
-    n_sample = arr.sizes["samples"]
+    if len(max_sizes) != 2:
+        raise ValueError("Truncation is only supported for two dimensions")
 
-    if n_variant <= max_variants:
-        # slice in half and recombine below
-        v_slice_0 = slice(0, n_variant // 2)
-        v_slice_1 = slice(n_variant // 2, n_variant)
+    dims = list(max_sizes.keys())
+    max_dim = max_sizes[dims[0]], max_sizes[dims[1]]
+    n_dim = ds.sizes[dims[0]], ds.sizes[dims[1]]
+
+    if n_dim[0] <= max_dim[0] + 2 and n_dim[1] <= max_dim[1] + 2:
+        # No truncation required
+        return ds
+
+    if n_dim[0] <= max_dim[0] + 1:
+        # Truncate dim1 only
+        m_dim = n_dim[0], max_dim[1] // 2 + 1
+        rows = [[(0, 0), (0, m_dim[1])]]
+    elif n_dim[1] <= max_dim[1] + 1:
+        # Truncate dim0 only
+        m_dim = max_dim[0] // 2 + 1, n_dim[1]
+        rows = [[(0, 0)], [(m_dim[0], 0)]]
     else:
-        v_slice_0 = slice(0, max_variants // 2 + 1)
-        v_slice_1 = slice(n_variant - max_variants // 2, n_variant)
+        # Truncate both dimensions
+        m_dim = max_dim[0] // 2 + 1, max_dim[1] // 2 + 1
+        rows = [[(0, 0), (0, m_dim[1])], [(m_dim[0], 0), (m_dim[0], m_dim[1])]]
 
-    if n_sample <= max_samples:
-        # slice in half and recombine below
-        s_slice_0 = slice(0, n_sample // 2)
-        s_slice_1 = slice(n_sample // 2, n_sample)
-    else:
-        s_slice_0 = slice(0, max_samples // 2 + 1)
-        s_slice_1 = slice(n_sample - max_samples // 2, n_sample)
-
-    grid = [
+    limits = {dims[0]: m_dim[0], dims[1]: m_dim[1]}
+    slices = {k: slice(v) for k, v in limits.items()}
+    ds_abbr: xr.Dataset = xr.combine_nested(  # type: ignore[no-untyped-call]
         [
-            arr.isel(variants=v_slice_0, samples=s_slice_0),
-            arr.isel(variants=v_slice_0, samples=s_slice_1),
+            [
+                # Roll all of these simultaneously along with any indexes/coords
+                # and then clip them using the same slice for each corner
+                ds.roll(dict(zip(limits, roll)), roll_coords=True).isel(**slices)
+                for roll in row
+            ]
+            for row in rows
         ],
-        [
-            arr.isel(variants=v_slice_1, samples=s_slice_0),
-            arr.isel(variants=v_slice_1, samples=s_slice_1),
-        ],
-    ]
-    combined: xr.DataArray = xr.combine_nested(grid, concat_dim=["variants", "samples"])  # type: ignore[no-untyped-call]
+        concat_dim=limits.keys(),
+    )
 
-    variants_subset: xr.DataArray = xr.combine_nested([variants.isel(variants=v_slice_0), variants.isel(variants=v_slice_1)], concat_dim=["variants"])  # type: ignore[no-untyped-call]
-    samples_subset: xr.DataArray = xr.combine_nested([samples.isel(samples=s_slice_0), samples.isel(samples=s_slice_1)], concat_dim=["samples"])  # type: ignore[no-untyped-call]
-    combined = combined.assign_coords(variants=variants_subset)  # type: ignore[no-untyped-call]
-    combined = combined.assign_coords(samples=samples_subset)  # type: ignore[no-untyped-call]
+    assert ds_abbr.sizes[dims[0]] <= max_dim[0] + 2
+    assert ds_abbr.sizes[dims[1]] <= max_dim[1] + 2
 
-    assert combined.shape[0] <= max_variants + 1
-    assert combined.shape[1] <= max_samples + 1
-
-    return combined
+    return ds_abbr
 
 
 def display_genotypes(
@@ -144,49 +158,41 @@ def display_genotypes(
         A printable object to display genotype information.
     """
 
-    variants = ds["variant_id"] if "variant_id" in ds else ds["variant_position"]
+    # Create a copy to avoid clobbering original indexes
+    ds_calls = ds.copy()
 
-    gt = _truncate(
-        ds["call_genotype"], variants, ds["sample_id"], max_variants, max_samples
-    ).astype(str)
-    missing = _truncate(
-        ds["call_genotype_mask"], variants, ds["sample_id"], max_variants, max_samples
+    # Set indexes only if not already set (allows users to have different row/col labels)
+    if isinstance(ds_calls.get_index("samples"), pd.RangeIndex):
+        ds_calls = ds_calls.set_index(samples="sample_id")
+    if isinstance(ds_calls.get_index("variants"), pd.RangeIndex):
+        variant_index = "variant_id" if "variant_id" in ds_calls else "variant_position"
+        ds_calls = ds_calls.set_index(variants=variant_index)
+
+    # Restrict to genotype call variables
+    if "call_genotype_phased" in ds_calls:
+        ds_calls = ds_calls[
+            ["call_genotype", "call_genotype_mask", "call_genotype_phased"]
+        ]
+    else:
+        ds_calls = ds_calls[["call_genotype", "call_genotype_mask"]]
+
+    # Truncate the dataset then convert to a dataframe
+    ds_abbr = truncate(
+        ds_calls, max_sizes={"variants": max_variants, "samples": max_samples}
     )
-    calls = xr.where(missing, ".", gt)  # type: ignore[no-untyped-call]
+    df = ds_abbr.to_dataframe().unstack(level="ploidy")  # type: ignore[no-untyped-call]
 
-    def make_unphased_genotype(x: ArrayLike) -> str:
-        return "/".join(map(str, x))
+    # Convert each genotype to a string representation
+    def calls_to_str(r: pd.DataFrame) -> str:
+        gt = r["call_genotype"].astype(str)
+        gt_mask = r["call_genotype_mask"].astype(bool)
+        gt[gt_mask] = "."
+        if "call_genotype_phased" in r and r["call_genotype_phased"][0]:
+            return "|".join(gt)
+        return "/".join(gt)
 
-    arr = xr.apply_ufunc(
-        make_unphased_genotype, calls, input_core_dims=[["ploidy"]], vectorize=True
-    )
+    df = df.apply(calls_to_str, axis=1).unstack("samples")
 
-    if "call_genotype_phased" in ds:
-
-        def make_phased_genotype(x: ArrayLike) -> str:
-            return "|".join(map(str, x))
-
-        arr_phased = xr.apply_ufunc(
-            make_phased_genotype, calls, input_core_dims=[["ploidy"]], vectorize=True
-        )
-
-        is_phased = _truncate(
-            ds["call_genotype_phased"],
-            variants,
-            ds["sample_id"],
-            max_variants,
-            max_samples,
-        )
-        arr = xr.where(is_phased, arr_phased, arr)  # type: ignore[no-untyped-call]
-
-    df_stacked = arr.to_series()
-    df = df_stacked.unstack()
-    # Reset the index so that column names are in the original order (not sorted)
-    # https://stackoverflow.com/questions/17156662/pandas-dataframe-unstack-changes-order-of-row-and-column-headers
-    df = df.reindex(df_stacked.index.get_level_values(1).unique(), axis=1)
     return GenotypeDisplay(
-        df,
-        (ds["call_genotype"].sizes["variants"], ds["call_genotype"].sizes["samples"]),
-        max_variants,
-        max_samples,
+        df, (ds.sizes["variants"], ds.sizes["samples"]), max_variants, max_samples,
     )
