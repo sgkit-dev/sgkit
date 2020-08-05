@@ -57,7 +57,7 @@ def count_alleles(ds: Dataset) -> DataArray:
         G,
         chunks=(G.chunks[0], max_allele),  # type: ignore[index]
     )
-    assert CT.shape == (n_variant, max_allele)
+    assert CT.shape == (n_variant, G.numblocks[1] * max_allele)
 
     # Stack the column blocks on top of each other
     CTS = da.stack([CT.blocks[:, i] for i in range(CT.numblocks[1])])
