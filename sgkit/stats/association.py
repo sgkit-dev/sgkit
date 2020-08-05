@@ -103,7 +103,7 @@ def _get_loop_covariates(ds: Dataset, dosage: Optional[str] = None) -> Array:
     if dosage is None:
         # TODO: This should be (probably gwas-specific) allele
         # count with sex chromosome considerations
-        G = ds["call/genotype"].sum(dim="ploidy")  # pragma: no cover
+        G = ds["call_genotype"].sum(dim="ploidy")  # pragma: no cover
     else:
         G = ds[dosage]
     return da.asarray(G.data)
@@ -160,6 +160,17 @@ def gwas_linear_regression(
     along the sample (row) dimension but not the column dimension (i.e.
     they must be tall and skinny).
 
+    Returns
+    -------
+    :class:`xarray.Dataset`
+        Dataset containing (N = num variants, O = num traits):
+            beta : (N, O) array-like
+                Beta values associated with each variant and trait
+            t_value : (N, O) array-like
+                T statistics for each beta
+            p_value : (N, O) array-like
+                P values as float in [0, 1]
+
     Warnings
     --------
     Regression statistics from this implementation are only valid when an
@@ -181,16 +192,7 @@ def gwas_linear_regression(
         Bayesian Mixed-Model Analysis Increases Association Power in Large Cohorts.”
         Nature Genetics 47 (3): 284–90.
 
-    Returns
-    -------
-    Dataset
-        Dataset containing (N = num variants, O = num traits):
-        beta : (N, O) array-like
-            Beta values associated with each variant and trait
-        t_value : (N, O) array-like
-            T statistics for each beta
-        p_value : (N, O) array-like
-            P values as float in [0, 1]
+
     """
     if isinstance(covariates, str):
         covariates = [covariates]
@@ -215,8 +217,8 @@ def gwas_linear_regression(
     res = linear_regression(G.T, X, Y)
     return xr.Dataset(
         {
-            "variant/beta": (("variants", "traits"), res.beta),
-            "variant/t_value": (("variants", "traits"), res.t_value),
-            "variant/p_value": (("variants", "traits"), res.p_value),
+            "variant_beta": (("variants", "traits"), res.beta),
+            "variant_t_value": (("variants", "traits"), res.t_value),
+            "variant_p_value": (("variants", "traits"), res.p_value),
         }
     )
