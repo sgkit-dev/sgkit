@@ -6,6 +6,7 @@ os.environ["PYSPARK_PYTHON"] = sys.executable
 
 import io
 import logging
+import logging.config
 import shutil
 from pathlib import Path
 from typing import Dict, List, Optional

@@ -2,6 +2,7 @@
 # coding: utf-8
 import io
 import logging
+import logging.config
 import shutil
 from pathlib import Path
 

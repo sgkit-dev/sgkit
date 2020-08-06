@@ -29,7 +29,7 @@ from sgkit.stats.regenie import (
 from sgkit.testing import simulate_genotype_call_dataset
 
 regenie_sim = functools.partial(
-    regenie, dosage="call/dosage", covariates="sample/covariate", traits="sample/trait"
+    regenie, dosage="call_dosage", covariates="sample_covariate", traits="sample_trait"
 )
 
 
@@ -46,16 +46,16 @@ def simulate_regression_dataset(
     ds = simulate_genotype_call_dataset(
         n_variant=n_variant, n_sample=n_sample, n_contig=n_contig
     )
-    G = ds["call/genotype"].sum(dim="ploidy")
+    G = ds["call_genotype"].sum(dim="ploidy")
     X = rs.normal(size=(n_sample, n_covariate))
     Y = (
         G.T.data @ rs.normal(size=(G.shape[0], n_trait))
         + X @ rs.normal(size=(n_covariate, n_trait))
         + rs.normal(size=(n_sample, 1), scale=noise_scale)
     )
-    ds["call/dosage"] = G
-    ds["sample/covariate"] = (("samples", "covariates"), X)
-    ds["sample/trait"] = (("samples", "traits"), Y)
+    ds["call_dosage"] = G
+    ds["sample_covariate"] = (("samples", "covariates"), X)
+    ds["sample_trait"] = (("samples", "traits"), Y)
     return ds
 
 
@@ -185,7 +185,7 @@ def prepare_stage_3_sgkit_results(
             for k, v in dataclasses.asdict(stats).items()
         }
     )
-    dsr = dsr.merge(ds[["variant/id"]].rename({"variant/id": "variant_id"}))
+    dsr = dsr.merge(ds[["variant_id"]])
     dsr = dsr.assign(outcome=xr.DataArray(df_trait.columns, dims=("outcomes")))
     df = dsr.to_dataframe().reset_index(drop=True)  # type: ignore[no-untyped-call]
     return df
@@ -244,12 +244,10 @@ def check_simulation_result(
     # Load simulated data
     with zarr.ZipStore(str(dataset_dir / "genotypes.zarr.zip"), mode="r") as store:
         ds = xr.open_zarr(store)  # type: ignore[no-untyped-call]
-        # Temporary workaround for https://github.com/pystatgen/sgkit/issues/62
-        ds = ds.rename_vars({v: v.replace("-", "/") for v in ds})
         df_covariate = load_covariates(dataset_dir)
         df_trait = load_traits(dataset_dir)
-        contigs = ds["variant/contig"].values
-        G = ds["call/genotype"].sum(dim="ploidy").values
+        contigs = ds["variant_contig"].values
+        G = ds["call_genotype"].sum(dim="ploidy").values
         X = df_covariate.values
         Y = df_trait.values
 
@@ -308,7 +306,7 @@ def test_regenie__32bit_float(ds):
     ds = ds.assign(
         {
             v: ds[v].astype(np.float32)
-            for v in ["call/dosage", "sample/covariate", "sample/trait"]
+            for v in ["call_dosage", "sample_covariate", "sample_trait"]
         }
     )
     # Ensure that a uniform demotion in types for input arrays (aside from contigs)

@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import logging
+import logging.config
 from pathlib import Path
 
 import fire
@@ -17,9 +18,7 @@ def run(dataset: str, dataset_dir="data/dataset"):
     dataset_dir = Path(dataset_dir)
     plink_path = dataset_dir / dataset / "genotypes"
     zarr_path = dataset_dir / dataset / "genotypes.zarr.zip"
-    ds = read_plink(plink_path, bim_sep="\t", fam_sep="\t")
-    # Temporary workaround for https://github.com/pystatgen/sgkit/issues/62
-    ds = ds.rename_vars({v: v.replace("/", "-") for v in ds})
+    ds = read_plink(path=plink_path, bim_sep="\t", fam_sep="\t")
     # Pre-compute string lengths until this is done:
     # https://github.com/pystatgen/sgkit-plink/issues/12
     ds = ds.compute()

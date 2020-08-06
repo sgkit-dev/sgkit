@@ -841,7 +841,7 @@ def regenie(
     G = ds[dosage]
     X = da.asarray(concat_2d(ds[list(covariates)], dims=("samples", "covariates")))
     Y = da.asarray(concat_2d(ds[list(traits)], dims=("samples", "traits")))
-    contigs = ds["variant/contig"]
+    contigs = ds["variant_contig"]
     return regenie_transform(
         G.T,
         X,

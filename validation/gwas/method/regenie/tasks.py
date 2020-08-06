@@ -1,5 +1,6 @@
 import glob
 import logging
+import logging.config
 import os
 import shutil
 from pathlib import Path
@@ -73,7 +74,7 @@ def copy_files(src, dst, patterns):
     dst.mkdir(parents=True, exist_ok=True)
     files = [Path(f) for pattern in patterns for f in glob.glob(str(src / pattern))]
     for f in files:
-        logger.info("\tCopying path: {f}")
+        logger.info(f"\tCopying path: {f}")
         if f.is_dir():
             shutil.copytree(f, dst / f.name)
         else:
