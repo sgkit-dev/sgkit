@@ -15,7 +15,7 @@ All of the above are represented as pyinvoke tasks in [tasks.py](tasks.py).
 
 The definition of each simulated dataset and parameterizations run against them can be seen in [config.yml](config.yml). 
 
-At TOW, these commands were used to generate the current test data:
+At time of writing, these commands were used to generate the current test data:
 
 ```bash
 # Build the simulated inputs and outputs

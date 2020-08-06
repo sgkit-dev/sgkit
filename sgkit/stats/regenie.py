@@ -140,16 +140,20 @@ def ridge_regression(
     if XtX.shape[0] != XtY.shape[0]:
         raise ValueError("Array arguments must have same size in first dimension")
     diags = []
-    for i in range(len(alphas)):
+    n_alpha, n_obs, n_outcome = len(alphas), XtX.shape[0], XtY.shape[1]
+    for i in range(n_alpha):
         diag = np.ones(XtX.shape[1]) * alphas[i]
         if n_zero_reg:
-            # Optionally remove regularization from leading covariates
+            # Optionally fix regularization for leading covariates
+            # TODO: This should probably be zero for consistency
+            # with orthogonalization, see:
+            # https://github.com/projectglow/glow/issues/266
             diag[:n_zero_reg] = 1
         diags.append(np.diag(diag))
     diags = np.stack(diags)
     B = np.linalg.inv(XtX + diags) @ XtY
     B = B.astype(dtype or XtX.dtype)
-    # Coefficients have shape (n_alpha, n_covar, n_outcome)
+    assert_array_shape(B, n_alpha, n_obs, n_outcome)
     return B
 
 
@@ -235,6 +239,22 @@ def _ridge_regression_cv(
 
 
 def _stage_1(G: Array, X: Array, Y: Array, alphas: Optional[ndarray] = None) -> Array:
+    """Stage 1 - WGR Base Regression
+
+    This stage will predict outcomes separately for each alpha parameter and variant
+    block. This "compresses" the variant dimension into a smaller space that is
+    much more amenable to efficient blockwise regressions in stage 2. Another
+    interpretation for this operation is that all sample blocks are treated
+    as folds in a K-fold CV fit within one single variant block. Predictions for
+    any one combination of variant and sample block then correspond to a
+    regression model fit all across sample blocks for that range of variants
+    except for a single sample block. In other words, the predictions are
+    out of sample which enables training of a stage 2 regressor based on
+    these predictions, a technique commonly referred to as stacking.
+
+    For more details, see the level 0 regression model described in step 1
+    of [Mbatchou et al. 2020](https://www.biorxiv.org/content/10.1101/2020.06.19.162354v2).
+    """
     assert G.ndim == 2
     assert X.ndim == 2
     assert Y.ndim == 2
@@ -283,6 +303,17 @@ def _stage_2(
     _glow_adj_alpha: bool = False,
     _glow_adj_scaling: bool = False,
 ) -> Tuple[Array, Array]:
+    """Stage 2 - WGR Meta Regression
+
+    This stage will train separate ridge regression models for each outcome
+    using the predictions from stage 1 for that same outcome as features. These
+    predictions are then evaluated based on R2 score to determine an optimal
+    "meta" estimator (see `_stage_1` for the "base" estimator description). Results
+    then include only predictions and coefficients from this optimal model.
+
+    For more details, see the level 1 regression model described in step 1
+    of [Mbatchou et al. 2020](https://www.biorxiv.org/content/10.1101/2020.06.19.162354v2).
+    """
     assert YP.ndim == 4
     assert X.ndim == 2
     assert Y.ndim == 2
@@ -406,6 +437,17 @@ def _stage_3(
     contigs: Array,
     variant_chunk_start: ndarray,
 ) -> Optional[Array]:
+    """Stage 3 - Leave-one-chromosome-out (LOCO) Estimation
+
+    This stage will use the coefficients for the optimal model in
+    stage 2 to re-estimate predictions in a LOCO scheme. This scheme
+    involves omitting coefficients that correspond to all variant
+    blocks for a single chromosome in the stage 2 model and then
+    recomputing predictions without those coefficients.
+
+    For more details, see the "LOCO predictions" section of the Supplementary Methods
+    in [Mbatchou et al. 2020](https://www.biorxiv.org/content/10.1101/2020.06.19.162354v2).
+    """
     assert B.ndim == 2
     assert YP.ndim == 4
     assert X.ndim == 2
@@ -699,8 +741,8 @@ def regenie(
     tests. These estimates are subtracted from trait values and
     sampling statistics (p-values, standard errors, etc.) are evaluated
     against the residuals. See the REGENIE preprint [1] for more details.
-
-    [1] - https://www.biorxiv.org/content/10.1101/2020.06.19.162354v2
+    For a simpler technical overview, see [2] for a detailed description
+    of the individual stages and separate regression models involved.
 
     Parameters
     ----------
@@ -738,6 +780,11 @@ def regenie(
         **Experimental**: Remove covariates through orthogonalization
         of genotypes and traits, by default False.
 
+    Warnings
+    --------
+    Binary traits are not yet supported so all outcomes provided
+    must be continuous.
+
     Returns
     -------
     Dataset
@@ -752,11 +799,40 @@ def regenie(
             blocks on held out contigs. This will be absent if the
             data provided does not contain at least 2 contigs.
 
+    Examples
+    --------
+
+    >>> import numpy as np
+    >>> from sgkit.testing import simulate_genotype_call_dataset
+    >>> from sgkit.stats.regenie import regenie
+    >>> n_variant, n_sample, n_contig, n_covariate, n_trait, seed = 100, 50, 2, 3, 5, 0
+    >>> rs = np.random.RandomState(seed)
+    >>> ds = simulate_genotype_call_dataset(n_variant=n_variant, n_sample=n_sample, n_contig=n_contig, seed=seed)
+    >>> ds["call_dosage"] = (("variants", "samples"), rs.normal(size=(n_variant, n_sample)))
+    >>> ds["sample_covariate"] = (("samples", "covariates"), rs.normal(size=(n_sample, n_covariate)))
+    >>> ds["sample_trait"] = (("samples", "traits"), rs.normal(size=(n_sample, n_trait)))
+    >>> res = regenie(ds, dosage="call_dosage", covariates="sample_covariate", traits="sample_trait")
+    >>> res.compute() # doctest: +NORMALIZE_WHITESPACE
+    <xarray.Dataset>
+    Dimensions:          (alphas: 5, blocks: 2, contigs: 2, outcomes: 5, samples: 50)
+    Dimensions without coordinates: alphas, blocks, contigs, outcomes, samples
+    Data variables:
+        base_prediction  (blocks, alphas, samples, outcomes) float64 0.3343 ... -...
+        meta_prediction  (samples, outcomes) float64 -0.4588 0.78 ... -0.3984 0.3734
+        loco_prediction  (contigs, samples, outcomes) float64 0.4886 ... -0.01498
+
+    References
+    ----------
+    [1] - Mbatchou, J., L. Barnard, J. Backman, and A. Marcketta. 2020.
+        “Computationally Efficient Whole Genome Regression for Quantitative and Binary
+        Traits.” bioRxiv. https://www.biorxiv.org/content/10.1101/2020.06.19.162354v2.abstract.
+    [2] - https://glow.readthedocs.io/en/latest/tertiary/whole-genome-regression.html
+
     Raises
     ------
     ValueError
-        If `G`, `X`, and `Y` do not have the same size along
-        the first (samples) dimension.
+        If dosage, covariates, and trait arrays do not have the same number
+        of samples.
     """
     if isinstance(covariates, str):
         covariates = [covariates]

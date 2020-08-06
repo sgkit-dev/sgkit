@@ -373,6 +373,18 @@ def test_ridge_regression():
     np.testing.assert_equal(res1, res2)
 
 
+def test_ridge_regression__raise_on_non_symmetric():
+    with pytest.raises(ValueError, match="First argument must be symmetric"):
+        ridge_regression(np.ones((2, 1)), np.ones((2, 1)), np.array([1.0]))
+
+
+def test_ridge_regression__raise_on_non_equal_first_dim():
+    with pytest.raises(
+        ValueError, match="Array arguments must have same size in first dimension"
+    ):
+        ridge_regression(np.ones((2, 2)), np.ones((1, 1)), np.array([1.0]))
+
+
 @pytest.mark.parametrize(  # type: ignore[misc]
     "x,size,expected_index,expected_sizes",  # type: ignore[no-untyped-def]
     [
