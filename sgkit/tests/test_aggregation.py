@@ -14,9 +14,9 @@ def get_dataset(calls: ArrayLike, **kwargs: Any) -> Dataset:
     ds = simulate_genotype_call_dataset(
         n_variant=calls.shape[0], n_sample=calls.shape[1], **kwargs
     )
-    dims = ds["call/genotype"].dims
-    ds["call/genotype"] = xr.DataArray(calls, dims=dims)
-    ds["call/genotype_mask"] = xr.DataArray(calls < 0, dims=dims)
+    dims = ds["call_genotype"].dims
+    ds["call_genotype"] = xr.DataArray(calls, dims=dims)
+    ds["call_genotype_mask"] = xr.DataArray(calls < 0, dims=dims)
     return ds
 
 
