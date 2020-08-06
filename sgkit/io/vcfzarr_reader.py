@@ -75,7 +75,7 @@ def read_vcfzarr(path: PathType) -> xr.Dataset:
     )
 
     # Add a mask for variant ID
-    ds["variant/id_mask"] = (
+    ds["variant_id_mask"] = (
         [DIM_VARIANT],
         variants_id == ".",
     )
