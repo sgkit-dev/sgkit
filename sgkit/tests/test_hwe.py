@@ -152,7 +152,7 @@ def test_hwep_dataset__raise_on_nondiploid():
         hwep_test(ds)
 
 
-def test_hwep_dataset__raise_on_biallelic():
+def test_hwep_dataset__raise_on_nonbiallelic():
     with pytest.raises(
         NotImplementedError, match="HWE test only implemented for biallelic genotypes"
     ):
