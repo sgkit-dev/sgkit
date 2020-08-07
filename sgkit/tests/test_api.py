@@ -8,6 +8,7 @@ from sgkit import (
     DIM_VARIANT,
     create_genotype_call_dataset,
     create_genotype_dosage_dataset,
+    display_genotypes,
 )
 
 
@@ -49,6 +50,17 @@ def test_create_genotype_call_dataset():
     assert_array_equal(ds["call_genotype"], call_genotype)
     assert_array_equal(ds["call_genotype_mask"], call_genotype < 0)
     assert_array_equal(ds["call_genotype_phased"], call_genotype_phased)
+
+    disp = display_genotypes(ds)
+    assert (
+        str(disp)
+        == """
+samples  sample_1 sample_2 sample_3
+variants                           
+rs1           0|0      0|1      1/0
+rs2           .|0      0/.      ./.
+""".strip()  # noqa: W291
+    )
 
 
 def test_create_genotype_dosage_dataset():
