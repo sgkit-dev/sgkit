@@ -107,7 +107,7 @@ def ds_eq():
     """Dataset with all variants near HWE"""
     ds = simulate_genotype_call_dataset(n_variant=50, n_sample=1000)
     gt_dist = (0.25, 0.5, 0.25)
-    ds["call/genotype"] = simulate_genotype_calls(
+    ds["call_genotype"] = simulate_genotype_calls(
         ds.dims["variants"], ds.dims["samples"], p=gt_dist
     )
     return ds
@@ -118,29 +118,29 @@ def ds_neq():
     """Dataset with all variants well out of HWE"""
     ds = simulate_genotype_call_dataset(n_variant=50, n_sample=1000)
     gt_dist = (0.9, 0.05, 0.05)
-    ds["call/genotype"] = simulate_genotype_calls(
+    ds["call_genotype"] = simulate_genotype_calls(
         ds.dims["variants"], ds.dims["samples"], p=gt_dist
     )
     return ds
 
 
 def test_hwep_dataset__in_eq(ds_eq: Dataset) -> None:
-    p = hwep_test(ds_eq)["variant/hwe_p_value"].values
+    p = hwep_test(ds_eq)["variant_hwe_p_value"].values
     assert np.all(p > 1e-8)
 
 
 def test_hwep_dataset__out_of_eq(ds_neq: Dataset) -> None:
-    p = hwep_test(ds_neq)["variant/hwe_p_value"].values
+    p = hwep_test(ds_neq)["variant_hwe_p_value"].values
     assert np.all(p < 1e-8)
 
 
 def test_hwep_dataset__precomputed_counts(ds_neq: Dataset) -> None:
     ds = ds_neq
-    ac = ds["call/genotype"].sum(dim="ploidy")
+    ac = ds["call_genotype"].sum(dim="ploidy")
     cts = [1, 0, 2]  # arg order: hets, hom1, hom2
     gtc = xr.concat([(ac == ct).sum(dim="samples") for ct in cts], dim="counts").T  # type: ignore[no-untyped-call]
-    ds = ds.assign(**{"variant/genotype_counts": gtc})
-    p = hwep_test(ds, genotype_counts="variant/genotype_counts")
+    ds = ds.assign(**{"variant_genotype_counts": gtc})
+    p = hwep_test(ds, genotype_counts="variant_genotype_counts")
     assert np.all(p < 1e-8)
 
 

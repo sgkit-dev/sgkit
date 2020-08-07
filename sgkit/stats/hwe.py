@@ -144,7 +144,7 @@ def hardy_weinberg_test(
     -------
     Dataset
         Dataset containing (N = num variants):
-        variant/hwe_p_value : (N,) ArrayLike
+        variant_hwe_p_value : (N,) ArrayLike
             P values from HWE test for each variant as float in [0, 1].
 
     References
@@ -170,9 +170,9 @@ def hardy_weinberg_test(
     else:
         # TODO: Use API genotype counting function instead, e.g.
         # https://github.com/pystatgen/sgkit/issues/29#issuecomment-656691069
-        mask = ds["call/genotype_mask"].any(dim="ploidy")
-        gtc = xr.where(mask, -1, ds["call/genotype"].sum(dim="ploidy"))  # type: ignore[no-untyped-call]
+        mask = ds["call_genotype_mask"].any(dim="ploidy")
+        gtc = xr.where(mask, -1, ds["call_genotype"].sum(dim="ploidy"))  # type: ignore[no-untyped-call]
         cts = [1, 0, 2]  # arg order: hets, hom1, hom2
         obs = [da.asarray((gtc == ct).sum(dim="samples")) for ct in cts]
     p = da.map_blocks(hardy_weinberg_p_value_vec_jit, *obs)
-    return xr.Dataset({"variant/hwe_p_value": ("variants", p)})
+    return xr.Dataset({"variant_hwe_p_value": ("variants", p)})
