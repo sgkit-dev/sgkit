@@ -131,6 +131,7 @@ dmypy.json
 # IDE
 .vscode
 .idea
+.DS_Store
 
 # sgkit
 docs/generated

@@ -2,7 +2,9 @@ codecov
 pre-commit
 pytest
 pytest-cov
+pytest-datadir
 hypothesis
+statsmodels
+zarr
 sphinx
 sphinx_rtd_theme
-statsmodels

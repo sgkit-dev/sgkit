@@ -1,0 +1,26 @@
+channels:
+- conda-forge
+- defaults
+dependencies:
+# CICD dependencies
+- black
+- flake8
+- isort
+- mypy
+- pre-commit
+- pylint
+- pytest
+- pytest-datadir
+- pytest-cov
+- hypothesis
+# Validation/visualization dependencies
+- statsmodels
+- python-dotenv
+- matplotlib
+- rope # for code refactor
+- graphviz
+- python-graphviz
+- scikit-learn
+- fire
+- invoke
+- pyarrow

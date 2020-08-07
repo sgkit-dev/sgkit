@@ -34,7 +34,7 @@ def check_array_like(
 
 
 def encode_array(x: ArrayLike) -> Tuple[ArrayLike, List[Any]]:
-    """Encode array values as integers indexing unique values
+    """Encode array values as integers indexing unique values.
 
     The codes created for each unique element in the array correspond
     to order of appearance, not the natural sort order for the array
@@ -49,14 +49,14 @@ def encode_array(x: ArrayLike) -> Tuple[ArrayLike, List[Any]]:
     Parameters
     ----------
     x : (M,) array-like
-        Array of elements to encode of any type
+        Array of elements to encode of any type.
 
     Returns
     -------
     indexes : (M,) ndarray
-        Encoded values as integer indices
+        Encoded values as integer indices.
     values : ndarray
-        Unique values in original array in order of appearance
+        Unique values in original array in order of appearance.
     """
     # argsort not implemented in dask: https://github.com/dask/dask/issues/4368
     names, index, inverse = np.unique(x, return_index=True, return_inverse=True)
@@ -68,6 +68,7 @@ def encode_array(x: ArrayLike) -> Tuple[ArrayLike, List[Any]]:
 
 def split_array_chunks(n: int, blocks: int) -> Tuple[int, ...]:
     """Compute chunk sizes for an array split into blocks.
+
     This is similar to `numpy.split_array` except that it
     will compute the sizes of the resulting splits rather
     than explicitly partitioning an array.

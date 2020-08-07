@@ -55,7 +55,7 @@ def count_alleles(ds: Dataset) -> DataArray:
     CT = da.map_blocks(
         lambda x: np.apply_along_axis(np.bincount, 1, x, minlength=max_allele),
         G,
-        chunks=(G.chunks[0], max_allele),  # type: ignore[index]
+        chunks=(G.chunks[0], max_allele),
     )
     assert CT.shape == (n_variant, G.numblocks[1] * max_allele)
 
