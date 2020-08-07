@@ -4,6 +4,7 @@ import numpy as np
 from xarray import Dataset
 
 from .api import create_genotype_call_dataset
+from .utils import split_array_chunks
 
 
 def simulate_genotype_call_dataset(
@@ -36,7 +37,7 @@ def simulate_genotype_call_dataset(
         Number of alleles to simulate
     n_contig : int, optional
         Number of contigs to partition variants with,
-        controlling values in `variant/contig`. Values
+        controlling values in `variant_contig`. Values
         will all be 0 by default with `n_contig` == 1.
     seed : int, optional
         Seed for random number generation
@@ -50,11 +51,11 @@ def simulate_genotype_call_dataset(
     call_genotype = rs.randint(
         0, n_allele, size=(n_variant, n_sample, n_ploidy), dtype=np.int8
     )
-    contig_size = np.ceil(n_variant / n_contig).astype(int)
-    contig = np.arange(n_variant) // contig_size
+    contig_size = split_array_chunks(n_variant, n_contig)
+    contig = np.repeat(np.arange(n_contig), contig_size)
     contig_names = np.unique(contig)
-    position = np.concatenate([np.arange(contig_size) for i in range(n_contig)])
-    position = position[:n_variant]
+    position = np.concatenate([np.arange(contig_size[i]) for i in range(n_contig)])
+    assert position.size == contig.size
     alleles = rs.choice(["A", "C", "G", "T"], size=(n_variant, n_allele)).astype("S")
     sample_id = np.array([f"S{i}" for i in range(n_sample)])
     return create_genotype_call_dataset(

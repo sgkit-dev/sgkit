@@ -1,0 +1,30 @@
+datasets:
+  sim_sm_01:
+    n_contigs: 1
+    n_covars: 3
+    n_samples: 50
+    n_traits: 1
+    n_variants: 250
+  sim_sm_02:
+    n_contigs: 10
+    n_covars: 3
+    n_samples: 50
+    n_traits: 5
+    n_variants: 250
+paramsets:
+  wgr_01:
+    alphas:
+    - 1000
+    sample_block_size: 10
+    variant_block_size: 10
+  wgr_02:
+    alphas: null
+    sample_block_size: 10
+    variant_block_size: 10
+runs:
+- dataset: sim_sm_01
+  name: sim_sm_01-wgr_01
+  paramset: wgr_01
+- dataset: sim_sm_02
+  name: sim_sm_02-wgr_02
+  paramset: wgr_02

@@ -14,9 +14,9 @@ def get_dataset(calls: ArrayLike, **kwargs: Any) -> Dataset:
     ds = simulate_genotype_call_dataset(
         n_variant=calls.shape[0], n_sample=calls.shape[1], **kwargs
     )
-    dims = ds["call/genotype"].dims
-    ds["call/genotype"] = xr.DataArray(calls, dims=dims)
-    ds["call/genotype_mask"] = xr.DataArray(calls < 0, dims=dims)
+    dims = ds["call_genotype"].dims
+    ds["call_genotype"] = xr.DataArray(calls, dims=dims)
+    ds["call_genotype_mask"] = xr.DataArray(calls < 0, dims=dims)
     return ds
 
 
@@ -75,3 +75,14 @@ def test_count_alleles__higher_ploidy():
         )
     )
     np.testing.assert_equal(ac, np.array([[1, 1, 1, 0], [1, 2, 2, 1]]))
+
+
+def test_count_alleles__chunked():
+    rs = np.random.RandomState(0)
+    calls = rs.randint(0, 1, size=(50, 10, 2))
+    ds = get_dataset(calls)
+    ac1 = count_alleles(ds)
+    # Coerce from numpy to multiple chunks in all dimensions
+    ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))  # type: ignore[arg-type]
+    ac2 = count_alleles(ds)
+    xr.testing.assert_equal(ac1, ac2)  # type: ignore[no-untyped-call]

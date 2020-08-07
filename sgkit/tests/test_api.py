@@ -8,6 +8,7 @@ from sgkit import (
     DIM_VARIANT,
     create_genotype_call_dataset,
     create_genotype_dosage_dataset,
+    display_genotypes,
 )
 
 
@@ -41,14 +42,25 @@ def test_create_genotype_call_dataset():
     assert DIM_ALLELE in ds.dims
 
     assert ds.attrs["contigs"] == variant_contig_names
-    assert_array_equal(ds["variant/contig"], variant_contig)
-    assert_array_equal(ds["variant/position"], variant_position)
-    assert_array_equal(ds["variant/alleles"], variant_alleles)
-    assert_array_equal(ds["variant/id"], variant_id)
-    assert_array_equal(ds["sample/id"], sample_id)
-    assert_array_equal(ds["call/genotype"], call_genotype)
-    assert_array_equal(ds["call/genotype_mask"], call_genotype < 0)
-    assert_array_equal(ds["call/genotype_phased"], call_genotype_phased)
+    assert_array_equal(ds["variant_contig"], variant_contig)
+    assert_array_equal(ds["variant_position"], variant_position)
+    assert_array_equal(ds["variant_allele"], variant_alleles)
+    assert_array_equal(ds["variant_id"], variant_id)
+    assert_array_equal(ds["sample_id"], sample_id)
+    assert_array_equal(ds["call_genotype"], call_genotype)
+    assert_array_equal(ds["call_genotype_mask"], call_genotype < 0)
+    assert_array_equal(ds["call_genotype_phased"], call_genotype_phased)
+
+    disp = display_genotypes(ds)
+    assert (
+        str(disp)
+        == """
+samples  sample_1 sample_2 sample_3
+variants                           
+rs1           0|0      0|1      1/0
+rs2           .|0      0/.      ./.
+""".strip()  # noqa: W291
+    )
 
 
 def test_create_genotype_dosage_dataset():
@@ -73,10 +85,10 @@ def test_create_genotype_dosage_dataset():
     assert DIM_SAMPLE in ds.dims
 
     assert ds.attrs["contigs"] == variant_contig_names
-    assert_array_equal(ds["variant/contig"], variant_contig)
-    assert_array_equal(ds["variant/position"], variant_position)
-    assert_array_equal(ds["variant/alleles"], variant_alleles)
-    assert_array_equal(ds["variant/id"], variant_id)
-    assert_array_equal(ds["sample/id"], sample_id)
-    assert_array_equal(ds["call/dosage"], call_dosage)
-    assert_array_equal(ds["call/dosage_mask"], np.isnan(call_dosage))
+    assert_array_equal(ds["variant_contig"], variant_contig)
+    assert_array_equal(ds["variant_position"], variant_position)
+    assert_array_equal(ds["variant_allele"], variant_alleles)
+    assert_array_equal(ds["variant_id"], variant_id)
+    assert_array_equal(ds["sample_id"], sample_id)
+    assert_array_equal(ds["call_dosage"], call_dosage)
+    assert_array_equal(ds["call_dosage_mask"], np.isnan(call_dosage))

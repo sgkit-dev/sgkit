@@ -129,7 +129,7 @@ def _get_statistics(
         res = _sm_statistics(ds, i, add_intercept)
         df_pred.append(
             dsr.to_dataframe()  # type: ignore[no-untyped-call]
-            .rename(columns=lambda c: c.replace("variant/", ""))
+            .rename(columns=lambda c: c.replace("variant_", ""))
             .iloc[i]
             .to_dict()
         )
