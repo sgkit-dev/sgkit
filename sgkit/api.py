@@ -24,6 +24,7 @@ def create_genotype_call_dataset(
     variant_id: Any = None,
 ) -> xr.Dataset:
     """Create a dataset of genotype calls.
+
     Parameters
     ----------
     variant_contig_names : list of str
@@ -45,10 +46,12 @@ def create_genotype_call_dataset(
         omitted all calls are unphased.
     variant_id: array_like, str or object, optional
         The unique identifier of the variant.
+
     Returns
     -------
     :class:`xarray.Dataset`
         The dataset of genotype calls.
+
     """
     check_array_like(variant_contig, kind="i", ndim=1)
     check_array_like(variant_position, kind="i", ndim=1)
@@ -112,10 +115,12 @@ def create_genotype_dosage_dataset(
         missing value.
     variant_id: array_like, str or object, optional
         The unique identifier of the variant.
+
     Returns
     -------
     xr.Dataset
         The dataset of genotype calls.
+
     """
     check_array_like(variant_contig, kind="i", ndim=1)
     check_array_like(variant_position, kind="i", ndim=1)
@@ -144,31 +149,3 @@ def create_genotype_dosage_dataset(
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
     return xr.Dataset(data_vars=data_vars, attrs=attrs)
-
-
-def ts_to_dataset(ts, samples=None):
-    """
-    Convert the specified tskit tree sequence into an sgkit dataset.
-    Note this just generates haploids for now. With msprime 1.0, we'll be
-    able to generate diploid/whatever-ploid individuals easily.
-    """
-    if samples is None:
-        samples = ts.samples()
-    tables = ts.dump_tables()
-    alleles = []
-    genotypes = []
-    for var in ts.variants(samples=samples):
-        alleles.append(var.alleles)
-        genotypes.append(var.genotypes)
-    alleles = np.array(alleles).astype("S")
-    genotypes = np.expand_dims(genotypes, axis=2)
-
-    df = create_genotype_call_dataset(
-        variant_contig_names=["1"],
-        variant_contig=np.zeros(len(tables.sites), dtype=int),
-        variant_position=tables.sites.position.astype(int),
-        variant_alleles=alleles,
-        sample_id=np.array([f"tsk_{u}" for u in samples]).astype("U"),
-        call_genotype=genotypes,
-    )
-    return df

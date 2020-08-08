@@ -11,6 +11,7 @@ from .io.vcfzarr_reader import read_vcfzarr
 from .stats.aggregation import count_call_alleles, count_variant_alleles, variant_stats
 from .stats.association import gwas_linear_regression
 from .stats.hwe import hardy_weinberg_test
+from .stats.popgen import Fst, Tajimas_D, divergence, diversity
 from .stats.regenie import regenie
 
 __all__ = [
@@ -28,4 +29,8 @@ __all__ = [
     "regenie",
     "hardy_weinberg_test",
     "variant_stats",
+    "diversity",
+    "divergence",
+    "Fst",
+    "Tajimas_D",
 ]

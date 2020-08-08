@@ -6,5 +6,6 @@ pytest-datadir
 hypothesis
 statsmodels
 zarr
+msprime
 sphinx
 sphinx_rtd_theme
