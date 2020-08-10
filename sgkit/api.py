@@ -33,7 +33,7 @@ def create_genotype_call_dataset(
         The (index of the) contig for each variant.
     variant_position : array_like, int
         The reference position of the variant.
-    variant_alleles : array_like, S1
+    variant_alleles : array_like, zero-terminated bytes, e.g. "S1", or object
         The possible alleles for the variant.
     sample_id : array_like, str
         The unique identifier of the sample.
@@ -55,7 +55,7 @@ def create_genotype_call_dataset(
     """
     check_array_like(variant_contig, kind="i", ndim=1)
     check_array_like(variant_position, kind="i", ndim=1)
-    check_array_like(variant_alleles, kind="S", ndim=2)
+    check_array_like(variant_alleles, kind={"S", "O"}, ndim=2)
     check_array_like(sample_id, kind="U", ndim=1)
     check_array_like(call_genotype, kind="i", ndim=3)
     data_vars: Dict[Hashable, Any] = {
@@ -102,7 +102,7 @@ def create_genotype_dosage_dataset(
         The (index of the) contig for each variant.
     variant_position : array_like, int
         The reference position of the variant.
-    variant_alleles : array_like, S1
+    variant_alleles : array_like, zero-terminated bytes, e.g. "S1", or object
         The possible alleles for the variant.
     sample_id : array_like, str
         The unique identifier of the sample.
@@ -120,7 +120,7 @@ def create_genotype_dosage_dataset(
     """
     check_array_like(variant_contig, kind="i", ndim=1)
     check_array_like(variant_position, kind="i", ndim=1)
-    check_array_like(variant_alleles, kind="S", ndim=2)
+    check_array_like(variant_alleles, kind={"S", "O"}, ndim=2)
     check_array_like(sample_id, kind="U", ndim=1)
     check_array_like(call_dosage, kind="f", ndim=2)
     data_vars: Dict[Hashable, Any] = {
