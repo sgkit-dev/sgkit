@@ -1,5 +1,4 @@
 import logging
-from dataclasses import dataclass
 from typing import (
     Any,
     Callable,
@@ -9,7 +8,6 @@ from typing import (
     List,
     Optional,
     Protocol,
-    Set,
     Type,
     TypeVar,
     Union,
@@ -19,6 +17,7 @@ from typing import (
 import numpy as np
 import xarray as xr
 
+from .typing import ArrayLikeSpec
 from .utils import check_array_like
 
 T = TypeVar("T", bound="DatasetType", covariant=True)
@@ -34,11 +33,8 @@ DIM_GENOTYPE = "genotypes"
 
 class DatasetType(Protocol):
     @classmethod
-    def validate_dataset(
-        cls, dataset: "SgkitDataset[DatasetType]"
-    ) -> "SgkitDataset[DatasetType]":
-        logging.debug(f"Validation of {dataset}, cls: {cls}")
-        xr_dataset = dataset.xr_dataset
+    def validate_dataset(cls, xr_dataset: xr.Dataset) -> xr.Dataset:
+        logging.debug(f"Validating if {cls} is compatible with {xr_dataset}")
         for var, typ in cls.__annotations__.items():
             try:
                 spec = getattr(cls, var)
@@ -59,13 +55,11 @@ class DatasetType(Protocol):
                 logging.warning(
                     f"Don't know how to validate `{var}` of type {type(spec)}"
                 )
-        return dataset
+        return xr_dataset
 
-
-@dataclass
-class ArrayLikeSpec:
-    kind: Union[None, str, Set[str]]
-    ndim: Union[None, int, Set[int]]
+    @classmethod
+    def create_dataset(cls: Type[T], xr_dataset: xr.Dataset) -> "SgkitDataset[T]":
+        return SgkitDataset(cls.validate_dataset(xr_dataset), cls)
 
 
 class GenotypeCall(DatasetType):
@@ -115,11 +109,11 @@ class SgkitDataset(Generic[T]):
     ) -> "Union[SgkitDataset[U], SgkitDataset[T]]":
         xr_fun_result = fun(self.xr_dataset)
         if type_ev is None:
-            return SgkitDataset(xr_fun_result, self.type_ev)
-        return SgkitDataset(xr_fun_result, type_ev)
+            return self.type_ev.create_dataset(xr_fun_result)
+        return type_ev.create_dataset(xr_fun_result)
 
     def cast(self, type_ev: Type[U]) -> "SgkitDataset[U]":
-        return SgkitDataset(self.xr_dataset.copy(), type_ev)
+        return type_ev.create_dataset(self.xr_dataset.copy())
 
     @classmethod
     def create_genotype_call_dataset(
@@ -183,11 +177,7 @@ class SgkitDataset(Generic[T]):
         if variant_id is not None:
             data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
         attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
-        dataset: SgkitDataset[GenotypeCall] = SgkitDataset[GenotypeCall](
-            xr.Dataset(data_vars=data_vars, attrs=attrs), GenotypeCall
-        )
-        dataset.type_ev.validate_dataset(dataset)
-        return dataset
+        return GenotypeCall.create_dataset(xr.Dataset(data_vars=data_vars, attrs=attrs))
 
     @classmethod
     def create_genotype_dosage_dataset(
@@ -238,8 +228,6 @@ class SgkitDataset(Generic[T]):
         if variant_id is not None:
             data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
         attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
-        dataset: SgkitDataset[GenotypeDosage] = SgkitDataset[GenotypeDosage](
-            xr.Dataset(data_vars=data_vars, attrs=attrs), GenotypeDosage
+        return GenotypeDosage.create_dataset(
+            xr.Dataset(data_vars=data_vars, attrs=attrs)
         )
-        dataset.type_ev.validate_dataset(dataset)
-        return dataset

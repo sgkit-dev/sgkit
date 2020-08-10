@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Sequence, Union
+from typing import Any, Dict, Hashable, Optional, Set
 
 import dask.array as da
 import numpy as np
@@ -7,20 +7,24 @@ import xarray as xr
 from dask.array import Array, stats
 from xarray import Dataset
 
-from ..typing import ArrayLike
+from ..api import DatasetType, SgkitDataset
+from ..typing import ArrayLike, ArrayLikeSpec
 from .utils import concat_2d
 
 
 @dataclass
-class LinearRegressionResult:
-    beta: ArrayLike
-    t_value: ArrayLike
-    p_value: ArrayLike
+class LinearRegressionResult(DatasetType):
+    beta: ArrayLikeSpec = ArrayLikeSpec(kind="f", ndim=2)
+    """Beta values associated with each loop covariate and outcome"""
+    t_value: ArrayLikeSpec = ArrayLikeSpec(kind="f", ndim=2)
+    """T statistics for each beta"""
+    p_value: ArrayLikeSpec = ArrayLikeSpec(kind="f", ndim=2)
+    """P values as float in [0, 1]"""
 
 
 def linear_regression(
     XL: ArrayLike, XC: ArrayLike, Y: ArrayLike
-) -> LinearRegressionResult:
+) -> SgkitDataset[LinearRegressionResult]:
     """Efficient linear regression estimation for multiple covariate sets
 
     Parameters
@@ -96,7 +100,8 @@ def linear_regression(
     P = 2 * stats.distributions.t.sf(np.abs(T), dof)
     assert P.shape == (n_loop_covar, n_outcome)
 
-    return LinearRegressionResult(beta=B, t_value=T, p_value=P)
+    data_vars: Dict[Hashable, Any] = dict(beta=B, t_value=T, p_value=P)
+    return LinearRegressionResult.create_dataset(xr.Dataset(data_vars=data_vars))
 
 
 def _get_loop_covariates(ds: Dataset, dosage: Optional[str] = None) -> Array:
@@ -109,14 +114,45 @@ def _get_loop_covariates(ds: Dataset, dosage: Optional[str] = None) -> Array:
     return da.asarray(G.data)
 
 
+@dataclass
+class GwasLinearRegressionResult(LinearRegressionResult):
+    variant_beta: ArrayLikeSpec = LinearRegressionResult.beta
+    """Beta values associated with each variant and trait"""
+    variant_t_value: ArrayLikeSpec = LinearRegressionResult.t_value
+    """T statistics for each beta"""
+    variant_p_value: ArrayLikeSpec = LinearRegressionResult.p_value
+    """P values as float in [0, 1]"""
+
+
+@dataclass
+class GwasLinearRegressionInput(DatasetType):
+    dosage = ArrayLikeSpec(kind="f", ndim=2, names="dosage")
+    """
+    Dosage variable name where "dosage" array can contain represent
+    one of several possible quantities, e.g.:
+        - Alternate allele counts
+        - Recessive or dominant allele encodings
+        - True dosages as computed from imputed or probabilistic variant calls
+        - Any other custom encoding in a user-defined variable
+    """
+    covariates = ArrayLikeSpec(kind="f", ndim={1, 2}, names={"covariates"})
+    """
+    Covariate variable names, must correspond to 1 or 2D dataset
+    variables of shape (samples[, covariates]). All covariate arrays
+    will be concatenated along the second axis (columns).
+    """
+    traits = ArrayLikeSpec(kind="f", ndim={1, 2}, names={"traits"})
+    """
+    Trait (e.g. phenotype) variable names, must all be continuous and
+    correspond to 1 or 2D dataset variables of shape (samples[, traits]).
+    2D trait arrays will be assumed to contain separate traits within columns
+    and concatenated to any 1D traits along the second axis (columns).
+    """
+
+
 def gwas_linear_regression(
-    ds: Dataset,
-    *,
-    dosage: str,
-    covariates: Union[str, Sequence[str]],
-    traits: Union[str, Sequence[str]],
-    add_intercept: bool = True,
-) -> Dataset:
+    dataset: SgkitDataset[GwasLinearRegressionInput], *, add_intercept: bool = True,
+) -> SgkitDataset[GwasLinearRegressionResult]:
     """Run linear regression to identify continuous trait associations with genetic variants.
 
     This method solves OLS regressions for each variant simultaneously and reports
@@ -128,24 +164,8 @@ def gwas_linear_regression(
 
     Parameters
     ----------
-    ds : Dataset
+    dataset : Dataset
         Dataset containing necessary dependent and independent variables.
-    dosage : str
-        Dosage variable name where "dosage" array can contain represent
-        one of several possible quantities, e.g.:
-        - Alternate allele counts
-        - Recessive or dominant allele encodings
-        - True dosages as computed from imputed or probabilistic variant calls
-        - Any other custom encoding in a user-defined variable
-    covariates : Union[str, Sequence[str]]
-        Covariate variable names, must correspond to 1 or 2D dataset
-        variables of shape (samples[, covariates]). All covariate arrays
-        will be concatenated along the second axis (columns).
-    traits : Union[str, Sequence[str]]
-        Trait (e.g. phenotype) variable names, must all be continuous and
-        correspond to 1 or 2D dataset variables of shape (samples[, traits]).
-        2D trait arrays will be assumed to contain separate traits within columns
-        and concatenated to any 1D traits along the second axis (columns).
     add_intercept : bool, optional
         Add intercept term to covariate set, by default True.
 
@@ -162,7 +182,7 @@ def gwas_linear_regression(
 
     Returns
     -------
-    :class:`xarray.Dataset`
+    :class:`SgkitDataset[GwasLinearRegressionResult]`
         Dataset containing (N = num variants, O = num traits):
             beta : (N, O) array-like
                 Beta values associated with each variant and trait
@@ -194,12 +214,19 @@ def gwas_linear_regression(
 
 
     """
-    if isinstance(covariates, str):
-        covariates = [covariates]
-    if isinstance(traits, str):
-        traits = [traits]
+    ds = dataset.xr_dataset
+    if not isinstance(dataset.type_ev.covariates.names, set):
+        raise ValueError("Covariate names must be a set of strings")
+    covariates: Set[str] = dataset.type_ev.covariates.names
+    if not isinstance(dataset.type_ev.traits.names, set):
+        raise ValueError("Traits names must be a set of strings")
+    traits: Set[str] = dataset.type_ev.traits.names
 
-    G = _get_loop_covariates(ds, dosage=dosage)
+    if not isinstance(dataset.type_ev.dosage.names, str):
+        raise ValueError(
+            f"Dosage should have a single name, given {dataset.type_ev.dosage.names}"
+        )
+    G = _get_loop_covariates(ds, dosage=dataset.type_ev.dosage.names)
 
     X = da.asarray(concat_2d(ds[list(covariates)], dims=("samples", "covariates")))
     if add_intercept:
@@ -215,10 +242,9 @@ def gwas_linear_regression(
     Y = Y.rechunk((None, -1))
 
     res = linear_regression(G.T, X, Y)
-    return xr.Dataset(
-        {
-            "variant_beta": (("variants", "traits"), res.beta),
-            "variant_t_value": (("variants", "traits"), res.t_value),
-            "variant_p_value": (("variants", "traits"), res.p_value),
-        }
+    data_vars: Dict[Hashable, Any] = dict(
+        variant_beta=(("variants", "traits"), res.xr_dataset.beta),
+        variant_t_value=(("variants", "traits"), res.xr_dataset.t_value),
+        variant_p_value=(("variants", "traits"), res.xr_dataset.p_value),
     )
+    return GwasLinearRegressionResult.create_dataset(xr.Dataset(data_vars=data_vars))
