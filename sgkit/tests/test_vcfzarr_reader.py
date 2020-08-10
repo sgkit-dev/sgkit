@@ -24,15 +24,15 @@ def test_read_vcfzarr(shared_datadir):
     assert_array_equal(
         ds["variant_allele"],
         [
-            [b"A", b"C", b"", b""],
-            [b"A", b"G", b"", b""],
-            [b"G", b"A", b"", b""],
-            [b"T", b"A", b"", b""],
-            [b"A", b"G", b"T", b""],
-            [b"T", b"", b"", b""],
-            [b"G", b"GA", b"GAC", b""],
-            [b"T", b"", b"", b""],
-            [b"AC", b"A", b"ATG", b"C"],
+            ["A", "C", "", ""],
+            ["A", "G", "", ""],
+            ["G", "A", "", ""],
+            ["T", "A", "", ""],
+            ["A", "G", "T", ""],
+            ["T", "", "", ""],
+            ["G", "GA", "GAC", ""],
+            ["T", "", "", ""],
+            ["AC", "A", "ATG", "C"],
         ],
     )
     assert_array_equal(

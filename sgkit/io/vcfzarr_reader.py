@@ -1,7 +1,4 @@
-from typing import Any
-
 import dask.array as da
-import numpy as np
 import xarray as xr
 import zarr
 
@@ -45,22 +42,11 @@ def read_vcfzarr(path: PathType) -> xr.Dataset:
     variant_contig_names = list(variant_contig_names)
 
     # For variant alleles, combine REF and ALT into a single array
-    # and calculate the number of alleles so we can set the dtype correctly
     variants_ref = da.from_zarr(vcfzarr["variants/REF"])
     variants_alt = da.from_zarr(vcfzarr["variants/ALT"])
-
-    def max_str_len(arr: ArrayLike) -> Any:
-        return arr.map_blocks(
-            lambda s: np.char.str_len(s.astype(str)), dtype=np.int8
-        ).max()
-
-    max_allele_length = max(
-        da.compute(max_str_len(variants_ref), max_str_len(variants_alt))
-    )
-    variants_ref_alt = da.concatenate(
+    variant_alleles = da.concatenate(
         [_ensure_2d(variants_ref), _ensure_2d(variants_alt)], axis=1
     )
-    variant_alleles = variants_ref_alt.astype(f"S{max_allele_length}")
 
     variants_id = da.from_zarr(vcfzarr["variants/ID"]).astype(str)
 
