@@ -175,21 +175,21 @@ covariates, only variants.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ds</strong> (<em>Dataset</em>) – Dataset containing necessary dependent and independent variables.</p></li>
-<li><p><strong>dosage</strong> (<em>str</em>) – Dosage variable name where “dosage” array can contain represent
+<li><p><strong>ds</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>) – Dataset containing necessary dependent and independent variables.</p></li>
+<li><p><strong>dosage</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Dosage variable name where “dosage” array can contain represent
 one of several possible quantities, e.g.:
 - Alternate allele counts
 - Recessive or dominant allele encodings
 - True dosages as computed from imputed or probabilistic variant calls
 - Any other custom encoding in a user-defined variable</p></li>
-<li><p><strong>covariates</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Sequence</em><em>[</em><em>str</em><em>]</em><em>]</em>) – Covariate variable names, must correspond to 1 or 2D dataset
+<li><p><strong>covariates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Union[str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence[str]]</span></code>) – Covariate variable names, must correspond to 1 or 2D dataset
 variables of shape (samples[, covariates]). All covariate arrays
 will be concatenated along the second axis (columns).</p></li>
-<li><p><strong>traits</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Sequence</em><em>[</em><em>str</em><em>]</em><em>]</em>) – Trait (e.g. phenotype) variable names, must all be continuous and
+<li><p><strong>traits</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Union[str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence[str]]</span></code>) – Trait (e.g. phenotype) variable names, must all be continuous and
 correspond to 1 or 2D dataset variables of shape (samples[, traits]).
 2D trait arrays will be assumed to contain separate traits within columns
 and concatenated to any 1D traits along the second axis (columns).</p></li>
-<li><p><strong>add_intercept</strong> (<em>bool</em><em>, </em><em>optional</em>) – Add intercept term to covariate set, by default True.</p></li>
+<li><p><strong>add_intercept</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Add intercept term to covariate set, by default True.</p></li>
 </ul>
 </dd>
 </dl>

@@ -1,4 +1,4 @@
-sgkit.gwas\_linear\_regression
+﻿sgkit.gwas\_linear\_regression
 ==============================
 
 .. currentmodule:: sgkit
