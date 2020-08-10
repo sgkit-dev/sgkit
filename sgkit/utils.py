@@ -7,30 +7,64 @@ from .typing import ArrayLike, DType
 
 def check_array_like(
     a: Any,
-    dtype: DType = None,
+    dtype: Union[None, DType, Set[DType]] = None,
     kind: Union[None, str, Set[str]] = None,
     ndim: Union[None, int, Set[int]] = None,
 ) -> None:
+    """Raise an error if an array does not match given attributes (dtype, kind, dimensions).
+
+    Parameters
+    ----------
+    a : Any
+        Array of any type.
+    dtype : Union[None, DType, Set[DType]], optional
+        The dtype the array must have, by default None (don't check)
+        If a set, then the array must have one of the dtypes in the set.
+    kind : Union[None, str, Set[str]], optional
+        The dtype kind the array must be, by default None (don't check).
+        If a set, then the array must be one of the kinds in the set.
+    ndim : Union[None, int, Set[int]], optional
+        Number of dimensions the array must have, by default None (don't check)
+        If a set, then the array must have one of the number of dimensions in the set.
+
+    Raises
+    ------
+    TypeError
+        * If `a` does not have the attibutes `dtype`, `shape`, and `ndim`.
+        * If `a` does not have a dtype that matches `dtype`.
+        * If `a` is not a dtype kind that matches `kind`.
+    ValueError
+        If the number of dimensions of `a` does not match `ndim`.
+    """
     array_attrs = "ndim", "dtype", "shape"
     for k in array_attrs:
         if not hasattr(a, k):
-            raise TypeError
+            raise TypeError(f"Not an array. Missing attribute '{k}'")
     if dtype is not None:
         if isinstance(dtype, set):
             dtype = {np.dtype(t) for t in dtype}
             if a.dtype not in dtype:
-                raise TypeError
+                raise TypeError(
+                    f"Array dtype ({a.dtype}) does not match one of {dtype}"
+                )
         elif a.dtype != np.dtype(dtype):
-            raise TypeError
+            raise TypeError(f"Array dtype ({a.dtype}) does not match {np.dtype(dtype)}")
     if kind is not None:
-        if a.dtype.kind not in kind:
-            raise TypeError
+        if isinstance(kind, set):
+            if a.dtype.kind not in kind:
+                raise TypeError(
+                    f"Array dtype kind ({a.dtype.kind}) does not match one of {kind}"
+                )
+        elif a.dtype.kind != kind:
+            raise TypeError(f"Array dtype kind ({a.dtype.kind}) does not match {kind}")
     if ndim is not None:
         if isinstance(ndim, set):
             if a.ndim not in ndim:
-                raise ValueError
+                raise ValueError(
+                    f"Number of dimensions ({a.ndim}) does not match one of {ndim}"
+                )
         elif ndim != a.ndim:
-            raise ValueError
+            raise ValueError(f"Number of dimensions ({a.ndim}) does not match {ndim}")
 
 
 def encode_array(x: ArrayLike) -> Tuple[ArrayLike, List[Any]]:
