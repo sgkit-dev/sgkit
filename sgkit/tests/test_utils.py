@@ -9,18 +9,31 @@ from sgkit.utils import check_array_like, encode_array, split_array_chunks
 
 
 def test_check_array_like():
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match=r"Not an array. Missing attribute 'ndim'"):
         check_array_like("foo")
     a = np.arange(100, dtype="i4")
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match=r"Array dtype \(int32\) does not match int64"):
         check_array_like(a, dtype="i8")
-    with pytest.raises(TypeError):
+    with pytest.raises(
+        TypeError,
+        match=r"Array dtype \(int32\) does not match one of (\{dtype\('int8'\), dtype\('int16'\)\}|\{dtype\('int16'\), dtype\('int8'\)\})",
+    ):
         check_array_like(a, dtype={"i1", "i2"})
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match=r"Array dtype kind \(i\) does not match f"):
         check_array_like(a, kind="f")
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        TypeError,
+        match=r"Array dtype kind \(i\) does not match one of (\{'f', 'S'\}|\{'S', 'f'\})",
+    ):
+        check_array_like(a, kind={"f", "S"})
+    with pytest.raises(
+        ValueError, match=r"Number of dimensions \(1\) does not match 2"
+    ):
         check_array_like(a, ndim=2)
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match=r"Number of dimensions \(1\) does not match one of (\{2, 3\}|\{3, 2\})",
+    ):
         check_array_like(a, ndim={2, 3})
 
 
