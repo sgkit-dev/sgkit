@@ -383,8 +383,8 @@ def test_ridge_regression__raise_on_non_equal_first_dim():
         ridge_regression(np.ones((2, 2)), np.ones((1, 1)), np.array([1.0]))
 
 
-@pytest.mark.parametrize(  # type: ignore[misc]
-    "x,size,expected_index,expected_sizes",  # type: ignore[no-untyped-def]
+@pytest.mark.parametrize(
+    "x,size,expected_index,expected_sizes",
     [
         ([0], 1, [0], [1]),
         ([0], 2, [0], [1]),
@@ -397,7 +397,7 @@ def test_ridge_regression__raise_on_non_equal_first_dim():
 )
 def test_index_array_blocks__basic(
     x: Any, size: int, expected_index: Any, expected_sizes: Any
-):
+) -> None:
     index, sizes = index_array_blocks(x, size)
     np.testing.assert_equal(index, expected_index)
     np.testing.assert_equal(sizes, expected_sizes)
@@ -425,7 +425,7 @@ def test_index_array_blocks__raise_on_not_monotonic_increasing():
         index_array_blocks([0, 1, 1, 1, 0], 3)
 
 
-@st.composite  # type: ignore[misc]
+@st.composite
 def monotonic_increasing_ints(draw: Any) -> ndarray:
     # Draw increasing ints with repeats, e.g. [0, 0, 5, 7, 7, 7]
     n = draw(st.integers(min_value=0, max_value=5))
@@ -439,9 +439,9 @@ def monotonic_increasing_ints(draw: Any) -> ndarray:
     return np.repeat(values, repeats)
 
 
-@given(st_data(), monotonic_increasing_ints())  # type: ignore[misc]
-@settings(max_examples=50)  # type: ignore[misc]
-def test_index_array_blocks__coverage(data: Any, x: ndarray):  # type: ignore[no-untyped-def]
+@given(st_data(), monotonic_increasing_ints())
+@settings(max_examples=50)
+def test_index_array_blocks__coverage(data: Any, x: ndarray) -> None:
     # Draw block size that is no less than 1 but possibly
     # greater than or equal to the size of the array
     size = data.draw(st.integers(min_value=1, max_value=len(x) + 1))
@@ -459,8 +459,8 @@ def test_index_array_blocks__coverage(data: Any, x: ndarray):  # type: ignore[no
         np.testing.assert_equal(np.concatenate(chunks), x)
 
 
-@pytest.mark.parametrize(  # type: ignore[misc]
-    "chunks,expected_index",  # type: ignore[no-untyped-def]
+@pytest.mark.parametrize(
+    "chunks,expected_index",
     [
         ([1], [0]),
         ([1, 1], [0, 1]),
@@ -469,7 +469,7 @@ def test_index_array_blocks__coverage(data: Any, x: ndarray):  # type: ignore[no
         ([10, 1, 1, 10], [0, 10, 11, 12]),
     ],
 )
-def test_index_block_sizes__basic(chunks: Any, expected_index: Any):
+def test_index_block_sizes__basic(chunks: Any, expected_index: Any) -> None:
     index, sizes = index_block_sizes(chunks)
     np.testing.assert_equal(index, expected_index)
     np.testing.assert_equal(sizes, chunks)
