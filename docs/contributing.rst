@@ -206,6 +206,28 @@ To run a specific tool (``black``/``flake8``/``isort``/``mypy`` etc)::
 You can omit ``--all-files`` to only check changed files.
 
 
+PR/Git ops
+~~~~~~~~~~
+
+We currently use ``rebase`` or ``squash`` PR merge strategies. This means that
+following certain git best practices will make your development life easier.
+
+
+1. Try to create isolated/single issue PRs
+
+   This makes it easier to review your changes, and should guarantee
+   a speedy review.
+
+2. Try to push meaningful small commits
+
+   Again this makes it easier to review your code, and in case of
+   bugs easier to isolate specific buggy commits.
+
+
+Please read `git best practices <https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project#_public_project>`_
+and specifically a very handy `interactive rebase doc <https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History#_rewriting_history>`_.
+
+
 Contributing to documentation
 -----------------------------
 
