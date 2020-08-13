@@ -146,6 +146,19 @@ are not covered by tests.
 
 The test suite is run automatically by CI.
 
+Test files live in ``sgkit/tests`` directory, test filename naming convention:
+``test_<MODULE>.py``.
+
+Use double underscore to organize tests into groups, for example:
+
+.. code-block:: python
+
+   def test_foo__accepts_empty_input():
+     ...
+
+   def test_foo__accepts_strings():
+     ...
+
 
 Docstrings
 ~~~~~~~~~~
