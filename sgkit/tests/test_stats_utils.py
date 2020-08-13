@@ -46,8 +46,8 @@ def test_r2_score__batch_dims():
     np.testing.assert_allclose(r2_actual.ravel(), r2_expected)
 
 
-@pytest.mark.parametrize(  # type: ignore[misc]
-    "predicted,actual,expected_r2",  # type: ignore[no-untyped-def]
+@pytest.mark.parametrize(
+    "predicted,actual,expected_r2",
     [
         ([1, 1], [1, 2], -1.0),
         ([1, 0], [1, 2], -7.0),
@@ -65,13 +65,13 @@ def test_r2_score__batch_dims():
 )
 def test_r2_score__sklearn_comparison(
     predicted: List[Any], actual: List[Any], expected_r2: float
-):
+) -> None:
     yp, yt = np.array(predicted), np.array(actual)
     assert r2_score(yp, yt) == expected_r2
 
 
-@given(st.integers(0, 25))  # type: ignore[misc]
-@settings(max_examples=10)  # type: ignore[misc]
+@given(st.integers(0, 25))
+@settings(max_examples=10)
 def test_concat_2d__values(n: int) -> None:
     x, y = np.arange(n), np.arange(n * n).reshape(n, n)
     z = np.copy(y)
@@ -119,9 +119,9 @@ def sample_dataset(draw):
     return ds
 
 
-@given(sample_dataset())  # type: ignore[misc]
-@settings(max_examples=25)  # type: ignore[misc]
-def test_concat_2d__variables(ds: Dataset):  # type: ignore[no-untyped-def]
+@given(sample_dataset())
+@settings(max_examples=25)
+def test_concat_2d__variables(ds: Dataset) -> None:
     # Select data variables expected to remain after extract
     data_vars = [v for v in ds if ds[v].dims[0] == "dim-0-0"]
     # Sum the number of columns for the kept variables

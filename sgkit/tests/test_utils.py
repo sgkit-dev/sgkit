@@ -37,8 +37,8 @@ def test_check_array_like():
         check_array_like(a, ndim={2, 3})
 
 
-@pytest.mark.parametrize(  # type: ignore[misc]
-    "x,expected_values,expected_names",  # type: ignore[no-untyped-def]
+@pytest.mark.parametrize(
+    "x,expected_values,expected_names",
     [
         ([], [], []),
         (["a"], [0], ["a"]),
@@ -60,14 +60,14 @@ def test_check_array_like():
 )
 def test_encode_array(
     x: List[Any], expected_values: List[Any], expected_names: List[Any]
-):
+) -> None:
     v, n = encode_array(np.array(x))
     np.testing.assert_equal(v, expected_values)
     np.testing.assert_equal(n, expected_names)
 
 
-@pytest.mark.parametrize(  # type: ignore[misc]
-    "n,blocks,expected_chunks",  # type: ignore[no-untyped-def]
+@pytest.mark.parametrize(
+    "n,blocks,expected_chunks",
     [
         (1, 1, [1]),
         (2, 1, [2]),
@@ -82,12 +82,12 @@ def test_encode_array(
 )
 def test_split_array_chunks__precomputed(
     n: int, blocks: int, expected_chunks: List[int]
-):
+) -> None:
     assert split_array_chunks(n, blocks) == tuple(expected_chunks)
 
 
-@given(st.integers(1, 50), st.integers(0, 50))  # type: ignore[misc]
-@settings(max_examples=50)  # type: ignore[misc]
+@given(st.integers(1, 50), st.integers(0, 50))
+@settings(max_examples=50)
 def test_split_array_chunks__size(a: int, b: int) -> None:
     res = split_array_chunks(a + b, a)
     assert sum(res) == a + b
