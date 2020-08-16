@@ -1,8 +1,8 @@
 import dask.array as da
 import numpy as np
 import xarray as xr
-from xarray import DataArray, Dataset
 from numba import njit
+from xarray import DataArray, Dataset
 
 
 def count_alleles(ds: Dataset) -> DataArray:
@@ -72,12 +72,14 @@ def count_alleles(ds: Dataset) -> DataArray:
     return DataArray(data=AC, dims=("variants", "alleles"), name="variant_allele_count")
 
 
-def count_call_alleles_ndarray(genotypes, mask, n_alleles=None, dtype=np.uint8):
+def count_call_alleles_ndarray(
+    g: np.ndarray, mask: np.ndarray, n_alleles: int = -1, dtype: type = np.uint8
+) -> np.ndarray:
     """Compute allele count from genotype calls.
 
     Parameters
     ----------
-    genotypes : ndarray, int, shape (variants, samples, ploidy)
+    g : ndarray, int, shape (variants, samples, ploidy)
         Array of genotype calls.
     mask : ndarray, bool, shape (variants, samples, ploidy)
         Array of booleans indicating individual allele calls
@@ -95,12 +97,12 @@ def count_call_alleles_ndarray(genotypes, mask, n_alleles=None, dtype=np.uint8):
         of non-missing occurrences of each allele.
 
     """
-    assert genotypes.shape == mask.shape
-    n_variants, n_samples, ploidy = genotypes.shape
+    assert g.shape == mask.shape
+    n_variants, n_samples, ploidy = g.shape
 
     # default to counting all alleles
-    if n_alleles is None:
-        n_alleles = np.max(genotypes) + 1
+    if n_alleles < 0:
+        n_alleles = np.max(g) + 1
 
     ac = np.zeros((n_variants, n_samples, n_alleles), dtype=dtype)
     for i in range(n_variants):
@@ -109,9 +111,9 @@ def count_call_alleles_ndarray(genotypes, mask, n_alleles=None, dtype=np.uint8):
                 if mask[i, j, k]:
                     pass
                 else:
-                    a = genotypes[i, j, k]
+                    a = g[i, j, k]
                     if a < 0:
-                        raise ValueError('Encountered unmasked negative allele value.')
+                        raise ValueError("Encountered unmasked negative allele value.")
                     if a >= n_alleles:
                         pass
                     else:
@@ -181,7 +183,5 @@ def count_call_alleles(ds: Dataset, dtype: type = np.uint8) -> DataArray:
     ac = da.map_overlap(func, g, m, chunks=shape)
 
     return DataArray(
-        data=ac,
-        dims=("variants", "samples", "alleles"),
-        name="call_allele_count",
+        data=ac, dims=("variants", "samples", "alleles"), name="call_allele_count",
     )

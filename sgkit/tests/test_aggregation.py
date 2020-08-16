@@ -115,14 +115,15 @@ def test_count_call_alleles__multi_variant_multi_sample():
         )
     )
     np.testing.assert_equal(
-        ac, np.array(
+        ac,
+        np.array(
             [
                 [[2, 0], [2, 0], [2, 0]],
                 [[2, 0], [2, 0], [1, 1]],
                 [[0, 2], [1, 1], [1, 1]],
                 [[0, 2], [0, 2], [0, 2]],
             ]
-        )
+        ),
     )
 
 
@@ -138,14 +139,15 @@ def test_count_call_alleles__missing_data():
         )
     )
     np.testing.assert_equal(
-        ac, np.array(
+        ac,
+        np.array(
             [
                 [[0, 0], [0, 0], [0, 0]],
                 [[0, 0], [2, 0], [0, 1]],
                 [[0, 2], [0, 0], [1, 0]],
                 [[0, 2], [0, 2], [0, 2]],
             ]
-        )
+        ),
     )
 
 
@@ -161,12 +163,13 @@ def test_count_call_alleles__higher_ploidy():
         )
     )
     np.testing.assert_equal(
-        ac, np.array(
+        ac,
+        np.array(
             [
                 [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]],
                 [[1, 1, 1, 0], [0, 1, 1, 1], [0, 0, 0, 0]],
             ]
-        )
+        ),
     )
 
 
