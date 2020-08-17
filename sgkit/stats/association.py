@@ -164,23 +164,12 @@ def gwas_linear_regression(
     -------
     :class:`xarray.Dataset`
         Dataset containing (N = num variants, O = num traits):
-            beta : (N, O) array-like
+            variant_beta : (N, O) array-like
                 Beta values associated with each variant and trait
-            t_value : (N, O) array-like
+            variant_t_value : (N, O) array-like
                 T statistics for each beta
-            p_value : (N, O) array-like
+            variant_p_value : (N, O) array-like
                 P values as float in [0, 1]
-
-    Warnings
-    --------
-    Regression statistics from this implementation are only valid when an
-    intercept is present. The `add_intercept` flag is a convenience for adding one
-    when not already present, but there is currently no parameterization for
-    intercept-free regression.
-
-    Additionally, both covariate and trait arrays will be rechunked to have blocks
-    along the sample (row) dimension but not the column dimension (i.e.
-    they must be tall and skinny).
 
     References
     ----------
@@ -191,7 +180,6 @@ def gwas_linear_regression(
         Hilary K. Finucane, Rany M. Salem, Daniel I. Chasman, et al. 2015. “Efficient
         Bayesian Mixed-Model Analysis Increases Association Power in Large Cohorts.”
         Nature Genetics 47 (3): 284–90.
-
 
     """
     if isinstance(covariates, str):

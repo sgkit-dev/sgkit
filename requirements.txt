@@ -2,4 +2,5 @@ numpy
 xarray
 dask[array]
 scipy
+numba
 zarr
