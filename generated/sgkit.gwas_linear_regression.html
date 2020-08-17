@@ -207,11 +207,11 @@ they must be tall and skinny).</p>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><dl class="simple">
 <dt>Dataset containing (N = num variants, O = num traits):</dt><dd><dl class="simple">
-<dt>beta<span class="classifier">(N, O) array-like</span></dt><dd><p>Beta values associated with each variant and trait</p>
+<dt>variant_beta<span class="classifier">(N, O) array-like</span></dt><dd><p>Beta values associated with each variant and trait</p>
 </dd>
-<dt>t_value<span class="classifier">(N, O) array-like</span></dt><dd><p>T statistics for each beta</p>
+<dt>variant_t_value<span class="classifier">(N, O) array-like</span></dt><dd><p>T statistics for each beta</p>
 </dd>
-<dt>p_value<span class="classifier">(N, O) array-like</span></dt><dd><p>P values as float in [0, 1]</p>
+<dt>variant_p_value<span class="classifier">(N, O) array-like</span></dt><dd><p>P values as float in [0, 1]</p>
 </dd>
 </dl>
 </dd>
@@ -222,16 +222,6 @@ they must be tall and skinny).</p>
 <dd class="field-even"><p><a class="reference external" href="http://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a></p>
 </dd>
 </dl>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Regression statistics from this implementation are only valid when an
-intercept is present. The <cite>add_intercept</cite> flag is a convenience for adding one
-when not already present, but there is currently no parameterization for
-intercept-free regression.</p>
-<p>Additionally, both covariate and trait arrays will be rechunked to have blocks
-along the sample (row) dimension but not the column dimension (i.e.
-they must be tall and skinny).</p>
-</div>
 <p class="rubric">References</p>
 <ul class="simple">
 <li><dl class="simple">
