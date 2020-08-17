@@ -169,17 +169,17 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>variant_contig_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The contig names.</p></li>
-<li><p><strong>variant_contig</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_like</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The (index of the) contig for each variant.</p></li>
-<li><p><strong>variant_position</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_like</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The reference position of the variant.</p></li>
-<li><p><strong>variant_alleles</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_like</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">zero-terminated</span> <span class="pre">bytes</span></code>, e.g. <code class="docutils literal notranslate"><span class="pre">&quot;S1&quot;</span></code>, or <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code>) – The possible alleles for the variant.</p></li>
-<li><p><strong>sample_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_like</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The unique identifier of the sample.</p></li>
-<li><p><strong>call_genotype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_like</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Genotype, encoded as allele values (0 for the reference, 1 for
+<li><p><strong>variant_contig_names</strong> (<em>list of str</em>) – The contig names.</p></li>
+<li><p><strong>variant_contig</strong> (<em>array_like</em><em>, </em><em>int</em>) – The (index of the) contig for each variant.</p></li>
+<li><p><strong>variant_position</strong> (<em>array_like</em><em>, </em><em>int</em>) – The reference position of the variant.</p></li>
+<li><p><strong>variant_alleles</strong> (<em>array_like</em><em>, </em><em>zero-terminated bytes</em><em>, </em><em>e.g. &quot;S1&quot;</em><em>, or </em><em>object</em>) – The possible alleles for the variant.</p></li>
+<li><p><strong>sample_id</strong> (<em>array_like</em><em>, </em><em>str</em>) – The unique identifier of the sample.</p></li>
+<li><p><strong>call_genotype</strong> (<em>array_like</em><em>, </em><em>int</em>) – Genotype, encoded as allele values (0 for the reference, 1 for
 the first allele, 2 for the second allele), or -1 to indicate a
 missing value.</p></li>
-<li><p><strong>call_genotype_phased</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_like</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – A flag for each call indicating if it is phased or not. If
+<li><p><strong>call_genotype_phased</strong> (<em>array_like</em><em>, </em><em>bool</em><em>, </em><em>optional</em>) – A flag for each call indicating if it is phased or not. If
 omitted all calls are unphased.</p></li>
-<li><p><strong>variant_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_like</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <em>optional</em>) – The unique identifier of the variant.</p></li>
+<li><p><strong>variant_id</strong> (<em>array_like</em><em>, </em><em>str</em><em>, </em><em>optional</em>) – The unique identifier of the variant.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
