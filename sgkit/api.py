@@ -44,7 +44,7 @@ def create_genotype_call_dataset(
     call_genotype_phased : array_like, bool, optional
         A flag for each call indicating if it is phased or not. If
         omitted all calls are unphased.
-    variant_id: array_like, str, optional
+    variant_id: array_like, str or object, optional
         The unique identifier of the variant.
 
     Returns
@@ -76,7 +76,7 @@ def create_genotype_call_dataset(
             call_genotype_phased,
         )
     if variant_id is not None:
-        check_array_like(variant_id, kind="U", ndim=1)
+        check_array_like(variant_id, kind={"U", "O"}, ndim=1)
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
     return xr.Dataset(data_vars=data_vars, attrs=attrs)
@@ -109,7 +109,7 @@ def create_genotype_dosage_dataset(
     call_dosage : array_like, float
         Dosages, encoded as floats, with NaN indicating a
         missing value.
-    variant_id: array_like, str, optional
+    variant_id: array_like, str or object, optional
         The unique identifier of the variant.
 
     Returns
@@ -132,7 +132,7 @@ def create_genotype_dosage_dataset(
         "call_dosage_mask": ([DIM_VARIANT, DIM_SAMPLE], np.isnan(call_dosage),),
     }
     if variant_id is not None:
-        check_array_like(variant_id, kind="U", ndim=1)
+        check_array_like(variant_id, kind={"U", "O"}, ndim=1)
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
     return xr.Dataset(data_vars=data_vars, attrs=attrs)
