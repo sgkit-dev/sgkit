@@ -170,9 +170,9 @@ def hardy_weinberg_test(
     else:
         # TODO: Use API genotype counting function instead, e.g.
         # https://github.com/pystatgen/sgkit/issues/29#issuecomment-656691069
-        mask = ds["call_genotype_mask"].any(dim="ploidy")
-        gtc = xr.where(mask, -1, ds["call_genotype"].sum(dim="ploidy"))  # type: ignore[no-untyped-call]
+        M = ds["call_genotype_mask"].any(dim="ploidy")
+        AC = xr.where(M, -1, ds["call_genotype"].sum(dim="ploidy"))  # type: ignore[no-untyped-call]
         cts = [1, 0, 2]  # arg order: hets, hom1, hom2
-        obs = [da.asarray((gtc == ct).sum(dim="samples")) for ct in cts]
+        obs = [da.asarray((AC == ct).sum(dim="samples")) for ct in cts]
     p = da.map_blocks(hardy_weinberg_p_value_vec_jit, *obs)
     return xr.Dataset({"variant_hwe_p_value": ("variants", p)})

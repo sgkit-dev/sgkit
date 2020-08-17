@@ -7,8 +7,10 @@ from .api import (  # noqa: F401
     create_genotype_dosage_dataset,
 )
 from .display import display_genotypes
+from .io.vcfzarr_reader import read_vcfzarr
 from .stats.aggregation import count_alleles
 from .stats.association import gwas_linear_regression
+from .stats.hwe import hardy_weinberg_test
 from .stats.regenie import regenie
 
 __all__ = [
@@ -21,5 +23,7 @@ __all__ = [
     "create_genotype_dosage_dataset",
     "display_genotypes",
     "gwas_linear_regression",
+    "read_vcfzarr",
     "regenie",
+    "hardy_weinberg_test",
 ]

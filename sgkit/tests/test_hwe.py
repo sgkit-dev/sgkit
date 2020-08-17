@@ -63,11 +63,10 @@ def test_hwep__reference_impl_comparison(datadir):
     np.testing.assert_allclose(p_expected, p_actual)
 
 
-def test_hwep__raise_on_negative():
-    args = [[-1, 0, 0], [0, -1, 0], [0, 0, -1]]
-    for arg in args:
-        with pytest.raises(ValueError):
-            hwep(*arg)
+@pytest.mark.parametrize("args", [[-1, 0, 0], [0, -1, 0], [0, 0, -1]])
+def test_hwep__raise_on_negative(args):
+    with pytest.raises(ValueError):
+        hwep(*args)
 
 
 def test_hwep__zeros():
