@@ -3,7 +3,7 @@ from typing import Any, Dict, Hashable, List
 import numpy as np
 import xarray as xr
 
-from .utils import check_array_like
+from .typing import SgkitSchema
 
 DIM_VARIANT = "variants"
 DIM_SAMPLE = "samples"
@@ -53,11 +53,6 @@ def create_genotype_call_dataset(
         The dataset of genotype calls.
 
     """
-    check_array_like(variant_contig, kind="i", ndim=1)
-    check_array_like(variant_position, kind="i", ndim=1)
-    check_array_like(variant_alleles, kind={"S", "O"}, ndim=2)
-    check_array_like(sample_id, kind={"U", "O"}, ndim=1)
-    check_array_like(call_genotype, kind="i", ndim=3)
     data_vars: Dict[Hashable, Any] = {
         "variant_contig": ([DIM_VARIANT], variant_contig),
         "variant_position": ([DIM_VARIANT], variant_position),
@@ -69,17 +64,25 @@ def create_genotype_call_dataset(
             call_genotype < 0,
         ),
     }
+    schema = {
+        SgkitSchema.variant_contig,
+        SgkitSchema.variant_position,
+        SgkitSchema.variant_allele,
+        SgkitSchema.sample_id,
+        SgkitSchema.call_genotype,
+        SgkitSchema.call_genotype_mask,
+    }
     if call_genotype_phased is not None:
-        check_array_like(call_genotype_phased, kind="b", ndim=2)
         data_vars["call_genotype_phased"] = (
             [DIM_VARIANT, DIM_SAMPLE],
             call_genotype_phased,
         )
+        schema.add(SgkitSchema.call_genotype_phased)
     if variant_id is not None:
-        check_array_like(variant_id, kind={"U", "O"}, ndim=1)
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
+        schema.add(SgkitSchema.variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
-    return xr.Dataset(data_vars=data_vars, attrs=attrs)
+    return SgkitSchema.spec(xr.Dataset(data_vars=data_vars, attrs=attrs), *schema)
 
 
 def create_genotype_dosage_dataset(
@@ -115,14 +118,9 @@ def create_genotype_dosage_dataset(
     Returns
     -------
     xr.Dataset
-        The dataset of genotype calls.
+        The dataset of genotype dosage.
 
     """
-    check_array_like(variant_contig, kind="i", ndim=1)
-    check_array_like(variant_position, kind="i", ndim=1)
-    check_array_like(variant_alleles, kind={"S", "O"}, ndim=2)
-    check_array_like(sample_id, kind={"U", "O"}, ndim=1)
-    check_array_like(call_dosage, kind="f", ndim=2)
     data_vars: Dict[Hashable, Any] = {
         "variant_contig": ([DIM_VARIANT], variant_contig),
         "variant_position": ([DIM_VARIANT], variant_position),
@@ -131,8 +129,16 @@ def create_genotype_dosage_dataset(
         "call_dosage": ([DIM_VARIANT, DIM_SAMPLE], call_dosage),
         "call_dosage_mask": ([DIM_VARIANT, DIM_SAMPLE], np.isnan(call_dosage),),
     }
+    schema = {
+        SgkitSchema.variant_contig,
+        SgkitSchema.variant_position,
+        SgkitSchema.variant_allele,
+        SgkitSchema.sample_id,
+        SgkitSchema.call_dosage,
+        SgkitSchema.call_dosage_mask,
+    }
     if variant_id is not None:
-        check_array_like(variant_id, kind={"U", "O"}, ndim=1)
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
+        schema.add(SgkitSchema.variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
-    return xr.Dataset(data_vars=data_vars, attrs=attrs)
+    return SgkitSchema.spec(xr.Dataset(data_vars=data_vars, attrs=attrs), *schema)

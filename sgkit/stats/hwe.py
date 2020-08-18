@@ -1,11 +1,11 @@
-from typing import Hashable, Optional
-
 import dask.array as da
 import numpy as np
 import xarray as xr
 from numba import njit
 from numpy import ndarray
 from xarray import Dataset
+
+from sgkit.typing import SgkitSchema
 
 
 def hardy_weinberg_p_value(obs_hets: int, obs_hom1: int, obs_hom2: int) -> float:
@@ -119,22 +119,17 @@ def hardy_weinberg_p_value_vec(
 hardy_weinberg_p_value_vec_jit = njit(hardy_weinberg_p_value_vec, fastmath=True)
 
 
-def hardy_weinberg_test(
-    ds: Dataset, genotype_counts: Optional[Hashable] = None
-) -> Dataset:
+def hardy_weinberg_test(ds: Dataset) -> Dataset:
     """Exact test for HWE as described in Wigginton et al. 2005 [1].
 
     Parameters
     ----------
     ds : Dataset
         Dataset containing genotype calls or precomputed genotype counts.
-    genotype_counts : Optional[Hashable], optional
-        Name of variable containing precomputed genotype counts, by default
-        None. If not provided, these counts will be computed automatically
-        from genotype calls. If present, must correspond to an (`N`, 3) array
-        where `N` is equal to the number of variants and the 3 columns contain
-        heterozygous, homozygous reference, and homozygous alternate counts
-        (in that order) across all samples for a variant.
+        May contain `sgkit.typing.SgkitSchema.genotype_counts` otherwise,
+        `sgkit.typing.SgkitSchema.call_genotype` and `sgkit.typing.SgkitSchema.call_genotype_mask`
+        must be present to calculate genotype counts.
+
 
     Warnings
     --------
@@ -144,8 +139,8 @@ def hardy_weinberg_test(
     -------
     Dataset
         Dataset containing (N = num variants):
-        variant_hwe_p_value : (N,) ArrayLike
-            P values from HWE test for each variant as float in [0, 1].
+        * `sgkit.typing.SgkitSchema.variant_hwe_p_value`: (N,)
+          P values from HWE test for each variant as float in [0, 1].
 
     References
     ----------
@@ -164,15 +159,22 @@ def hardy_weinberg_test(
     if ds.dims["alleles"] != 2:
         raise NotImplementedError("HWE test only implemented for biallelic genotypes")
     # Use precomputed genotype counts if provided
-    if genotype_counts is not None:
-        obs = list(da.asarray(ds[genotype_counts]).T)
+    schm = SgkitSchema.get_schema(ds)
+    if SgkitSchema.genotype_counts in schm:
+        obs = list(da.asarray(ds[schm[SgkitSchema.genotype_counts][0]]).T)
     # Otherwise compute genotype counts from calls
     else:
+        SgkitSchema.schema_has(
+            ds, SgkitSchema.call_genotype, SgkitSchema.call_genotype_mask
+        )
         # TODO: Use API genotype counting function instead, e.g.
         # https://github.com/pystatgen/sgkit/issues/29#issuecomment-656691069
-        M = ds["call_genotype_mask"].any(dim="ploidy")
-        AC = xr.where(M, -1, ds["call_genotype"].sum(dim="ploidy"))  # type: ignore[no-untyped-call]
+        M = ds[schm["call_genotype_mask"][0]].any(dim="ploidy")
+        AC = xr.where(M, -1, ds[schm["call_genotype"][0]].sum(dim="ploidy"))  # type: ignore[no-untyped-call]
         cts = [1, 0, 2]  # arg order: hets, hom1, hom2
         obs = [da.asarray((AC == ct).sum(dim="samples")) for ct in cts]
     p = da.map_blocks(hardy_weinberg_p_value_vec_jit, *obs)
-    return xr.Dataset({"variant_hwe_p_value": ("variants", p)})
+    return SgkitSchema.spec(
+        xr.Dataset({"variant_hwe_p_value": ("variants", p)}),
+        SgkitSchema.variant_hwe_p_value,
+    )

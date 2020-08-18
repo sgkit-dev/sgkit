@@ -3,6 +3,8 @@ import numpy as np
 import xarray as xr
 from xarray import DataArray, Dataset
 
+from sgkit.typing import SgkitSchema
+
 
 def count_alleles(ds: Dataset) -> DataArray:
     """Compute allele count from genotype calls.
@@ -10,8 +12,10 @@ def count_alleles(ds: Dataset) -> DataArray:
     Parameters
     ----------
     ds : Dataset
-        Genotype call dataset such as from
-        `sgkit.create_genotype_call_dataset`.
+        Genotype call dataset such as from `sgkit.create_genotype_call_dataset`.
+        Must hold:
+        * `sgkit.typing.SgkitSchema.call_genotype`
+        * `sgkit.typing.SgkitSchema.call_genotype_mask`
 
     Returns
     -------
@@ -40,10 +44,13 @@ def count_alleles(ds: Dataset) -> DataArray:
            [2, 2],
            [4, 0]])
     """
+    schm = SgkitSchema.schema_has(
+        ds, SgkitSchema.call_genotype, SgkitSchema.call_genotype_mask
+    )
     # Count each allele index individually as a 1D vector and
     # restack into new alleles dimension with same order
-    G = ds["call_genotype"].stack(calls=("samples", "ploidy"))
-    M = ds["call_genotype_mask"].stack(calls=("samples", "ploidy"))
+    G = ds[schm["call_genotype"][0]].stack(calls=("samples", "ploidy"))
+    M = ds[schm["call_genotype_mask"][0]].stack(calls=("samples", "ploidy"))
     n_variant, n_allele = G.shape[0], ds.dims["alleles"]
     max_allele = n_allele + 1
 

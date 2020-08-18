@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Sequence, Union
+from typing import Optional
 
 import dask.array as da
 import numpy as np
@@ -7,7 +7,7 @@ import xarray as xr
 from dask.array import Array, stats
 from xarray import Dataset
 
-from ..typing import ArrayLike
+from ..typing import ArrayLike, SgkitSchema
 from .utils import concat_2d
 
 
@@ -109,14 +109,7 @@ def _get_loop_covariates(ds: Dataset, dosage: Optional[str] = None) -> Array:
     return da.asarray(G.data)
 
 
-def gwas_linear_regression(
-    ds: Dataset,
-    *,
-    dosage: str,
-    covariates: Union[str, Sequence[str]],
-    traits: Union[str, Sequence[str]],
-    add_intercept: bool = True,
-) -> Dataset:
+def gwas_linear_regression(ds: Dataset, *, add_intercept: bool = True) -> Dataset:
     """Run linear regression to identify continuous trait associations with genetic variants.
 
     This method solves OLS regressions for each variant simultaneously and reports
@@ -130,22 +123,10 @@ def gwas_linear_regression(
     ----------
     ds : Dataset
         Dataset containing necessary dependent and independent variables.
-    dosage : str
-        Dosage variable name where "dosage" array can contain represent
-        one of several possible quantities, e.g.:
-        - Alternate allele counts
-        - Recessive or dominant allele encodings
-        - True dosages as computed from imputed or probabilistic variant calls
-        - Any other custom encoding in a user-defined variable
-    covariates : Union[str, Sequence[str]]
-        Covariate variable names, must correspond to 1 or 2D dataset
-        variables of shape (samples[, covariates]). All covariate arrays
-        will be concatenated along the second axis (columns).
-    traits : Union[str, Sequence[str]]
-        Trait (e.g. phenotype) variable names, must all be continuous and
-        correspond to 1 or 2D dataset variables of shape (samples[, traits]).
-        2D trait arrays will be assumed to contain separate traits within columns
-        and concatenated to any 1D traits along the second axis (columns).
+        Must hold:
+        * `sgkit.typing.SgkitSchema.dosage`
+        * `sgkit.typing.SgkitSchema.covariates`
+        * `sgkit.typing.SgkitSchema.traits`
     add_intercept : bool, optional
         Add intercept term to covariate set, by default True.
 
@@ -164,11 +145,11 @@ def gwas_linear_regression(
     -------
     :class:`xarray.Dataset`
         Dataset containing (N = num variants, O = num traits):
-            variant_beta : (N, O) array-like
+            SgkitSchema.variant_beta: (N, O)
                 Beta values associated with each variant and trait
-            variant_t_value : (N, O) array-like
+            SgkitSchema.variant_t_value: (N, O)
                 T statistics for each beta
-            variant_p_value : (N, O) array-like
+            SgkitSchema.variant_p_value: (N, O)
                 P values as float in [0, 1]
 
     References
@@ -182,14 +163,15 @@ def gwas_linear_regression(
         Nature Genetics 47 (3): 284–90.
 
     """
-    if isinstance(covariates, str):
-        covariates = [covariates]
-    if isinstance(traits, str):
-        traits = [traits]
+    schm = SgkitSchema.schema_has(
+        ds, SgkitSchema.dosage, SgkitSchema.covariates, SgkitSchema.traits,
+    )
 
-    G = _get_loop_covariates(ds, dosage=dosage)
+    G = _get_loop_covariates(ds, dosage=schm[SgkitSchema.dosage][0])
 
-    X = da.asarray(concat_2d(ds[list(covariates)], dims=("samples", "covariates")))
+    X = da.asarray(
+        concat_2d(ds[schm[SgkitSchema.covariates]], dims=("samples", "covariates"))
+    )
     if add_intercept:
         X = da.concatenate([da.ones((X.shape[0], 1), dtype=X.dtype), X], axis=1)
     # Note: dask qr decomp (used by lstsq) requires no chunking in one
@@ -198,15 +180,21 @@ def gwas_linear_regression(
     # should be removed from dim 1
     X = X.rechunk((None, -1))
 
-    Y = da.asarray(concat_2d(ds[list(traits)], dims=("samples", "traits")))
+    Y = da.asarray(concat_2d(ds[schm[SgkitSchema.traits]], dims=("samples", "traits")))
     # Like covariates, traits must also be tall-skinny arrays
     Y = Y.rechunk((None, -1))
 
     res = linear_regression(G.T, X, Y)
-    return xr.Dataset(
+    ds = xr.Dataset(
         {
             "variant_beta": (("variants", "traits"), res.beta),
             "variant_t_value": (("variants", "traits"), res.t_value),
             "variant_p_value": (("variants", "traits"), res.p_value),
         }
+    )
+    return SgkitSchema.spec(
+        ds,
+        SgkitSchema.variant_beta,
+        SgkitSchema.variant_t_value,
+        SgkitSchema.variant_p_value,
     )

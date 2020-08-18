@@ -14,6 +14,7 @@ from sgkit.stats.hwe import hardy_weinberg_p_value_vec as hwep_vec
 from sgkit.stats.hwe import hardy_weinberg_p_value_vec_jit as hwep_vec_jit
 from sgkit.stats.hwe import hardy_weinberg_test as hwep_test
 from sgkit.testing import simulate_genotype_call_dataset
+from sgkit.typing import SgkitSchema
 
 
 def simulate_genotype_calls(
@@ -139,7 +140,9 @@ def test_hwep_dataset__precomputed_counts(ds_neq: Dataset) -> None:
     cts = [1, 0, 2]  # arg order: hets, hom1, hom2
     gtc = xr.concat([(ac == ct).sum(dim="samples") for ct in cts], dim="counts").T  # type: ignore[no-untyped-call]
     ds = ds.assign(**{"variant_genotype_counts": gtc})
-    p = hwep_test(ds, genotype_counts="variant_genotype_counts")
+    p = hwep_test(
+        SgkitSchema.spec(ds, (SgkitSchema.genotype_counts, ["variant_genotype_counts"]))
+    )
     assert np.all(p < 1e-8)
 
 

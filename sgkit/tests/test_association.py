@@ -1,5 +1,5 @@
 import warnings
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, Hashable, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -9,7 +9,7 @@ from pandas import DataFrame
 from xarray import Dataset
 
 from sgkit.stats.association import gwas_linear_regression, linear_regression
-from sgkit.typing import ArrayLike
+from sgkit.typing import ArrayLike, SgkitSchema
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore", DeprecationWarning)
@@ -78,18 +78,26 @@ def _generate_test_data(
 
 def _generate_test_dataset(**kwargs: Any) -> Dataset:
     g, x, bg, ys = _generate_test_data(**kwargs)
-    data_vars = {}
-    data_vars["dosage"] = (["variants", "samples"], g.T)
+    data_vars: Dict[Hashable, Any] = {"dosage": (["variants", "samples"], g.T)}
+    covars = []
     for i in range(x.shape[1]):
         data_vars[f"covar_{i}"] = (["samples"], x[:, i])
+        covars.append(f"covar_{i}")
+    traits = []
     for i in range(ys.shape[0]):
         # Traits are NOT multivariate simulations based on
         # values of multiple variants; they instead correspond
         # 1:1 with variants such that variant i has no causal
         # relationship with trait j where i != j
         data_vars[f"trait_{i}"] = (["samples"], ys[i])
-    attrs = dict(beta=bg, n_trait=ys.shape[0], n_covar=x.shape[1])
-    return xr.Dataset(data_vars, attrs=attrs)  # type: ignore[arg-type]
+        traits.append(f"trait_{i}")
+    attrs: Dict[Hashable, Any] = dict(beta=bg, n_trait=ys.shape[0], n_covar=x.shape[1])
+    return SgkitSchema.spec(
+        xr.Dataset(data_vars, attrs=attrs),
+        (SgkitSchema.dosage, []),
+        (SgkitSchema.traits, traits),
+        (SgkitSchema.covariates, covars),
+    )
 
 
 @pytest.fixture(scope="module")
@@ -113,18 +121,13 @@ def _sm_statistics(
     return sm.OLS(y, X, hasconst=True).fit()
 
 
-def _get_statistics(
-    ds: Dataset, add_intercept: bool, **kwargs: Any
-) -> Tuple[DataFrame, DataFrame]:
+def _get_statistics(ds: Dataset, add_intercept: bool) -> Tuple[DataFrame, DataFrame]:
     df_pred: List[Dict[str, Any]] = []
     df_true: List[Dict[str, Any]] = []
     for i in range(ds.dims["variants"]):
         dsr = gwas_linear_regression(
-            ds,
-            dosage="dosage",
-            traits=[f"trait_{i}"],
+            SgkitSchema.spec(ds, (SgkitSchema.traits, [f"trait_{i}"])),
             add_intercept=add_intercept,
-            **kwargs,
         )
         res = _sm_statistics(ds, i, add_intercept)
         df_pred.append(
@@ -155,44 +158,36 @@ def test_gwas_linear_regression__validate_statistics(ds):
         np.testing.assert_allclose(dfp["p_value"], dft["p_value"])
 
     dfp, dft = _get_statistics(
-        ds, covariates=["covar_0", "covar_1", "covar_2"], add_intercept=True
+        SgkitSchema.spec(
+            ds, (SgkitSchema.covariates, ["covar_0", "covar_1", "covar_2"])
+        ),
+        add_intercept=True,
     )
     validate(dfp, dft)
 
     dfp, dft = _get_statistics(
-        ds.assign(covar_3=("samples", np.ones(ds.dims["samples"]))),
-        covariates=["covar_0", "covar_1", "covar_2", "covar_3"],
+        SgkitSchema.spec(
+            ds.assign(covar_3=("samples", np.ones(ds.dims["samples"]))),
+            (SgkitSchema.covariates, ["covar_0", "covar_1", "covar_2", "covar_3"]),
+        ),
         add_intercept=False,
     )
     validate(dfp, dft)
 
 
 def test_gwas_linear_regression__multi_trait(ds):
-    def run(traits: Sequence[str]) -> Dataset:
+    def run(traits: List[str]) -> Dataset:
         return gwas_linear_regression(
-            ds,
-            dosage="dosage",
-            covariates=["covar_0"],
-            traits=traits,
-            add_intercept=True,
+            SgkitSchema.spec(ds, (SgkitSchema.traits, traits)), add_intercept=True,
         )
 
-    traits = [f"trait_{i}" for i in range(ds.attrs["n_trait"])]
+    ds = SgkitSchema.spec(ds, (SgkitSchema.covariates, ["covar_0"]))
+    traits = SgkitSchema.get_schema(ds)[SgkitSchema.traits]
     # Run regressions on individual traits and concatenate resulting statistics
     dfr_single = xr.concat([run([t]) for t in traits], dim="traits").to_dataframe()  # type: ignore[no-untyped-call]
     # Run regressions on all traits simulatenously
     dfr_multi: DataFrame = run(traits).to_dataframe()  # type: ignore[no-untyped-call]
     pd.testing.assert_frame_equal(dfr_single, dfr_multi)
-
-
-def test_gwas_linear_regression__scalar_vars(ds: xr.Dataset) -> None:
-    res_scalar = gwas_linear_regression(
-        ds, dosage="dosage", covariates="covar_0", traits="trait_0"
-    )
-    res_list = gwas_linear_regression(
-        ds, dosage="dosage", covariates=["covar_0"], traits=["trait_0"]
-    )
-    xr.testing.assert_equal(res_scalar, res_list)  # type: ignore[no-untyped-call]
 
 
 def test_linear_regression__raise_on_non_2D():
