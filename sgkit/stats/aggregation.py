@@ -53,15 +53,15 @@ def count_call_alleles(ds: Dataset) -> DataArray:
     >>> sg.count_call_alleles(ds).values # doctest: +NORMALIZE_WHITESPACE
     array([[[1, 1],
             [1, 1]],
-
+    <BLANKLINE>
            [[1, 1],
             [0, 2]],
-
+    <BLANKLINE>
            [[1, 1],
             [1, 1]],
-
+    <BLANKLINE>
            [[2, 0],
-            [2, 0]]], dtype=uint8
+            [2, 0]]], dtype=uint8)
     """
     n_alleles = ds.dims['alleles']
     G = da.asarray(ds['call_genotype'])
