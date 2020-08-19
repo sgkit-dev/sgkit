@@ -4,7 +4,7 @@ import numpy as np
 import xarray as xr
 from xarray import Dataset
 
-from sgkit.stats.aggregation import count_variant_alleles, count_call_alleles
+from sgkit.stats.aggregation import count_call_alleles, count_variant_alleles
 from sgkit.testing import simulate_genotype_call_dataset
 from sgkit.typing import ArrayLike
 

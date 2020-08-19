@@ -1,19 +1,23 @@
 import dask.array as da
+import numba
 import numpy as np
 import xarray as xr
-import numba
 from xarray import DataArray, Dataset
 
 from ..typing import ArrayLike
 
 
-@numba.guvectorize([
-    'void(numba.int8[:], numba.uint8[:], numba.uint8[:])',
-    'void(numba.int16[:], numba.uint8[:], numba.uint8[:])',
-    'void(numba.int32[:], numba.uint8[:], numba.uint8[:])',
-    'void(numba.int64[:], numba.uint8[:], numba.uint8[:])',
-    ], '(k),(n)->(n)', nopython=True)
-def count_alleles(g: ArrayLike, _: ArrayLike, out: ArrayLike):
+@numba.guvectorize(
+    [
+        "void(numba.int8[:], numba.uint8[:], numba.uint8[:])",
+        "void(numba.int16[:], numba.uint8[:], numba.uint8[:])",
+        "void(numba.int32[:], numba.uint8[:], numba.uint8[:])",
+        "void(numba.int64[:], numba.uint8[:], numba.uint8[:])",
+    ],
+    "(k),(n)->(n)",
+    nopython=True,
+)
+def count_alleles(g: ArrayLike, _: ArrayLike, out: ArrayLike) -> None:
     """Generaliszed U-function for computing per sample allele counts.
 
     Parameters
@@ -82,14 +86,14 @@ def count_call_alleles(ds: Dataset) -> DataArray:
            [[2, 0],
             [2, 0]]], dtype=uint8)
     """
-    n_alleles = ds.dims['alleles']
-    G = da.asarray(ds['call_genotype'])
+    n_alleles = ds.dims["alleles"]
+    G = da.asarray(ds["call_genotype"])
     shape = (G.chunks[0], G.chunks[1], n_alleles)
     N = da.empty(n_alleles, dtype=np.uint8)
     return xr.DataArray(
         da.map_blocks(count_alleles, G, N, chunks=shape, drop_axis=2, new_axis=2),
-        dims=('variants', 'samples', 'alleles'),
-        name='call_allele_count'
+        dims=("variants", "samples", "alleles"),
+        name="call_allele_count",
     )
 
 
@@ -129,8 +133,7 @@ def count_variant_alleles(ds: Dataset) -> DataArray:
            [2, 2],
            [4, 0]], dtype=uint64)
     """
-    return (
-        count_call_alleles(ds)
-        .sum(dim='samples')
-        .rename('variant_allele_count')
+    return xr.DataArray(
+        count_call_alleles(ds).sum(dim="samples").rename("variant_allele_count"),
+        dims=("variants", "alleles"),
     )
