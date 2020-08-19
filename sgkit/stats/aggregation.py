@@ -10,12 +10,14 @@ from xarray import DataArray, Dataset
     'void(numba.int16[:], numba.uint8[:], numba.uint8[:])',
     'void(numba.int32[:], numba.uint8[:], numba.uint8[:])',
     'void(numba.int64[:], numba.uint8[:], numba.uint8[:])',
-    ], '(n),(k)->(k)')
-def count_alleles(x, _, out):
+    ], '(n),(k)->(k)', nopython=True)
+def count_alleles(g, _, out):
     out[:] = 0
-    for v in x:
-        if v >= 0:
-            out[v] += 1
+    n_allele = len(g)
+    for i in range(n_allele):
+        a = g[i]
+        if a >= 0:
+            out[a] += 1
 
 
 def count_call_alleles(ds: Dataset) -> DataArray:
@@ -61,13 +63,12 @@ def count_call_alleles(ds: Dataset) -> DataArray:
            [[2, 0],
             [2, 0]]], dtype=uint8
     """
-    G = da.asarray(ds.call_genotype)
-    # This array is only necessary to tell dask/numba what the
-    # dimensions and dtype are for the output array
-    O = da.empty(G.shape[:2] + (ds.dims['alleles'],), dtype=np.uint8)
-    O = O.rechunk(G.chunks[:2] + (-1,))
+    n_alleles = ds.dims['alleles']
+    G = da.asarray(ds['call_genotype'])
+    shape = (G.chunks[0], G.chunks[1], n_alleles)
+    K = da.empty(n_alleles, dtype=np.uint8)
     return xr.DataArray(
-        count_alleles(G, O),
+        da.map_blocks(count_alleles, G, K, chunks=shape, drop_axis=2, new_axis=2),
         dims=('variants', 'samples', 'alleles'),
         name='call_allele_count'
     )
