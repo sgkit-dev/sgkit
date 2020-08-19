@@ -1,18 +1,18 @@
 import dask.array as da
-import numba
 import numpy as np
 import xarray as xr
+from numba import guvectorize
 from xarray import DataArray, Dataset
 
 from ..typing import ArrayLike
 
 
-@numba.guvectorize(  # type: ignore
+@guvectorize(  # type: ignore
     [
-        "void(numba.int8[:], numba.uint8[:], numba.uint8[:])",
-        "void(numba.int16[:], numba.uint8[:], numba.uint8[:])",
-        "void(numba.int32[:], numba.uint8[:], numba.uint8[:])",
-        "void(numba.int64[:], numba.uint8[:], numba.uint8[:])",
+        "void(int8[:], uint8[:], uint8[:])",
+        "void(int16[:], uint8[:], uint8[:])",
+        "void(int32[:], uint8[:], uint8[:])",
+        "void(int64[:], uint8[:], uint8[:])",
     ],
     "(k),(n)->(n)",
     nopython=True,
