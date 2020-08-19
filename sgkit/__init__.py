@@ -10,6 +10,7 @@ from .display import display_genotypes
 from .io.vcfzarr_reader import read_vcfzarr
 from .stats.aggregation import count_variant_alleles, count_call_alleles
 from .stats.association import gwas_linear_regression
+from .stats.hwe import hardy_weinberg_test
 from .stats.regenie import regenie
 
 __all__ = [
@@ -25,4 +26,5 @@ __all__ = [
     "gwas_linear_regression",
     "read_vcfzarr",
     "regenie",
+    "hardy_weinberg_test",
 ]

@@ -92,7 +92,7 @@ def _generate_test_dataset(**kwargs: Any) -> Dataset:
     return xr.Dataset(data_vars, attrs=attrs)  # type: ignore[arg-type]
 
 
-@pytest.fixture(scope="module")  # type: ignore[misc]
+@pytest.fixture(scope="module")
 def ds() -> Dataset:
     return _generate_test_dataset()
 
@@ -185,7 +185,7 @@ def test_gwas_linear_regression__multi_trait(ds):
     pd.testing.assert_frame_equal(dfr_single, dfr_multi)
 
 
-def test_gwas_linear_regression__scalar_vars(ds):
+def test_gwas_linear_regression__scalar_vars(ds: xr.Dataset) -> None:
     res_scalar = gwas_linear_regression(
         ds, dosage="dosage", covariates="covar_0", traits="trait_0"
     )

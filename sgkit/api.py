@@ -35,7 +35,7 @@ def create_genotype_call_dataset(
         The reference position of the variant.
     variant_alleles : array_like, zero-terminated bytes, e.g. "S1", or object
         The possible alleles for the variant.
-    sample_id : array_like, str
+    sample_id : array_like, str or object
         The unique identifier of the sample.
     call_genotype : array_like, int
         Genotype, encoded as allele values (0 for the reference, 1 for
@@ -44,7 +44,7 @@ def create_genotype_call_dataset(
     call_genotype_phased : array_like, bool, optional
         A flag for each call indicating if it is phased or not. If
         omitted all calls are unphased.
-    variant_id: array_like, str, optional
+    variant_id: array_like, str or object, optional
         The unique identifier of the variant.
 
     Returns
@@ -56,7 +56,7 @@ def create_genotype_call_dataset(
     check_array_like(variant_contig, kind="i", ndim=1)
     check_array_like(variant_position, kind="i", ndim=1)
     check_array_like(variant_alleles, kind={"S", "O"}, ndim=2)
-    check_array_like(sample_id, kind="U", ndim=1)
+    check_array_like(sample_id, kind={"U", "O"}, ndim=1)
     check_array_like(call_genotype, kind="i", ndim=3)
     data_vars: Dict[Hashable, Any] = {
         "variant_contig": ([DIM_VARIANT], variant_contig),
@@ -76,7 +76,7 @@ def create_genotype_call_dataset(
             call_genotype_phased,
         )
     if variant_id is not None:
-        check_array_like(variant_id, kind="U", ndim=1)
+        check_array_like(variant_id, kind={"U", "O"}, ndim=1)
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
     return xr.Dataset(data_vars=data_vars, attrs=attrs)
@@ -104,12 +104,12 @@ def create_genotype_dosage_dataset(
         The reference position of the variant.
     variant_alleles : array_like, zero-terminated bytes, e.g. "S1", or object
         The possible alleles for the variant.
-    sample_id : array_like, str
+    sample_id : array_like, str or object
         The unique identifier of the sample.
     call_dosage : array_like, float
         Dosages, encoded as floats, with NaN indicating a
         missing value.
-    variant_id: array_like, str, optional
+    variant_id: array_like, str or object, optional
         The unique identifier of the variant.
 
     Returns
@@ -121,7 +121,7 @@ def create_genotype_dosage_dataset(
     check_array_like(variant_contig, kind="i", ndim=1)
     check_array_like(variant_position, kind="i", ndim=1)
     check_array_like(variant_alleles, kind={"S", "O"}, ndim=2)
-    check_array_like(sample_id, kind="U", ndim=1)
+    check_array_like(sample_id, kind={"U", "O"}, ndim=1)
     check_array_like(call_dosage, kind="f", ndim=2)
     data_vars: Dict[Hashable, Any] = {
         "variant_contig": ([DIM_VARIANT], variant_contig),
@@ -132,7 +132,7 @@ def create_genotype_dosage_dataset(
         "call_dosage_mask": ([DIM_VARIANT, DIM_SAMPLE], np.isnan(call_dosage),),
     }
     if variant_id is not None:
-        check_array_like(variant_id, kind="U", ndim=1)
+        check_array_like(variant_id, kind={"U", "O"}, ndim=1)
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
     return xr.Dataset(data_vars=data_vars, attrs=attrs)
