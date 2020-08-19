@@ -4,14 +4,33 @@ import xarray as xr
 import numba
 from xarray import DataArray, Dataset
 
+from ..typing import ArrayLike
+
 
 @numba.guvectorize([
     'void(numba.int8[:], numba.uint8[:], numba.uint8[:])',
     'void(numba.int16[:], numba.uint8[:], numba.uint8[:])',
     'void(numba.int32[:], numba.uint8[:], numba.uint8[:])',
     'void(numba.int64[:], numba.uint8[:], numba.uint8[:])',
-    ], '(n),(k)->(k)', nopython=True)
-def count_alleles(g, _, out):
+    ], '(k),(n)->(n)', nopython=True)
+def count_alleles(g: ArrayLike, _: ArrayLike, out: ArrayLike):
+    """Generaliszed U-function for computing per sample allele counts.
+
+    Parameters
+    ----------
+    g : (K,) array-like, int
+        A genotype call with K alleles where K is the genotypes ploidy.
+    _: (N,) array-like, uint8
+        Dummy variable of length N where N is the number of possible
+        unique alleles.
+
+    Returns
+    -------
+    ac : (N,) array-like, uint8
+        Allele counts with values corresponding to the number of
+        non-missing occurrences of each allele whithin g.
+
+    """
     out[:] = 0
     n_allele = len(g)
     for i in range(n_allele):
@@ -66,9 +85,9 @@ def count_call_alleles(ds: Dataset) -> DataArray:
     n_alleles = ds.dims['alleles']
     G = da.asarray(ds['call_genotype'])
     shape = (G.chunks[0], G.chunks[1], n_alleles)
-    K = da.empty(n_alleles, dtype=np.uint8)
+    N = da.empty(n_alleles, dtype=np.uint8)
     return xr.DataArray(
-        da.map_blocks(count_alleles, G, K, chunks=shape, drop_axis=2, new_axis=2),
+        da.map_blocks(count_alleles, G, N, chunks=shape, drop_axis=2, new_axis=2),
         dims=('variants', 'samples', 'alleles'),
         name='call_allele_count'
     )
