@@ -7,7 +7,7 @@ from xarray import DataArray, Dataset
 from ..typing import ArrayLike
 
 
-@numba.guvectorize(
+@numba.guvectorize(  # type: ignore
     [
         "void(numba.int8[:], numba.uint8[:], numba.uint8[:])",
         "void(numba.int16[:], numba.uint8[:], numba.uint8[:])",
