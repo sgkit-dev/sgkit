@@ -69,7 +69,7 @@ some parallel computing (Dask) are assumed.
 
 Before starting work, make sure there is an issue covering the feature or bug you
 plan to produce a pull request for. Assign the issue to yourself to indicate that
-you are working on it.
+you are working on it. In the PR make sure to mention/link the related issue(s).
 
 Development environment
 -----------------------
@@ -259,3 +259,7 @@ Review process
 
 Pull requests will be reviewed by a project maintainer. All changes to *sgkit* require
 approval by at least one maintainer.
+
+We use `mergify <https://mergify.io/>`_ to automate PR flow. A project maintainer
+(reviewer) could decide to automatically merge a PR by labeling it with ``auto-merge``,
+and when the PR gets: at least one +1 and a clean build it will get merged automatically.
