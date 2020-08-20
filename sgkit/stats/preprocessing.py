@@ -1,8 +1,12 @@
-from sklearn.base import BaseEstimator, TransformerMixin
+from typing import Optional
+
 import dask.array as da
+from sklearn.base import BaseEstimator, TransformerMixin
+
+from ..typing import ArrayLike
 
 
-class PattersonScaler(TransformerMixin, BaseEstimator):
+class PattersonScaler(TransformerMixin, BaseEstimator):  # type: ignore
     """New Patterson Scaler with SKLearn API
 
     Parameters
@@ -42,39 +46,33 @@ class PattersonScaler(TransformerMixin, BaseEstimator):
     >>> scaled_genotypes = scaler.fit_transform(genotypes)
     """
 
-    def __init__(self, copy=True, ploidy=2):
-        self.mean_ = None
-        self.std_ = None
-        self.copy = copy
-        self.ploidy = 2
+    def __init__(self, copy: bool = True, ploidy: int = 2):
+        self.mean_: ArrayLike = None
+        self.std_: ArrayLike = None
+        self.copy: bool = copy
+        self.ploidy: int = ploidy
 
-    def _reset(self):
+    def _reset(self) -> None:
         """Reset internal data-dependent state of the scaler, if necessary.
         __init__ parameters are not touched.
         """
 
         # Checking one attribute is enough, becase they are all set together
         # in fit
-        if hasattr(self, 'mean_'):
+        if hasattr(self, "mean_"):
             del self.mean_
             del self.std_
 
-    def fit(self, gn):
+    def fit(self, gn: ArrayLike) -> "PattersonScaler":
         """Compute the mean and std to be used for later scaling.
         Parameters
         ----------
-        X : {array-like, sparse matrix}, shape [n_samples, n_features]
-            The data used to compute the mean and standard deviation
-            used for later scaling along the features axis.
-        y
-            Ignored
+        gn : {array-like}, shape [n_samples, n_features]
+            Genotype calls
         """
 
         # Reset internal state before fitting
         self._reset()
-
-        # check input
-        # gn = asarray_ndim(gn, 2)
 
         # find the mean
         self.mean_ = gn.mean(axis=1, keepdims=True)
@@ -82,10 +80,9 @@ class PattersonScaler(TransformerMixin, BaseEstimator):
         # find the scaling factor
         p = self.mean_ / self.ploidy
         self.std_ = da.sqrt(p * (1 - p))
-
         return self
 
-    def transform(self, gn, copy=None):
+    def transform(self, gn: ArrayLike, y: Optional[ArrayLike] = None) -> ArrayLike:
         # check inputs
         # TODO Add pack in type and dim checks
         # copy = copy if copy is not None else self.copy
@@ -102,7 +99,7 @@ class PattersonScaler(TransformerMixin, BaseEstimator):
 
         return transformed
 
-    def fit_transform(self, gn, y=None):
+    def fit_transform(self, gn: ArrayLike, y: Optional[ArrayLike] = None) -> ArrayLike:
         # TODO Raise an Error if this is not a dask array
         # if not dask.is_dask_collection(gn):
         #    gn = da.from_array(gn, chunks=gn.shape)
@@ -110,7 +107,7 @@ class PattersonScaler(TransformerMixin, BaseEstimator):
         return self.transform(gn)
 
 
-class CenterScaler(TransformerMixin, BaseEstimator):
+class CenterScaler(TransformerMixin, BaseEstimator):  # type: ignore
     """
 
     Parameters
@@ -147,27 +144,26 @@ class CenterScaler(TransformerMixin, BaseEstimator):
     >>> scaled_genotypes = scaler.fit_transform(genotypes)
     """
 
-    def __init__(self, copy=True):
+    def __init__(self, copy: bool = True):
         self.copy = copy
         self.mean_ = None
 
-    def _reset(self):
+    def _reset(self) -> None:
         """Reset internal data-dependent state of the scaler, if necessary.
         __init__ parameters are not touched.
         """
         del self.mean_
 
-    def fit(self, gn):
+    def fit(self, gn: ArrayLike) -> "CenterScaler":
         self._reset()
         # TODO add back in check input sanity checks
         # gn = asarray_ndim(gn, 2)
 
         # find mean
         self.mean_ = gn.mean(axis=1, keepdims=True)
-
         return self
 
-    def transform(self, gn, y=None):
+    def transform(self, gn: ArrayLike, y: Optional[ArrayLike] = None) -> ArrayLike:
         # TODO sanity check check inputs
         # gn = asarray_ndim(gn, 2, copy=copy)
         # if not gn.dtype.kind == 'f':
@@ -178,6 +174,6 @@ class CenterScaler(TransformerMixin, BaseEstimator):
 
         return transform
 
-    def fit_transform(self, gn, y=None):
+    def fit_transform(self, gn: ArrayLike, y: Optional[ArrayLike] = None) -> ArrayLike:
         self.fit(gn)
         return self.transform(gn, y=y)

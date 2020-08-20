@@ -4,3 +4,4 @@ dask[array]
 scipy
 numba
 zarr
+sklearn
