@@ -22,17 +22,19 @@ def count_alleles(g: ArrayLike, _: ArrayLike, out: ArrayLike) -> None:
 
     Parameters
     ----------
-    g : (K,) array-like, int
-        A genotype call with K alleles where K is the genotypes ploidy.
-    _: (N,) array-like, uint8
-        Dummy variable of length N where N is the number of possible
-        unique alleles.
+    g : array_like
+        Genotype call of shape (ploidy,) containing alleles encoded as
+        type `int` with values < 0 indicating a missing allele.
+    _: array_like
+        Dummy variable of type `uint8` and shape (alleles,) used to
+        define the number of unique alleles to be counted in the
+        return value.
 
     Returns
     -------
-    ac : (N,) array-like, uint8
-        Allele counts with values corresponding to the number of
-        non-missing occurrences of each allele whithin g.
+    ac : ndarray
+        Allele counts with shape (alleles,) and values corresponding to
+        the number of non-missing occurrences of each allele.
 
     """
     out[:] = 0
