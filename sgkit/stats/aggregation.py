@@ -18,7 +18,7 @@ from ..typing import ArrayLike
     nopython=True,
 )
 def count_alleles(g: ArrayLike, _: ArrayLike, out: ArrayLike) -> None:
-    """Generaliszed U-function for computing per sample allele counts.
+    """Generalized U-function for computing per sample allele counts.
 
     Parameters
     ----------
@@ -65,13 +65,13 @@ def count_call_alleles(ds: Dataset) -> DataArray:
     >>> import sgkit as sg
     >>> from sgkit.testing import simulate_genotype_call_dataset
     >>> ds = simulate_genotype_call_dataset(n_variant=4, n_sample=2, seed=1)
-    >>> ds['call_genotype'].to_series().unstack().astype(str).apply('/'.join, axis=1).unstack() # doctest: +NORMALIZE_WHITESPACE
-    samples 0   1
+    >>> sg.display_genotypes(ds) # doctest: +NORMALIZE_WHITESPACE
+    samples    S0   S1
     variants
-    0       1/0	1/0
-    1       1/0	1/1
-    2       0/1	1/0
-    3       0/0	0/0
+    0         1/0  1/0
+    1         1/0  1/1
+    2         0/1  1/0
+    3         0/0  0/0
 
     >>> sg.count_call_alleles(ds).values # doctest: +NORMALIZE_WHITESPACE
     array([[[1, 1],
@@ -119,13 +119,13 @@ def count_variant_alleles(ds: Dataset) -> DataArray:
     >>> import sgkit as sg
     >>> from sgkit.testing import simulate_genotype_call_dataset
     >>> ds = simulate_genotype_call_dataset(n_variant=4, n_sample=2, seed=1)
-    >>> ds['call_genotype'].to_series().unstack().astype(str).apply('/'.join, axis=1).unstack() # doctest: +NORMALIZE_WHITESPACE
-    samples 0   1
+    >>> sg.display_genotypes(ds) # doctest: +NORMALIZE_WHITESPACE
+    samples    S0   S1
     variants
-    0       1/0	1/0
-    1       1/0	1/1
-    2       0/1	1/0
-    3       0/0	0/0
+    0         1/0  1/0
+    1         1/0  1/1
+    2         0/1  1/0
+    3         0/0  0/0
 
     >>> sg.count_variant_alleles(ds).values # doctest: +NORMALIZE_WHITESPACE
     array([[2, 2],
