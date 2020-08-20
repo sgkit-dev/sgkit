@@ -7,8 +7,9 @@ pull_request_rules:
       - label=auto-merge
     actions:
       merge:
-        strict: smart+fasttrack
-        method: rebase
+        strict: smart
+        strict_method: rebase
+        method: merge
   - name: deleting merged branch
     conditions:
       - merged
