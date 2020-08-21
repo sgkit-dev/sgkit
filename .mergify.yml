@@ -3,6 +3,7 @@ pull_request_rules:
     conditions:
       - base=master
       - status-success=build
+      - approved-reviews-by=@pystatgen/committers
       - "#approved-reviews-by>=1"
       - label=auto-merge
     actions:
