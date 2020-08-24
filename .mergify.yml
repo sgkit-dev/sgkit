@@ -3,12 +3,18 @@ pull_request_rules:
     conditions:
       - base=master
       - status-success=build
+      - approved-reviews-by=@pystatgen/committers
       - "#approved-reviews-by>=1"
       - label=auto-merge
     actions:
       merge:
         strict: smart+fasttrack
         method: rebase
+  - name: remove outdated reviews
+    conditions:
+      - base=master
+    actions:
+      dismiss_reviews: {}
   - name: deleting merged branch
     conditions:
       - merged

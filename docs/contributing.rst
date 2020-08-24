@@ -260,6 +260,8 @@ Review process
 Pull requests will be reviewed by a project maintainer. All changes to *sgkit* require
 approval by at least one maintainer.
 
-We use `mergify <https://mergify.io/>`_ to automate PR flow. A project maintainer
-(reviewer) could decide to automatically merge a PR by labeling it with ``auto-merge``,
-and when the PR gets: at least one +1 and a clean build it will get merged automatically.
+We use `mergify <https://mergify.io/>`_ to automate PR flow. A project
+[committer](https://github.com/orgs/pystatgen/teams/committers) (reviewer) could decide
+to automatically merge a PR by labeling it with ``auto-merge``, and when the PR gets:
+at least one +1 (from [committers](https://github.com/orgs/pystatgen/teams/committers))
+and a clean build it will get merged automatically.
