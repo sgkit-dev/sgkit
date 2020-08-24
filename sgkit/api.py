@@ -90,6 +90,7 @@ def create_genotype_dosage_dataset(
     variant_alleles: Any,
     sample_id: Any,
     call_dosage: Any,
+    call_genotype_probability: Any,
     variant_id: Any = None,
 ) -> xr.Dataset:
     """Create a dataset of genotype calls.
@@ -109,6 +110,9 @@ def create_genotype_dosage_dataset(
     call_dosage : array_like, float
         Dosages, encoded as floats, with NaN indicating a
         missing value.
+    call_genotype_probability: array_like, float
+        Probabilities, encoded as floats, with NaN indicating a
+        missing value.
     variant_id: array_like, str or object, optional
         The unique identifier of the variant.
 
@@ -123,13 +127,22 @@ def create_genotype_dosage_dataset(
     check_array_like(variant_alleles, kind={"S", "O"}, ndim=2)
     check_array_like(sample_id, kind={"U", "O"}, ndim=1)
     check_array_like(call_dosage, kind="f", ndim=2)
+    check_array_like(call_genotype_probability, kind="f", ndim=3)
     data_vars: Dict[Hashable, Any] = {
         "variant_contig": ([DIM_VARIANT], variant_contig),
         "variant_position": ([DIM_VARIANT], variant_position),
         "variant_allele": ([DIM_VARIANT, DIM_ALLELE], variant_alleles),
         "sample_id": ([DIM_SAMPLE], sample_id),
         "call_dosage": ([DIM_VARIANT, DIM_SAMPLE], call_dosage),
-        "call_dosage_mask": ([DIM_VARIANT, DIM_SAMPLE], np.isnan(call_dosage),),
+        "call_dosage_mask": ([DIM_VARIANT, DIM_SAMPLE], np.isnan(call_dosage)),
+        "call_genotype_probability": (
+            [DIM_VARIANT, DIM_SAMPLE, DIM_GENOTYPE],
+            call_genotype_probability,
+        ),
+        "call_genotype_probability_mask": (
+            [DIM_VARIANT, DIM_SAMPLE, DIM_GENOTYPE],
+            np.isnan(call_genotype_probability),
+        ),
     }
     if variant_id is not None:
         check_array_like(variant_id, kind={"U", "O"}, ndim=1)
