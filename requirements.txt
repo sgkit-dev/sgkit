@@ -1,6 +1,9 @@
 numpy
 xarray
 dask[array]
+dask[dataframe]
+dask-ml
+fsspec
 scipy
 numba
 zarr
