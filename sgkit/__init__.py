@@ -8,7 +8,7 @@ from .api import (  # noqa: F401
 )
 from .display import display_genotypes
 from .io.vcfzarr_reader import read_vcfzarr
-from .stats.aggregation import count_call_alleles, count_variant_alleles
+from .stats.aggregation import count_call_alleles, count_variant_alleles, variant_stats
 from .stats.association import gwas_linear_regression
 from .stats.hwe import hardy_weinberg_test
 from .stats.regenie import regenie
@@ -27,4 +27,5 @@ __all__ = [
     "read_vcfzarr",
     "regenie",
     "hardy_weinberg_test",
+    "variant_stats",
 ]

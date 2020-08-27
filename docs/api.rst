@@ -27,9 +27,9 @@ Methods
    gwas_linear_regression
    hardy_weinberg_test
    regenie
+   variant_stats
 
 Utilities
-=========
 
 .. autosummary::
    :toctree: generated/

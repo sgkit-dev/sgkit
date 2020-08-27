@@ -182,10 +182,11 @@ def call_rate(ds: Dataset, dim: Dimension) -> Dataset:
 def genotype_count(ds: Dataset, dim: Dimension) -> Dataset:
     odim = _swap(dim)[:-1]
     M, G = ds["call_genotype_mask"].any(dim="ploidy"), ds["call_genotype"]
-    n_het = (G > 0).any(dim="ploidy") & (G == 0).any(dim="ploidy")
     n_hom_ref = (G == 0).all(dim="ploidy")
-    n_hom_alt = (G > 0).all(dim="ploidy")
+    n_hom_alt = ((G > 0) & (G[..., 0] == G)).all(dim="ploidy")
     n_non_ref = (G > 0).any(dim="ploidy")
+    n_het = ~(n_hom_alt | n_hom_ref)
+    # This would 0 out the `het` case with any missing calls
     agg = lambda x: xr.where(M, False, x).sum(dim=dim)  # type: ignore[no-untyped-call]
     return xr.Dataset(
         {
@@ -198,7 +199,7 @@ def genotype_count(ds: Dataset, dim: Dimension) -> Dataset:
 
 
 def allele_frequency(ds: Dataset) -> Dataset:
-    AC = count_alleles(ds)
+    AC = count_variant_alleles(ds)
 
     M = ds["call_genotype_mask"].stack(calls=("samples", "ploidy"))
     AN = (~M).sum(dim="calls")  # type: ignore
