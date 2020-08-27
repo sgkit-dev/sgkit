@@ -41,6 +41,14 @@ n_comp = 10
 n_ploidy = 2
 
 
+def assert_max_distance(x: ArrayLike, y: ArrayLike, allowed_distance: float) -> None:
+    """Calculate the distance and assert that arrays are within that distance
+    Used in arrays where there is slight differences in rounding"""
+    d = np.abs(np.array(x).flatten()) - np.abs(np.array(y).flatten())
+    d = np.abs(d)
+    assert d.max() < allowed_distance
+
+
 def test_genotype_pca_shape():
     genotypes = simulate_genotype_calls(
         n_variants=n_variants, n_samples=n_samples, n_ploidy=n_ploidy
@@ -116,9 +124,9 @@ def test_da_svd_against_scipy_svd():
     assert_eq(scipy_u.shape, da_u.shape)
     assert_eq(scipy_s.shape, da_s.shape)
     assert_eq(scipy_v.shape, da_v.shape)
-    assert_array_almost_equal(scipy_u, da_u.compute(), 2)
-    assert_array_almost_equal(scipy_s, da_s.compute(), 2)
-    assert_array_almost_equal(scipy_v, da_v.compute(), 2)
+    assert_max_distance(scipy_u, da_u.compute(), 0.09)
+    assert_max_distance(scipy_s, da_s.compute(), 0.09)
+    assert_max_distance(scipy_v, da_v.compute(), 0.09)
 
 
 def test_sgkit_genotype_pca_fit_against_allel_genotype_pca_fit():
@@ -187,7 +195,4 @@ def test_sgkit_genotype_pca_fit_transform_against_allel_genotype_pca_fit_transfo
             np.abs(np.round(X_r, 3)), np.abs(np.round(X_r2.compute(), 3)), decimal=2,
         )
     except AssertionError:
-        d = np.abs(X_r.flatten()) - np.abs(np.array(X_r2).flatten())
-        d = np.abs(d)
-        allowed_distance = 0.09
-        assert d.max() < allowed_distance
+        assert_max_distance(X_r, X_r2, 0.09)
