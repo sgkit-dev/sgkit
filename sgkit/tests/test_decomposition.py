@@ -100,7 +100,7 @@ def test_da_svd_against_scipy_svd():
     # Testing this because of
     # https://github.com/dask/dask/issues/3576
     genotypes = simulate_genotype_calls(
-        n_variants=n_variants, n_samples=n_samples, n_ploidy=n_ploidy
+        n_variants=1000, n_samples=50, n_ploidy=n_ploidy
     )
 
     # Original Allel Genotype PCA with scaler built in
