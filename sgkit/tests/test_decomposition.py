@@ -4,6 +4,7 @@ import pytest
 import scipy  # type: ignore
 from allel.stats.decomposition import GenotypePCA as AllelGenotypePCA  # type: ignore
 from dask.array.utils import assert_eq
+from dask_ml.decomposition import PCA as DaskPCA
 from numpy.testing import assert_array_almost_equal, assert_equal
 from sklearn.pipeline import Pipeline
 
@@ -196,3 +197,44 @@ def test_sgkit_genotype_pca_fit_transform_against_allel_genotype_pca_fit_transfo
         )
     except AssertionError:
         assert_max_distance(X_r, X_r2, 0.09)
+
+
+def test_dask_ml_pca_against_allel_pca():
+    genotypes = simulate_genotype_calls(
+        n_variants=n_variants, n_samples=n_samples, n_ploidy=n_ploidy
+    )
+    np_genotypes = np.array(genotypes)
+
+    # Original Allel Genotype PCA with scaler built in
+    allel_pca = AllelGenotypePCA(n_components=n_comp, scaler="patterson")
+
+    X_r = allel_pca.fit(np_genotypes).transform(np_genotypes)
+
+    # Sgkit PCA
+    scaler = PattersonScaler()
+    scaled_genotypes = scaler.fit(genotypes).transform(genotypes)
+    dask_pca = DaskPCA(whiten=False, n_components=n_comp, svd_solver="full")
+    X_r2 = dask_pca.fit_transform(scaled_genotypes)
+    X_r2 = X_r2[0:n_comp]
+
+    print("X_r shape")
+    print(X_r.shape)
+
+    print("X_r2 shape")
+    print(X_r2.shape)
+
+    assert_equal(X_r.flatten().shape, np.array(X_r2.T.compute()).flatten().shape)
+    try:
+        assert_array_almost_equal(
+            X_r.flatten(), np.array(X_r2.T.compute()).flatten(), 2
+        )
+    except AssertionError as e:
+        print("Arrays not equal assertion")
+        print(e)
+
+    dask_pca_2 = DaskPCA(n_components=n_comp, svd_solver="auto", whiten=False)
+    try:
+        dask_pca_2.fit(scaled_genotypes.T).transform(scaled_genotypes.T)
+    except Exception as e:
+        print("Transposing genotypes fails")
+        print(e)
