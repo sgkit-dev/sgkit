@@ -145,7 +145,7 @@ def hardy_weinberg_test(
     Dataset
         Dataset containing (N = num variants):
         variant_hwe_p_value : (N,) ArrayLike
-            P values from HWE test for each variant as float in [0, 1].
+        P values from HWE test for each variant as float in [0, 1].
 
     References
     ----------
@@ -156,8 +156,9 @@ def hardy_weinberg_test(
     Raises
     ------
     NotImplementedError
-        * If ploidy of provided dataset != 2
-        * If maximum number of alleles in provided dataset != 2
+        If ploidy of provided dataset != 2
+    NotImplementedError
+        If maximum number of alleles in provided dataset != 2
     """
     if ds.dims["ploidy"] != 2:
         raise NotImplementedError("HWE test only implemented for diploid genotypes")
