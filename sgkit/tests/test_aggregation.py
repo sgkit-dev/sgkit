@@ -22,6 +22,7 @@ def get_dataset(calls: ArrayLike, **kwargs: Any) -> Dataset:
 
 def test_count_variant_alleles__single_variant_single_sample():
     ds = count_variant_alleles(get_dataset([[[1, 0]]]))
+    assert "call_genotype" in ds
     ac = ds["variant_allele_count"]
     np.testing.assert_equal(ac, np.array([[1, 1]]))
 
@@ -92,6 +93,13 @@ def test_count_variant_alleles__chunked():
     ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))  # type: ignore[arg-type]
     ac2 = count_variant_alleles(ds)
     xr.testing.assert_equal(ac1, ac2)  # type: ignore[no-untyped-call]
+
+
+def test_count_variant_alleles__no_merge():
+    ds = count_variant_alleles(get_dataset([[[1, 0]]]), merge=False)
+    assert "call_genotype" not in ds
+    ac = ds["variant_allele_count"]
+    np.testing.assert_equal(ac, np.array([[1, 1]]))
 
 
 def test_count_call_alleles__single_variant_single_sample():

@@ -44,7 +44,7 @@ def count_alleles(g: ArrayLike, _: ArrayLike, out: ArrayLike) -> None:
             out[a] += 1
 
 
-def count_call_alleles(ds: Dataset) -> Dataset:
+def count_call_alleles(ds: Dataset, merge: bool = True) -> Dataset:
     """Compute per sample allele counts from genotype calls.
 
     Parameters
@@ -52,6 +52,9 @@ def count_call_alleles(ds: Dataset) -> Dataset:
     ds : Dataset
         Genotype call dataset such as from
         `sgkit.create_genotype_call_dataset`.
+    merge : bool
+        If True, merge the input dataset and the computed variables into
+        a single dataset, otherwise return only the computed variables.
 
     Returns
     -------
@@ -91,7 +94,7 @@ def count_call_alleles(ds: Dataset) -> Dataset:
     G = da.asarray(ds["call_genotype"])
     shape = (G.chunks[0], G.chunks[1], n_alleles)
     N = da.empty(n_alleles, dtype=np.uint8)
-    return Dataset(
+    new_ds = Dataset(
         {
             "call_allele_count": (
                 ("variants", "samples", "alleles"),
@@ -101,9 +104,10 @@ def count_call_alleles(ds: Dataset) -> Dataset:
             )
         }
     )
+    return ds.merge(new_ds) if merge else new_ds
 
 
-def count_variant_alleles(ds: Dataset) -> Dataset:
+def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
     """Compute allele count from genotype calls.
 
     Parameters
@@ -111,6 +115,9 @@ def count_variant_alleles(ds: Dataset) -> Dataset:
     ds : Dataset
         Genotype call dataset such as from
         `sgkit.create_genotype_call_dataset`.
+    merge : bool
+        If True, merge the input dataset and the computed variables into
+        a single dataset, otherwise return only the computed variables.
 
     Returns
     -------
@@ -139,7 +146,7 @@ def count_variant_alleles(ds: Dataset) -> Dataset:
            [2, 2],
            [4, 0]], dtype=uint64)
     """
-    return Dataset(
+    new_ds = Dataset(
         {
             "variant_allele_count": (
                 ("variants", "alleles"),
@@ -147,3 +154,4 @@ def count_variant_alleles(ds: Dataset) -> Dataset:
             )
         }
     )
+    return ds.merge(new_ds) if merge else new_ds
