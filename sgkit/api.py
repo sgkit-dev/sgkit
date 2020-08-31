@@ -93,7 +93,7 @@ def create_genotype_dosage_dataset(
     call_genotype_probability: Any,
     variant_id: Any = None,
 ) -> xr.Dataset:
-    """Create a dataset of genotype calls.
+    """Create a dataset of genotype dosages.
 
     Parameters
     ----------

@@ -736,7 +736,7 @@ def regenie(
 ) -> Dataset:
     """Regenie trait transformation.
 
-    [REGENIE](https://github.com/rgcgithub/regenie) is a whole-genome
+    `REGENIE <https://github.com/rgcgithub/regenie>`_ is a whole-genome
     regression technique that produces trait estimates for association
     tests. These estimates are subtracted from trait values and
     sampling statistics (p-values, standard errors, etc.) are evaluated
@@ -790,14 +790,20 @@ def regenie(
     Dataset
         A dataset containing the following variables:
         - `base_prediction` (blocks, alphas, samples, outcomes): Stage 1
-            predictions from ridge regression reduction .
+        predictions from ridge regression reduction .
         - `meta_prediction` (samples, outcomes): Stage 2 predictions from
-            the best meta estimator trained on the out-of-sample Stage 1
-            predictions.
+        the best meta estimator trained on the out-of-sample Stage 1
+        predictions.
         - `loco_prediction` (contigs, samples, outcomes): LOCO predictions
-            resulting from Stage 2 predictions ignoring effects for variant
-            blocks on held out contigs. This will be absent if the
-            data provided does not contain at least 2 contigs.
+        resulting from Stage 2 predictions ignoring effects for variant
+        blocks on held out contigs. This will be absent if the
+        data provided does not contain at least 2 contigs.
+
+    Raises
+    ------
+    ValueError
+        If dosage, covariates, and trait arrays do not have the same number
+        of samples.
 
     Examples
     --------
@@ -824,15 +830,10 @@ def regenie(
     References
     ----------
     [1] - Mbatchou, J., L. Barnard, J. Backman, and A. Marcketta. 2020.
-        “Computationally Efficient Whole Genome Regression for Quantitative and Binary
-        Traits.” bioRxiv. https://www.biorxiv.org/content/10.1101/2020.06.19.162354v2.abstract.
-    [2] - https://glow.readthedocs.io/en/latest/tertiary/whole-genome-regression.html
+    “Computationally Efficient Whole Genome Regression for Quantitative and Binary
+    Traits.” bioRxiv. https://www.biorxiv.org/content/10.1101/2020.06.19.162354v2.abstract.
 
-    Raises
-    ------
-    ValueError
-        If dosage, covariates, and trait arrays do not have the same number
-        of samples.
+    [2] - https://glow.readthedocs.io/en/latest/tertiary/whole-genome-regression.html
     """
     if isinstance(covariates, str):
         covariates = [covariates]
