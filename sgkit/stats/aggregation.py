@@ -220,6 +220,31 @@ def allele_frequency(ds: Dataset) -> Dataset:
 
 
 def variant_stats(ds: Dataset, merge: bool = True) -> Dataset:
+    """Compute quality control variant statistics from genotype calls.
+
+    Parameters
+    ----------
+    ds : Dataset
+        Genotype call dataset such as from
+        `sgkit.create_genotype_call_dataset`.
+    merge : bool, optional
+        If True (the default), merge the input dataset and the computed variables into
+        a single dataset, otherwise return only the computed variables.
+
+    Returns
+    -------
+    Dataset
+        A dataset containing the following variables:
+            - `variant_n_called` (variants): The number of samples with called genotypes.
+            - `variant_call_rate` (variants): The fraction of samples with called genotypes.
+            - `variant_n_het` (variants): The number of samples with heterozygous calls.
+            - `variant_n_hom_ref` (variants): The number of samples with homozygous reference calls.
+            - `variant_n_hom_alt` (variants): The number of samples with homozygous alternate calls.
+            - `variant_n_non_ref` (variants): The number of samples that are not homozygous reference calls.
+            - `variant_allele_count` (variants, alleles): The number of occurrences of each allele.
+            - `variant_allele_total` (variants): The number of occurrences of all alleles.
+            - `variant_allele_frequency` (variants, alleles): The frequency of occurence of each allele.
+    """
     new_ds = xr.merge(
         [
             call_rate(ds, dim="samples"),
