@@ -1,10 +1,15 @@
 from typing import Any
 
 import numpy as np
+import pytest
 import xarray as xr
 from xarray import Dataset
 
-from sgkit.stats.aggregation import count_call_alleles, count_variant_alleles, variant_stats
+from sgkit.stats.aggregation import (
+    count_call_alleles,
+    count_variant_alleles,
+    variant_stats,
+)
 from sgkit.testing import simulate_genotype_call_dataset
 from sgkit.typing import ArrayLike
 
@@ -204,10 +209,13 @@ def test_count_call_alleles__chunked():
     xr.testing.assert_equal(ac1, ac2)  # type: ignore[no-untyped-call]
 
 
-def test_variant_stats():
+@pytest.mark.parametrize("precompute_variant_allele_count", [False, True])
+def test_variant_stats(precompute_variant_allele_count):
     ds = get_dataset(
         [[[1, 0], [-1, -1]], [[1, 0], [1, 1]], [[0, 1], [1, 0]], [[-1, -1], [0, 0]]]
     )
+    if precompute_variant_allele_count:
+        ds = count_variant_alleles(ds)
     vs = variant_stats(ds)
 
     np.testing.assert_equal(vs["variant_n_called"], np.array([1, 2, 2, 1]))

@@ -1,5 +1,8 @@
+from typing import Any, Dict, Hashable
+
 import dask.array as da
 import numpy as np
+import xarray as xr
 from numba import guvectorize
 from typing_extensions import Literal
 from xarray import Dataset
@@ -188,7 +191,7 @@ def genotype_count(ds: Dataset, dim: Dimension) -> Dataset:
     n_het = ~(n_hom_alt | n_hom_ref)
     # This would 0 out the `het` case with any missing calls
     agg = lambda x: xr.where(M, False, x).sum(dim=dim)  # type: ignore[no-untyped-call]
-    return xr.Dataset(
+    return Dataset(
         {
             f"{odim}_n_het": agg(n_het),  # type: ignore[no-untyped-call]
             f"{odim}_n_hom_ref": agg(n_hom_ref),  # type: ignore[no-untyped-call]
@@ -199,26 +202,29 @@ def genotype_count(ds: Dataset, dim: Dimension) -> Dataset:
 
 
 def allele_frequency(ds: Dataset) -> Dataset:
-    AC = count_variant_alleles(ds)
+    data_vars: Dict[Hashable, Any] = {}
+    # only compute variant allele count if not already in dataset
+    if "variant_allele_count" in ds:
+        AC = ds["variant_allele_count"]
+    else:
+        AC = count_variant_alleles(ds, merge=False)["variant_allele_count"]
+        data_vars["variant_allele_count"] = AC
 
     M = ds["call_genotype_mask"].stack(calls=("samples", "ploidy"))
     AN = (~M).sum(dim="calls")  # type: ignore
     assert AN.shape == (ds.dims["variants"],)
 
-    return xr.Dataset(
-        {
-            "variant_allele_count": AC,
-            "variant_allele_total": AN,
-            "variant_allele_frequency": AC / AN,
-        }
-    )
+    data_vars["variant_allele_total"] = AN
+    data_vars["variant_allele_frequency"] = AC / AN
+    return Dataset(data_vars)
 
 
-def variant_stats(ds: Dataset) -> Dataset:
-    return xr.merge(
+def variant_stats(ds: Dataset, merge: bool = True) -> Dataset:
+    new_ds = xr.merge(
         [
             call_rate(ds, dim="samples"),
             genotype_count(ds, dim="samples"),
             allele_frequency(ds),
         ]
     )
+    return ds.merge(new_ds) if merge else new_ds
