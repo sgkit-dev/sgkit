@@ -21,22 +21,25 @@ def get_dataset(calls: ArrayLike, **kwargs: Any) -> Dataset:
 
 
 def test_count_variant_alleles__single_variant_single_sample():
-    ac = count_variant_alleles(get_dataset([[[1, 0]]]))
+    ds = count_variant_alleles(get_dataset([[[1, 0]]]))
+    ac = ds["variant_allele_count"]
     np.testing.assert_equal(ac, np.array([[1, 1]]))
 
 
 def test_count_variant_alleles__multi_variant_single_sample():
-    ac = count_variant_alleles(get_dataset([[[0, 0]], [[0, 1]], [[1, 0]], [[1, 1]]]))
+    ds = count_variant_alleles(get_dataset([[[0, 0]], [[0, 1]], [[1, 0]], [[1, 1]]]))
+    ac = ds["variant_allele_count"]
     np.testing.assert_equal(ac, np.array([[2, 0], [1, 1], [1, 1], [0, 2]]))
 
 
 def test_count_variant_alleles__single_variant_multi_sample():
-    ac = count_variant_alleles(get_dataset([[[0, 0], [1, 0], [0, 1], [1, 1]]]))
+    ds = count_variant_alleles(get_dataset([[[0, 0], [1, 0], [0, 1], [1, 1]]]))
+    ac = ds["variant_allele_count"]
     np.testing.assert_equal(ac, np.array([[4, 4]]))
 
 
 def test_count_variant_alleles__multi_variant_multi_sample():
-    ac = count_variant_alleles(
+    ds = count_variant_alleles(
         get_dataset(
             [
                 [[0, 0], [0, 0], [0, 0]],
@@ -46,11 +49,12 @@ def test_count_variant_alleles__multi_variant_multi_sample():
             ]
         )
     )
+    ac = ds["variant_allele_count"]
     np.testing.assert_equal(ac, np.array([[6, 0], [5, 1], [2, 4], [0, 6]]))
 
 
 def test_count_variant_alleles__missing_data():
-    ac = count_variant_alleles(
+    ds = count_variant_alleles(
         get_dataset(
             [
                 [[-1, -1], [-1, -1], [-1, -1]],
@@ -60,11 +64,12 @@ def test_count_variant_alleles__missing_data():
             ]
         )
     )
+    ac = ds["variant_allele_count"]
     np.testing.assert_equal(ac, np.array([[0, 0], [2, 1], [1, 2], [0, 6]]))
 
 
 def test_count_variant_alleles__higher_ploidy():
-    ac = count_variant_alleles(
+    ds = count_variant_alleles(
         get_dataset(
             [
                 [[-1, -1, 0], [-1, -1, 1], [-1, -1, 2]],
@@ -74,6 +79,7 @@ def test_count_variant_alleles__higher_ploidy():
             n_ploidy=3,
         )
     )
+    ac = ds["variant_allele_count"]
     np.testing.assert_equal(ac, np.array([[1, 1, 1, 0], [1, 2, 2, 1]]))
 
 
@@ -89,22 +95,25 @@ def test_count_variant_alleles__chunked():
 
 
 def test_count_call_alleles__single_variant_single_sample():
-    ac = count_call_alleles(get_dataset([[[1, 0]]]))
+    ds = count_call_alleles(get_dataset([[[1, 0]]]))
+    ac = ds["call_allele_count"]
     np.testing.assert_equal(ac, np.array([[[1, 1]]]))
 
 
 def test_count_call_alleles__multi_variant_single_sample():
-    ac = count_call_alleles(get_dataset([[[0, 0]], [[0, 1]], [[1, 0]], [[1, 1]]]))
+    ds = count_call_alleles(get_dataset([[[0, 0]], [[0, 1]], [[1, 0]], [[1, 1]]]))
+    ac = ds["call_allele_count"]
     np.testing.assert_equal(ac, np.array([[[2, 0]], [[1, 1]], [[1, 1]], [[0, 2]]]))
 
 
 def test_count_call_alleles__single_variant_multi_sample():
-    ac = count_call_alleles(get_dataset([[[0, 0], [1, 0], [0, 1], [1, 1]]]))
+    ds = count_call_alleles(get_dataset([[[0, 0], [1, 0], [0, 1], [1, 1]]]))
+    ac = ds["call_allele_count"]
     np.testing.assert_equal(ac, np.array([[[2, 0], [1, 1], [1, 1], [0, 2]]]))
 
 
 def test_count_call_alleles__multi_variant_multi_sample():
-    ac = count_call_alleles(
+    ds = count_call_alleles(
         get_dataset(
             [
                 [[0, 0], [0, 0], [0, 0]],
@@ -114,6 +123,7 @@ def test_count_call_alleles__multi_variant_multi_sample():
             ]
         )
     )
+    ac = ds["call_allele_count"]
     np.testing.assert_equal(
         ac,
         np.array(
@@ -128,7 +138,7 @@ def test_count_call_alleles__multi_variant_multi_sample():
 
 
 def test_count_call_alleles__missing_data():
-    ac = count_call_alleles(
+    ds = count_call_alleles(
         get_dataset(
             [
                 [[-1, -1], [-1, -1], [-1, -1]],
@@ -138,6 +148,7 @@ def test_count_call_alleles__missing_data():
             ]
         )
     )
+    ac = ds["call_allele_count"]
     np.testing.assert_equal(
         ac,
         np.array(
@@ -152,7 +163,7 @@ def test_count_call_alleles__missing_data():
 
 
 def test_count_call_alleles__higher_ploidy():
-    ac = count_call_alleles(
+    ds = count_call_alleles(
         get_dataset(
             [
                 [[-1, -1, 0], [-1, -1, 1], [-1, -1, 2]],
@@ -162,6 +173,7 @@ def test_count_call_alleles__higher_ploidy():
             n_ploidy=3,
         )
     )
+    ac = ds["call_allele_count"]
     np.testing.assert_equal(
         ac,
         np.array(

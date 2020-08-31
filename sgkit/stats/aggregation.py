@@ -1,8 +1,7 @@
 import dask.array as da
 import numpy as np
-import xarray as xr
 from numba import guvectorize
-from xarray import DataArray, Dataset
+from xarray import Dataset
 
 from ..typing import ArrayLike
 
@@ -45,7 +44,7 @@ def count_alleles(g: ArrayLike, _: ArrayLike, out: ArrayLike) -> None:
             out[a] += 1
 
 
-def count_call_alleles(ds: Dataset) -> DataArray:
+def count_call_alleles(ds: Dataset) -> Dataset:
     """Compute per sample allele counts from genotype calls.
 
     Parameters
@@ -56,10 +55,10 @@ def count_call_alleles(ds: Dataset) -> DataArray:
 
     Returns
     -------
-    call_allele_count : DataArray
-        Allele counts with shape (variants, samples, alleles) and values
-        corresponding to the number of non-missing occurrences
-        of each allele.
+    Dataset
+        Array `call_allele_count` of allele counts with
+        shape (variants, samples, alleles) and values corresponding to
+        the number of non-missing occurrences of each allele.
 
     Examples
     --------
@@ -75,7 +74,7 @@ def count_call_alleles(ds: Dataset) -> DataArray:
     2         0/1  1/0
     3         0/0  0/0
 
-    >>> sg.count_call_alleles(ds).values # doctest: +NORMALIZE_WHITESPACE
+    >>> sg.count_call_alleles(ds)["call_allele_count"].values # doctest: +NORMALIZE_WHITESPACE
     array([[[1, 1],
             [1, 1]],
     <BLANKLINE>
@@ -92,14 +91,19 @@ def count_call_alleles(ds: Dataset) -> DataArray:
     G = da.asarray(ds["call_genotype"])
     shape = (G.chunks[0], G.chunks[1], n_alleles)
     N = da.empty(n_alleles, dtype=np.uint8)
-    return xr.DataArray(
-        da.map_blocks(count_alleles, G, N, chunks=shape, drop_axis=2, new_axis=2),
-        dims=("variants", "samples", "alleles"),
-        name="call_allele_count",
+    return Dataset(
+        {
+            "call_allele_count": (
+                ("variants", "samples", "alleles"),
+                da.map_blocks(
+                    count_alleles, G, N, chunks=shape, drop_axis=2, new_axis=2
+                ),
+            )
+        }
     )
 
 
-def count_variant_alleles(ds: Dataset) -> DataArray:
+def count_variant_alleles(ds: Dataset) -> Dataset:
     """Compute allele count from genotype calls.
 
     Parameters
@@ -110,10 +114,10 @@ def count_variant_alleles(ds: Dataset) -> DataArray:
 
     Returns
     -------
-    variant_allele_count : DataArray
-        Allele counts with shape (variants, alleles) and values
-        corresponding to the number of non-missing occurrences
-        of each allele.
+    Dataset
+        Array `variant_allele_count` of allele counts with
+        shape (variants, alleles) and values corresponding to
+        the number of non-missing occurrences of each allele.
 
     Examples
     --------
@@ -129,13 +133,17 @@ def count_variant_alleles(ds: Dataset) -> DataArray:
     2         0/1  1/0
     3         0/0  0/0
 
-    >>> sg.count_variant_alleles(ds).values # doctest: +NORMALIZE_WHITESPACE
+    >>> sg.count_variant_alleles(ds)["variant_allele_count"].values # doctest: +NORMALIZE_WHITESPACE
     array([[2, 2],
            [1, 3],
            [2, 2],
            [4, 0]], dtype=uint64)
     """
-    return xr.DataArray(
-        count_call_alleles(ds).sum(dim="samples").rename("variant_allele_count"),
-        dims=("variants", "alleles"),
+    return Dataset(
+        {
+            "variant_allele_count": (
+                ("variants", "alleles"),
+                count_call_alleles(ds)["call_allele_count"].sum(dim="samples"),
+            )
+        }
     )
