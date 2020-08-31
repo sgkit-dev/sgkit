@@ -85,9 +85,22 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#top-level-functions">Top-level functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#creating-a-dataset">Creating a dataset</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.create_genotype_call_dataset.html">sgkit.create_genotype_call_dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.create_genotype_dosage_dataset.html">sgkit.create_genotype_dosage_dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.read_vcfzarr.html">sgkit.read_vcfzarr</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#methods">Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.count_call_alleles.html">sgkit.count_call_alleles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.count_variant_alleles.html">sgkit.count_variant_alleles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.gwas_linear_regression.html">sgkit.gwas_linear_regression</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.hardy_weinberg_test.html">sgkit.hardy_weinberg_test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.regenie.html">sgkit.regenie</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.display_genotypes.html">sgkit.display_genotypes</a></li>
 </ul>
 </li>
 </ul>
@@ -161,8 +174,8 @@
   <div class="section" id="api-reference">
 <h1>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
 <p>This page provides an auto-generated summary of sgkits’s API.</p>
-<div class="section" id="top-level-functions">
-<h2>Top-level functions<a class="headerlink" href="#top-level-functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="creating-a-dataset">
+<h2>Creating a dataset<a class="headerlink" href="#creating-a-dataset" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -172,8 +185,51 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.create_genotype_call_dataset.html#sgkit.create_genotype_call_dataset" title="sgkit.create_genotype_call_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_genotype_call_dataset</span></code></a>(*, …[, …])</p></td>
 <td><p>Create a dataset of genotype calls.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.gwas_linear_regression.html#sgkit.gwas_linear_regression" title="sgkit.gwas_linear_regression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gwas_linear_regression</span></code></a>(ds, *, dosage, …[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.create_genotype_dosage_dataset.html#sgkit.create_genotype_dosage_dataset" title="sgkit.create_genotype_dosage_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_genotype_dosage_dataset</span></code></a>(*, …[, …])</p></td>
+<td><p>Create a dataset of genotype dosages.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.read_vcfzarr.html#sgkit.read_vcfzarr" title="sgkit.read_vcfzarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_vcfzarr</span></code></a>(path)</p></td>
+<td><p>Read a VCF Zarr file.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.count_call_alleles.html#sgkit.count_call_alleles" title="sgkit.count_call_alleles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_call_alleles</span></code></a>(ds)</p></td>
+<td><p>Compute per sample allele counts from genotype calls.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.count_variant_alleles.html#sgkit.count_variant_alleles" title="sgkit.count_variant_alleles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_variant_alleles</span></code></a>(ds)</p></td>
+<td><p>Compute allele count from genotype calls.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.gwas_linear_regression.html#sgkit.gwas_linear_regression" title="sgkit.gwas_linear_regression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gwas_linear_regression</span></code></a>(ds, *, dosage, …[, …])</p></td>
 <td><p>Run linear regression to identify continuous trait associations with genetic variants.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.hardy_weinberg_test.html#sgkit.hardy_weinberg_test" title="sgkit.hardy_weinberg_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hardy_weinberg_test</span></code></a>(ds[, genotype_counts])</p></td>
+<td><p>Exact test for HWE as described in Wigginton et al.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.regenie.html#sgkit.regenie" title="sgkit.regenie"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regenie</span></code></a>(ds, *, dosage, covariates, traits[, …])</p></td>
+<td><p>Regenie trait transformation.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="utilities">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.display_genotypes.html#sgkit.display_genotypes" title="sgkit.display_genotypes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_genotypes</span></code></a>(ds[, max_variants, …])</p></td>
+<td><p>Display genotype calls.</p></td>
 </tr>
 </tbody>
 </table>
