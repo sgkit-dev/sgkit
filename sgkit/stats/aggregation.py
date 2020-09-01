@@ -228,8 +228,11 @@ def variant_stats(ds: Dataset, merge: bool = True) -> Dataset:
         Genotype call dataset such as from
         `sgkit.create_genotype_call_dataset`.
     merge : bool, optional
-        If True (the default), merge the input dataset and the computed variables into
-        a single dataset, otherwise return only the computed variables.
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset. Output variables will
+        overwrite any input variables with the same name, and a warning
+        will be issued in this case.
+        If False, return only the computed output variables.
 
     Returns
     -------
@@ -252,4 +255,4 @@ def variant_stats(ds: Dataset, merge: bool = True) -> Dataset:
             allele_frequency(ds),
         ]
     )
-    return ds.merge(new_ds) if merge else new_ds
+    return merge_datasets(ds, new_ds) if merge else new_ds
