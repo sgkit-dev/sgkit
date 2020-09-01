@@ -3,7 +3,8 @@ import numpy as np
 from numba import guvectorize
 from xarray import Dataset
 
-from ..typing import ArrayLike
+from sgkit.typing import ArrayLike
+from sgkit.utils import merge_datasets
 
 
 @guvectorize(  # type: ignore
@@ -52,9 +53,12 @@ def count_call_alleles(ds: Dataset, merge: bool = True) -> Dataset:
     ds : Dataset
         Genotype call dataset such as from
         `sgkit.create_genotype_call_dataset`.
-    merge : bool
-        If True, merge the input dataset and the computed variables into
-        a single dataset, otherwise return only the computed variables.
+    merge : bool, optional
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset. Output variables will
+        overwrite any input variables with the same name, and a warning
+        will be issued in this case.
+        If False, return only the computed output variables.
 
     Returns
     -------
@@ -104,7 +108,7 @@ def count_call_alleles(ds: Dataset, merge: bool = True) -> Dataset:
             )
         }
     )
-    return ds.merge(new_ds) if merge else new_ds
+    return merge_datasets(ds, new_ds) if merge else new_ds
 
 
 def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
@@ -115,9 +119,12 @@ def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
     ds : Dataset
         Genotype call dataset such as from
         `sgkit.create_genotype_call_dataset`.
-    merge : bool
-        If True, merge the input dataset and the computed variables into
-        a single dataset, otherwise return only the computed variables.
+    merge : bool, optional
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset. Output variables will
+        overwrite any input variables with the same name, and a warning
+        will be issued in this case.
+        If False, return only the computed output variables.
 
     Returns
     -------
@@ -154,4 +161,4 @@ def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
             )
         }
     )
-    return ds.merge(new_ds) if merge else new_ds
+    return merge_datasets(ds, new_ds) if merge else new_ds

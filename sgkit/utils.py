@@ -1,6 +1,8 @@
+import warnings
 from typing import Any, List, Set, Tuple, Union
 
 import numpy as np
+from xarray import Dataset
 
 from .typing import ArrayLike, DType
 
@@ -98,6 +100,39 @@ def encode_array(x: ArrayLike) -> Tuple[ArrayLike, List[Any]]:
     rank = np.empty_like(index)
     rank[index] = np.arange(len(index))
     return rank[inverse], names[index]
+
+
+class MergeWarning(UserWarning):
+    """Warnings about merging datasets."""
+
+    pass
+
+
+def merge_datasets(input: Dataset, output: Dataset) -> Dataset:
+    """Merge the input and output datasets into a new dataset, giving precedence to variables in the output.
+
+    Parameters
+    ----------
+    input : Dataset
+        The input dataset.
+    output : Dataset
+        The output dataset.
+
+    Returns
+    -------
+    Dataset
+        The merged dataset. If `input` and `output` have variables with the same name, a `MergeWarning`
+        is issued, and the variables from the `output` dataset are used.
+    """
+    input_vars = {str(v) for v in input.data_vars.keys()}
+    output_vars = {str(v) for v in output.data_vars.keys()}
+    clobber_vars = sorted(list(input_vars & output_vars))
+    if len(clobber_vars) > 0:
+        warnings.warn(
+            f"The following variables in the input dataset will be replaced in the output: {', '.join(clobber_vars)}",
+            MergeWarning,
+        )
+    return output.merge(input, compat="override")
 
 
 def split_array_chunks(n: int, blocks: int) -> Tuple[int, ...]:
