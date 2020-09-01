@@ -77,12 +77,8 @@ def test_encode_array(
 def test_merge_datasets():
     ds = xr.Dataset(dict(x=xr.DataArray(da.zeros(100))))
 
-    new_ds1 = xr.Dataset(
-        dict(y=xr.DataArray(da.zeros(100)), z=xr.DataArray(da.zeros(100)))
-    )
-    new_ds2 = xr.Dataset(
-        dict(y=xr.DataArray(da.ones(100)), z=xr.DataArray(da.zeros(100)))
-    )
+    new_ds1 = xr.Dataset(dict(y=xr.DataArray(da.zeros(100))))
+    new_ds2 = xr.Dataset(dict(y=xr.DataArray(da.ones(100))))
 
     ds = merge_datasets(ds, new_ds1)
     assert "y" in ds
