@@ -3,6 +3,9 @@ import numpy as np
 import pytest
 import scipy  # type: ignore
 from allel.stats.decomposition import GenotypePCA as AllelGenotypePCA  # type: ignore
+from allel.stats.decomposition import (
+    GenotypeRandomizedPCA as AllelGenotypeRandomizedPCA,
+)
 from dask.array.utils import assert_eq
 from dask_ml.decomposition import PCA as DaskPCA
 from numpy.testing import assert_array_almost_equal, assert_equal
@@ -10,6 +13,7 @@ from sklearn.pipeline import Pipeline
 
 from sgkit.stats.decomposition import GenotypePCA
 from sgkit.stats.preprocessing import PattersonScaler
+from sgkit.testing import simulate_genotype_call_dataset
 from sgkit.typing import ArrayLike
 
 
@@ -152,11 +156,15 @@ def test_sgkit_genotype_pca_fit_against_allel_genotype_pca_fit():
     sgkit_pca = GenotypePCA()
     sgkit_pca = sgkit_pca.fit(scaled_genotypes)
 
-    assert_array_almost_equal(
-        np.round(allel_pca.explained_variance_, 3),
-        np.round(sgkit_pca.explained_variance_.compute(), 3),
-        decimal=1,
+    # assert_array_almost_equal(
+    #     np.round(allel_pca.explained_variance_, 3),
+    #     np.round(sgkit_pca.explained_variance_.compute(), 3),
+    #     decimal=1,
+    # )
+    np.testing.assert_allclose(
+        allel_pca.explained_variance_, sgkit_pca.explained_variance_.compute(), atol=0.1
     )
+
     assert_array_almost_equal(
         np.round(allel_pca.explained_variance_ratio_, 3),
         np.round(sgkit_pca.explained_variance_ratio_.compute(), 3),
@@ -170,71 +178,116 @@ def test_sgkit_genotype_pca_fit_against_allel_genotype_pca_fit():
 
 
 def test_sgkit_genotype_pca_fit_transform_against_allel_genotype_pca_fit_transform():
+    n_variants = 10000
+    n_samples = 100
+    n_comp = 2
     genotypes = simulate_genotype_calls(
         n_variants=n_variants, n_samples=n_samples, n_ploidy=n_ploidy
     )
     np_genotypes = np.array(genotypes)
 
-    # Original Allel Genotype PCA with scaler built in
+    # scikit learn PCA - the pca scales the values
     allel_pca = AllelGenotypePCA(n_components=n_comp, scaler="patterson")
-
-    scaler = PattersonScaler()
-
     X_r = allel_pca.fit(np_genotypes).transform(np_genotypes)
 
     # Sgkit PCA
+    scaler = PattersonScaler()
     scaled_genotypes = scaler.fit(genotypes).transform(genotypes)
     sgkit_pca = GenotypePCA()
-    X_r2 = sgkit_pca.fit(scaled_genotypes).transform(scaled_genotypes)
+    X_r2 = sgkit_pca.fit(scaled_genotypes).transform(scaled_genotypes).compute()
 
-    # There are slight differences in rounding between
-    # allel.stats.decomposition.GenotypePCA and sgkit.stats.decomposition.GenotypePCA
-    # Try the assert_array_almost_equal
-    # And then fallback to just calculating distance
-    try:
-        assert_array_almost_equal(
-            np.abs(np.round(X_r, 3)), np.abs(np.round(X_r2.compute(), 3)), decimal=2,
-        )
-    except AssertionError:
-        assert_max_distance(X_r, X_r2, 0.09)
+    np.testing.assert_allclose(np.abs(X_r[:, 0]), np.abs(X_r2[:, 0]), atol=0.1)
 
 
-def test_dask_ml_pca_against_allel_pca():
-    genotypes = simulate_genotype_calls(
-        n_variants=n_variants, n_samples=n_samples, n_ploidy=n_ploidy
-    )
-    np_genotypes = np.array(genotypes)
+@pytest.mark.filterwarnings("ignore:invalid value encountered in true_divide")
+def test_scikit_allel_pca_fails_with_small_numbers():
+    n_variants = 100
+    n_samples = 1
+    n_comp = 2
+    ds = simulate_genotype_call_dataset(n_variant=n_variants, n_sample=n_samples)
+    genotypes = ds.call_genotype.sum(dim="ploidy")
+    allel_pca = AllelGenotypeRandomizedPCA(n_components=n_comp)
+
+    with pytest.raises(ValueError, match="array must not contain infs or NaNs"):
+        allel_pca.fit(np.asarray(genotypes)).transform(np.asarray(genotypes))
+
+
+def test_scikit_allel_pca_passes_with_large_numbers():
+    n_variants = 10000
+    n_samples = 100
+    n_comp = 2
+    ds = simulate_genotype_call_dataset(n_variant=n_variants, n_sample=n_samples)
+    genotypes = ds.call_genotype.sum(dim="ploidy")
+    allel_pca = AllelGenotypeRandomizedPCA(n_components=n_comp)
+    allel_pca.fit(np.asarray(genotypes)).transform(np.asarray(genotypes))
+
+
+# Testing different shapes of arrays for DaskML
+
+
+def test_dask_ml_pca_against_allel_pca_square():
+    n_variants = 1000
+    n_samples = 1000
+    n_comp = 2
+    ds = simulate_genotype_call_dataset(n_variant=n_variants, n_sample=n_samples)
+    genotypes = ds.call_genotype.sum(dim="ploidy")
 
     # Original Allel Genotype PCA with scaler built in
     allel_pca = AllelGenotypePCA(n_components=n_comp, scaler="patterson")
+    X_r = allel_pca.fit(np.asarray(genotypes)).transform(np.asarray(genotypes))
 
-    X_r = allel_pca.fit(np_genotypes).transform(np_genotypes)
-
-    # Sgkit PCA
     scaler = PattersonScaler()
-    scaled_genotypes = scaler.fit(genotypes).transform(genotypes)
-    dask_pca = DaskPCA(whiten=False, n_components=n_comp, svd_solver="full")
-    X_r2 = dask_pca.fit_transform(scaled_genotypes)
-    X_r2 = X_r2[0:n_comp]
+    scaled_genotypes = scaler.fit(da.asarray(genotypes)).transform(
+        da.asarray(genotypes)
+    )
+    scaled_genotypes = scaled_genotypes.rechunk(chunks=genotypes.shape)
 
-    print("X_r shape")
-    print(X_r.shape)
+    dask_pca = DaskPCA(n_components=n_comp, svd_solver="full")
+    X_r2 = dask_pca.fit(scaled_genotypes.T).transform(scaled_genotypes.T).compute()
+    assert X_r.shape[0], X_r2.shape[0]
+    np.testing.assert_allclose(np.abs(X_r[:, 0]), np.abs(X_r2[:, 0]), atol=0.1)
+    np.testing.assert_allclose(np.abs(X_r[:, 1]), np.abs(X_r2[:, 1]), atol=0.1)
 
-    print("X_r2 shape")
-    print(X_r2.shape)
 
-    assert_equal(X_r.flatten().shape, np.array(X_r2.T.compute()).flatten().shape)
-    try:
-        assert_array_almost_equal(
-            X_r.flatten(), np.array(X_r2.T.compute()).flatten(), 2
-        )
-    except AssertionError as e:
-        print("Arrays not equal assertion")
-        print(e)
+def test_dask_ml_pca_against_allel_pca_tall():
+    n_variants = 10000
+    n_samples = 10
+    n_comp = 2
+    ds = simulate_genotype_call_dataset(n_variant=n_variants, n_sample=n_samples)
+    genotypes = ds.call_genotype.sum(dim="ploidy")
 
-    dask_pca_2 = DaskPCA(n_components=n_comp, svd_solver="auto", whiten=False)
-    try:
-        dask_pca_2.fit(scaled_genotypes.T).transform(scaled_genotypes.T)
-    except Exception as e:
-        print("Transposing genotypes fails")
-        print(e)
+    scaler = PattersonScaler()
+    scaled_genotypes = scaler.fit(da.asarray(genotypes)).transform(
+        da.asarray(genotypes)
+    )
+    # scaled_genotypes = scaled_genotypes.rechunk(chunks=genotypes.shape)
+
+    dask_pca = DaskPCA(n_components=n_comp, svd_solver="full")
+    with pytest.raises(
+        ValueError, match="operands could not be broadcast together with shapes"
+    ):
+        dask_pca.fit(scaled_genotypes.T).transform(scaled_genotypes.T).compute()
+
+
+def test_dask_ml_pca_against_allel_pca_fat():
+    n_variants = 10
+    n_samples = 100
+    n_comp = 2
+    ds = simulate_genotype_call_dataset(n_variant=n_variants, n_sample=n_samples)
+    genotypes = ds.call_genotype.sum(dim="ploidy")
+
+    # Original Allel Genotype PCA with scaler built in
+    allel_pca = AllelGenotypePCA(n_components=n_comp, scaler="patterson")
+    X_r = allel_pca.fit(np.asarray(genotypes)).transform(np.asarray(genotypes))
+
+    scaler = PattersonScaler()
+    scaled_genotypes = scaler.fit(da.asarray(genotypes)).transform(
+        da.asarray(genotypes)
+    )
+    scaled_genotypes = scaled_genotypes.rechunk(chunks=genotypes.shape)
+
+    dask_pca = DaskPCA(n_components=n_comp, svd_solver="full")
+    X_r2 = dask_pca.fit(scaled_genotypes.T).transform(scaled_genotypes.T).compute()
+    assert X_r.shape[0], X_r2.shape[0]
+    np.testing.assert_allclose(np.abs(X_r[:, 0]), np.abs(X_r2[:, 0]), atol=0.1)
+    np.testing.assert_allclose(np.abs(X_r[:, 1]), np.abs(X_r2[:, 1]), atol=0.1)

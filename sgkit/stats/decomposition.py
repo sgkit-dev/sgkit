@@ -78,18 +78,18 @@ class GenotypePCA(dask_ml.decomposition.PCA):  # type: ignore
     * The scalers have been separated out from the PCAs to conform with
     scikit-learn pipelines - https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html
 
-    * RandomizedGenotypePCA is replaced with GenotypetypePCA(svd_solver="randomized")
-    Instead of
+    >>> # RandomizedGenotypePCA is replaced with
+    >>> # GenotypetypePCA(svd_solver="randomized")
     >>> from allel.stats.decomposition import randomized_pca
     >>> import numpy as np
     >>> # generate some random diploid genotype data
-    >>> n_variants = 100
-    >>> n_samples = 5
+    >>> n_variants = 10000
+    >>> n_samples = 20
     >>> genotypes = np.random.choice(3, n_variants * n_samples)
     >>> genotypes = genotypes.reshape(n_variants, n_samples)
     >>> coords, model = randomized_pca(gn=genotypes)
 
-    Use
+    >>> # Use the sgkit GenotypePCA
 
     >>> from sgkit.stats.decomposition import GenotypePCA
     >>> x_R = GenotypePCA(svd_solver="randomized")
