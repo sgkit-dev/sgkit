@@ -30,6 +30,7 @@ Methods
    variant_stats
 
 Utilities
+=========
 
 .. autosummary::
    :toctree: generated/
