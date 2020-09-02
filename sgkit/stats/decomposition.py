@@ -6,7 +6,13 @@ from ..typing import ArrayLike
 
 
 class GenotypePCA(dask_ml.decomposition.PCA):  # type: ignore
-    """
+    """Principal component analysis (PCA)
+
+    Linear dimensionality reduction using Singular Value Decomposition of the
+    data to project it to a lower dimensional space.
+
+    It uses the "tsqr" algorithm from Benson et. al. (2013). See the References
+    for more.
 
     Parameters
     ----------
@@ -131,7 +137,12 @@ class GenotypePCA(dask_ml.decomposition.PCA):  # type: ignore
     >>> pcs_oos = est.transform(genotypes)
 
     References
-    --------
+    ----------
+    Direct QR factorizations for tall-and-skinny matrices in
+    MapReduce architectures.
+    A. Benson, D. Gleich, and J. Demmel.
+    IEEE International Conference on Big Data, 2013.
+    http://arxiv.org/abs/1301.1071
 
     Notes
     --------
