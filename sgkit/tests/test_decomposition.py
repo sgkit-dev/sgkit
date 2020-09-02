@@ -8,7 +8,7 @@ from allel.stats.decomposition import (
 )
 from dask.array.utils import assert_eq
 from dask_ml.decomposition import PCA as DaskPCA
-from numpy.testing import assert_array_almost_equal, assert_equal
+from numpy.testing import assert_equal
 from sklearn.pipeline import Pipeline
 
 from sgkit.stats.decomposition import GenotypePCA
@@ -40,21 +40,15 @@ def simulate_genotype_calls(
     return genotypes.reshape(n_variants, n_samples)
 
 
-n_variants = 100
-n_samples = 10
+n_variants = 10
+n_samples = 100
 n_comp = 10
 n_ploidy = 2
 
 
-def assert_max_distance(x: ArrayLike, y: ArrayLike, allowed_distance: float) -> None:
-    """Calculate the distance and assert that arrays are within that distance
-    Used in arrays where there is slight differences in rounding"""
-    d = np.abs(np.array(x).flatten()) - np.abs(np.array(y).flatten())
-    d = np.abs(d)
-    assert d.max() < allowed_distance
-
-
 def test_genotype_pca_shape():
+    n_variants = 10
+    n_samples = 100
     genotypes = simulate_genotype_calls(
         n_variants=n_variants, n_samples=n_samples, n_ploidy=n_ploidy
     )
@@ -78,7 +72,10 @@ def test_genotype_pca_shape():
 def test_genotype_pca_no_fit():
     genotypes = simulate_genotype_calls(n_variants, n_samples, n_ploidy)
     pca = GenotypePCA(n_components=10, svd_solver="full")
-    with pytest.raises(ValueError, match="model has not been not fitted"):
+    with pytest.raises(
+        ValueError,
+        match="instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator",
+    ):
         pca.transform(genotypes)
 
 
@@ -90,6 +87,8 @@ def test_genotype_pca_invalid_solver():
 
 
 def test_patterson_scaler_against_genotype_pca_sklearn_pipeline():
+    n_variants = 10
+    n_samples = 100
     genotypes = simulate_genotype_calls(
         n_variants=n_variants, n_samples=n_samples, n_ploidy=n_ploidy
     )
@@ -129,15 +128,14 @@ def test_da_svd_against_scipy_svd():
     assert_eq(scipy_u.shape, da_u.shape)
     assert_eq(scipy_s.shape, da_s.shape)
     assert_eq(scipy_v.shape, da_v.shape)
-    assert_max_distance(scipy_u, da_u.compute(), 0.09)
-    assert_max_distance(scipy_s, da_s.compute(), 0.09)
-    assert_max_distance(scipy_v, da_v.compute(), 0.09)
+    np.testing.assert_allclose(scipy_u, da_u.compute(), atol=0.2)
+    np.testing.assert_allclose(scipy_s, da_s.compute(), atol=0.2)
+    np.testing.assert_allclose(scipy_v, da_v.compute(), atol=0.2)
 
 
 def test_sgkit_genotype_pca_fit_against_allel_genotype_pca_fit():
-    # Rounding errors are more apparent on smaller sample sizes
     genotypes = simulate_genotype_calls(
-        n_variants=1000, n_samples=50, n_ploidy=n_ploidy
+        n_variants=n_variants, n_samples=n_samples, n_ploidy=n_ploidy
     )
 
     # Original Allel Genotype PCA with scaler built in
@@ -156,31 +154,20 @@ def test_sgkit_genotype_pca_fit_against_allel_genotype_pca_fit():
     sgkit_pca = GenotypePCA()
     sgkit_pca = sgkit_pca.fit(scaled_genotypes)
 
-    # assert_array_almost_equal(
-    #     np.round(allel_pca.explained_variance_, 3),
-    #     np.round(sgkit_pca.explained_variance_.compute(), 3),
-    #     decimal=1,
-    # )
     np.testing.assert_allclose(
-        allel_pca.explained_variance_, sgkit_pca.explained_variance_.compute(), atol=0.1
+        allel_pca.explained_variance_, sgkit_pca.explained_variance_, atol=0.2
     )
-
-    assert_array_almost_equal(
-        np.round(allel_pca.explained_variance_ratio_, 3),
-        np.round(sgkit_pca.explained_variance_ratio_.compute(), 3),
-        decimal=1,
+    np.testing.assert_allclose(
+        allel_pca.explained_variance_ratio_,
+        sgkit_pca.explained_variance_ratio_,
+        atol=0.2,
     )
-    assert_array_almost_equal(
-        np.round(np.abs(allel_pca.components_), 3),
-        np.round(np.abs(sgkit_pca.components_.compute()), 3),
-        decimal=1,
+    np.testing.assert_allclose(
+        np.abs(allel_pca.components_), np.abs(sgkit_pca.components_), atol=0.25,
     )
 
 
 def test_sgkit_genotype_pca_fit_transform_against_allel_genotype_pca_fit_transform():
-    n_variants = 10000
-    n_samples = 100
-    n_comp = 2
     genotypes = simulate_genotype_calls(
         n_variants=n_variants, n_samples=n_samples, n_ploidy=n_ploidy
     )
@@ -196,7 +183,7 @@ def test_sgkit_genotype_pca_fit_transform_against_allel_genotype_pca_fit_transfo
     sgkit_pca = GenotypePCA()
     X_r2 = sgkit_pca.fit(scaled_genotypes).transform(scaled_genotypes).compute()
 
-    np.testing.assert_allclose(np.abs(X_r[:, 0]), np.abs(X_r2[:, 0]), atol=0.1)
+    np.testing.assert_allclose(np.abs(X_r[:, 0]), np.abs(X_r2[:, 0]), atol=0.2)
 
 
 @pytest.mark.filterwarnings("ignore:invalid value encountered in true_divide")
@@ -249,7 +236,7 @@ def test_dask_ml_pca_against_allel_pca_square():
     np.testing.assert_allclose(np.abs(X_r[:, 1]), np.abs(X_r2[:, 1]), atol=0.1)
 
 
-def test_dask_ml_pca_against_allel_pca_tall():
+def test_dask_ml_pca_against_allel_pca_skinny():
     n_variants = 10000
     n_samples = 10
     n_comp = 2
@@ -260,8 +247,6 @@ def test_dask_ml_pca_against_allel_pca_tall():
     scaled_genotypes = scaler.fit(da.asarray(genotypes)).transform(
         da.asarray(genotypes)
     )
-    # scaled_genotypes = scaled_genotypes.rechunk(chunks=genotypes.shape)
-
     dask_pca = DaskPCA(n_components=n_comp, svd_solver="full")
     with pytest.raises(
         ValueError, match="operands could not be broadcast together with shapes"

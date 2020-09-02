@@ -1,9 +1,6 @@
-from typing import Optional, Tuple
+from typing import Any, Optional
 
-import dask.array as da
 import dask_ml.decomposition
-import numpy as np
-from sklearn.utils.validation import check_random_state
 
 from ..typing import ArrayLike
 
@@ -107,8 +104,8 @@ class GenotypePCA(dask_ml.decomposition.PCA):  # type: ignore
     >>> import dask.array as da
 
     >>> # generate some random diploid genotype data
-    >>> n_variants = 100
-    >>> n_samples = 5
+    >>> n_variants = 10
+    >>> n_samples = 100
     >>> genotypes = da.random.choice(3, n_variants * n_samples)
     >>> genotypes = genotypes.reshape(n_variants, n_samples)
 
@@ -161,75 +158,11 @@ class GenotypePCA(dask_ml.decomposition.PCA):  # type: ignore
             random_state=random_state,
         )
 
-    def _get_solver(self) -> str:
-        solvers = {"full", "randomized"}
-        solver: str = self.svd_solver
-
-        if solver not in solvers:
-            raise ValueError(
-                "Invalid solver '{}'. Must be one of {}".format(solver, solvers)
-            )
-        return solver
-
-    def fit_transform(self, gn: ArrayLike, y: Optional[ArrayLike] = None) -> ArrayLike:
-        u, s, v = self._fit(gn)
-        solver = self._get_solver()
-
-        if solver in {"full"}:
-            u = u[:, : self.n_components]
-            u *= s[: self.n_components]
-        else:
-            u *= s
-
-        return u
-
-    def _fit(self, gn: ArrayLike) -> Tuple[ArrayLike, ArrayLike, ArrayLike]:
-        x = gn.T
-        n_samples, n_features = x.shape
-        n_components = self.n_components
-        solver = self._get_solver()
-
-        if solver in {"full"}:
-            u, s, v = da.linalg.svd(x)
-        else:
-            # randomized
-            random_state = check_random_state(self.random_state)
-            seed = random_state.randint(np.iinfo("int32").max, None)
-            n_power_iter = self.iterated_power
-            u, s, v = da.linalg.svd_compressed(
-                x, self.n_components, n_power_iter=n_power_iter, seed=seed
-            )
-
-        if solver in {"full"}:
-            # calculate explained variance
-            explained_variance_ = (s ** 2) / n_samples
-            explained_variance_ratio_ = explained_variance_ / da.sum(
-                explained_variance_
-            )
-
-            # store variables
-            n_components = self.n_components
-            self.components_ = v[:n_components]
-            self.explained_variance_ = explained_variance_[:n_components]
-            self.explained_variance_ratio_ = explained_variance_ratio_[:n_components]
-
-        else:
-            # randomized
-            # https://github.com/cggh/scikit-allel/blob/master/allel/stats/decomposition.py#L219
-            self.explained_variance_ = exp_var = (s ** 2) / n_samples
-            full_var = np.var(x, axis=0).sum()
-            self.explained_variance_ratio_ = exp_var / full_var
-            self.components_ = v
-
-        return u, s, v
+    def fit(self, gn: ArrayLike, y: Optional[ArrayLike] = None) -> Any:
+        return super().fit(gn.T)
 
     def transform(self, gn: ArrayLike) -> ArrayLike:
-        if not hasattr(self, "components_"):
-            raise ValueError("model has not been not fitted")
+        return super().transform(gn.T)
 
-        x = gn.T
-
-        # apply transformation
-        x_transformed = da.dot(x, self.components_.T)
-
-        return x_transformed
+    def fit_transform(self, gn: ArrayLike, y: Optional[ArrayLike] = None) -> ArrayLike:
+        return super().fit_transform(gn.T)
