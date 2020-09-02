@@ -169,20 +169,27 @@
 <h1>sgkit.count_call_alleles<a class="headerlink" href="#sgkit-count-call-alleles" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="sgkit.count_call_alleles">
-<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">count_call_alleles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em><span class="sig-paren">)</span> &#x2192; xarray.core.dataarray.DataArray<a class="headerlink" href="#sgkit.count_call_alleles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">count_call_alleles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em>, <em class="sig-param"><span class="n">merge</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; xarray.core.dataset.Dataset<a class="headerlink" href="#sgkit.count_call_alleles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute per sample allele counts from genotype calls.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>ds</strong> (<em>Dataset</em>) – Genotype call dataset such as from
-<cite>sgkit.create_genotype_call_dataset</cite>.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<em>Dataset</em>) – Genotype call dataset such as from
+<cite>sgkit.create_genotype_call_dataset</cite>.</p></li>
+<li><p><strong>merge</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (the default), merge the input dataset and the computed
+output variables into a single dataset. Output variables will
+overwrite any input variables with the same name, and a warning
+will be issued in this case.
+If False, return only the computed output variables.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>call_allele_count</strong> – Allele counts with shape (variants, samples, alleles) and values
-corresponding to the number of non-missing occurrences
-of each allele.</p>
+<dd class="field-even"><p>Array <cite>call_allele_count</cite> of allele counts with
+shape (variants, samples, alleles) and values corresponding to
+the number of non-missing occurrences of each allele.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>DataArray</p>
+<dd class="field-odd"><p>Dataset</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -198,7 +205,7 @@ of each allele.</p>
 <span class="go">3         0/0  0/0</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">count_call_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">values</span> 
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">count_call_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)[</span><span class="s2">&quot;call_allele_count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
 <span class="go">array([[[1, 1],</span>
 <span class="go">        [1, 1]],</span>
 
