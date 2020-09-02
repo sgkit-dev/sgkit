@@ -1,11 +1,19 @@
 from typing import Any, List
 
+import dask.array as da
 import numpy as np
 import pytest
+import xarray as xr
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from sgkit.utils import check_array_like, encode_array, split_array_chunks
+from sgkit.utils import (
+    MergeWarning,
+    check_array_like,
+    encode_array,
+    merge_datasets,
+    split_array_chunks,
+)
 
 
 def test_check_array_like():
@@ -64,6 +72,20 @@ def test_encode_array(
     v, n = encode_array(np.array(x))
     np.testing.assert_equal(v, expected_values)
     np.testing.assert_equal(n, expected_names)
+
+
+def test_merge_datasets():
+    ds = xr.Dataset(dict(x=xr.DataArray(da.zeros(100))))
+
+    new_ds1 = xr.Dataset(dict(y=xr.DataArray(da.zeros(100))))
+    new_ds2 = xr.Dataset(dict(y=xr.DataArray(da.ones(100))))
+
+    ds = merge_datasets(ds, new_ds1)
+    assert "y" in ds
+
+    with pytest.warns(MergeWarning):
+        ds = merge_datasets(ds, new_ds2)
+        np.testing.assert_equal(ds["y"].values, np.ones(100))
 
 
 @pytest.mark.parametrize(
