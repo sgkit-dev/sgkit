@@ -2,7 +2,7 @@ import dask.array as da
 import xarray as xr
 import zarr
 
-from ..api import DIM_VARIANT, create_genotype_call_dataset
+from ..model import DIM_VARIANT, create_genotype_call_dataset
 from ..typing import ArrayLike, PathType
 from ..utils import encode_array
 
