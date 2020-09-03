@@ -9,7 +9,10 @@ from ..typing import ArrayLike
 
 
 class GenotypePCA(dask_ml.decomposition.PCA):  # type: ignore
-    """
+    """Principal component analysis (PCA)
+    Linear dimensionality reduction using Singular Value Decomposition of the
+    data to project it to a lower dimensional space.
+    for more.
 
     Parameters
     ----------
@@ -21,7 +24,7 @@ class GenotypePCA(dask_ml.decomposition.PCA):  # type: ignore
         ignored
     whiten : bool, optional (default False)
         ignored
-    svd_solver : string {'auto', 'full', 'tsqr', 'randomized'}
+    svd_solver : string { 'full', 'randomized'}
         full :
             run exact full SVD and select the components by postprocessing
         randomized :
@@ -135,10 +138,19 @@ class GenotypePCA(dask_ml.decomposition.PCA):  # type: ignore
 
     References
     --------
+    Direct QR factorizations for tall-and-skinny matrices in
+    MapReduce architectures.
+    A. Benson, D. Gleich, and J. Demmel.
+    IEEE International Conference on Big Data, 2013.
+    http://arxiv.org/abs/1301.1071
+
+    https://ml.dask.org/modules/generated/dask_ml.decomposition.PCA.html
+    https://scikit-allel.readthedocs.io/en/stable/_modules/allel/stats/decomposition.html#pca
 
     Notes
     --------
-    Genotype data should be filtered prior to using this function to remove variants in linkage disequilibrium.
+    Genotype data should be filtered prior to using this function to
+    remove variants in linkage disequilibrium.
     """
 
     def __init__(
