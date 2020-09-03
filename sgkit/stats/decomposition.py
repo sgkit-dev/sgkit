@@ -1,18 +1,15 @@
-from typing import Any, Optional
+from typing import Optional, Tuple
 
+import dask.array as da
 import dask_ml.decomposition
+import numpy as np
+from sklearn.utils.validation import check_random_state
 
 from ..typing import ArrayLike
 
 
 class GenotypePCA(dask_ml.decomposition.PCA):  # type: ignore
-    """Principal component analysis (PCA)
-
-    Linear dimensionality reduction using Singular Value Decomposition of the
-    data to project it to a lower dimensional space.
-
-    It uses the "tsqr" algorithm from Benson et. al. (2013). See the References
-    for more.
+    """
 
     Parameters
     ----------
@@ -110,8 +107,8 @@ class GenotypePCA(dask_ml.decomposition.PCA):  # type: ignore
     >>> import dask.array as da
 
     >>> # generate some random diploid genotype data
-    >>> n_variants = 10
-    >>> n_samples = 100
+    >>> n_variants = 100
+    >>> n_samples = 5
     >>> genotypes = da.random.choice(3, n_variants * n_samples)
     >>> genotypes = genotypes.reshape(n_variants, n_samples)
 
@@ -137,12 +134,7 @@ class GenotypePCA(dask_ml.decomposition.PCA):  # type: ignore
     >>> pcs_oos = est.transform(genotypes)
 
     References
-    ----------
-    Direct QR factorizations for tall-and-skinny matrices in
-    MapReduce architectures.
-    A. Benson, D. Gleich, and J. Demmel.
-    IEEE International Conference on Big Data, 2013.
-    http://arxiv.org/abs/1301.1071
+    --------
 
     Notes
     --------
@@ -169,11 +161,58 @@ class GenotypePCA(dask_ml.decomposition.PCA):  # type: ignore
             random_state=random_state,
         )
 
-    def fit(self, gn: ArrayLike, y: Optional[ArrayLike] = None) -> Any:
-        return super().fit(gn.T)
+    def _get_solver(self) -> str:
+        solvers = {"full", "randomized"}
+        solver: str = self.svd_solver
+
+        if solver not in solvers:
+            raise ValueError(
+                "Invalid solver '{}'. Must be one of {}".format(solver, solvers)
+            )
+        return solver
+
+    def _fit(self, gn: ArrayLike) -> Tuple[ArrayLike, ArrayLike, ArrayLike]:
+        x = gn.T
+        n_samples, n_features = x.shape
+        solver = self._get_solver()
+
+        self.mean_ = x.mean(0)
+        x -= self.mean_
+
+        if solver in {"full"}:
+            u, s, v = da.linalg.svd(x)
+        else:
+            # randomized
+            random_state = check_random_state(self.random_state)
+            seed = random_state.randint(np.iinfo("int32").max, None)
+            n_power_iter = self.iterated_power
+            u, s, v = da.linalg.svd_compressed(
+                x, self.n_components, n_power_iter=n_power_iter, seed=seed
+            )
+
+        if solver in {"full"}:
+            # calculate explained variance
+            explained_variance_ = (s ** 2) / n_samples
+            explained_variance_ratio_ = explained_variance_ / da.sum(
+                explained_variance_
+            )
+
+            # store variables
+            n_components = self.n_components
+            self.components_ = v[:n_components]
+            self.explained_variance_ = explained_variance_[:n_components]
+            self.explained_variance_ratio_ = explained_variance_ratio_[:n_components]
+
+        else:
+            # randomized
+            # https://github.com/cggh/scikit-allel/blob/master/allel/stats/decomposition.py#L219
+            self.explained_variance_ = exp_var = (s ** 2) / n_samples
+            full_var = np.var(x, axis=0).sum()
+            self.explained_variance_ratio_ = exp_var / full_var
+            self.components_ = v
+
+        self.n_components_ = self.n_components
+        return u, s, v
 
     def transform(self, gn: ArrayLike) -> ArrayLike:
         return super().transform(gn.T)
-
-    def fit_transform(self, gn: ArrayLike, y: Optional[ArrayLike] = None) -> ArrayLike:
-        return super().fit_transform(gn.T)

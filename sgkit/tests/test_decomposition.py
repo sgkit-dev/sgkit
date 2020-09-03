@@ -40,15 +40,13 @@ def simulate_genotype_calls(
     return genotypes.reshape(n_variants, n_samples)
 
 
-n_variants = 10
-n_samples = 100
+n_variants = 100
+n_samples = 10
 n_comp = 10
 n_ploidy = 2
 
 
 def test_genotype_pca_shape():
-    n_variants = 10
-    n_samples = 100
     genotypes = simulate_genotype_calls(
         n_variants=n_variants, n_samples=n_samples, n_ploidy=n_ploidy
     )
@@ -73,8 +71,7 @@ def test_genotype_pca_no_fit():
     genotypes = simulate_genotype_calls(n_variants, n_samples, n_ploidy)
     pca = GenotypePCA(n_components=10, svd_solver="full")
     with pytest.raises(
-        ValueError,
-        match="instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator",
+        ValueError, match="instance is not fitted yet",
     ):
         pca.transform(genotypes)
 
@@ -87,8 +84,8 @@ def test_genotype_pca_invalid_solver():
 
 
 def test_patterson_scaler_against_genotype_pca_sklearn_pipeline():
-    n_variants = 10
-    n_samples = 100
+    # n_variants = 10
+    # n_samples = 100
     genotypes = simulate_genotype_calls(
         n_variants=n_variants, n_samples=n_samples, n_ploidy=n_ploidy
     )
@@ -155,7 +152,7 @@ def test_sgkit_genotype_pca_fit_against_allel_genotype_pca_fit():
     sgkit_pca = sgkit_pca.fit(scaled_genotypes)
 
     np.testing.assert_allclose(
-        allel_pca.explained_variance_, sgkit_pca.explained_variance_, atol=0.2
+        allel_pca.explained_variance_, sgkit_pca.explained_variance_, atol=0.1
     )
     np.testing.assert_allclose(
         allel_pca.explained_variance_ratio_,
@@ -163,7 +160,7 @@ def test_sgkit_genotype_pca_fit_against_allel_genotype_pca_fit():
         atol=0.2,
     )
     np.testing.assert_allclose(
-        np.abs(allel_pca.components_), np.abs(sgkit_pca.components_), atol=0.25,
+        np.abs(allel_pca.components_), np.abs(sgkit_pca.components_), atol=0.35,
     )
 
 
@@ -184,6 +181,9 @@ def test_sgkit_genotype_pca_fit_transform_against_allel_genotype_pca_fit_transfo
     X_r2 = sgkit_pca.fit(scaled_genotypes).transform(scaled_genotypes).compute()
 
     np.testing.assert_allclose(np.abs(X_r[:, 0]), np.abs(X_r2[:, 0]), atol=0.2)
+
+
+# This test is just to demonstrate behavior I noticed with scikit-allel PCA and small numbers
 
 
 @pytest.mark.filterwarnings("ignore:invalid value encountered in true_divide")
@@ -234,6 +234,11 @@ def test_dask_ml_pca_against_allel_pca_square():
     assert X_r.shape[0], X_r2.shape[0]
     np.testing.assert_allclose(np.abs(X_r[:, 0]), np.abs(X_r2[:, 0]), atol=0.1)
     np.testing.assert_allclose(np.abs(X_r[:, 1]), np.abs(X_r2[:, 1]), atol=0.1)
+
+
+# These tests are to demonstrate why we are NOT using dask-ml at this time
+# It fails on tall / skinny arrays
+# Any sample will have many variants
 
 
 def test_dask_ml_pca_against_allel_pca_skinny():
