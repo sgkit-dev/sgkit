@@ -3,7 +3,7 @@ from typing import Optional
 import numpy as np
 from xarray import Dataset
 
-from .api import create_genotype_call_dataset
+from .model import create_genotype_call_dataset
 from .utils import split_array_chunks
 
 
