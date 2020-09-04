@@ -24,10 +24,14 @@ Methods
 
    count_call_alleles
    count_variant_alleles
+   divergence
+   diversity
+   Fst
    gwas_linear_regression
    hardy_weinberg_test
    regenie
    variant_stats
+   Tajimas_D
 
 Utilities
 =========
