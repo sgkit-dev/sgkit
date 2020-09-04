@@ -37,8 +37,10 @@ def diversity(
     if len(ds.samples) < 2:
         return xr.DataArray(np.nan)
     if allele_counts not in ds:
-        ds = count_variant_alleles(ds)
-    ac = ds[allele_counts]
+        ds_new = count_variant_alleles(ds)
+    else:
+        ds_new = ds
+    ac = ds_new[allele_counts]
     an = ac.sum(axis=1)
     n_pairs = an * (an - 1) / 2
     n_same = (ac * (ac - 1) / 2).sum(axis=1)
@@ -67,13 +69,17 @@ def divergence(
          divergence value between the two datasets.
     """
     if allele_counts not in ds1:
-        ds1 = count_variant_alleles(ds1)
-    ac1 = ds1[allele_counts]
+        ds1_new = count_variant_alleles(ds1)
+    else:
+        ds1_new = ds1
+    ac1 = ds1_new[allele_counts]
     if allele_counts not in ds2:
-        ds2 = count_variant_alleles(ds2)
-    ac2 = ds2[allele_counts]
-    an1 = ds1[allele_counts].sum(axis=1)
-    an2 = ds2[allele_counts].sum(axis=1)
+        ds2_new = count_variant_alleles(ds2)
+    else:
+        ds2_new = ds2
+    ac2 = ds2_new[allele_counts]
+    an1 = ds1_new[allele_counts].sum(axis=1)
+    an2 = ds2_new[allele_counts].sum(axis=1)
 
     n_pairs = an1 * an2
     n_same = (ac1 * ac2).sum(axis=1)
@@ -126,8 +132,10 @@ def Tajimas_D(
          Tajimas' D value.
     """
     if allele_counts not in ds:
-        ds = count_variant_alleles(ds)
-    ac = ds[allele_counts]
+        ds_new = count_variant_alleles(ds)
+    else:
+        ds_new = ds
+    ac = ds_new[allele_counts]
 
     # count segregating
     S = ((ac > 0).sum(axis=1) > 1).sum()
@@ -142,7 +150,7 @@ def Tajimas_D(
     theta = S / a1
 
     # calculate diversity
-    div = diversity(ds)
+    div = diversity(ds_new)
 
     # N.B., both theta estimates are usually divided by the number of
     # (accessible) bases but here we want the absolute difference
