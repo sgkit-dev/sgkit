@@ -6,7 +6,7 @@ import pandas as pd
 import xarray as xr
 from sgkit_plink import read_plink
 
-from sgkit.stats.pc_relate import pc_relate
+from sgkit import pc_relate
 
 
 def test_same_as_the_reference_implementation() -> None:

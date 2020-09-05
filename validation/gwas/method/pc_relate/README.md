@@ -2,7 +2,7 @@ This runs test to validate our implementation gets the same
 exact results as the reference R implementation for production
 HapMap data.
 
-This code gets executed weekly as part of the Github Actions CI.
+This code is scheduled as part of the Github Actions CI.
 
 To run manually:
 
