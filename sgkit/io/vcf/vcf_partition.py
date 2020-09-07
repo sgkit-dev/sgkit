@@ -77,44 +77,43 @@ def partition_into_regions(
     """
     Calculate genomic region strings to partition a compressed VCF or BCF file into roughly equal parts.
 
-    A .tbi or .csi file is used to find BGZF boundaries in the compressed VCF file, which are then
+    A ``.tbi`` or ``.csi`` file is used to find BGZF boundaries in the compressed VCF file, which are then
     used to divide the file into parts.
 
-    The number of parts can specified directly by providing `num_parts`, or by specifying the
-    desired size (in bytes) of each (compressed) part by providing `target_part_size`. Exactly one of `num_parts` or
-    `target_part_size` must be provided.
+    The number of parts can specified directly by providing ``num_parts``, or by specifying the
+    desired size (in bytes) of each (compressed) part by providing ``target_part_size``.
+    Exactly one of ``num_parts`` or ``target_part_size`` must be provided.
 
-    Both `num_parts` and `target_part_size` serve as hints: the number of parts and their sizes
+    Both ``num_parts`` and ``target_part_size`` serve as hints: the number of parts and their sizes
     may be more or less than these parameters.
 
     Parameters
     ----------
-    vcf_path : PathType
+    vcf_path
         The path to the VCF file.
-    index_path : Optional[PathType], optional
-        The path to the VCF index (`.tbi` or `.csi`), by default None. If not specified, the
-        index path is constructed by appending the index suffix (`.tbi` or `.csi`) to the VCF path.
-    num_parts : Optional[int], optional
+    index_path
+        The path to the VCF index (``.tbi`` or ``.csi``), by default None. If not specified, the
+        index path is constructed by appending the index suffix (``.tbi`` or ``.csi``) to the VCF path.
+    num_parts
         The desired number of parts to partition the VCF file into, by default None
-    target_part_size : Optional[int], optional
+    target_part_size
         The desired size, in bytes, of each (compressed) part of the partitioned VCF, by default None
-    storage_options: Optional[Dict[str, str]], optional
-        Any additional parameters for the storage backend (see `fsspec.open`).
+    storage_options:
+        Any additional parameters for the storage backend (see ``fsspec.open``).
 
     Returns
     -------
-    Optional[Sequence[str]]
-        The region strings that partition the VCF file, or None if the VCF file should not be partitioned
-        (so there is only a single partition).
+    The region strings that partition the VCF file, or None if the VCF file should not be partitioned
+    (so there is only a single partition).
 
     Raises
     ------
     ValueError
-        If neither of `num_parts` or `target_part_size` has been specified.
+        If neither of ``num_parts`` or ``target_part_size`` has been specified.
     ValueError
-        If both of `num_parts` and `target_part_size` have been specified.
+        If both of ``num_parts`` and ``target_part_size`` have been specified.
     ValueError
-        If either of `num_parts` or `target_part_size` is not a positive integer.
+        If either of ``num_parts`` or ``target_part_size`` is not a positive integer.
     """
     if num_parts is None and target_part_size is None:
         raise ValueError("One of num_parts or target_part_size must be specified")

@@ -7,17 +7,32 @@ This page provides an auto-generated summary of sgkits's API.
 IO/imports
 ==========
 
+PLINK
+-----
+
 .. currentmodule:: sgkit.io.plink
 .. autosummary::
    :toctree: generated/
 
-    read_plink
+   read_plink
+
+VCF
+---
+
+.. currentmodule:: sgkit.io.vcf
+.. autosummary::
+   :toctree: generated/
+
+   partition_into_regions
+   vcf_to_zarr
+   vcf_to_zarrs
+   zarrs_to_dataset
 
 .. currentmodule:: sgkit
 .. autosummary::
    :toctree: generated/
 
-    read_vcfzarr
+   read_vcfzarr
 
 .. currentmodule:: sgkit
 
