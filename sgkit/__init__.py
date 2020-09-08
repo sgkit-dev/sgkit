@@ -11,6 +11,7 @@ from .model import (  # noqa: F401
 from .stats.aggregation import count_call_alleles, count_variant_alleles, variant_stats
 from .stats.association import gwas_linear_regression
 from .stats.hwe import hardy_weinberg_test
+from .stats.pc_relate import pc_relate
 from .stats.popgen import Fst, Tajimas_D, divergence, diversity
 from .stats.regenie import regenie
 
@@ -33,4 +34,5 @@ __all__ = [
     "divergence",
     "Fst",
     "Tajimas_D",
+    "pc_relate",
 ]

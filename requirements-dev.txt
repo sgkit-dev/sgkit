@@ -9,3 +9,4 @@ zarr
 msprime
 sphinx
 sphinx_rtd_theme
+sklearn
