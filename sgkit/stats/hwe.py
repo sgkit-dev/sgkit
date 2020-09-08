@@ -98,7 +98,7 @@ def hardy_weinberg_p_value(obs_hets: int, obs_hom1: int, obs_hom2: int) -> float
 
 
 # Benchmarks show ~25% improvement w/ fastmath on large (~10M) counts
-hardy_weinberg_p_value_jit = njit(hardy_weinberg_p_value, fastmath=True)
+hardy_weinberg_p_value_jit = njit(hardy_weinberg_p_value, fastmath=True, nogil=True)
 
 
 def hardy_weinberg_p_value_vec(
@@ -116,7 +116,9 @@ def hardy_weinberg_p_value_vec(
     return p
 
 
-hardy_weinberg_p_value_vec_jit = njit(hardy_weinberg_p_value_vec, fastmath=True)
+hardy_weinberg_p_value_vec_jit = njit(
+    hardy_weinberg_p_value_vec, fastmath=True, nogil=True
+)
 
 
 def hardy_weinberg_test(
