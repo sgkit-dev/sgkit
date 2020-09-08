@@ -32,6 +32,7 @@ Methods
    regenie
    variant_stats
    Tajimas_D
+   pc_relate
 
 Utilities
 =========
