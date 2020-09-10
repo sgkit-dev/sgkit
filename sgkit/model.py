@@ -1,8 +1,9 @@
-from typing import Any, Dict, Hashable, List
+from typing import Any, Dict, Hashable, List, Optional
 
 import numpy as np
 import xarray as xr
 
+from .typing import ArrayLike
 from .utils import check_array_like
 
 DIM_VARIANT = "variants"
@@ -23,35 +24,36 @@ def create_genotype_call_dataset(
     call_genotype_phased: Any = None,
     variant_id: Any = None,
 ) -> xr.Dataset:
-    """Create a dataset of genotype calls.
+    """
+    Create a dataset of genotype calls.
 
     Parameters
     ----------
-    variant_contig_names : list of str
-        The contig names.
-    variant_contig : array_like, int
-        The (index of the) contig for each variant.
-    variant_position : array_like, int
-        The reference position of the variant.
-    variant_alleles : array_like, zero-terminated bytes, e.g. "S1", or object
+    variant_contig_names
+        list of str The contig names.
+    variant_contig
+        array_like, int The (index of the) contig for each variant.
+    variant_position
+        array_like, int The reference position of the variant.
+    variant_alleles
+        array_like, zero-terminated bytes, e.g. "S1", or object
         The possible alleles for the variant.
-    sample_id : array_like, str or object
-        The unique identifier of the sample.
-    call_genotype : array_like, int
-        Genotype, encoded as allele values (0 for the reference, 1 for
-        the first allele, 2 for the second allele), or -1 to indicate a
-        missing value.
-    call_genotype_phased : array_like, bool, optional
-        A flag for each call indicating if it is phased or not. If
-        omitted all calls are unphased.
-    variant_id: array_like, str or object, optional
-        The unique identifier of the variant.
+    sample_id
+        array_like, str or object The unique identifier of the sample.
+    call_genotype
+        array_like, int Genotype, encoded as allele values
+        (0 for the reference, 1 for the first allele, 2 for the second allele),
+        or -1 to indicate a missing value.
+    call_genotype_phased
+        array_like, bool, optional A flag for each call indicating if it is
+        phased or not. If omitted all calls are unphased.
+    variant_id
+        array_like, str or object, optional. The unique identifier of the variant.
 
     Returns
     -------
     :class:`xarray.Dataset`
         The dataset of genotype calls.
-
     """
     check_array_like(variant_contig, kind="i", ndim=1)
     check_array_like(variant_position, kind="i", ndim=1)
@@ -85,40 +87,47 @@ def create_genotype_call_dataset(
 def create_genotype_dosage_dataset(
     *,
     variant_contig_names: List[str],
-    variant_contig: Any,
-    variant_position: Any,
-    variant_alleles: Any,
-    sample_id: Any,
-    call_dosage: Any,
-    call_genotype_probability: Any,
-    variant_id: Any = None,
+    variant_contig: ArrayLike,
+    variant_position: ArrayLike,
+    variant_alleles: ArrayLike,
+    sample_id: ArrayLike,
+    call_dosage: ArrayLike,
+    call_genotype_probability: ArrayLike,
+    variant_id: Optional[ArrayLike] = None,
 ) -> xr.Dataset:
     """Create a dataset of genotype dosages.
 
     Parameters
     ----------
-    variant_contig_names : list of str
+    variant_contig_names
         The contig names.
-    variant_contig : array_like, int
+    variant_contig
+        array_like (element type: int).
         The (index of the) contig for each variant.
-    variant_position : array_like, int
+    variant_position
+        array_like (element type: int)
         The reference position of the variant.
-    variant_alleles : array_like, zero-terminated bytes, e.g. "S1", or object
+    variant_alleles
+        array_like, zero-terminated bytes, e.g. "S1", or object
         The possible alleles for the variant.
-    sample_id : array_like, str or object
+    sample_id
+        array_like (element type: str or object)
         The unique identifier of the sample.
-    call_dosage : array_like, float
+    call_dosage
+        array_like (element type: float)
         Dosages, encoded as floats, with NaN indicating a
         missing value.
-    call_genotype_probability: array_like, float
+    call_genotype_probability
+        array_like (element type: float)
         Probabilities, encoded as floats, with NaN indicating a
         missing value.
-    variant_id: array_like, str or object, optional
+    variant_id
+        array_like (element type: str or object), optional
         The unique identifier of the variant.
 
     Returns
     -------
-    xr.Dataset
+    :class:`xarray.Dataset`
         The dataset of genotype calls.
 
     """

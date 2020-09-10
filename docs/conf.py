@@ -34,14 +34,25 @@ author = "sgkit developers"
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx_autodoc_typehints",  # needs to be after napoleon
+    "scanpydoc.elegant_typehints",
     "sphinx.ext.autosummary",
     "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.napoleon",
+    "scanpydoc",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
+
+html_context = dict(
+    display_github=False,  # Integrate GitHub
+    github_user="pystatgen",  # Username
+    github_repo="sgkit",  # Repo name
+    github_version="master",  # Version
+    conf_py_path="/docs/",  # Path in the checkout to the docs root
+)
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
