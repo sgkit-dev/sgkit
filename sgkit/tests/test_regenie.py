@@ -297,7 +297,7 @@ def test_regenie__no_loco_with_one_contig():
     ds = simulate_regression_dataset(
         n_variant=10, n_sample=5, n_contig=1, n_covariate=1, n_trait=1
     )
-    res = regenie_sim(ds=ds)
+    res = regenie_sim(ds=ds, merge=False)
     assert len(res) == 2
     assert "loco_prediction" not in res
 
@@ -311,7 +311,7 @@ def test_regenie__32bit_float(ds):
     )
     # Ensure that a uniform demotion in types for input arrays (aside from contigs)
     # results in arrays with the same type
-    res = regenie_sim(ds=ds)
+    res = regenie_sim(ds=ds, merge=False)
     for v in res:
         assert res[v].dtype == np.float32
 
