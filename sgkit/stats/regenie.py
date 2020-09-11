@@ -8,7 +8,7 @@ from numpy import ndarray
 from xarray import Dataset
 
 from ..typing import ArrayLike
-from ..utils import split_array_chunks
+from ..utils import merge_datasets, split_array_chunks
 from .utils import (
     assert_array_shape,
     assert_block_shape,
@@ -732,6 +732,7 @@ def regenie(
     add_intercept: bool = True,
     normalize: bool = False,
     orthogonalize: bool = False,
+    merge: bool = True,
     **kwargs: Any,
 ) -> Dataset:
     """Regenie trait transformation.
@@ -779,6 +780,12 @@ def regenie(
     orthogonalize : bool
         **Experimental**: Remove covariates through orthogonalization
         of genotypes and traits, by default False.
+    merge : bool, optional
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset. Output variables will
+        overwrite any input variables with the same name, and a warning
+        will be issued in this case.
+        If False, return only the computed output variables.
 
     Warnings
     --------
@@ -817,7 +824,7 @@ def regenie(
     >>> ds["call_dosage"] = (("variants", "samples"), rs.normal(size=(n_variant, n_sample)))
     >>> ds["sample_covariate"] = (("samples", "covariates"), rs.normal(size=(n_sample, n_covariate)))
     >>> ds["sample_trait"] = (("samples", "traits"), rs.normal(size=(n_sample, n_trait)))
-    >>> res = regenie(ds, dosage="call_dosage", covariates="sample_covariate", traits="sample_trait")
+    >>> res = regenie(ds, dosage="call_dosage", covariates="sample_covariate", traits="sample_trait", merge=False)
     >>> res.compute() # doctest: +NORMALIZE_WHITESPACE
     <xarray.Dataset>
     Dimensions:          (alphas: 5, blocks: 2, contigs: 2, outcomes: 5, samples: 50)
@@ -843,7 +850,7 @@ def regenie(
     X = da.asarray(concat_2d(ds[list(covariates)], dims=("samples", "covariates")))
     Y = da.asarray(concat_2d(ds[list(traits)], dims=("samples", "traits")))
     contigs = ds["variant_contig"]
-    return regenie_transform(
+    new_ds = regenie_transform(
         G.T,
         X,
         Y,
@@ -856,3 +863,4 @@ def regenie(
         orthogonalize=orthogonalize,
         **kwargs,
     )
+    return merge_datasets(ds, new_ds) if merge else new_ds
