@@ -1,6 +1,9 @@
+import itertools
+
 import msprime  # type: ignore
 import numpy as np
 import pytest
+import xarray as xr
 
 from sgkit import Fst, Tajimas_D, create_genotype_call_dataset, divergence, diversity
 
@@ -37,32 +40,60 @@ def ts_to_dataset(ts, samples=None):
 def test_diversity(size):
     ts = msprime.simulate(size, length=100, mutation_rate=0.05, random_seed=42)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
-    div = diversity(ds).compute()
+    sample_cohorts = np.full_like(ts.samples(), 0)
+    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    ds = ds.assign_coords({"cohorts": ["co_0"]})
+    ds = diversity(ds)
+    div = ds["stat_diversity"].sel(cohorts="co_0").values
     ts_div = ts.diversity(span_normalise=False)
     np.testing.assert_allclose(div, ts_div)
 
 
-@pytest.mark.parametrize("size", [2, 3, 10, 100])
-def test_divergence(size):
+@pytest.mark.parametrize(
+    "size, n_cohorts",
+    [(2, 2), (3, 2), (3, 3), (10, 2), (10, 3), (10, 4), (100, 2), (100, 3), (100, 4)],
+)
+def test_divergence(size, n_cohorts):
     ts = msprime.simulate(size, length=100, mutation_rate=0.05, random_seed=42)
-    subset_1 = ts.samples()[: ts.num_samples // 2]
-    subset_2 = ts.samples()[ts.num_samples // 2 :]
-    ds1 = ts_to_dataset(ts, subset_1)  # type: ignore[no-untyped-call]
-    ds2 = ts_to_dataset(ts, subset_2)  # type: ignore[no-untyped-call]
-    div = divergence(ds1, ds2).compute()
-    ts_div = ts.divergence([subset_1, subset_2], span_normalise=False)
+    subsets = np.array_split(ts.samples(), n_cohorts)
+    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    sample_cohorts = np.concatenate(
+        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
+    )
+    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
+    ds = ds.assign_coords({"cohorts_a": cohort_names, "cohorts_b": cohort_names})
+    ds = divergence(ds)
+    div = ds["stat_divergence"].values
+
+    ts_div = np.full([n_cohorts, n_cohorts], np.nan)
+    for i, j in itertools.combinations(range(n_cohorts), 2):
+        ts_div[i, j] = ts.divergence([subsets[i], subsets[j]], span_normalise=False)
+        ts_div[j, i] = ts_div[i, j]
     np.testing.assert_allclose(div, ts_div)
 
 
-@pytest.mark.parametrize("size", [2, 3, 10, 100])
-def test_Fst(size):
+@pytest.mark.parametrize(
+    "size, n_cohorts",
+    [(2, 2), (3, 2), (3, 3), (10, 2), (10, 3), (10, 4), (100, 2), (100, 3), (100, 4)],
+)
+def test_Fst(size, n_cohorts):
     ts = msprime.simulate(size, length=100, mutation_rate=0.05, random_seed=42)
-    subset_1 = ts.samples()[: ts.num_samples // 2]
-    subset_2 = ts.samples()[ts.num_samples // 2 :]
-    ds1 = ts_to_dataset(ts, subset_1)  # type: ignore[no-untyped-call]
-    ds2 = ts_to_dataset(ts, subset_2)  # type: ignore[no-untyped-call]
-    fst = Fst(ds1, ds2).compute()
-    ts_fst = ts.Fst([subset_1, subset_2])
+    subsets = np.array_split(ts.samples(), n_cohorts)
+    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    sample_cohorts = np.concatenate(
+        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
+    )
+    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
+    ds = ds.assign_coords({"cohorts_a": cohort_names, "cohorts_b": cohort_names})
+    ds = Fst(ds)
+    fst = ds["stat_Fst"].values
+
+    ts_fst = np.full([n_cohorts, n_cohorts], np.nan)
+    for i, j in itertools.combinations(range(n_cohorts), 2):
+        ts_fst[i, j] = ts.Fst([subsets[i], subsets[j]])
+        ts_fst[j, i] = ts_fst[i, j]
     np.testing.assert_allclose(fst, ts_fst)
 
 
@@ -70,6 +101,9 @@ def test_Fst(size):
 def test_Tajimas_D(size):
     ts = msprime.simulate(size, length=100, mutation_rate=0.05, random_seed=42)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    sample_cohorts = np.full_like(ts.samples(), 0)
+    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    ds = Tajimas_D(ds)
+    d = ds["stat_Tajimas_D"].compute()
     ts_d = ts.Tajimas_D()
-    d = Tajimas_D(ds).compute()
     np.testing.assert_allclose(d, ts_d)

@@ -7,6 +7,7 @@ from numba import guvectorize
 from typing_extensions import Literal
 from xarray import Dataset
 
+from sgkit.stats.utils import assert_array_shape
 from sgkit.typing import ArrayLike
 from sgkit.utils import conditional_merge_datasets
 
@@ -49,6 +50,38 @@ def count_alleles(g: ArrayLike, _: ArrayLike, out: ArrayLike) -> None:
         a = g[i]
         if a >= 0:
             out[a] += 1
+
+
+# n = samples, c = cohorts, k = alleles
+@guvectorize(  # type: ignore
+    [
+        "void(uint8[:, :], int32[:], uint8[:], int32[:,:])",
+        "void(uint8[:, :], int64[:], uint8[:], int32[:,:])",
+    ],
+    "(n, k),(n),(c)->(c,k)",
+    nopython=True,
+)
+def _count_cohort_alleles(
+    ac: ArrayLike, cohorts: ArrayLike, _: ArrayLike, out: ArrayLike
+) -> None:
+    """Generalized U-function for computing per cohort allele counts.
+
+    Parameters
+    ----------
+    ac
+        Allele counts of shape (samples, alleles) containing per-sample allele counts.
+    cohorts
+        Cohort indexes for samples of shape (samples,).
+    _
+        Dummy variable of type `uint8` and shape (cohorts,) used to
+        define the number of cohorts.
+    out
+        Allele counts with shape (cohorts, alleles) and values corresponding to
+        the number of non-missing occurrences of each allele in each cohort.
+    """
+    out[:, :] = 0  # (cohorts, alleles)
+    for i in range(ac.shape[0]):
+        out[cohorts[i]] += ac[i]
 
 
 def count_call_alleles(ds: Dataset, merge: bool = True) -> Dataset:
@@ -164,6 +197,53 @@ def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
             )
         }
     )
+    return conditional_merge_datasets(ds, new_ds, merge)
+
+
+def count_cohort_alleles(ds: Dataset, merge: bool = True) -> Dataset:
+    """Compute per cohort allele counts from genotype calls.
+
+    Parameters
+    ----------
+    ds
+        Genotype call dataset such as from
+        `sgkit.create_genotype_call_dataset`.
+    merge
+        (optional)
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    Dataset containing variable `call_allele_count` of allele counts with
+    shape (variants, cohorts, alleles) and values corresponding to
+    the number of non-missing occurrences of each allele.
+    """
+
+    n_variants = ds.dims["variants"]
+    n_alleles = ds.dims["alleles"]
+
+    ds = count_call_alleles(ds)
+    AC, SC = da.asarray(ds.call_allele_count), da.asarray(ds.sample_cohort)
+    n_cohorts = SC.max().compute() + 1  # 0-based indexing
+    C = da.empty(n_cohorts, dtype=np.uint8)
+
+    G = da.asarray(ds["call_genotype"])
+    shape = (G.chunks[0], n_cohorts, n_alleles)
+
+    AC = da.map_blocks(_count_cohort_alleles, AC, SC, C, chunks=shape, dtype=np.int32)
+    assert_array_shape(
+        AC, n_variants, n_cohorts * AC.numblocks[0], n_alleles * AC.numblocks[1]
+    )
+
+    # Stack the blocks and sum across them
+    # (which will only work because each chunk is guaranteed to have same size)
+    AC = da.stack([AC.blocks[:, i] for i in range(AC.numblocks[1])]).sum(axis=0)
+    assert_array_shape(AC, n_variants, n_cohorts, n_alleles)
+
+    new_ds = Dataset({"cohort_allele_count": (("variants", "cohorts", "alleles"), AC)})
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
