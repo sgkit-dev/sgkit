@@ -1,0 +1,6 @@
+﻿sgkit.variant\_stats
+====================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: variant_stats

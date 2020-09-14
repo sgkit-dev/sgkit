@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>sgkit.count_call_alleles &mdash; sgkit  documentation</title>
+  <title>sgkit.variant_stats &mdash; sgkit  documentation</title>
   
 
   
@@ -36,8 +36,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.count_variant_alleles" href="sgkit.count_variant_alleles.html" />
-    <link rel="prev" title="sgkit.read_vcfzarr" href="sgkit.read_vcfzarr.html" /> 
+    <link rel="next" title="sgkit.display_genotypes" href="sgkit.display_genotypes.html" />
+    <link rel="prev" title="sgkit.regenie" href="sgkit.regenie.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -87,12 +87,12 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../api.html#creating-a-dataset">Creating a dataset</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#methods">Methods</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.count_call_alleles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.count_call_alleles.html">sgkit.count_call_alleles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.count_variant_alleles.html">sgkit.count_variant_alleles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.gwas_linear_regression.html">sgkit.gwas_linear_regression</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.hardy_weinberg_test.html">sgkit.hardy_weinberg_test</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.regenie.html">sgkit.regenie</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sgkit.variant_stats.html">sgkit.variant_stats</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.variant_stats</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#utilities">Utilities</a></li>
@@ -147,13 +147,13 @@
         
           <li><a href="../api.html">API reference</a> &raquo;</li>
         
-      <li>sgkit.count_call_alleles</li>
+      <li>sgkit.variant_stats</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/generated/sgkit.count_call_alleles.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/generated/sgkit.variant_stats.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -166,12 +166,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sgkit-count-call-alleles">
-<h1>sgkit.count_call_alleles<a class="headerlink" href="#sgkit-count-call-alleles" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="sgkit-variant-stats">
+<h1>sgkit.variant_stats<a class="headerlink" href="#sgkit-variant-stats" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="sgkit.count_call_alleles">
-<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">count_call_alleles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em>, <em class="sig-param"><span class="n">merge</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; xarray.core.dataset.Dataset<a class="headerlink" href="#sgkit.count_call_alleles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute per sample allele counts from genotype calls.</p>
+<dt id="sgkit.variant_stats">
+<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">variant_stats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em>, <em class="sig-param"><span class="n">merge</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; xarray.core.dataset.Dataset<a class="headerlink" href="#sgkit.variant_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute quality control variant statistics from genotype calls.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -185,41 +185,26 @@ If False, return only the computed output variables.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Array <cite>call_allele_count</cite> of allele counts with
-shape (variants, samples, alleles) and values corresponding to
-the number of non-missing occurrences of each allele.</p>
+<dd class="field-even"><p><dl class="simple">
+<dt>A dataset containing the following variables:</dt><dd><ul class="simple">
+<li><p><cite>variant_n_called</cite> (variants): The number of samples with called genotypes.</p></li>
+<li><p><cite>variant_call_rate</cite> (variants): The fraction of samples with called genotypes.</p></li>
+<li><p><cite>variant_n_het</cite> (variants): The number of samples with heterozygous calls.</p></li>
+<li><p><cite>variant_n_hom_ref</cite> (variants): The number of samples with homozygous reference calls.</p></li>
+<li><p><cite>variant_n_hom_alt</cite> (variants): The number of samples with homozygous alternate calls.</p></li>
+<li><p><cite>variant_n_non_ref</cite> (variants): The number of samples that are not homozygous reference calls.</p></li>
+<li><p><cite>variant_allele_count</cite> (variants, alleles): The number of occurrences of each allele.</p></li>
+<li><p><cite>variant_allele_total</cite> (variants): The number of occurrences of all alleles.</p></li>
+<li><p><cite>variant_allele_frequency</cite> (variants, alleles): The frequency of occurence of each allele.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Dataset</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.testing</span> <span class="kn">import</span> <span class="n">simulate_genotype_call_dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">display_genotypes</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span> 
-<span class="go">samples    S0   S1</span>
-<span class="go">variants</span>
-<span class="go">0         1/0  1/0</span>
-<span class="go">1         1/0  1/1</span>
-<span class="go">2         0/1  1/0</span>
-<span class="go">3         0/0  0/0</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">count_call_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)[</span><span class="s2">&quot;call_allele_count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
-<span class="go">array([[[1, 1],</span>
-<span class="go">        [1, 1]],</span>
-
-<span class="go">       [[1, 1],</span>
-<span class="go">        [0, 2]],</span>
-
-<span class="go">       [[1, 1],</span>
-<span class="go">        [1, 1]],</span>
-
-<span class="go">       [[2, 0],</span>
-<span class="go">        [2, 0]]], dtype=uint8)</span>
-</pre></div>
-</div>
 </dd></dl>
 
 </div>
@@ -232,10 +217,10 @@ the number of non-missing occurrences of each allele.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="sgkit.count_variant_alleles.html" class="btn btn-neutral float-right" title="sgkit.count_variant_alleles" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="sgkit.display_genotypes.html" class="btn btn-neutral float-right" title="sgkit.display_genotypes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="sgkit.read_vcfzarr.html" class="btn btn-neutral float-left" title="sgkit.read_vcfzarr" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="sgkit.regenie.html" class="btn btn-neutral float-left" title="sgkit.regenie" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
