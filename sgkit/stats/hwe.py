@@ -7,7 +7,7 @@ from numba import njit
 from numpy import ndarray
 from xarray import Dataset
 
-from sgkit.utils import merge_datasets
+from sgkit.utils import conditional_merge_datasets
 
 
 def hardy_weinberg_p_value(obs_hets: int, obs_hom1: int, obs_hom2: int) -> float:
@@ -187,4 +187,4 @@ def hardy_weinberg_test(
         obs = [da.asarray((AC == ct).sum(dim="samples")) for ct in cts]
     p = da.map_blocks(hardy_weinberg_p_value_vec_jit, *obs)
     new_ds = xr.Dataset({"variant_hwe_p_value": ("variants", p)})
-    return merge_datasets(ds, new_ds) if merge else new_ds
+    return conditional_merge_datasets(ds, new_ds, merge)

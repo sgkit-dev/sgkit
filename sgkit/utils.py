@@ -135,6 +135,11 @@ def merge_datasets(input: Dataset, output: Dataset) -> Dataset:
     return output.merge(input, compat="override")
 
 
+def conditional_merge_datasets(input: Dataset, output: Dataset, merge: bool) -> Dataset:
+    """Merge the input and output datasets only if `merge` is true, otherwise just return the output."""
+    return merge_datasets(input, output) if merge else output
+
+
 def split_array_chunks(n: int, blocks: int) -> Tuple[int, ...]:
     """Compute chunk sizes for an array split into blocks.
 

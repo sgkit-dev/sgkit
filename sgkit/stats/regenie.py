@@ -8,7 +8,7 @@ from numpy import ndarray
 from xarray import Dataset
 
 from ..typing import ArrayLike
-from ..utils import merge_datasets, split_array_chunks
+from ..utils import conditional_merge_datasets, split_array_chunks
 from .utils import (
     assert_array_shape,
     assert_block_shape,
@@ -863,4 +863,4 @@ def regenie(
         orthogonalize=orthogonalize,
         **kwargs,
     )
-    return merge_datasets(ds, new_ds) if merge else new_ds
+    return conditional_merge_datasets(ds, new_ds, merge)
