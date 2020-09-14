@@ -4,7 +4,7 @@ import dask.array as da
 import xarray as xr
 
 from sgkit.typing import ArrayLike
-from sgkit.utils import merge_datasets
+from sgkit.utils import conditional_merge_datasets
 
 
 def gramian(a: ArrayLike) -> ArrayLike:
@@ -69,10 +69,9 @@ def pc_relate(ds: xr.Dataset, maf: float = 0.01, merge: bool = True) -> xr.Datas
         The default value is 0.01. Must be between (0.0, 0.1).
     merge : bool, optional
         If True (the default), merge the input dataset and the computed
-        output variables into a single dataset. Output variables will
-        overwrite any input variables with the same name, and a warning
-        will be issued in this case.
-        If False, return only the computed output variables.
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
 
     Warnings
     --------
@@ -149,4 +148,4 @@ def pc_relate(ds: xr.Dataset, maf: float = 0.01, merge: bool = True) -> xr.Datas
     # NOTE: phi is of shape (S x S), S = num samples
     assert phi.shape == (call_g.shape[1],) * 2
     new_ds = xr.Dataset({"pc_relate_phi": (("sample_x", "sample_y"), phi)})
-    return merge_datasets(ds, new_ds) if merge else new_ds
+    return conditional_merge_datasets(ds, new_ds, merge)
