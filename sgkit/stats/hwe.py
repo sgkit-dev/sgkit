@@ -141,10 +141,9 @@ def hardy_weinberg_test(
         (in that order) across all samples for a variant.
     merge : bool, optional
         If True (the default), merge the input dataset and the computed
-        output variables into a single dataset. Output variables will
-        overwrite any input variables with the same name, and a warning
-        will be issued in this case.
-        If False, return only the computed output variables.
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
 
     Warnings
     --------
