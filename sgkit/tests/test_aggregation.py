@@ -7,6 +7,7 @@ from xarray import Dataset
 
 from sgkit.stats.aggregation import (
     count_call_alleles,
+    count_cohort_alleles,
     count_variant_alleles,
     variant_stats,
 )
@@ -207,6 +208,26 @@ def test_count_call_alleles__chunked():
     ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))  # type: ignore[arg-type]
     ac2 = count_call_alleles(ds)
     xr.testing.assert_equal(ac1, ac2)  # type: ignore[no-untyped-call]
+
+
+def test_count_cohort_alleles__multi_variant_multi_sample():
+    ds = get_dataset(
+        [
+            [[0, 0], [0, 0], [0, 0]],
+            [[0, 0], [0, 0], [0, 1]],
+            [[1, 1], [0, 1], [1, 0]],
+            [[1, 1], [1, 1], [1, 1]],
+        ]
+    )
+    ds["sample_cohort"] = xr.DataArray(np.array([0, 1, 1]), dims="samples")
+    ds = count_cohort_alleles(ds)
+    ac = ds["cohort_allele_count"]
+    np.testing.assert_equal(
+        ac,
+        np.array(
+            [[[2, 0], [4, 0]], [[2, 0], [3, 1]], [[0, 2], [2, 2]], [[0, 2], [0, 4]]]
+        ),
+    )
 
 
 @pytest.mark.parametrize("precompute_variant_allele_count", [False, True])
