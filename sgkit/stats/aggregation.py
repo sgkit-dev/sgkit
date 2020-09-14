@@ -61,10 +61,9 @@ def count_call_alleles(ds: Dataset, merge: bool = True) -> Dataset:
         `sgkit.create_genotype_call_dataset`.
     merge : bool, optional
         If True (the default), merge the input dataset and the computed
-        output variables into a single dataset. Output variables will
-        overwrite any input variables with the same name, and a warning
-        will be issued in this case.
-        If False, return only the computed output variables.
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
 
     Returns
     -------
@@ -127,10 +126,9 @@ def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
         `sgkit.create_genotype_call_dataset`.
     merge : bool, optional
         If True (the default), merge the input dataset and the computed
-        output variables into a single dataset. Output variables will
-        overwrite any input variables with the same name, and a warning
-        will be issued in this case.
-        If False, return only the computed output variables.
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
 
     Returns
     -------
@@ -229,10 +227,9 @@ def variant_stats(ds: Dataset, merge: bool = True) -> Dataset:
         `sgkit.create_genotype_call_dataset`.
     merge : bool, optional
         If True (the default), merge the input dataset and the computed
-        output variables into a single dataset. Output variables will
-        overwrite any input variables with the same name, and a warning
-        will be issued in this case.
-        If False, return only the computed output variables.
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
 
     Returns
     -------

@@ -6,6 +6,7 @@ sgkit: Statistical genetics toolkit in Python
    :caption: Contents:
 
    api
+   usage
    contributing
 
 
