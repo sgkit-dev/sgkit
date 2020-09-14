@@ -40,9 +40,9 @@ def index_array_blocks(
     Examples
     --------
     >>> from sgkit.stats.regenie import index_array_blocks
-    >>> index_array_blocks([0, 0, 0], 2)
+    >>> index_array_blocks([0, 0, 0], 2) # doctest: +SKIP
     (array([0, 2]), array([2, 1]))
-    >>> index_array_blocks([0, 0, 1, 1, 1], 2)
+    >>> index_array_blocks([0, 0, 1, 1, 1], 2) # doctest: +SKIP
     (array([0, 2, 4]), array([2, 2, 1]))
 
     Returns
@@ -98,7 +98,7 @@ def index_block_sizes(
     Examples
     --------
     >>> from sgkit.stats.regenie import index_block_sizes
-    >>> index_block_sizes([3, 4, 5])
+    >>> index_block_sizes([3, 4, 5]) # doctest: +SKIP
     (array([0, 3, 7]), array([3, 4, 5]))
 
     Returns

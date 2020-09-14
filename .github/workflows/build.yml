@@ -5,32 +5,44 @@ on: [push, pull_request]
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest]
         python-version: [3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+    - name: Set up Miniconda with Python version ${{ matrix.python-version }}
+      uses: goanpeca/setup-miniconda@v1
       with:
+        auto-update-conda: true
+        channels: conda-forge
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
+      shell: bash -l {0}
       run: |
-        sudo apt install libgsl-dev   # Needed for msprime < 1.0. Binary wheels include GSL for >= 1.0
-        python -m pip install --upgrade pip
+        conda install msprime
         pip install -r requirements.txt -r requirements-dev.txt
     - name: Run pre-commit
-      uses: pre-commit/action@v2.0.0
+      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7'
+      shell: bash -l {0}
+      run: |
+        pre-commit install
+        pre-commit run --all-files
     - name: Check for Sphinx doc warnings
+      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7'
+      shell: bash -l {0}
       run: |
         cd docs
         make html SPHINXOPTS="-W --keep-going"
     - name: Test with pytest and coverage
+      shell: bash -l {0}
       run: |
         pytest -v --cov=sgkit --cov-report=term-missing
     - name: Upload coverage to Codecov
+      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8'
+      shell: bash -l {0}
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |

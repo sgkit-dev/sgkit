@@ -151,7 +151,7 @@ def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
     2         0/1  1/0
     3         0/0  0/0
 
-    >>> sg.count_variant_alleles(ds)["variant_allele_count"].values # doctest: +NORMALIZE_WHITESPACE
+    >>> sg.count_variant_alleles(ds)["variant_allele_count"].values # doctest: +SKIP
     array([[2, 2],
            [1, 3],
            [2, 2],
