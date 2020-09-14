@@ -8,7 +8,7 @@ from dask.array import Array, stats
 from xarray import Dataset
 
 from ..typing import ArrayLike
-from ..utils import merge_datasets
+from ..utils import conditional_merge_datasets
 from .utils import concat_2d
 
 
@@ -218,4 +218,4 @@ def gwas_linear_regression(
             "variant_p_value": (("variants", "traits"), res.p_value),
         }
     )
-    return merge_datasets(ds, new_ds) if merge else new_ds
+    return conditional_merge_datasets(ds, new_ds, merge)
