@@ -11,11 +11,6 @@ pull_request_rules:
       merge:
         strict: smart+fasttrack
         method: rebase
-  - name: remove outdated reviews
-    conditions:
-      - base=master
-    actions:
-      dismiss_reviews: {}
   - name: deleting merged branch
     conditions:
       - merged
