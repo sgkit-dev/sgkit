@@ -6,6 +6,7 @@ pytest-cov
 pytest-datadir
 pytest-mock
 hypothesis
+scikit-allel
 statsmodels
 zarr
 msprime
@@ -18,3 +19,4 @@ git+https://github.com/pangeo-data/rechunker.git
 cbgen
 cyvcf2; platform_system != "Windows"
 yarl
+matplotlib

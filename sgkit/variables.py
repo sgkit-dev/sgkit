@@ -247,6 +247,41 @@ sample_pcs, sample_pcs_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("sample_pcs", ndim=2, kind="f")
 )
 """Sample PCs (PCxS)."""
+sample_pca_component, sample_pca_component_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_pca_component", ndim=2, kind="f")
+)
+"""Principal axes defined as eigenvectors for sample covariance matrix.
+In the context of SVD, these are equivalent to the right singular vectors in
+the decomposition of a (N, M) matrix., i.e. ``dask_ml.decomposition.TruncatedSVD.components_``."""
+(
+    sample_pca_explained_variance,
+    sample_pca_explained_variance_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_pca_explained_variance", ndim=1, kind="f")
+)
+"""Variance explained by each principal component. These values are equivalent
+to eigenvalues that result from the eigendecomposition of a (N, M) matrix,
+i.e. ``dask_ml.decomposition.TruncatedSVD.explained_variance_``."""
+(
+    sample_pca_explained_variance_ratio,
+    sample_pca_explained_variance_ratio_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_pca_explained_variance_ratio", ndim=1, kind="f")
+)
+"""Ratio of variance explained to total variance for each principal component,
+i.e. ``dask_ml.decomposition.TruncatedSVD.explained_variance_ratio_``."""
+sample_pca_loading, sample_pca_loading_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_pca_loading", ndim=2, kind="f")
+)
+"""PCA loadings defined as principal axes scaled by square root of eigenvalues.
+These values  can also be interpreted  as the correlation between the original variables
+and unit-scaled principal axes."""
+sample_pca_projection, sample_pca_projection_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_pca_projection", ndim=2, kind="f")
+)
+"""Projection of samples onto principal axes. This array is commonly
+referred to as "scores" or simply "principal components (PCs)" for a set of samples."""
+
 stat_Fst, stat_Fst_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("stat_Fst", ndim=2, kind="f")
 )

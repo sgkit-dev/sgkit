@@ -26,4 +26,4 @@ repos:
     hooks:
       - id: mypy
         args: ["--strict", "--show-error-codes"]
-        additional_dependencies: ["numpy", "xarray", "dask[array]", "scipy", "typing-extensions", "zarr", "numba"]
+        additional_dependencies: ["numpy", "xarray", "dask[array]", "scipy", "typing-extensions", "zarr", "numba", "dask-ml"]
