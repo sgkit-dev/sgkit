@@ -8,6 +8,7 @@ from dask.array import Array, stats
 from xarray import Dataset
 
 from ..typing import ArrayLike
+from ..utils import conditional_merge_datasets
 from .utils import concat_2d
 
 
@@ -116,6 +117,7 @@ def gwas_linear_regression(
     covariates: Union[str, Sequence[str]],
     traits: Union[str, Sequence[str]],
     add_intercept: bool = True,
+    merge: bool = True,
 ) -> Dataset:
     """Run linear regression to identify continuous trait associations with genetic variants.
 
@@ -148,6 +150,11 @@ def gwas_linear_regression(
         and concatenated to any 1D traits along the second axis (columns).
     add_intercept : bool, optional
         Add intercept term to covariate set, by default True.
+    merge : bool, optional
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
 
     Warnings
     --------
@@ -203,10 +210,11 @@ def gwas_linear_regression(
     Y = Y.rechunk((None, -1))
 
     res = linear_regression(G.T, X, Y)
-    return xr.Dataset(
+    new_ds = xr.Dataset(
         {
             "variant_beta": (("variants", "traits"), res.beta),
             "variant_t_value": (("variants", "traits"), res.t_value),
             "variant_p_value": (("variants", "traits"), res.p_value),
         }
     )
+    return conditional_merge_datasets(ds, new_ds, merge)

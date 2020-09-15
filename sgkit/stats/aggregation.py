@@ -8,7 +8,7 @@ from typing_extensions import Literal
 from xarray import Dataset
 
 from sgkit.typing import ArrayLike
-from sgkit.utils import merge_datasets
+from sgkit.utils import conditional_merge_datasets
 
 Dimension = Literal["samples", "variants"]
 
@@ -61,10 +61,9 @@ def count_call_alleles(ds: Dataset, merge: bool = True) -> Dataset:
         `sgkit.create_genotype_call_dataset`.
     merge : bool, optional
         If True (the default), merge the input dataset and the computed
-        output variables into a single dataset. Output variables will
-        overwrite any input variables with the same name, and a warning
-        will be issued in this case.
-        If False, return only the computed output variables.
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
 
     Returns
     -------
@@ -114,7 +113,7 @@ def count_call_alleles(ds: Dataset, merge: bool = True) -> Dataset:
             )
         }
     )
-    return merge_datasets(ds, new_ds) if merge else new_ds
+    return conditional_merge_datasets(ds, new_ds, merge)
 
 
 def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
@@ -127,10 +126,9 @@ def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
         `sgkit.create_genotype_call_dataset`.
     merge : bool, optional
         If True (the default), merge the input dataset and the computed
-        output variables into a single dataset. Output variables will
-        overwrite any input variables with the same name, and a warning
-        will be issued in this case.
-        If False, return only the computed output variables.
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
 
     Returns
     -------
@@ -167,7 +165,7 @@ def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
             )
         }
     )
-    return merge_datasets(ds, new_ds) if merge else new_ds
+    return conditional_merge_datasets(ds, new_ds, merge)
 
 
 def _swap(dim: Dimension) -> Dimension:
@@ -229,10 +227,9 @@ def variant_stats(ds: Dataset, merge: bool = True) -> Dataset:
         `sgkit.create_genotype_call_dataset`.
     merge : bool, optional
         If True (the default), merge the input dataset and the computed
-        output variables into a single dataset. Output variables will
-        overwrite any input variables with the same name, and a warning
-        will be issued in this case.
-        If False, return only the computed output variables.
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
 
     Returns
     -------
@@ -255,4 +252,4 @@ def variant_stats(ds: Dataset, merge: bool = True) -> Dataset:
             allele_frequency(ds),
         ]
     )
-    return merge_datasets(ds, new_ds) if merge else new_ds
+    return conditional_merge_datasets(ds, new_ds, merge)

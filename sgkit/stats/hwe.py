@@ -7,6 +7,8 @@ from numba import njit
 from numpy import ndarray
 from xarray import Dataset
 
+from sgkit.utils import conditional_merge_datasets
+
 
 def hardy_weinberg_p_value(obs_hets: int, obs_hom1: int, obs_hom2: int) -> float:
     """Exact test for HWE as described in Wigginton et al. 2005 [1].
@@ -122,7 +124,7 @@ hardy_weinberg_p_value_vec_jit = njit(
 
 
 def hardy_weinberg_test(
-    ds: Dataset, genotype_counts: Optional[Hashable] = None
+    ds: Dataset, genotype_counts: Optional[Hashable] = None, merge: bool = True,
 ) -> Dataset:
     """Exact test for HWE as described in Wigginton et al. 2005 [1].
 
@@ -137,6 +139,11 @@ def hardy_weinberg_test(
         where `N` is equal to the number of variants and the 3 columns contain
         heterozygous, homozygous reference, and homozygous alternate counts
         (in that order) across all samples for a variant.
+    merge : bool, optional
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
 
     Warnings
     --------
@@ -178,4 +185,5 @@ def hardy_weinberg_test(
         cts = [1, 0, 2]  # arg order: hets, hom1, hom2
         obs = [da.asarray((AC == ct).sum(dim="samples")) for ct in cts]
     p = da.map_blocks(hardy_weinberg_p_value_vec_jit, *obs)
-    return xr.Dataset({"variant_hwe_p_value": ("variants", p)})
+    new_ds = xr.Dataset({"variant_hwe_p_value": ("variants", p)})
+    return conditional_merge_datasets(ds, new_ds, merge)
