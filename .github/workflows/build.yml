@@ -1,4 +1,4 @@
-name: Check code standards and run tests
+name: Build
 
 on: [push, pull_request]
 
