@@ -56,10 +56,11 @@ def count_call_alleles(ds: Dataset, merge: bool = True) -> Dataset:
 
     Parameters
     ----------
-    ds : Dataset
+    ds
         Genotype call dataset such as from
         `sgkit.create_genotype_call_dataset`.
-    merge : bool, optional
+    merge
+        (optional)
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
         the computed output variables.
@@ -67,10 +68,9 @@ def count_call_alleles(ds: Dataset, merge: bool = True) -> Dataset:
 
     Returns
     -------
-    Dataset
-        Array `call_allele_count` of allele counts with
-        shape (variants, samples, alleles) and values corresponding to
-        the number of non-missing occurrences of each allele.
+    Array `call_allele_count` of allele counts with
+    shape (variants, samples, alleles) and values corresponding to
+    the number of non-missing occurrences of each allele.
 
     Examples
     --------
@@ -121,10 +121,10 @@ def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
 
     Parameters
     ----------
-    ds : Dataset
+    ds
         Genotype call dataset such as from
         `sgkit.create_genotype_call_dataset`.
-    merge : bool, optional
+    merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
         the computed output variables.
@@ -132,10 +132,9 @@ def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
 
     Returns
     -------
-    Dataset
-        Array `variant_allele_count` of allele counts with
-        shape (variants, alleles) and values corresponding to
-        the number of non-missing occurrences of each allele.
+    Array `variant_allele_count` of allele counts with
+    shape (variants, alleles) and values corresponding to
+    the number of non-missing occurrences of each allele.
 
     Examples
     --------
@@ -222,10 +221,10 @@ def variant_stats(ds: Dataset, merge: bool = True) -> Dataset:
 
     Parameters
     ----------
-    ds : Dataset
+    ds
         Genotype call dataset such as from
         `sgkit.create_genotype_call_dataset`.
-    merge : bool, optional
+    merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
         the computed output variables.
@@ -233,17 +232,17 @@ def variant_stats(ds: Dataset, merge: bool = True) -> Dataset:
 
     Returns
     -------
-    Dataset
-        A dataset containing the following variables:
-            - `variant_n_called` (variants): The number of samples with called genotypes.
-            - `variant_call_rate` (variants): The fraction of samples with called genotypes.
-            - `variant_n_het` (variants): The number of samples with heterozygous calls.
-            - `variant_n_hom_ref` (variants): The number of samples with homozygous reference calls.
-            - `variant_n_hom_alt` (variants): The number of samples with homozygous alternate calls.
-            - `variant_n_non_ref` (variants): The number of samples that are not homozygous reference calls.
-            - `variant_allele_count` (variants, alleles): The number of occurrences of each allele.
-            - `variant_allele_total` (variants): The number of occurrences of all alleles.
-            - `variant_allele_frequency` (variants, alleles): The frequency of occurence of each allele.
+    A dataset containing the following variables:
+
+    - `variant_n_called` (variants): The number of samples with called genotypes.
+    - `variant_call_rate` (variants): The fraction of samples with called genotypes.
+    - `variant_n_het` (variants): The number of samples with heterozygous calls.
+    - `variant_n_hom_ref` (variants): The number of samples with homozygous reference calls.
+    - `variant_n_hom_alt` (variants): The number of samples with homozygous alternate calls.
+    - `variant_n_non_ref` (variants): The number of samples that are not homozygous reference calls.
+    - `variant_allele_count` (variants, alleles): The number of occurrences of each allele.
+    - `variant_allele_total` (variants): The number of occurrences of all alleles.
+    - `variant_allele_frequency` (variants, alleles): The frequency of occurence of each allele.
     """
     new_ds = xr.merge(
         [
