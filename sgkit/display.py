@@ -140,22 +140,21 @@ def display_genotypes(
 
     Parameters
     ----------
-    ds : Dataset
+    ds
         The dataset containing genotype calls in the `call/genotype`
         variable, and (optionally) phasing information in the
         `call/genotype_phased` variable. If no phasing information is
         present genotypes are assumed to be unphased.
-    max_variants : int
+    max_variants
         The maximum number of variants (rows) to display. If there are
         more variants than this then the table is truncated.
-    max_samples : int
+    max_samples
         The maximum number of samples (columns) to display. If there are
         more samples than this then the table is truncated.
 
     Returns
     -------
-    GenotypeDisplay
-        A printable object to display genotype information.
+    A printable object to display genotype information.
     """
 
     # Create a copy to avoid clobbering original indexes
