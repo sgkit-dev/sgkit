@@ -27,15 +27,15 @@ def linear_regression(
     Parameters
     ----------
     XL
-        array-like (M, N)
+        (M, N) array-like
         "Loop" covariates for which N separate regressions will be run
     XC
-        array-like (M, P)
+        (M, P) array-like
         "Core" covariates included in the regressions for each loop
         covariate. All P core covariates are used in each of the N
         loop covariate regressions.
     Y
-        array-like (M, O)
+        (M, O) array-like
         Continuous outcomes
 
     Returns

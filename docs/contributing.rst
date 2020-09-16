@@ -249,7 +249,7 @@ You can build the documentation locally with ``make``::
 
 The resulting HTML files end up in the ``_build/html`` directory.
 
-You can now make edits to rst files and run ``make html`` again to update
+You can now make edits to ``.rst`` files and run ``make html`` again to update
 the affected pages.
 
 The documentation build is checked by CI to ensure that it builds

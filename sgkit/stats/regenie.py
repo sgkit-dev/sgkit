@@ -610,16 +610,16 @@ def regenie_transform(
     Parameters
     ----------
     G
-        ArrayLike (M, N)
+        (M, N) ArrayLike
         Genotype data array, `M` samples by `N` variants.
     X
-        ArrayLike (M, C)
+        (M, C) ArrayLike
         Covariate array, `M` samples by `C` covariates.
     Y
-        ArrayLike (M, O)
+        (M, O) ArrayLike
         Outcome array, `M` samples by `O` outcomes.
     contigs
-        ArrayLike (N,)
+        (N,) ArrayLike
         Variant contigs as monotonic increasting integer contig index.
 
     See the `regenie` function for documentation on remaining fields.
