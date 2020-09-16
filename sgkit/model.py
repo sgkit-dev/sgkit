@@ -16,39 +16,42 @@ DIM_GENOTYPE = "genotypes"
 def create_genotype_call_dataset(
     *,
     variant_contig_names: List[str],
-    variant_contig: Any,
-    variant_position: Any,
-    variant_alleles: Any,
-    sample_id: Any,
-    call_genotype: Any,
-    call_genotype_phased: Any = None,
-    variant_id: Any = None,
+    variant_contig: ArrayLike,
+    variant_position: ArrayLike,
+    variant_alleles: ArrayLike,
+    sample_id: ArrayLike,
+    call_genotype: ArrayLike,
+    call_genotype_phased: Optional[ArrayLike] = None,
+    variant_id: Optional[ArrayLike] = None,
 ) -> xr.Dataset:
-    """
-    Create a dataset of genotype calls.
+    """Create a dataset of genotype calls.
 
     Parameters
     ----------
     variant_contig_names
-        list of str The contig names.
+        The contig names.
     variant_contig
-        array_like, int The (index of the) contig for each variant.
+        array_like (element type: int).
+        The (index of the) contig for each variant.
     variant_position
-        array_like, int The reference position of the variant.
+        array_like (element type: int)
+        The reference position of the variant.
     variant_alleles
         array_like, zero-terminated bytes, e.g. "S1", or object
         The possible alleles for the variant.
     sample_id
-        array_like, str or object The unique identifier of the sample.
+        array_like (element type: str or object)
+        The unique identifier of the sample.
     call_genotype
-        array_like, int Genotype, encoded as allele values
+        array_like (element type: int) Genotype, encoded as allele values
         (0 for the reference, 1 for the first allele, 2 for the second allele),
         or -1 to indicate a missing value.
     call_genotype_phased
-        array_like, bool, optional A flag for each call indicating if it is
+        array_like (element type: bool), optional A flag for each call indicating if it is
         phased or not. If omitted all calls are unphased.
     variant_id
-        array_like, str or object, optional. The unique identifier of the variant.
+        array_like (element type: str or object), optional.
+        The unique identifier of the variant.
 
     Returns
     -------

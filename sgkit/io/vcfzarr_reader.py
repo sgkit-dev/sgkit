@@ -24,12 +24,12 @@ def read_vcfzarr(path: PathType) -> xr.Dataset:
 
     Parameters
     ----------
-    path : PathType
+    path
         Path to the Zarr file.
 
     Returns
     -------
-    xr.Dataset
+    :class:`xarray.Dataset`
         The dataset of genotype calls, created using `create_genotype_call_dataset`.
     """
 
