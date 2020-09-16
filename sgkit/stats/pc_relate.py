@@ -56,18 +56,18 @@ def pc_relate(ds: xr.Dataset, maf: float = 0.01, merge: bool = True) -> xr.Datas
 
     Parameters
     ----------
-    ds : Dataset
+    ds
         Dataset containing (S = num samples, V = num variants, D = ploidy, PC = num PC)
 
         - genotype calls: "call_genotype" (SxVxD)
         - genotype calls mask: "call_genotype_mask" (SxVxD)
         - sample PCs: "sample_pcs" (PCxS)
-    maf : float
+    maf
         individual minor allele frequency filter. If an individual's estimated
         individual-specific minor allele frequency at a SNP is less than this value,
         that SNP will be excluded from the analysis for that individual.
         The default value is 0.01. Must be between (0.0, 0.1).
-    merge : bool, optional
+    merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
         the computed output variables.
@@ -79,7 +79,6 @@ def pc_relate(ds: xr.Dataset, maf: float = 0.01, merge: bool = True) -> xr.Datas
 
     Returns
     -------
-    Dataset
         Dataset containing (S = num samples):
         pc_relate_phi: (S,S) ArrayLike
         pairwise recent kinship coefficient matrix as float in [-0.5, 0.5].

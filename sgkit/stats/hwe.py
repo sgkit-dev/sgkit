@@ -130,16 +130,16 @@ def hardy_weinberg_test(
 
     Parameters
     ----------
-    ds : Dataset
+    ds
         Dataset containing genotype calls or precomputed genotype counts.
-    genotype_counts : Optional[Hashable], optional
+    genotype_counts
         Name of variable containing precomputed genotype counts, by default
         None. If not provided, these counts will be computed automatically
         from genotype calls. If present, must correspond to an (`N`, 3) array
         where `N` is equal to the number of variants and the 3 columns contain
         heterozygous, homozygous reference, and homozygous alternate counts
         (in that order) across all samples for a variant.
-    merge : bool, optional
+    merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
         the computed output variables.
@@ -151,7 +151,6 @@ def hardy_weinberg_test(
 
     Returns
     -------
-    Dataset
         Dataset containing (N = num variants):
         variant_hwe_p_value : (N,) ArrayLike
         P values from HWE test for each variant as float in [0, 1].

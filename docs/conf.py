@@ -12,11 +12,15 @@
 #
 import os
 import sys
+from pathlib import Path
 
 sys.path.insert(0, os.path.abspath(".."))
 
 print("python exec:", sys.executable)
 print("sys.path:", sys.path)
+
+HERE = Path(__file__).parent
+sys.path[:0] = [str(HERE.parent), str(HERE / "extensions")]
 
 import sgkit  # noqa: F401 isort:skip
 
@@ -41,6 +45,7 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
     "scanpydoc",
+    *[p.stem for p in (HERE / "extensions").glob("*.py")],
 ]
 
 # Add any paths that contain templates here, relative to this directory.

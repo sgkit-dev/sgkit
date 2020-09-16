@@ -24,15 +24,14 @@ def diversity(
 
     Parameters
     ----------
-    ds : Dataset
+    ds
         Genotype call dataset.
-    allele_counts : Hashable
+    allele_counts
         allele counts to use or calculate.
 
     Returns
     -------
-    DataArray
-        diversity value.
+    diversity value.
     """
     if len(ds.samples) < 2:
         return xr.DataArray(np.nan)
@@ -56,17 +55,16 @@ def divergence(
 
     Parameters
     ----------
-    ds1 : Dataset
+    ds1
         Genotype call dataset.
-    ds2 : Dataset
+    ds2
         Genotype call dataset.
-    allele_counts : Hashable
+    allele_counts
         allele counts to use or calculate.
 
     Returns
     -------
-    DataArray
-         divergence value between the two datasets.
+    divergence value between the two datasets.
     """
     if allele_counts not in ds1:
         ds1_new = count_variant_alleles(ds1)
@@ -95,17 +93,16 @@ def Fst(
 
     Parameters
     ----------
-    ds1 : Dataset
+    ds1
         Genotype call dataset.
-    ds2 : Dataset
+    ds2
         Genotype call dataset.
-    allele_counts : Hashable
+    allele_counts
         allele counts to use or calculate.
 
     Returns
     -------
-    DataArray
-         fst value between the two datasets.
+    fst value between the two datasets.
     """
     total_div = diversity(ds1) + diversity(ds2)
     gs = divergence(ds1, ds2)
@@ -121,15 +118,15 @@ def Tajimas_D(
 
     Parameters
     ----------
-    ds : Dataset
+    ds
         Genotype call dataset.
-    allele_counts : Hashable
+    allele_counts
         allele counts to use or calculate.
 
     Returns
     -------
-    DataArray
-         Tajimas' D value.
+    Tajimas' D value.
+
     """
     if allele_counts not in ds:
         ds_new = count_variant_alleles(ds)

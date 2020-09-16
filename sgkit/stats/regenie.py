@@ -747,20 +747,20 @@ def regenie(
 
     Parameters
     ----------
-    dosage : str
+    dosage
         Name of genetic dosage variable.
-    covariates : Union[str, Sequence[str]]
+    covariates
         Names of covariate variables (1D or 2D).
-    traits : Union[str, Sequence[str]]
+    traits
         Names of trait variables (1D or 2D).
-    variant_block_size : Optional[Union[int, Tuple[int]]], optional
+    variant_block_size
         Number of variants in each block.
         If int, this describes the number of variants in each block
         but the last which may be smaller.
         If Tuple[int, ...], this must describe the desired number of
         variants in each block individually.
         Defaults to 1000 or num variants // 2, whichever is smaller.
-    sample_block_size : Optional[Union[int, Tuple[int]]], optional
+    sample_block_size
         Number of samples in each block.
         If int, this describes the number of samples in each block
         but the last which may be smaller.
@@ -768,19 +768,19 @@ def regenie(
         samples in each block individually.
         Defaults to 10 sample blocks split roughly across all possible
         samples or the number of samples, if that number is < 10.
-    alphas : Optional[Sequence[float]], optional
+    alphas
         List of alpha values to use for regularization, by default None.
         If not provided, these will be set automatically based on
         datasize and apriori heritability assumptions.
-    add_intercept : bool
+    add_intercept
         Whether or not to add intercept to covariates, by default True.
-    normalize : bool
+    normalize
         Rescale genotypes, traits, and covariates to have
         mean 0 and stdev 1, by default False.
-    orthogonalize : bool
+    orthogonalize
         **Experimental**: Remove covariates through orthogonalization
         of genotypes and traits, by default False.
-    merge : bool, optional
+    merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
         the computed output variables.
@@ -793,7 +793,6 @@ def regenie(
 
     Returns
     -------
-    Dataset
         A dataset containing the following variables:
         - `base_prediction` (blocks, alphas, samples, outcomes): Stage 1
         predictions from ridge regression reduction .
