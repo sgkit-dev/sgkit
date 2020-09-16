@@ -165,6 +165,8 @@ Docstrings
 
 User facing functions should follow the numpydoc_ standard, including
 sections for ``Parameters``, ``Examples``, and general explanatory prose.
+A reference for the same should be added in the API documentation file
+``docs/api.rst``, which makes them accessible on the user documentation page.
 
 By default, examples will be doc-tested.  Reproducible examples in documentation
 is valuable both for testing and, more importantly, for communication of common
