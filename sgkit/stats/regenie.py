@@ -798,15 +798,18 @@ def regenie(
     Returns
     -------
     A dataset containing the following variables:
+
     - `base_prediction` (blocks, alphas, samples, outcomes): Stage 1
-    predictions from ridge regression reduction .
+        predictions from ridge regression reduction .
+
     - `meta_prediction` (samples, outcomes): Stage 2 predictions from
-    the best meta estimator trained on the out-of-sample Stage 1
-    predictions.
+        the best meta estimator trained on the out-of-sample Stage 1
+        predictions.
+
     - `loco_prediction` (contigs, samples, outcomes): LOCO predictions
-    resulting from Stage 2 predictions ignoring effects for variant
-    blocks on held out contigs. This will be absent if the
-    data provided does not contain at least 2 contigs.
+        resulting from Stage 2 predictions ignoring effects for variant
+        blocks on held out contigs. This will be absent if the
+        data provided does not contain at least 2 contigs.
 
     Raises
     ------

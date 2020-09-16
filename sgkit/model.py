@@ -55,8 +55,7 @@ def create_genotype_call_dataset(
 
     Returns
     -------
-    :class:`xarray.Dataset`
-        The dataset of genotype calls.
+    The dataset of genotype calls.
     """
     check_array_like(variant_contig, kind="i", ndim=1)
     check_array_like(variant_position, kind="i", ndim=1)
@@ -130,8 +129,7 @@ def create_genotype_dosage_dataset(
 
     Returns
     -------
-    :class:`xarray.Dataset`
-        The dataset of genotype calls.
+    The dataset of genotype calls.
 
     """
     check_array_like(variant_contig, kind="i", ndim=1)

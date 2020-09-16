@@ -29,8 +29,7 @@ def read_vcfzarr(path: PathType) -> xr.Dataset:
 
     Returns
     -------
-    :class:`xarray.Dataset`
-        The dataset of genotype calls, created using `create_genotype_call_dataset`.
+    The dataset of genotype calls, created using `create_genotype_call_dataset`.
     """
 
     vcfzarr = zarr.open_group(str(path), mode="r")
