@@ -26,25 +26,28 @@ def linear_regression(
 
     Parameters
     ----------
-    XL : (M, N) array-like
+    XL
+        array-like (M, N)
         "Loop" covariates for which N separate regressions will be run
-    XC : (M, P) array-like
+    XC
+        array-like (M, P)
         "Core" covariates included in the regressions for each loop
         covariate. All P core covariates are used in each of the N
         loop covariate regressions.
-    Y : (M, O)
+    Y
+        array-like (M, O)
         Continuous outcomes
 
     Returns
     -------
-    LinearRegressionResult
-        Dataclass containing:
-        beta : (N, O) array-like
-            Beta values associated with each loop covariate and outcome
-        t_value : (N, O) array-like
-            T statistics for each beta
-        p_value : (N, O) array-like
-            P values as float in [0, 1]
+    Dataclass containing:
+
+    beta : (N, O) array-like
+        Beta values associated with each loop covariate and outcome
+    t_value : (N, O) array-like
+        T statistics for each beta
+    p_value : (N, O) array-like
+        P values as float in [0, 1]
     """
     XL, XC = da.asarray(XL), da.asarray(XC)  # Coerce for `lstsq`
     if set([x.ndim for x in [XL, XC, Y]]) != {2}:
@@ -130,27 +133,27 @@ def gwas_linear_regression(
 
     Parameters
     ----------
-    ds : Dataset
+    ds
         Dataset containing necessary dependent and independent variables.
-    dosage : str
+    dosage
         Dosage variable name where "dosage" array can contain represent
         one of several possible quantities, e.g.:
         - Alternate allele counts
         - Recessive or dominant allele encodings
         - True dosages as computed from imputed or probabilistic variant calls
         - Any other custom encoding in a user-defined variable
-    covariates : Union[str, Sequence[str]]
+    covariates
         Covariate variable names, must correspond to 1 or 2D dataset
         variables of shape (samples[, covariates]). All covariate arrays
         will be concatenated along the second axis (columns).
-    traits : Union[str, Sequence[str]]
+    traits
         Trait (e.g. phenotype) variable names, must all be continuous and
         correspond to 1 or 2D dataset variables of shape (samples[, traits]).
         2D trait arrays will be assumed to contain separate traits within columns
         and concatenated to any 1D traits along the second axis (columns).
-    add_intercept : bool, optional
+    add_intercept
         Add intercept term to covariate set, by default True.
-    merge : bool, optional
+    merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
         the computed output variables.

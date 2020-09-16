@@ -29,12 +29,12 @@ def index_array_blocks(
 
     Parameters
     ----------
-    x : Union[ArrayLike, Sequence[int]]
+    x
         Vector of group assignments, must be monotonic increasing.
         Resulting blocks will never cross these group assignments
         and the resulting `index` and `sizes` values constitute
         covering slices for any array of the same size as `x`.
-    size : int
+    size
         Maximum block size.
 
     Examples
@@ -92,7 +92,7 @@ def index_block_sizes(
 
     Parameters
     ----------
-    sizes : Union[ArrayLike, Sequence[int]]
+    sizes
         Block sizes to generate indexes for.
 
     Examples
@@ -609,30 +609,34 @@ def regenie_transform(
 
     Parameters
     ----------
-    G : (M, N) ArrayLike
+    G
+        ArrayLike (M, N)
         Genotype data array, `M` samples by `N` variants.
-    X : (M, C) ArrayLike
+    X
+        ArrayLike (M, C)
         Covariate array, `M` samples by `C` covariates.
-    Y : (M, O) ArrayLike
+    Y
+        ArrayLike (M, O)
         Outcome array, `M` samples by `O` outcomes.
-    contigs : (N,) ArrayLike
+    contigs
+        ArrayLike (N,)
         Variant contigs as monotonic increasting integer contig index.
 
     See the `regenie` function for documentation on remaining fields.
 
     Returns
     -------
-    Dataset
-        A dataset containing the following variables:
-        - `base_prediction` (blocks, alphas, samples, outcomes): Stage 1
-            predictions from ridge regression reduction .
-        - `meta_prediction` (samples, outcomes): Stage 2 predictions from
-            the best meta estimator trained on the out-of-sample Stage 1
-            predictions.
-        - `loco_prediction` (contigs, samples, outcomes): LOCO predictions
-            resulting from Stage 2 predictions ignoring effects for variant
-            blocks on held out contigs. This will be absent if the
-            data provided does not contain at least 2 contigs.
+    A dataset containing the following variables:
+
+    - `base_prediction` (blocks, alphas, samples, outcomes): Stage 1
+        predictions from ridge regression reduction .
+    - `meta_prediction` (samples, outcomes): Stage 2 predictions from
+        the best meta estimator trained on the out-of-sample Stage 1
+        predictions.
+    - `loco_prediction` (contigs, samples, outcomes): LOCO predictions
+        resulting from Stage 2 predictions ignoring effects for variant
+        blocks on held out contigs. This will be absent if the
+        data provided does not contain at least 2 contigs.
 
     Raises
     ------
@@ -793,16 +797,16 @@ def regenie(
 
     Returns
     -------
-        A dataset containing the following variables:
-        - `base_prediction` (blocks, alphas, samples, outcomes): Stage 1
-        predictions from ridge regression reduction .
-        - `meta_prediction` (samples, outcomes): Stage 2 predictions from
-        the best meta estimator trained on the out-of-sample Stage 1
-        predictions.
-        - `loco_prediction` (contigs, samples, outcomes): LOCO predictions
-        resulting from Stage 2 predictions ignoring effects for variant
-        blocks on held out contigs. This will be absent if the
-        data provided does not contain at least 2 contigs.
+    A dataset containing the following variables:
+    - `base_prediction` (blocks, alphas, samples, outcomes): Stage 1
+    predictions from ridge regression reduction .
+    - `meta_prediction` (samples, outcomes): Stage 2 predictions from
+    the best meta estimator trained on the out-of-sample Stage 1
+    predictions.
+    - `loco_prediction` (contigs, samples, outcomes): LOCO predictions
+    resulting from Stage 2 predictions ignoring effects for variant
+    blocks on held out contigs. This will be absent if the
+    data provided does not contain at least 2 contigs.
 
     Raises
     ------

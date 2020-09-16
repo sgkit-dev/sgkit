@@ -79,9 +79,9 @@ def pc_relate(ds: xr.Dataset, maf: float = 0.01, merge: bool = True) -> xr.Datas
 
     Returns
     -------
-        Dataset containing (S = num samples):
-        pc_relate_phi: (S,S) ArrayLike
-        pairwise recent kinship coefficient matrix as float in [-0.5, 0.5].
+    Dataset containing (S = num samples):
+    pc_relate_phi: (S,S) ArrayLike
+    pairwise recent kinship coefficient matrix as float in [-0.5, 0.5].
 
     References
     ----------

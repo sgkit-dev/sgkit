@@ -15,17 +15,16 @@ def hardy_weinberg_p_value(obs_hets: int, obs_hom1: int, obs_hom2: int) -> float
 
     Parameters
     ----------
-    obs_hets : int
+    obs_hets
         Number of heterozygotes with minor variant.
-    obs_hom1 : int
+    obs_hom1
         Number of reference/major homozygotes.
-    obs_hom2 : int
+    obs_hom2
         Number of alternate/minor homozygotes.
 
     Returns
     -------
-    float
-        P value in [0, 1]
+    P value in [0, 1]
 
     References
     ----------
@@ -151,9 +150,9 @@ def hardy_weinberg_test(
 
     Returns
     -------
-        Dataset containing (N = num variants):
-        variant_hwe_p_value : (N,) ArrayLike
-        P values from HWE test for each variant as float in [0, 1].
+    Dataset containing (N = num variants):
+    variant_hwe_p_value : (N,) ArrayLike
+    P values from HWE test for each variant as float in [0, 1].
 
     References
     ----------

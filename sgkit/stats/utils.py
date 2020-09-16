@@ -13,19 +13,18 @@ def concat_2d(ds: Dataset, dims: Tuple[Hashable, Hashable]) -> DataArray:
 
     Parameters
     ----------
-    ds : Dataset
+    ds
         Dataset containing variables to convert.
         Any variables with a first dimension not equal to `dims[0]`
         will be ignored.
-    dims : Tuple[Hashable, Hashable]
+    dims
         Names of resulting dimensions in 2D array where first dimension
         is shared by all variables and all others are collapsed into
         a new dimension named by the second item.
 
     Returns
     -------
-    DataArray
-        Array with dimensions defined by `dims`.
+    Array with dimensions defined by `dims`.
     """
     arrs = []
     for var in ds:
@@ -52,11 +51,13 @@ def r2_score(YP: ArrayLike, YT: ArrayLike) -> ArrayLike:
 
     Parameters
     ----------
-    YP : (..., M) ArrayLike
+    YP
+        ArrayLike (..., M)
         Predicted values, can be any of any shape >= 1D.
         All leading dimensions must be broadcastable to
         the leading dimensions of `YT`.
-    YT : (..., M) ArrayLike
+    YT
+        ArrayLike (..., M)
         True values, can be any of any shape >= 1D.
         All leading dimensions must be broadcastable to
         the leading dimensions of `YP`.
