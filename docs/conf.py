@@ -66,11 +66,13 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 autosummary_generate = True
 
-intersphinx_mapping = {
-    "xarray": ("http://xarray.pydata.org/en/stable/", None),
-    "zarr": ("https://zarr.readthedocs.io/en/stable", None),
-}
-
+intersphinx_mapping = dict(
+    xarray=("https://xarray.pydata.org/en/stable/", None),
+    zarr=("https://zarr.readthedocs.io/en/stable", None),
+    numpy=("https://numpy.org/doc/stable/", None),
+    python=("https://docs.python.org/3", None),
+    sklearn=("https://scikit-learn.org/stable/", None),
+)
 
 # -- Options for HTML output -------------------------------------------------
 
