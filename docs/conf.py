@@ -14,6 +14,8 @@ import os
 import sys
 from pathlib import Path
 
+import xarray
+
 sys.path.insert(0, os.path.abspath(".."))
 
 print("python exec:", sys.executable)
@@ -65,6 +67,14 @@ html_context = dict(
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 autosummary_generate = True
+
+
+# FIXME: Workaround for linking xarray module
+# For some reason, intersphinx is not able to to link xarray objects.
+# https://github.com/pydata/xarray/issues/4279
+xarray.Dataset.__module__ = "xarray"
+xarray.DataArray.__module__ = "xarray"
+
 
 intersphinx_mapping = dict(
     xarray=("https://xarray.pydata.org/en/stable/", None),
