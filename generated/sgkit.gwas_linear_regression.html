@@ -37,7 +37,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sgkit.hardy_weinberg_test" href="sgkit.hardy_weinberg_test.html" />
-    <link rel="prev" title="sgkit.count_variant_alleles" href="sgkit.count_variant_alleles.html" /> 
+    <link rel="prev" title="sgkit.Fst" href="sgkit.Fst.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -89,15 +89,21 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#methods">Methods</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="sgkit.count_call_alleles.html">sgkit.count_call_alleles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.count_variant_alleles.html">sgkit.count_variant_alleles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.divergence.html">sgkit.divergence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.diversity.html">sgkit.diversity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.Fst.html">sgkit.Fst</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.gwas_linear_regression</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.hardy_weinberg_test.html">sgkit.hardy_weinberg_test</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.regenie.html">sgkit.regenie</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variant_stats.html">sgkit.variant_stats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.Tajimas_D.html">sgkit.Tajimas_D</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.pc_relate.html">sgkit.pc_relate</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#utilities">Utilities</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to sgkit</a></li>
 </ul>
 
@@ -170,7 +176,7 @@
 <h1>sgkit.gwas_linear_regression<a class="headerlink" href="#sgkit-gwas-linear-regression" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="sgkit.gwas_linear_regression">
-<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">gwas_linear_regression</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">dosage</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">covariates</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>Sequence<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">traits</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>Sequence<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">add_intercept</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; xarray.core.dataset.Dataset<a class="headerlink" href="#sgkit.gwas_linear_regression" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">gwas_linear_regression</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">dosage</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">covariates</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>Sequence<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">traits</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>Sequence<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">add_intercept</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">merge</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; xarray.core.dataset.Dataset<a class="headerlink" href="#sgkit.gwas_linear_regression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run linear regression to identify continuous trait associations with genetic variants.</p>
 <p>This method solves OLS regressions for each variant simultaneously and reports
 effect statistics as defined in [1]. This is facilitated by the removal of
@@ -196,6 +202,10 @@ correspond to 1 or 2D dataset variables of shape (samples[, traits]).
 2D trait arrays will be assumed to contain separate traits within columns
 and concatenated to any 1D traits along the second axis (columns).</p></li>
 <li><p><strong>add_intercept</strong> (<em>bool</em><em>, </em><em>optional</em>) – Add intercept term to covariate set, by default True.</p></li>
+<li><p><strong>merge</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (the default), merge the input dataset and the computed
+output variables into a single dataset, otherwise return only
+the computed output variables.
+See <a class="reference internal" href="../usage.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p></li>
 </ul>
 </dd>
 </dl>
@@ -259,7 +269,7 @@ Nature Genetics 47 (3): 284–90.</p>
         <a href="sgkit.hardy_weinberg_test.html" class="btn btn-neutral float-right" title="sgkit.hardy_weinberg_test" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="sgkit.count_variant_alleles.html" class="btn btn-neutral float-left" title="sgkit.count_variant_alleles" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="sgkit.Fst.html" class="btn btn-neutral float-left" title="sgkit.Fst" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

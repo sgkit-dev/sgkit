@@ -36,7 +36,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.gwas_linear_regression" href="sgkit.gwas_linear_regression.html" />
+    <link rel="next" title="sgkit.divergence" href="sgkit.divergence.html" />
     <link rel="prev" title="sgkit.count_call_alleles" href="sgkit.count_call_alleles.html" /> 
 </head>
 
@@ -89,15 +89,21 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#methods">Methods</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="sgkit.count_call_alleles.html">sgkit.count_call_alleles</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.count_variant_alleles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.divergence.html">sgkit.divergence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.diversity.html">sgkit.diversity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.Fst.html">sgkit.Fst</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.gwas_linear_regression.html">sgkit.gwas_linear_regression</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.hardy_weinberg_test.html">sgkit.hardy_weinberg_test</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.regenie.html">sgkit.regenie</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variant_stats.html">sgkit.variant_stats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.Tajimas_D.html">sgkit.Tajimas_D</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.pc_relate.html">sgkit.pc_relate</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#utilities">Utilities</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to sgkit</a></li>
 </ul>
 
@@ -178,10 +184,9 @@
 <li><p><strong>ds</strong> (<em>Dataset</em>) – Genotype call dataset such as from
 <cite>sgkit.create_genotype_call_dataset</cite>.</p></li>
 <li><p><strong>merge</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (the default), merge the input dataset and the computed
-output variables into a single dataset. Output variables will
-overwrite any input variables with the same name, and a warning
-will be issued in this case.
-If False, return only the computed output variables.</p></li>
+output variables into a single dataset, otherwise return only
+the computed output variables.
+See <a class="reference internal" href="../usage.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -225,7 +230,7 @@ the number of non-missing occurrences of each allele.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="sgkit.gwas_linear_regression.html" class="btn btn-neutral float-right" title="sgkit.gwas_linear_regression" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="sgkit.divergence.html" class="btn btn-neutral float-right" title="sgkit.divergence" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="sgkit.count_call_alleles.html" class="btn btn-neutral float-left" title="sgkit.count_call_alleles" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

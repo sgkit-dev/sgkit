@@ -89,15 +89,21 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#methods">Methods</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="sgkit.count_call_alleles.html">sgkit.count_call_alleles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.count_variant_alleles.html">sgkit.count_variant_alleles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.divergence.html">sgkit.divergence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.diversity.html">sgkit.diversity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.Fst.html">sgkit.Fst</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.gwas_linear_regression.html">sgkit.gwas_linear_regression</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.hardy_weinberg_test</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.regenie.html">sgkit.regenie</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variant_stats.html">sgkit.variant_stats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.Tajimas_D.html">sgkit.Tajimas_D</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.pc_relate.html">sgkit.pc_relate</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#utilities">Utilities</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to sgkit</a></li>
 </ul>
 
@@ -170,7 +176,7 @@
 <h1>sgkit.hardy_weinberg_test<a class="headerlink" href="#sgkit-hardy-weinberg-test" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="sgkit.hardy_weinberg_test">
-<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">hardy_weinberg_test</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em>, <em class="sig-param"><span class="n">genotype_counts</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Hashable<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; xarray.core.dataset.Dataset<a class="headerlink" href="#sgkit.hardy_weinberg_test" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">hardy_weinberg_test</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em>, <em class="sig-param"><span class="n">genotype_counts</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Hashable<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">merge</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; xarray.core.dataset.Dataset<a class="headerlink" href="#sgkit.hardy_weinberg_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exact test for HWE as described in Wigginton et al. 2005 [1].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -182,6 +188,10 @@ from genotype calls. If present, must correspond to an (<cite>N</cite>, 3) array
 where <cite>N</cite> is equal to the number of variants and the 3 columns contain
 heterozygous, homozygous reference, and homozygous alternate counts
 (in that order) across all samples for a variant.</p></li>
+<li><p><strong>merge</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (the default), merge the input dataset and the computed
+output variables into a single dataset, otherwise return only
+the computed output variables.
+See <a class="reference internal" href="../usage.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p></li>
 </ul>
 </dd>
 </dl>

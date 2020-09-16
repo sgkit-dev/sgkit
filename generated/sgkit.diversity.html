@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>sgkit.count_call_alleles &mdash; sgkit  documentation</title>
+  <title>sgkit.diversity &mdash; sgkit  documentation</title>
   
 
   
@@ -36,8 +36,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.count_variant_alleles" href="sgkit.count_variant_alleles.html" />
-    <link rel="prev" title="sgkit.read_vcfzarr" href="sgkit.read_vcfzarr.html" /> 
+    <link rel="next" title="sgkit.Fst" href="sgkit.Fst.html" />
+    <link rel="prev" title="sgkit.divergence" href="sgkit.divergence.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -87,10 +87,10 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../api.html#creating-a-dataset">Creating a dataset</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#methods">Methods</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.count_call_alleles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.count_call_alleles.html">sgkit.count_call_alleles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.count_variant_alleles.html">sgkit.count_variant_alleles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.divergence.html">sgkit.divergence</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sgkit.diversity.html">sgkit.diversity</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.diversity</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.Fst.html">sgkit.Fst</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.gwas_linear_regression.html">sgkit.gwas_linear_regression</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.hardy_weinberg_test.html">sgkit.hardy_weinberg_test</a></li>
@@ -153,13 +153,13 @@
         
           <li><a href="../api.html">API reference</a> &raquo;</li>
         
-      <li>sgkit.count_call_alleles</li>
+      <li>sgkit.diversity</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/generated/sgkit.count_call_alleles.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/generated/sgkit.diversity.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -172,59 +172,34 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sgkit-count-call-alleles">
-<h1>sgkit.count_call_alleles<a class="headerlink" href="#sgkit-count-call-alleles" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="sgkit-diversity">
+<h1>sgkit.diversity<a class="headerlink" href="#sgkit-diversity" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="sgkit.count_call_alleles">
-<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">count_call_alleles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em>, <em class="sig-param"><span class="n">merge</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; xarray.core.dataset.Dataset<a class="headerlink" href="#sgkit.count_call_alleles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute per sample allele counts from genotype calls.</p>
+<dt id="sgkit.diversity">
+<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">diversity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em>, <em class="sig-param"><span class="n">allele_counts</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">=</span> <span class="default_value">'variant_allele_count'</span></em><span class="sig-paren">)</span> &#x2192; xarray.core.dataarray.DataArray<a class="headerlink" href="#sgkit.diversity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute diversity from allele counts.</p>
+<p>Because we’re not providing any arguments on windowing, etc,
+we return the total over the whole region. Maybe this isn’t
+the behaviour we want, but it’s a starting point. Note that
+this is different to the tskit default behaviour where we
+normalise by the size of windows so that results
+in different windows are comparable. However, we don’t have
+any information about the overall length of the sequence here
+so we can’t normalise by it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ds</strong> (<em>Dataset</em>) – Genotype call dataset such as from
-<cite>sgkit.create_genotype_call_dataset</cite>.</p></li>
-<li><p><strong>merge</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (the default), merge the input dataset and the computed
-output variables into a single dataset, otherwise return only
-the computed output variables.
-See <a class="reference internal" href="../usage.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p></li>
+<li><p><strong>ds</strong> (<em>Dataset</em>) – Genotype call dataset.</p></li>
+<li><p><strong>allele_counts</strong> (<em>Hashable</em>) – allele counts to use or calculate.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Array <cite>call_allele_count</cite> of allele counts with
-shape (variants, samples, alleles) and values corresponding to
-the number of non-missing occurrences of each allele.</p>
+<dd class="field-even"><p>diversity value.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Dataset</p>
+<dd class="field-odd"><p>DataArray</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.testing</span> <span class="kn">import</span> <span class="n">simulate_genotype_call_dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">display_genotypes</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span> 
-<span class="go">samples    S0   S1</span>
-<span class="go">variants</span>
-<span class="go">0         1/0  1/0</span>
-<span class="go">1         1/0  1/1</span>
-<span class="go">2         0/1  1/0</span>
-<span class="go">3         0/0  0/0</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">count_call_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)[</span><span class="s2">&quot;call_allele_count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
-<span class="go">array([[[1, 1],</span>
-<span class="go">        [1, 1]],</span>
-
-<span class="go">       [[1, 1],</span>
-<span class="go">        [0, 2]],</span>
-
-<span class="go">       [[1, 1],</span>
-<span class="go">        [1, 1]],</span>
-
-<span class="go">       [[2, 0],</span>
-<span class="go">        [2, 0]]], dtype=uint8)</span>
-</pre></div>
-</div>
 </dd></dl>
 
 </div>
@@ -237,10 +212,10 @@ the number of non-missing occurrences of each allele.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="sgkit.count_variant_alleles.html" class="btn btn-neutral float-right" title="sgkit.count_variant_alleles" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="sgkit.Fst.html" class="btn btn-neutral float-right" title="sgkit.Fst" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="sgkit.read_vcfzarr.html" class="btn btn-neutral float-left" title="sgkit.read_vcfzarr" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="sgkit.divergence.html" class="btn btn-neutral float-left" title="sgkit.divergence" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
