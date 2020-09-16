@@ -169,7 +169,7 @@ sections for ``Parameters``, ``Examples``, and general explanatory prose.
 The types for parameters and returns should not be added to the docstring,
 they should be only added as type hints, to avoid duplication.
 
-A reference for the same should be added in the API documentation file
+A reference for each new public function should be added in the API documentation file
 ``docs/api.rst``, which makes them accessible on the user documentation page.
 
 By default, examples will be doc-tested.  Reproducible examples in documentation
