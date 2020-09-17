@@ -31,26 +31,26 @@ def create_genotype_call_dataset(
     variant_contig_names
         The contig names.
     variant_contig
-        array_like (element type: int).
+        [array_like, element type: int]
         The (index of the) contig for each variant.
     variant_position
-        array_like (element type: int)
+        [array_like, element type: int]
         The reference position of the variant.
     variant_alleles
-        array_like, zero-terminated bytes, e.g. "S1", or object
+        [array_like, element_type: zero-terminated bytes, e.g. "S1", or object]
         The possible alleles for the variant.
     sample_id
-        array_like (element type: str or object)
+        [array_like, element type: str or object]
         The unique identifier of the sample.
     call_genotype
-        array_like (element type: int) Genotype, encoded as allele values
+        [array_like, element type: int] Genotype, encoded as allele values
         (0 for the reference, 1 for the first allele, 2 for the second allele),
         or -1 to indicate a missing value.
     call_genotype_phased
-        array_like (element type: bool), optional A flag for each call indicating if it is
+        [array_like, element type: bool], optional A flag for each call indicating if it is
         phased or not. If omitted all calls are unphased.
     variant_id
-        array_like (element type: str or object), optional.
+        [array_like, element type: str or object], optional.
         The unique identifier of the variant.
 
     Returns
@@ -104,27 +104,27 @@ def create_genotype_dosage_dataset(
     variant_contig_names
         The contig names.
     variant_contig
-        array_like (element type: int).
+        [array_like, element type: int]
         The (index of the) contig for each variant.
     variant_position
-        array_like (element type: int)
+        [array_like, element type: int]
         The reference position of the variant.
     variant_alleles
-        array_like, zero-terminated bytes, e.g. "S1", or object
+        [array_like, element_type: zero-terminated bytes, e.g. "S1", or object]
         The possible alleles for the variant.
     sample_id
-        array_like (element type: str or object)
+        [array_like, element type: str or object]
         The unique identifier of the sample.
     call_dosage
-        array_like (element type: float)
+        [array_like, element type: float]
         Dosages, encoded as floats, with NaN indicating a
         missing value.
     call_genotype_probability
-        array_like (element type: float)
+        [array_like, element type: float]
         Probabilities, encoded as floats, with NaN indicating a
         missing value.
     variant_id
-        array_like (element type: str or object), optional
+        [array_like, element type: str or object], optional
         The unique identifier of the variant.
 
     Returns
