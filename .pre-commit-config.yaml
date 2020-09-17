@@ -7,10 +7,6 @@ repos:
       - id: mixed-line-ending
       - id: check-case-conflict
       - id: check-yaml
-  - repo: https://github.com/asottile/seed-isort-config
-    rev: v2.2.0
-    hooks:
-      - id: seed-isort-config
   - repo: https://github.com/timothycrosley/isort
     rev: 5.1.1
     hooks:
