@@ -1,0 +1,30 @@
+name: Windows build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Miniconda with Python version ${{ matrix.python-version }}
+      uses: goanpeca/setup-miniconda@v1
+      with:
+        auto-update-conda: true
+        channels: conda-forge
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      # activate conda
+      shell: bash -l {0}
+      run: |
+        conda install --file requirements.txt --file requirements-dev.txt msprime
+    - name: Test with pytest and coverage
+      # activate conda
+      shell: bash -l {0}
+      run: |
+        pytest -v
