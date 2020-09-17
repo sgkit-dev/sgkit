@@ -1,0 +1,23 @@
+name: Validation
+
+on:
+  schedule:
+    # Run at the end of every day
+    - cron: "0 0 * * *"
+  # manual trigger
+  workflow_dispatch:
+
+jobs:
+  validation_suite:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+    - name: Download public test data (real HapMap data)
+      run: gsutil -u $GCLOUD_PROJECT cp gs://sgkit-data/validation/hapmap_JPT_CHB_r23a_filtered.zip /tmp/
+    - name: Validate PC Relate
+      run: ./validation/gwas/method/pc_relate/run.sh /tmp/hapmap_JPT_CHB_r23a_filtered.zip
