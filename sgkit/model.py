@@ -47,10 +47,10 @@ def create_genotype_call_dataset(
         (0 for the reference, 1 for the first allele, 2 for the second allele),
         or -1 to indicate a missing value.
     call_genotype_phased
-        [array_like, element type: bool], optional A flag for each call indicating if it is
+        [array_like, element type: bool, optional] A flag for each call indicating if it is
         phased or not. If omitted all calls are unphased.
     variant_id
-        [array_like, element type: str or object], optional.
+        [array_like, element type: str or object, optional]
         The unique identifier of the variant.
 
     Returns
@@ -124,7 +124,7 @@ def create_genotype_dosage_dataset(
         Probabilities, encoded as floats, with NaN indicating a
         missing value.
     variant_id
-        [array_like, element type: str or object], optional
+        [array_like, element type: str or object, optional]
         The unique identifier of the variant.
 
     Returns
