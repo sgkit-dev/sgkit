@@ -1,9 +1,9 @@
-name: Windows build
+name: Windows
 
 on: [push, pull_request]
 
 jobs:
-  build:
+  win_build:
 
     runs-on: windows-latest
     strategy:
