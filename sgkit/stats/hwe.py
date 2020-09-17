@@ -151,7 +151,7 @@ def hardy_weinberg_test(
     Returns
     -------
     Dataset containing (N = num variants):
-    variant_hwe_p_value : (N,) ArrayLike
+    variant_hwe_p_value : [array-like, shape: (N, O)]
     P values from HWE test for each variant as float in [0, 1].
 
     References

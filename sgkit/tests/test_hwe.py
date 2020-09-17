@@ -23,11 +23,11 @@ def simulate_genotype_calls(
 
     Parameters
     ----------
-    n_variant : int
+    n_variant
         Number of variants
-    n_sample : int
+    n_sample
         Number of samples
-    p : Tuple[float, float, float]
+    p
         Genotype distribution as float in [0, 1] with order
         homozygous ref, heterozygous, homozygous alt
 

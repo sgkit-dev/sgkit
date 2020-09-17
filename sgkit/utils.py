@@ -17,15 +17,15 @@ def check_array_like(
 
     Parameters
     ----------
-    a : Any
+    a
         Array of any type.
-    dtype : Union[None, DType, Set[DType]], optional
+    dtype
         The dtype the array must have, by default None (don't check)
         If a set, then the array must have one of the dtypes in the set.
-    kind : Union[None, str, Set[str]], optional
+    kind
         The dtype kind the array must be, by default None (don't check).
         If a set, then the array must be one of the kinds in the set.
-    ndim : Union[None, int, Set[int]], optional
+    ndim
         Number of dimensions the array must have, by default None (don't check)
         If a set, then the array must have one of the number of dimensions in the set.
 
@@ -84,7 +84,8 @@ def encode_array(x: ArrayLike) -> Tuple[ArrayLike, List[Any]]:
 
     Parameters
     ----------
-    x : (M,) array-like
+    x
+        [array-like, shape: (M,)]
         Array of elements to encode of any type.
 
     Returns
@@ -113,9 +114,10 @@ def merge_datasets(input: Dataset, output: Dataset) -> Dataset:
 
     Parameters
     ----------
-    input : Dataset
+    input
         The input dataset.
-    output : Dataset
+    output
+        Dataset
         The output dataset.
 
     Returns
@@ -149,9 +151,9 @@ def split_array_chunks(n: int, blocks: int) -> Tuple[int, ...]:
 
     Parameters
     ----------
-    n : int
+    n
         Number of array elements.
-    blocks : int
+    blocks
         Number of partitions to generate chunk sizes for.
 
     Examples

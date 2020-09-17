@@ -28,22 +28,23 @@ def simulate_genotype_call_dataset(
 
     Parameters
     ----------
-    n_variant : int
+    n_variant
         Number of variants to simulate
-    n_sample : int
+    n_sample
         Number of samples to simulate
-    n_ploidy : int
+    n_ploidy
         Number of chromosome copies in each sample
-    n_allele: int
+    n_allele
         Number of alleles to simulate
-    n_contig : int, optional
+    n_contig
+        optional
         Number of contigs to partition variants with,
         controlling values in `variant_contig`. Values
         will all be 0 by default with `n_contig` == 1.
-    seed : int, optional
-        Seed for random number generation
-    missing_pct: float, optional
-        Donate the percent of missing calls, must be within [0.0, 1.0]
+    seed
+        Seed for random number generation, optional
+    missing_pct
+        Donate the percent of missing calls, must be within [0.0, 1.0], optional
 
     Returns
     -------

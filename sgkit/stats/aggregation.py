@@ -28,10 +28,10 @@ def count_alleles(g: ArrayLike, _: ArrayLike, out: ArrayLike) -> None:
 
     Parameters
     ----------
-    g : array_like
+    g
         Genotype call of shape (ploidy,) containing alleles encoded as
         type `int` with values < 0 indicating a missing allele.
-    _: array_like
+    _
         Dummy variable of type `uint8` and shape (alleles,) used to
         define the number of unique alleles to be counted in the
         return value.

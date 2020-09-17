@@ -27,26 +27,26 @@ def linear_regression(
     Parameters
     ----------
     XL
-        (M, N) array-like
+        [array-like, shape: (M, N)]
         "Loop" covariates for which N separate regressions will be run
     XC
-        (M, P) array-like
+        [array-like, shape: (M, P)]
         "Core" covariates included in the regressions for each loop
         covariate. All P core covariates are used in each of the N
         loop covariate regressions.
     Y
-        (M, O) array-like
+        [array-like, shape: (M, O)]
         Continuous outcomes
 
     Returns
     -------
     Dataclass containing:
 
-    beta : (N, O) array-like
+    beta : [array-like, shape: (N, O)]
         Beta values associated with each loop covariate and outcome
-    t_value : (N, O) array-like
+    t_value : [array-like, shape: (N, O)]
         T statistics for each beta
-    p_value : (N, O) array-like
+    p_value : [array-like, shape: (N, O)]
         P values as float in [0, 1]
     """
     XL, XC = da.asarray(XL), da.asarray(XC)  # Coerce for `lstsq`
@@ -174,11 +174,11 @@ def gwas_linear_regression(
     -------
     Dataset containing (N = num variants, O = num traits):
 
-    variant_beta : (N, O) array-like
+    variant_beta : [array-like, shape: (N, O)]
         Beta values associated with each variant and trait
-    variant_t_value : (N, O) array-like
+    variant_t_value : [array-like, shape: (N, O)]
         T statistics for each beta
-    variant_p_value : (N, O) array-like
+    variant_p_value : [array-like, shape: (N, O)]
         P values as float in [0, 1]
 
     References
