@@ -13,6 +13,7 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/typehints.css" type="text/css" />
 
   
   
@@ -176,7 +177,7 @@
 <h1>sgkit.pc_relate<a class="headerlink" href="#sgkit-pc-relate" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="sgkit.pc_relate">
-<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">pc_relate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em>, <em class="sig-param"><span class="n">maf</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">merge</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; xarray.core.dataset.Dataset<a class="headerlink" href="#sgkit.pc_relate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">pc_relate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">maf</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">merge</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.pc_relate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute PC-Relate as described in Conomos, et al. 2016 [1].</p>
 <p>This method computes the kinship coefficient matrix. The kinship coefficient for
 a pair of individuals <code class="docutils literal notranslate"><span class="pre">i</span></code> and <code class="docutils literal notranslate"><span class="pre">j</span></code> is commonly defined to be the probability that
@@ -219,23 +220,26 @@ corresponding kinship coefficient:</p>
 </table>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ds</strong> (<em>Dataset</em>) – <p>Dataset containing (S = num samples, V = num variants, D = ploidy, PC = num PC)</p>
-<ul>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p><p>Dataset containing (S = num samples, V = num variants, D = ploidy, PC = num PC)</p>
+<ul class="simple">
 <li><p>genotype calls: “call_genotype” (SxVxD)</p></li>
 <li><p>genotype calls mask: “call_genotype_mask” (SxVxD)</p></li>
 <li><p>sample PCs: “sample_pcs” (PCxS)</p></li>
 </ul>
-</p></li>
-<li><p><strong>maf</strong> (<em>float</em>) – individual minor allele frequency filter. If an individual’s estimated
+</p>
+</dd>
+<dt><strong>maf</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">0.01</span></code>)</dt><dd><p>individual minor allele frequency filter. If an individual’s estimated
 individual-specific minor allele frequency at a SNP is less than this value,
 that SNP will be excluded from the analysis for that individual.
-The default value is 0.01. Must be between (0.0, 0.1).</p></li>
-<li><p><strong>merge</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (the default), merge the input dataset and the computed
+The default value is 0.01. Must be between (0.0, 0.1).</p>
+</dd>
+<dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
 the computed output variables.
-See <a class="reference internal" href="../usage.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p></li>
-</ul>
+See <a class="reference internal" href="../usage.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 <div class="admonition warning">
@@ -243,13 +247,13 @@ See <a class="reference internal" href="../usage.html#dataset-merge"><span class
 <p>This function is only applicable to diploid, biallelic datasets.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Dataset containing (S = num samples):
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dataset containing (S = num samples):
 pc_relate_phi: (S,S) ArrayLike
 pairwise recent kinship coefficient matrix as float in [-0.5, 0.5].</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>Dataset</p>
 </dd>
 </dl>
 <p class="rubric">References</p>
@@ -259,10 +263,10 @@ American Journal of Human Genetics 98 (1): 127–48.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ValueError</strong> – If ploidy of provided dataset != 2</p></li>
-<li><p><strong>ValueError</strong> – If maximum number of alleles in provided dataset != 2</p></li>
-<li><p><strong>ValueError</strong> – Input dataset is missing any of the required variables</p></li>
-<li><p><strong>ValueError</strong> – If maf is not in (0.0, 1.0)</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If ploidy of provided dataset != 2</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If maximum number of alleles in provided dataset != 2</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – Input dataset is missing any of the required variables</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If maf is not in (0.0, 1.0)</p></li>
 </ul>
 </dd>
 </dl>

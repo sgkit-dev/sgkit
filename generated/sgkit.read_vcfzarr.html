@@ -13,6 +13,7 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/typehints.css" type="text/css" />
 
   
   
@@ -168,7 +169,7 @@
 <h1>sgkit.read_vcfzarr<a class="headerlink" href="#sgkit-read-vcfzarr" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="sgkit.read_vcfzarr">
-<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">read_vcfzarr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; xarray.core.dataset.Dataset<a class="headerlink" href="#sgkit.read_vcfzarr" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">read_vcfzarr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.read_vcfzarr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a VCF Zarr file.</p>
 <p>Loads VCF variant, sample, and genotype data as Dask arrays within a Dataset
 from a Zarr file created using scikit-allel’s <cite>vcf_to_zarr</cite> function.</p>
@@ -176,13 +177,16 @@ from a Zarr file created using scikit-allel’s <cite>vcf_to_zarr</cite> functio
 <cite>call/genotype_phased</cite> variable in the resulting dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> (<em>PathType</em>) – Path to the Zarr file.</p>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>path</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.8)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>]</span></dt><dd><p>Path to the Zarr file.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The dataset of genotype calls, created using <cite>create_genotype_call_dataset</cite>.</p>
+</dl>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>xr.Dataset</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The dataset of genotype calls, created using <cite>create_genotype_call_dataset</cite>.</p>
 </dd>
 </dl>
 </dd></dl>

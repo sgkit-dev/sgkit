@@ -13,6 +13,7 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/typehints.css" type="text/css" />
 
   
   
@@ -176,23 +177,26 @@
 <h1>sgkit.hardy_weinberg_test<a class="headerlink" href="#sgkit-hardy-weinberg-test" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="sgkit.hardy_weinberg_test">
-<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">hardy_weinberg_test</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em>, <em class="sig-param"><span class="n">genotype_counts</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Hashable<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">merge</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; xarray.core.dataset.Dataset<a class="headerlink" href="#sgkit.hardy_weinberg_test" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">hardy_weinberg_test</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">genotype_counts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">merge</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.hardy_weinberg_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exact test for HWE as described in Wigginton et al. 2005 [1].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ds</strong> (<em>Dataset</em>) – Dataset containing genotype calls or precomputed genotype counts.</p></li>
-<li><p><strong>genotype_counts</strong> (<em>Optional</em><em>[</em><em>Hashable</em><em>]</em><em>, </em><em>optional</em>) – Name of variable containing precomputed genotype counts, by default
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Dataset containing genotype calls or precomputed genotype counts.</p>
+</dd>
+<dt><strong>genotype_counts</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.8)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Name of variable containing precomputed genotype counts, by default
 None. If not provided, these counts will be computed automatically
 from genotype calls. If present, must correspond to an (<cite>N</cite>, 3) array
 where <cite>N</cite> is equal to the number of variants and the 3 columns contain
 heterozygous, homozygous reference, and homozygous alternate counts
-(in that order) across all samples for a variant.</p></li>
-<li><p><strong>merge</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (the default), merge the input dataset and the computed
+(in that order) across all samples for a variant.</p>
+</dd>
+<dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
 the computed output variables.
-See <a class="reference internal" href="../usage.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p></li>
-</ul>
+See <a class="reference internal" href="../usage.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 <div class="admonition warning">
@@ -200,13 +204,13 @@ See <a class="reference internal" href="../usage.html#dataset-merge"><span class
 <p>This function is only applicable to diploid, biallelic datasets.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Dataset containing (N = num variants):
-variant_hwe_p_value : (N,) ArrayLike
-P values from HWE test for each variant as float in [0, 1].</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>Dataset</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dataset containing (N = num variants):
+variant_hwe_p_value : [array-like, shape: (N, O)]
+P values from HWE test for each variant as float in [0, 1].</p>
 </dd>
 </dl>
 <p class="rubric">References</p>
@@ -221,8 +225,8 @@ Human Genetics 76 (5): 887–93.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>NotImplementedError</strong> – If ploidy of provided dataset != 2</p></li>
-<li><p><strong>NotImplementedError</strong> – If maximum number of alleles in provided dataset != 2</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.8)"><strong>NotImplementedError</strong></a> – If ploidy of provided dataset != 2</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.8)"><strong>NotImplementedError</strong></a> – If maximum number of alleles in provided dataset != 2</p></li>
 </ul>
 </dd>
 </dl>

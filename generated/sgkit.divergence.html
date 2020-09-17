@@ -13,6 +13,7 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/typehints.css" type="text/css" />
 
   
   
@@ -176,21 +177,24 @@
 <h1>sgkit.divergence<a class="headerlink" href="#sgkit-divergence" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="sgkit.divergence">
-<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">divergence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds1</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em>, <em class="sig-param"><span class="n">ds2</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em>, <em class="sig-param"><span class="n">allele_counts</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">=</span> <span class="default_value">'variant_allele_count'</span></em><span class="sig-paren">)</span> &#x2192; xarray.core.dataarray.DataArray<a class="headerlink" href="#sgkit.divergence" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">divergence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds1</span></em>, <em class="sig-param"><span class="n">ds2</span></em>, <em class="sig-param"><span class="n">allele_counts</span><span class="o">=</span><span class="default_value">'variant_allele_count'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.divergence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute divergence between two genotype call datasets.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ds1</strong> (<em>Dataset</em>) – Genotype call dataset.</p></li>
-<li><p><strong>ds2</strong> (<em>Dataset</em>) – Genotype call dataset.</p></li>
-<li><p><strong>allele_counts</strong> (<em>Hashable</em>) – allele counts to use or calculate.</p></li>
-</ul>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ds1</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Genotype call dataset.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>divergence value between the two datasets.</p>
+<dt><strong>ds2</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Genotype call dataset.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>DataArray</p>
+<dt><strong>allele_counts</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'variant_allele_count'</span></code>)</dt><dd><p>allele counts to use or calculate.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>divergence value between the two datasets.</p>
 </dd>
 </dl>
 </dd></dl>

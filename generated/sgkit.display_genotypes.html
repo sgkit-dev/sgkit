@@ -13,6 +13,7 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/typehints.css" type="text/css" />
 
   
   
@@ -166,7 +167,7 @@
 <h1>sgkit.display_genotypes<a class="headerlink" href="#sgkit-display-genotypes" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="sgkit.display_genotypes">
-<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">display_genotypes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">xarray.core.dataset.Dataset</span></em>, <em class="sig-param"><span class="n">max_variants</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">60</span></em>, <em class="sig-param"><span class="n">max_samples</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">10</span></em><span class="sig-paren">)</span> &#x2192; sgkit.display.GenotypeDisplay<a class="headerlink" href="#sgkit.display_genotypes" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">display_genotypes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">max_variants</span><span class="o">=</span><span class="default_value">60</span></em>, <em class="sig-param"><span class="n">max_samples</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.display_genotypes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display genotype calls.</p>
 <p>Display genotype calls in a tabular format, with rows for variants,
 and columns for samples. Genotypes are displayed in the same manner
@@ -175,22 +176,25 @@ allele and the reference allele (0). Phased calls are denoted by a <cite>|</cite
 separator. Missing values are denoted by <cite>.</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ds</strong> (<em>Dataset</em>) – The dataset containing genotype calls in the <cite>call/genotype</cite>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.15.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>The dataset containing genotype calls in the <cite>call/genotype</cite>
 variable, and (optionally) phasing information in the
 <cite>call/genotype_phased</cite> variable. If no phasing information is
-present genotypes are assumed to be unphased.</p></li>
-<li><p><strong>max_variants</strong> (<em>int</em>) – The maximum number of variants (rows) to display. If there are
-more variants than this then the table is truncated.</p></li>
-<li><p><strong>max_samples</strong> (<em>int</em>) – The maximum number of samples (columns) to display. If there are
-more samples than this then the table is truncated.</p></li>
-</ul>
+present genotypes are assumed to be unphased.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A printable object to display genotype information.</p>
+<dt><strong>max_variants</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">60</span></code>)</dt><dd><p>The maximum number of variants (rows) to display. If there are
+more variants than this then the table is truncated.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>GenotypeDisplay</p>
+<dt><strong>max_samples</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">10</span></code>)</dt><dd><p>The maximum number of samples (columns) to display. If there are
+more samples than this then the table is truncated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><span class="annotation terse"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenotypeDisplay</span></code></span><span class="annotation full"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenotypeDisplay</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A printable object to display genotype information.</p>
 </dd>
 </dl>
 </dd></dl>

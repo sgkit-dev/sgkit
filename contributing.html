@@ -13,6 +13,7 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/typehints.css" type="text/css" />
 
   
   
@@ -325,6 +326,10 @@ are not covered by tests.</p>
 <h3><a class="toc-backref" href="#id12">Docstrings</a><a class="headerlink" href="#docstrings" title="Permalink to this headline">¶</a></h3>
 <p>User facing functions should follow the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">numpydoc</a> standard, including
 sections for <code class="docutils literal notranslate"><span class="pre">Parameters</span></code>, <code class="docutils literal notranslate"><span class="pre">Examples</span></code>, and general explanatory prose.</p>
+<p>The types for parameters and returns should not be added to the docstring,
+they should be only added as type hints, to avoid duplication.</p>
+<p>A reference for each new public function should be added in the API documentation file
+<code class="docutils literal notranslate"><span class="pre">docs/api.rst</span></code>, which makes them accessible on the user documentation page.</p>
 <p>By default, examples will be doc-tested.  Reproducible examples in documentation
 is valuable both for testing and, more importantly, for communication of common
 usage to the user.  Documentation trumps testing in this case and clear
@@ -388,7 +393,7 @@ and API documentation.</p>
 </pre></div>
 </div>
 <p>The resulting HTML files end up in the <code class="docutils literal notranslate"><span class="pre">_build/html</span></code> directory.</p>
-<p>You can now make edits to rst files and run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> again to update
+<p>You can now make edits to <code class="docutils literal notranslate"><span class="pre">.rst</span></code> files and run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> again to update
 the affected pages.</p>
 <p>The documentation build is checked by CI to ensure that it builds
 without warnings. You can do that locally with:</p>
