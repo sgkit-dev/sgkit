@@ -37,28 +37,32 @@ def _generate_test_data(
 
     Parameters
     ----------
-    n : int, optional
-        Number of samples
-    m : int, optional
-        Number of variants
-    p : int, optional
-        Number of covariates
-    e_std : float, optional
-        Standard deviation for noise term
-    b_zero_slice : slice
+    n
+        Number of samples, optional
+    m
+        Number of variants, optional
+    p
+        Number of covariates, optional
+    e_std
+        Standard deviation for noise term, optional
+    b_zero_slice
         Variant beta values to zero out, defaults to `slice(m // 2)`
         meaning that the first half will all be 0.
         Set to `slice(0)` to disable.
 
     Returns
     -------
-    g : (n, m) array-like
+    g
+        [array-like, shape: (n, m)]
         Simulated genotype dosage
-    x : (n, p) array-like
+    x
+        [array-like, shape: (n, p)]
         Simulated covariates
-    bg : (m,) array-like
+    bg
+        [array-like, shape: (m,)]
         Variant betas
-    ys : (m, n) array-like
+    ys
+        [array-like, shape: (m, n)]
         Outcomes for each column in genotypes i.e. variant
     """
     if b_zero_slice is None:

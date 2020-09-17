@@ -64,7 +64,7 @@ def truncate(ds: xr.Dataset, max_sizes: Mapping[Hashable, int]) -> xr.Dataset:
 
     Parameters
     ----------
-    ds : Dataset
+    ds
         The dataset to be truncated.
     max_sizes : Mapping[Hashable, int]
         A dict with keys matching dimensions and integer values indicating
