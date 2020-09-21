@@ -79,8 +79,8 @@ def encode_array(x: ArrayLike) -> Tuple[ArrayLike, List[Any]]:
     Examples
     --------
 
-    >>> encode_array(['c', 'a', 'a', 'b'])
-    (array([0, 1, 1, 2]), array(['c', 'a', 'b'], dtype='<U1'))
+    >>> encode_array(['c', 'a', 'a', 'b']) # doctest: +SKIP
+    (array([0, 1, 1, 2], dtype=int64), array(['c', 'a', 'b'], dtype='<U1'))
 
     Parameters
     ----------
