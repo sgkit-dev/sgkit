@@ -7,3 +7,4 @@ hypothesis
 statsmodels
 zarr
 msprime
+scikit-learn
