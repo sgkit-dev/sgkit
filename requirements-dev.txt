@@ -7,8 +7,3 @@ hypothesis
 statsmodels
 zarr
 msprime
-sphinx
-sphinx_rtd_theme
-scikit-learn
-sphinx_autodoc_typehints
-scanpydoc
