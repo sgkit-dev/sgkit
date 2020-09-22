@@ -308,6 +308,10 @@ stat_diversity, stat_diversity_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("stat_diversity", ndim=2, kind="f")
 )
 """Genetic diversity (also known as "Tajima’s pi") for cohorts."""
+stat_pbs, stat_pbs_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("stat_pbs", ndim=4, kind="f")
+)
+"""Population branching statistic for cohort triples."""
 stat_Tajimas_D, stat_Tajimas_D_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("stat_Tajimas_D", ndim={0, 2}, kind="f")
 )

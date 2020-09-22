@@ -15,6 +15,7 @@ from sgkit import (
     create_genotype_call_dataset,
     divergence,
     diversity,
+    pbs,
     variables,
 )
 from sgkit.window import window
@@ -328,3 +329,73 @@ def test_Tajimas_D(sample_size):
     d = ds.stat_Tajimas_D.compute()
     ts_d = ts.Tajimas_D()
     np.testing.assert_allclose(d, ts_d)
+
+
+@pytest.mark.parametrize(
+    "sample_size, n_cohorts",
+    [(10, 3)],
+)
+def test_pbs(sample_size, n_cohorts):
+    ts = msprime.simulate(sample_size, length=100, mutation_rate=0.05, random_seed=42)
+    subsets = np.array_split(ts.samples(), n_cohorts)
+    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    sample_cohorts = np.concatenate(
+        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
+    )
+    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
+    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    n_variants = ds.dims["variants"]
+    ds = window(ds, size=n_variants, step=n_variants)  # single window
+
+    ds = pbs(ds)
+    stat_pbs = ds["stat_pbs"]
+
+    # scikit-allel
+    ac1 = ds.cohort_allele_count.values[:, 0, :]
+    ac2 = ds.cohort_allele_count.values[:, 1, :]
+    ac3 = ds.cohort_allele_count.values[:, 2, :]
+
+    ska_pbs_value = np.full([1, n_cohorts, n_cohorts, n_cohorts], np.nan)
+    for i, j, k in itertools.combinations(range(n_cohorts), 3):
+        ska_pbs_value[0, i, j, k] = allel.pbs(
+            ac1, ac2, ac3, window_size=n_variants, window_step=n_variants
+        )
+
+    np.testing.assert_allclose(stat_pbs, ska_pbs_value)
+
+
+@pytest.mark.parametrize(
+    "sample_size, n_cohorts",
+    [(10, 3)],
+)
+@pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
+def test_pbs__windowed(sample_size, n_cohorts, chunks):
+    ts = msprime.simulate(sample_size, length=200, mutation_rate=0.05, random_seed=42)
+    subsets = np.array_split(ts.samples(), n_cohorts)
+    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
+    sample_cohorts = np.concatenate(
+        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
+    )
+    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
+    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds = window(ds, size=25, step=25)
+
+    ds = pbs(ds)
+    stat_pbs = ds["stat_pbs"].values
+
+    # scikit-allel
+    ac1 = ds.cohort_allele_count.values[:, 0, :]
+    ac2 = ds.cohort_allele_count.values[:, 1, :]
+    ac3 = ds.cohort_allele_count.values[:, 2, :]
+
+    # scikit-allel has final window missing
+    n_windows = ds.dims["windows"] - 1
+    ska_pbs_value = np.full([n_windows, n_cohorts, n_cohorts, n_cohorts], np.nan)
+    for i, j, k in itertools.combinations(range(n_cohorts), 3):
+        ska_pbs_value[:, i, j, k] = allel.pbs(
+            ac1, ac2, ac3, window_size=25, window_step=25
+        )
+
+    np.testing.assert_allclose(stat_pbs[:-1], ska_pbs_value)
