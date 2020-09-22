@@ -10,6 +10,7 @@ statsmodels
 zarr
 msprime
 scikit-learn
+scikit-allel
 partd
 fsspec
 bed-reader
