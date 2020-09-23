@@ -14,6 +14,3 @@ RUN R -e 'BiocManager::install("SNPRelate")'
 RUN R -e 'BiocManager::install("gdsfmt")'
 RUN R -e 'BiocManager::install("GWASTools")'
 RUN R -e 'BiocManager::install("GENESIS")'
-
-COPY requirements.txt /requirements.txt
-RUN pip3 install -r /requirements.txt

@@ -8,3 +8,6 @@ statsmodels
 zarr
 msprime
 scikit-learn
+partd
+fsspec
+bed-reader
