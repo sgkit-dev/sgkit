@@ -43,7 +43,7 @@ def concat_2d(ds: Dataset, dims: Tuple[Hashable, Hashable]) -> DataArray:
             # Add concatenation axis
             arr = arr.expand_dims(dim=dims[1], axis=1)
         arrs.append(arr)
-    return xr.concat(arrs, dim=dims[1])  # type: ignore[no-any-return,no-untyped-call]
+    return xr.concat(arrs, dim=dims[1])
 
 
 def r2_score(YP: ArrayLike, YT: ArrayLike) -> ArrayLike:
