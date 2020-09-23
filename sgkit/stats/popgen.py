@@ -9,7 +9,8 @@ from .aggregation import count_variant_alleles
 
 
 def diversity(
-    ds: Dataset, allele_counts: Hashable = "variant_allele_count",
+    ds: Dataset,
+    allele_counts: Hashable = "variant_allele_count",
 ) -> DataArray:
     """Compute diversity from allele counts.
 
@@ -49,7 +50,9 @@ def diversity(
 
 
 def divergence(
-    ds1: Dataset, ds2: Dataset, allele_counts: Hashable = "variant_allele_count",
+    ds1: Dataset,
+    ds2: Dataset,
+    allele_counts: Hashable = "variant_allele_count",
 ) -> DataArray:
     """Compute divergence between two genotype call datasets.
 
@@ -87,7 +90,9 @@ def divergence(
 
 
 def Fst(
-    ds1: Dataset, ds2: Dataset, allele_counts: Hashable = "variant_allele_count",
+    ds1: Dataset,
+    ds2: Dataset,
+    allele_counts: Hashable = "variant_allele_count",
 ) -> DataArray:
     """Compute Fst between two genotype call datasets.
 
@@ -112,7 +117,8 @@ def Fst(
 
 
 def Tajimas_D(
-    ds: Dataset, allele_counts: Hashable = "variant_allele_count",
+    ds: Dataset,
+    allele_counts: Hashable = "variant_allele_count",
 ) -> DataArray:
     """Compute Tajimas' D for a genotype call dataset.
 

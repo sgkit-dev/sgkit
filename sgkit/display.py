@@ -193,5 +193,8 @@ def display_genotypes(
     df = df.apply(calls_to_str, axis=1).unstack("samples")
 
     return GenotypeDisplay(
-        df, (ds.sizes["variants"], ds.sizes["samples"]), max_variants, max_samples,
+        df,
+        (ds.sizes["variants"], ds.sizes["samples"]),
+        max_variants,
+        max_samples,
     )
