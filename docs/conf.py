@@ -47,6 +47,8 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
     "scanpydoc",
+    "IPython.sphinxext.ipython_console_highlighting",
+    "IPython.sphinxext.ipython_directive",
     *[p.stem for p in (HERE / "extensions").glob("*.py")],
 ]
 

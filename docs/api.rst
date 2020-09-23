@@ -30,6 +30,8 @@ Creating a dataset
    create_genotype_call_dataset
    create_genotype_dosage_dataset
 
+.. _api_methods:
+
 Methods
 =======
 
