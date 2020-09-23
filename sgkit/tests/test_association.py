@@ -132,7 +132,7 @@ def _get_statistics(
         )
         res = _sm_statistics(ds, i, add_intercept)
         df_pred.append(
-            dsr.to_dataframe()  # type: ignore[no-untyped-call]
+            dsr.to_dataframe()
             .rename(columns=lambda c: c.replace("variant_", ""))
             .iloc[i]
             .to_dict()
@@ -183,9 +183,9 @@ def test_gwas_linear_regression__multi_trait(ds):
 
     traits = [f"trait_{i}" for i in range(ds.attrs["n_trait"])]
     # Run regressions on individual traits and concatenate resulting statistics
-    dfr_single = xr.concat([run([t]) for t in traits], dim="traits").to_dataframe()  # type: ignore[no-untyped-call]
+    dfr_single = xr.concat([run([t]) for t in traits], dim="traits").to_dataframe()
     # Run regressions on all traits simulatenously
-    dfr_multi: DataFrame = run(traits).to_dataframe()  # type: ignore[no-untyped-call]
+    dfr_multi: DataFrame = run(traits).to_dataframe()
     pd.testing.assert_frame_equal(dfr_single, dfr_multi)
 
 
