@@ -237,7 +237,9 @@ def test_variant_stats(precompute_variant_allele_count):
     )
     if precompute_variant_allele_count:
         ds = count_variant_alleles(ds)
-    vs = variant_stats(ds)
+        vs = variant_stats(ds, variant_allele_count="variant_allele_count")
+    else:
+        vs = variant_stats(ds)
 
     np.testing.assert_equal(vs["variant_n_called"], np.array([1, 2, 2, 1]))
     np.testing.assert_equal(vs["variant_call_rate"], np.array([0.5, 1.0, 1.0, 0.5]))

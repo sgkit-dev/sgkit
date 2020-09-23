@@ -7,6 +7,7 @@ from dask.array import Array
 from numpy import ndarray
 from xarray import Dataset
 
+from .. import variables
 from ..typing import ArrayLike
 from ..utils import conditional_merge_datasets, split_array_chunks
 from .utils import (
@@ -730,6 +731,7 @@ def regenie(
     dosage: str,
     covariates: Union[str, Sequence[str]],
     traits: Union[str, Sequence[str]],
+    variant_contig: str = "variant_contig",
     variant_block_size: Optional[Union[int, Tuple[int, ...]]] = None,
     sample_block_size: Optional[Union[int, Tuple[int, ...]]] = None,
     alphas: Optional[Sequence[float]] = None,
@@ -753,10 +755,16 @@ def regenie(
     ----------
     dosage
         Name of genetic dosage variable.
+        As defined by `sgkit.variables.dosage`.
     covariates
         Names of covariate variables (1D or 2D).
+        As defined by `sgkit.variables.covariates`.
     traits
         Names of trait variables (1D or 2D).
+        As defined by `sgkit.variables.traits`.
+    variant_contig
+        Name of the variant contig input variable.
+        As definied by `sgkit.variables.variant_contig`.
     variant_block_size
         Number of variants in each block.
         If int, this describes the number of variants in each block
@@ -800,16 +808,18 @@ def regenie(
     A dataset containing the following variables:
 
     - `base_prediction` (blocks, alphas, samples, outcomes): Stage 1
-        predictions from ridge regression reduction .
+        predictions from ridge regression reduction. As defined by
+        `sgkit.variables.base_prediction`.
 
     - `meta_prediction` (samples, outcomes): Stage 2 predictions from
         the best meta estimator trained on the out-of-sample Stage 1
-        predictions.
+        predictions. As defined by `sgkit.variables.meta_prediction`.
 
     - `loco_prediction` (contigs, samples, outcomes): LOCO predictions
         resulting from Stage 2 predictions ignoring effects for variant
         blocks on held out contigs. This will be absent if the
-        data provided does not contain at least 2 contigs.
+        data provided does not contain at least 2 contigs. As defined by
+        `sgkit.variables.loco_prediction`.
 
     Raises
     ------
@@ -851,10 +861,18 @@ def regenie(
         covariates = [covariates]
     if isinstance(traits, str):
         traits = [traits]
+
+    variables.validate(
+        ds,
+        {dosage: variables.dosage, variant_contig: variables.variant_contig},
+        {c: variables.covariates for c in covariates},
+        {t: variables.traits for t in traits},
+    )
+
     G = ds[dosage]
     X = da.asarray(concat_2d(ds[list(covariates)], dims=("samples", "covariates")))
     Y = da.asarray(concat_2d(ds[list(traits)], dims=("samples", "traits")))
-    contigs = ds["variant_contig"]
+    contigs = ds[variant_contig]
     new_ds = regenie_transform(
         G.T,
         X,
@@ -868,4 +886,6 @@ def regenie(
         orthogonalize=orthogonalize,
         **kwargs,
     )
-    return conditional_merge_datasets(ds, new_ds, merge)
+    return variables.validate(
+        conditional_merge_datasets(ds, new_ds, merge), *new_ds.variables.keys()
+    )

@@ -3,6 +3,7 @@ from typing import Any, Dict, Hashable, List, Optional
 import numpy as np
 import xarray as xr
 
+from . import variables
 from .typing import ArrayLike
 from .utils import check_array_like
 
@@ -57,11 +58,6 @@ def create_genotype_call_dataset(
     -------
     The dataset of genotype calls.
     """
-    check_array_like(variant_contig, kind="i", ndim=1)
-    check_array_like(variant_position, kind="i", ndim=1)
-    check_array_like(variant_alleles, kind={"S", "O"}, ndim=2)
-    check_array_like(sample_id, kind={"U", "O"}, ndim=1)
-    check_array_like(call_genotype, kind="i", ndim=3)
     data_vars: Dict[Hashable, Any] = {
         "variant_contig": ([DIM_VARIANT], variant_contig),
         "variant_position": ([DIM_VARIANT], variant_position),
@@ -83,7 +79,9 @@ def create_genotype_call_dataset(
         check_array_like(variant_id, kind={"U", "O"}, ndim=1)
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
-    return xr.Dataset(data_vars=data_vars, attrs=attrs)
+    return variables.validate(
+        xr.Dataset(data_vars=data_vars, attrs=attrs), *data_vars.keys()
+    )
 
 
 def create_genotype_dosage_dataset(
@@ -132,12 +130,6 @@ def create_genotype_dosage_dataset(
     The dataset of genotype calls.
 
     """
-    check_array_like(variant_contig, kind="i", ndim=1)
-    check_array_like(variant_position, kind="i", ndim=1)
-    check_array_like(variant_alleles, kind={"S", "O"}, ndim=2)
-    check_array_like(sample_id, kind={"U", "O"}, ndim=1)
-    check_array_like(call_dosage, kind="f", ndim=2)
-    check_array_like(call_genotype_probability, kind="f", ndim=3)
     data_vars: Dict[Hashable, Any] = {
         "variant_contig": ([DIM_VARIANT], variant_contig),
         "variant_position": ([DIM_VARIANT], variant_position),
@@ -158,4 +150,6 @@ def create_genotype_dosage_dataset(
         check_array_like(variant_id, kind={"U", "O"}, ndim=1)
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
-    return xr.Dataset(data_vars=data_vars, attrs=attrs)
+    return variables.validate(
+        xr.Dataset(data_vars=data_vars, attrs=attrs), *data_vars.keys()
+    )

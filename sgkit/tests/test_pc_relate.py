@@ -27,17 +27,13 @@ def test_pc_relate__genotype_inputs_checks() -> None:
         pc_relate(g_non_biallelic)
 
     g_no_pcs = simulate_genotype_call_dataset(100, 10)
-    with pytest.raises(
-        ValueError, match="Input dataset must contain sample_pcs variable"
-    ):
+    with pytest.raises(ValueError, match="sample_pcs not present"):
         pc_relate(g_no_pcs)
 
-    with pytest.raises(ValueError, match="Input dataset must contain call_genotype"):
+    with pytest.raises(ValueError, match="call_genotype not present"):
         pc_relate(g_no_pcs.drop_vars("call_genotype"))
 
-    with pytest.raises(
-        ValueError, match="Input dataset must contain call_genotype_mask"
-    ):
+    with pytest.raises(ValueError, match="call_genotype_mask not present"):
         pc_relate(g_no_pcs.drop_vars("call_genotype_mask"))
 
 
