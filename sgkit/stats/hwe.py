@@ -123,7 +123,9 @@ hardy_weinberg_p_value_vec_jit = njit(
 
 
 def hardy_weinberg_test(
-    ds: Dataset, genotype_counts: Optional[Hashable] = None, merge: bool = True,
+    ds: Dataset,
+    genotype_counts: Optional[Hashable] = None,
+    merge: bool = True,
 ) -> Dataset:
     """Exact test for HWE as described in Wigginton et al. 2005 [1].
 
