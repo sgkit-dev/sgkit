@@ -4,9 +4,9 @@ import dask.array as da
 import numpy as np
 import pandas as pd
 import xarray as xr
-from sgkit_plink import read_plink
 
 from sgkit import pc_relate
+from sgkit.io.plink import read_plink
 
 
 def test_same_as_the_reference_implementation() -> None:
