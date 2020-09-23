@@ -7,6 +7,7 @@ import xarray as xr
 from dask.array import Array, stats
 from xarray import Dataset
 
+from .. import variables
 from ..typing import ArrayLike
 from ..utils import conditional_merge_datasets
 from .utils import concat_2d
@@ -136,21 +137,14 @@ def gwas_linear_regression(
     ds
         Dataset containing necessary dependent and independent variables.
     dosage
-        Dosage variable name where "dosage" array can contain represent
-        one of several possible quantities, e.g.:
-        - Alternate allele counts
-        - Recessive or dominant allele encodings
-        - True dosages as computed from imputed or probabilistic variant calls
-        - Any other custom encoding in a user-defined variable
+        Name of genetic dosage variable.
+        As defined by `sgkit.variables.dosage`.
     covariates
-        Covariate variable names, must correspond to 1 or 2D dataset
-        variables of shape (samples[, covariates]). All covariate arrays
-        will be concatenated along the second axis (columns).
+        Names of covariate variables (1D or 2D).
+        As defined by `sgkit.variables.covariates`.
     traits
-        Trait (e.g. phenotype) variable names, must all be continuous and
-        correspond to 1 or 2D dataset variables of shape (samples[, traits]).
-        2D trait arrays will be assumed to contain separate traits within columns
-        and concatenated to any 1D traits along the second axis (columns).
+        Names of trait variables (1D or 2D).
+        As defined by `sgkit.variables.traits`.
     add_intercept
         Add intercept term to covariate set, by default True.
     merge
@@ -197,6 +191,13 @@ def gwas_linear_regression(
     if isinstance(traits, str):
         traits = [traits]
 
+    variables.validate(
+        ds,
+        {dosage: variables.dosage},
+        {c: variables.covariates for c in covariates},
+        {t: variables.traits for t in traits},
+    )
+
     G = _get_loop_covariates(ds, dosage=dosage)
 
     X = da.asarray(concat_2d(ds[list(covariates)], dims=("samples", "covariates")))
@@ -220,4 +221,6 @@ def gwas_linear_regression(
             "variant_p_value": (("variants", "traits"), res.p_value),
         }
     )
-    return conditional_merge_datasets(ds, new_ds, merge)
+    return variables.validate(
+        conditional_merge_datasets(ds, new_ds, merge), *new_ds.variables.keys()
+    )

@@ -1,4 +1,4 @@
-from typing import Any, Dict, Hashable
+from typing import Any, Dict, Hashable, Optional
 
 import dask.array as da
 import numpy as np
@@ -8,6 +8,7 @@ from typing_extensions import Literal
 from xarray import Dataset
 
 from sgkit.stats.utils import assert_array_shape
+from sgkit import variables
 from sgkit.typing import ArrayLike
 from sgkit.utils import conditional_merge_datasets
 
@@ -84,7 +85,9 @@ def _count_cohort_alleles(
         out[cohorts[i]] += ac[i]
 
 
-def count_call_alleles(ds: Dataset, merge: bool = True) -> Dataset:
+def count_call_alleles(
+    ds: Dataset, merge: bool = True, *, call_genotype: str = "call_genotype"
+) -> Dataset:
     """Compute per sample allele counts from genotype calls.
 
     Parameters
@@ -97,6 +100,8 @@ def count_call_alleles(ds: Dataset, merge: bool = True) -> Dataset:
         output variables into a single dataset, otherwise return only
         the computed output variables.
         See :ref:`dataset_merge` for more details.
+    call_genotype
+        Input variable name holding call_genotype as defined by `sgkit.variables.call_genotype`
 
     Returns
     -------
@@ -131,8 +136,9 @@ def count_call_alleles(ds: Dataset, merge: bool = True) -> Dataset:
            [[2, 0],
             [2, 0]]], dtype=uint8)
     """
+    variables.validate(ds, {call_genotype: variables.call_genotype})
     n_alleles = ds.dims["alleles"]
-    G = da.asarray(ds["call_genotype"])
+    G = da.asarray(ds[call_genotype])
     shape = (G.chunks[0], G.chunks[1], n_alleles)
     N = da.empty(n_alleles, dtype=np.uint8)
     new_ds = Dataset(
@@ -145,10 +151,14 @@ def count_call_alleles(ds: Dataset, merge: bool = True) -> Dataset:
             )
         }
     )
-    return conditional_merge_datasets(ds, new_ds, merge)
+    return variables.validate(
+        conditional_merge_datasets(ds, new_ds, merge), "call_allele_count"
+    )
 
 
-def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
+def count_variant_alleles(
+    ds: Dataset, merge: bool = True, *, call_genotype: str = "call_genotype"
+) -> Dataset:
     """Compute allele count from genotype calls.
 
     Parameters
@@ -161,6 +171,8 @@ def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
         output variables into a single dataset, otherwise return only
         the computed output variables.
         See :ref:`dataset_merge` for more details.
+    call_genotype
+        Input variable name holding call_genotype as defined by `sgkit.variables.call_genotype`
 
     Returns
     -------
@@ -192,11 +204,15 @@ def count_variant_alleles(ds: Dataset, merge: bool = True) -> Dataset:
         {
             "variant_allele_count": (
                 ("variants", "alleles"),
-                count_call_alleles(ds)["call_allele_count"].sum(dim="samples"),
+                count_call_alleles(ds, call_genotype=call_genotype)[
+                    "call_allele_count"
+                ].sum(dim="samples"),
             )
         }
     )
-    return conditional_merge_datasets(ds, new_ds, merge)
+    return variables.validate(
+        conditional_merge_datasets(ds, new_ds, merge), "variant_allele_count"
+    )
 
 
 def count_cohort_alleles(ds: Dataset, merge: bool = True) -> Dataset:
@@ -249,17 +265,19 @@ def _swap(dim: Dimension) -> Dimension:
     return "samples" if dim == "variants" else "variants"
 
 
-def call_rate(ds: Dataset, dim: Dimension) -> Dataset:
+def call_rate(ds: Dataset, dim: Dimension, call_genotype_mask: str) -> Dataset:
     odim = _swap(dim)[:-1]
-    n_called = (~ds["call_genotype_mask"].any(dim="ploidy")).sum(dim=dim)
+    n_called = (~ds[call_genotype_mask].any(dim="ploidy")).sum(dim=dim)
     return xr.Dataset(
         {f"{odim}_n_called": n_called, f"{odim}_call_rate": n_called / ds.dims[dim]}
     )
 
 
-def genotype_count(ds: Dataset, dim: Dimension) -> Dataset:
+def genotype_count(
+    ds: Dataset, dim: Dimension, call_genotype: str, call_genotype_mask: str
+) -> Dataset:
     odim = _swap(dim)[:-1]
-    M, G = ds["call_genotype_mask"].any(dim="ploidy"), ds["call_genotype"]
+    M, G = ds[call_genotype_mask].any(dim="ploidy"), ds[call_genotype]
     n_hom_ref = (G == 0).all(dim="ploidy")
     n_hom_alt = ((G > 0) & (G[..., 0] == G)).all(dim="ploidy")
     n_non_ref = (G > 0).any(dim="ploidy")
@@ -276,16 +294,24 @@ def genotype_count(ds: Dataset, dim: Dimension) -> Dataset:
     )
 
 
-def allele_frequency(ds: Dataset) -> Dataset:
+def allele_frequency(
+    ds: Dataset,
+    call_genotype: str,
+    call_genotype_mask: str,
+    variant_allele_count: Optional[str],
+) -> Dataset:
     data_vars: Dict[Hashable, Any] = {}
     # only compute variant allele count if not already in dataset
-    if "variant_allele_count" in ds:
-        AC = ds["variant_allele_count"]
+    if variant_allele_count is not None:
+        variables.validate(ds, {variant_allele_count: variables.variant_allele_count})
+        AC = ds[variant_allele_count]
     else:
-        AC = count_variant_alleles(ds, merge=False)["variant_allele_count"]
+        AC = count_variant_alleles(ds, merge=False, call_genotype=call_genotype)[
+            "variant_allele_count"
+        ]
         data_vars["variant_allele_count"] = AC
 
-    M = ds["call_genotype_mask"].stack(calls=("samples", "ploidy"))
+    M = ds[call_genotype_mask].stack(calls=("samples", "ploidy"))
     AN = (~M).sum(dim="calls")  # type: ignore
     assert AN.shape == (ds.dims["variants"],)
 
@@ -294,7 +320,14 @@ def allele_frequency(ds: Dataset) -> Dataset:
     return Dataset(data_vars)
 
 
-def variant_stats(ds: Dataset, merge: bool = True) -> Dataset:
+def variant_stats(
+    ds: Dataset,
+    *,
+    call_genotype_mask: str = "call_genotype_mask",
+    call_genotype: str = "call_genotype",
+    variant_allele_count: Optional[str] = None,
+    merge: bool = True,
+) -> Dataset:
     """Compute quality control variant statistics from genotype calls.
 
     Parameters
@@ -302,6 +335,15 @@ def variant_stats(ds: Dataset, merge: bool = True) -> Dataset:
     ds
         Genotype call dataset such as from
         `sgkit.create_genotype_call_dataset`.
+    call_genotype
+        Input variable name holding call_genotype.
+        As defined by `sgkit.variables.call_genotype`.
+    call_genotype_mask
+        Input variable name holding call_genotype_mask.
+        As defined by `sgkit.variables.call_genotype_mask`
+    variant_allele_count
+        Optional name of the input variable holding variant_allele_count,
+        as defined by `sgkit.variables.variant_allele_count`.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -322,11 +364,30 @@ def variant_stats(ds: Dataset, merge: bool = True) -> Dataset:
     - `variant_allele_total` (variants): The number of occurrences of all alleles.
     - `variant_allele_frequency` (variants, alleles): The frequency of occurence of each allele.
     """
+    variables.validate(
+        ds,
+        {
+            call_genotype: variables.call_genotype,
+            call_genotype_mask: variables.call_genotype_mask,
+        },
+    )
     new_ds = xr.merge(
         [
-            call_rate(ds, dim="samples"),
-            genotype_count(ds, dim="samples"),
-            allele_frequency(ds),
+            call_rate(ds, dim="samples", call_genotype_mask=call_genotype_mask),
+            genotype_count(
+                ds,
+                dim="samples",
+                call_genotype=call_genotype,
+                call_genotype_mask=call_genotype_mask,
+            ),
+            allele_frequency(
+                ds,
+                call_genotype=call_genotype,
+                call_genotype_mask=call_genotype_mask,
+                variant_allele_count=variant_allele_count,
+            ),
         ]
     )
-    return conditional_merge_datasets(ds, new_ds, merge)
+    return variables.validate(
+        conditional_merge_datasets(ds, new_ds, merge), *new_ds.variables.keys()
+    )

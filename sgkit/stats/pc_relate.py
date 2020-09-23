@@ -3,6 +3,7 @@ from typing import Tuple
 import dask.array as da
 import xarray as xr
 
+from sgkit import variables
 from sgkit.typing import ArrayLike
 from sgkit.utils import conditional_merge_datasets
 
@@ -21,13 +22,25 @@ def _impute_genotype_call_with_variant_mean(
     return imputed_call_g
 
 
-def _collapse_ploidy(ds: xr.Dataset) -> Tuple[xr.DataArray, xr.DataArray]:
-    call_g_mask = ds["call_genotype_mask"].any(dim="ploidy")
-    call_g = xr.where(call_g_mask, -1, ds["call_genotype"].sum(dim="ploidy"))  # type: ignore[no-untyped-call]
+def _collapse_ploidy(
+    ds: xr.Dataset,
+    call_genotype: str = "call_genotype",
+    call_genotype_mask: str = "call_genotype_mask",
+) -> Tuple[xr.DataArray, xr.DataArray]:
+    call_g_mask = ds[call_genotype_mask].any(dim="ploidy")
+    call_g = xr.where(call_g_mask, -1, ds[call_genotype].sum(dim="ploidy"))  # type: ignore[no-untyped-call]
     return call_g, call_g_mask
 
 
-def pc_relate(ds: xr.Dataset, maf: float = 0.01, merge: bool = True) -> xr.Dataset:
+def pc_relate(
+    ds: xr.Dataset,
+    maf: float = 0.01,
+    *,
+    call_genotype: str = "call_genotype",
+    call_genotype_mask: str = "call_genotype_mask",
+    sample_pcs: str = "sample_pcs",
+    merge: bool = True
+) -> xr.Dataset:
     """Compute PC-Relate as described in Conomos, et al. 2016 [1].
 
     This method computes the kinship coefficient matrix. The kinship coefficient for
@@ -59,9 +72,9 @@ def pc_relate(ds: xr.Dataset, maf: float = 0.01, merge: bool = True) -> xr.Datas
     ds
         Dataset containing (S = num samples, V = num variants, D = ploidy, PC = num PC)
 
-        - genotype calls: "call_genotype" (SxVxD)
-        - genotype calls mask: "call_genotype_mask" (SxVxD)
-        - sample PCs: "sample_pcs" (PCxS)
+        - genotype calls: (SxVxD)
+        - genotype calls mask: (SxVxD)
+        - sample PCs: (PCxS)
     maf
         individual minor allele frequency filter. If an individual's estimated
         individual-specific minor allele frequency at a SNP is less than this value,
@@ -72,6 +85,15 @@ def pc_relate(ds: xr.Dataset, maf: float = 0.01, merge: bool = True) -> xr.Datas
         output variables into a single dataset, otherwise return only
         the computed output variables.
         See :ref:`dataset_merge` for more details.
+    call_genotype
+        Input variable name holding call_genotype.
+        As defined by `sgkit.variables.call_genotype`.
+    call_genotype_mask
+        Input variable name holding call_genotype_mask.
+        As defined by `sgkit.variables.call_genotype_mask`
+    sample_pcs
+        Input variable name holding sample_pcs.
+        As defined by `sgkit.variables.sample_pcs`
 
     Warnings
     --------
@@ -106,19 +128,21 @@ def pc_relate(ds: xr.Dataset, maf: float = 0.01, merge: bool = True) -> xr.Datas
         raise ValueError("PC Relate only works for diploid genotypes")
     if "alleles" in ds.dims and ds.dims["alleles"] != 2:
         raise ValueError("PC Relate only works for biallelic genotypes")
-    if "call_genotype" not in ds:
-        raise ValueError("Input dataset must contain call_genotype")
-    if "call_genotype_mask" not in ds:
-        raise ValueError("Input dataset must contain call_genotype_mask")
-    if "sample_pcs" not in ds:
-        raise ValueError("Input dataset must contain sample_pcs variable")
+    variables.validate(
+        ds,
+        {
+            call_genotype: variables.call_genotype,
+            call_genotype_mask: variables.call_genotype_mask,
+            sample_pcs: variables.sample_pcs,
+        },
+    )
 
-    call_g, call_g_mask = _collapse_ploidy(ds)
+    call_g, call_g_mask = _collapse_ploidy(ds, call_genotype, call_genotype_mask)
     imputed_call_g = _impute_genotype_call_with_variant_mean(call_g, call_g_mask)
 
     # 𝔼[gs|V] = 1β0 + Vβ, where 1 is a length _s_ vector of 1s, and β = (β1,...,βD)^T
     # is a length D vector of regression coefficients for each of the PCs
-    pcs = ds["sample_pcs"]
+    pcs = ds[sample_pcs]
     pcsi = da.concatenate([da.ones((1, pcs.shape[1]), dtype=pcs.dtype), pcs], axis=0)
     # Note: dask qr decomp requires no chunking in one dimension, and because number of
     # components should be smaller than number of samples in most cases, we disable
@@ -147,4 +171,6 @@ def pc_relate(ds: xr.Dataset, maf: float = 0.01, merge: bool = True) -> xr.Datas
     # NOTE: phi is of shape (S x S), S = num samples
     assert phi.shape == (call_g.shape[1],) * 2
     new_ds = xr.Dataset({"pc_relate_phi": (("sample_x", "sample_y"), phi)})
-    return conditional_merge_datasets(ds, new_ds, merge)
+    return variables.validate(
+        conditional_merge_datasets(ds, new_ds, merge), "pc_relate_phi"
+    )

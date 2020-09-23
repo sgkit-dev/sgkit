@@ -7,6 +7,7 @@ from numba import njit
 from numpy import ndarray
 from xarray import Dataset
 
+from sgkit import variables
 from sgkit.utils import conditional_merge_datasets
 
 
@@ -124,7 +125,10 @@ hardy_weinberg_p_value_vec_jit = njit(
 
 def hardy_weinberg_test(
     ds: Dataset,
+    *,
     genotype_counts: Optional[Hashable] = None,
+    call_genotype: str = "call_genotype",
+    call_genotype_mask: str = "call_genotype_mask",
     merge: bool = True,
 ) -> Dataset:
     """Exact test for HWE as described in Wigginton et al. 2005 [1].
@@ -140,6 +144,12 @@ def hardy_weinberg_test(
         where `N` is equal to the number of variants and the 3 columns contain
         heterozygous, homozygous reference, and homozygous alternate counts
         (in that order) across all samples for a variant.
+    call_genotype
+        Input variable name holding call_genotype.
+        As defined by `sgkit.variables.call_genotype`.
+    call_genotype_mask
+        Input variable name holding call_genotype_mask.
+        As defined by `sgkit.variables.call_genotype_mask`
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -175,15 +185,25 @@ def hardy_weinberg_test(
         raise NotImplementedError("HWE test only implemented for biallelic genotypes")
     # Use precomputed genotype counts if provided
     if genotype_counts is not None:
+        variables.validate(ds, {genotype_counts: variables.genotype_counts})
         obs = list(da.asarray(ds[genotype_counts]).T)
     # Otherwise compute genotype counts from calls
     else:
+        variables.validate(
+            ds,
+            {
+                call_genotype_mask: variables.call_genotype_mask,
+                call_genotype: variables.call_genotype,
+            },
+        )
         # TODO: Use API genotype counting function instead, e.g.
         # https://github.com/pystatgen/sgkit/issues/29#issuecomment-656691069
-        M = ds["call_genotype_mask"].any(dim="ploidy")
-        AC = xr.where(M, -1, ds["call_genotype"].sum(dim="ploidy"))  # type: ignore[no-untyped-call]
+        M = ds[call_genotype_mask].any(dim="ploidy")
+        AC = xr.where(M, -1, ds[call_genotype].sum(dim="ploidy"))  # type: ignore[no-untyped-call]
         cts = [1, 0, 2]  # arg order: hets, hom1, hom2
         obs = [da.asarray((AC == ct).sum(dim="samples")) for ct in cts]
     p = da.map_blocks(hardy_weinberg_p_value_vec_jit, *obs)
     new_ds = xr.Dataset({"variant_hwe_p_value": ("variants", p)})
-    return conditional_merge_datasets(ds, new_ds, merge)
+    return variables.validate(
+        conditional_merge_datasets(ds, new_ds, merge), "variant_hwe_p_value"
+    )
