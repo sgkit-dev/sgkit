@@ -187,7 +187,7 @@ def prepare_stage_3_sgkit_results(
     )
     dsr = dsr.merge(ds[["variant_id"]])
     dsr = dsr.assign(outcome=xr.DataArray(df_trait.columns, dims=("outcomes")))
-    df = dsr.to_dataframe().reset_index(drop=True)  # type: ignore[no-untyped-call]
+    df = dsr.to_dataframe().reset_index(drop=True)
     return df
 
 

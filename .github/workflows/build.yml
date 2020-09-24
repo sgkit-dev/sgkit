@@ -20,7 +20,7 @@ jobs:
       run: |
         sudo apt install libgsl-dev   # Needed for msprime < 1.0. Binary wheels include GSL for >= 1.0
         python -m pip install --upgrade pip
-        pip install -r requirements.txt -r requirements-dev.txt
+        pip install -r requirements.txt -r requirements-dev.txt -r requirements-doc.txt
     - name: Run pre-commit
       uses: pre-commit/action@v2.0.0
     - name: Check for Sphinx doc warnings

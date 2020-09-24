@@ -179,7 +179,7 @@ def display_genotypes(
     ds_abbr = truncate(
         ds_calls, max_sizes={"variants": max_variants, "samples": max_samples}
     )
-    df = ds_abbr.to_dataframe().unstack(level="ploidy")  # type: ignore[no-untyped-call]
+    df = ds_abbr.to_dataframe().unstack(level="ploidy")
 
     # Convert each genotype to a string representation
     def calls_to_str(r: pd.DataFrame) -> str:
@@ -193,5 +193,8 @@ def display_genotypes(
     df = df.apply(calls_to_str, axis=1).unstack("samples")
 
     return GenotypeDisplay(
-        df, (ds.sizes["variants"], ds.sizes["samples"]), max_variants, max_samples,
+        df,
+        (ds.sizes["variants"], ds.sizes["samples"]),
+        max_variants,
+        max_samples,
     )

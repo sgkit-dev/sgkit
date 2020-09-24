@@ -76,7 +76,11 @@ def test_concat_2d__values(n: int) -> None:
     x, y = np.arange(n), np.arange(n * n).reshape(n, n)
     z = np.copy(y)
     ds = xr.Dataset(
-        dict(x=(("dim0"), x), y=(("dim0", "dim1"), y), z=(("dim1", "dim2"), z),)
+        dict(
+            x=(("dim0"), x),
+            y=(("dim0", "dim1"), y),
+            z=(("dim1", "dim2"), z),
+        )
     )
     actual = concat_2d(ds, dims=("dim0", "dim1"))
     expected = np.concatenate([x.reshape(-1, 1), y], axis=1)

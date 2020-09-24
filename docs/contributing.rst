@@ -92,7 +92,7 @@ To build the library you can install the necessary requirements using
 pip::
 
   cd sgkit
-  pip install -r requirements.txt -r requirements-dev.txt
+  pip install -r requirements.txt -r requirements-dev.txt -r requirements-doc.txt
 
 Also install pre-commit, which is used to enforce coding standards::
 

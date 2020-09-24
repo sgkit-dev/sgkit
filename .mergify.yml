@@ -4,6 +4,8 @@ pull_request_rules:
       - base=master
       - status-success=build (3.7)
       - status-success=build (3.8)
+      - status-success=win_build (3.7)
+      - status-success=win_build (3.8)
       - approved-reviews-by=@pystatgen/committers
       - "#approved-reviews-by>=1"
       - label=auto-merge
