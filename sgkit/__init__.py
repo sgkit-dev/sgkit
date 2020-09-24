@@ -37,4 +37,5 @@ __all__ = [
     "Tajimas_D",
     "pc_relate",
     "simulate_genotype_call_dataset",
+    "variables",
 ]

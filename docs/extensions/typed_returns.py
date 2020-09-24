@@ -7,8 +7,8 @@ to fix this issue: https://github.com/theislab/scanpydoc/issues/7
 import re
 from typing import Iterator, List
 
-from sphinx.application import Sphinx  # type: ignore
-from sphinx.ext.napoleon import NumpyDocstring  # type: ignore
+from sphinx.application import Sphinx
+from sphinx.ext.napoleon import NumpyDocstring
 
 
 def process_return(lines: List[str]) -> Iterator[str]:

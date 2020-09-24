@@ -6,6 +6,8 @@
 
 # -- Path setup --------------------------------------------------------------
 
+import logging as pylogging
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -15,6 +17,7 @@ import sys
 from pathlib import Path
 
 import xarray
+from sphinx.util import logging
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -51,6 +54,26 @@ extensions = [
     "IPython.sphinxext.ipython_directive",
     *[p.stem for p in (HERE / "extensions").glob("*.py")],
 ]
+
+
+# Workaround https://github.com/agronholm/sphinx-autodoc-typehints/issues/123
+# When this https://github.com/agronholm/sphinx-autodoc-typehints/pull/153
+# gets merged, we can remove this
+class FilterForIssue123(pylogging.Filter):
+    def filter(self, record: pylogging.LogRecord) -> bool:
+        msg = record.getMessage()
+        return not (
+            msg.startswith("Cannot treat a function")
+            and any(
+                s in msg
+                for s in ["sgkit.variables.Spec", "sgkit.variables.ArrayLikeSpec"]
+            )
+        )
+
+
+logging.getLogger("sphinx_autodoc_typehints").logger.addFilter(FilterForIssue123())
+# End of workaround
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
