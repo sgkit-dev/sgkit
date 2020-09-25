@@ -138,13 +138,13 @@ def gwas_linear_regression(
         Dataset containing necessary dependent and independent variables.
     dosage
         Name of genetic dosage variable.
-        As defined by `sgkit.variables.dosage`.
+        As defined by :data:`sgkit.variables.dosage`.
     covariates
         Names of covariate variables (1D or 2D).
-        As defined by `sgkit.variables.covariates`.
+        As defined by :data:`sgkit.variables.covariates`.
     traits
         Names of trait variables (1D or 2D).
-        As defined by `sgkit.variables.traits`.
+        As defined by :data:`sgkit.variables.traits`.
     add_intercept
         Add intercept term to covariate set, by default True.
     merge
