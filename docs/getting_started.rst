@@ -4,6 +4,9 @@
 Getting Started
 **********************
 
+.. contents:: Table of contents:
+   :local:
+
 Installation
 ------------
 
@@ -18,6 +21,17 @@ package yet though (or pypi package for that matter) so the recommended setup in
 
 Overview
 --------
+
+Sgkit is a general purpose toolkit for quantitative and population genetics.
+The primary goal of sgkit is to take advantage of powerful tools in the `PyData ecosystem <https://pydata.org/>`_
+to facilitate interactive analysis of large-scale datasets. The main libraries we use are:
+
+- `Xarray <http://xarray.pydata.org/en/stable/>`_: N-D labeling for arrays and datasets
+- `Dask <https://docs.dask.org/en/latest/>`_: Parallel computing on chunked arrays
+- `Zarr <https://zarr.readthedocs.io/en/stable/>`_: Serialization for chunked arrays
+- `Numpy <https://numpy.org/doc/stable/>`_: N-D in-memory array manipulation
+- `Pandas <https://pandas.pydata.org/docs/>`_: Tabular data frame manipulation
+- `CuPy <https://docs.cupy.dev/en/stable/>`_: Numpy-like array interface for CUDA GPUs
 
 Data structures
 ~~~~~~~~~~~~~~~
@@ -40,19 +54,22 @@ several of the sgkit conventions in place for representing common genetic quanti
 
 .. ipython:: python
 
-    from sgkit.testing import simulate_genotype_call_dataset
-    ds = simulate_genotype_call_dataset(n_variant=1000, n_sample=250, n_contig=23, missing_pct=.1, seed=0)
+    import sgkit as sg
+    ds = sg.simulate_genotype_call_dataset(n_variant=1000, n_sample=250, n_contig=23, missing_pct=.1)
     ds
 
 The presence of a single-nucleotide variant (SNV) is indicated above by the ``call_genotype`` variable, which contains
 an integer value corresponding to the index of the associated allele present (i.e. index into the ``variant_allele`` variable)
-for a sample at a given locus and chromosome. Every sgkit variable has a set of fixed semantics like this. For more
+for a sample at a given genome coordinate and chromosome. Every sgkit variable has a set of fixed semantics like this. For more
 information on this specific variable and any others, see :ref:`genetic_variables`.
 
 Data subsets can be accessed as shown here, using the features described in
 `Indexing and Selecting Xarray Data <http://xarray.pydata.org/en/stable/indexing.html>`_:
 
 .. ipython:: python
+
+    import sgkit as sg
+    ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, n_contig=23, missing_pct=.1)
 
     # Subset the entire dataset to the first 10 variants/samples
     ds.isel(variants=slice(10), samples=slice(10))
@@ -81,6 +98,7 @@ sgkit utilities as well as the Pandas/Xarray integration:
 .. ipython:: python
 
     import sgkit as sg
+    ds = sg.simulate_genotype_call_dataset(n_variant=1000, n_sample=250, missing_pct=.1)
 
     # Show genotype calls with domain-specific display logic
     sg.display_genotypes(ds, max_variants=8, max_samples=8)
@@ -115,11 +133,54 @@ across samples for each individual variant:
 
 .. ipython:: python
 
+    import sgkit as sg
+    ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
     sg.variant_stats(ds, merge=False)
 
 There are two ways that the results of every function are handled -- either they are merged with the provided
-dataset or they are returned in a separate dataset.  See :ref:`dataset_merge` for more details.
+dataset or they are returned in a separate dataset.  See :ref:`dataset_merge` below for more details.
 
+.. _dataset_merge:
+
+Dataset merge behavior
+~~~~~~~~~~~~~~~~~~~~~~
+
+Generally, method functions in sgkit compute some new variables based on the
+input dataset, then return a new output dataset that consists of the input
+dataset plus the new computed variables. The input dataset is unchanged.
+
+This behavior can be controlled using the ``merge`` parameter. If set to ``True``
+(the default), then the function will merge the input dataset and the computed
+output variables into a single dataset. Output variables will overwrite any
+input variables with the same name, and a warning will be issued in this case.
+If ``False``, the function will return only the computed output variables.
+
+Examples:
+
+.. ipython:: python
+    :okwarning:
+
+    import sgkit as sg
+    ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
+    ds = ds[['variant_allele', 'call_genotype']]
+    ds
+
+    # By default, new variables are merged into a copy of the provided dataset
+    ds = sg.count_variant_alleles(ds)
+    ds
+
+    # If an existing variable would be re-defined, a warning is thrown
+    import warnings
+    ds = sg.count_variant_alleles(ds)
+    with warnings.catch_warnings(record=True) as w:
+        ds = sg.count_variant_alleles(ds)
+        print(f"{w[0].category.__name__}: {w[0].message}")
+
+    # New variables can also be returned in their own dataset
+    sg.count_variant_alleles(ds, merge=False)
+
+    # This can be useful for merging multiple datasets manually
+    ds.merge(sg.count_variant_alleles(ds, merge=False))
 
 .. _missing_data:
 
@@ -128,16 +189,38 @@ Missing data
 
 Missing data in sgkit is represented using a sentinel value within data arrays
 (``-1`` in integer arrays and ``NaN`` in float arrays) as well as a companion boolean mask array
-(``True`` where data is missing). The sentinel values are often more useful when implementing compiled
-operations while the boolean mask array facilitates user operations in a higher level API like Xarray or Numpy.
+(``True`` where data is missing).  These sentinel values are handled transparently in
+most sgkit functions and where this isn't possible, limitations related to it are documented
+along with potential workarounds.
 
-This example shows how either can be used, though users should prefer the mask array where possible since
-its on-disk representation is typically far smaller after compression is applied.
+This example demonstrates one such function where missing calls are ignored:
 
 .. ipython:: python
 
-    dsm = simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=2, missing_pct=.3, seed=4)
-    dsm.call_genotype
+    import sgkit as sg
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=2, missing_pct=.3, seed=4)
+    ds.call_genotype
+
+    # Here, you can see that the missing calls above are not included in the allele counts
+    sg.count_variant_alleles(ds).variant_allele_count
+
+
+A primary design goal in sgkit is to facilitate ad-hoc analysis. There are many useful functions in
+the library but they are not enough on their own to accomplish many analyses. To that end, it is
+often helpful to be able to handle missing data in your own functions or exploratory summaries.
+Both the sentinel values and the boolean mask array help make this possible, where the sentinel values
+are typically more useful when implementing compiled operations and the boolean mask array is easier to use
+in a higher level API like Xarray or Numpy.  Only advanced users would likely ever need to worry
+about compiling their own functions.  Using Xarray functions and the boolean mask is
+generally enough to accomplish most tasks, and this mask is often more efficient to operate
+on due to its high on-disk compression ratio.  These examples better demonstrate the distinction between
+the two as well as ways in which they are commonly used:
+
+.. ipython:: python
+
+    import sgkit as sg
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=2, missing_pct=.3, seed=4)
+    ds.call_genotype
 
     # Count alternate alleles while omitting partial calls
     ##############
@@ -146,9 +229,9 @@ its on-disk representation is typically far smaller after compression is applied
     import xarray as xr
     alt_allele_count = xr.where(
         # Identify where there are any missing calls across chromosomes
-        dsm.call_genotype_mask.any(dim='ploidy'),
+        ds.call_genotype_mask.any(dim='ploidy'),
         -1, # Return -1 if any one call for a chromosome is missing
-        (dsm.call_genotype > 0).sum(dim='ploidy') # Otherwise, sum non-ref calls
+        (ds.call_genotype > 0).sum(dim='ploidy') # Otherwise, sum non-ref calls
     )
     # Note that only the first two samples have meaningful counts since
     # at least one call is missing for the last two samples
@@ -169,18 +252,25 @@ its on-disk representation is typically far smaller after compression is applied
 
     # Jit-compiled functions are often simpler with a single array input, since
     # conditional logic based on sentinel values is easier to program with this API
-    numba.njit(alt_allele_count)(dsm.call_genotype.values)
+    numba.njit(alt_allele_count)(ds.call_genotype.values)
 
-This is not necessarily a level of detail most users should need to worry about. Missing data
-is handled explicitly in sgkit functions and where this isn't possible, limitations related
-to it are documented along with potential workarounds.
+Again, this is not necessarily a level of detail most users should need to worry about. It is important
+to understand though when constructing more complex workflows that take full advantage of the many
+tools in the `PyData <https://pydata.org/>`_ ecosystem.
+
 
 Chaining operations
 ~~~~~~~~~~~~~~~~~~~
 
-This example shows to chain multiple sgkit, xarray, and pandas operations into a single pipeline:
+`Method chaining <https://tomaugspurger.github.io/method-chaining.html>`_ is a common practice with Python
+data tools that improves code readability and reduces the probability of introducing accidental namespace collisions.
+Sgkit functions are compatible with this idiom by default and this example shows to use it in conjunction with
+Xarray and Xandas operations in a single pipeline:
 
 .. ipython:: python
+
+    import sgkit as sg
+    ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
 
     # Use `pipe` to apply a single sgkit function to a dataset
     ds_qc = ds.pipe(sg.variant_stats).drop_dims('samples')
@@ -212,10 +302,13 @@ See :ref:`dataset_merge` for more details.
 Chunked arrays
 ~~~~~~~~~~~~~~
 
-Chunked arrays, via Dask, operate very similarly to in-memory arrays within Xarray. Because of this, few affordances
-in sgkit are provided to treat them differently. They can generally be used in whatever context in-memory arrays are
-used and vise-versa with the biggest difference in behavior being that operations on chunked arrays are evaluated
-lazily.  This means that if an Xarray ``Dataset`` contains only chunked arrays, no computations will be performed
+Chunked arrays are required when working on large datasets. Libraries for managing chunked arrays such as `Dask Array <https://docs.dask.org/en/latest/array.html>`_
+and `Zarr <https://zarr.readthedocs.io/en/stable/>`_ make it possible to implement blockwise algorithms that operate
+on subsets of arrays (in parallel) without ever requiring them to fit entirely in memory.
+
+By design, they behave almost identically to in-memory (typically Numpy) arrays within Xarray and can be interchanged freely when provided
+to sgkit functions. The most notable difference in behavior though is that operations on chunked arrays are `evaluated lazily <https://tutorial.dask.org/01x_lazy.html>`_.
+This means that if an Xarray ``Dataset`` contains only chunked arrays, no actual computations will be performed
 until one of the following occurs:
 
 - `Dataset.compute <http://xarray.pydata.org/en/stable/generated/xarray.Dataset.compute.html>`_ is called
@@ -227,21 +320,24 @@ This example shows a few of these features:
 
 .. ipython:: python
 
+    import sgkit as sg
+    ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
+
     # Chunk our original in-memory dataset using a blocksize of 50 in all dimensions.
-    dsc = ds.chunk(chunks=50)
-    dsc
+    ds = ds.chunk(chunks=50)
+    ds
 
     # Show the chunked array representing base pair position
-    dsc.variant_position
+    ds.variant_position
 
     # Call compute via the dask.array API
-    dsc.variant_position.data.compute()[:5]
+    ds.variant_position.data.compute()[:5]
 
     # Coerce to numpy via Xarray
-    dsc.variant_position.values[:5]
+    ds.variant_position.values[:5]
 
     # Compute without unboxing from xarray.DataArray
-    dsc.variant_position.compute()[:5]
+    ds.variant_position.compute()[:5]
 
 
 Unlike this simplified example, real datasets often contain a mixture of chunked and unchunked arrays. Sgkit
@@ -266,9 +362,11 @@ As an example, this code shows how to track the progress of a single sgkit funct
 .. ipython:: python
     :okwarning:
 
+    import sgkit as sg
     from dask.diagnostics import ProgressBar
+    ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
     with ProgressBar():
-        ac = sg.count_variant_alleles(dsc).variant_allele_count.compute()
+        ac = sg.count_variant_alleles(ds).variant_allele_count.compute()
     ac[:5]
 
 Monitoring resource utilization with `ResourceProfiler <https://docs.dask.org/en/latest/diagnostics-local.html#resourceprofiler>`_

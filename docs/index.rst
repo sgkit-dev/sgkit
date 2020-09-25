@@ -19,8 +19,8 @@ both popular Python genetics toolkits with a respective focus on population and 
 
    getting_started
    api
-   usage
    io
+   user_guide
    contributing
 
 Indices and tables
