@@ -49,7 +49,7 @@ def simulate_genotype_call_dataset(
     Returns
     -------
     Dataset
-        Dataset from `sgkit.create_genotype_call_dataset`.
+        Dataset from :func:`sgkit.create_genotype_call_dataset`.
     """
     if missing_pct and (missing_pct < 0.0 or missing_pct > 1.0):
         raise ValueError("missing_pct must be within [0.0, 1.0]")

@@ -80,20 +80,20 @@ def pc_relate(
         individual-specific minor allele frequency at a SNP is less than this value,
         that SNP will be excluded from the analysis for that individual.
         The default value is 0.01. Must be between (0.0, 0.1).
+    call_genotype
+        Input variable name holding call_genotype.
+        As defined by :data:`sgkit.variables.call_genotype`.
+    call_genotype_mask
+        Input variable name holding call_genotype_mask.
+        As defined by :data:`sgkit.variables.call_genotype_mask`
+    sample_pcs
+        Input variable name holding sample_pcs.
+        As defined by :data:`sgkit.variables.sample_pcs`
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
         the computed output variables.
         See :ref:`dataset_merge` for more details.
-    call_genotype
-        Input variable name holding call_genotype.
-        As defined by `sgkit.variables.call_genotype`.
-    call_genotype_mask
-        Input variable name holding call_genotype_mask.
-        As defined by `sgkit.variables.call_genotype_mask`
-    sample_pcs
-        Input variable name holding sample_pcs.
-        As defined by `sgkit.variables.sample_pcs`
 
     Warnings
     --------
@@ -102,7 +102,7 @@ def pc_relate(
     Returns
     -------
     Dataset containing (S = num samples):
-    pc_relate_phi: (S,S) ArrayLike
+    :data:`sgkit.variables.pc_relate_phi`: (S,S) ArrayLike
     pairwise recent kinship coefficient matrix as float in [-0.5, 0.5].
 
     References
