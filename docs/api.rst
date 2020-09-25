@@ -1,10 +1,25 @@
-.. currentmodule:: sgkit
-
 #############
 API reference
 #############
 
 This page provides an auto-generated summary of sgkits's API.
+
+IO/imports
+==========
+
+.. currentmodule:: sgkit.io.plink
+.. autosummary::
+   :toctree: generated/
+
+    read_plink
+
+.. currentmodule:: sgkit
+.. autosummary::
+   :toctree: generated/
+
+    read_vcfzarr
+
+.. currentmodule:: sgkit
 
 Creating a dataset
 ==================
@@ -14,7 +29,6 @@ Creating a dataset
 
    create_genotype_call_dataset
    create_genotype_dosage_dataset
-   read_vcfzarr
 
 Methods
 =======
