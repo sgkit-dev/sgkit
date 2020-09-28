@@ -34,8 +34,8 @@ def _collapse_ploidy(
 
 def pc_relate(
     ds: xr.Dataset,
-    maf: float = 0.01,
     *,
+    maf: float = 0.01,
     call_genotype: str = "call_genotype",
     call_genotype_mask: str = "call_genotype_mask",
     sample_pcs: str = "sample_pcs",
@@ -82,13 +82,13 @@ def pc_relate(
         The default value is 0.01. Must be between (0.0, 0.1).
     call_genotype
         Input variable name holding call_genotype.
-        As defined by :data:`sgkit.variables.call_genotype`.
+        Defined by :data:`sgkit.variables.call_genotype`.
     call_genotype_mask
         Input variable name holding call_genotype_mask.
-        As defined by :data:`sgkit.variables.call_genotype_mask`
+        Defined by :data:`sgkit.variables.call_genotype_mask`
     sample_pcs
         Input variable name holding sample_pcs.
-        As defined by :data:`sgkit.variables.sample_pcs`
+        Defined by :data:`sgkit.variables.sample_pcs`
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
