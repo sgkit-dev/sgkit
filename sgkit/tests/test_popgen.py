@@ -62,7 +62,7 @@ def test_divergence(size, n_cohorts):
     )
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
-    ds = ds.assign_coords({"cohorts_a": cohort_names, "cohorts_b": cohort_names})
+    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
     ds = divergence(ds)
     div = ds["stat_divergence"].values
 
@@ -86,7 +86,7 @@ def test_Fst(size, n_cohorts):
     )
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
-    ds = ds.assign_coords({"cohorts_a": cohort_names, "cohorts_b": cohort_names})
+    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
     ds = Fst(ds)
     fst = ds["stat_Fst"].values
 
