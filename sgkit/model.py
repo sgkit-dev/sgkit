@@ -79,9 +79,7 @@ def create_genotype_call_dataset(
         check_array_like(variant_id, kind={"U", "O"}, ndim=1)
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
-    return variables.validate(
-        xr.Dataset(data_vars=data_vars, attrs=attrs), *data_vars.keys()
-    )
+    return variables.validate(xr.Dataset(data_vars=data_vars, attrs=attrs))
 
 
 def create_genotype_dosage_dataset(
@@ -150,6 +148,4 @@ def create_genotype_dosage_dataset(
         check_array_like(variant_id, kind={"U", "O"}, ndim=1)
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
-    return variables.validate(
-        xr.Dataset(data_vars=data_vars, attrs=attrs), *data_vars.keys()
-    )
+    return variables.validate(xr.Dataset(data_vars=data_vars, attrs=attrs))

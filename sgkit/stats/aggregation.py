@@ -152,9 +152,7 @@ def count_call_alleles(
             )
         }
     )
-    return variables.validate(
-        conditional_merge_datasets(ds, new_ds, merge), "call_allele_count"
-    )
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
 
 
 def count_variant_alleles(
@@ -212,9 +210,7 @@ def count_variant_alleles(
             )
         }
     )
-    return variables.validate(
-        conditional_merge_datasets(ds, new_ds, merge), "variant_allele_count"
-    )
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
 
 
 def count_cohort_alleles(ds: Dataset, merge: bool = True) -> Dataset:
@@ -399,6 +395,4 @@ def variant_stats(
             ),
         ]
     )
-    return variables.validate(
-        conditional_merge_datasets(ds, new_ds, merge), *new_ds.variables.keys()
-    )
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)

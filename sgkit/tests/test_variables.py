@@ -65,3 +65,17 @@ def test_variables__multiple_specs(dummy_ds: xr.Dataset) -> None:
         variables.validate(dummy_ds, {"bar": invalid_spec})
     with pytest.raises(ValueError, match="bar does not match the spec"):
         variables.validate(dummy_ds, {"foo": spec}, {"bar": invalid_spec})
+
+
+def test_variables__whole_ds(dummy_ds: xr.Dataset) -> None:
+    spec_foo = ArrayLikeSpec("foo", kind="i", ndim=1)
+    spec_bar = ArrayLikeSpec("bar", kind="i", ndim=1)
+    try:
+        SgkitVariables.register_variable(spec_foo)
+        with pytest.raises(ValueError, match="No array spec registered for bar"):
+            variables.validate(dummy_ds)
+        SgkitVariables.register_variable(spec_bar)
+        variables.validate(dummy_ds)
+    finally:
+        SgkitVariables.registered_variables.pop("foo", None)
+        SgkitVariables.registered_variables.pop("bar", None)
