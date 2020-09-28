@@ -755,16 +755,16 @@ def regenie(
     ----------
     dosage
         Name of genetic dosage variable.
-        As defined by :data:`sgkit.variables.dosage`.
+        Defined by :data:`sgkit.variables.dosage`.
     covariates
         Names of covariate variables (1D or 2D).
-        As defined by :data:`sgkit.variables.covariates`.
+        Defined by :data:`sgkit.variables.covariates`.
     traits
         Names of trait variables (1D or 2D).
-        As defined by :data:`sgkit.variables.traits`.
+        Defined by :data:`sgkit.variables.traits`.
     variant_contig
         Name of the variant contig input variable.
-        As definied by :data:`sgkit.variables.variant_contig`.
+        Definied by :data:`sgkit.variables.variant_contig`.
     variant_block_size
         Number of variants in each block.
         If int, this describes the number of variants in each block
@@ -808,17 +808,17 @@ def regenie(
     A dataset containing the following variables:
 
     - `base_prediction` (blocks, alphas, samples, outcomes): Stage 1
-        predictions from ridge regression reduction. As defined by
+        predictions from ridge regression reduction. Defined by
         :data:`sgkit.variables.base_prediction`.
 
     - `meta_prediction` (samples, outcomes): Stage 2 predictions from
         the best meta estimator trained on the out-of-sample Stage 1
-        predictions. As defined by :data:`sgkit.variables.meta_prediction`.
+        predictions. Defined by :data:`sgkit.variables.meta_prediction`.
 
     - `loco_prediction` (contigs, samples, outcomes): LOCO predictions
         resulting from Stage 2 predictions ignoring effects for variant
         blocks on held out contigs. This will be absent if the
-        data provided does not contain at least 2 contigs. As defined by
+        data provided does not contain at least 2 contigs. Defined by
         :data:`sgkit.variables.loco_prediction`.
 
     Raises

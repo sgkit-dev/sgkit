@@ -146,10 +146,10 @@ def hardy_weinberg_test(
         (in that order) across all samples for a variant.
     call_genotype
         Input variable name holding call_genotype.
-        As defined by :data:`sgkit.variables.call_genotype`.
+        Defined by :data:`sgkit.variables.call_genotype`.
     call_genotype_mask
         Input variable name holding call_genotype_mask.
-        As defined by :data:`sgkit.variables.call_genotype_mask`
+        Defined by :data:`sgkit.variables.call_genotype_mask`
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only

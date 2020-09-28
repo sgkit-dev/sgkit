@@ -335,10 +335,10 @@ def variant_stats(
         :func:`sgkit.create_genotype_call_dataset`.
     call_genotype
         Input variable name holding call_genotype.
-        As defined by :data:`sgkit.variables.call_genotype`.
+        Defined by :data:`sgkit.variables.call_genotype`.
     call_genotype_mask
         Input variable name holding call_genotype_mask.
-        As defined by :data:`sgkit.variables.call_genotype_mask`
+        Defined by :data:`sgkit.variables.call_genotype_mask`
     variant_allele_count
         Optional name of the input variable holding variant_allele_count,
         as defined by :data:`sgkit.variables.variant_allele_count`.
