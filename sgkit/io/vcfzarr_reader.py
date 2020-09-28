@@ -60,11 +60,9 @@ def read_vcfzarr(path: PathType) -> xr.Dataset:
     )
 
     # Add a mask for variant ID
-    # Note: we wrap the "." inside a list to workaround https://github.com/dask/dask/issues/6631,
-    #       and therefor force dask array's eq
     ds["variant_id_mask"] = (
         [DIM_VARIANT],
-        variants_id == ["."],
+        variants_id == ".",
     )
 
     return ds
