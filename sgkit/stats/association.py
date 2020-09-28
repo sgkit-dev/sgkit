@@ -221,6 +221,4 @@ def gwas_linear_regression(
             "variant_p_value": (("variants", "traits"), res.p_value),
         }
     )
-    return variables.validate(
-        conditional_merge_datasets(ds, new_ds, merge), *new_ds.variables.keys()
-    )
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)

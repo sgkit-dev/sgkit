@@ -1,7 +1,10 @@
+import logging
 from dataclasses import dataclass
 from typing import Dict, Hashable, Mapping, Set, Union, overload
 
 import xarray as xr
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -161,7 +164,7 @@ class SgkitVariables:
     ) -> xr.Dataset:
         """
         Validate that xr_dataset contains array(s) of interest with alternative
-        variable name(s).
+        variable name(s). To validate all variables in the dataset, skip `specs`.
         """
         ...
 
@@ -170,7 +173,7 @@ class SgkitVariables:
     def _validate(cls, xr_dataset: xr.Dataset, *specs: ArrayLikeSpec) -> xr.Dataset:
         """
         Validate that xr_dataset contains array(s) of interest with default
-        variable name(s).
+        variable name(s). To validate all variables in the dataset, skip `specs`.
         """
         ...
 
@@ -180,6 +183,7 @@ class SgkitVariables:
         """
         Validate that xr_dataset contains array(s) of interest with variable
         name(s). Variable must be registered in `SgkitVariables.registered_variables`.
+        To validate all variables in the dataset, skip `specs`.
         """
         ...
 
@@ -189,6 +193,9 @@ class SgkitVariables:
         xr_dataset: xr.Dataset,
         *specs: Union[ArrayLikeSpec, Mapping[Hashable, ArrayLikeSpec], Hashable],
     ) -> xr.Dataset:
+        if len(specs) == 0:
+            specs = tuple(xr_dataset.variables.keys())
+            logger.debug(f"No specs provided, will validate all variables: {specs}")
         for s in specs:
             if isinstance(s, ArrayLikeSpec):
                 cls._check_field(xr_dataset, s, s.default_name)
