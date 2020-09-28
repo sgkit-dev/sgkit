@@ -127,7 +127,7 @@ def divergence(
     d_sum = d.sum(axis=0)
     assert_array_shape(d_sum, n_cohorts, n_cohorts)
 
-    new_ds = Dataset({"stat_divergence": (("cohorts_a", "cohorts_b"), d_sum)})
+    new_ds = Dataset({"stat_divergence": (("cohorts_0", "cohorts_1"), d_sum)})
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
