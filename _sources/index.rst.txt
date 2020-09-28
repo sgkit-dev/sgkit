@@ -2,12 +2,13 @@ sgkit: Statistical genetics toolkit in Python
 =============================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: Contents:
 
-   api
-   usage
-   contributing
+    api
+    usage
+    io
+    contributing
 
 
 Indices and tables

@@ -37,7 +37,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="sgkit.create_genotype_call_dataset" href="generated/sgkit.create_genotype_call_dataset.html" />
+    <link rel="next" title="sgkit.io.plink.read_plink" href="generated/sgkit.io.plink.read_plink.html" />
     <link rel="prev" title="sgkit: Statistical genetics toolkit in Python" href="index.html" /> 
 </head>
 
@@ -86,10 +86,14 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#io-imports">IO/imports</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.io.plink.read_plink.html">sgkit.io.plink.read_plink</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.read_vcfzarr.html">sgkit.read_vcfzarr</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#creating-a-dataset">Creating a dataset</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.create_genotype_call_dataset.html">sgkit.create_genotype_call_dataset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.create_genotype_dosage_dataset.html">sgkit.create_genotype_dosage_dataset</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.read_vcfzarr.html">sgkit.read_vcfzarr</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#methods">Methods</a><ul>
@@ -113,6 +117,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">IOs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to sgkit</a></li>
 </ul>
 
@@ -182,6 +187,31 @@
   <div class="section" id="api-reference">
 <h1>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
 <p>This page provides an auto-generated summary of sgkits’s API.</p>
+<div class="section" id="io-imports">
+<h2>IO/imports<a class="headerlink" href="#io-imports" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.plink.read_plink.html#sgkit.io.plink.read_plink" title="sgkit.io.plink.read_plink"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_plink</span></code></a>(*[, path, bed_path, bim_path, …])</p></td>
+<td><p>Read PLINK dataset.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.read_vcfzarr.html#sgkit.read_vcfzarr" title="sgkit.read_vcfzarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_vcfzarr</span></code></a>(path)</p></td>
+<td><p>Read a VCF Zarr file.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="section" id="creating-a-dataset">
 <h2>Creating a dataset<a class="headerlink" href="#creating-a-dataset" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
@@ -195,9 +225,6 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.create_genotype_dosage_dataset.html#sgkit.create_genotype_dosage_dataset" title="sgkit.create_genotype_dosage_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_genotype_dosage_dataset</span></code></a>(*, …[, …])</p></td>
 <td><p>Create a dataset of genotype dosages.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.read_vcfzarr.html#sgkit.read_vcfzarr" title="sgkit.read_vcfzarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_vcfzarr</span></code></a>(path)</p></td>
-<td><p>Read a VCF Zarr file.</p></td>
 </tr>
 </tbody>
 </table>
@@ -270,7 +297,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="generated/sgkit.create_genotype_call_dataset.html" class="btn btn-neutral float-right" title="sgkit.create_genotype_call_dataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="generated/sgkit.io.plink.read_plink.html" class="btn btn-neutral float-right" title="sgkit.io.plink.read_plink" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="index.html" class="btn btn-neutral float-left" title="sgkit: Statistical genetics toolkit in Python" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

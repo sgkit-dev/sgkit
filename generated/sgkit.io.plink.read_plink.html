@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sgkit.io.plink.read_plink &mdash; sgkit  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/typehints.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="sgkit.read_vcfzarr" href="sgkit.read_vcfzarr.html" />
+    <link rel="prev" title="API reference" href="../api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> sgkit
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#io-imports">IO/imports</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.io.plink.read_plink</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.read_vcfzarr.html">sgkit.read_vcfzarr</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#creating-a-dataset">Creating a dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#methods">Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#utilities">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io.html">IOs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to sgkit</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">sgkit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../api.html">API reference</a> &raquo;</li>
+        
+      <li>sgkit.io.plink.read_plink</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/generated/sgkit.io.plink.read_plink.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sgkit-io-plink-read-plink">
+<h1>sgkit.io.plink.read_plink<a class="headerlink" href="#sgkit-io-plink-read-plink" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="sgkit.io.plink.read_plink">
+<code class="sig-prename descclassname">sgkit.io.plink.</code><code class="sig-name descname">read_plink</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bed_path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bim_path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fam_path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">chunks</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">fam_sep</span><span class="o">=</span><span class="default_value">' '</span></em>, <em class="sig-param"><span class="n">bim_sep</span><span class="o">=</span><span class="default_value">'\\t'</span></em>, <em class="sig-param"><span class="n">bim_int_contig</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">count_a1</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">lock</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">persist</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.io.plink.read_plink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read PLINK dataset.</p>
+<p>Loads a single PLINK dataset as dask arrays within a Dataset
+from bed, bim, and fam files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>path</strong> : <em>Optional</em><em>[</em><em>PathType</em><em>]</em></dt><dd><p>Path to PLINK file set.
+This should not include a suffix, i.e. if the files are
+at <cite>data.{bed,fam,bim}</cite> then only ‘data’ should be
+provided (suffixes are added internally).
+Either this path must be provided or all 3 of
+<cite>bed_path</cite>, <cite>bim_path</cite> and <cite>fam_path</cite>.</p>
+</dd>
+<dt><strong>bed_path</strong> : <em>Optional</em><em>[</em><em>PathType</em><em>]</em></dt><dd><p>Path to PLINK bed file.
+This should be a full path including the <cite>.bed</cite> extension
+and cannot be specified in conjunction with <cite>path</cite>.</p>
+</dd>
+<dt><strong>bim_path</strong> : <em>Optional</em><em>[</em><em>PathType</em><em>]</em></dt><dd><p>Path to PLINK bim file.
+This should be a full path including the <cite>.bim</cite> extension
+and cannot be specified in conjunction with <cite>path</cite>.</p>
+</dd>
+<dt><strong>fam_path</strong> : <em>Optional</em><em>[</em><em>PathType</em><em>]</em></dt><dd><p>Path to PLINK fam file.
+This should be a full path including the <cite>.fam</cite> extension
+and cannot be specified in conjunction with <cite>path</cite>.</p>
+</dd>
+<dt><strong>chunks</strong> : <em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>]</em><em>, </em><em>optional</em></dt><dd><p>Chunk size for genotype (i.e. <cite>.bed</cite>) data, by default “auto”</p>
+</dd>
+<dt><strong>fam_sep</strong> : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em></dt><dd><p>Delimiter for <cite>.fam</cite> file, by default ” “</p>
+</dd>
+<dt><strong>bim_sep</strong> : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em></dt><dd><p>Delimiter for <cite>.bim</cite> file, by default ” “</p>
+</dd>
+<dt><strong>bim_int_contig</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em></dt><dd><p>Whether or not the contig/chromosome name in the <cite>.bim</cite>
+file should be interpreted as an integer, by default False.
+If False, then the <cite>variant/contig</cite> field in the resulting
+dataset will contain the indexes of corresponding strings
+encountered in the first <cite>.bim</cite> field.</p>
+</dd>
+<dt><strong>count_a1</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em></dt><dd><p>Whether or not allele counts should be for A1 or A2,
+by default True. Typically A1 is the minor allele
+and should be counted instead of A2. This is not enforced
+by PLINK though and it is up to the data generating process
+to ensure that A1 is in fact an alternate/minor/effect
+allele. See <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats">https://www.cog-genomics.org/plink/1.9/formats</a>
+for more details.</p>
+</dd>
+<dt><strong>lock</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em></dt><dd><p>Whether or not to synchronize concurrent reads of <cite>.bed</cite>
+file blocks, by default False. This is passed through to
+[dask.array.from_array](<a class="reference external" href="https://docs.dask.org/en/latest/array-api.html#dask.array.from_array">https://docs.dask.org/en/latest/array-api.html#dask.array.from_array</a>).</p>
+</dd>
+<dt><strong>persist</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em></dt><dd><p>Whether or not to persist <cite>.fam</cite> and <cite>.bim</cite> information in
+memory, by default True. This is an important performance
+consideration as the plain text files for this data will
+be read multiple times when False. This can lead to load
+times that are upwards of 10x slower.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Dataset</dt><dd><p>A dataset containing genotypes as 3 dimensional calls along with
+all accompanying pedigree and variant information. The content
+of this dataset matches that of <cite>sgkit.create_genotype_call_dataset</cite>
+with all pedigree-specific fields defined as:</p>
+<ul class="simple">
+<li><p>sample_family_id: Family identifier commonly referred to as FID</p></li>
+<li><p>sample_id: Within-family identifier for sample</p></li>
+<li><p>sample_paternal_id: Within-family identifier for father of sample</p></li>
+<li><p>sample_maternal_id: Within-family identifier for mother of sample</p></li>
+<li><p>sample_sex: Sex code equal to 1 for male, 2 for female, and -1
+for missing</p></li>
+<li><p>sample_phenotype: Phenotype code equal to 1 for control, 2 for case,
+and -1 for missing</p></li>
+</ul>
+</dd>
+</dl>
+<p>See <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#fam">https://www.cog-genomics.org/plink/1.9/formats#fam</a> for more details.</p>
+</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>path</cite> and one of <cite>bed_path</cite>, <cite>bim_path</cite> or <cite>fam_path</cite> are provided.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sgkit.read_vcfzarr.html" class="btn btn-neutral float-right" title="sgkit.read_vcfzarr" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../api.html" class="btn btn-neutral float-left" title="API reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sgkit developers
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
