@@ -309,7 +309,7 @@ def zarrs_to_dataset(
     datasets = [xr.open_zarr(fsspec.get_mapper(path, **storage_options)) for path in urls]  # type: ignore[no-untyped-call]
 
     # Combine the datasets into one
-    ds = xr.concat(datasets, dim="variants", data_vars="minimal")  # type: ignore[no-untyped-call, no-redef]
+    ds = xr.concat(datasets, dim="variants", data_vars="minimal")
 
     # This is a workaround to make rechunking work when the temp_chunk_length is different to chunk_length
     # See https://github.com/pydata/xarray/issues/4380
@@ -326,8 +326,8 @@ def zarrs_to_dataset(
     max_variant_allele_length = max(
         ds.attrs["max_variant_allele_length"] for ds in datasets
     )
-    ds["variant_id"] = ds["variant_id"].astype(f"S{max_variant_id_length}")
-    ds["variant_allele"] = ds["variant_allele"].astype(f"S{max_variant_allele_length}")
+    ds["variant_id"] = ds["variant_id"].astype(f"S{max_variant_id_length}")  # type: ignore[no-untyped-call]
+    ds["variant_allele"] = ds["variant_allele"].astype(f"S{max_variant_allele_length}")  # type: ignore[no-untyped-call]
     del ds.attrs["max_variant_id_length"]
     del ds.attrs["max_variant_allele_length"]
 
