@@ -5,7 +5,6 @@ import xarray as xr
 
 from . import variables
 from .typing import ArrayLike
-from .utils import check_array_like
 
 DIM_VARIANT = "variants"
 DIM_SAMPLE = "samples"
@@ -70,13 +69,11 @@ def create_genotype_call_dataset(
         ),
     }
     if call_genotype_phased is not None:
-        check_array_like(call_genotype_phased, kind="b", ndim=2)
         data_vars["call_genotype_phased"] = (
             [DIM_VARIANT, DIM_SAMPLE],
             call_genotype_phased,
         )
     if variant_id is not None:
-        check_array_like(variant_id, kind={"U", "O"}, ndim=1)
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
     return variables.validate(xr.Dataset(data_vars=data_vars, attrs=attrs))
@@ -145,7 +142,6 @@ def create_genotype_dosage_dataset(
         ),
     }
     if variant_id is not None:
-        check_array_like(variant_id, kind={"U", "O"}, ndim=1)
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
     return variables.validate(xr.Dataset(data_vars=data_vars, attrs=attrs))

@@ -86,7 +86,7 @@ def _count_cohort_alleles(
 
 
 def count_call_alleles(
-    ds: Dataset, *, call_genotype: str = "call_genotype", merge: bool = True
+    ds: Dataset, *, call_genotype: str = variables.call_genotype, merge: bool = True
 ) -> Dataset:
     """Compute per sample allele counts from genotype calls.
 
@@ -97,7 +97,7 @@ def count_call_alleles(
         :func:`sgkit.create_genotype_call_dataset`.
     call_genotype
         Input variable name holding call_genotype as defined by
-        :data:`sgkit.variables.call_genotype`
+        :data:`sgkit.variables.call_genotype_spec`
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -137,14 +137,14 @@ def count_call_alleles(
            [[2, 0],
             [2, 0]]], dtype=uint8)
     """
-    variables.validate(ds, {call_genotype: variables.call_genotype})
+    variables.validate(ds, {call_genotype: variables.call_genotype_spec})
     n_alleles = ds.dims["alleles"]
     G = da.asarray(ds[call_genotype])
     shape = (G.chunks[0], G.chunks[1], n_alleles)
     N = da.empty(n_alleles, dtype=np.uint8)
     new_ds = Dataset(
         {
-            "call_allele_count": (
+            variables.call_allele_count: (
                 ("variants", "samples", "alleles"),
                 da.map_blocks(
                     count_alleles, G, N, chunks=shape, drop_axis=2, new_axis=2
@@ -156,7 +156,7 @@ def count_call_alleles(
 
 
 def count_variant_alleles(
-    ds: Dataset, *, call_genotype: str = "call_genotype", merge: bool = True
+    ds: Dataset, *, call_genotype: str = variables.call_genotype, merge: bool = True
 ) -> Dataset:
     """Compute allele count from genotype calls.
 
@@ -167,7 +167,7 @@ def count_variant_alleles(
         :func:`sgkit.create_genotype_call_dataset`.
     call_genotype
         Input variable name holding call_genotype as defined by
-        :data:`sgkit.variables.call_genotype`
+        :data:`sgkit.variables.call_genotype_spec`
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -202,10 +202,10 @@ def count_variant_alleles(
     """
     new_ds = Dataset(
         {
-            "variant_allele_count": (
+            variables.variant_allele_count: (
                 ("variants", "alleles"),
                 count_call_alleles(ds, call_genotype=call_genotype)[
-                    "call_allele_count"
+                    variables.call_allele_count
                 ].sum(dim="samples"),
             )
         }
@@ -301,28 +301,30 @@ def allele_frequency(
     data_vars: Dict[Hashable, Any] = {}
     # only compute variant allele count if not already in dataset
     if variant_allele_count is not None:
-        variables.validate(ds, {variant_allele_count: variables.variant_allele_count})
+        variables.validate(
+            ds, {variant_allele_count: variables.variant_allele_count_spec}
+        )
         AC = ds[variant_allele_count]
     else:
         AC = count_variant_alleles(ds, merge=False, call_genotype=call_genotype)[
-            "variant_allele_count"
+            variables.variant_allele_count
         ]
-        data_vars["variant_allele_count"] = AC
+        data_vars[variables.variant_allele_count] = AC
 
     M = ds[call_genotype_mask].stack(calls=("samples", "ploidy"))
     AN = (~M).sum(dim="calls")  # type: ignore
     assert AN.shape == (ds.dims["variants"],)
 
-    data_vars["variant_allele_total"] = AN
-    data_vars["variant_allele_frequency"] = AC / AN
+    data_vars[variables.variant_allele_total] = AN
+    data_vars[variables.variant_allele_frequency] = AC / AN
     return Dataset(data_vars)
 
 
 def variant_stats(
     ds: Dataset,
     *,
-    call_genotype_mask: str = "call_genotype_mask",
-    call_genotype: str = "call_genotype",
+    call_genotype_mask: str = variables.call_genotype_mask,
+    call_genotype: str = variables.call_genotype,
     variant_allele_count: Optional[str] = None,
     merge: bool = True,
 ) -> Dataset:
@@ -335,13 +337,13 @@ def variant_stats(
         :func:`sgkit.create_genotype_call_dataset`.
     call_genotype
         Input variable name holding call_genotype.
-        Defined by :data:`sgkit.variables.call_genotype`.
+        Defined by :data:`sgkit.variables.call_genotype_spec`.
     call_genotype_mask
         Input variable name holding call_genotype_mask.
-        Defined by :data:`sgkit.variables.call_genotype_mask`
+        Defined by :data:`sgkit.variables.call_genotype_mask_spec`
     variant_allele_count
         Optional name of the input variable holding variant_allele_count,
-        as defined by :data:`sgkit.variables.variant_allele_count`.
+        as defined by :data:`sgkit.variables.variant_allele_count_spec`.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -352,30 +354,30 @@ def variant_stats(
     -------
     A dataset containing the following variables:
 
-    - :data:`sgkit.variables.variant_n_called` (variants):
+    - :data:`sgkit.variables.variant_n_called_spec` (variants):
       The number of samples with called genotypes.
-    - :data:`sgkit.variables.variant_call_rate` (variants):
+    - :data:`sgkit.variables.variant_call_rate_spec` (variants):
       The fraction of samples with called genotypes.
-    - :data:`sgkit.variables.variant_n_het` (variants):
+    - :data:`sgkit.variables.variant_n_het_spec` (variants):
       The number of samples with heterozygous calls.
-    - :data:`sgkit.variables.variant_n_hom_ref` (variants):
+    - :data:`sgkit.variables.variant_n_hom_ref_spec` (variants):
       The number of samples with homozygous reference calls.
-    - :data:`sgkit.variables.variant_n_hom_alt` (variants):
+    - :data:`sgkit.variables.variant_n_hom_alt_spec` (variants):
       The number of samples with homozygous alternate calls.
-    - :data:`sgkit.variables.variant_n_non_ref` (variants):
+    - :data:`sgkit.variables.variant_n_non_ref_spec` (variants):
       The number of samples that are not homozygous reference calls.
-    - :data:`sgkit.variables.variant_allele_count` (variants, alleles):
+    - :data:`sgkit.variables.variant_allele_count_spec` (variants, alleles):
       The number of occurrences of each allele.
-    - :data:`sgkit.variables.variant_allele_total` (variants):
+    - :data:`sgkit.variables.variant_allele_total_spec` (variants):
       The number of occurrences of all alleles.
-    - :data:`sgkit.variables.variant_allele_frequency` (variants, alleles):
+    - :data:`sgkit.variables.variant_allele_frequency_spec` (variants, alleles):
       The frequency of occurrence of each allele.
     """
     variables.validate(
         ds,
         {
-            call_genotype: variables.call_genotype,
-            call_genotype_mask: variables.call_genotype_mask,
+            call_genotype: variables.call_genotype_spec,
+            call_genotype_mask: variables.call_genotype_mask_spec,
         },
     )
     new_ds = xr.merge(

@@ -127,8 +127,8 @@ def hardy_weinberg_test(
     ds: Dataset,
     *,
     genotype_counts: Optional[Hashable] = None,
-    call_genotype: str = "call_genotype",
-    call_genotype_mask: str = "call_genotype_mask",
+    call_genotype: str = variables.call_genotype,
+    call_genotype_mask: str = variables.call_genotype_mask,
     merge: bool = True,
 ) -> Dataset:
     """Exact test for HWE as described in Wigginton et al. 2005 [1].
@@ -146,10 +146,10 @@ def hardy_weinberg_test(
         (in that order) across all samples for a variant.
     call_genotype
         Input variable name holding call_genotype.
-        Defined by :data:`sgkit.variables.call_genotype`.
+        Defined by :data:`sgkit.variables.call_genotype_spec`.
     call_genotype_mask
         Input variable name holding call_genotype_mask.
-        Defined by :data:`sgkit.variables.call_genotype_mask`
+        Defined by :data:`sgkit.variables.call_genotype_mask_spec`
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -185,15 +185,15 @@ def hardy_weinberg_test(
         raise NotImplementedError("HWE test only implemented for biallelic genotypes")
     # Use precomputed genotype counts if provided
     if genotype_counts is not None:
-        variables.validate(ds, {genotype_counts: variables.genotype_counts})
+        variables.validate(ds, {genotype_counts: variables.genotype_counts_spec})
         obs = list(da.asarray(ds[genotype_counts]).T)
     # Otherwise compute genotype counts from calls
     else:
         variables.validate(
             ds,
             {
-                call_genotype_mask: variables.call_genotype_mask,
-                call_genotype: variables.call_genotype,
+                call_genotype_mask: variables.call_genotype_mask_spec,
+                call_genotype: variables.call_genotype_spec,
             },
         )
         # TODO: Use API genotype counting function instead, e.g.
@@ -203,5 +203,5 @@ def hardy_weinberg_test(
         cts = [1, 0, 2]  # arg order: hets, hom1, hom2
         obs = [da.asarray((AC == ct).sum(dim="samples")) for ct in cts]
     p = da.map_blocks(hardy_weinberg_p_value_vec_jit, *obs)
-    new_ds = xr.Dataset({"variant_hwe_p_value": ("variants", p)})
+    new_ds = xr.Dataset({variables.variant_hwe_p_value: ("variants", p)})
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)

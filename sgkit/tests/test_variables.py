@@ -27,10 +27,15 @@ def test_variables__no_spec(dummy_ds: xr.Dataset) -> None:
 def test_variables__validate_by_name(dummy_ds: xr.Dataset) -> None:
     spec = ArrayLikeSpec("foo", kind="i", ndim=1)
     try:
-        SgkitVariables.register_variable(spec)
+        assert "foo" not in SgkitVariables.registered_variables
+        name, spec_b = SgkitVariables.register_variable(spec)
+        assert "foo" in SgkitVariables.registered_variables
+        assert name == "foo"
+        assert spec_b == spec
         variables.validate(dummy_ds, "foo")
     finally:
         SgkitVariables.registered_variables.pop("foo", None)
+        assert "foo" not in SgkitVariables.registered_variables
 
 
 def test_variables__validate_by_dummy_spec(dummy_ds: xr.Dataset) -> None:
