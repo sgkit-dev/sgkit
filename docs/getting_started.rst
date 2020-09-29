@@ -28,7 +28,7 @@ to facilitate interactive analysis of large-scale datasets. The main libraries w
 
 - `Xarray <http://xarray.pydata.org/en/stable/>`_: N-D labeling for arrays and datasets
 - `Dask <https://docs.dask.org/en/latest/>`_: Parallel computing on chunked arrays
-- `Zarr <https://zarr.readthedocs.io/en/stable/>`_: Serialization for chunked arrays
+- `Zarr <https://zarr.readthedocs.io/en/stable/>`_: Storage for chunked arrays
 - `Numpy <https://numpy.org/doc/stable/>`_: N-D in-memory array manipulation
 - `Pandas <https://pandas.pydata.org/docs/>`_: Tabular data frame manipulation
 - `CuPy <https://docs.cupy.dev/en/stable/>`_: Numpy-like array interface for CUDA GPUs
@@ -36,14 +36,15 @@ to facilitate interactive analysis of large-scale datasets. The main libraries w
 Data structures
 ~~~~~~~~~~~~~~~
 
-There are currently no data models in the library that attempt to capture the complexity of many (or even common)
-analyses and the data structures that would support them -- operations are applied primarily to Xarray
-`Dataset <http://xarray.pydata.org/en/stable/data-structures.html#dataset>`_ objects instead. Users are free to manipulate data
-within these objects as they see fit, but they must do so within the confines of a set of conventions for variable
-names, dimensions, and underlying data types. The example below illustrates a ``Dataset`` format that would result
-from an assay expressible as `VCF <https://en.wikipedia.org/wiki/Variant_Call_Format>`_,
+Sgkit uses Xarray `Dataset <http://xarray.pydata.org/en/stable/data-structures.html#dataset>`_ objects to model genetic data.
+Users are free to manipulate quantities within these objects as they see fit and a set of conventions for variable names,
+dimensions and underlying data types is provided to aid in workflow standardization. The example below illustrates a
+``Dataset`` format that would result from an assay expressible as `VCF <https://en.wikipedia.org/wiki/Variant_Call_Format>`_,
 `PLINK <https://www.cog-genomics.org/plink2>`_ or `BGEN <https://www.well.ox.ac.uk/~gav/bgen_format/>`_.
 This is a guideline however, and a ``Dataset`` seen in practice might include many more or fewer variables and dimensions.
+
+..
+  This image was generated as an export from https://docs.google.com/drawings/d/1NheB6LCvvkB4C0nAoSFwoYVZ3mtOPaseGmg_mZvcQ8I/edit?usp=sharing
 
 .. image:: _static/data-structures-xarray.jpg
     :width: 600
@@ -205,58 +206,44 @@ This example demonstrates one such function where missing calls are ignored:
     sg.count_variant_alleles(ds).variant_allele_count
 
 
-A primary design goal in sgkit is to facilitate ad-hoc analysis. There are many useful functions in
+A primary design goal in sgkit is to facilitate ad hoc analysis. There are many useful functions in
 the library but they are not enough on their own to accomplish many analyses. To that end, it is
 often helpful to be able to handle missing data in your own functions or exploratory summaries.
 Both the sentinel values and the boolean mask array help make this possible, where the sentinel values
 are typically more useful when implementing compiled operations and the boolean mask array is easier to use
 in a higher level API like Xarray or Numpy.  Only advanced users would likely ever need to worry
-about compiling their own functions.  Using Xarray functions and the boolean mask is
-generally enough to accomplish most tasks, and this mask is often more efficient to operate
-on due to its high on-disk compression ratio.  These examples better demonstrate the distinction between
-the two as well as ways in which they are commonly used:
+about compiling their own functions (see :ref:`custom_computations` for more details).
+Using Xarray functions and the boolean mask is generally enough to accomplish most tasks, and this
+mask is often more efficient to operate on due to its high on-disk compression ratio.  This example
+shows how it can be used in the context of doing something simple like counting heterozygous calls:
 
 .. ipython:: python
 
     import sgkit as sg
-    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=2, missing_pct=.3, seed=4)
+    import xarray as xr
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=2, missing_pct=.2, seed=2)
+    # This array contains the allele indexes called for a sample
     ds.call_genotype
 
-    # Count alternate alleles while omitting partial calls
-    ##############
-    # Using Xarray
-    ##############
-    import xarray as xr
-    alt_allele_count = xr.where(
-        # Identify where there are any missing calls across chromosomes
-        ds.call_genotype_mask.any(dim='ploidy'),
-        -1, # Return -1 if any one call for a chromosome is missing
-        (ds.call_genotype > 0).sum(dim='ploidy') # Otherwise, sum non-ref calls
-    )
-    # Note that only the first two samples have meaningful counts since
-    # at least one call is missing for the last two samples
-    alt_allele_count.values
+    # This array represents only locations where the above calls are missing
+    ds.call_genotype_mask
 
-    #############
-    # Using Numba
-    #############
-    import numba
-    import numpy as np
+    # Determine which calls are heterozygous
+    is_heterozygous = (ds.call_genotype[..., 0] != ds.call_genotype[..., 1])
+    is_heterozygous
 
-    def alt_allele_count(gt):
-        out = np.full(gt.shape[:2], -1, dtype=np.int64)
-        for i, j in np.ndindex(*out.shape):
-            if np.all(gt[i, j] >= 0):
-                out[i, j] = np.sum(gt[i, j] > 0)
-        return out
+    # Count the number of heterozygous samples for the lone variant
+    is_heterozygous.sum().item(0)
 
-    # Jit-compiled functions are often simpler with a single array input, since
-    # conditional logic based on sentinel values is easier to program with this API
-    numba.njit(alt_allele_count)(ds.call_genotype.values)
+    # This is almost correct except that the calls for the first sample aren't
+    # really heterozygous, one of them is just missing.  Conditional logic like
+    # this can be used to isolate those values and replace them in the result:
+    xr.where(ds.call_genotype_mask.any(dim='ploidy'), False, is_heterozygous).sum().item(0)
 
-Again, this is not necessarily a level of detail most users should need to worry about. It is important
-to understand though when constructing more complex workflows that take full advantage of the many
-tools in the `PyData <https://pydata.org/>`_ ecosystem.
+    # Now the result is correct -- only the third sample is heterozygous so the count should be 1.
+    # This how many sgkit functions handle missing data internally:
+    sg.variant_stats(ds).variant_n_het.item(0)
+
 
 
 Chaining operations
@@ -279,7 +266,7 @@ Xarray and Xandas operations in a single pipeline:
     # Show statistics for one of the arrays to be used as a filter
     ds_qc.variant_call_rate.to_series().describe()
 
-    # Build a pipeline that filters on call rate and computes Fst between two populations
+    # Build a pipeline that filters on call rate and computes Fst between two cohorts
     (
         ds
         # Add call rate and other statistics
@@ -314,7 +301,7 @@ until one of the following occurs:
 - `Dataset.compute <http://xarray.pydata.org/en/stable/generated/xarray.Dataset.compute.html>`_ is called
 - `DataArray.compute <http://xarray.pydata.org/en/stable/generated/xarray.DataArray.compute.html>`_ is called
 - The ``DataArray.values`` attribute is referenced
-- Individual dask arrays are retrieved through the ``DataArray.data`` attribute and forced to evaluate via `Client.compute <https://distributed.dask.org/en/latest/api.html#distributed.Client.compute>`_, `dask.array.Array.compute <https://tutorial.dask.org/03_array.html#Example>`_ or by coercing them to another array type (e.g. using np.asarray)
+- Individual dask arrays are retrieved through the ``DataArray.data`` attribute and forced to evaluate via `Client.compute <https://distributed.dask.org/en/latest/api.html#distributed.Client.compute>`_, `dask.array.Array.compute <https://tutorial.dask.org/03_array.html#Example>`_ or by coercing them to another array type (e.g. using `np.asarray <https://numpy.org/doc/stable/reference/generated/numpy.asarray.html>`_)
 
 This example shows a few of these features:
 

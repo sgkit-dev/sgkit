@@ -10,18 +10,17 @@ designed for complex workflows over large distributed datasets but attempts to m
 down to smaller datasets and access simpler functionality for those that may be new to Python (though there is still
 a good bit of work to done on this front). See :ref:`getting_started` for more details.
 
-Sgkit is inspired heavily by `scikit-allel <https://scikit-allel.readthedocs.io/en/stable/>`_ and `hail <https://hail.is/docs/0.2/index.html>`_,
+Sgkit is inspired heavily by `scikit-allel <https://scikit-allel.readthedocs.io/en/stable/>`_ and `Hail <https://hail.is/docs/0.2/index.html>`_,
 both popular Python genetics toolkits with a respective focus on population and quantitative genetics.
 
 .. toctree::
     :maxdepth: 2
     :caption: Contents:
 
-   getting_started
-   api
-   io
-   user_guide
-   contributing
+    getting_started
+    api
+    user_guide
+    contributing
 
 Indices and tables
 ==================
