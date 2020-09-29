@@ -708,16 +708,16 @@ def regenie_transform(
     YP3 = _stage_3(B2, YP1, X, Y, contigs, variant_chunk_start)
 
     data_vars: Dict[Hashable, Any] = {}
-    data_vars["base_prediction"] = xr.DataArray(
+    data_vars[variables.base_prediction] = xr.DataArray(
         YP1,
         dims=("blocks", "alphas", "samples", "outcomes"),
         attrs={"description": DESC_BASE_PRED},
     )
-    data_vars["meta_prediction"] = xr.DataArray(
+    data_vars[variables.meta_prediction] = xr.DataArray(
         YP2, dims=("samples", "outcomes"), attrs={"description": DESC_META_PRED}
     )
     if YP3 is not None:
-        data_vars["loco_prediction"] = xr.DataArray(
+        data_vars[variables.loco_prediction] = xr.DataArray(
             YP3,
             dims=("contigs", "samples", "outcomes"),
             attrs={"description": DESC_LOCO_PRED},
@@ -731,7 +731,7 @@ def regenie(
     dosage: str,
     covariates: Union[str, Sequence[str]],
     traits: Union[str, Sequence[str]],
-    variant_contig: str = "variant_contig",
+    variant_contig: str = variables.variant_contig,
     variant_block_size: Optional[Union[int, Tuple[int, ...]]] = None,
     sample_block_size: Optional[Union[int, Tuple[int, ...]]] = None,
     alphas: Optional[Sequence[float]] = None,
@@ -755,16 +755,16 @@ def regenie(
     ----------
     dosage
         Name of genetic dosage variable.
-        Defined by :data:`sgkit.variables.dosage`.
+        Defined by :data:`sgkit.variables.dosage_spec`.
     covariates
         Names of covariate variables (1D or 2D).
-        Defined by :data:`sgkit.variables.covariates`.
+        Defined by :data:`sgkit.variables.covariates_spec`.
     traits
         Names of trait variables (1D or 2D).
-        Defined by :data:`sgkit.variables.traits`.
+        Defined by :data:`sgkit.variables.traits_spec`.
     variant_contig
         Name of the variant contig input variable.
-        Definied by :data:`sgkit.variables.variant_contig`.
+        Definied by :data:`sgkit.variables.variant_contig_spec`.
     variant_block_size
         Number of variants in each block.
         If int, this describes the number of variants in each block
@@ -809,17 +809,17 @@ def regenie(
 
     - `base_prediction` (blocks, alphas, samples, outcomes): Stage 1
         predictions from ridge regression reduction. Defined by
-        :data:`sgkit.variables.base_prediction`.
+        :data:`sgkit.variables.base_prediction_spec`.
 
     - `meta_prediction` (samples, outcomes): Stage 2 predictions from
         the best meta estimator trained on the out-of-sample Stage 1
-        predictions. Defined by :data:`sgkit.variables.meta_prediction`.
+        predictions. Defined by :data:`sgkit.variables.meta_prediction_spec`.
 
     - `loco_prediction` (contigs, samples, outcomes): LOCO predictions
         resulting from Stage 2 predictions ignoring effects for variant
         blocks on held out contigs. This will be absent if the
         data provided does not contain at least 2 contigs. Defined by
-        :data:`sgkit.variables.loco_prediction`.
+        :data:`sgkit.variables.loco_prediction_spec`.
 
     Raises
     ------
@@ -864,9 +864,9 @@ def regenie(
 
     variables.validate(
         ds,
-        {dosage: variables.dosage, variant_contig: variables.variant_contig},
-        {c: variables.covariates for c in covariates},
-        {t: variables.traits for t in traits},
+        {dosage: variables.dosage_spec, variant_contig: variables.variant_contig_spec},
+        {c: variables.covariates_spec for c in covariates},
+        {t: variables.traits_spec for t in traits},
     )
 
     G = ds[dosage]
