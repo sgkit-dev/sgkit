@@ -18,6 +18,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
+        sudo apt update -y
+        sudo apt install -y libcurl4-openssl-dev  # Needed for htslib (via cyvcf2)
         sudo apt install libgsl-dev   # Needed for msprime < 1.0. Binary wheels include GSL for >= 1.0
         python -m pip install --upgrade pip
         pip install -r requirements.txt -r requirements-dev.txt -r requirements-doc.txt
