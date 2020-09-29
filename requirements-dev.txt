@@ -13,5 +13,4 @@ scikit-learn
 partd
 fsspec
 bed-reader
-cyvcf2
 yarl

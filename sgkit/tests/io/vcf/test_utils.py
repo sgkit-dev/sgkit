@@ -1,9 +1,12 @@
+import pytest  # noqa: F401 isort:skip
+
+cyvcf2 = pytest.importorskip("cyvcf2")  # noqa: F401
+
 import os
 import tempfile
 from pathlib import Path
 
 import fsspec
-import pytest
 from callee.strings import StartsWith
 
 from sgkit.io.vcf.utils import build_url, temporary_directory
