@@ -5,7 +5,8 @@ from pathlib import Path
 import fsspec
 import pytest
 from callee.strings import StartsWith
-from sgkit_vcf.utils import build_url, temporary_directory
+
+from sgkit.io.vcf.utils import build_url, temporary_directory
 
 
 def directory_with_file_scheme() -> str:

@@ -7,13 +7,13 @@ from dataclasses import dataclass
 from typing import Any, Dict, Optional, Sequence
 
 import numpy as np
-from sgkit_vcf.utils import (
+
+from sgkit.io.vcf.utils import (
     get_file_offset,
     open_gzip,
     read_bytes_as_tuple,
     read_bytes_as_value,
 )
-
 from sgkit.typing import PathType
 
 TABIX_EXTENSION = ".tbi"

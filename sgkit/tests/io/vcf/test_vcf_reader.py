@@ -4,8 +4,10 @@ import numpy as np
 import pytest
 import xarray as xr
 from numpy.testing import assert_array_equal
-from sgkit_vcf import partition_into_regions, vcf_to_zarr
-from sgkit_vcf.tests.utils import path_for_test
+
+from sgkit.io.vcf import partition_into_regions, vcf_to_zarr
+
+from .utils import path_for_test
 
 
 @pytest.mark.parametrize(
