@@ -21,6 +21,7 @@ def test_record_counts_tbi(shared_datadir, vcf_file, is_path):
     # Check record counts in tabix with actual count of VCF
     vcf_path = path_for_test(shared_datadir, vcf_file, is_path)
     tabix_path = get_tabix_path(vcf_path)
+    assert tabix_path is not None
     tabix = read_tabix(tabix_path)
 
     for i, contig in enumerate(tabix.sequence_names):

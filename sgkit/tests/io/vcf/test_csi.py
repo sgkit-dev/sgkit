@@ -22,6 +22,7 @@ def test_record_counts_csi(shared_datadir, vcf_file, is_path):
     # Check record counts in csi with actual count of VCF
     vcf_path = path_for_test(shared_datadir, vcf_file, is_path)
     csi_path = get_csi_path(vcf_path)
+    assert csi_path is not None
     csi = read_csi(csi_path)
 
     for i, contig in enumerate(VCF(vcf_path).seqnames):
