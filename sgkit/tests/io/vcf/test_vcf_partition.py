@@ -1,7 +1,9 @@
 import pytest
-from sgkit_vcf.tests.utils import path_for_test
-from sgkit_vcf.vcf_partition import partition_into_regions
-from sgkit_vcf.vcf_reader import count_variants
+
+from sgkit.io.vcf import partition_into_regions
+from sgkit.io.vcf.vcf_reader import count_variants
+
+from .utils import path_for_test
 
 
 @pytest.mark.parametrize(

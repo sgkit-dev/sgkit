@@ -8,8 +8,8 @@ import fsspec
 import numpy as np
 import xarray as xr
 from cyvcf2 import VCF, Variant
-from sgkit_vcf.utils import build_url, chunks, temporary_directory, url_filename
 
+from sgkit.io.vcf.utils import build_url, chunks, temporary_directory, url_filename
 from sgkit.model import DIM_VARIANT, create_genotype_call_dataset
 from sgkit.typing import PathType
 

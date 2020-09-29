@@ -3,10 +3,10 @@ from typing import Any, Dict, Optional, Sequence
 import fsspec
 import numpy as np
 from cyvcf2 import VCF
-from sgkit_vcf.csi import CSI_EXTENSION, read_csi
-from sgkit_vcf.tbi import TABIX_EXTENSION, read_tabix
-from sgkit_vcf.utils import ceildiv, get_file_length
 
+from sgkit.io.vcf.csi import CSI_EXTENSION, read_csi
+from sgkit.io.vcf.tbi import TABIX_EXTENSION, read_tabix
+from sgkit.io.vcf.utils import ceildiv, get_file_length
 from sgkit.typing import PathType
 
 

@@ -1,8 +1,10 @@
+callee
 codecov
 pre-commit
 pytest
 pytest-cov
 pytest-datadir
+pytest-mock
 hypothesis
 statsmodels
 zarr
@@ -11,3 +13,5 @@ scikit-learn
 partd
 fsspec
 bed-reader
+cyvcf2
+yarl
