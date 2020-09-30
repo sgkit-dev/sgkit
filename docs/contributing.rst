@@ -271,3 +271,43 @@ We use `mergify <https://mergify.io/>`_ to automate PR flow. A project
 to automatically merge a PR by labeling it with ``auto-merge``, and when the PR gets:
 at least one +1 (from [committers](https://github.com/orgs/pystatgen/teams/committers))
 and a clean build it will get merged automatically.
+
+Design discussions
+------------------
+
+The information on these topics may be useful for developers in understanding the
+history behind the design choices that have been made within the project so far.
+
+Dataset sublcassing
+~~~~~~~~~~~~~~~~~~~
+
+Debates on whether or not we should use Xarray objects directly or
+put them behind a layer of encapsulation:
+
+- https://github.com/pystatgen/sgkit/pull/16#issuecomment-657725092
+- https://github.com/pystatgen/sgkit/pull/78#issuecomment-669878845
+
+Dataset API typing
+~~~~~~~~~~~~~~~~~~
+
+Discussions around bringing stricter array type enforcement into the API:
+
+- https://github.com/pystatgen/sgkit/issues/43
+- https://github.com/pystatgen/sgkit/pull/124
+- https://github.com/pystatgen/sgkit/pull/276
+
+
+Delayed invariant checks
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Discussions on how to run sanity checks on arrays efficiently and why those checks would be
+useful if they were possible (they are not possible currently w/ Dask):
+
+- https://github.com/pystatgen/sgkit/issues/61
+- https://github.com/dask/dask/issues/97
+
+Mixed ploidy
+~~~~~~~~~~~~
+
+Proposal for handling mixed ploidy: https://github.com/pystatgen/sgkit/issues/243
+

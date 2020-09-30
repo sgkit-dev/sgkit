@@ -13,7 +13,7 @@ def simulate_genotype_call_dataset(
     n_ploidy: int = 2,
     n_allele: int = 2,
     n_contig: int = 1,
-    seed: Optional[int] = None,
+    seed: Optional[int] = 0,
     missing_pct: Optional[float] = None,
 ) -> Dataset:
     """Simulate genotype calls and variant/sample data.

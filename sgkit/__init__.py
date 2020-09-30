@@ -14,6 +14,7 @@ from .stats.hwe import hardy_weinberg_test
 from .stats.pc_relate import pc_relate
 from .stats.popgen import Fst, Tajimas_D, divergence, diversity
 from .stats.regenie import regenie
+from .testing import simulate_genotype_call_dataset
 
 __all__ = [
     "DIM_ALLELE",
@@ -35,4 +36,5 @@ __all__ = [
     "Fst",
     "Tajimas_D",
     "pc_relate",
+    "simulate_genotype_call_dataset",
 ]
