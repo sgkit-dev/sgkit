@@ -67,7 +67,7 @@ def test_vcf_to_zarr__small_vcf(shared_datadir, is_path, tmp_path):
             [[0, 0], [0, 0], [0, 0]],
             [[0, 1], [0, 2], [-1, -1]],
             [[0, 0], [0, 0], [-1, -1]],
-            [[0, -1], [0, 1], [0, 2]],
+            [[0, -2], [0, 1], [0, 2]],  # -2 signifies non-allele
         ],
         dtype="i1",
     )
