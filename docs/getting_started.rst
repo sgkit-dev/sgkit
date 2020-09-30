@@ -252,7 +252,7 @@ Chaining operations
 `Method chaining <https://tomaugspurger.github.io/method-chaining.html>`_ is a common practice with Python
 data tools that improves code readability and reduces the probability of introducing accidental namespace collisions.
 Sgkit functions are compatible with this idiom by default and this example shows to use it in conjunction with
-Xarray and Xandas operations in a single pipeline:
+Xarray and Pandas operations in a single pipeline:
 
 .. ipython:: python
 
