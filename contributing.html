@@ -37,7 +37,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="IOs" href="io.html" /> 
+    <link rel="prev" title="User Guide" href="user_guide.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -84,9 +84,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io.html">IOs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing to sgkit</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#discussion-forums">Discussion forums</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code-repositories">Code repositories</a></li>
@@ -108,6 +108,13 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#contributing-to-documentation">Contributing to documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#review-process">Review process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#design-discussions">Design discussions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dataset-sublcassing">Dataset sublcassing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataset-api-typing">Dataset API typing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#delayed-invariant-checks">Delayed invariant checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mixed-ploidy">Mixed ploidy</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -202,6 +209,14 @@
 </li>
 <li><p><a class="reference internal" href="#contributing-to-documentation" id="id15">Contributing to documentation</a></p></li>
 <li><p><a class="reference internal" href="#review-process" id="id16">Review process</a></p></li>
+<li><p><a class="reference internal" href="#design-discussions" id="id17">Design discussions</a></p>
+<ul>
+<li><p><a class="reference internal" href="#dataset-sublcassing" id="id18">Dataset sublcassing</a></p></li>
+<li><p><a class="reference internal" href="#dataset-api-typing" id="id19">Dataset API typing</a></p></li>
+<li><p><a class="reference internal" href="#delayed-invariant-checks" id="id20">Delayed invariant checks</a></p></li>
+<li><p><a class="reference internal" href="#mixed-ploidy" id="id21">Mixed ploidy</a></p></li>
+</ul>
+</li>
 </ul>
 </div>
 <p>All contributions, bug reports, bug fixes, documentation improvements,
@@ -412,6 +427,42 @@ to automatically merge a PR by labeling it with <code class="docutils literal no
 at least one +1 (from [committers](<a class="reference external" href="https://github.com/orgs/pystatgen/teams/committers">https://github.com/orgs/pystatgen/teams/committers</a>))
 and a clean build it will get merged automatically.</p>
 </div>
+<div class="section" id="design-discussions">
+<h2><a class="toc-backref" href="#id17">Design discussions</a><a class="headerlink" href="#design-discussions" title="Permalink to this headline">¶</a></h2>
+<p>The information on these topics may be useful for developers in understanding the
+history behind the design choices that have been made within the project so far.</p>
+<div class="section" id="dataset-sublcassing">
+<h3><a class="toc-backref" href="#id18">Dataset sublcassing</a><a class="headerlink" href="#dataset-sublcassing" title="Permalink to this headline">¶</a></h3>
+<p>Debates on whether or not we should use Xarray objects directly or
+put them behind a layer of encapsulation:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/pull/16#issuecomment-657725092">https://github.com/pystatgen/sgkit/pull/16#issuecomment-657725092</a></p></li>
+<li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/pull/78#issuecomment-669878845">https://github.com/pystatgen/sgkit/pull/78#issuecomment-669878845</a></p></li>
+</ul>
+</div>
+<div class="section" id="dataset-api-typing">
+<h3><a class="toc-backref" href="#id19">Dataset API typing</a><a class="headerlink" href="#dataset-api-typing" title="Permalink to this headline">¶</a></h3>
+<p>Discussions around bringing stricter array type enforcement into the API:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/issues/43">https://github.com/pystatgen/sgkit/issues/43</a></p></li>
+<li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/pull/124">https://github.com/pystatgen/sgkit/pull/124</a></p></li>
+<li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/pull/276">https://github.com/pystatgen/sgkit/pull/276</a></p></li>
+</ul>
+</div>
+<div class="section" id="delayed-invariant-checks">
+<h3><a class="toc-backref" href="#id20">Delayed invariant checks</a><a class="headerlink" href="#delayed-invariant-checks" title="Permalink to this headline">¶</a></h3>
+<p>Discussions on how to run sanity checks on arrays efficiently and why those checks would be
+useful if they were possible (they are not possible currently w/ Dask):</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/issues/61">https://github.com/pystatgen/sgkit/issues/61</a></p></li>
+<li><p><a class="reference external" href="https://github.com/dask/dask/issues/97">https://github.com/dask/dask/issues/97</a></p></li>
+</ul>
+</div>
+<div class="section" id="mixed-ploidy">
+<h3><a class="toc-backref" href="#id21">Mixed ploidy</a><a class="headerlink" href="#mixed-ploidy" title="Permalink to this headline">¶</a></h3>
+<p>Proposal for handling mixed ploidy: <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/243">https://github.com/pystatgen/sgkit/issues/243</a></p>
+</div>
+</div>
 </div>
 
 
@@ -423,7 +474,7 @@ and a clean build it will get merged automatically.</p>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="io.html" class="btn btn-neutral float-left" title="IOs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="user_guide.html" class="btn btn-neutral float-left" title="User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -37,7 +37,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="API reference" href="api.html" /> 
+    <link rel="next" title="Getting Started" href="getting_started.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -84,9 +84,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io.html">IOs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to sgkit</a></li>
 </ul>
 
@@ -155,9 +155,24 @@
             
   <div class="section" id="sgkit-statistical-genetics-toolkit-in-python">
 <h1>sgkit: Statistical genetics toolkit in Python<a class="headerlink" href="#sgkit-statistical-genetics-toolkit-in-python" title="Permalink to this headline">¶</a></h1>
+<p>Sgkit is a Python package that provides a variety of analytical genetics methods through the use of
+general-purpose frameworks such as <a class="reference external" href="http://xarray.pydata.org/en/stable/">Xarray</a>, <a class="reference external" href="https://pandas.pydata.org/docs/">Pandas</a>,
+<a class="reference external" href="https://docs.dask.org/en/latest/">Dask</a> and <a class="reference external" href="https://zarr.readthedocs.io/en/stable/">Zarr</a>. The sgkit API makes as
+few assumptions as possible about the origin, structure, and intended use of genetic data by adopting a set of
+domain-specific conventions that allow such data to be used within this broader ecosystem of tools. The package is
+designed for complex workflows over large distributed datasets but attempts to make it as easy as possible to scale
+down to smaller datasets and access simpler functionality for those that may be new to Python (though there is still
+a good bit of work to done on this front). See <a class="reference internal" href="getting_started.html#getting-started"><span class="std std-ref">Getting Started</span></a> for more details.</p>
+<p>Sgkit is inspired heavily by <a class="reference external" href="https://scikit-allel.readthedocs.io/en/stable/">scikit-allel</a> and <a class="reference external" href="https://hail.is/docs/0.2/index.html">Hail</a>,
+both popular Python genetics toolkits with a respective focus on population and quantitative genetics.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#overview">Overview</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#io-imports">IO/imports</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#creating-a-dataset">Creating a dataset</a></li>
@@ -165,12 +180,15 @@
 <li class="toctree-l2"><a class="reference internal" href="api.html#utilities">Utilities</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="usage.html#dataset-merge-behavior">Dataset merge behavior</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="io.html">IOs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="io.html#plink">PLINK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#io">IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#converting-genetic-data-to-zarr">Converting genetic data to Zarr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#working-with-cloud-native-data">Working with cloud-native data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#deploying-sgkit-on-a-cluster">Deploying sgkit on a cluster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#adding-custom-data-to-a-dataset">Adding custom data to a Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#pca">PCA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#using-gpus">Using GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#custom-computations">Custom Computations</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to sgkit</a><ul>
@@ -181,6 +199,7 @@
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#contributing-to-code">Contributing to code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#contributing-to-documentation">Contributing to documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#review-process">Review process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#design-discussions">Design discussions</a></li>
 </ul>
 </li>
 </ul>
@@ -202,7 +221,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="api.html" class="btn btn-neutral float-right" title="API reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="getting_started.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>
