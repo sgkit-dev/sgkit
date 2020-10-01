@@ -233,7 +233,7 @@ def count_cohort_alleles(ds: Dataset, merge: bool = True) -> Dataset:
 
     AC = da.map_blocks(_count_cohort_alleles, AC, SC, C, chunks=shape, dtype=np.int32)
     assert_array_shape(
-        AC, n_variants, n_cohorts * AC.numblocks[0], n_alleles * AC.numblocks[1]
+        AC, n_variants, n_cohorts * AC.numblocks[1], n_alleles * AC.numblocks[2]
     )
 
     # Stack the blocks and sum across them

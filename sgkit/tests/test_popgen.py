@@ -37,9 +37,11 @@ def ts_to_dataset(ts, samples=None):
 
 
 @pytest.mark.parametrize("size", [2, 3, 10, 100])
-def test_diversity(size):
+@pytest.mark.parametrize("chunks", [(-1, -1), (10, -1)])
+def test_diversity(size, chunks):
     ts = msprime.simulate(size, length=100, mutation_rate=0.05, random_seed=42)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    ds = ds.chunk(dict(zip(["variants", "samples"], chunks)))
     sample_cohorts = np.full_like(ts.samples(), 0)
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     ds = ds.assign_coords({"cohorts": ["co_0"]})
