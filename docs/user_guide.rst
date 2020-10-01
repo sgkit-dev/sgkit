@@ -67,7 +67,7 @@ TODO: Finish explaining how Numba works and how users might apply it
 
 Here is an example that demonstrates an alt allele count:
 
-.. ipython:: python
+.. jupyter-execute::
 
     import numba
     import sgkit as sg

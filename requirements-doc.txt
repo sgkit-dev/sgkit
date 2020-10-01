@@ -2,5 +2,5 @@ sphinx
 sphinx_rtd_theme
 sphinx_autodoc_typehints
 scanpydoc
-ipython
 matplotlib
+jupyter-sphinx

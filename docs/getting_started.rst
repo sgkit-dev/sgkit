@@ -53,7 +53,32 @@ This is a guideline however, and a ``Dataset`` seen in practice might include ma
 The worked examples below show how to access and visualize data like this using Xarray. They also demonstrate
 several of the sgkit conventions in place for representing common genetic quantities.
 
-.. ipython:: python
+.. jupyter-execute::
+    :hide-code:
+    :hide-output:
+
+    import xarray
+    import pandas
+
+    def doc_repr(self):
+        print(self)
+        return ''
+
+    # Monkey patch these to avoid inconsistencies with preformatted text
+    # See: https://github.com/pydata/xarray/blob/master/xarray/core/dataset.py#L1670
+    xarray.Dataset._repr_html_ = doc_repr
+    xarray.DataArray._repr_html_ = doc_repr
+    pandas.DataFrame._repr_html_ = doc_repr
+    pandas.Series._repr_html_ = doc_repr
+
+    # Pre-load matplotlib to avoid "UserWarning: Matplotlib is building the font cache; this may take a moment."
+    # See: https://github.com/matplotlib/matplotlib/issues/5836#issuecomment-171036012
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore");
+        import matplotlib.pyplot as plt
+
+.. jupyter-execute::
 
     import sgkit as sg
     ds = sg.simulate_genotype_call_dataset(n_variant=1000, n_sample=250, n_contig=23, missing_pct=.1)
@@ -67,7 +92,7 @@ information on this specific variable and any others, see :ref:`genetic_variable
 Data subsets can be accessed as shown here, using the features described in
 `Indexing and Selecting Xarray Data <http://xarray.pydata.org/en/stable/indexing.html>`_:
 
-.. ipython:: python
+.. jupyter-execute::
 
     import sgkit as sg
     ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, n_contig=23, missing_pct=.1)
@@ -75,20 +100,51 @@ Data subsets can be accessed as shown here, using the features described in
     # Subset the entire dataset to the first 10 variants/samples
     ds.isel(variants=slice(10), samples=slice(10))
 
+.. jupyter-execute::
+
     # Subset to a specific set of variables
     ds[['variant_allele', 'call_genotype']]
+
+.. jupyter-execute::
 
     # Extract a single variable
     ds.call_genotype[:3, :3]
 
+.. jupyter-execute::
+
     # Access the array underlying a single variable (this would return dask.array.Array if chunked)
     ds.call_genotype.data[:3, :3]
+
+.. jupyter-execute::
+
+    # Subset to a specific set of variables
+    ds[['variant_allele', 'call_genotype']]
+
+.. jupyter-execute::
+
+    # Extract a single variable
+    ds.call_genotype[:3, :3]
+
+.. jupyter-execute::
+
+    # Access the array underlying a single variable (this would return dask.array.Array if chunked)
+    ds.call_genotype.data[:3, :3]
+
+.. jupyter-execute::
 
     # Access the alleles corresponding to the calls for the first variant and sample
     allele_indexes = ds.call_genotype[0, 0]
     allele_indexes
 
+.. jupyter-execute::
+
     ds.variant_allele[0, allele_indexes]
+
+.. jupyter-execute::
+
+    ds.variant_allele[0, allele_indexes]
+
+.. jupyter-execute::
 
     # Get a single item from an array as a Python scalar
     ds.sample_id.item(0)
@@ -96,13 +152,15 @@ Data subsets can be accessed as shown here, using the features described in
 Larger subsets of data can be visualized and/or summarized through various
 sgkit utilities as well as the Pandas/Xarray integration:
 
-.. ipython:: python
+.. jupyter-execute::
 
     import sgkit as sg
     ds = sg.simulate_genotype_call_dataset(n_variant=1000, n_sample=250, missing_pct=.1)
 
     # Show genotype calls with domain-specific display logic
     sg.display_genotypes(ds, max_variants=8, max_samples=8)
+
+.. jupyter-execute::
 
     # A naive version of the above is also possible using only Xarray/Pandas and
     # illustrates the flexibility that comes from being able to transition into
@@ -111,6 +169,8 @@ sgkit utilities as well as the Pandas/Xarray integration:
         .unstack().where(lambda df: df >= 0, None).fillna('.')
         .astype(str).apply('/'.join, axis=1).unstack())
 
+.. jupyter-execute::
+
     # Show call rate distribution for each variant using Pandas
     df = ~ds.call_genotype_mask.to_dataframe()
     df.head(5)
@@ -118,7 +178,8 @@ sgkit utilities as well as the Pandas/Xarray integration:
     call_rates = df.groupby('variants').mean()
     call_rates
 
-    @savefig call_rate_example.png width=6in height=3in
+.. jupyter-execute::
+
     call_rates.plot(kind='hist', bins=24, title='Call Rate Distribution', figsize=(6, 3))
 
 This last example alludes to representations of missing data that are explained further in :ref:`missing_data`.
@@ -132,7 +193,7 @@ available methods, see :ref:`api_methods`.
 In this example, the ``variant_stats`` method is applied to a dataset to compute a number of statistics
 across samples for each individual variant:
 
-.. ipython:: python
+.. jupyter-execute::
 
     import sgkit as sg
     ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
@@ -158,27 +219,38 @@ If ``False``, the function will return only the computed output variables.
 
 Examples:
 
-.. ipython:: python
-    :okwarning:
+.. jupyter-execute::
 
     import sgkit as sg
     ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
     ds = ds[['variant_allele', 'call_genotype']]
     ds
 
+.. jupyter-execute::
+
     # By default, new variables are merged into a copy of the provided dataset
     ds = sg.count_variant_alleles(ds)
     ds
 
+.. jupyter-execute::
+
     # If an existing variable would be re-defined, a warning is thrown
     import warnings
-    ds = sg.count_variant_alleles(ds)
     with warnings.catch_warnings(record=True) as w:
         ds = sg.count_variant_alleles(ds)
         print(f"{w[0].category.__name__}: {w[0].message}")
 
+.. jupyter-execute::
+
     # New variables can also be returned in their own dataset
     sg.count_variant_alleles(ds, merge=False)
+
+.. jupyter-execute::
+
+    # New variables can also be returned in their own dataset
+    sg.count_variant_alleles(ds, merge=False)
+
+.. jupyter-execute::
 
     # This can be useful for merging multiple datasets manually
     ds.merge(sg.count_variant_alleles(ds, merge=False))
@@ -196,11 +268,13 @@ along with potential workarounds.
 
 This example demonstrates one such function where missing calls are ignored:
 
-.. ipython:: python
+.. jupyter-execute::
 
     import sgkit as sg
     ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=2, missing_pct=.3, seed=4)
     ds.call_genotype
+
+.. jupyter-execute::
 
     # Here, you can see that the missing calls above are not included in the allele counts
     sg.count_variant_alleles(ds).variant_allele_count
@@ -217,7 +291,7 @@ Using Xarray functions and the boolean mask is generally enough to accomplish mo
 mask is often more efficient to operate on due to its high on-disk compression ratio.  This example
 shows how it can be used in the context of doing something simple like counting heterozygous calls:
 
-.. ipython:: python
+.. jupyter-execute::
 
     import sgkit as sg
     import xarray as xr
@@ -225,23 +299,38 @@ shows how it can be used in the context of doing something simple like counting 
     # This array contains the allele indexes called for a sample
     ds.call_genotype
 
+.. jupyter-execute::
+
     # This array represents only locations where the above calls are missing
     ds.call_genotype_mask
+
+.. jupyter-execute::
+
+    # This array represents only locations where the above calls are missing
+    ds.call_genotype_mask
+
+.. jupyter-execute::
 
     # Determine which calls are heterozygous
     is_heterozygous = (ds.call_genotype[..., 0] != ds.call_genotype[..., 1])
     is_heterozygous
 
+.. jupyter-execute::
+
     # Count the number of heterozygous samples for the lone variant
     is_heterozygous.sum().item(0)
+
+.. jupyter-execute::
 
     # This is almost correct except that the calls for the first sample aren't
     # really heterozygous, one of them is just missing.  Conditional logic like
     # this can be used to isolate those values and replace them in the result:
     xr.where(ds.call_genotype_mask.any(dim='ploidy'), False, is_heterozygous).sum().item(0)
 
+.. jupyter-execute::
+
     # Now the result is correct -- only the third sample is heterozygous so the count should be 1.
-    # This how many sgkit functions handle missing data internally:
+    # This how many sgkit functions handle missing data internally
     sg.variant_stats(ds).variant_n_het.item(0)
 
 
@@ -254,18 +343,27 @@ data tools that improves code readability and reduces the probability of introdu
 Sgkit functions are compatible with this idiom by default and this example shows to use it in conjunction with
 Xarray and Pandas operations in a single pipeline:
 
-.. ipython:: python
-    :okwarning:
+.. jupyter-execute::
 
     import sgkit as sg
+    import numpy as np
     ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
 
     # Use `pipe` to apply a single sgkit function to a dataset
     ds_qc = ds.pipe(sg.variant_stats).drop_dims('samples')
     ds_qc
 
+.. jupyter-execute::
+
     # Show statistics for one of the arrays to be used as a filter
     ds_qc.variant_call_rate.to_series().describe()
+
+.. jupyter-execute::
+
+    # Show statistics for one of the arrays to be used as a filter
+    ds_qc.variant_call_rate.to_series().describe()
+
+.. jupyter-execute::
 
     # Build a pipeline that filters on call rate and computes Fst between two cohorts
     (
@@ -305,23 +403,33 @@ until one of the following occurs:
 
 This example shows a few of these features:
 
-.. ipython:: python
+.. jupyter-execute::
 
     import sgkit as sg
     ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
+
+.. jupyter-execute::
 
     # Chunk our original in-memory dataset using a blocksize of 50 in all dimensions.
     ds = ds.chunk(chunks=50)
     ds
 
+.. jupyter-execute::
+
     # Show the chunked array representing base pair position
     ds.variant_position
+
+.. jupyter-execute::
 
     # Call compute via the dask.array API
     ds.variant_position.data.compute()[:5]
 
+.. jupyter-execute::
+
     # Coerce to numpy via Xarray
     ds.variant_position.values[:5]
+
+.. jupyter-execute::
 
     # Compute without unboxing from xarray.DataArray
     ds.variant_position.compute()[:5]
@@ -346,8 +454,7 @@ The simplest way to monitor operations when running sgkit on a single host is to
 
 As an example, this code shows how to track the progress of a single sgkit function:
 
-.. ipython:: python
-    :okwarning:
+.. jupyter-execute::
 
     import sgkit as sg
     from dask.diagnostics import ProgressBar

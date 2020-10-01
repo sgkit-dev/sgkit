@@ -18,6 +18,9 @@ import xarray
 
 sys.path.insert(0, os.path.abspath(".."))
 
+package_path = os.path.abspath("..")
+os.environ["PYTHONPATH"] = ":".join((package_path, os.environ.get("PYTHONPATH", "")))
+
 print("python exec:", sys.executable)
 print("sys.path:", sys.path)
 
@@ -47,8 +50,7 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
     "scanpydoc",
-    "IPython.sphinxext.ipython_console_highlighting",
-    "IPython.sphinxext.ipython_directive",
+    "jupyter_sphinx",
     *[p.stem for p in (HERE / "extensions").glob("*.py")],
 ]
 
