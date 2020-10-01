@@ -13,4 +13,5 @@ scikit-learn
 partd
 fsspec
 bed-reader
+cyvcf2; platform_system != "Windows"
 yarl
