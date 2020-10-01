@@ -1,12 +1,21 @@
 import itertools
 
+import allel
 import msprime  # type: ignore
 import numpy as np
 import pytest
 import xarray as xr
 from allel import hudson_fst
 
-from sgkit import Fst, Tajimas_D, create_genotype_call_dataset, divergence, diversity
+from sgkit import (
+    Fst,
+    Tajimas_D,
+    count_variant_alleles,
+    create_genotype_call_dataset,
+    divergence,
+    diversity,
+)
+from sgkit.window import window
 
 
 def ts_to_dataset(ts, chunks=None, samples=None):
@@ -49,9 +58,38 @@ def test_diversity(size, chunks):
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     ds = ds.assign_coords({"cohorts": ["co_0"]})
     ds = diversity(ds)
-    div = ds.stat_diversity.sel(cohorts="co_0").values
+    div = ds.stat_diversity.sum(axis=0, skipna=False).sel(cohorts="co_0").values
     ts_div = ts.diversity(span_normalise=False)
     np.testing.assert_allclose(div, ts_div)
+
+
+@pytest.mark.parametrize("size", [10])
+def test_windowed_diversity(size):
+    ts = msprime.simulate(size, length=200, mutation_rate=0.05, random_seed=42)
+    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    sample_cohorts = np.full_like(ts.samples(), 0)
+    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    ds = ds.assign_coords({"cohorts": ["co_0"]})
+    ds = window(ds, size=25, step=25)
+    ds = diversity(ds)
+    div = ds["stat_diversity"].sel(cohorts="co_0").compute()
+
+    # Calculate diversity using tskit windows
+    # Find the variant positions so we can have windows with a fixed number of variants
+    positions = [variant.site.position for variant in ts.variants()]
+    windows = [0] + positions[::25][1:] + [ts.sequence_length]
+    ts_div = ts.diversity(windows=windows, span_normalise=False)
+    np.testing.assert_allclose(div, ts_div)
+
+    # Calculate diversity using scikit-allel moving_statistic
+    # (Don't use windowed_diversity, since it treats the last window differently)
+    ds = count_variant_alleles(ts_to_dataset(ts))  # type: ignore[no-untyped-call]
+    ac = ds["variant_allele_count"].values
+    mpd = allel.mean_pairwise_difference(ac, fill=0)
+    sa_div = allel.moving_statistic(mpd, np.sum, size=25, step=25)
+    np.testing.assert_allclose(
+        div[:-1], sa_div
+    )  # scikit-allel has final window missing
 
 
 @pytest.mark.parametrize(

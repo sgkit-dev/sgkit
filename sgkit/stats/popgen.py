@@ -8,6 +8,7 @@ from xarray import Dataset
 from sgkit.stats.utils import assert_array_shape
 from sgkit.typing import ArrayLike
 from sgkit.utils import conditional_merge_datasets
+from sgkit.window import has_windows, window_statistic
 
 from .. import variables
 from .aggregation import count_cohort_alleles, count_variant_alleles
@@ -68,15 +69,33 @@ def diversity(
     # replace zeros to avoid divide by zero error
     n_pairs_na = n_pairs.where(n_pairs != 0)
     pi = n_diff / n_pairs_na
-    pi_sum = pi.sum(axis=0, skipna=False)
-    new_ds = Dataset(
-        {
-            variables.stat_diversity: (
-                "cohorts",
-                pi_sum,
-            )
-        }
-    )
+
+    if has_windows(ds):
+        div = window_statistic(
+            pi,
+            np.sum,
+            ds.window_start.values,
+            ds.window_stop.values,
+            dtype=pi.dtype,
+            axis=0,
+        )
+        new_ds = Dataset(
+            {
+                "stat_diversity": (
+                    ("windows", "cohorts"),
+                    div,
+                )
+            }
+        )
+    else:
+        new_ds = Dataset(
+            {
+                "stat_diversity": (
+                    ("variants", "cohorts"),
+                    pi,
+                )
+            }
+        )
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
 
 
