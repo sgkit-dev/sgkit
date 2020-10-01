@@ -93,7 +93,6 @@ def count_call_alleles(ds: Dataset, merge: bool = True) -> Dataset:
         Genotype call dataset such as from
         `sgkit.create_genotype_call_dataset`.
     merge
-        (optional)
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
         the computed output variables.
@@ -209,7 +208,6 @@ def count_cohort_alleles(ds: Dataset, merge: bool = True) -> Dataset:
         Genotype call dataset such as from
         `sgkit.create_genotype_call_dataset`.
     merge
-        (optional)
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
         the computed output variables.
