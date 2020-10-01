@@ -661,11 +661,13 @@ Xarray and Pandas operations in a single pipeline:</p>
 <span class="gp">   ....: </span>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">)</span>
 <span class="gp">   ....: </span>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="k">lambda</span> <span class="n">ds</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">variants</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">variant_call_rate</span> <span class="o">&gt;</span> <span class="o">.</span><span class="mi">8</span><span class="p">))</span>
 <span class="gp">   ....: </span>    <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">sample_cohort</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s1">&#39;samples&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
-<span class="gp">   ....: </span>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="k">lambda</span> <span class="n">ds</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">Fst</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;sample_cohort&#39;</span><span class="p">))))</span>
-<span class="gp">   ....: </span>    <span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">   ....: </span>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">Fst</span><span class="p">)</span>
+<span class="gp">   ....: </span>    <span class="o">.</span><span class="n">stat_Fst</span><span class="o">.</span><span class="n">values</span>
 <span class="gp">   ....: </span><span class="p">)</span>
 <span class="gp">   ....: </span>
-<span class="gh">Out[56]: </span><span class="go">-0.00543792215101635</span>
+<span class="gh">Out[56]: </span><span class="go"></span>
+<span class="go">array([[       nan, 0.00139266],</span>
+<span class="go">       [0.00139266,        nan]])</span>
 </pre></div>
 </div>
 <p>This is possible because sgkit functions nearly always take a <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> as the first argument, create new

@@ -255,6 +255,7 @@ Sgkit functions are compatible with this idiom by default and this example shows
 Xarray and Pandas operations in a single pipeline:
 
 .. ipython:: python
+    :okwarning:
 
     import sgkit as sg
     ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
@@ -276,10 +277,9 @@ Xarray and Pandas operations in a single pipeline:
         # Assign a "cohort" variable that splits samples into two groups
         .assign(sample_cohort=np.repeat([0, 1], ds.dims['samples'] // 2))
         # Compute Fst between the groups
-        # TODO: Refactor based on https://github.com/pystatgen/sgkit/pull/260
-        .pipe(lambda ds: sg.Fst(*(g[1] for g in ds.groupby('sample_cohort'))))
-        # Extract the single Fst value from the resulting array
-        .item(0)
+        .pipe(sg.Fst)
+        # Extract the Fst values for cohort pairs
+        .stat_Fst.values
     )
 
 This is possible because sgkit functions nearly always take a ``Dataset`` as the first argument, create new
