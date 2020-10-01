@@ -44,7 +44,7 @@ def test_diversity(size):
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     ds = ds.assign_coords({"cohorts": ["co_0"]})
     ds = diversity(ds)
-    div = ds["stat_diversity"].sel(cohorts="co_0").values
+    div = ds.stat_diversity.sel(cohorts="co_0").values
     ts_div = ts.diversity(span_normalise=False)
     np.testing.assert_allclose(div, ts_div)
 
@@ -64,7 +64,7 @@ def test_divergence(size, n_cohorts):
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
     ds = divergence(ds)
-    div = ds["stat_divergence"].values
+    div = ds.stat_divergence.values
 
     ts_div = np.full([n_cohorts, n_cohorts], np.nan)
     for i, j in itertools.combinations(range(n_cohorts), 2):
@@ -88,7 +88,7 @@ def test_Fst(size, n_cohorts):
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
     ds = Fst(ds)
-    fst = ds["stat_Fst"].values
+    fst = ds.stat_Fst.values
 
     ts_fst = np.full([n_cohorts, n_cohorts], np.nan)
     for i, j in itertools.combinations(range(n_cohorts), 2):
@@ -104,6 +104,6 @@ def test_Tajimas_D(size):
     sample_cohorts = np.full_like(ts.samples(), 0)
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     ds = Tajimas_D(ds)
-    d = ds["stat_Tajimas_D"].compute()
+    d = ds.stat_Tajimas_D.compute()
     ts_d = ts.Tajimas_D()
     np.testing.assert_allclose(d, ts_d)

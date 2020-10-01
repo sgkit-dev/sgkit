@@ -221,7 +221,7 @@ def test_count_cohort_alleles__multi_variant_multi_sample():
     )
     ds["sample_cohort"] = xr.DataArray(np.array([0, 1, 1]), dims="samples")
     ds = count_cohort_alleles(ds)
-    ac = ds["cohort_allele_count"]
+    ac = ds.cohort_allele_count
     np.testing.assert_equal(
         ac,
         np.array(
