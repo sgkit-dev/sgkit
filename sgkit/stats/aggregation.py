@@ -230,7 +230,7 @@ def count_cohort_alleles(ds: Dataset, merge: bool = True) -> Dataset:
     n_cohorts = SC.max().compute() + 1  # 0-based indexing
     C = da.empty(n_cohorts, dtype=np.uint8)
 
-    G = da.asarray(ds["call_genotype"])
+    G = da.asarray(ds.call_genotype)
     shape = (G.chunks[0], n_cohorts, n_alleles)
 
     AC = da.map_blocks(_count_cohort_alleles, AC, SC, C, chunks=shape, dtype=np.int32)
