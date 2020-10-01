@@ -1,40 +1,10 @@
-from .display import display_genotypes
-from .io.vcfzarr_reader import read_vcfzarr
-from .model import (  # noqa: F401
-    DIM_ALLELE,
-    DIM_PLOIDY,
-    DIM_SAMPLE,
-    DIM_VARIANT,
-    create_genotype_call_dataset,
-    create_genotype_dosage_dataset,
-)
-from .stats.aggregation import count_call_alleles, count_variant_alleles, variant_stats
-from .stats.association import gwas_linear_regression
-from .stats.hwe import hardy_weinberg_test
-from .stats.pc_relate import pc_relate
-from .stats.popgen import Fst, Tajimas_D, divergence, diversity
-from .stats.regenie import regenie
+from .display import *
+from .io.vcfzarr_reader import *
+from .model import *
+from .stats.aggregation import *
+from .stats.association import *
+from .stats.hwe import *
+from .stats.pc_relate import *
+from .stats.popgen import *
+from .stats.regenie import *
 from .testing import simulate_genotype_call_dataset
-
-__all__ = [
-    "DIM_ALLELE",
-    "DIM_PLOIDY",
-    "DIM_SAMPLE",
-    "DIM_VARIANT",
-    "create_genotype_call_dataset",
-    "count_variant_alleles",
-    "count_call_alleles",
-    "create_genotype_dosage_dataset",
-    "display_genotypes",
-    "gwas_linear_regression",
-    "read_vcfzarr",
-    "regenie",
-    "hardy_weinberg_test",
-    "variant_stats",
-    "diversity",
-    "divergence",
-    "Fst",
-    "Tajimas_D",
-    "pc_relate",
-    "simulate_genotype_call_dataset",
-]
