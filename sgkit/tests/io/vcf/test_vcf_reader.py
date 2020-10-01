@@ -1,10 +1,7 @@
-import pytest  # noqa: F401 isort:skip
-
-cyvcf2 = pytest.importorskip("cyvcf2")  # noqa: F401
-
 from typing import MutableMapping
 
 import numpy as np
+import pytest
 import xarray as xr
 from numpy.testing import assert_array_equal
 

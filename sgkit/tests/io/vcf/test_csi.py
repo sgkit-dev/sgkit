@@ -1,7 +1,4 @@
-import pytest  # noqa: F401 isort:skip
-
-cyvcf2 = pytest.importorskip("cyvcf2")  # noqa: F401
-
+import pytest
 from cyvcf2 import VCF
 
 from sgkit.io.vcf.csi import read_csi
