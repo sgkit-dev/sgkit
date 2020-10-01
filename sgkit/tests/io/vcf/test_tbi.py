@@ -1,6 +1,4 @@
-import pytest  # noqa: F401 isort:skip
-
-cyvcf2 = pytest.importorskip("cyvcf2")  # noqa: F401
+import pytest
 
 from sgkit.io.vcf.tbi import read_tabix
 from sgkit.io.vcf.vcf_partition import get_tabix_path

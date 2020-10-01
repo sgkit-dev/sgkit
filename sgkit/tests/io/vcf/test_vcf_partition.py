@@ -1,6 +1,4 @@
-import pytest  # noqa: F401 isort:skip
-
-cyvcf2 = pytest.importorskip("cyvcf2")  # noqa: F401
+import pytest
 
 from sgkit.io.vcf import partition_into_regions
 from sgkit.io.vcf.vcf_reader import count_variants
