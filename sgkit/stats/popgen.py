@@ -133,7 +133,10 @@ def divergence(
 
 # c = cohorts
 @guvectorize(  # type: ignore
-    ["void(float64[:], float64[:,:])"],
+    [
+        "void(float32[:], float32[:,:])",
+        "void(float64[:], float64[:,:])",
+    ],
     "(c)->(c,c)",
     nopython=True,
 )
