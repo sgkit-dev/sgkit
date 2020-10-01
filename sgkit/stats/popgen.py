@@ -36,6 +36,11 @@ def diversity(
     Returns
     -------
     diversity value.
+
+    Warnings
+    --------
+    This method does not currently support datasets that are chunked along the
+    samples dimension.
     """
     if allele_counts not in ds:
         ds = count_cohort_alleles(ds)
@@ -109,6 +114,11 @@ def divergence(
     Returns
     -------
     divergence value between pairs of cohorts.
+
+    Warnings
+    --------
+    This method does not currently support datasets that are chunked along the
+    samples dimension.
     """
 
     if allele_counts not in ds:
@@ -173,6 +183,11 @@ def Fst(
     Returns
     -------
     Fst value between pairs of cohorts.
+
+    Warnings
+    --------
+    This method does not currently support datasets that are chunked along the
+    samples dimension.
     """
     if allele_counts not in ds:
         ds = count_cohort_alleles(ds)
@@ -209,6 +224,10 @@ def Tajimas_D(
     -------
     Tajimas' D value.
 
+    Warnings
+    --------
+    This method does not currently support datasets that are chunked along the
+    samples dimension.
     """
     if allele_counts not in ds:
         ds = count_variant_alleles(ds)
