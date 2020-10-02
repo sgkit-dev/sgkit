@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Hashable, Tuple
 
 import dask.array as da
 import xarray as xr
@@ -24,8 +24,8 @@ def _impute_genotype_call_with_variant_mean(
 
 def _collapse_ploidy(
     ds: xr.Dataset,
-    call_genotype: str = variables.call_genotype,
-    call_genotype_mask: str = variables.call_genotype_mask,
+    call_genotype: Hashable = variables.call_genotype,
+    call_genotype_mask: Hashable = variables.call_genotype_mask,
 ) -> Tuple[xr.DataArray, xr.DataArray]:
     call_g_mask = ds[call_genotype_mask].any(dim="ploidy")
     call_g = xr.where(call_g_mask, -1, ds[call_genotype].sum(dim="ploidy"))  # type: ignore[no-untyped-call]
@@ -36,9 +36,9 @@ def pc_relate(
     ds: xr.Dataset,
     *,
     maf: float = 0.01,
-    call_genotype: str = variables.call_genotype,
-    call_genotype_mask: str = variables.call_genotype_mask,
-    sample_pcs: str = variables.sample_pcs,
+    call_genotype: Hashable = variables.call_genotype,
+    call_genotype_mask: Hashable = variables.call_genotype_mask,
+    sample_pcs: Hashable = variables.sample_pcs,
     merge: bool = True
 ) -> xr.Dataset:
     """Compute PC-Relate as described in Conomos, et al. 2016 [1].

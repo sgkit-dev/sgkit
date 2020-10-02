@@ -127,8 +127,8 @@ def hardy_weinberg_test(
     ds: Dataset,
     *,
     genotype_counts: Optional[Hashable] = None,
-    call_genotype: str = variables.call_genotype,
-    call_genotype_mask: str = variables.call_genotype_mask,
+    call_genotype: Hashable = variables.call_genotype,
+    call_genotype_mask: Hashable = variables.call_genotype_mask,
     merge: bool = True,
 ) -> Dataset:
     """Exact test for HWE as described in Wigginton et al. 2005 [1].

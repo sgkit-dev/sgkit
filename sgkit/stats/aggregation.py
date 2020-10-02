@@ -279,7 +279,7 @@ def _swap(dim: Dimension) -> Dimension:
     return "samples" if dim == "variants" else "variants"
 
 
-def call_rate(ds: Dataset, dim: Dimension, call_genotype_mask: str) -> Dataset:
+def call_rate(ds: Dataset, dim: Dimension, call_genotype_mask: Hashable) -> Dataset:
     odim = _swap(dim)[:-1]
     n_called = (~ds[call_genotype_mask].any(dim="ploidy")).sum(dim=dim)
     return xr.Dataset(
@@ -288,7 +288,7 @@ def call_rate(ds: Dataset, dim: Dimension, call_genotype_mask: str) -> Dataset:
 
 
 def genotype_count(
-    ds: Dataset, dim: Dimension, call_genotype: str, call_genotype_mask: str
+    ds: Dataset, dim: Dimension, call_genotype: Hashable, call_genotype_mask: Hashable
 ) -> Dataset:
     odim = _swap(dim)[:-1]
     M, G = ds[call_genotype_mask].any(dim="ploidy"), ds[call_genotype]
@@ -310,9 +310,9 @@ def genotype_count(
 
 def allele_frequency(
     ds: Dataset,
-    call_genotype: str,
-    call_genotype_mask: str,
-    variant_allele_count: Optional[str],
+    call_genotype: Hashable,
+    call_genotype_mask: Hashable,
+    variant_allele_count: Optional[Hashable],
 ) -> Dataset:
     data_vars: Dict[Hashable, Any] = {}
     # only compute variant allele count if not already in dataset
@@ -339,9 +339,9 @@ def allele_frequency(
 def variant_stats(
     ds: Dataset,
     *,
-    call_genotype_mask: str = variables.call_genotype_mask,
-    call_genotype: str = variables.call_genotype,
-    variant_allele_count: Optional[str] = None,
+    call_genotype_mask: Hashable = variables.call_genotype_mask,
+    call_genotype: Hashable = variables.call_genotype,
+    variant_allele_count: Optional[Hashable] = None,
     merge: bool = True,
 ) -> Dataset:
     """Compute quality control variant statistics from genotype calls.
