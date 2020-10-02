@@ -348,10 +348,11 @@ def Fst(
         ds, allele_counts=allele_counts, call_genotype=call_genotype, merge=False
     ).stat_divergence
     gs = da.asarray(gs)
-    shape = (n_cohorts, n_cohorts)
+    shape = (gs.chunks[0], n_cohorts, n_cohorts)
     fst = da.map_blocks(known_estimators[estimator], gs, chunks=shape, dtype=np.float64)
-    assert_array_shape(fst, n_cohorts, n_cohorts)
-    new_ds = Dataset({variables.stat_Fst: (("cohorts_0", "cohorts_1"), fst)})
+    # TODO: reinstate assert (first dim could be either variants or windows)
+    # assert_array_shape(fst, n_windows, n_cohorts, n_cohorts)
+    new_ds = Dataset({variables.stat_Fst: (("windows", "cohorts_0", "cohorts_1"), fst)})
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
 
 

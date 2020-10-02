@@ -297,7 +297,7 @@ sample_pca_projection, sample_pca_projection_spec = SgkitVariables.register_vari
 referred to as "scores" or simply "principal components (PCs)" for a set of samples."""
 
 stat_Fst, stat_Fst_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("stat_Fst", ndim=2, kind="f")
+    ArrayLikeSpec("stat_Fst", ndim=3, kind="f")
 )
 """TODO"""
 stat_divergence, stat_divergence_spec = SgkitVariables.register_variable(
