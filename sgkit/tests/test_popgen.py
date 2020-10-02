@@ -180,6 +180,8 @@ def test_Fst__Hudson(size, chunks):
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    n_variants = ds.dims["variants"]
+    ds = window(ds, size=n_variants, step=n_variants)  # single window
     ds = Fst(ds, estimator="Hudson")
     fst = ds.stat_Fst.sel(cohorts_0="co_0", cohorts_1="co_1").values
 
@@ -207,13 +209,15 @@ def test_Fst__Nei(size, n_cohorts, chunks):
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    n_variants = ds.dims["variants"]
+    ds = window(ds, size=n_variants, step=n_variants)  # single window
     ds = Fst(ds, estimator="Nei")
     fst = ds.stat_Fst.values
 
-    ts_fst = np.full([n_cohorts, n_cohorts], np.nan)
+    ts_fst = np.full([1, n_cohorts, n_cohorts], np.nan)
     for i, j in itertools.combinations(range(n_cohorts), 2):
-        ts_fst[i, j] = ts.Fst([subsets[i], subsets[j]])
-        ts_fst[j, i] = ts_fst[i, j]
+        ts_fst[0, i, j] = ts.Fst([subsets[i], subsets[j]])
+        ts_fst[0, j, i] = ts_fst[0, i, j]
     np.testing.assert_allclose(fst, ts_fst)
 
 
@@ -224,6 +228,50 @@ def test_Fst__unknown_estimator():
         ValueError, match="Estimator 'Unknown' is not a known estimator"
     ):
         Fst(ds, estimator="Unknown")
+
+
+@pytest.mark.parametrize(
+    "size, n_cohorts",
+    [(10, 2)],
+)
+def test_windowed_Fst(size, n_cohorts):
+    ts = msprime.simulate(size, length=200, mutation_rate=0.05, random_seed=42)
+    subsets = np.array_split(ts.samples(), n_cohorts)
+    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    sample_cohorts = np.concatenate(
+        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
+    )
+    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
+    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds = window(ds, size=25, step=25)
+    fst_ds = Fst(ds, estimator="Nei")
+    fst = fst_ds["stat_Fst"].values
+
+    # Calculate Fst using tskit windows
+    # Find the variant positions so we can have windows with a fixed number of variants
+    positions = [variant.site.position for variant in ts.variants()]
+    windows = [0] + positions[::25][1:] + [ts.sequence_length]
+    n_windows = len(windows) - 1
+    ts_fst = np.full([n_windows, n_cohorts, n_cohorts], np.nan)
+    for i, j in itertools.combinations(range(n_cohorts), 2):
+        ts_fst[:, i, j] = ts.Fst(
+            [subsets[i], subsets[j]], windows=windows, span_normalise=False
+        )
+        ts_fst[:, j, i] = ts_fst[:, i, j]
+
+    np.testing.assert_allclose(fst, ts_fst)
+
+    fst_ds = Fst(ds, estimator="Hudson")
+    fst = fst_ds["stat_Fst"].sel(cohorts_0="co_0", cohorts_1="co_1").values
+
+    ac1 = fst_ds.cohort_allele_count.values[:, 0, :]
+    ac2 = fst_ds.cohort_allele_count.values[:, 1, :]
+    ska_fst = allel.moving_hudson_fst(ac1, ac2, size=25, step=25)
+
+    np.testing.assert_allclose(
+        fst[:-1], ska_fst
+    )  # scikit-allel has final window missing
 
 
 @pytest.mark.parametrize("size", [2, 3, 10, 100])
