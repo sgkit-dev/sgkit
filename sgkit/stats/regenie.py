@@ -729,9 +729,9 @@ def regenie(
     ds: Dataset,
     *,
     dosage: str,
-    covariates: Union[str, Sequence[str]],
-    traits: Union[str, Sequence[str]],
-    variant_contig: str = variables.variant_contig,
+    covariates: Union[Hashable, Sequence[Hashable]],
+    traits: Union[Hashable, Sequence[Hashable]],
+    variant_contig: Hashable = variables.variant_contig,
     variant_block_size: Optional[Union[int, Tuple[int, ...]]] = None,
     sample_block_size: Optional[Union[int, Tuple[int, ...]]] = None,
     alphas: Optional[Sequence[float]] = None,
@@ -857,9 +857,9 @@ def regenie(
 
     [2] - https://glow.readthedocs.io/en/latest/tertiary/whole-genome-regression.html
     """
-    if isinstance(covariates, str):
+    if isinstance(covariates, Hashable):
         covariates = [covariates]
-    if isinstance(traits, str):
+    if isinstance(traits, Hashable):
         traits = [traits]
 
     variables.validate(

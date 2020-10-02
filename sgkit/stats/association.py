@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Sequence, Union
+from typing import Hashable, Optional, Sequence, Union
 
 import dask.array as da
 import numpy as np
@@ -105,7 +105,7 @@ def linear_regression(
 
 
 def _get_loop_covariates(
-    ds: Dataset, call_genotype: str, dosage: Optional[str] = None
+    ds: Dataset, call_genotype: Hashable, dosage: Optional[Hashable] = None
 ) -> Array:
     if dosage is None:
         # TODO: This should be (probably gwas-specific) allele
@@ -119,11 +119,11 @@ def _get_loop_covariates(
 def gwas_linear_regression(
     ds: Dataset,
     *,
-    dosage: str,
-    covariates: Union[str, Sequence[str]],
-    traits: Union[str, Sequence[str]],
+    dosage: Hashable,
+    covariates: Union[Hashable, Sequence[Hashable]],
+    traits: Union[Hashable, Sequence[Hashable]],
     add_intercept: bool = True,
-    call_genotype: str = variables.call_genotype,
+    call_genotype: Hashable = variables.call_genotype,
     merge: bool = True,
 ) -> Dataset:
     """Run linear regression to identify continuous trait associations with genetic variants.
@@ -192,9 +192,9 @@ def gwas_linear_regression(
         Nature Genetics 47 (3): 284–90.
 
     """
-    if isinstance(covariates, str):
+    if isinstance(covariates, Hashable):
         covariates = [covariates]
-    if isinstance(traits, str):
+    if isinstance(traits, Hashable):
         traits = [traits]
 
     variables.validate(
