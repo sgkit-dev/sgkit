@@ -7,8 +7,8 @@ from numba import guvectorize
 from typing_extensions import Literal
 from xarray import Dataset
 
-from sgkit.stats.utils import assert_array_shape
 from sgkit import variables
+from sgkit.stats.utils import assert_array_shape
 from sgkit.typing import ArrayLike
 from sgkit.utils import conditional_merge_datasets
 
@@ -86,7 +86,10 @@ def _count_cohort_alleles(
 
 
 def count_call_alleles(
-    ds: Dataset, *, call_genotype: str = variables.call_genotype, merge: bool = True
+    ds: Dataset,
+    *,
+    call_genotype: Hashable = variables.call_genotype,
+    merge: bool = True,
 ) -> Dataset:
     """Compute per sample allele counts from genotype calls.
 
@@ -156,7 +159,10 @@ def count_call_alleles(
 
 
 def count_variant_alleles(
-    ds: Dataset, *, call_genotype: str = variables.call_genotype, merge: bool = True
+    ds: Dataset,
+    *,
+    call_genotype: Hashable = variables.call_genotype,
+    merge: bool = True,
 ) -> Dataset:
     """Compute allele count from genotype calls.
 
@@ -213,7 +219,12 @@ def count_variant_alleles(
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
 
 
-def count_cohort_alleles(ds: Dataset, merge: bool = True) -> Dataset:
+def count_cohort_alleles(
+    ds: Dataset,
+    *,
+    call_genotype: Hashable = variables.call_genotype,
+    merge: bool = True,
+) -> Dataset:
     """Compute per cohort allele counts from genotype calls.
 
     Parameters
@@ -221,6 +232,9 @@ def count_cohort_alleles(ds: Dataset, merge: bool = True) -> Dataset:
     ds
         Genotype call dataset such as from
         `sgkit.create_genotype_call_dataset`.
+    call_genotype
+        Input variable name holding call_genotype as defined by
+        :data:`sgkit.variables.call_genotype_spec`
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -237,7 +251,7 @@ def count_cohort_alleles(ds: Dataset, merge: bool = True) -> Dataset:
     n_variants = ds.dims["variants"]
     n_alleles = ds.dims["alleles"]
 
-    ds = count_call_alleles(ds)
+    ds = count_call_alleles(ds, call_genotype=call_genotype)
     AC, SC = da.asarray(ds.call_allele_count), da.asarray(ds.sample_cohort)
     n_cohorts = SC.max().compute() + 1  # 0-based indexing
     C = da.empty(n_cohorts, dtype=np.uint8)
@@ -255,8 +269,10 @@ def count_cohort_alleles(ds: Dataset, merge: bool = True) -> Dataset:
     AC = da.stack([AC.blocks[:, i] for i in range(AC.numblocks[1])]).sum(axis=0)
     assert_array_shape(AC, n_variants, n_cohorts, n_alleles)
 
-    new_ds = Dataset({"cohort_allele_count": (("variants", "cohorts", "alleles"), AC)})
-    return conditional_merge_datasets(ds, new_ds, merge)
+    new_ds = Dataset(
+        {variables.cohort_allele_count: (("variants", "cohorts", "alleles"), AC)}
+    )
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
 
 
 def _swap(dim: Dimension) -> Dimension:
