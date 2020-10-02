@@ -1,0 +1,6 @@
+﻿sgkit.variables.variant\_beta\_spec
+===================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: variant_beta_spec

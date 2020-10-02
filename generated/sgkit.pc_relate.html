@@ -37,7 +37,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.display_genotypes" href="sgkit.display_genotypes.html" />
+    <link rel="next" title="sgkit.variables.base_prediction_spec" href="sgkit.variables.base_prediction_spec.html" />
     <link rel="prev" title="sgkit.Tajimas_D" href="sgkit.Tajimas_D.html" /> 
 </head>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.pc_relate</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#variables">Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#utilities">Utilities</a></li>
 </ul>
 </li>
@@ -179,7 +180,7 @@
 <h1>sgkit.pc_relate<a class="headerlink" href="#sgkit-pc-relate" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="sgkit.pc_relate">
-<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">pc_relate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">maf</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">merge</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.pc_relate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">pc_relate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">maf</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">call_genotype</span><span class="o">=</span><span class="default_value">'call_genotype'</span></em>, <em class="sig-param"><span class="n">call_genotype_mask</span><span class="o">=</span><span class="default_value">'call_genotype_mask'</span></em>, <em class="sig-param"><span class="n">sample_pcs</span><span class="o">=</span><span class="default_value">'sample_pcs'</span></em>, <em class="sig-param"><span class="n">merge</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.pc_relate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute PC-Relate as described in Conomos, et al. 2016 [1].</p>
 <p>This method computes the kinship coefficient matrix. The kinship coefficient for
 a pair of individuals <code class="docutils literal notranslate"><span class="pre">i</span></code> and <code class="docutils literal notranslate"><span class="pre">j</span></code> is commonly defined to be the probability that
@@ -225,9 +226,9 @@ corresponding kinship coefficient:</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p><p>Dataset containing (S = num samples, V = num variants, D = ploidy, PC = num PC)</p>
 <ul class="simple">
-<li><p>genotype calls: “call_genotype” (SxVxD)</p></li>
-<li><p>genotype calls mask: “call_genotype_mask” (SxVxD)</p></li>
-<li><p>sample PCs: “sample_pcs” (PCxS)</p></li>
+<li><p>genotype calls: (SxVxD)</p></li>
+<li><p>genotype calls mask: (SxVxD)</p></li>
+<li><p>sample PCs: (PCxS)</p></li>
 </ul>
 </p>
 </dd>
@@ -235,6 +236,15 @@ corresponding kinship coefficient:</p>
 individual-specific minor allele frequency at a SNP is less than this value,
 that SNP will be excluded from the analysis for that individual.
 The default value is 0.01. Must be between (0.0, 0.1).</p>
+</dd>
+<dt><strong>call_genotype</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype'</span></code>)</dt><dd><p>Input variable name holding call_genotype.
+Defined by <a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a>.</p>
+</dd>
+<dt><strong>call_genotype_mask</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype_mask'</span></code>)</dt><dd><p>Input variable name holding call_genotype_mask.
+Defined by <a class="reference internal" href="sgkit.variables.call_genotype_mask_spec.html#sgkit.variables.call_genotype_mask_spec" title="sgkit.variables.call_genotype_mask_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_mask_spec</span></code></a></p>
+</dd>
+<dt><strong>sample_pcs</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'sample_pcs'</span></code>)</dt><dd><p>Input variable name holding sample_pcs.
+Defined by <a class="reference internal" href="sgkit.variables.sample_pcs_spec.html#sgkit.variables.sample_pcs_spec" title="sgkit.variables.sample_pcs_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_pcs_spec</span></code></a></p>
 </dd>
 <dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
@@ -254,7 +264,7 @@ See <a class="reference internal" href="../getting_started.html#dataset-merge"><
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Dataset containing (S = num samples):
-pc_relate_phi: (S,S) ArrayLike
+<a class="reference internal" href="sgkit.variables.pc_relate_phi_spec.html#sgkit.variables.pc_relate_phi_spec" title="sgkit.variables.pc_relate_phi_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.pc_relate_phi_spec</span></code></a>: (S,S) ArrayLike
 pairwise recent kinship coefficient matrix as float in [-0.5, 0.5].</p>
 </dd>
 </dl>
@@ -284,7 +294,7 @@ American Journal of Human Genetics 98 (1): 127–48.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="sgkit.display_genotypes.html" class="btn btn-neutral float-right" title="sgkit.display_genotypes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="sgkit.variables.base_prediction_spec.html" class="btn btn-neutral float-right" title="sgkit.variables.base_prediction_spec" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="sgkit.Tajimas_D.html" class="btn btn-neutral float-left" title="sgkit.Tajimas_D" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

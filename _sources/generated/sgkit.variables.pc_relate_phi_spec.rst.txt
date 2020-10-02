@@ -1,0 +1,6 @@
+﻿sgkit.variables.pc\_relate\_phi\_spec
+=====================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: pc_relate_phi_spec

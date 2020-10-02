@@ -1,0 +1,6 @@
+﻿sgkit.variables.call\_genotype\_probability\_spec
+=================================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: call_genotype_probability_spec
