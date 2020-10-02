@@ -197,10 +197,32 @@ def divergence(
     d = da.map_blocks(_divergence, ac, chunks=shape, dtype=np.float64)
     assert_array_shape(d, n_variants, n_cohorts, n_cohorts)
 
-    d_sum = d.sum(axis=0)
-    assert_array_shape(d_sum, n_cohorts, n_cohorts)
-
-    new_ds = Dataset({variables.stat_divergence: (("cohorts_0", "cohorts_1"), d_sum)})
+    if has_windows(ds):
+        div = window_statistic(
+            d,
+            np.sum,
+            ds.window_start.values,
+            ds.window_stop.values,
+            dtype=d.dtype,
+            axis=0,
+        )
+        new_ds = Dataset(
+            {
+                "stat_divergence": (
+                    ("windows", "cohorts_0", "cohorts_1"),
+                    div,
+                )
+            }
+        )
+    else:
+        new_ds = Dataset(
+            {
+                "stat_divergence": (
+                    ("variants", "cohorts_0", "cohorts_1"),
+                    d,
+                )
+            }
+        )
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
 
 

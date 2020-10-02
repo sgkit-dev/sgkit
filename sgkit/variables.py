@@ -301,7 +301,7 @@ stat_Fst, stat_Fst_spec = SgkitVariables.register_variable(
 )
 """TODO"""
 stat_divergence, stat_divergence_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("stat_divergence", ndim=2, kind="f")
+    ArrayLikeSpec("stat_divergence", ndim=3, kind="f")
 )
 """TODO"""
 stat_diversity, stat_diversity_spec = SgkitVariables.register_variable(

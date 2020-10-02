@@ -108,7 +108,7 @@ def test_divergence(size, n_cohorts, chunks):
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
     ds = divergence(ds)
-    div = ds.stat_divergence.values
+    div = ds.stat_divergence.sum(axis=0, skipna=False).values
 
     # entries on the diagonal are diversity values
     for i in range(n_cohorts):
@@ -122,6 +122,48 @@ def test_divergence(size, n_cohorts, chunks):
         ts_div[i, j] = ts.divergence([subsets[i], subsets[j]], span_normalise=False)
         ts_div[j, i] = ts.divergence([subsets[j], subsets[i]], span_normalise=False)
     np.testing.assert_allclose(div, ts_div)
+
+
+@pytest.mark.parametrize("size, n_cohorts", [(10, 2)])
+def test_windowed_divergence(size, n_cohorts):
+    ts = msprime.simulate(size, length=200, mutation_rate=0.05, random_seed=42)
+    subsets = np.array_split(ts.samples(), n_cohorts)
+    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    sample_cohorts = np.concatenate(
+        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
+    )
+    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
+    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds = window(ds, size=25, step=25)
+    ds = divergence(ds)
+    div = ds["stat_divergence"].values
+    # test off-diagonal entries, by replacing diagonal with NaNs
+    div[:, np.arange(2), np.arange(2)] = np.nan
+
+    # Calculate diversity using tskit windows
+    # Find the variant positions so we can have windows with a fixed number of variants
+    positions = [variant.site.position for variant in ts.variants()]
+    windows = [0] + positions[::25][1:] + [ts.sequence_length]
+    n_windows = len(windows) - 1
+    ts_div = np.full([n_windows, n_cohorts, n_cohorts], np.nan)
+    for i, j in itertools.combinations(range(n_cohorts), 2):
+        ts_div[:, i, j] = ts.divergence(
+            [subsets[i], subsets[j]], windows=windows, span_normalise=False
+        )
+        ts_div[:, j, i] = ts_div[:, i, j]
+    np.testing.assert_allclose(div, ts_div)
+
+    # Calculate divergence using scikit-allel moving_statistic
+    # (Don't use windowed_divergence, since it treats the last window differently)
+    ds1 = count_variant_alleles(ts_to_dataset(ts, samples=ts.samples()[:1]))  # type: ignore[no-untyped-call]
+    ds2 = count_variant_alleles(ts_to_dataset(ts, samples=ts.samples()[1:]))  # type: ignore[no-untyped-call]
+    ac1 = ds1["variant_allele_count"].values
+    ac2 = ds2["variant_allele_count"].values
+    mpd = allel.mean_pairwise_difference_between(ac1, ac2, fill=0)
+    sa_div = allel.moving_statistic(mpd, np.sum, size=25, step=25)  # noqa: F841
+    # TODO: investigate why numbers are different
+    # np.testing.assert_allclose(div[:-1], sa_div)  # scikit-allel has final window missing
 
 
 @pytest.mark.parametrize("size", [2, 3, 10, 100])
