@@ -190,6 +190,9 @@ all calls are unphased.
     ArrayLikeSpec("call_genotype_probability_mask", kind="b", ndim=3)
 )
 """TODO"""
+cohort_allele_count, cohort_allele_count_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("cohort_allele_count", kind="i", ndim=3)
+)
 covariates, covariates_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("covariates", ndim={1, 2})
 )
@@ -244,6 +247,22 @@ sample_pcs, sample_pcs_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("sample_pcs", ndim=2, kind="f")
 )
 """Sample PCs (PCxS)."""
+stat_Fst, stat_Fst_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("stat_Fst", ndim=2, kind="f")
+)
+"""TODO"""
+stat_divergence, stat_divergence_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("stat_divergence", ndim=2, kind="f")
+)
+"""TODO"""
+stat_diversity, stat_diversity_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("stat_diversity", ndim=1, kind="f")
+)
+"""TODO"""
+stat_Tajimas_D, stat_Tajimas_D_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("stat_Tajimas_D", ndim={0, 1}, kind="f")
+)
+"""TODO"""
 traits, traits_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("traits", ndim={1, 2})
 )
