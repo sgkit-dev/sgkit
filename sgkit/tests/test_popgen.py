@@ -281,6 +281,8 @@ def test_Tajimas_D(size, chunks):
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     sample_cohorts = np.full_like(ts.samples(), 0)
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    n_variants = ds.dims["variants"]
+    ds = window(ds, size=n_variants, step=n_variants)  # single window
     ds = Tajimas_D(ds)
     d = ds.stat_Tajimas_D.compute()
     ts_d = ts.Tajimas_D()
