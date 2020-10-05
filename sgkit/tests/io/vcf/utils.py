@@ -9,6 +9,4 @@ def path_for_test(shared_datadir: Path, file: str, is_path: bool = True) -> Path
     If `isPath` is True, return a `Path`, otherwise return a `str`.
     """
     path: PathType = shared_datadir / file
-    if not is_path:
-        path = str(path)
-    return path
+    return path if is_path else str(path)
