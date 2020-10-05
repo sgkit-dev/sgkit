@@ -169,6 +169,7 @@ def vcf_to_zarr_parallel(
     temp_chunk_length: Optional[int] = None,
     tempdir: Optional[PathType] = None,
     tempdir_storage_options: Optional[Dict[str, str]] = None,
+    dask_fuse_avg_width: int = 50,
 ) -> None:
     """Convert specified regions of one or more VCF files to zarr files, then concat, rechunk, write to zarr"""
 
@@ -191,7 +192,7 @@ def vcf_to_zarr_parallel(
         ds = zarrs_to_dataset(paths, chunk_length, chunk_width, tempdir_storage_options)
 
         # Ensure Dask task graph is efficient, see https://github.com/dask/dask/issues/5105
-        with dask.config.set({"optimization.fuse.ave-width": 50}):
+        with dask.config.set({"optimization.fuse.ave-width": dask_fuse_avg_width}):
             ds.to_zarr(output, mode="w")
 
 
@@ -419,7 +420,4 @@ def count_variants(path: PathType, region: Optional[str] = None) -> int:
     with open_vcf(path) as vcf:
         if region is not None:
             vcf = vcf(region)
-        count = 0
-        for variant in region_filter(vcf, region):
-            count = count + 1
-        return count
+        return sum(1 for _ in region_filter(vcf, region))
