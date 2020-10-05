@@ -64,7 +64,7 @@ def test_diversity(size, chunks):
 
 
 @pytest.mark.parametrize("size", [10])
-def test_windowed_diversity(size):
+def test_diversity__windowed(size):
     ts = msprime.simulate(size, length=200, mutation_rate=0.05, random_seed=42)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
     sample_cohorts = np.full_like(ts.samples(), 0)
@@ -86,9 +86,9 @@ def test_windowed_diversity(size):
     ds = count_variant_alleles(ts_to_dataset(ts))  # type: ignore[no-untyped-call]
     ac = ds["variant_allele_count"].values
     mpd = allel.mean_pairwise_difference(ac, fill=0)
-    sa_div = allel.moving_statistic(mpd, np.sum, size=25, step=25)
+    ska_div = allel.moving_statistic(mpd, np.sum, size=25, step=25)
     np.testing.assert_allclose(
-        div[:-1], sa_div
+        div[:-1], ska_div
     )  # scikit-allel has final window missing
 
 
@@ -125,7 +125,7 @@ def test_divergence(size, n_cohorts, chunks):
 
 
 @pytest.mark.parametrize("size, n_cohorts", [(10, 2)])
-def test_windowed_divergence(size, n_cohorts):
+def test_divergence__windowed(size, n_cohorts):
     ts = msprime.simulate(size, length=200, mutation_rate=0.05, random_seed=42)
     subsets = np.array_split(ts.samples(), n_cohorts)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
@@ -161,9 +161,9 @@ def test_windowed_divergence(size, n_cohorts):
     ac1 = ds1["variant_allele_count"].values
     ac2 = ds2["variant_allele_count"].values
     mpd = allel.mean_pairwise_difference_between(ac1, ac2, fill=0)
-    sa_div = allel.moving_statistic(mpd, np.sum, size=25, step=25)  # noqa: F841
+    ska_div = allel.moving_statistic(mpd, np.sum, size=25, step=25)  # noqa: F841
     # TODO: investigate why numbers are different
-    # np.testing.assert_allclose(div[:-1], sa_div)  # scikit-allel has final window missing
+    # np.testing.assert_allclose(div[:-1], ska_div)  # scikit-allel has final window missing
 
 
 @pytest.mark.parametrize("size", [2, 3, 10, 100])
@@ -234,7 +234,7 @@ def test_Fst__unknown_estimator():
     "size, n_cohorts",
     [(10, 2)],
 )
-def test_windowed_Fst(size, n_cohorts):
+def test_Fst__windowed(size, n_cohorts):
     ts = msprime.simulate(size, length=200, mutation_rate=0.05, random_seed=42)
     subsets = np.array_split(ts.samples(), n_cohorts)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
