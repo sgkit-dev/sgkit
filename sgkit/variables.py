@@ -311,7 +311,7 @@ variant_hwe_p_value, variant_hwe_p_value_spec = SgkitVariables.register_variable
 )
 """P values from HWE test for each variant as float in [0, 1]."""
 variant_id, variant_id_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("variant_id", kind="U", ndim=1)
+    ArrayLikeSpec("variant_id", kind={"U", "O"}, ndim=1)
 )
 """The unique identifier of the variant."""
 variant_n_called, variant_n_called_spec = SgkitVariables.register_variable(
