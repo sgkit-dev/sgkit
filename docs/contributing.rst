@@ -95,10 +95,8 @@ pip::
   pip install -r requirements.txt -r requirements-dev.txt -r requirements-doc.txt
 
 You also need to install GSL (GNU Scientific Library), which is required for ``msprime``.
-Since its a system package and installation may vary depending on the operating
-system, the easiest way to install it is using conda::
-
-    conda install -c conda-forge gsl
+Since it's a system package and installation may vary depending on the operating
+system, the instructions for the same can be found on `msprime docs. <https://msprime.readthedocs.io/en/stable/installation.html#installing-system-requirements>`_
 
 Also install pre-commit, which is used to enforce coding standards::
 
