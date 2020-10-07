@@ -318,6 +318,22 @@ stat_diversity, stat_diversity_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("stat_diversity", ndim=2, kind="f")
 )
 """Genetic diversity (also known as "Tajima’s pi") for cohorts."""
+stat_Garud_h1, stat_Garud_h1_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("stat_Garud_h1", ndim={1, 2}, kind="f")
+)
+"""Garud H1 statistic for cohorts."""
+stat_Garud_h12, stat_Garud_h12_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("stat_Garud_h12", ndim={1, 2}, kind="f")
+)
+"""Garud H12 statistic for cohorts."""
+stat_Garud_h123, stat_Garud_h123_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("stat_Garud_h123", ndim={1, 2}, kind="f")
+)
+"""Garud H123 statistic for cohorts."""
+stat_Garud_h2_h1, stat_Garud_h2_h1_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("stat_Garud_h2_h1", ndim={1, 2}, kind="f")
+)
+"""Garud H2/H1 statistic for cohorts."""
 stat_pbs, stat_pbs_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("stat_pbs", ndim=4, kind="f")
 )

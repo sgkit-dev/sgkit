@@ -1,6 +1,7 @@
 import warnings
 from typing import Any, Callable, Hashable, List, Optional, Set, Tuple, Union
 
+import numba
 import numpy as np
 from xarray import Dataset
 
@@ -271,3 +272,29 @@ def max_str_len(a: ArrayLike) -> ArrayLike:
     if isinstance(a, np.ndarray):
         lens = np.asarray(lens)
     return lens.max()
+
+
+@numba.njit(nogil=True, cache=True)  # type: ignore
+def hash_columns(x: ArrayLike) -> ArrayLike:
+    """Hash columns of ``x`` using the DJBX33A hash function.
+
+    This is ~5 times faster than calling ``tobytes()`` followed
+    by ``hash()`` on array columns. This function also does not
+    hold the GIL, making it suitable for use with the Dask
+    threaded scheduler.
+
+    Parameters
+    ----------
+    x
+        Array of shape (m, n) and type integer.
+
+    Returns
+    -------
+    Array containing hash values of shape (n,) and type int64.
+    """
+    h = np.empty((x.shape[1]), dtype=np.int64)
+    for j in range(x.shape[1]):
+        h[j] = 5381
+        for i in range(x.shape[0]):
+            h[j] = h[j] * 33 + x[i, j]
+    return h

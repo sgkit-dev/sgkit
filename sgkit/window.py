@@ -1,4 +1,4 @@
-from typing import Any, Callable, Tuple
+from typing import Any, Callable, Iterable, Tuple, Union
 
 import dask.array as da
 import numpy as np
@@ -134,10 +134,13 @@ def window_statistic(
     window_starts: ArrayLike,
     window_stops: ArrayLike,
     dtype: DType,
+    chunks: Any = None,
+    new_axis: Union[None, int, Iterable[int]] = None,
     **kwargs: Any,
 ) -> da.Array:
 
     values = da.asarray(values)
+    desired_chunks = chunks or values.chunks
 
     window_lengths = window_stops - window_starts
     depth = np.max(window_lengths)
@@ -184,7 +187,7 @@ def window_statistic(
         # depth is 0 except in first axis
         depth = {0: depth}
         # new chunks are same except in first axis
-        new_chunks = tuple([tuple(windows_per_chunk)] + list(values.chunks[1:]))  # type: ignore
+        new_chunks = tuple([tuple(windows_per_chunk)] + list(desired_chunks[1:]))  # type: ignore
     return values.map_overlap(
         blockwise_moving_stat,
         dtype=dtype,
@@ -192,6 +195,7 @@ def window_statistic(
         depth=depth,
         boundary=0,
         trim=False,
+        new_axis=new_axis,
     )
 
 

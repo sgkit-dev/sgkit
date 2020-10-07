@@ -48,6 +48,7 @@ Methods
    divergence
    diversity
    Fst
+   Garud_h
    gwas_linear_regression
    hardy_weinberg_test
    regenie
@@ -88,6 +89,10 @@ Variables
     variables.pc_relate_phi_spec
     variables.sample_id_spec
     variables.sample_pcs_spec
+    variables.stat_Garud_h1_spec
+    variables.stat_Garud_h12_spec
+    variables.stat_Garud_h123_spec
+    variables.stat_Garud_h2_h1_spec
     variables.traits_spec
     variables.variant_allele_spec
     variables.variant_allele_count_spec

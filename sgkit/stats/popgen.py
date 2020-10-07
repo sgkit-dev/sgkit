@@ -1,3 +1,4 @@
+import collections
 from typing import Hashable, Optional
 
 import dask.array as da
@@ -5,9 +6,14 @@ import numpy as np
 from numba import guvectorize
 from xarray import Dataset
 
+from sgkit import to_haplotype_calls
 from sgkit.stats.utils import assert_array_shape
 from sgkit.typing import ArrayLike
-from sgkit.utils import conditional_merge_datasets, define_variable_if_absent
+from sgkit.utils import (
+    conditional_merge_datasets,
+    define_variable_if_absent,
+    hash_columns,
+)
 from sgkit.window import has_windows, window_statistic
 
 from .. import variables
@@ -681,4 +687,191 @@ def pbs(
     new_ds = Dataset(
         {variables.stat_pbs: (["windows", "cohorts_0", "cohorts_1", "cohorts_2"], p)}
     )
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+
+
+N_GARUD_H_STATS = 4  # H1, H12, H123, H2/H1
+
+
+def _Garud_h(k: ArrayLike) -> ArrayLike:
+    # find haplotype counts (sorted in descending order)
+    counts = sorted(collections.Counter(k.tolist()).values(), reverse=True)
+    counts = np.array(counts)
+
+    # find haplotype frequencies
+    n = k.shape[0]
+    f = counts / n
+
+    # compute H1
+    h1 = np.sum(f ** 2)
+
+    # compute H12
+    h12 = np.sum(f[:2]) ** 2 + np.sum(f[2:] ** 2)
+
+    # compute H123
+    h123 = np.sum(f[:3]) ** 2 + np.sum(f[3:] ** 2)
+
+    # compute H2/H1
+    h2 = h1 - f[0] ** 2
+    h2_h1 = h2 / h1
+
+    return np.array([h1, h12, h123, h2_h1])
+
+
+def _Garud_h_cohorts(
+    ht: ArrayLike, sample_cohort: ArrayLike, n_cohorts: int
+) -> ArrayLike:
+    k = hash_columns(ht)  # hash haplotypes
+    arr = np.empty((n_cohorts, N_GARUD_H_STATS))
+    for c in range(n_cohorts):
+        arr[c, :] = _Garud_h(k[sample_cohort == c])
+    return arr
+
+
+def Garud_h(
+    ds: Dataset,
+    *,
+    call_haplotype: Hashable = variables.call_haplotype,
+    merge: bool = True,
+) -> Dataset:
+    """Compute the H1, H12, H123 and H2/H1 statistics for detecting signatures
+    of soft sweeps, as defined in Garud et al. (2015).
+
+    By default, values of this statistic are calculated across all variants.
+    To compute values in windows, call :func:`window` before calling
+    this function.
+
+    Parameters
+    ----------
+    ds
+        Genotype call dataset.
+    call_haplotype
+        Call haplotype variable to use or calculate. Defined by
+        :data:`sgkit.variables.call_haplotype_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`to_haplotype_calls`.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing the following variables:
+
+    - `stat_Garud_h1` (windows, cohorts): Garud H1 statistic.
+        Defined by :data:`sgkit.variables.stat_Garud_h1_spec`.
+
+    - `stat_Garud_h12` (windows, cohorts): Garud H12 statistic.
+        Defined by :data:`sgkit.variables.stat_Garud_h12_spec`.
+
+    - `stat_Garud_h123` (windows, cohorts): Garud H123 statistic.
+        Defined by :data:`sgkit.variables.stat_Garud_h123_spec`.
+
+    - `stat_Garud_h2_h1` (windows, cohorts): Garud H2/H1 statistic.
+        Defined by :data:`sgkit.variables.stat_Garud_h2_h1_spec`.
+
+    Raises
+    ------
+    NotImplementedError
+        If the dataset is not diploid.
+
+    Warnings
+    --------
+    This function is currently only implemented for diploid datasets.
+
+    Examples
+    --------
+
+    >>> import numpy as np
+    >>> import sgkit as sg
+    >>> import xarray as xr
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
+
+    >>> # Divide samples into two cohorts
+    >>> sample_cohort = np.repeat([0, 1], ds.dims["samples"] // 2)
+    >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
+
+    >>> # Divide into windows of size three (variants)
+    >>> ds = sg.window(ds, size=3, step=3)
+
+    >>> gh = sg.Garud_h(ds)
+    >>> gh["stat_Garud_h1"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[0.25 , 0.375],
+        [0.375, 0.375]])
+    >>> gh["stat_Garud_h12"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[0.375, 0.625],
+        [0.625, 0.625]])
+    >>> gh["stat_Garud_h123"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[0.625, 1.   ],
+        [1.   , 1.   ]])
+    >>> gh["stat_Garud_h2_h1"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[0.75      , 0.33333333],
+        [0.33333333, 0.33333333]])
+    """
+
+    if ds.dims["ploidy"] != 2:
+        raise NotImplementedError("Garud H only implemented for diploid genotypes")
+
+    ds = define_variable_if_absent(
+        ds, variables.call_haplotype, call_haplotype, to_haplotype_calls
+    )
+    variables.validate(ds, {call_haplotype: variables.call_haplotype_spec})
+
+    ht = ds[call_haplotype]
+
+    # convert sample cohorts to haplotype layout
+    sc = ds.sample_cohort.values
+    hsc = np.stack((sc, sc), axis=1).ravel()  # TODO: assumes diploid
+    n_cohorts = sc.max() + 1  # 0-based indexing
+
+    if has_windows(ds):
+        gh = window_statistic(
+            ht,
+            lambda ht: _Garud_h_cohorts(ht, hsc, n_cohorts),
+            ds.window_start.values,
+            ds.window_stop.values,
+            dtype=np.float64,
+            # first chunks dimension is windows, computed in window_statistic
+            chunks=(-1, n_cohorts, N_GARUD_H_STATS),
+            new_axis=2,  # 2d -> 3d
+        )
+        n_windows = ds.window_start.shape[0]
+        assert_array_shape(gh, n_windows, n_cohorts, N_GARUD_H_STATS)
+        new_ds = Dataset(
+            {
+                variables.stat_Garud_h1: (
+                    ("windows", "cohorts"),
+                    gh[:, :, 0],
+                ),
+                variables.stat_Garud_h12: (
+                    ("windows", "cohorts"),
+                    gh[:, :, 1],
+                ),
+                variables.stat_Garud_h123: (
+                    ("windows", "cohorts"),
+                    gh[:, :, 2],
+                ),
+                variables.stat_Garud_h2_h1: (
+                    ("windows", "cohorts"),
+                    gh[:, :, 3],
+                ),
+            }
+        )
+    else:
+        # TODO: note this materializes all the data, so windowless should be discouraged/not supported
+        ht = ht.values
+
+        gh = _Garud_h_cohorts(ht, sample_cohort=hsc, n_cohorts=n_cohorts)
+        assert_array_shape(gh, n_cohorts, N_GARUD_H_STATS)
+
+        new_ds = Dataset(
+            {
+                variables.stat_Garud_h1: gh[:, 0],
+                variables.stat_Garud_h12: gh[:, 1],
+                variables.stat_Garud_h123: gh[:, 2],
+                variables.stat_Garud_h2_h1: gh[:, 3],
+            }
+        )
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
