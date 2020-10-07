@@ -13,6 +13,7 @@ from sgkit.utils import (
     check_array_like,
     define_variable_if_absent,
     encode_array,
+    hash_columns,
     max_str_len,
     merge_datasets,
     split_array_chunks,
@@ -208,3 +209,25 @@ def test_split_array_chunks__raise_on_blocks_lte_0():
 def test_split_array_chunks__raise_on_n_lte_0():
     with pytest.raises(ValueError, match=r"Number of elements .* must be >= 0"):
         split_array_chunks(0, 0)
+
+
+@given(st.integers(1, 50), st.integers(2, 50))
+@settings(deadline=None)  # avoid problem with numba jit compilation
+def test_hash_columns(n_rows, n_cols):
+    # construct an array with random repeated columns
+    x = np.random.randint(-2, 10, size=(n_rows, n_cols // 2))
+    cols = np.random.choice(x.shape[1], n_cols, replace=True)
+    x = x[:, cols]
+
+    # find unique column counts (exact method)
+    _, expected_inverse, expected_counts = np.unique(
+        x, axis=1, return_inverse=True, return_counts=True
+    )
+
+    # hash columns, then find unique column counts using the hash values
+    h = hash_columns(x)
+    _, inverse, counts = np.unique(h, return_inverse=True, return_counts=True)
+
+    # counts[inverse] gives the count for each column in x
+    # these should be the same for both ways of counting
+    np.testing.assert_equal(counts[inverse], expected_counts[expected_inverse])
