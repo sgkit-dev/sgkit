@@ -197,19 +197,19 @@ and cannot be specified in conjunction with <cite>path</cite>.</p>
 This should be a full path including the <cite>.fam</cite> extension
 and cannot be specified in conjunction with <cite>path</cite>.</p>
 </dd>
-<dt><strong>chunks</strong> : <em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>]</em><em>, </em><em>optional</em></dt><dd><p>Chunk size for genotype (i.e. <cite>.bed</cite>) data, by default “auto”</p>
+<dt><strong>chunks</strong> : <em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a><em>]</em><em>, </em><em>optional</em></dt><dd><p>Chunk size for genotype (i.e. <cite>.bed</cite>) data, by default “auto”</p>
 </dd>
-<dt><strong>fam_sep</strong> : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em></dt><dd><p>Delimiter for <cite>.fam</cite> file, by default ” “</p>
+<dt><strong>fam_sep</strong> : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em></dt><dd><p>Delimiter for <cite>.fam</cite> file, by default ” “</p>
 </dd>
-<dt><strong>bim_sep</strong> : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em></dt><dd><p>Delimiter for <cite>.bim</cite> file, by default ” “</p>
+<dt><strong>bim_sep</strong> : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em></dt><dd><p>Delimiter for <cite>.bim</cite> file, by default ” “</p>
 </dd>
-<dt><strong>bim_int_contig</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em></dt><dd><p>Whether or not the contig/chromosome name in the <cite>.bim</cite>
+<dt><strong>bim_int_contig</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em></dt><dd><p>Whether or not the contig/chromosome name in the <cite>.bim</cite>
 file should be interpreted as an integer, by default False.
 If False, then the <cite>variant/contig</cite> field in the resulting
 dataset will contain the indexes of corresponding strings
 encountered in the first <cite>.bim</cite> field.</p>
 </dd>
-<dt><strong>count_a1</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em></dt><dd><p>Whether or not allele counts should be for A1 or A2,
+<dt><strong>count_a1</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em></dt><dd><p>Whether or not allele counts should be for A1 or A2,
 by default True. Typically A1 is the minor allele
 and should be counted instead of A2. This is not enforced
 by PLINK though and it is up to the data generating process
@@ -217,11 +217,11 @@ to ensure that A1 is in fact an alternate/minor/effect
 allele. See <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats">https://www.cog-genomics.org/plink/1.9/formats</a>
 for more details.</p>
 </dd>
-<dt><strong>lock</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em></dt><dd><p>Whether or not to synchronize concurrent reads of <cite>.bed</cite>
+<dt><strong>lock</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em></dt><dd><p>Whether or not to synchronize concurrent reads of <cite>.bed</cite>
 file blocks, by default False. This is passed through to
 [dask.array.from_array](<a class="reference external" href="https://docs.dask.org/en/latest/array-api.html#dask.array.from_array">https://docs.dask.org/en/latest/array-api.html#dask.array.from_array</a>).</p>
 </dd>
-<dt><strong>persist</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em></dt><dd><p>Whether or not to persist <cite>.fam</cite> and <cite>.bim</cite> information in
+<dt><strong>persist</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em></dt><dd><p>Whether or not to persist <cite>.fam</cite> and <cite>.bim</cite> information in
 memory, by default True. This is an important performance
 consideration as the plain text files for this data will
 be read multiple times when False. This can lead to load
@@ -254,7 +254,7 @@ and -1 for missing</p></li>
 </p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>path</cite> and one of <cite>bed_path</cite>, <cite>bim_path</cite> or <cite>fam_path</cite> are provided.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If <cite>path</cite> and one of <cite>bed_path</cite>, <cite>bim_path</cite> or <cite>fam_path</cite> are provided.</p>
 </dd>
 </dl>
 </dd></dl>
