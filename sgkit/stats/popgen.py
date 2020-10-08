@@ -313,7 +313,7 @@ def Fst(
     shape = (n_cohorts, n_cohorts)
     fst = da.map_blocks(known_estimators[estimator], gs, chunks=shape, dtype=np.float64)
     assert_array_shape(fst, n_cohorts, n_cohorts)
-    new_ds = Dataset({"stat_Fst": (("cohorts_0", "cohorts_1"), fst)})
+    new_ds = Dataset({variables.stat_Fst: (("cohorts_0", "cohorts_1"), fst)})
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
 
 
