@@ -30,6 +30,33 @@ def test_read_multi_path(shared_datadir, ds1):
     xr.testing.assert_equal(ds1, ds2)  # type: ignore[no-untyped-call]
 
 
+def test_read_ids(ds1):
+    assert ds1["sample_id"].values.tolist() == [
+        "000",
+        "001",
+        "002",
+        "003",
+        "004",
+        "005",
+        "006",
+        "007",
+        "008",
+        "009",
+    ]
+    assert ds1["variant_id"][:10].values.tolist() == [
+        "1:1:G:CGCGCG",
+        "1:2:ACT:G",
+        "1:3:ACT:G",
+        "1:4:G:CGCGCG",
+        "1:5:G:CGCGCG",
+        "1:6:ACT:G",
+        "1:7:G:CGCGCG",
+        "1:8:T:GTGG",
+        "1:9:T:GTGG",
+        "1:10:A:C",
+    ]
+
+
 def test_raise_on_both_path_types():
     with pytest.raises(
         ValueError,
