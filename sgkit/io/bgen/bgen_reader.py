@@ -190,7 +190,7 @@ def read_metafile(path: PathType) -> dd.DataFrame:
 
 
 def read_samples(path: PathType) -> pd.DataFrame:
-    """ Read bgen .sample file """
+    """ Read BGEN .sample file """
     df = pd.read_csv(path, sep=" ", skiprows=[1], usecols=[0])
     df.columns = ["sample_id"]
     return df
@@ -546,7 +546,7 @@ def bgen_to_zarr(
     Depending on the system memory available (and the `max_mem` setting) this
     rechunking may occur without the need of any intermediate data store. Otherwise,
     approximately as much disk space is required as was needed to store the original
-    bgen data. Experiments show that this Zarr representation is ~20% larger even
+    BGEN data. Experiments show that this Zarr representation is ~20% larger even
     with all available optimizations and fairly aggressive compression (i.e. the
     default `clevel` 7).
 
@@ -557,7 +557,7 @@ def bgen_to_zarr(
     Parameters
     ----------
     input : PathType
-        Path to local bgen dataset.
+        Path to local BGEN dataset.
     output : Union[PathType, MutableMapping[str, bytes]]
         Zarr store or path to directory in file system.
     region : Optional[Mapping[Hashable, Any]]
@@ -570,7 +570,7 @@ def bgen_to_zarr(
     chunk_width : int
         Width (number of samples) to use when storing chunks in output, by default 1_000.
     temp_chunk_length : int
-        Length of chunks used in raw bgen read, by default 100. This defines the vertical
+        Length of chunks used in raw BGEN read, by default 100. This defines the vertical
         chunking (i.e. in the variants dimension) used when reading the raw data and because
         there is no horizontal chunking at this phase (i.e. in the samples dimension), this
         value should be much smaller than the target `chunk_length`.
@@ -596,7 +596,7 @@ def bgen_to_zarr(
 
     Warnings
     --------
-    This functional is only applicable to diploid, bi-allelic bgen datasets.
+    This functional is only applicable to diploid, bi-allelic BGEN datasets.
 
     Returns
     -------
