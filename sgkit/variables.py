@@ -303,9 +303,13 @@ variant_call_rate, variant_call_rate_spec = SgkitVariables.register_variable(
 )
 """The number of samples with heterozygous calls."""
 variant_contig, variant_contig_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("variant_contig", kind="i", ndim=1)
+    ArrayLikeSpec("variant_contig", kind={"i", "u"}, ndim=1)
 )
-"""The (index of the) contig for each variant."""
+"""
+Index corresponding to contig name for each variant. In some less common scenarios,
+this may also be equivalent to the contig names if the data generating process used
+contig names that were also integers.
+"""
 variant_hwe_p_value, variant_hwe_p_value_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("variant_hwe_p_value", kind="f")
 )

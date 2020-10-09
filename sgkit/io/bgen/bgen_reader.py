@@ -2,7 +2,6 @@
 import logging
 import tempfile
 from pathlib import Path
-from threading import RLock
 from typing import (
     Any,
     Dict,
@@ -22,7 +21,6 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 import zarr
-from cachetools import LRUCache, cached
 from cbgen import bgen_file, bgen_metafile
 from rechunker import api as rechunker_api
 from xarray import Dataset
@@ -74,7 +72,7 @@ class BgenReader:
 
             if not self.metafile_path.exists():
                 logger.info(
-                    "Generating BGEN metafile for '{self.path}' (this may take a while)"
+                    f"Generating BGEN metafile for '{self.path}' (this may take a while)"
                 )
                 bgen.create_metafile(self.metafile_path, verbose=False)
                 logger.info("BGEN metafile generation complete")
@@ -85,7 +83,8 @@ class BgenReader:
                 self.partition_size = mf.partition_size
 
         self.shape = (self.n_variants, self.n_samples, 3)
-        self.dtype = dtype
+        self.dtype = np.dtype(dtype)
+        self.precision = 64 if self.dtype.itemsize >= 8 else 32
         self.ndim = 3
 
     def __getitem__(self, idx: Any) -> np.ndarray:
@@ -135,17 +134,13 @@ class BgenReader:
         with bgen_file(self.path) as bgen:
             res = None
             for i, vaddr in enumerate(all_vaddr):
-                probs = bgen.read_probability(vaddr, precision=32)[idx[1]]
+                probs = bgen.read_probability(vaddr, precision=self.precision)[idx[1]]
                 assert len(probs.shape) == 2 and probs.shape[1] == 3
                 if res is None:
                     res = np.zeros((len(all_vaddr), len(probs), 3), dtype=self.dtype)
                 res[i] = probs
             res = res[..., idx[2]]  # type: ignore[index]
             return np.squeeze(res, axis=squeeze_dims)
-
-
-cache = LRUCache(maxsize=3)
-lock = RLock()
 
 
 def _split_alleles(allele_ids: bytes) -> List[bytes]:
@@ -157,7 +152,6 @@ def _split_alleles(allele_ids: bytes) -> List[bytes]:
     return alleles
 
 
-@cached(cache, lock=lock)  # type: ignore[misc]
 def _read_metafile_partition(path: Path, partition: int) -> pd.DataFrame:
     with bgen_metafile(path) as mf:
         part = mf.read_partition(partition)
@@ -243,17 +237,42 @@ def read_bgen(
         be read multiple times when False.
     contig_dtype
         Data type for contig names, by default "str".
-        This may be an integer type, but this will fail if any of the contig names cannot be
-        converted to integers.
+        This may also be an integer type (e.g. "int"), but will fail if any of the contig names
+        cannot be converted to integers.
     gp_dtype
         Data type for genotype probabilities, by default "float32".
 
     Warnings
     --------
     Only bi-allelic, diploid BGEN files are currently supported.
+
+    Returns
+    -------
+    A dataset containing the following variables:
+
+    - :data:`sgkit.variables.variant_id` (variants)
+    - :data:`sgkit.variables.variant_contig` (variants)
+    - :data:`sgkit.variables.variant_position` (variants)
+    - :data:`sgkit.variables.variant_allele` (variants)
+    - :data:`sgkit.variables.sample_id` (samples)
+    - :data:`sgkit.variables.call_dosage` (variants, samples)
+    - :data:`sgkit.variables.call_dosage_mask` (variants, samples)
+    - :data:`sgkit.variables.call_genotype_probability` (variants, samples, genotypes)
+    - :data:`sgkit.variables.call_genotype_probability_mask` (variants, samples, genotypes)
+
     """
     if isinstance(chunks, tuple) and len(chunks) != 3:
-        raise ValueError(f"Chunks must be tuple with 3 items, not {chunks}")
+        raise ValueError(f"`chunks` must be tuple with 3 items, not {chunks}")
+    if not np.issubdtype(gp_dtype, np.floating):
+        raise ValueError(
+            f"`gp_dtype` must be a floating point data type, not {gp_dtype}"
+        )
+    if not np.issubdtype(contig_dtype, np.integer) and np.dtype(
+        contig_dtype
+    ).kind not in {"U", "S"}:
+        raise ValueError(
+            f"`contig_dtype` must be of string or int type, not {contig_dtype}"
+        )
 
     path = Path(path)
     sample_path = Path(sample_path) if sample_path else path.with_suffix(".sample")
