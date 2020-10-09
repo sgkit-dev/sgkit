@@ -116,6 +116,35 @@ def test_read_bgen__gp_dtype(shared_datadir, dtype):
     assert ds["call_dosage"].dtype == dtype
 
 
+@pytest.mark.parametrize("dtype", ["c8", "i8", "str"])
+def test_read_bgen__invalid_gp_dtype(shared_datadir, dtype):
+    path = shared_datadir / "example.bgen"
+    with pytest.raises(
+        ValueError, match="`gp_dtype` must be a floating point data type"
+    ):
+        read_bgen(path, gp_dtype=dtype)
+
+
+@pytest.mark.parametrize("dtype", ["U", "S", "u1", "u2", "i8", "int"])
+def test_read_bgen__contig_dtype(shared_datadir, dtype):
+    path = shared_datadir / "example.bgen"
+    ds = read_bgen(path, contig_dtype=dtype)
+    dtype = np.dtype(dtype)
+    if dtype.kind in {"U", "S"}:
+        assert ds["variant_contig"].dtype == np.int64
+    else:
+        assert ds["variant_contig"].dtype == dtype
+
+
+@pytest.mark.parametrize("dtype", ["c8", "M", "f4"])
+def test_read_bgen__invalid_contig_dtype(shared_datadir, dtype):
+    path = shared_datadir / "example.bgen"
+    with pytest.raises(
+        ValueError, match="`contig_dtype` must be of string or int type"
+    ):
+        read_bgen(path, contig_dtype=dtype)
+
+
 @pytest.mark.parametrize("chunks", CHUNKS)
 def test_read_bgen__fancy_index(shared_datadir, chunks):
     path = shared_datadir / "example.bgen"
@@ -165,7 +194,7 @@ def test_split_alleles__raise_on_multiallelic():
 
 def test_read_bgen__invalid_chunks(shared_datadir):
     path = shared_datadir / "example.bgen"
-    with pytest.raises(ValueError, match="Chunks must be tuple with 3 items"):
+    with pytest.raises(ValueError, match="`chunks` must be tuple with 3 items"):
         read_bgen(path, chunks=(100, -1))  # type: ignore[arg-type]
 
 
