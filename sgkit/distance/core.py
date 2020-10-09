@@ -19,10 +19,10 @@ def pairwise(
     given two-dimensional array, using the map reduce ufuncs. To illustrate
     the algorithm consider the following (4, 5) two dimensional array:
 
-    [e.00, e.01, e.02, e.03]
-    [e.10, e.11, e.12, e.13]
-    [e.20, e.21, e.22, e.23]
-    [e.30, e.31, e.32, e.33]
+    [e.00, e.01, e.02, e.03, e.04]
+    [e.10, e.11, e.12, e.13, e.14]
+    [e.20, e.21, e.22, e.23, e.24]
+    [e.30, e.31, e.32, e.33, e.34]
 
     The rows of the above matrix are the set of vectors. Now lets label all
     the vectors as v0, v1, v2, v3
@@ -45,7 +45,7 @@ def pairwise(
     chunking, which makes it highly parallelizable.
 
     Algorithm: This function works on the philosophy of map/reduce style
-    computation.The map step, which is implemented in the given map_fn
+    computation. The map step, which is implemented in the given map_fn
     is applied on each pair of chunk of a vector, with every chunk of
     every other vector. Consider the example of the above mentioned array
 
@@ -68,7 +68,7 @@ def pairwise(
     After the partial calculations of the chunks are done in the map step, they
     are accumulated in the reduce step, via the given reduce function.
 
-    The importance of ``chunks`` can be seen from the mentioned algorith above,
+    The importance of ``chunks`` can be seen from the mentioned algorithm above,
     better the chunking better the parallelisation.
 
     Parameters
