@@ -39,16 +39,17 @@ GT_DATA_VARS = [
     "call_dosage_mask",
 ]
 
-METAFILE_FIELDS = [
-    ("id", "S"),
-    ("rsid", "S"),
-    ("chrom", "S"),
-    ("pos", "int32"),
-    ("a1", "S"),
-    ("a2", "S"),
-    ("offset", "int64"),
-]
-METAFILE_DTYPE = dict(METAFILE_FIELDS)
+METAFILE_DTYPE = dict(
+    [
+        ("id", "S"),
+        ("rsid", "S"),
+        ("chrom", "S"),
+        ("pos", "int32"),
+        ("a1", "S"),
+        ("a2", "S"),
+        ("offset", "int64"),
+    ]
+)
 
 
 class BgenReader:
@@ -63,7 +64,7 @@ class BgenReader:
     ) -> None:
         self.path = Path(path)
         self.metafile_path = (
-            Path(metafile_path) if metafile_path else path.with_suffix(".metafile")  # type: ignore[union-attr]
+            Path(metafile_path) if metafile_path else self.path.with_suffix(".metafile")
         )
 
         with bgen_file(self.path) as bgen:
@@ -208,16 +209,16 @@ def read_bgen(
     """Read BGEN dataset.
 
     Loads a single BGEN dataset as dask arrays within a Dataset
-    from a bgen file.
+    from a ``.bgen`` file.
 
     Parameters
     ----------
     path
         Path to BGEN file.
     metafile_path
-        Path to companion index file used to determine bgen byte offsets.
+        Path to companion index file used to determine BGEN byte offsets.
         Defaults to ``path`` + ".metafile" if not provided.
-        This file is necessary for reading bgen genotype probabilities and it will be
+        This file is necessary for reading BGEN genotype probabilities and it will be
         generated the first time the file is read if it does not already exist.
         If it needs to be created, it can make the first call to this function
         much slower than subsequent calls.
@@ -435,7 +436,7 @@ def rechunk_bgen(
     Depending on the system memory available (and the `max_mem` setting) this
     rechunking may occur without the need of any intermediate data store. Otherwise,
     approximately as much disk space is required as was needed to store the original
-    bgen data. Experiments show that this Zarr representation is ~20% larger even
+    BGEN data. Experiments show that this Zarr representation is ~20% larger even
     with all available optimizations and fairly aggressive compression (i.e. the
     default `clevel` 7).
 
@@ -474,7 +475,7 @@ def rechunk_bgen(
 
     Warnings
     --------
-    This functional is only applicable to diploid, bi-allelic bgen datasets.
+    This functional is only applicable to diploid, bi-allelic BGEN datasets.
 
     Returns
     -------
