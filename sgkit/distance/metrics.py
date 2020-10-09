@@ -160,7 +160,7 @@ def euclidean_map(x: ArrayLike, y: ArrayLike, _: ArrayLike, out: ArrayLike) -> N
     _
         A dummy variable to map the size of output
     out
-        The output array, which has the output of pearson correlation.
+        The output array, which has the output of the map step of "pearson correlation".
 
     Returns
     -------
