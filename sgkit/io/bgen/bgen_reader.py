@@ -1,6 +1,7 @@
 """BGEN reader implementation (using bgen_reader)"""
 import logging
 import tempfile
+import time
 from pathlib import Path
 from typing import (
     Any,
@@ -72,11 +73,15 @@ class BgenReader:
             self.n_samples = bgen.nsamples
 
             if not self.metafile_path.exists():
+                start = time.time()
                 logger.info(
                     f"Generating BGEN metafile for '{self.path}' (this may take a while)"
                 )
                 bgen.create_metafile(self.metafile_path, verbose=False)
-                logger.info("BGEN metafile generation complete")
+                stop = time.time()
+                logger.info(
+                    f"BGEN metafile generation complete ({stop - start:.0f} seconds)"
+                )
 
             with bgen_metafile(self.metafile_path) as mf:
                 assert self.n_variants == mf.nvariants

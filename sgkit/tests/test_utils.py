@@ -120,16 +120,20 @@ def test_split_array_chunks__size(a: int, b: int) -> None:
 
 @pytest.mark.parametrize("dtype", ["U", "S", "O"])
 @pytest.mark.parametrize("chunks", [None, -1, 5])
+@pytest.mark.parametrize("backend", [xr.DataArray, np.array, da.array])
 @given(st.data())
 @settings(max_examples=25)
-def test_max_str_len(dtype, chunks, data):
+def test_max_str_len(dtype, chunks, backend, data):
     shape = data.draw(st.lists(st.integers(0, 15), min_size=0, max_size=3))
     ndim = len(shape)
     x = data.draw(arrays(dtype=dtype if dtype != "O" else "U", shape=shape))
+    x = backend(x)
     if dtype == "O":
         x = x.astype(object)
-    if chunks is not None:
-        x = da.asarray(x, chunks=(chunks,) * ndim)
+    if chunks is not None and backend is xr.DataArray:
+        x = x.chunk(chunks=(chunks,) * ndim)
+    if chunks is not None and backend is da.array:
+        x = x.rechunk((chunks,) * ndim)
     if x.size == 0:
         with pytest.raises(
             ValueError, match="Max string length cannot be calculated for empty array"
@@ -137,7 +141,7 @@ def test_max_str_len(dtype, chunks, data):
             max_str_len(x)
     else:
         expected = max(map(len, np.asarray(x).ravel()))
-        actual = max_str_len(x).compute()
+        actual = int(max_str_len(x))
         assert expected == actual
 
 
