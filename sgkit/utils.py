@@ -1,7 +1,6 @@
 import warnings
 from typing import Any, List, Set, Tuple, Union
 
-import dask.array as da
 import numpy as np
 from xarray import Dataset
 
@@ -197,7 +196,7 @@ def split_array_chunks(n: int, blocks: int) -> Tuple[int, ...]:
     return chunks  # type: ignore[no-any-return]
 
 
-def max_str_len(a: ArrayLike) -> da.Array:
+def max_str_len(a: ArrayLike) -> ArrayLike:
     """Compute maximum string length for elements of an array
 
     Parameters
@@ -208,7 +207,7 @@ def max_str_len(a: ArrayLike) -> da.Array:
     Returns
     -------
     max_length
-        Dask array with scalar integer value
+        Scalar array with same type as provided array
     """
     if a.size == 0:
         raise ValueError("Max string length cannot be calculated for empty array")
@@ -217,10 +216,7 @@ def max_str_len(a: ArrayLike) -> da.Array:
     if a.dtype.kind not in {"U", "S"}:
         raise ValueError(f"Array must have string dtype (got dtype {a.dtype})")
 
-    ndim = a.ndim
-
-    def fn(x: np.ndarray) -> np.ndarray:
-        max_len = np.asarray(np.frompyfunc(len, 1, 1)(x)).max()
-        return np.expand_dims(max_len, list(range(ndim)))
-
-    return da.map_blocks(fn, a, chunks=(1,) * ndim, dtype=int).max()
+    lens = np.frompyfunc(len, 1, 1)(a)
+    if isinstance(a, np.ndarray):
+        lens = np.asarray(lens)
+    return lens.max()
