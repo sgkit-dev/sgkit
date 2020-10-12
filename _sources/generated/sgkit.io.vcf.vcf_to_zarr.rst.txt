@@ -1,0 +1,6 @@
+﻿sgkit.io.vcf.vcf\_to\_zarr
+==========================
+
+.. currentmodule:: sgkit.io.vcf
+
+.. autofunction:: vcf_to_zarr

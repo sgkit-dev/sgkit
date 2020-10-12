@@ -88,8 +88,18 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#io-imports">IO/imports</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.io.plink.read_plink.html">sgkit.io.plink.read_plink</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.read_vcfzarr.html">sgkit.read_vcfzarr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plink">PLINK</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/sgkit.io.plink.read_plink.html">sgkit.io.plink.read_plink</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#vcf">VCF</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/sgkit.io.vcf.partition_into_regions.html">sgkit.io.vcf.partition_into_regions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html">sgkit.io.vcf.vcf_to_zarr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarrs.html">sgkit.io.vcf.vcf_to_zarrs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/sgkit.io.vcf.zarrs_to_dataset.html">sgkit.io.vcf.zarrs_to_dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/sgkit.read_vcfzarr.html">sgkit.read_vcfzarr</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#creating-a-dataset">Creating a dataset</a><ul>
@@ -156,6 +166,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vcf.html">Reading VCF</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to sgkit</a></li>
 </ul>
 
@@ -227,6 +238,8 @@
 <p>This page provides an auto-generated summary of sgkits’s API.</p>
 <div class="section" id="io-imports">
 <h2>IO/imports<a class="headerlink" href="#io-imports" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="plink">
+<h3>PLINK<a class="headerlink" href="#plink" title="Permalink to this headline">¶</a></h3>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -238,6 +251,29 @@
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section" id="vcf">
+<h3>VCF<a class="headerlink" href="#vcf" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.vcf.partition_into_regions.html#sgkit.io.vcf.partition_into_regions" title="sgkit.io.vcf.partition_into_regions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">partition_into_regions</span></code></a>(vcf_path, *[, …])</p></td>
+<td><p>Calculate genomic region strings to partition a compressed VCF or BCF file into roughly equal parts.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code></a>(input, output, *[, regions, …])</p></td>
+<td><p>Convert VCF files to a single Zarr on-disk store.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarrs.html#sgkit.io.vcf.vcf_to_zarrs" title="sgkit.io.vcf.vcf_to_zarrs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vcf_to_zarrs</span></code></a>(input, output, regions[, …])</p></td>
+<td><p>Convert VCF files to multiple Zarr on-disk stores, one per region.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.io.vcf.zarrs_to_dataset.html#sgkit.io.vcf.zarrs_to_dataset" title="sgkit.io.vcf.zarrs_to_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zarrs_to_dataset</span></code></a>(urls[, chunk_length, …])</p></td>
+<td><p>Combine multiple Zarr stores into a single Xarray dataset.</p></td>
+</tr>
+</tbody>
+</table>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -245,10 +281,11 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.read_vcfzarr.html#sgkit.read_vcfzarr" title="sgkit.read_vcfzarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_vcfzarr</span></code></a>(path)</p></td>
-<td><p>Read a VCF Zarr file.</p></td>
+<td><p>Read a VCF Zarr file created using scikit-allel.</p></td>
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 <div class="section" id="creating-a-dataset">
 <h2>Creating a dataset<a class="headerlink" href="#creating-a-dataset" title="Permalink to this headline">¶</a></h2>

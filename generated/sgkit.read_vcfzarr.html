@@ -38,7 +38,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sgkit.create_genotype_call_dataset" href="sgkit.create_genotype_call_dataset.html" />
-    <link rel="prev" title="sgkit.io.plink.read_plink" href="sgkit.io.plink.read_plink.html" /> 
+    <link rel="prev" title="sgkit.io.vcf.zarrs_to_dataset" href="sgkit.io.vcf.zarrs_to_dataset.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -88,8 +88,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#io-imports">IO/imports</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="sgkit.io.plink.read_plink.html">sgkit.io.plink.read_plink</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.read_vcfzarr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#plink">PLINK</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../api.html#vcf">VCF</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="sgkit.io.vcf.partition_into_regions.html">sgkit.io.vcf.partition_into_regions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sgkit.io.vcf.vcf_to_zarr.html">sgkit.io.vcf.vcf_to_zarr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sgkit.io.vcf.vcf_to_zarrs.html">sgkit.io.vcf.vcf_to_zarrs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sgkit.io.vcf.zarrs_to_dataset.html">sgkit.io.vcf.zarrs_to_dataset</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">sgkit.read_vcfzarr</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#creating-a-dataset">Creating a dataset</a></li>
@@ -99,6 +106,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vcf.html">Reading VCF</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to sgkit</a></li>
 </ul>
 
@@ -172,7 +180,7 @@
 <dl class="py function">
 <dt id="sgkit.read_vcfzarr">
 <code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">read_vcfzarr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.read_vcfzarr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a VCF Zarr file.</p>
+<dd><p>Read a VCF Zarr file created using scikit-allel.</p>
 <p>Loads VCF variant, sample, and genotype data as Dask arrays within a Dataset
 from a Zarr file created using scikit-allel’s <cite>vcf_to_zarr</cite> function.</p>
 <p>Since <cite>vcf_to_zarr</cite> does not preserve phasing information, there is no
@@ -206,7 +214,7 @@ from a Zarr file created using scikit-allel’s <cite>vcf_to_zarr</cite> functio
         <a href="sgkit.create_genotype_call_dataset.html" class="btn btn-neutral float-right" title="sgkit.create_genotype_call_dataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="sgkit.io.plink.read_plink.html" class="btn btn-neutral float-left" title="sgkit.io.plink.read_plink" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="sgkit.io.vcf.zarrs_to_dataset.html" class="btn btn-neutral float-left" title="sgkit.io.vcf.zarrs_to_dataset" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
