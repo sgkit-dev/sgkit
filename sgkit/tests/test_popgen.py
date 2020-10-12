@@ -83,11 +83,10 @@ def test_divergence(size, n_cohorts):
     np.testing.assert_allclose(div, ts_div)
 
 
-@pytest.mark.parametrize(
-    "size, n_cohorts",
-    [(2, 2), (3, 2), (10, 2), (100, 2)],
-)
-def test_Fst__Hudson(size, n_cohorts):
+@pytest.mark.parametrize("size", [2, 3, 10, 100])
+def test_Fst__Hudson(size):
+    # scikit-allel can only calculate Fst for pairs of cohorts (populations)
+    n_cohorts = 2
     ts = msprime.simulate(size, length=100, mutation_rate=0.05, random_seed=42)
     subsets = np.array_split(ts.samples(), n_cohorts)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
