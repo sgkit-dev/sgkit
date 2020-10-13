@@ -9,10 +9,10 @@ from bed_reader import open_bed
 from dask.dataframe import DataFrame
 from xarray import Dataset
 
-from ... import create_genotype_call_dataset
-from ...model import DIM_SAMPLE
-from ...utils import encode_array
-from ..utils import dataframe_to_dict
+from sgkit import create_genotype_call_dataset
+from sgkit.io.utils import dataframe_to_dict
+from sgkit.model import DIM_SAMPLE
+from sgkit.utils import encode_array
 
 PathType = Union[str, Path]
 

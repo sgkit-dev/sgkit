@@ -27,9 +27,8 @@ from rechunker import api as rechunker_api
 from xarray import Dataset
 
 from sgkit import create_genotype_dosage_dataset
+from sgkit.io.utils import dataframe_to_dict, encode_contigs
 from sgkit.typing import ArrayLike, DType, PathType
-
-from ..utils import dataframe_to_dict, encode_contigs
 
 logger = logging.getLogger(__name__)
 
