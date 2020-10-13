@@ -9,7 +9,7 @@ from allel import hudson_fst
 from sgkit import Fst, Tajimas_D, create_genotype_call_dataset, divergence, diversity
 
 
-def ts_to_dataset(ts, samples=None):
+def ts_to_dataset(ts, chunks=None, samples=None):
     """
     Convert the specified tskit tree sequence into an sgkit dataset.
     Note this just generates haploids for now. With msprime 1.0, we'll be
@@ -26,7 +26,7 @@ def ts_to_dataset(ts, samples=None):
     alleles = np.array(alleles).astype("S")
     genotypes = np.expand_dims(genotypes, axis=2)
 
-    df = create_genotype_call_dataset(
+    ds = create_genotype_call_dataset(
         variant_contig_names=["1"],
         variant_contig=np.zeros(len(tables.sites), dtype=int),
         variant_position=tables.sites.position.astype(int),
@@ -34,14 +34,16 @@ def ts_to_dataset(ts, samples=None):
         sample_id=np.array([f"tsk_{u}" for u in samples]).astype("U"),
         call_genotype=genotypes,
     )
-    return df
+    if chunks is not None:
+        ds = ds.chunk(dict(zip(["variants", "samples"], chunks)))
+    return ds
 
 
 @pytest.mark.parametrize("size", [2, 3, 10, 100])
 @pytest.mark.parametrize("chunks", [(-1, -1), (10, -1)])
 def test_diversity(size, chunks):
     ts = msprime.simulate(size, length=100, mutation_rate=0.05, random_seed=42)
-    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     ds = ds.chunk(dict(zip(["variants", "samples"], chunks)))
     sample_cohorts = np.full_like(ts.samples(), 0)
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
@@ -56,10 +58,11 @@ def test_diversity(size, chunks):
     "size, n_cohorts",
     [(2, 2), (3, 2), (3, 3), (10, 2), (10, 3), (10, 4), (100, 2), (100, 3), (100, 4)],
 )
-def test_divergence(size, n_cohorts):
+@pytest.mark.parametrize("chunks", [(-1, -1), (10, -1)])
+def test_divergence(size, n_cohorts, chunks):
     ts = msprime.simulate(size, length=100, mutation_rate=0.05, random_seed=42)
     subsets = np.array_split(ts.samples(), n_cohorts)
-    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     sample_cohorts = np.concatenate(
         [np.full_like(subset, i) for i, subset in enumerate(subsets)]
     )
@@ -84,12 +87,13 @@ def test_divergence(size, n_cohorts):
 
 
 @pytest.mark.parametrize("size", [2, 3, 10, 100])
-def test_Fst__Hudson(size):
+@pytest.mark.parametrize("chunks", [(-1, -1), (10, -1)])
+def test_Fst__Hudson(size, chunks):
     # scikit-allel can only calculate Fst for pairs of cohorts (populations)
     n_cohorts = 2
     ts = msprime.simulate(size, length=100, mutation_rate=0.05, random_seed=42)
     subsets = np.array_split(ts.samples(), n_cohorts)
-    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     sample_cohorts = np.concatenate(
         [np.full_like(subset, i) for i, subset in enumerate(subsets)]
     )
@@ -112,10 +116,11 @@ def test_Fst__Hudson(size):
     "size, n_cohorts",
     [(2, 2), (3, 2), (3, 3), (10, 2), (10, 3), (10, 4), (100, 2), (100, 3), (100, 4)],
 )
-def test_Fst__Nei(size, n_cohorts):
+@pytest.mark.parametrize("chunks", [(-1, -1), (10, -1)])
+def test_Fst__Nei(size, n_cohorts, chunks):
     ts = msprime.simulate(size, length=100, mutation_rate=0.05, random_seed=42)
     subsets = np.array_split(ts.samples(), n_cohorts)
-    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     sample_cohorts = np.concatenate(
         [np.full_like(subset, i) for i, subset in enumerate(subsets)]
     )
@@ -142,9 +147,10 @@ def test_Fst__unknown_estimator():
 
 
 @pytest.mark.parametrize("size", [2, 3, 10, 100])
-def test_Tajimas_D(size):
+@pytest.mark.parametrize("chunks", [(-1, -1), (10, -1)])
+def test_Tajimas_D(size, chunks):
     ts = msprime.simulate(size, length=100, mutation_rate=0.05, random_seed=42)
-    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     sample_cohorts = np.full_like(ts.samples(), 0)
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     ds = Tajimas_D(ds)

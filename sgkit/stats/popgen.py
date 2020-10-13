@@ -82,23 +82,22 @@ def diversity(
 
 # c = cohorts, k = alleles
 @guvectorize(  # type: ignore
-    ["void(int64[:, :], int64[:], float64[:,:])"],
-    "(c, k),(c)->(c,c)",
+    ["void(int64[:, :], float64[:,:])"],
+    "(c, k)->(c,c)",
     nopython=True,
 )
-def _divergence(ac: ArrayLike, an: ArrayLike, out: ArrayLike) -> None:
+def _divergence(ac: ArrayLike, out: ArrayLike) -> None:
     """Generalized U-function for computing divergence.
 
     Parameters
     ----------
     ac
         Allele counts of shape (cohorts, alleles) containing per-cohort allele counts.
-    an
-        Allele totals of shape (cohorts,) containing per-cohort allele totals.
     out
         Pairwise divergence stats with shape (cohorts, cohorts), where the entry at
         (i, j) is the divergence between cohort i and cohort j.
     """
+    an = ac.sum(axis=-1)
     out[:, :] = np.nan  # (cohorts, cohorts)
     n_cohorts = ac.shape[0]
     n_alleles = ac.shape[1]
@@ -171,14 +170,12 @@ def divergence(
     else:
         variables.validate(ds, {allele_counts: variables.cohort_allele_count_spec})
     ac = ds[allele_counts]
-    an = ac.sum(axis=2)
 
     n_variants = ds.dims["variants"]
     n_cohorts = ds.dims["cohorts"]
     ac = da.asarray(ac)
-    an = da.asarray(an)
     shape = (ac.chunks[0], n_cohorts, n_cohorts)
-    d = da.map_blocks(_divergence, ac, an, chunks=shape, dtype=np.float64)
+    d = da.map_blocks(_divergence, ac, chunks=shape, dtype=np.float64)
     assert_array_shape(d, n_variants, n_cohorts, n_cohorts)
 
     d_sum = d.sum(axis=0)
