@@ -205,8 +205,10 @@
 <h1>sgkit.variables.variant_contig_spec<a class="headerlink" href="#sgkit-variables-variant-contig-spec" title="Permalink to this headline">¶</a></h1>
 <dl class="py data">
 <dt id="sgkit.variables.variant_contig_spec">
-<code class="sig-prename descclassname">sgkit.variables.</code><code class="sig-name descname">variant_contig_spec</code><em class="property"> = ArrayLikeSpec(default_name='variant_contig', kind='i', ndim=1)</em><a class="headerlink" href="#sgkit.variables.variant_contig_spec" title="Permalink to this definition">¶</a></dt>
-<dd><p>The (index of the) contig for each variant.</p>
+<code class="sig-prename descclassname">sgkit.variables.</code><code class="sig-name descname">variant_contig_spec</code><em class="property"> = ArrayLikeSpec(default_name='variant_contig', kind={'i', 'u'}, ndim=1)</em><a class="headerlink" href="#sgkit.variables.variant_contig_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Index corresponding to contig name for each variant. In some less common scenarios,
+this may also be equivalent to the contig names if the data generating process used
+contig names that were also integers.</p>
 </dd></dl>
 
 </div>
