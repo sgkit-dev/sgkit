@@ -1,16 +1,16 @@
 """PLINK 1.9 reader implementation"""
 from pathlib import Path
-from typing import Any, List, Mapping, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 from bed_reader import open_bed
-from dask.array import Array
 from dask.dataframe import DataFrame
 from xarray import Dataset
 
 from sgkit import create_genotype_call_dataset
+from sgkit.io.utils import dataframe_to_dict
 from sgkit.model import DIM_SAMPLE
 from sgkit.utils import encode_array
 
@@ -32,8 +32,8 @@ BIM_FIELDS = [
     ("variant_id", str, "U"),
     ("cm_pos", "float32", "float32"),
     ("pos", "int32", "int32"),
-    ("a1", str, "U"),
-    ("a2", str, "U"),
+    ("a1", str, "S"),
+    ("a2", str, "S"),
 ]
 BIM_DF_DTYPE = dict([(f[0], f[1]) for f in BIM_FIELDS])
 BIM_ARRAY_DTYPE = dict([(f[0], f[2]) for f in BIM_FIELDS])
@@ -92,28 +92,6 @@ class BedReader(object):
         # but this will still be problematic if the an array is created
         # from the same PLINK dataset many times
         self.bed._close_bed()  # pragma: no cover
-
-
-def _max_str_len(arr: Array) -> Array:
-    return arr.map_blocks(lambda s: np.char.str_len(s.astype(str)), dtype=np.int8).max()
-
-
-def _to_dict(
-    df: DataFrame, dtype: Optional[Mapping[str, Any]] = None
-) -> Mapping[str, Any]:
-    arrs = {}
-    for c in df:
-        a = df[c].to_dask_array(lengths=True)
-        dt = df[c].dtype
-        if dtype:
-            dt = dtype[c]
-        kind = np.dtype(dt).kind
-        if kind in ["U", "S"]:
-            # Compute fixed-length string dtype for array
-            max_len = _max_str_len(a).compute()
-            dt = f"{kind}{max_len}"
-        arrs[c] = a.astype(dt)
-    return arrs
 
 
 def read_fam(path: PathType, sep: str = " ") -> DataFrame:
@@ -256,8 +234,8 @@ def read_plink(
         df_fam = df_fam.persist()
         df_bim = df_bim.persist()
 
-    arr_fam = _to_dict(df_fam, dtype=FAM_ARRAY_DTYPE)
-    arr_bim = _to_dict(df_bim, dtype=BIM_ARRAY_DTYPE)
+    arr_fam = dataframe_to_dict(df_fam, dtype=FAM_ARRAY_DTYPE)
+    arr_bim = dataframe_to_dict(df_bim, dtype=BIM_ARRAY_DTYPE)
 
     # Load genotyping data
     call_genotype = da.from_array(

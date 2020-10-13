@@ -20,6 +20,7 @@ both popular Python genetics toolkits with a respective focus on population and 
     getting_started
     api
     user_guide
+    vcf
     contributing
 
 Indices and tables

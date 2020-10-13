@@ -14,5 +14,7 @@ scikit-allel
 partd
 fsspec
 bed-reader
+git+https://github.com/pangeo-data/rechunker.git
+cbgen
 cyvcf2; platform_system != "Windows"
 yarl

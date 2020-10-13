@@ -240,7 +240,7 @@ pc_relate_phi, pc_relate_phi_spec = SgkitVariables.register_variable(
 )
 """PC Relate kinship coefficient matrix."""
 sample_id, sample_id_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("sample_id", kind={"U", "O"}, ndim=1)
+    ArrayLikeSpec("sample_id", kind={"S", "U", "O"}, ndim=1)
 )
 """The unique identifier of the sample."""
 sample_pcs, sample_pcs_spec = SgkitVariables.register_variable(
@@ -303,15 +303,19 @@ variant_call_rate, variant_call_rate_spec = SgkitVariables.register_variable(
 )
 """The number of samples with heterozygous calls."""
 variant_contig, variant_contig_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("variant_contig", kind="i", ndim=1)
+    ArrayLikeSpec("variant_contig", kind={"i", "u"}, ndim=1)
 )
-"""The (index of the) contig for each variant."""
+"""
+Index corresponding to contig name for each variant. In some less common scenarios,
+this may also be equivalent to the contig names if the data generating process used
+contig names that were also integers.
+"""
 variant_hwe_p_value, variant_hwe_p_value_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("variant_hwe_p_value", kind="f")
 )
 """P values from HWE test for each variant as float in [0, 1]."""
 variant_id, variant_id_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("variant_id", kind={"U", "O"}, ndim=1)
+    ArrayLikeSpec("variant_id", kind={"S", "U", "O"}, ndim=1)
 )
 """The unique identifier of the variant."""
 variant_n_called, variant_n_called_spec = SgkitVariables.register_variable(

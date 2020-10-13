@@ -194,3 +194,29 @@ def split_array_chunks(n: int, blocks: int) -> Tuple[int, ...]:
     n_div, n_mod = np.divmod(n, blocks)
     chunks = n_mod * (n_div + 1,) + (blocks - n_mod) * (n_div,)
     return chunks  # type: ignore[no-any-return]
+
+
+def max_str_len(a: ArrayLike) -> ArrayLike:
+    """Compute maximum string length for elements of an array
+
+    Parameters
+    ----------
+    a
+        Array of any shape, must have string or object dtype
+
+    Returns
+    -------
+    max_length
+        Scalar array with same type as provided array
+    """
+    if a.size == 0:
+        raise ValueError("Max string length cannot be calculated for empty array")
+    if a.dtype.kind == "O":
+        a = a.astype(str)
+    if a.dtype.kind not in {"U", "S"}:
+        raise ValueError(f"Array must have string dtype (got dtype {a.dtype})")
+
+    lens = np.frompyfunc(len, 1, 1)(a)
+    if isinstance(a, np.ndarray):
+        lens = np.asarray(lens)
+    return lens.max()

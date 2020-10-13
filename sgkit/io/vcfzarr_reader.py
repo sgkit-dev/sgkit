@@ -14,7 +14,7 @@ def _ensure_2d(arr: ArrayLike) -> ArrayLike:
 
 
 def read_vcfzarr(path: PathType) -> xr.Dataset:
-    """Read a VCF Zarr file.
+    """Read a VCF Zarr file created using scikit-allel.
 
     Loads VCF variant, sample, and genotype data as Dask arrays within a Dataset
     from a Zarr file created using scikit-allel's `vcf_to_zarr` function.
