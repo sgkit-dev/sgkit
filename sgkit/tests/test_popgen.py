@@ -125,10 +125,11 @@ def test_divergence(size, n_cohorts, chunks):
 
 
 @pytest.mark.parametrize("size, n_cohorts", [(10, 2)])
-def test_divergence__windowed(size, n_cohorts):
+@pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
+def test_divergence__windowed(size, n_cohorts, chunks):
     ts = msprime.simulate(size, length=200, mutation_rate=0.05, random_seed=42)
     subsets = np.array_split(ts.samples(), n_cohorts)
-    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     sample_cohorts = np.concatenate(
         [np.full_like(subset, i) for i, subset in enumerate(subsets)]
     )
@@ -167,13 +168,12 @@ def test_divergence__windowed(size, n_cohorts):
 
 
 @pytest.mark.parametrize("size", [2, 3, 10, 100])
-@pytest.mark.parametrize("chunks", [(-1, -1), (10, -1)])
-def test_Fst__Hudson(size, chunks):
+def test_Fst__Hudson(size):
     # scikit-allel can only calculate Fst for pairs of cohorts (populations)
     n_cohorts = 2
     ts = msprime.simulate(size, length=100, mutation_rate=0.05, random_seed=42)
     subsets = np.array_split(ts.samples(), n_cohorts)
-    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
     sample_cohorts = np.concatenate(
         [np.full_like(subset, i) for i, subset in enumerate(subsets)]
     )
@@ -198,11 +198,10 @@ def test_Fst__Hudson(size, chunks):
     "size, n_cohorts",
     [(2, 2), (3, 2), (3, 3), (10, 2), (10, 3), (10, 4), (100, 2), (100, 3), (100, 4)],
 )
-@pytest.mark.parametrize("chunks", [(-1, -1), (10, -1)])
-def test_Fst__Nei(size, n_cohorts, chunks):
+def test_Fst__Nei(size, n_cohorts):
     ts = msprime.simulate(size, length=100, mutation_rate=0.05, random_seed=42)
     subsets = np.array_split(ts.samples(), n_cohorts)
-    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
     sample_cohorts = np.concatenate(
         [np.full_like(subset, i) for i, subset in enumerate(subsets)]
     )
@@ -234,10 +233,11 @@ def test_Fst__unknown_estimator():
     "size, n_cohorts",
     [(10, 2)],
 )
-def test_Fst__windowed(size, n_cohorts):
+@pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
+def test_Fst__windowed(size, n_cohorts, chunks):
     ts = msprime.simulate(size, length=200, mutation_rate=0.05, random_seed=42)
     subsets = np.array_split(ts.samples(), n_cohorts)
-    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     sample_cohorts = np.concatenate(
         [np.full_like(subset, i) for i, subset in enumerate(subsets)]
     )
@@ -275,10 +275,9 @@ def test_Fst__windowed(size, n_cohorts):
 
 
 @pytest.mark.parametrize("size", [2, 3, 10, 100])
-@pytest.mark.parametrize("chunks", [(-1, -1), (10, -1)])
-def test_Tajimas_D(size, chunks):
+def test_Tajimas_D(size):
     ts = msprime.simulate(size, length=100, mutation_rate=0.05, random_seed=42)
-    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
     sample_cohorts = np.full_like(ts.samples(), 0)
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     n_variants = ds.dims["variants"]
