@@ -22,8 +22,6 @@ def pdist(
     metric
         The distance metric to use. The distance function can be
         'euclidean' or 'correlation'
-    chunks
-        The chunksize for the given array, if x is of type ndarray
 
     Returns
     -------

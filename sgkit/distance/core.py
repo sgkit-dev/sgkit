@@ -6,11 +6,11 @@ from sgkit.typing import ArrayLike
 
 def pairwise(
     x: ArrayLike,
-    map_fn: np.ufunc,
+    metric_func: np.ufunc,
 ) -> ArrayLike:
     """A generic pairwise function for any separable distance metric.
     This calculates the pairwise distance between a set of vectors in the
-    given two-dimensional array, using the map reduce ufuncs. To illustrate
+    given two-dimensional array, using the ``metric_func`` ufunc. To illustrate
     the algorithm consider the following (4, 5) two dimensional array:
 
     [e.00, e.01, e.02, e.03, e.04]
@@ -38,47 +38,13 @@ def pairwise(
     performance, it is recommended to use dask array with suitable
     chunking, which makes it highly parallelizable.
 
-    Algorithm: This function works on the philosophy of map/reduce style
-    computation. The map step, which is implemented in the given map_fn
-    is applied on each pair of chunk of a vector, with every chunk of
-    every other vector. Consider the example of the above mentioned array
-
-    The matrix is divided in chunks, lets assume the chunk size is (2, 2).
-    The first chunk would be:
-
-    [e.00, e.01]
-    [e.10, e.11]
-
-    and the next chunk along the y-axis would be:
-
-    [e.20, e.21]
-    [e.30, e.31]
-
-    Now instead of passing the whole vectors: v0, v1, v2, v3 for the
-    calculation of the distance, only chunks of them are passed and the map
-    function calculates partial, between the chunks of two or more vectors and
-    this calculation can happen in parallel, hence speeding up the whole process.
-
-    After the partial calculations of the chunks are done in the map step, they
-    are accumulated in the reduce step, via the given reduce function.
-
-    The importance of ``chunks`` can be seen from the mentioned algorithm above,
-    better the chunking better the parallelisation.
-
     Parameters
     ----------
     x
         [array-like, shape: (M, N)]
         An array like two dimensional matrix.
-    map_fn
+    metric_func
         Map function for the distance metric.
-    reduce_fn
-        Reduce function for the distance metric
-    n_map_param
-        An integer which represents the dimension of the output.
-    chunks
-        The chunksize for the given array, to be used to convert
-        the given array to dask array if x is of type ndarray.
 
     Returns
     -------
@@ -102,11 +68,15 @@ def pairwise(
     array([[1.        , 0.73704347, 0.99717646],
            [0.73704347, 1.        , 0.78571429],
            [0.99717646, 0.78571429, 1.        ]])
-
+    >>> pairwise(x, euclidean).compute()
+    array([[0.        , 2.44948974, 4.69041576],
+           [2.44948974, 0.        , 5.47722558],
+           [4.69041576, 5.47722558, 0.        ]])
     """
+    x = da.asarray(x)
     return da.blockwise(
         # Lambda wraps reshape for broadcast
-        lambda _x, _y: map_fn(_x[:, None, :], _y),
+        lambda _x, _y: metric_func(_x[:, None, :], _y),
         "jk",
         x,
         "ji",
