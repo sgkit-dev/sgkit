@@ -177,20 +177,15 @@ def _read_metafile_partition(path: Path, partition: int) -> pd.DataFrame:
 def read_metafile(path: PathType) -> dd.DataFrame:
     """ Read cbgen metafile containing partitioned variant info """
     with bgen_metafile(path) as mf:
-        nvariants = mf.nvariants
-        npartitions = mf.npartitions
-        partition_size = mf.partition_size
-    dfs = []
-    index_base = 0
-    divisions = []
-    for i in range(npartitions):
-        divisions.append(index_base)
-        d = dask.delayed(_read_metafile_partition)(path, i)
-        dfs.append(d)
-        index_base += partition_size
-    divisions.append(nvariants - 1)
-    meta = dd.utils.make_meta(METAFILE_DTYPE)
-    return dd.from_delayed(dfs, meta=meta, divisions=divisions)
+        divisions = [mf.partition_size * i for i in range(mf.npartitions)] + [
+            mf.nvariants - 1
+        ]
+        dfs = [
+            dask.delayed(_read_metafile_partition)(path, i)
+            for i in range(mf.npartitions)
+        ]
+        meta = dd.utils.make_meta(METAFILE_DTYPE)
+        return dd.from_delayed(dfs, meta=meta, divisions=divisions)
 
 
 def read_samples(path: PathType) -> pd.DataFrame:
