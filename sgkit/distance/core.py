@@ -1,6 +1,3 @@
-import typing
-import warnings
-
 import dask.array as da
 import numpy as np
 
@@ -10,9 +7,6 @@ from sgkit.typing import ArrayLike
 def pairwise(
     x: ArrayLike,
     map_fn: np.ufunc,
-    reduce_fn: np.ufunc,
-    n_map_param: int,
-    chunks: typing.Optional[typing.Tuple[int, int]] = None,
 ) -> ArrayLike:
     """A generic pairwise function for any separable distance metric.
     This calculates the pairwise distance between a set of vectors in the
@@ -94,70 +88,30 @@ def pairwise(
     --------
 
     >>> from sgkit.distance.core import pairwise
-    >>> from sgkit.distance.metrics import correlation_map, correlation_reduce, N_MAP_PARAM
+    >>> from sgkit.distance.metrics import correlation, euclidean
     >>> import numpy as np
     >>> import dask.array as da
     >>> x = da.array([[6, 4, 1,], [4, 5, 2], [9, 7, 3]]).rechunk(2, 2)
-    >>> pairwise(x, correlation_map, correlation_reduce, N_MAP_PARAM['correlation']).compute()
+    >>> pairwise(x, correlation).compute()
     array([[1.        , 0.73704347, 0.99717646],
            [0.73704347, 1.        , 0.78571429],
            [0.99717646, 0.78571429, 1.        ]])
 
     >>> x = np.array([[6, 4, 1,], [4, 5, 2], [9, 7, 3]])
-    >>> pairwise(x, correlation_map, correlation_reduce, N_MAP_PARAM['correlation'], chunks=(2, 2)).compute()
+    >>> pairwise(x, correlation).compute()
     array([[1.        , 0.73704347, 0.99717646],
            [0.73704347, 1.        , 0.78571429],
            [0.99717646, 0.78571429, 1.        ]])
 
     """
-    if isinstance(x, np.ndarray) and not chunks:
-        warnings.warn(
-            "x is of type ndarray and 'chunks' is not passed, this will result "
-            "in chunksize same as the size of x, while conversion to dask array. This "
-            "will make it slow as chunks run in parallel."
-        )
-        x = da.from_array(x).astype("f8")
-    elif isinstance(x, np.ndarray) and chunks:
-        x = da.from_array(x).astype("f8").rechunk(chunks)
-
-    I1 = range(x.numblocks[0])
-    I2 = range(x.numblocks[0])
-    J = range(x.numblocks[1])
-
-    def _get_items_to_stack(_i1: int, _i2: int) -> da.array:
-        items_to_stack = []
-        for j in J:
-            item_to_stack = map_fn(
-                x.blocks[_i1, j][:, None, :],
-                x.blocks[_i2, j],
-                np.empty(n_map_param),
-            )
-
-            # Since the resultant array is a symmetric matrix we avoid the
-            # calculation of map function on the lower triangular matrix
-            # by filling it will nan
-            if _i1 <= _i2:
-                items_to_stack.append(item_to_stack)
-            else:
-                nans = da.full(item_to_stack.shape, fill_value=np.nan)
-                items_to_stack.append(nans)
-        return da.stack(items_to_stack, axis=-1)
-
-    concatenate_i2 = []
-    for i1 in I1:
-        stacked_items = []
-        for i2 in I2:
-            stacks = _get_items_to_stack(i1, i2)
-            stacked_items.append(stacks)
-        concatenate_i2.append(da.concatenate(stacked_items, axis=1))
-    x_map = da.concatenate(concatenate_i2, axis=0)
-
-    assert x_map.shape == (len(x), len(x), n_map_param, x.numblocks[1])
-
-    # Apply reduction to arrays with shape (n_map_param, n_column_chunk),
-    # which would easily fit in memory
-    x_reduce = reduce_fn(x_map.rechunk((None, None, -1, -1)))
-    # This returns the symmetric matrix, since we only calculate upper
-    # triangular matrix, we fill up the lower triangular matrix by upper
-    x_distance = da.triu(x_reduce, 1) + da.triu(x_reduce).T
-    return x_distance
+    return da.blockwise(
+        # Lambda wraps reshape for broadcast
+        lambda _x, _y: map_fn(_x[:, None, :], _y),
+        "jk",
+        x,
+        "ji",
+        x,
+        "ki",
+        dtype="float64",
+        concatenate=True,
+    )
