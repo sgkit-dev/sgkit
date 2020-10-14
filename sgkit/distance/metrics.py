@@ -1,9 +1,4 @@
-"""
-This module implements various distance metrics. To implement a new distance
-metric, two methods needs to be written, one of them suffixed by 'map' and other
-suffixed by 'reduce'. An entry for the same should be added in the N_MAP_PARAM
-dictionary below.
-"""
+"""This module implements various distance metrics."""
 
 import numpy as np
 from numba import guvectorize
@@ -13,11 +8,70 @@ from sgkit.typing import ArrayLike
 
 @guvectorize(["void(float64[:], float64[:], float64[:])"], "(n),(n)->()", fastmath=True)  # type: ignore
 def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
-    # Equivalent to np.corrcoef(x, y)[0, 1] but 2x faster
+    """
+    Parameters
+    ----------
+    x
+        [array-like, shape: (M,)]
+        A vector
+    y
+        [array-like, shape: (M,)]
+        Another vector
+    out
+        The output array, which has the output of pearson correlation.
+
+    Returns
+    -------
+    A scalar representing the pearson correlation coefficient between two vectors x and y.
+
+    Examples
+    --------
+    >>> from sgkit.distance.metrics import correlation
+    >>> import dask.array as da
+    >>> import numpy as np
+    >>> x = da.array([4, 3, 2, 3], dtype='i1')
+    >>> y = da.array([5, 6, 7, 0], dtype='i1')
+    >>> correlation(x, y).compute()
+    -0.2626128657194451
+
+    >>> correlation(x, x).compute()
+    1.0
+    """
     cov = ((x - x.mean()) * (y - y.mean())).sum()
     out[0] = cov / (x.std() * y.std()) / x.shape[0]
 
 
 @guvectorize(["void(float64[:], float64[:], float64[:])"], "(n),(n)->()", fastmath=True)  # type: ignore
 def euclidean(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
+    """
+
+    Parameters
+    ----------
+    x
+        [array-like, shape: (M,)]
+        A vector
+    y
+        [array-like, shape: (M,)]
+        Another vector
+    out
+        The output scalar, which has the output of euclidean between two vectors.
+
+    Returns
+    -------
+    A scalar representing the euclidean distance between two vectors x and y.
+
+    Examples
+    --------
+    >>> from sgkit.distance.metrics import euclidean
+    >>> import dask.array as da
+    >>> import numpy as np
+    >>> x = da.array([4, 3, 2, 3], dtype='i1')
+    >>> y = da.array([5, 6, 7, 0], dtype='i1')
+    >>> euclidean(x, y).compute()
+    6.6332495807108
+
+    >>> euclidean(x, x).compute()
+    0.0
+
+    """
     out[0] = np.sqrt(((x - y) ** 2).sum())
