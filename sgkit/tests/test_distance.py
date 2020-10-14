@@ -33,7 +33,7 @@ def test_distance_euclidean() -> None:
 
 def test_distance_ndarray() -> None:
     x = get_vectors(array_type="np")
-    distance_matrix = pdist(x, metric="euclidean", chunks=(6, 10))
+    distance_matrix = pdist(x, metric="euclidean")
     distance_array = scipy_pdist(x)
     expected_matrix = squareform(distance_array)
     np.testing.assert_almost_equal(distance_matrix, expected_matrix)
@@ -42,4 +42,4 @@ def test_distance_ndarray() -> None:
 def test_undefined_metric() -> None:
     x = get_vectors(array_type="np")
     with pytest.raises(NotImplementedError):
-        pdist(x, metric="not-implemented-metric", chunks=(6, 10))
+        pdist(x, metric="not-implemented-metric")
