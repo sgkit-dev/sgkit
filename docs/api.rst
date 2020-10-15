@@ -34,17 +34,6 @@ VCF
 
    read_vcfzarr
 
-.. currentmodule:: sgkit
-
-Creating a dataset
-==================
-
-.. autosummary::
-   :toctree: generated/
-
-   create_genotype_call_dataset
-   create_genotype_dosage_dataset
-
 .. _api_methods:
 
 Methods
@@ -64,6 +53,15 @@ Methods
    variant_stats
    Tajimas_D
    pc_relate
+
+Utilities
+=========
+
+.. autosummary::
+   :toctree: generated/
+
+   display_genotypes
+   simulate_genotype_call_dataset
 
 Variables
 =========
@@ -106,11 +104,3 @@ Variables
     variables.variant_p_value_spec
     variables.variant_position_spec
     variables.variant_t_value_spec
-
-Utilities
-=========
-
-.. autosummary::
-   :toctree: generated/
-
-   display_genotypes
