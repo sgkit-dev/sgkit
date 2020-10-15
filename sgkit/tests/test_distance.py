@@ -11,10 +11,10 @@ from sgkit.distance.api import pdist
 from sgkit.typing import ArrayLike
 
 
-def get_vectors(array_type: str = "da") -> ArrayLike:
+def get_vectors(array_type: str = "da", dtype="i1") -> ArrayLike:
     if array_type == "da":
         rs = da.random.RandomState(0)
-        x = rs.randint(0, 3, size=(5, 5), dtype="i1").rechunk((2, 2))
+        x = rs.randint(0, 3, size=(5, 5), dtype=dtype).rechunk((2, 2))
     else:
         x = np.random.rand(5, 5)
     return x
