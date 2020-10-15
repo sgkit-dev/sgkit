@@ -70,7 +70,7 @@ def pairwise(
            [4.69041576, 5.47722558, 0.        ]])
     """
     x = da.asarray(x)
-    return da.blockwise(
+    x_distance = da.blockwise(
         # Lambda wraps reshape for broadcast
         lambda _x, _y: metric_func(_x[:, None, :], _y),
         "jk",
@@ -81,3 +81,4 @@ def pairwise(
         dtype="float64",
         concatenate=True,
     )
+    return da.triu(x_distance, 1) + da.triu(x_distance).T
