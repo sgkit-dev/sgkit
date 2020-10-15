@@ -194,23 +194,31 @@ def read_plink(
 
     Returns
     -------
-    Dataset
-        A dataset containing genotypes as 3 dimensional calls along with
-        all accompanying pedigree and variant information. The content
-        of this dataset matches that of `sgkit.create_genotype_call_dataset`
-        with all pedigree-specific fields defined as:
+    A dataset containing genotypes as 3 dimensional calls along with
+    all accompanying pedigree and variant information. The content
+    of this dataset includes:
 
-        - sample_family_id: Family identifier commonly referred to as FID
-        - sample_id: Within-family identifier for sample
-        - sample_paternal_id: Within-family identifier for father of sample
-        - sample_maternal_id: Within-family identifier for mother of sample
-        - sample_sex: Sex code equal to 1 for male, 2 for female, and -1
-          for missing
-        - sample_phenotype: Phenotype code equal to 1 for control, 2 for case,
-          and -1 for missing
+    - :data:`sgkit.variables.variant_id_spec` (variants)
+    - :data:`sgkit.variables.variant_contig_spec` (variants)
+    - :data:`sgkit.variables.variant_position_spec` (variants)
+    - :data:`sgkit.variables.variant_allele_spec` (variants)
+    - :data:`sgkit.variables.sample_id_spec` (samples)
+    - :data:`sgkit.variables.call_genotype_spec` (variants, samples, ploidy)
+    - :data:`sgkit.variables.call_genotype_mask_spec` (variants, samples, ploidy)
+
+    The following pedigree-specific fields are also included:
+
+    - ``sample_family_id``: Family identifier commonly referred to as FID
+    - ``sample_id``: Within-family identifier for sample
+    - ``sample_paternal_id``: Within-family identifier for father of sample
+    - ``sample_maternal_id``: Within-family identifier for mother of sample
+    - ``sample_sex``: Sex code equal to 1 for male, 2 for female, and -1
+        for missing
+    - ``sample_phenotype``: Phenotype code equal to 1 for control, 2 for case,
+        and -1 for missing
 
 
-        See https://www.cog-genomics.org/plink/1.9/formats#fam for more details.
+    See https://www.cog-genomics.org/plink/1.9/formats#fam for more details.
 
     Raises
     ------

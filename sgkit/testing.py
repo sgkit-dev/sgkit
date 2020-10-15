@@ -22,7 +22,7 @@ def simulate_genotype_call_dataset(
     biological interpretation and that summary statistics
     or other methods applied to it will produce meaningless
     results.  This function is primarily a convenience on
-    generating `Dataset` containers so quantities of interest
+    generating :class:`xarray.Dataset` containers so quantities of interest
     should be overwritten, where appropriate, within the
     context of a more specific application.
 
@@ -39,8 +39,8 @@ def simulate_genotype_call_dataset(
     n_contig
         optional
         Number of contigs to partition variants with,
-        controlling values in `variant_contig`. Values
-        will all be 0 by default with `n_contig` == 1.
+        controlling values in ``variant_contig``. Values
+        will all be 0 by default when ``n_contig`` is 1.
     seed
         Seed for random number generation, optional
     missing_pct
@@ -48,8 +48,14 @@ def simulate_genotype_call_dataset(
 
     Returns
     -------
-    Dataset
-        Dataset from :func:`sgkit.create_genotype_call_dataset`.
+    A dataset containing the following variables:
+
+    - :data:`sgkit.variables.variant_contig_spec` (variants)
+    - :data:`sgkit.variables.variant_position_spec` (variants)
+    - :data:`sgkit.variables.variant_allele_spec` (variants)
+    - :data:`sgkit.variables.sample_id_spec` (samples)
+    - :data:`sgkit.variables.call_genotype_spec` (variants, samples, ploidy)
+    - :data:`sgkit.variables.call_genotype_mask_spec` (variants, samples, ploidy)
     """
     if missing_pct and (missing_pct < 0.0 or missing_pct > 1.0):
         raise ValueError("missing_pct must be within [0.0, 1.0]")
