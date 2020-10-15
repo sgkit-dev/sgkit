@@ -18,7 +18,8 @@ def pdist(
     ----------
     x
         [array-like, shape: (M, N)]
-        An array like two dimensional matrix
+        An array like two dimensional matrix. The rows are the
+        vectors used for comparison, i.e. for pairwise distance.
     metric
         The distance metric to use. The distance function can be
         'euclidean' or 'correlation'
