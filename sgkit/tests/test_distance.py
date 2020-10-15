@@ -11,12 +11,12 @@ from sgkit.distance.api import pdist
 from sgkit.typing import ArrayLike
 
 
-def get_vectors(array_type: str = "da", dtype="i1") -> ArrayLike:
+def get_vectors(array_type: str = "da", dtype: str = "i8") -> ArrayLike:
     if array_type == "da":
         rs = da.random.RandomState(0)
-        x = rs.randint(0, 3, size=(5, 5), dtype=dtype).rechunk((2, 2))
+        x = rs.randint(0, 3, size=(100, 100)).astype(dtype).rechunk((20, 10))
     else:
-        x = np.random.rand(5, 5)
+        x = np.random.rand(100, 100).astype(dtype)
     return x
 
 
@@ -43,7 +43,7 @@ def test_distance_euclidean() -> None:
 
 
 def test_distance_missing_values() -> None:
-    x = get_vectors(array_type="np")
+    x = get_vectors(array_type="np", dtype="f8")
     nan_indices = set([randint(0, x.shape[1] - 1) for _ in range(5)])
 
     for k in nan_indices:
@@ -64,6 +64,20 @@ def test_distance_ndarray() -> None:
     distance_array = scipy_pdist(x)
     expected_matrix = squareform(distance_array)
     np.testing.assert_almost_equal(distance_matrix, expected_matrix)
+
+
+@pytest.mark.parametrize(
+    "dtype, expected",
+    [
+        ("i8", "float64"),
+        ("f4", "float32"),
+        ("f8", "float64"),
+    ],
+)
+def test_data_types(dtype, expected):
+    x = get_vectors(dtype=dtype)
+    distance_matrix = pdist(x)
+    assert distance_matrix.dtype.name == expected
 
 
 def test_undefined_metric() -> None:
