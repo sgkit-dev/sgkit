@@ -6,7 +6,15 @@ from numba import guvectorize
 from sgkit.typing import ArrayLike
 
 
-@guvectorize(["void(float64[:], float64[:], float64[:])"], "(n),(n)->()", fastmath=True)  # type: ignore
+@guvectorize(
+    [
+        "void(float32[:], float32[:], float32[:])",
+        "void(float64[:], float64[:], float64[:])",
+        "void(int8[:], int8[:], float64[:])",
+    ],
+    "(n),(n)->()",
+    fastmath=True,
+)  # type: ignore
 def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
     """
     Parameters
@@ -41,7 +49,15 @@ def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
     out[0] = cov / (x.std() * y.std()) / x.shape[0]
 
 
-@guvectorize(["void(float64[:], float64[:], float64[:])"], "(n),(n)->()", fastmath=True)  # type: ignore
+@guvectorize(
+    [
+        "void(float32[:], float32[:], float32[:])",
+        "void(float64[:], float64[:], float64[:])",
+        "void(int8[:], int8[:], float64[:])",
+    ],
+    "(n),(n)->()",
+    fastmath=True,
+)  # type: ignore
 def euclidean(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
     """
 

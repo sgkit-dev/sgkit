@@ -31,6 +31,16 @@ def test_distance_euclidean() -> None:
     np.testing.assert_almost_equal(distance_matrix, expected_matrix)
 
 
+def test_distance_missing_values() -> None:
+    x = get_vectors(array_type="np")
+    x[5][6] = np.nan
+    x[10][1] = np.nan
+    distance_matrix = pdist(x)
+    distance_array = scipy_pdist(x)
+    expected_matrix = squareform(distance_array)
+    np.testing.assert_almost_equal(distance_matrix, expected_matrix)
+
+
 def test_distance_ndarray() -> None:
     x = get_vectors(array_type="np")
     distance_matrix = pdist(x, metric="euclidean")
