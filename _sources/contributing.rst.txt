@@ -23,13 +23,13 @@ Discussion forums
 Conversation about *sgkit* happens in the following places:
 
 1.  `GitHub Issue Tracker`_: for discussions around new features or bugs
-2.  `Software, Methods, and Data for Statistical Genetics forum`_: for general discussion
+2.  `Python for Statistical Genetics forum`_: for general discussion
 
 Discussions on the forum tend to be about higher-level themes, and statistical genetics in
 general. Coding details should be discussed on GitHub issues and pull requests.
 
 .. _`GitHub Issue Tracker`: https://github.com/pystatgen/sgkit/issues
-.. _`Software, Methods, and Data for Statistical Genetics forum`: https://discourse.smadstatgen.org/
+.. _`Python for Statistical Genetics forum`: https://discourse.pystatgen.org/
 
 
 Code repositories
