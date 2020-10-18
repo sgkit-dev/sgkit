@@ -15,7 +15,8 @@ from sgkit.typing import ArrayLike
     "(n),(n)->()",
 )
 def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
-    """
+    """Calculates the correlation between two vectors.
+
     Parameters
     ----------
     x
@@ -81,7 +82,7 @@ def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
     "(n),(n)->()",
 )
 def euclidean(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
-    """
+    """Calculates the euclidean distance between two vectors.
 
     Parameters
     ----------
