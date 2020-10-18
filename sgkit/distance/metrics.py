@@ -44,8 +44,27 @@ def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
     >>> correlation(x, x).compute()
     1.0
     """
-    cov = ((x - x.mean()) * (y - y.mean())).sum()
-    out[0] = cov / (x.std() * y.std()) / x.shape[0]
+    m = x.shape[0]
+    valid_indices = np.zeros(m, dtype=np.float64)
+
+    for i in range(m):
+        if x[i] >= 0 and y[i] >= 0:
+            valid_indices[i] = 1.0
+
+    valid_shape = valid_indices.shape[0]
+
+    _x = np.zeros(valid_shape, dtype=x.dtype)
+    _y = np.zeros(valid_shape, dtype=y.dtype)
+
+    fill = 0
+    for i in range(valid_indices.shape[0]):
+        if valid_indices[i] > 0:
+            _x[fill] = x[i]
+            _y[fill] = y[i]
+            fill += 1
+
+    cov = ((_x - _x.mean()) * (_y - _y.mean())).sum()
+    out[0] = cov / (_x.std() * _y.std()) / _x.shape[0]
 
 
 @guvectorize(  # type: ignore
