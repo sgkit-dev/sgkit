@@ -52,16 +52,16 @@ def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
             valid_indices[i] = 1
 
     valid_shape = valid_indices.sum()
-
     _x = np.zeros(int(valid_shape), dtype=x.dtype)
     _y = np.zeros(int(valid_shape), dtype=y.dtype)
 
-    fill = 0
+    # Ignore missing values
+    valid_idx = 0
     for i in range(valid_indices.shape[0]):
-        if valid_indices[i] > 0:
-            _x[fill] = x[i]
-            _y[fill] = y[i]
-            fill += 1
+        if valid_indices[i]g > 0:
+            _x[valid_idx] = x[i]
+            _y[valid_idx] = y[i]
+            valid_idx += 1
 
     cov = ((_x - _x.mean()) * (_y - _y.mean())).sum()
     denom = (_x.std() * _y.std()) / _x.shape[0]
@@ -114,6 +114,7 @@ def euclidean(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
     """
     square_sum = 0.0
     m = x.shape[0]
+    # Ignore missing values
     for i in range(m):
         if x[i] >= 0 and y[i] >= 0:
             square_sum += (x[i] - y[i]) ** 2

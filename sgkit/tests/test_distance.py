@@ -26,6 +26,21 @@ def get_vectors(
 def create_distance_matrix(
     x: ArrayLike, metric_func: typing.Callable[[ArrayLike, ArrayLike], np.float64]
 ) -> ArrayLike:
+    """
+    Parameters
+    ----------
+    x
+        [array-like, shape: (M, N)]
+        An array like two dimensional matrix. The rows are the
+        vectors used for comparison, i.e. for pairwise distance.
+    metric_func
+        metric function for the distance metric.
+
+    Returns
+    -------
+    A two dimensional distance matrix.
+
+    """
     m = x.shape[0]
     distance_matrix = np.zeros((m, m), dtype=np.float64)
     for i in range(x.shape[0]):
@@ -86,25 +101,29 @@ def test_distance_ndarray() -> None:
 
 
 @pytest.mark.parametrize(
-    "metric, metric_func",
+    "metric, metric_func, dtype",
     [
-        ("euclidean", euclidean),
-        ("correlation", lambda u, v: np.corrcoef(u, v)[0][1]),
+        ("euclidean", euclidean, "f8"),
+        ("euclidean", euclidean, "i8"),
+        ("correlation", lambda u, v: np.corrcoef(u, v)[0][1], "f8"),
+        ("correlation", lambda u, v: np.corrcoef(u, v)[0][1], "i8"),
     ],
 )
 def test_missing_values(
-    metric: str, metric_func: typing.Callable[[ArrayLike, ArrayLike], np.float64]
+    metric: str,
+    metric_func: typing.Callable[[ArrayLike, ArrayLike], np.float64],
+    dtype: str,
 ) -> None:
-    x = np.array(
-        [
-            [7, np.nan, 8, 1],
-            [5, 5, 0, 6],
-            [8, 2, 7, -5],
-            [np.nan, 9, 1, -2],
-            [9, 1, 6, 7],
-        ],
-        dtype="f8",
-    )
+    x = get_vectors(array_type="np", dtype=dtype)
+
+    ri_times = np.random.randint(5, 20)
+    m, n = x.shape
+    for i in range(ri_times):
+        if dtype == "f8":
+            x[np.random.randint(0, m)][np.random.randint(0, m)] = np.nan
+        x[np.random.randint(0, m)][np.random.randint(0, m)] = np.random.randint(
+            -100, -1
+        )
 
     distance_matrix = pairwise_distance(x, metric=metric)
     expected_matrix = create_distance_matrix(x, metric_func)
