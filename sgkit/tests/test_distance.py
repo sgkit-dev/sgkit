@@ -1,5 +1,4 @@
 import typing
-from random import randint
 
 import dask.array as da
 import numpy as np
@@ -39,22 +38,6 @@ def test_distance_euclidean() -> None:
     distance_matrix = pdist(x, metric="euclidean")
     distance_array = scipy_pdist(x)
     expected_matrix = squareform(distance_array)
-    np.testing.assert_almost_equal(distance_matrix, expected_matrix)
-
-
-def test_distance_missing_values() -> None:
-    x = get_vectors(array_type="np", dtype="f8")
-    nan_indices = set([randint(0, x.shape[1] - 1) for _ in range(5)])
-
-    for k in nan_indices:
-        x[k][randint(0, x.shape[1] - 1)] = np.nan
-
-    distance_matrix = pdist(x)
-    distance_array = scipy_pdist(x)
-    expected_matrix = squareform(distance_array)
-    expected_matrix = fill_invalid_indices_with_invalid_value(
-        expected_matrix, nan_indices, np.nan
-    )
     np.testing.assert_almost_equal(distance_matrix, expected_matrix)
 
 
