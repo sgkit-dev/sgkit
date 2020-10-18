@@ -58,7 +58,7 @@ def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
     # Ignore missing values
     valid_idx = 0
     for i in range(valid_indices.shape[0]):
-        if valid_indices[i]g > 0:
+        if valid_indices[i] > 0:
             _x[valid_idx] = x[i]
             _y[valid_idx] = y[i]
             valid_idx += 1

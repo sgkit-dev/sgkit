@@ -54,7 +54,6 @@ def create_distance_matrix(
                 # unable to calculate distance metric which
                 # which means array contains only one element or
                 # not possible to calculate distance metric
-                # import ipdb as pdb; pdb.set_trace()
                 distance_matrix[i][j] = np.nan
     return distance_matrix
 

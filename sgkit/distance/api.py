@@ -10,8 +10,7 @@ def pairwise_distance(
     metric: str = "euclidean",
 ) -> np.ndarray:
     """Calculates the pairwise distance between all pairs of vectors in the
-    given two dimensional array x. The API is similar to:
-    ``scipy.spatial.distance.pdist``.
+    given two dimensional array x.
 
     To illustrate the algorithm consider the following (4, 5) two dimensional array:
 
@@ -93,5 +92,5 @@ def pairwise_distance(
         dtype="float64",
         concatenate=True,
     )
-    x_distance = da.triu(x_distance, 1) + da.triu(x_distance).T.compute()
+    x_distance = da.triu(x_distance, 1) + da.triu(x_distance).T
     return x_distance.compute()
