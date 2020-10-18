@@ -44,14 +44,34 @@ def create_distance_matrix(
     return distance_matrix
 
 
-def test_distance_correlation() -> None:
-    x = get_vectors()
+@pytest.mark.parametrize(
+    "size, chunk",
+    [
+        ((100, 100), (20, 10)),
+        ((100, 100), (25, 10)),
+        ((100, 100), (50, 10)),
+    ],
+)
+def test_distance_correlation(
+    size: typing.Tuple[int, int], chunk: typing.Tuple[int, int]
+) -> None:
+    x = get_vectors(size=size, chunk=chunk)
     distance_matrix = pairwise_distance(x, metric="correlation")
     np.testing.assert_almost_equal(distance_matrix, np.corrcoef(x).compute())
 
 
-def test_distance_euclidean() -> None:
-    x = get_vectors()
+@pytest.mark.parametrize(
+    "size, chunk",
+    [
+        ((100, 100), (20, 10)),
+        ((100, 100), (25, 10)),
+        ((100, 100), (50, 10)),
+    ],
+)
+def test_distance_euclidean(
+    size: typing.Tuple[int, int], chunk: typing.Tuple[int, int]
+) -> None:
+    x = get_vectors(size=size, chunk=chunk)
     distance_matrix = pairwise_distance(x, metric="euclidean")
     distance_array = pdist(x)
     expected_matrix = squareform(distance_array)
@@ -65,23 +85,16 @@ def test_distance_ndarray() -> None:
     np.testing.assert_almost_equal(distance_matrix, expected_matrix)
 
 
-def test_missing_values_negative() -> None:
-    x = da.array([[4, 3, 2], [2, -4, 5], [0, 4, 5]], dtype="i1")
-    distance_matrix = pairwise_distance(x, metric="euclidean")
-    expected_matrix = pdist(x)
-    expected_matrix[0] = euclidean([4, 2], [2, 5])
-    expected_matrix[2] = euclidean([2, 5], [0, 5])
-    np.testing.assert_almost_equal(distance_matrix, squareform(expected_matrix))
-
-
-def test_missing_values_nan_and_negative_euclidean() -> None:
-    x = da.array([[4, np.nan, 2], [2, -4, 5], [0, 4, 5]], dtype="f8")
-    distance_matrix = pairwise_distance(x, metric="euclidean")
-    expected_matrix = create_distance_matrix(x, euclidean)
-    np.testing.assert_almost_equal(distance_matrix, expected_matrix)
-
-
-def test_missing_values_nan_and_negative_correlation() -> None:
+@pytest.mark.parametrize(
+    "metric, metric_func",
+    [
+        ("euclidean", euclidean),
+        ("correlation", lambda u, v: np.corrcoef(u, v)[0][1]),
+    ],
+)
+def test_missing_values(
+    metric: str, metric_func: typing.Callable[[ArrayLike, ArrayLike], np.float64]
+) -> None:
     x = np.array(
         [
             [7, np.nan, 8, 1],
@@ -93,8 +106,8 @@ def test_missing_values_nan_and_negative_correlation() -> None:
         dtype="f8",
     )
 
-    distance_matrix = pairwise_distance(x, metric="correlation")
-    expected_matrix = create_distance_matrix(x, lambda u, v: np.corrcoef(u, v)[0][1])
+    distance_matrix = pairwise_distance(x, metric=metric)
+    expected_matrix = create_distance_matrix(x, metric_func)
     np.testing.assert_almost_equal(distance_matrix, expected_matrix)
 
 
