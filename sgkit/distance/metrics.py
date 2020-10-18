@@ -49,12 +49,12 @@ def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
 
     for i in range(m):
         if x[i] >= 0 and y[i] >= 0:
-            valid_indices[i] = 1.0
+            valid_indices[i] = 1
 
-    valid_shape = valid_indices.shape[0]
+    valid_shape = valid_indices.sum()
 
-    _x = np.zeros(valid_shape, dtype=x.dtype)
-    _y = np.zeros(valid_shape, dtype=y.dtype)
+    _x = np.zeros(int(valid_shape), dtype=x.dtype)
+    _y = np.zeros(int(valid_shape), dtype=y.dtype)
 
     fill = 0
     for i in range(valid_indices.shape[0]):
@@ -64,7 +64,12 @@ def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
             fill += 1
 
     cov = ((_x - _x.mean()) * (_y - _y.mean())).sum()
-    out[0] = cov / (_x.std() * _y.std()) / _x.shape[0]
+    denom = (_x.std() * _y.std()) / _x.shape[0]
+
+    value = np.nan
+    if denom > 0:
+        value = cov / (_x.std() * _y.std()) / _x.shape[0]
+    out[0] = value
 
 
 @guvectorize(  # type: ignore
