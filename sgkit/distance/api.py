@@ -36,6 +36,8 @@ def pairwise_distance(
     The (i, j) position in the resulting array (matrix) denotes the distance
     between vi and vj vectors.
 
+    Negative and nan values are considered as missing values. They are ignored
+    for all distance metric calculations.
 
     Parameters
     ----------
