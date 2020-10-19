@@ -46,7 +46,7 @@ def pairwise_distance(
         vectors used for comparison, i.e. for pairwise distance.
     metric
         The distance metric to use. The distance function can be
-        'euclidean' or 'correlation'
+        'euclidean' or 'correlation'.
 
     Returns
     -------
@@ -76,9 +76,9 @@ def pairwise_distance(
 
     >>> x = np.array([[6, 4, 1,], [4, 5, 2], [9, 7, 3]])
     >>> pairwise_distance(x, metric='correlation')
-    array([[1.        , 0.73704347, 0.99717646],
-           [0.73704347, 1.        , 0.78571429],
-           [0.99717646, 0.78571429, 1.        ]])
+    array([[1.11022302e-16, 2.62956526e-01, 2.82353505e-03],
+           [2.62956526e-01, 0.00000000e+00, 2.14285714e-01],
+           [2.82353505e-03, 2.14285714e-01, 0.00000000e+00]])
     """
 
     try:

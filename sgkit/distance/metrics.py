@@ -40,10 +40,10 @@ def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
     >>> x = da.array([4, 3, 2, 3], dtype='i1')
     >>> y = da.array([5, 6, 7, 0], dtype='i1')
     >>> correlation(x, y).compute()
-    -0.2626128657194451
+    1.2626128
 
     >>> correlation(x, x).compute()
-    1.0
+    -1.1920929e-07
     """
     m = x.shape[0]
     valid_indices = np.zeros(m, dtype=np.float64)
@@ -69,7 +69,7 @@ def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
 
     value = np.nan
     if denom > 0:
-        value = cov / (_x.std() * _y.std()) / _x.shape[0]
+        value = 1.0 - (cov / (_x.std() * _y.std()) / _x.shape[0])
     out[0] = value
 
 
