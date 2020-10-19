@@ -129,7 +129,9 @@ def hardy_weinberg_test(
     genotype_counts: Optional[Hashable] = None,
     call_genotype: Hashable = variables.call_genotype,
     call_genotype_mask: Hashable = variables.call_genotype_mask,
-    merge: bool = True,
+    ploidy: Optional[int] = None,
+    alleles: Optional[int] = None,
+    merge: bool = True
 ) -> Dataset:
     """Exact test for HWE as described in Wigginton et al. 2005 [1].
 
@@ -150,6 +152,12 @@ def hardy_weinberg_test(
     call_genotype_mask
         Input variable name holding call_genotype_mask.
         Defined by :data:`sgkit.variables.call_genotype_mask_spec`
+    ploidy
+        Genotype ploidy, defaults to ``ploidy`` dimension of genotype
+        call array (:data:`sgkit.variables.call_genotype_spec`) if present.
+        If that variable is not present, then this value must be set.
+        Currently HWE calculations are only supported for diploid datasets,
+        i.e. ``ploidy`` must equal 2.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -179,7 +187,12 @@ def hardy_weinberg_test(
     NotImplementedError
         If maximum number of alleles in provided dataset != 2
     """
-    if ds.dims["ploidy"] != 2:
+    ploidy = ploidy or ds.dims.get("ploidy")
+    if not ploidy:
+        raise ValueError(
+            "`ploidy` parameter must be set when not present as array dimension."
+        )
+    if ploidy != 2:
         raise NotImplementedError("HWE test only implemented for diploid genotypes")
     if ds.dims["alleles"] != 2:
         raise NotImplementedError("HWE test only implemented for biallelic genotypes")
