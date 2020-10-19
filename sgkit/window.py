@@ -70,7 +70,7 @@ def _get_windows(
     start: int, stop: int, size: int, step: int
 ) -> Tuple[ArrayLike, ArrayLike]:
     # Find the indexes for the start positions of all windows
-    # TODO: take contigs into account
+    # TODO: take contigs into account https://github.com/pystatgen/sgkit/issues/335
     window_starts = np.arange(start, stop, step)
     window_stops = np.clip(window_starts + size, start, stop)
     return window_starts, window_stops
