@@ -3,7 +3,12 @@ import typing
 import dask.array as da
 import numpy as np
 import pytest
-from scipy.spatial.distance import euclidean, pdist, squareform  # type: ignore
+from scipy.spatial.distance import (  # type: ignore
+    correlation,
+    euclidean,
+    pdist,
+    squareform,
+)
 
 from sgkit.distance.api import pairwise_distance
 from sgkit.typing import ArrayLike
@@ -71,7 +76,9 @@ def test_distance_correlation(
 ) -> None:
     x = get_vectors(size=size, chunk=chunk)
     distance_matrix = pairwise_distance(x, metric="correlation")
-    np.testing.assert_almost_equal(distance_matrix, np.corrcoef(x).compute())
+    distance_array = pdist(x, metric="correlation")
+    expected_matrix = squareform(distance_array)
+    np.testing.assert_almost_equal(distance_matrix, expected_matrix)
 
 
 @pytest.mark.parametrize(
@@ -87,8 +94,7 @@ def test_distance_euclidean(
 ) -> None:
     x = get_vectors(size=size, chunk=chunk)
     distance_matrix = pairwise_distance(x, metric="euclidean")
-    distance_array = pdist(x)
-    expected_matrix = squareform(distance_array)
+    expected_matrix = squareform(pdist(x))
     np.testing.assert_almost_equal(distance_matrix, expected_matrix)
 
 
@@ -104,8 +110,8 @@ def test_distance_ndarray() -> None:
     [
         ("euclidean", euclidean, "f8"),
         ("euclidean", euclidean, "i8"),
-        ("correlation", lambda u, v: np.corrcoef(u, v)[0][1], "f8"),
-        ("correlation", lambda u, v: np.corrcoef(u, v)[0][1], "i8"),
+        ("correlation", correlation, "f8"),
+        ("correlation", correlation, "i8"),
     ],
 )
 def test_missing_values(
