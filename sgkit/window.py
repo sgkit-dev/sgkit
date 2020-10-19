@@ -17,8 +17,35 @@ def window(
     step: int,
     merge: bool = True,
 ) -> Dataset:
-    """Add windowing information to a dataset."""
+    """Add fixed-size windowing information to a dataset.
 
+    Windows are defined over the ``variants`` dimension, and are
+    used by some downstream functions to calculate statistics for
+    each window.
+
+    Parameters
+    ----------
+    ds
+        Genotype call dataset.
+    size
+        The window size (number of variants).
+    step
+        The distance (number of variants) between start positions of windows.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing the following variables:
+
+    - :data:`sgkit.variables.window_start_spec` (windows):
+      The index values of window start positions.
+    - :data:`sgkit.variables.window_stop_spec` (windows):
+      The index values of window stop positions.
+    """
     n_variants = ds.dims["variants"]
 
     length = n_variants
