@@ -154,7 +154,6 @@ def hardy_weinberg_test(
         Input variable name holding call_genotype_mask.
         Defined by :data:`sgkit.variables.call_genotype_mask_spec`
     ploidy
-<<<<<<< HEAD
         Genotype ploidy, defaults to ``ploidy`` dimension of provided dataset.
         If the `ploidy` dimension is not present, then this value must be set explicitly.
         Currently HWE calculations are only supported for diploid datasets,
@@ -164,13 +163,6 @@ def hardy_weinberg_test(
         If the `alleles` dimension is not present, then this value must be set explicitly.
         Currently HWE calculations are only supported for biallelic datasets,
         i.e. ``alleles`` must equal 2.
-=======
-        Genotype ploidy, defaults to ``ploidy`` dimension of genotype
-        call array (:data:`sgkit.variables.call_genotype_spec`) if present.
-        If that variable is not present, then this value must be set.
-        Currently HWE calculations are only supported for diploid datasets,
-        i.e. ``ploidy`` must equal 2.
->>>>>>> Rework HWE inputs
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
