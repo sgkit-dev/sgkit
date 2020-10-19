@@ -103,9 +103,7 @@ def window_statistic(
     if depth > values.chunks[0][-1]:
         chunk0 = values.chunks[0]
         new_chunk0 = tuple(list(chunk0[:-2]) + [chunk0[-2] + chunk0[-1]])
-        # None means don't rechunk along that axis
-        new_chunks = tuple(list([new_chunk0] + ([None] * (len(chunk0) - 1))))  # type: ignore
-        values = values.rechunk(new_chunks)
+        values = values.rechunk({0: new_chunk0})
 
     chunks = values.chunks[0]
 
@@ -141,7 +139,7 @@ def window_statistic(
         # depth is 0 except in first axis
         depth = tuple([depth] + ([0] * (values.ndim - 1)))
         # new chunks are same except in first axis
-        new_chunks = tuple([tuple(windows_per_chunk)] + list(values.chunks[1:]))
+        new_chunks = tuple([tuple(windows_per_chunk)] + list(values.chunks[1:]))  # type: ignore
     return values.map_overlap(
         blockwise_moving_stat,
         dtype=dtype,
