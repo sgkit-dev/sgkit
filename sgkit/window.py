@@ -1,10 +1,12 @@
-from typing import Any, Callable
+from typing import Any, Callable, Tuple
 
 import dask.array as da
 import numpy as np
 from xarray import Dataset
 
 from sgkit.utils import conditional_merge_datasets
+
+from .typing import ArrayLike, DType
 
 # Window definition (user code)
 
@@ -37,7 +39,9 @@ def window(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-def _get_windows(start: int, stop: int, size: int, step: int) -> Any:
+def _get_windows(
+    start: int, stop: int, size: int, step: int
+) -> Tuple[ArrayLike, ArrayLike]:
     # Find the indexes for the start positions of all windows
     # TODO: take contigs into account
     window_starts = np.arange(start, stop, step)
@@ -54,13 +58,13 @@ def has_windows(ds: Dataset) -> bool:
 
 
 def moving_statistic(
-    values: Any,
-    statistic: Callable[..., Any],
+    values: ArrayLike,
+    statistic: Callable[..., ArrayLike],
     size: int,
     step: int,
-    dtype: int,
+    dtype: DType,
     **kwargs: Any,
-) -> Any:
+) -> da.Array:
     """A Dask implementation of scikit-allel's moving_statistic function."""
     length = values.shape[0]
     chunks = values.chunks[0]
@@ -79,13 +83,13 @@ def moving_statistic(
 
 
 def window_statistic(
-    values: Any,
-    statistic: Callable[..., Any],
-    window_starts: Any,
-    window_stops: Any,
-    dtype: int,
+    values: ArrayLike,
+    statistic: Callable[..., ArrayLike],
+    window_starts: ArrayLike,
+    window_stops: ArrayLike,
+    dtype: DType,
     **kwargs: Any,
-) -> Any:
+) -> da.Array:
 
     values = da.asarray(values)
 
@@ -115,7 +119,7 @@ def window_statistic(
 
     chunk_offsets = _sizes_to_start_offsets(windows_per_chunk)
 
-    def blockwise_moving_stat(x: Any, block_info: Any = None) -> Any:
+    def blockwise_moving_stat(x: ArrayLike, block_info: Any = None) -> ArrayLike:
         if block_info is None or len(block_info) == 0:
             return np.array([])
         chunk_number = block_info[0]["chunk-location"][0]
@@ -148,14 +152,17 @@ def window_statistic(
     )
 
 
-def _sizes_to_start_offsets(sizes: Any) -> Any:
+def _sizes_to_start_offsets(sizes: ArrayLike) -> ArrayLike:
     """Convert an array of sizes, to cumulative offsets, starting with 0"""
     return np.cumsum(np.insert(sizes, 0, 0, axis=0))
 
 
 def _get_chunked_windows(
-    chunks: Any, length: int, window_starts: Any, window_stops: Any
-) -> Any:
+    chunks: ArrayLike,
+    length: int,
+    window_starts: ArrayLike,
+    window_stops: ArrayLike,
+) -> Tuple[ArrayLike, ArrayLike]:
     """Find the window start positions relative to the start of the chunk they are in,
     and the number of windows in each chunk."""
 
