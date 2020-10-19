@@ -164,7 +164,7 @@ def window_statistic(
         new_chunks = (tuple(windows_per_chunk),)
     else:
         # depth is 0 except in first axis
-        depth = tuple([depth] + ([0] * (values.ndim - 1)))
+        depth = {0: depth}
         # new chunks are same except in first axis
         new_chunks = tuple([tuple(windows_per_chunk)] + list(values.chunks[1:]))  # type: ignore
     return values.map_overlap(
