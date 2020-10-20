@@ -122,9 +122,9 @@ def test_split_array_chunks__size(a: int, b: int) -> None:
 @pytest.mark.parametrize("chunks", [None, -1, 5])
 @pytest.mark.parametrize("backend", [xr.DataArray, np.array, da.array])
 @given(st.data())
-@settings(max_examples=25)
+@settings(max_examples=10, deadline=None)
 def test_max_str_len(dtype, chunks, backend, data):
-    shape = data.draw(st.lists(st.integers(0, 15), min_size=0, max_size=3))
+    shape = data.draw(st.lists(st.integers(0, 8), min_size=0, max_size=3))
     ndim = len(shape)
     x = data.draw(arrays(dtype=dtype if dtype != "O" else "U", shape=shape))
     x = backend(x)
