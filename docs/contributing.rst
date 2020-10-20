@@ -23,13 +23,13 @@ Discussion forums
 Conversation about *sgkit* happens in the following places:
 
 1.  `GitHub Issue Tracker`_: for discussions around new features or bugs
-2.  `Software, Methods, and Data for Statistical Genetics forum`_: for general discussion
+2.  `Python for Statistical Genetics forum`_: for general discussion
 
 Discussions on the forum tend to be about higher-level themes, and statistical genetics in
 general. Coding details should be discussed on GitHub issues and pull requests.
 
 .. _`GitHub Issue Tracker`: https://github.com/pystatgen/sgkit/issues
-.. _`Software, Methods, and Data for Statistical Genetics forum`: https://discourse.smadstatgen.org/
+.. _`Python for Statistical Genetics forum`: https://discourse.pystatgen.org/
 
 
 Code repositories
@@ -88,11 +88,16 @@ Contributions to *sgkit* can then be made by submitting pull requests on GitHub.
 Install
 ~~~~~~~
 
-To build the library you can install the necessary requirements using
-pip::
+To build the library you need to first install GSL (GNU Scientific Library),
+which is required for ``msprime``. Since it's a system package and installation
+may vary depending on the operating system, the instructions for the same can be
+found on `msprime docs. <https://msprime.readthedocs.io/en/stable/installation.html#installing-system-requirements>`_
+
+You can install rest of the necessary requirements using pip::
 
   cd sgkit
   pip install -r requirements.txt -r requirements-dev.txt -r requirements-doc.txt
+
 
 Also install pre-commit, which is used to enforce coding standards::
 

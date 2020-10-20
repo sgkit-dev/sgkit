@@ -70,13 +70,13 @@ def simulate_genotype_call_dataset(
 
     contig_size = split_array_chunks(n_variant, n_contig)
     contig = np.repeat(np.arange(n_contig), contig_size)
-    contig_names = np.unique(contig)
+    contig_names = np.unique(contig).tolist()
     position = np.concatenate([np.arange(contig_size[i]) for i in range(n_contig)])
     assert position.size == contig.size
     alleles = rs.choice(["A", "C", "G", "T"], size=(n_variant, n_allele)).astype("S")
     sample_id = np.array([f"S{i}" for i in range(n_sample)])
     return create_genotype_call_dataset(
-        variant_contig_names=list(contig_names),
+        variant_contig_names=contig_names,
         variant_contig=contig,
         variant_position=position,
         variant_alleles=alleles,
