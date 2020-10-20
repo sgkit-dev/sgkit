@@ -5,6 +5,7 @@ import numpy as np
 from xarray import Dataset
 
 from sgkit.utils import conditional_merge_datasets
+from sgkit.variables import window_start, window_stop
 
 from .typing import ArrayLike, DType
 
@@ -53,11 +54,11 @@ def window(
 
     new_ds = Dataset(
         {
-            "window_start": (
+            window_start: (
                 "windows",
                 window_starts,
             ),
-            "window_stop": (
+            window_stop: (
                 "windows",
                 window_stops,
             ),
@@ -81,7 +82,7 @@ def _get_windows(
 
 def has_windows(ds: Dataset) -> bool:
     """Test if a dataset has windowing information."""
-    return "window_start" in ds and "window_stop" in ds
+    return window_start in ds and window_stop in ds
 
 
 def moving_statistic(
