@@ -102,11 +102,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#creating-a-dataset">Creating a dataset</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.create_genotype_call_dataset.html">sgkit.create_genotype_call_dataset</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.create_genotype_dosage_dataset.html">sgkit.create_genotype_dosage_dataset</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="#methods">Methods</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.count_call_alleles.html">sgkit.count_call_alleles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.count_variant_alleles.html">sgkit.count_variant_alleles</a></li>
@@ -119,6 +114,11 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variant_stats.html">sgkit.variant_stats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.Tajimas_D.html">sgkit.Tajimas_D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.pc_relate.html">sgkit.pc_relate</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.display_genotypes.html">sgkit.display_genotypes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html">sgkit.simulate_genotype_call_dataset</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#variables">Variables</a><ul>
@@ -157,10 +157,6 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.variant_p_value_spec.html">sgkit.variables.variant_p_value_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.variant_position_spec.html">sgkit.variables.variant_position_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.variant_t_value_spec.html">sgkit.variables.variant_t_value_spec</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.display_genotypes.html">sgkit.display_genotypes</a></li>
 </ul>
 </li>
 </ul>
@@ -287,23 +283,6 @@
 </table>
 </div>
 </div>
-<div class="section" id="creating-a-dataset">
-<h2>Creating a dataset<a class="headerlink" href="#creating-a-dataset" title="Permalink to this headline">¶</a></h2>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.create_genotype_call_dataset.html#sgkit.create_genotype_call_dataset" title="sgkit.create_genotype_call_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_genotype_call_dataset</span></code></a>(*, …[, …])</p></td>
-<td><p>Create a dataset of genotype calls.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.create_genotype_dosage_dataset.html#sgkit.create_genotype_dosage_dataset" title="sgkit.create_genotype_dosage_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_genotype_dosage_dataset</span></code></a>(*, …[, …])</p></td>
-<td><p>Create a dataset of genotype dosages.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
 <div class="section" id="methods">
 <span id="api-methods"></span><h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
@@ -344,6 +323,23 @@
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pc_relate.html#sgkit.pc_relate" title="sgkit.pc_relate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pc_relate</span></code></a>(ds, *[, maf, call_genotype, …])</p></td>
 <td><p>Compute PC-Relate as described in Conomos, et al.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="utilities">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.display_genotypes.html#sgkit.display_genotypes" title="sgkit.display_genotypes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_genotypes</span></code></a>(ds[, max_variants, …])</p></td>
+<td><p>Display genotype calls.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset" title="sgkit.simulate_genotype_call_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_genotype_call_dataset</span></code></a>(n_variant, …)</p></td>
+<td><p>Simulate genotype calls and variant/sample data.</p></td>
 </tr>
 </tbody>
 </table>
@@ -460,20 +456,6 @@
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.variant_t_value_spec.html#sgkit.variables.variant_t_value_spec" title="sgkit.variables.variant_t_value_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.variant_t_value_spec</span></code></a></p></td>
 <td><p>T statistics for each beta.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="utilities">
-<h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.display_genotypes.html#sgkit.display_genotypes" title="sgkit.display_genotypes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_genotypes</span></code></a>(ds[, max_variants, …])</p></td>
-<td><p>Display genotype calls.</p></td>
 </tr>
 </tbody>
 </table>

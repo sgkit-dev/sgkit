@@ -37,7 +37,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.create_genotype_call_dataset" href="sgkit.create_genotype_call_dataset.html" />
+    <link rel="next" title="sgkit.count_call_alleles" href="sgkit.count_call_alleles.html" />
     <link rel="prev" title="sgkit.io.vcf.zarrs_to_dataset" href="sgkit.io.vcf.zarrs_to_dataset.html" /> 
 </head>
 
@@ -99,10 +99,9 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../api.html#creating-a-dataset">Creating a dataset</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#methods">Methods</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api.html#variables">Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#utilities">Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#variables">Variables</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
@@ -182,9 +181,9 @@
 <code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">read_vcfzarr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.read_vcfzarr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a VCF Zarr file created using scikit-allel.</p>
 <p>Loads VCF variant, sample, and genotype data as Dask arrays within a Dataset
-from a Zarr file created using scikit-allel’s <cite>vcf_to_zarr</cite> function.</p>
-<p>Since <cite>vcf_to_zarr</cite> does not preserve phasing information, there is no
-<cite>call/genotype_phased</cite> variable in the resulting dataset.</p>
+from a Zarr file created using scikit-allel’s <code class="docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code> function.</p>
+<p>Since <code class="docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code> does not preserve phasing information, there is no
+<a class="reference internal" href="sgkit.variables.call_genotype_phased_spec.html#sgkit.variables.call_genotype_phased_spec" title="sgkit.variables.call_genotype_phased_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_phased_spec</span></code></a> variable in the resulting dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -196,7 +195,17 @@ from a Zarr file created using scikit-allel’s <cite>vcf_to_zarr</cite> functio
 <dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The dataset of genotype calls, created using <cite>create_genotype_call_dataset</cite>.</p>
+<dd class="field-odd"><p><p>A dataset containing the following variables:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="sgkit.variables.variant_id_spec.html#sgkit.variables.variant_id_spec" title="sgkit.variables.variant_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_id_spec</span></code></a> (variants)</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.variant_contig_spec.html#sgkit.variables.variant_contig_spec" title="sgkit.variables.variant_contig_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_contig_spec</span></code></a> (variants)</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.variant_position_spec.html#sgkit.variables.variant_position_spec" title="sgkit.variables.variant_position_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_position_spec</span></code></a> (variants)</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.variant_allele_spec.html#sgkit.variables.variant_allele_spec" title="sgkit.variables.variant_allele_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_allele_spec</span></code></a> (variants)</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.sample_id_spec.html#sgkit.variables.sample_id_spec" title="sgkit.variables.sample_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_id_spec</span></code></a> (samples)</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a> (variants, samples, ploidy)</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.call_genotype_mask_spec.html#sgkit.variables.call_genotype_mask_spec" title="sgkit.variables.call_genotype_mask_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_mask_spec</span></code></a> (variants, samples, ploidy)</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>
@@ -211,7 +220,7 @@ from a Zarr file created using scikit-allel’s <cite>vcf_to_zarr</cite> functio
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="sgkit.create_genotype_call_dataset.html" class="btn btn-neutral float-right" title="sgkit.create_genotype_call_dataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="sgkit.count_call_alleles.html" class="btn btn-neutral float-right" title="sgkit.count_call_alleles" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="sgkit.io.vcf.zarrs_to_dataset.html" class="btn btn-neutral float-left" title="sgkit.io.vcf.zarrs_to_dataset" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

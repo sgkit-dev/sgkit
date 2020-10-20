@@ -95,10 +95,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../api.html#vcf">VCF</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../api.html#creating-a-dataset">Creating a dataset</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#methods">Methods</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api.html#variables">Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#utilities">Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#variables">Variables</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
@@ -237,28 +236,42 @@ times that are upwards of 10x slower.</p>
 <dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><dl class="simple">
-<dt>Dataset</dt><dd><p>A dataset containing genotypes as 3 dimensional calls along with
+<dd class="field-odd"><p><p>A dataset containing genotypes as 3 dimensional calls along with
 all accompanying pedigree and variant information. The content
-of this dataset matches that of <cite>sgkit.create_genotype_call_dataset</cite>
-with all pedigree-specific fields defined as:</p>
+of this dataset includes:</p>
 <ul class="simple">
-<li><p>sample_family_id: Family identifier commonly referred to as FID</p></li>
-<li><p>sample_id: Within-family identifier for sample</p></li>
-<li><p>sample_paternal_id: Within-family identifier for father of sample</p></li>
-<li><p>sample_maternal_id: Within-family identifier for mother of sample</p></li>
-<li><p>sample_sex: Sex code equal to 1 for male, 2 for female, and -1
-for missing</p></li>
-<li><p>sample_phenotype: Phenotype code equal to 1 for control, 2 for case,
-and -1 for missing</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.variant_id_spec.html#sgkit.variables.variant_id_spec" title="sgkit.variables.variant_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_id_spec</span></code></a> (variants)</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.variant_contig_spec.html#sgkit.variables.variant_contig_spec" title="sgkit.variables.variant_contig_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_contig_spec</span></code></a> (variants)</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.variant_position_spec.html#sgkit.variables.variant_position_spec" title="sgkit.variables.variant_position_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_position_spec</span></code></a> (variants)</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.variant_allele_spec.html#sgkit.variables.variant_allele_spec" title="sgkit.variables.variant_allele_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_allele_spec</span></code></a> (variants)</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.sample_id_spec.html#sgkit.variables.sample_id_spec" title="sgkit.variables.sample_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_id_spec</span></code></a> (samples)</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a> (variants, samples, ploidy)</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.call_genotype_mask_spec.html#sgkit.variables.call_genotype_mask_spec" title="sgkit.variables.call_genotype_mask_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_mask_spec</span></code></a> (variants, samples, ploidy)</p></li>
 </ul>
+<p>The following pedigree-specific fields are also included:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_family_id</span></code>: Family identifier commonly referred to as FID</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_id</span></code>: Within-family identifier for sample</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_paternal_id</span></code>: Within-family identifier for father of sample</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_maternal_id</span></code>: Within-family identifier for mother of sample</p></li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sample_sex</span></code>: Sex code equal to 1 for male, 2 for female, and -1</dt><dd><p>for missing</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sample_phenotype</span></code>: Phenotype code equal to 1 for control, 2 for case,</dt><dd><p>and -1 for missing</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
 </dd>
 </dl>
 <p>See <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#fam">https://www.cog-genomics.org/plink/1.9/formats#fam</a> for more details.</p>
-</p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If <cite>path</cite> and one of <cite>bed_path</cite>, <cite>bim_path</cite> or <cite>fam_path</cite> are provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If <cite>path</cite> and one of <cite>bed_path</cite>, <cite>bim_path</cite> or <cite>fam_path</cite> are provided.</p>
 </dd>
 </dl>
 </dd></dl>
