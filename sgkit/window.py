@@ -121,7 +121,6 @@ def window_statistic(
 
     values = da.asarray(values)
 
-    length = values.shape[0]
     window_lengths = window_stops - window_starts
     depth = np.max(window_lengths)
 
@@ -136,7 +135,7 @@ def window_statistic(
     chunks = values.chunks[0]
 
     rel_window_starts, windows_per_chunk = _get_chunked_windows(
-        chunks, length, window_starts, window_stops
+        chunks, window_starts, window_stops
     )
 
     # Add depth for map_overlap
@@ -185,7 +184,6 @@ def _sizes_to_start_offsets(sizes: ArrayLike) -> ArrayLike:
 
 def _get_chunked_windows(
     chunks: ArrayLike,
-    length: int,
     window_starts: ArrayLike,
     window_stops: ArrayLike,
 ) -> Tuple[ArrayLike, ArrayLike]:
@@ -202,6 +200,10 @@ def _get_chunked_windows(
     rel_window_starts = window_starts - chunk_starts[chunk_numbers]
 
     # Find the number of windows in each chunk
-    _, windows_per_chunk = np.unique(chunk_numbers, return_counts=True)
+    unique_chunk_numbers, unique_chunk_counts = np.unique(
+        chunk_numbers, return_counts=True
+    )
+    windows_per_chunk = np.zeros_like(chunks)
+    windows_per_chunk[unique_chunk_numbers] = unique_chunk_counts  # set non-zero counts
 
     return rel_window_starts, windows_per_chunk
