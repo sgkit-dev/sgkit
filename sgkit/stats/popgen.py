@@ -11,7 +11,6 @@ from sgkit.utils import conditional_merge_datasets
 from sgkit.window import has_windows, window_statistic
 
 from .. import variables
-from .aggregation import count_cohort_alleles, count_variant_alleles
 
 
 def diversity(
@@ -37,7 +36,7 @@ def diversity(
     ds
         Genotype call dataset.
     allele_counts
-        cohort allele counts to use or calculate. Defined by
+        cohort allele counts to use. Defined by
         :data:`sgkit.variables.cohort_allele_count_spec`
     call_genotype
         Input variable name holding call_genotype as defined by
@@ -57,10 +56,7 @@ def diversity(
     This method does not currently support datasets that are chunked along the
     samples dimension.
     """
-    if allele_counts not in ds:
-        ds = count_cohort_alleles(ds, call_genotype=call_genotype)
-    else:
-        variables.validate(ds, {allele_counts: variables.cohort_allele_count_spec})
+    variables.validate(ds, {allele_counts: variables.cohort_allele_count_spec})
     ac = ds[allele_counts]
     an = ac.sum(axis=2)
     n_pairs = an * (an - 1) / 2
@@ -162,7 +158,7 @@ def divergence(
     ds
         Genotype call dataset.
     allele_counts
-        cohort allele counts to use or calculate. Defined by
+        cohort allele counts to use. Defined by
         :data:`sgkit.variables.cohort_allele_count_spec`
     call_genotype
         Input variable name holding call_genotype as defined by
@@ -184,10 +180,7 @@ def divergence(
     samples dimension.
     """
 
-    if allele_counts not in ds:
-        ds = count_cohort_alleles(ds, call_genotype=call_genotype)
-    else:
-        variables.validate(ds, {allele_counts: variables.cohort_allele_count_spec})
+    variables.validate(ds, {allele_counts: variables.cohort_allele_count_spec})
     ac = ds[allele_counts]
 
     n_variants = ds.dims["variants"]
@@ -311,7 +304,7 @@ def Fst(
         Other supported estimators include ``Nei`` (1986), (the same estimator
         as tskit).
     allele_counts
-        cohort allele counts to use or calculate. Defined by
+        cohort allele counts to use. Defined by
         :data:`sgkit.variables.cohort_allele_count_spec`
     call_genotype
         Input variable name holding call_genotype as defined by
@@ -338,10 +331,7 @@ def Fst(
             f"Estimator '{estimator}' is not a known estimator: {known_estimators.keys()}"
         )
     estimator = estimator or "Hudson"
-    if allele_counts not in ds:
-        ds = count_cohort_alleles(ds, call_genotype=call_genotype)
-    else:
-        variables.validate(ds, {allele_counts: variables.cohort_allele_count_spec})
+    variables.validate(ds, {allele_counts: variables.cohort_allele_count_spec})
 
     n_cohorts = ds.dims["cohorts"]
     gs = divergence(
@@ -371,10 +361,10 @@ def Tajimas_D(
     ds
         Genotype call dataset.
     variant_allele_counts
-        variant allele counts to use or calculate. Defined by
+        variant allele counts to use. Defined by
         :data:`sgkit.variables.variant_allele_counts_spec`
     allele_counts
-        cohort allele counts to use or calculate. Defined by
+        cohort allele counts to use. Defined by
         :data:`sgkit.variables.cohort_allele_count_spec`
     call_genotype
         Input variable name holding call_genotype as defined by
@@ -394,12 +384,13 @@ def Tajimas_D(
     This method does not currently support datasets that are chunked along the
     samples dimension.
     """
-    if variant_allele_counts not in ds:
-        ds = count_variant_alleles(ds, call_genotype=call_genotype)
-    else:
-        variables.validate(
-            ds, {variant_allele_counts: variables.variant_allele_count_spec}
-        )
+    variables.validate(
+        ds,
+        {
+            variant_allele_counts: variables.variant_allele_count_spec,
+            allele_counts: variables.cohort_allele_count_spec,
+        },
+    )
     ac = ds[variant_allele_counts]
 
     # count segregating

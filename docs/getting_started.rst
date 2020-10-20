@@ -276,6 +276,8 @@ Xarray and Pandas operations in a single pipeline:
         .pipe(lambda ds: ds.sel(variants=ds.variant_call_rate > .8))
         # Assign a "cohort" variable that splits samples into two groups
         .assign(sample_cohort=np.repeat([0, 1], ds.dims['samples'] // 2))
+        # Count alleles for each cohort
+        .pipe(sg.count_cohort_alleles)
         # Compute Fst between the groups
         .pipe(sg.Fst)
         # Extract the Fst values for cohort pairs

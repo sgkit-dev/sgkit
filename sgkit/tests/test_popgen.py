@@ -10,6 +10,7 @@ from allel import hudson_fst
 from sgkit import (
     Fst,
     Tajimas_D,
+    count_cohort_alleles,
     count_variant_alleles,
     create_genotype_call_dataset,
     divergence,
@@ -57,6 +58,7 @@ def test_diversity(sample_size, chunks):
     sample_cohorts = np.full_like(ts.samples(), 0)
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     ds = ds.assign_coords({"cohorts": ["co_0"]})
+    ds = count_cohort_alleles(ds)
     ds = diversity(ds)
     div = ds.stat_diversity.sum(axis=0, skipna=False).sel(cohorts="co_0").values
     ts_div = ts.diversity(span_normalise=False)
@@ -70,6 +72,7 @@ def test_diversity__windowed(sample_size):
     sample_cohorts = np.full_like(ts.samples(), 0)
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     ds = ds.assign_coords({"cohorts": ["co_0"]})
+    ds = count_cohort_alleles(ds)
     ds = window(ds, size=25, step=25)
     ds = diversity(ds)
     div = ds["stat_diversity"].sel(cohorts="co_0").compute()
@@ -107,6 +110,7 @@ def test_divergence(sample_size, n_cohorts, chunks):
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds = count_cohort_alleles(ds)
     ds = divergence(ds)
     div = ds.stat_divergence.sum(axis=0, skipna=False).values
 
@@ -136,6 +140,7 @@ def test_divergence__windowed(sample_size, n_cohorts, chunks):
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds = count_cohort_alleles(ds)
     ds = window(ds, size=25, step=25)
     ds = divergence(ds)
     div = ds["stat_divergence"].values
@@ -169,6 +174,7 @@ def test_divergence__windowed_scikit_allel_comparison(sample_size, n_cohorts, ch
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds = count_cohort_alleles(ds)
     ds = window(ds, size=25, step=25)
     ds = divergence(ds)
     div = ds["stat_divergence"].values
@@ -202,6 +208,7 @@ def test_Fst__Hudson(sample_size):
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds = count_cohort_alleles(ds)
     n_variants = ds.dims["variants"]
     ds = window(ds, size=n_variants, step=n_variants)  # single window
     ds = Fst(ds, estimator="Hudson")
@@ -230,6 +237,7 @@ def test_Fst__Nei(sample_size, n_cohorts):
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds = count_cohort_alleles(ds)
     n_variants = ds.dims["variants"]
     ds = window(ds, size=n_variants, step=n_variants)  # single window
     ds = Fst(ds, estimator="Nei")
@@ -266,6 +274,7 @@ def test_Fst__windowed(sample_size, n_cohorts, chunks):
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds = count_cohort_alleles(ds)
     ds = window(ds, size=25, step=25)
     fst_ds = Fst(ds, estimator="Nei")
     fst = fst_ds["stat_Fst"].values
@@ -302,6 +311,8 @@ def test_Tajimas_D(sample_size):
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
     sample_cohorts = np.full_like(ts.samples(), 0)
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    ds = count_variant_alleles(ds)
+    ds = count_cohort_alleles(ds)
     n_variants = ds.dims["variants"]
     ds = window(ds, size=n_variants, step=n_variants)  # single window
     ds = Tajimas_D(ds)
