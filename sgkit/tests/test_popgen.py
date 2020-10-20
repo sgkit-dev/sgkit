@@ -76,8 +76,8 @@ def test_diversity__windowed(sample_size):
 
     # Calculate diversity using tskit windows
     # Find the variant positions so we can have windows with a fixed number of variants
-    positions = [variant.site.position for variant in ts.variants()]
-    windows = [0] + positions[::25][1:] + [ts.sequence_length]
+    positions = ts.tables.sites.position
+    windows = np.concatenate(([0], positions[::25][1:], [ts.sequence_length]))
     ts_div = ts.diversity(windows=windows, span_normalise=False)
     np.testing.assert_allclose(div, ts_div)
 
@@ -144,8 +144,8 @@ def test_divergence__windowed(sample_size, n_cohorts, chunks):
 
     # Calculate diversity using tskit windows
     # Find the variant positions so we can have windows with a fixed number of variants
-    positions = [variant.site.position for variant in ts.variants()]
-    windows = [0] + positions[::25][1:] + [ts.sequence_length]
+    positions = ts.tables.sites.position
+    windows = np.concatenate(([0], positions[::25][1:], [ts.sequence_length]))
     n_windows = len(windows) - 1
     ts_div = np.full([n_windows, n_cohorts, n_cohorts], np.nan)
     for i, j in itertools.combinations(range(n_cohorts), 2):
@@ -272,8 +272,8 @@ def test_Fst__windowed(sample_size, n_cohorts, chunks):
 
     # Calculate Fst using tskit windows
     # Find the variant positions so we can have windows with a fixed number of variants
-    positions = [variant.site.position for variant in ts.variants()]
-    windows = [0] + positions[::25][1:] + [ts.sequence_length]
+    positions = ts.tables.sites.position
+    windows = np.concatenate(([0], positions[::25][1:], [ts.sequence_length]))
     n_windows = len(windows) - 1
     ts_fst = np.full([n_windows, n_cohorts, n_cohorts], np.nan)
     for i, j in itertools.combinations(range(n_cohorts), 2):
