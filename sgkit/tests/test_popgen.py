@@ -55,6 +55,19 @@ def ts_to_dataset(ts, chunks=None, samples=None):
     return ds
 
 
+def add_cohorts(ds, ts, n_cohorts=1, cohort_key_names=["cohorts_0", "cohorts_1"]):
+    subsets = np.array_split(ts.samples(), n_cohorts)
+    sample_cohorts = np.concatenate(
+        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
+    )
+    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    if cohort_key_names is not None:
+        cohort_names = [f"co_{i}" for i in range(n_cohorts)]
+        coords = {k: cohort_names for k in cohort_key_names}
+        ds = ds.assign_coords(coords)
+    return ds, subsets
+
+
 @pytest.mark.parametrize("sample_size", [2, 3, 10, 100])
 @pytest.mark.parametrize("chunks", [(-1, -1), (10, -1)])
 @pytest.mark.parametrize(
@@ -64,9 +77,7 @@ def ts_to_dataset(ts, chunks=None, samples=None):
 def test_diversity(sample_size, chunks, cohort_allele_count):
     ts = msprime.simulate(sample_size, length=100, mutation_rate=0.05, random_seed=42)
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
-    ds = ds.chunk(dict(zip(["variants", "samples"], chunks)))
-    sample_cohorts = np.full_like(ts.samples(), 0)
-    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    ds, subsets = add_cohorts(ds, ts, cohort_key_names=["cohorts"])  # type: ignore[no-untyped-call]
     if cohort_allele_count is not None:
         ds = count_cohort_alleles(ds, merge=False).rename(
             {variables.cohort_allele_count: cohort_allele_count}
@@ -86,9 +97,7 @@ def test_diversity(sample_size, chunks, cohort_allele_count):
 def test_diversity__windowed(sample_size):
     ts = msprime.simulate(sample_size, length=200, mutation_rate=0.05, random_seed=42)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
-    sample_cohorts = np.full_like(ts.samples(), 0)
-    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
-    ds = ds.assign_coords({"cohorts": ["co_0"]})
+    ds, subsets = add_cohorts(ds, ts, cohort_key_names=["cohorts"])  # type: ignore[no-untyped-call]
     ds = window(ds, size=25)
     ds = diversity(ds)
     div = ds["stat_diversity"].sel(cohorts="co_0").compute()
@@ -124,14 +133,8 @@ def test_diversity__missing_call_genotype():
 @pytest.mark.parametrize("chunks", [(-1, -1), (10, -1)])
 def test_divergence(sample_size, n_cohorts, chunks):
     ts = msprime.simulate(sample_size, length=100, mutation_rate=0.05, random_seed=42)
-    subsets = np.array_split(ts.samples(), n_cohorts)
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
-    sample_cohorts = np.concatenate(
-        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
-    )
-    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
-    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
-    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
     ds = divergence(ds)
     div = ds.stat_divergence.sum(axis=0, skipna=False).values
 
@@ -153,14 +156,8 @@ def test_divergence(sample_size, n_cohorts, chunks):
 @pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
 def test_divergence__windowed(sample_size, n_cohorts, chunks):
     ts = msprime.simulate(sample_size, length=200, mutation_rate=0.05, random_seed=42)
-    subsets = np.array_split(ts.samples(), n_cohorts)
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
-    sample_cohorts = np.concatenate(
-        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
-    )
-    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
-    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
-    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
     ds = window(ds, size=25)
     ds = divergence(ds)
     div = ds["stat_divergence"].values
@@ -186,14 +183,8 @@ def test_divergence__windowed(sample_size, n_cohorts, chunks):
 @pytest.mark.xfail()  # combine with test_divergence__windowed when this is passing
 def test_divergence__windowed_scikit_allel_comparison(sample_size, n_cohorts, chunks):
     ts = msprime.simulate(sample_size, length=200, mutation_rate=0.05, random_seed=42)
-    subsets = np.array_split(ts.samples(), n_cohorts)
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
-    sample_cohorts = np.concatenate(
-        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
-    )
-    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
-    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
-    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
     ds = window(ds, size=25)
     ds = divergence(ds)
     div = ds["stat_divergence"].values
@@ -230,14 +221,8 @@ def test_Fst__Hudson(sample_size):
     # scikit-allel can only calculate Fst for pairs of cohorts (populations)
     n_cohorts = 2
     ts = msprime.simulate(sample_size, length=100, mutation_rate=0.05, random_seed=42)
-    subsets = np.array_split(ts.samples(), n_cohorts)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
-    sample_cohorts = np.concatenate(
-        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
-    )
-    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
-    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
-    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
     n_variants = ds.dims["variants"]
     ds = window(ds, size=n_variants)  # single window
     ds = Fst(ds, estimator="Hudson")
@@ -258,14 +243,8 @@ def test_Fst__Hudson(sample_size):
 )
 def test_Fst__Nei(sample_size, n_cohorts):
     ts = msprime.simulate(sample_size, length=100, mutation_rate=0.05, random_seed=42)
-    subsets = np.array_split(ts.samples(), n_cohorts)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
-    sample_cohorts = np.concatenate(
-        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
-    )
-    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
-    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
-    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
     n_variants = ds.dims["variants"]
     ds = window(ds, size=n_variants)  # single window
     ds = Fst(ds, estimator="Nei")
@@ -294,14 +273,8 @@ def test_Fst__unknown_estimator():
 @pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
 def test_Fst__windowed(sample_size, n_cohorts, chunks):
     ts = msprime.simulate(sample_size, length=200, mutation_rate=0.05, random_seed=42)
-    subsets = np.array_split(ts.samples(), n_cohorts)
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
-    sample_cohorts = np.concatenate(
-        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
-    )
-    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
-    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
-    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
     ds = window(ds, size=25)
     fst_ds = Fst(ds, estimator="Nei")
     fst = fst_ds["stat_Fst"].values
@@ -336,8 +309,7 @@ def test_Fst__windowed(sample_size, n_cohorts, chunks):
 def test_Tajimas_D(sample_size):
     ts = msprime.simulate(sample_size, length=100, mutation_rate=0.05, random_seed=42)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
-    sample_cohorts = np.full_like(ts.samples(), 0)
-    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    ds, subsets = add_cohorts(ds, ts, cohort_key_names=None)  # type: ignore[no-untyped-call]
     n_variants = ds.dims["variants"]
     ds = window(ds, size=n_variants)  # single window
     ds = Tajimas_D(ds)
@@ -352,14 +324,8 @@ def test_Tajimas_D(sample_size):
 )
 def test_pbs(sample_size, n_cohorts):
     ts = msprime.simulate(sample_size, length=100, mutation_rate=0.05, random_seed=42)
-    subsets = np.array_split(ts.samples(), n_cohorts)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
-    sample_cohorts = np.concatenate(
-        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
-    )
-    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
-    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
-    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
     n_variants = ds.dims["variants"]
     ds = window(ds, size=n_variants)  # single window
 
@@ -385,14 +351,8 @@ def test_pbs(sample_size, n_cohorts):
 @pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
 def test_pbs__windowed(sample_size, n_cohorts, chunks):
     ts = msprime.simulate(sample_size, length=200, mutation_rate=0.05, random_seed=42)
-    subsets = np.array_split(ts.samples(), n_cohorts)
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
-    sample_cohorts = np.concatenate(
-        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
-    )
-    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
-    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
-    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
     ds = window(ds, size=25)
 
     ds = pbs(ds)
