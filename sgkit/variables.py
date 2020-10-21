@@ -176,6 +176,20 @@ call_genotype_phased, call_genotype_phased_spec = SgkitVariables.register_variab
 A flag for each call indicating if it is phased or not. If omitted
 all calls are unphased.
 """
+call_genotype_complete, call_genotype_complete_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("call_genotype_complete", kind="i", ndim=3)
+)
+"""
+Call genotypes in which partial genotype calls are replaced with
+completely missing genotype calls.
+"""
+(
+    call_genotype_complete_mask,
+    call_genotype_complete_mask_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec("call_genotype_complete_mask", kind="b", ndim=3)
+)
+"""TODO"""
 (
     call_genotype_probability,
     call_genotype_probability_spec,
