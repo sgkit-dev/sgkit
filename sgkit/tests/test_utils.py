@@ -6,11 +6,13 @@ import pytest
 import xarray as xr
 from hypothesis import given, settings
 from hypothesis import strategies as st
+from hypothesis.extra.numpy import arrays
 
 from sgkit.utils import (
     MergeWarning,
     check_array_like,
     encode_array,
+    max_str_len,
     merge_datasets,
     split_array_chunks,
 )
@@ -114,6 +116,38 @@ def test_split_array_chunks__size(a: int, b: int) -> None:
     res = split_array_chunks(a + b, a)
     assert sum(res) == a + b
     assert len(res) == a
+
+
+@pytest.mark.parametrize("dtype", ["U", "S", "O"])
+@pytest.mark.parametrize("chunks", [None, -1, 5])
+@pytest.mark.parametrize("backend", [xr.DataArray, np.array, da.array])
+@given(st.data())
+@settings(max_examples=10, deadline=None)
+def test_max_str_len(dtype, chunks, backend, data):
+    shape = data.draw(st.lists(st.integers(0, 8), min_size=0, max_size=3))
+    ndim = len(shape)
+    x = data.draw(arrays(dtype=dtype if dtype != "O" else "U", shape=shape))
+    x = backend(x)
+    if dtype == "O":
+        x = x.astype(object)
+    if chunks is not None and backend is xr.DataArray:
+        x = x.chunk(chunks=(chunks,) * ndim)
+    if chunks is not None and backend is da.array:
+        x = x.rechunk((chunks,) * ndim)
+    if x.size == 0:
+        with pytest.raises(
+            ValueError, match="Max string length cannot be calculated for empty array"
+        ):
+            max_str_len(x)
+    else:
+        expected = max(map(len, np.asarray(x).ravel()))
+        actual = int(max_str_len(x))
+        assert expected == actual
+
+
+def test_max_str_len__invalid_dtype():
+    with pytest.raises(ValueError, match="Array must have string dtype"):
+        max_str_len(np.array([1]))
 
 
 def test_split_array_chunks__raise_on_blocks_gt_n():

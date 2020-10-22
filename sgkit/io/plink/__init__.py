@@ -4,7 +4,7 @@ try:
     __all__ = ["read_plink"]
 except ImportError as e:
     msg = (
-        "sgkit-plink requirements are not installed.\n\n"
+        "sgkit plink requirements are not installed.\n\n"
         "Please install them via pip :\n\n"
         "  pip install 'git+https://github.com/pystatgen/sgkit#egg=sgkit[plink]'"
     )

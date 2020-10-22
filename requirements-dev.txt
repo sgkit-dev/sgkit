@@ -6,12 +6,17 @@ pytest-cov
 pytest-datadir
 pytest-mock
 hypothesis
+scikit-allel
 statsmodels
 zarr
 msprime
 scikit-learn
+scikit-allel
 partd
 fsspec
 bed-reader
+rechunker
+cbgen
 cyvcf2; platform_system != "Windows"
 yarl
+matplotlib

@@ -1,16 +1,16 @@
 """PLINK 1.9 reader implementation"""
 from pathlib import Path
-from typing import Any, List, Mapping, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 from bed_reader import open_bed
-from dask.array import Array
 from dask.dataframe import DataFrame
 from xarray import Dataset
 
 from sgkit import create_genotype_call_dataset
+from sgkit.io.utils import dataframe_to_dict
 from sgkit.model import DIM_SAMPLE
 from sgkit.utils import encode_array
 
@@ -32,8 +32,8 @@ BIM_FIELDS = [
     ("variant_id", str, "U"),
     ("cm_pos", "float32", "float32"),
     ("pos", "int32", "int32"),
-    ("a1", str, "U"),
-    ("a2", str, "U"),
+    ("a1", str, "S"),
+    ("a2", str, "S"),
 ]
 BIM_DF_DTYPE = dict([(f[0], f[1]) for f in BIM_FIELDS])
 BIM_ARRAY_DTYPE = dict([(f[0], f[2]) for f in BIM_FIELDS])
@@ -92,28 +92,6 @@ class BedReader(object):
         # but this will still be problematic if the an array is created
         # from the same PLINK dataset many times
         self.bed._close_bed()  # pragma: no cover
-
-
-def _max_str_len(arr: Array) -> Array:
-    return arr.map_blocks(lambda s: np.char.str_len(s.astype(str)), dtype=np.int8).max()
-
-
-def _to_dict(
-    df: DataFrame, dtype: Optional[Mapping[str, Any]] = None
-) -> Mapping[str, Any]:
-    arrs = {}
-    for c in df:
-        a = df[c].to_dask_array(lengths=True)
-        dt = df[c].dtype
-        if dtype:
-            dt = dtype[c]
-        kind = np.dtype(dt).kind
-        if kind in ["U", "S"]:
-            # Compute fixed-length string dtype for array
-            max_len = _max_str_len(a).compute()
-            dt = f"{kind}{max_len}"
-        arrs[c] = a.astype(dt)
-    return arrs
 
 
 def read_fam(path: PathType, sep: str = " ") -> DataFrame:
@@ -216,23 +194,31 @@ def read_plink(
 
     Returns
     -------
-    Dataset
-        A dataset containing genotypes as 3 dimensional calls along with
-        all accompanying pedigree and variant information. The content
-        of this dataset matches that of `sgkit.create_genotype_call_dataset`
-        with all pedigree-specific fields defined as:
+    A dataset containing genotypes as 3 dimensional calls along with
+    all accompanying pedigree and variant information. The content
+    of this dataset includes:
 
-        - sample_family_id: Family identifier commonly referred to as FID
-        - sample_id: Within-family identifier for sample
-        - sample_paternal_id: Within-family identifier for father of sample
-        - sample_maternal_id: Within-family identifier for mother of sample
-        - sample_sex: Sex code equal to 1 for male, 2 for female, and -1
-          for missing
-        - sample_phenotype: Phenotype code equal to 1 for control, 2 for case,
-          and -1 for missing
+    - :data:`sgkit.variables.variant_id_spec` (variants)
+    - :data:`sgkit.variables.variant_contig_spec` (variants)
+    - :data:`sgkit.variables.variant_position_spec` (variants)
+    - :data:`sgkit.variables.variant_allele_spec` (variants)
+    - :data:`sgkit.variables.sample_id_spec` (samples)
+    - :data:`sgkit.variables.call_genotype_spec` (variants, samples, ploidy)
+    - :data:`sgkit.variables.call_genotype_mask_spec` (variants, samples, ploidy)
+
+    The following pedigree-specific fields are also included:
+
+    - ``sample_family_id``: Family identifier commonly referred to as FID
+    - ``sample_id``: Within-family identifier for sample
+    - ``sample_paternal_id``: Within-family identifier for father of sample
+    - ``sample_maternal_id``: Within-family identifier for mother of sample
+    - ``sample_sex``: Sex code equal to 1 for male, 2 for female, and -1
+        for missing
+    - ``sample_phenotype``: Phenotype code equal to 1 for control, 2 for case,
+        and -1 for missing
 
 
-        See https://www.cog-genomics.org/plink/1.9/formats#fam for more details.
+    See https://www.cog-genomics.org/plink/1.9/formats#fam for more details.
 
     Raises
     ------
@@ -256,8 +242,8 @@ def read_plink(
         df_fam = df_fam.persist()
         df_bim = df_bim.persist()
 
-    arr_fam = _to_dict(df_fam, dtype=FAM_ARRAY_DTYPE)
-    arr_bim = _to_dict(df_bim, dtype=BIM_ARRAY_DTYPE)
+    arr_fam = dataframe_to_dict(df_fam, dtype=FAM_ARRAY_DTYPE)
+    arr_bim = dataframe_to_dict(df_bim, dtype=BIM_ARRAY_DTYPE)
 
     # Load genotyping data
     call_genotype = da.from_array(

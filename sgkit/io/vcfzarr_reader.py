@@ -14,13 +14,13 @@ def _ensure_2d(arr: ArrayLike) -> ArrayLike:
 
 
 def read_vcfzarr(path: PathType) -> xr.Dataset:
-    """Read a VCF Zarr file.
+    """Read a VCF Zarr file created using scikit-allel.
 
     Loads VCF variant, sample, and genotype data as Dask arrays within a Dataset
-    from a Zarr file created using scikit-allel's `vcf_to_zarr` function.
+    from a Zarr file created using scikit-allel's ``vcf_to_zarr`` function.
 
-    Since `vcf_to_zarr` does not preserve phasing information, there is no
-    `call/genotype_phased` variable in the resulting dataset.
+    Since ``vcf_to_zarr`` does not preserve phasing information, there is no
+    :data:`sgkit.variables.call_genotype_phased_spec` variable in the resulting dataset.
 
     Parameters
     ----------
@@ -29,7 +29,15 @@ def read_vcfzarr(path: PathType) -> xr.Dataset:
 
     Returns
     -------
-    The dataset of genotype calls, created using `create_genotype_call_dataset`.
+    A dataset containing the following variables:
+
+    - :data:`sgkit.variables.variant_id_spec` (variants)
+    - :data:`sgkit.variables.variant_contig_spec` (variants)
+    - :data:`sgkit.variables.variant_position_spec` (variants)
+    - :data:`sgkit.variables.variant_allele_spec` (variants)
+    - :data:`sgkit.variables.sample_id_spec` (samples)
+    - :data:`sgkit.variables.call_genotype_spec` (variants, samples, ploidy)
+    - :data:`sgkit.variables.call_genotype_mask_spec` (variants, samples, ploidy)
     """
 
     vcfzarr = zarr.open_group(str(path), mode="r")

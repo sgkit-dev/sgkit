@@ -13,13 +13,22 @@ IO
 PLINK
 -----
 
-The :func:`sgkit.io.plink.read_plink` loads a single PLINK dataset as Dask
-arrays within an ``xr.Dataset`` from bed, bim, and fam files.
+The :func:`sgkit.io.plink.read_plink` function loads a single PLINK dataset as Dask
+arrays within an :class:`xarray.Dataset` from ``bed``, ``bim``, and ``fam`` files.
 
 PLINK IO support is an "extra" feature within sgkit and requires additional
 dependencies. To install sgkit with PLINK support using pip::
 
     $ pip install git+https://github.com/pystatgen/sgkit#egg=sgkit[plink]
+
+VCF
+---
+
+The :func:`sgkit.io.vcf.vcf_to_zarr` function converts one or more VCF files to
+Zarr files stored in sgkit's Xarray data representation, which can then be opened
+as a :class:`xarray.Dataset`.
+
+See :ref:`vcf` for installation instructions, and details on using VCF in sgkit.
 
 Converting genetic data to Zarr
 ===============================

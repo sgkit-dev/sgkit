@@ -8,6 +8,7 @@ from numpy import ndarray
 from xarray import Dataset
 
 from sgkit import variables
+from sgkit.stats.aggregation import genotype_count
 from sgkit.utils import conditional_merge_datasets
 
 
@@ -129,7 +130,9 @@ def hardy_weinberg_test(
     genotype_counts: Optional[Hashable] = None,
     call_genotype: Hashable = variables.call_genotype,
     call_genotype_mask: Hashable = variables.call_genotype_mask,
-    merge: bool = True,
+    ploidy: Optional[int] = None,
+    alleles: Optional[int] = None,
+    merge: bool = True
 ) -> Dataset:
     """Exact test for HWE as described in Wigginton et al. 2005 [1].
 
@@ -150,6 +153,16 @@ def hardy_weinberg_test(
     call_genotype_mask
         Input variable name holding call_genotype_mask.
         Defined by :data:`sgkit.variables.call_genotype_mask_spec`
+    ploidy
+        Genotype ploidy, defaults to ``ploidy`` dimension of provided dataset.
+        If the `ploidy` dimension is not present, then this value must be set explicitly.
+        Currently HWE calculations are only supported for diploid datasets,
+        i.e. ``ploidy`` must equal 2.
+    alleles
+        Genotype allele count, defaults to ``alleles`` dimension of provided dataset.
+        If the `alleles` dimension is not present, then this value must be set explicitly.
+        Currently HWE calculations are only supported for biallelic datasets,
+        i.e. ``alleles`` must equal 2.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -163,8 +176,9 @@ def hardy_weinberg_test(
     Returns
     -------
     Dataset containing (N = num variants):
+
     variant_hwe_p_value : [array-like, shape: (N, O)]
-    P values from HWE test for each variant as float in [0, 1].
+        P values from HWE test for each variant as float in [0, 1].
 
     References
     ----------
@@ -179,10 +193,22 @@ def hardy_weinberg_test(
     NotImplementedError
         If maximum number of alleles in provided dataset != 2
     """
-    if ds.dims["ploidy"] != 2:
+    ploidy = ploidy or ds.dims.get("ploidy")
+    if not ploidy:
+        raise ValueError(
+            "`ploidy` parameter must be set when not present as dataset dimension."
+        )
+    if ploidy != 2:
         raise NotImplementedError("HWE test only implemented for diploid genotypes")
-    if ds.dims["alleles"] != 2:
+
+    alleles = alleles or ds.dims.get("alleles")
+    if not alleles:
+        raise ValueError(
+            "`alleles` parameter must be set when not present as dataset dimension."
+        )
+    if alleles != 2:
         raise NotImplementedError("HWE test only implemented for biallelic genotypes")
+
     # Use precomputed genotype counts if provided
     if genotype_counts is not None:
         variables.validate(ds, {genotype_counts: variables.genotype_counts_spec})
@@ -196,12 +222,16 @@ def hardy_weinberg_test(
                 call_genotype: variables.call_genotype_spec,
             },
         )
-        # TODO: Use API genotype counting function instead, e.g.
-        # https://github.com/pystatgen/sgkit/issues/29#issuecomment-656691069
-        M = ds[call_genotype_mask].any(dim="ploidy")
-        AC = xr.where(M, -1, ds[call_genotype].sum(dim="ploidy"))  # type: ignore[no-untyped-call]
-        cts = [1, 0, 2]  # arg order: hets, hom1, hom2
-        obs = [da.asarray((AC == ct).sum(dim="samples")) for ct in cts]
+        ds_ct = genotype_count(
+            ds,
+            dim="samples",
+            call_genotype=call_genotype,
+            call_genotype_mask=call_genotype_mask,
+        )
+        obs = [
+            da.asarray(ds_ct[v])
+            for v in ["variant_n_het", "variant_n_hom_ref", "variant_n_hom_alt"]
+        ]
     p = da.map_blocks(hardy_weinberg_p_value_vec_jit, *obs)
     new_ds = xr.Dataset({variables.variant_hwe_p_value: ("variants", p)})
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)

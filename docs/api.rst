@@ -7,28 +7,32 @@ This page provides an auto-generated summary of sgkits's API.
 IO/imports
 ==========
 
+PLINK
+-----
+
 .. currentmodule:: sgkit.io.plink
 .. autosummary::
    :toctree: generated/
 
-    read_plink
+   read_plink
+
+VCF
+---
+
+.. currentmodule:: sgkit.io.vcf
+.. autosummary::
+   :toctree: generated/
+
+   partition_into_regions
+   vcf_to_zarr
+   vcf_to_zarrs
+   zarrs_to_dataset
 
 .. currentmodule:: sgkit
 .. autosummary::
    :toctree: generated/
 
-    read_vcfzarr
-
-.. currentmodule:: sgkit
-
-Creating a dataset
-==================
-
-.. autosummary::
-   :toctree: generated/
-
-   create_genotype_call_dataset
-   create_genotype_dosage_dataset
+   read_vcfzarr
 
 .. _api_methods:
 
@@ -49,6 +53,15 @@ Methods
    variant_stats
    Tajimas_D
    pc_relate
+
+Utilities
+=========
+
+.. autosummary::
+   :toctree: generated/
+
+   display_genotypes
+   simulate_genotype_call_dataset
 
 Variables
 =========
@@ -91,11 +104,3 @@ Variables
     variables.variant_p_value_spec
     variables.variant_position_spec
     variables.variant_t_value_spec
-
-Utilities
-=========
-
-.. autosummary::
-   :toctree: generated/
-
-   display_genotypes

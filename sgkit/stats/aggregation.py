@@ -96,8 +96,7 @@ def count_call_alleles(
     Parameters
     ----------
     ds
-        Genotype call dataset such as from
-        :func:`sgkit.create_genotype_call_dataset`.
+        Dataset containing genotype calls.
     call_genotype
         Input variable name holding call_genotype as defined by
         :data:`sgkit.variables.call_genotype_spec`
@@ -169,8 +168,7 @@ def count_variant_alleles(
     Parameters
     ----------
     ds
-        Genotype call dataset such as from
-        :func:`sgkit.create_genotype_call_dataset`.
+        Dataset containing genotype calls.
     call_genotype
         Input variable name holding call_genotype as defined by
         :data:`sgkit.variables.call_genotype_spec`
@@ -230,8 +228,7 @@ def count_cohort_alleles(
     Parameters
     ----------
     ds
-        Genotype call dataset such as from
-        `sgkit.create_genotype_call_dataset`.
+        Dataset containing genotype calls.
     call_genotype
         Input variable name holding call_genotype as defined by
         :data:`sgkit.variables.call_genotype_spec`
@@ -349,8 +346,7 @@ def variant_stats(
     Parameters
     ----------
     ds
-        Genotype call dataset such as from
-        :func:`sgkit.create_genotype_call_dataset`.
+        Dataset containing genotype calls.
     call_genotype
         Input variable name holding call_genotype.
         Defined by :data:`sgkit.variables.call_genotype_spec`.

@@ -176,6 +176,20 @@ call_genotype_phased, call_genotype_phased_spec = SgkitVariables.register_variab
 A flag for each call indicating if it is phased or not. If omitted
 all calls are unphased.
 """
+call_genotype_complete, call_genotype_complete_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("call_genotype_complete", kind="i", ndim=3)
+)
+"""
+Call genotypes in which partial genotype calls are replaced with
+completely missing genotype calls.
+"""
+(
+    call_genotype_complete_mask,
+    call_genotype_complete_mask_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec("call_genotype_complete_mask", kind="b", ndim=3)
+)
+"""TODO"""
 (
     call_genotype_probability,
     call_genotype_probability_spec,
@@ -240,27 +254,62 @@ pc_relate_phi, pc_relate_phi_spec = SgkitVariables.register_variable(
 )
 """PC Relate kinship coefficient matrix."""
 sample_id, sample_id_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("sample_id", kind={"U", "O"}, ndim=1)
+    ArrayLikeSpec("sample_id", kind={"S", "U", "O"}, ndim=1)
 )
 """The unique identifier of the sample."""
 sample_pcs, sample_pcs_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("sample_pcs", ndim=2, kind="f")
 )
 """Sample PCs (PCxS)."""
+sample_pca_component, sample_pca_component_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_pca_component", ndim=2, kind="f")
+)
+"""Principal axes defined as eigenvectors for sample covariance matrix.
+In the context of SVD, these are equivalent to the right singular vectors in
+the decomposition of a (N, M) matrix., i.e. ``dask_ml.decomposition.TruncatedSVD.components_``."""
+(
+    sample_pca_explained_variance,
+    sample_pca_explained_variance_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_pca_explained_variance", ndim=1, kind="f")
+)
+"""Variance explained by each principal component. These values are equivalent
+to eigenvalues that result from the eigendecomposition of a (N, M) matrix,
+i.e. ``dask_ml.decomposition.TruncatedSVD.explained_variance_``."""
+(
+    sample_pca_explained_variance_ratio,
+    sample_pca_explained_variance_ratio_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_pca_explained_variance_ratio", ndim=1, kind="f")
+)
+"""Ratio of variance explained to total variance for each principal component,
+i.e. ``dask_ml.decomposition.TruncatedSVD.explained_variance_ratio_``."""
+sample_pca_loading, sample_pca_loading_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_pca_loading", ndim=2, kind="f")
+)
+"""PCA loadings defined as principal axes scaled by square root of eigenvalues.
+These values  can also be interpreted  as the correlation between the original variables
+and unit-scaled principal axes."""
+sample_pca_projection, sample_pca_projection_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_pca_projection", ndim=2, kind="f")
+)
+"""Projection of samples onto principal axes. This array is commonly
+referred to as "scores" or simply "principal components (PCs)" for a set of samples."""
+
 stat_Fst, stat_Fst_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("stat_Fst", ndim=2, kind="f")
+    ArrayLikeSpec("stat_Fst", ndim=3, kind="f")
 )
 """TODO"""
 stat_divergence, stat_divergence_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("stat_divergence", ndim=2, kind="f")
+    ArrayLikeSpec("stat_divergence", ndim=3, kind="f")
 )
 """TODO"""
 stat_diversity, stat_diversity_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("stat_diversity", ndim=1, kind="f")
+    ArrayLikeSpec("stat_diversity", ndim=2, kind="f")
 )
 """TODO"""
 stat_Tajimas_D, stat_Tajimas_D_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("stat_Tajimas_D", ndim={0, 1}, kind="f")
+    ArrayLikeSpec("stat_Tajimas_D", ndim={0, 2}, kind="f")
 )
 """TODO"""
 traits, traits_spec = SgkitVariables.register_variable(
@@ -303,15 +352,19 @@ variant_call_rate, variant_call_rate_spec = SgkitVariables.register_variable(
 )
 """The number of samples with heterozygous calls."""
 variant_contig, variant_contig_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("variant_contig", kind="i", ndim=1)
+    ArrayLikeSpec("variant_contig", kind={"i", "u"}, ndim=1)
 )
-"""The (index of the) contig for each variant."""
+"""
+Index corresponding to contig name for each variant. In some less common scenarios,
+this may also be equivalent to the contig names if the data generating process used
+contig names that were also integers.
+"""
 variant_hwe_p_value, variant_hwe_p_value_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("variant_hwe_p_value", kind="f")
 )
 """P values from HWE test for each variant as float in [0, 1]."""
 variant_id, variant_id_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("variant_id", kind={"U", "O"}, ndim=1)
+    ArrayLikeSpec("variant_id", kind={"S", "U", "O"}, ndim=1)
 )
 """The unique identifier of the variant."""
 variant_n_called, variant_n_called_spec = SgkitVariables.register_variable(
@@ -346,3 +399,11 @@ variant_t_value, variant_t_value_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("variant_t_value")
 )
 """T statistics for each beta."""
+window_start, window_start_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("window_start", kind="i", ndim=1)
+)
+"""The index values of window start positions along the ``variants`` dimension."""
+window_stop, window_stop_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("window_stop", kind="i", ndim=1)
+)
+"""The index values of window stop positions along the ``variants`` dimension."""

@@ -169,6 +169,7 @@ def vcf_to_zarr_parallel(
     temp_chunk_length: Optional[int] = None,
     tempdir: Optional[PathType] = None,
     tempdir_storage_options: Optional[Dict[str, str]] = None,
+    dask_fuse_avg_width: int = 50,
 ) -> None:
     """Convert specified regions of one or more VCF files to zarr files, then concat, rechunk, write to zarr"""
 
@@ -191,7 +192,7 @@ def vcf_to_zarr_parallel(
         ds = zarrs_to_dataset(paths, chunk_length, chunk_width, tempdir_storage_options)
 
         # Ensure Dask task graph is efficient, see https://github.com/dask/dask/issues/5105
-        with dask.config.set({"optimization.fuse.ave-width": 50}):
+        with dask.config.set({"optimization.fuse.ave-width": dask_fuse_avg_width}):
             ds.to_zarr(output, mode="w")
 
 
@@ -203,32 +204,30 @@ def vcf_to_zarrs(
     chunk_width: int = 1_000,
     output_storage_options: Optional[Dict[str, str]] = None,
 ) -> Sequence[str]:
-    """Convert specified regions of one or more VCF files to multiple Zarr on-disk stores,
-    one per region.
+    """Convert VCF files to multiple Zarr on-disk stores, one per region.
 
     Parameters
     ----------
-    input : Union[PathType, Sequence[PathType]]
+    input
         A path (or paths) to the input BCF or VCF file (or files). VCF files should
-        be compressed and have a .tbi or .csi index file. BCF files should have a .csi
-        index file.
-    output : PathType
+        be compressed and have a ``.tbi`` or ``.csi`` index file. BCF files should
+        have a ``.csi`` index file.
+    output
         Path to directory containing the multiple Zarr output stores.
-    regions : Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]], optional
+    regions
         Genomic region or regions to extract variants for. For multiple inputs, multiple
         input regions are specified as a sequence of values which may be None, or a
         sequence of region strings.
-    chunk_length : int, optional
-        Length (number of variants) of chunks in which data are stored, by default 10_000.
-    chunk_width : int, optional
-        Width (number of samples) to use when storing chunks in output, by default 1_000.
-    output_storage_options : Optional[Dict[str, str]], optional
-        Any additional parameters for the storage backend, for the output (see `fsspec.open`).
+    chunk_length
+        Length (number of variants) of chunks in which data are stored, by default 10,000.
+    chunk_width
+        Width (number of samples) to use when storing chunks in output, by default 1,000.
+    output_storage_options
+        Any additional parameters for the storage backend, for the output (see ``fsspec.open``).
 
     Returns
     -------
-    Sequence[str]
-        A list of URLs to the Zarr outputs.
+    A list of URLs to the Zarr outputs.
     """
 
     output_storage_options = output_storage_options or {}
@@ -282,26 +281,25 @@ def zarrs_to_dataset(
     chunk_width: int = 1_000,
     storage_options: Optional[Dict[str, str]] = None,
 ) -> xr.Dataset:
-    """Combine multiple Zarr stores to a single Xarray dataset.
+    """Combine multiple Zarr stores into a single Xarray dataset.
 
     The Zarr stores are concatenated and rechunked to produce a single combined dataset.
 
     Parameters
     ----------
-    urls : Sequence[Path]
+    urls
         A list of URLs to the Zarr stores to combine, typically the return value of
-        `vcf_to_zarrs`.
-    chunk_length : int, optional
-        Length (number of variants) of chunks in which data are stored, by default 10_000.
-    chunk_width : int, optional
-        Width (number of samples) to use when storing chunks in output, by default 1_000.
-    storage_options : Optional[Dict[str, str]], optional
-        Any additional parameters for the storage backend (see `fsspec.open`).
+        :func:`vcf_to_zarrs`.
+    chunk_length
+        Length (number of variants) of chunks in which data are stored, by default 10,000.
+    chunk_width
+        Width (number of samples) to use when storing chunks in output, by default 1,000.
+    storage_options
+        Any additional parameters for the storage backend (see ``fsspec.open``).
 
     Returns
     -------
-    xr.Dataset
-        A dataset representing the combined dataset.
+    A dataset representing the combined dataset.
     """
 
     storage_options = storage_options or {}
@@ -345,44 +343,45 @@ def vcf_to_zarr(
     tempdir: Optional[PathType] = None,
     tempdir_storage_options: Optional[Dict[str, str]] = None,
 ) -> None:
-    """Convert specified regions of one or more VCF files to a single Zarr on-disk store.
+    """Convert VCF files to a single Zarr on-disk store.
 
     For a single input and a single region, the conversion is carried out sequentially.
 
     For multiple outputs or regions, the conversion is carried out in parallel, by writing
-    the output for each region to a separate, intermediate Zarr store in `tempdir`. Then,
+    the output for each region to a separate, intermediate Zarr store in ``tempdir``. Then,
     in a second step the intermediate outputs are concatenated and rechunked into the final
-    output Zarr store in `output`.
+    output Zarr store in ``output``.
 
-    For more control over these two steps, consider using `vcf_to_zarrs` followed by
-    `zarrs_to_dataset`, then saving the dataset using Xarray's `to_zarr` function.
+    For more control over these two steps, consider using :func:`vcf_to_zarrs` followed by
+    :func:`zarrs_to_dataset`, then saving the dataset using Xarray's
+    :meth:`xarray.Dataset.to_zarr` method.
 
     Parameters
     ----------
-    input : Union[PathType, Sequence[PathType]]
+    input
         A path (or paths) to the input BCF or VCF file (or files). VCF files should
-        be compressed and have a .tbi or .csi index file. BCF files should have a .csi
-        index file.
-    output : Union[PathType, MutableMapping[str, bytes]]
+        be compressed and have a ``.tbi`` or ``.csi`` index file. BCF files should
+        have a ``.csi`` index file.
+    output
         Zarr store or path to directory in file system.
-    regions : Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]], optional
+    regions
         Genomic region or regions to extract variants for. For multiple inputs, multiple
         input regions are specified as a sequence of values which may be None, or a
         sequence of region strings.
-    chunk_length : int, optional
-        Length (number of variants) of chunks in which data are stored, by default 10_000.
-    chunk_width : int, optional
-        Width (number of samples) to use when storing chunks in output, by default 1_000.
-    temp_chunk_length : Optional[int], optional
+    chunk_length
+        Length (number of variants) of chunks in which data are stored, by default 10,000.
+    chunk_width
+        Width (number of samples) to use when storing chunks in output, by default 1,000.
+    temp_chunk_length
         Length (number of variants) of chunks for temporary intermediate files. Set this
-        to be smaller than `chunk_length` to avoid memory errors when loading files with
-        very large numbers of samples. Must be evenly divisible into `chunk_length`.
-        Defaults to `chunk_length` if not set.
-    tempdir : Optional[PathType], optional
+        to be smaller than ``chunk_length`` to avoid memory errors when loading files with
+        very large numbers of samples. Must be evenly divisible into ``chunk_length``.
+        Defaults to ``chunk_length`` if not set.
+    tempdir
         Temporary directory where intermediate files are stored. The default None means
         use the system default temporary directory.
-    tempdir_storage_options: Optional[Dict[str, str]], optional
-        Any additional parameters for the storage backend for tempdir (see `fsspec.open`).
+    tempdir_storage_options:
+        Any additional parameters for the storage backend for tempdir (see ``fsspec.open``).
     """
 
     if temp_chunk_length is not None:
@@ -419,7 +418,4 @@ def count_variants(path: PathType, region: Optional[str] = None) -> int:
     with open_vcf(path) as vcf:
         if region is not None:
             vcf = vcf(region)
-        count = 0
-        for variant in region_filter(vcf, region):
-            count = count + 1
-        return count
+        return sum(1 for _ in region_filter(vcf, region))
