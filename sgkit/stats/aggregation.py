@@ -81,8 +81,10 @@ def _count_cohort_alleles(
         the number of non-missing occurrences of each allele in each cohort.
     """
     out[:, :] = 0  # (cohorts, alleles)
-    for i in range(ac.shape[0]):
-        out[cohorts[i]] += ac[i]
+    n_samples, n_alleles = ac.shape
+    for i in range(n_samples):
+        for j in range(n_alleles):
+            out[cohorts[i], j] += ac[i, j]
 
 
 def count_call_alleles(
