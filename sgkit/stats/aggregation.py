@@ -292,9 +292,20 @@ def call_rate(ds: Dataset, dim: Dimension, call_genotype_mask: Hashable) -> Data
     )
 
 
-def genotype_count(
-    ds: Dataset, dim: Dimension, call_genotype: Hashable, call_genotype_mask: Hashable
+def count_genotypes(
+    ds: Dataset,
+    dim: Dimension,
+    call_genotype: Hashable = variables.call_genotype,
+    call_genotype_mask: Hashable = variables.call_genotype_mask,
+    merge: bool = True,
 ) -> Dataset:
+    variables.validate(
+        ds,
+        {
+            call_genotype_mask: variables.call_genotype_mask_spec,
+            call_genotype: variables.call_genotype_spec,
+        },
+    )
     odim = _swap(dim)[:-1]
     M, G = ds[call_genotype_mask].any(dim="ploidy"), ds[call_genotype]
     n_hom_ref = (G == 0).all(dim="ploidy")
@@ -303,7 +314,7 @@ def genotype_count(
     n_het = ~(n_hom_alt | n_hom_ref)
     # This would 0 out the `het` case with any missing calls
     agg = lambda x: xr.where(M, False, x).sum(dim=dim)  # type: ignore[no-untyped-call]
-    return Dataset(
+    new_ds = Dataset(
         {
             f"{odim}_n_het": agg(n_het),  # type: ignore[no-untyped-call]
             f"{odim}_n_hom_ref": agg(n_hom_ref),  # type: ignore[no-untyped-call]
@@ -311,6 +322,7 @@ def genotype_count(
             f"{odim}_n_non_ref": agg(n_non_ref),  # type: ignore[no-untyped-call]
         }
     )
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
 
 
 def allele_frequency(
@@ -404,11 +416,12 @@ def variant_stats(
     new_ds = xr.merge(
         [
             call_rate(ds, dim="samples", call_genotype_mask=call_genotype_mask),
-            genotype_count(
+            count_genotypes(
                 ds,
                 dim="samples",
                 call_genotype=call_genotype,
                 call_genotype_mask=call_genotype_mask,
+                merge=False,
             ),
             allele_frequency(
                 ds,
