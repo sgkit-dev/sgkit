@@ -15,6 +15,7 @@ from sgkit import (
     create_genotype_call_dataset,
     divergence,
     diversity,
+    variables,
 )
 from sgkit.window import window
 
@@ -51,18 +52,26 @@ def ts_to_dataset(ts, chunks=None, samples=None):
 
 @pytest.mark.parametrize("sample_size", [2, 3, 10, 100])
 @pytest.mark.parametrize("chunks", [(-1, -1), (10, -1)])
-@pytest.mark.parametrize("precompute_cohort_allele_count", [False, True])
-def test_diversity(sample_size, chunks, precompute_cohort_allele_count):
+@pytest.mark.parametrize(
+    "cohort_allele_count",
+    [None, variables.cohort_allele_count, "cohort_allele_count_non_default"],
+)
+def test_diversity(sample_size, chunks, cohort_allele_count):
     ts = msprime.simulate(sample_size, length=100, mutation_rate=0.05, random_seed=42)
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     ds = ds.chunk(dict(zip(["variants", "samples"], chunks)))
     sample_cohorts = np.full_like(ts.samples(), 0)
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
-    if precompute_cohort_allele_count:
-        ds = count_cohort_alleles(ds, merge=False)
-    ds = ds.assign_coords({"cohorts": ["co_0"]})
+    if cohort_allele_count is not None:
+        ds = count_cohort_alleles(ds, merge=False).rename(
+            {variables.cohort_allele_count: cohort_allele_count}
+        )
+        ds = ds.assign_coords({"cohorts": ["co_0"]})
+        ds = diversity(ds, cohort_allele_count=cohort_allele_count)
+    else:
+        ds = ds.assign_coords({"cohorts": ["co_0"]})
+        ds = diversity(ds)
 
-    ds = diversity(ds)
     div = ds.stat_diversity.sum(axis=0, skipna=False).sel(cohorts="co_0").values
     ts_div = ts.diversity(span_normalise=False)
     np.testing.assert_allclose(div, ts_div)
