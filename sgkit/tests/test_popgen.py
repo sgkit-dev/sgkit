@@ -39,7 +39,7 @@ def ts_to_dataset(ts, chunks=None, samples=None):
         variant_contig_names=["1"],
         variant_contig=np.zeros(len(tables.sites), dtype=int),
         variant_position=tables.sites.position.astype(int),
-        variant_alleles=alleles,
+        variant_allele=alleles,
         sample_id=np.array([f"tsk_{u}" for u in samples]).astype("U"),
         call_genotype=genotypes,
     )
