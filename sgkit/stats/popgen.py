@@ -395,7 +395,7 @@ def Tajimas_D(
     samples dimension.
     """
     if variant_allele_counts not in ds:
-        ds = count_variant_alleles(ds, call_genotype=call_genotype)
+        ds = count_variant_alleles(ds)
     else:
         variables.validate(
             ds, {variant_allele_counts: variables.variant_allele_count_spec}
