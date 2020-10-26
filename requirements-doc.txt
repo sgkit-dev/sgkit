@@ -4,3 +4,4 @@ sphinx_autodoc_typehints
 scanpydoc
 ipython
 matplotlib
+graphviz

@@ -362,6 +362,47 @@ commonly used local diagnostics.
 
 For similar monitoring in a distributed cluster, see `Dask distributed diagnostics <https://docs.dask.org/en/latest/diagnostics-distributed.html>`_.
 
+Visualizing computations
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Dask allows you to `visualize the task graph <https://docs.dask.org/en/latest/graphviz.html>`_ of a computation
+before running it, which can be handy when trying to understand where the bottlenecks are.
+
+In most cases the number of tasks is too large to visualize, so it's useful to restrict
+the graph just a few chunks, as shown in this example.
+
+.. ipython:: python
+    :okwarning:
+
+    import sgkit as sg
+    ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
+    # Rechunk to illustrate multiple tasks
+    ds = ds.chunk({"variants": 25, "samples": 25})
+    counts = sg.count_call_alleles(ds).call_allele_count.data
+
+    # Restrict to first 3 chunks in variants dimension
+    counts = counts[:3*counts.chunksize[0],...]
+
+    counts.visualize(optimize_graph=True)
+
+.. image:: _static/mydask.png
+    :width: 600
+    :align: center
+
+By passing keyword arguments to ``visualize`` we can see the order tasks will run in:
+
+.. ipython:: python
+
+    # Graph where colors indicate task ordering
+    counts.visualize(filename="order", optimize_graph=True, color="order", cmap="autumn", node_attr={"penwidth": "4"})
+
+.. image:: _static/order.png
+    :width: 600
+    :align: center
+
+Task order number is shown in circular boxes, colored from red to yellow.
+
+
 Custom naming conventions
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
