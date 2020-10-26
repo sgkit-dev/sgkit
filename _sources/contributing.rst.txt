@@ -283,7 +283,7 @@ Design discussions
 The information on these topics may be useful for developers in understanding the
 history behind the design choices that have been made within the project so far.
 
-Dataset sublcassing
+Dataset subclassing
 ~~~~~~~~~~~~~~~~~~~
 
 Debates on whether or not we should use Xarray objects directly or
@@ -316,3 +316,10 @@ Mixed ploidy
 
 Proposal for handling mixed ploidy: https://github.com/pystatgen/sgkit/issues/243
 
+Numba guvectorize usage
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Learning how to use ``guvectorize`` effectively:
+
+- https://github.com/pystatgen/sgkit/pull/114
+- https://github.com/pystatgen/sgkit/pull/348

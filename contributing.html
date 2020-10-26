@@ -110,10 +110,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#contributing-to-documentation">Contributing to documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#review-process">Review process</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#design-discussions">Design discussions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#dataset-sublcassing">Dataset sublcassing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataset-subclassing">Dataset subclassing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#dataset-api-typing">Dataset API typing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#delayed-invariant-checks">Delayed invariant checks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mixed-ploidy">Mixed ploidy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#numba-guvectorize-usage">Numba guvectorize usage</a></li>
 </ul>
 </li>
 </ul>
@@ -212,10 +213,11 @@
 <li><p><a class="reference internal" href="#review-process" id="id16">Review process</a></p></li>
 <li><p><a class="reference internal" href="#design-discussions" id="id17">Design discussions</a></p>
 <ul>
-<li><p><a class="reference internal" href="#dataset-sublcassing" id="id18">Dataset sublcassing</a></p></li>
+<li><p><a class="reference internal" href="#dataset-subclassing" id="id18">Dataset subclassing</a></p></li>
 <li><p><a class="reference internal" href="#dataset-api-typing" id="id19">Dataset API typing</a></p></li>
 <li><p><a class="reference internal" href="#delayed-invariant-checks" id="id20">Delayed invariant checks</a></p></li>
 <li><p><a class="reference internal" href="#mixed-ploidy" id="id21">Mixed ploidy</a></p></li>
+<li><p><a class="reference internal" href="#numba-guvectorize-usage" id="id22">Numba guvectorize usage</a></p></li>
 </ul>
 </li>
 </ul>
@@ -435,8 +437,8 @@ and a clean build it will get merged automatically.</p>
 <h2><a class="toc-backref" href="#id17">Design discussions</a><a class="headerlink" href="#design-discussions" title="Permalink to this headline">¶</a></h2>
 <p>The information on these topics may be useful for developers in understanding the
 history behind the design choices that have been made within the project so far.</p>
-<div class="section" id="dataset-sublcassing">
-<h3><a class="toc-backref" href="#id18">Dataset sublcassing</a><a class="headerlink" href="#dataset-sublcassing" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="dataset-subclassing">
+<h3><a class="toc-backref" href="#id18">Dataset subclassing</a><a class="headerlink" href="#dataset-subclassing" title="Permalink to this headline">¶</a></h3>
 <p>Debates on whether or not we should use Xarray objects directly or
 put them behind a layer of encapsulation:</p>
 <ul class="simple">
@@ -465,6 +467,14 @@ useful if they were possible (they are not possible currently w/ Dask):</p>
 <div class="section" id="mixed-ploidy">
 <h3><a class="toc-backref" href="#id21">Mixed ploidy</a><a class="headerlink" href="#mixed-ploidy" title="Permalink to this headline">¶</a></h3>
 <p>Proposal for handling mixed ploidy: <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/243">https://github.com/pystatgen/sgkit/issues/243</a></p>
+</div>
+<div class="section" id="numba-guvectorize-usage">
+<h3><a class="toc-backref" href="#id22">Numba guvectorize usage</a><a class="headerlink" href="#numba-guvectorize-usage" title="Permalink to this headline">¶</a></h3>
+<p>Learning how to use <code class="docutils literal notranslate"><span class="pre">guvectorize</span></code> effectively:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/pull/114">https://github.com/pystatgen/sgkit/pull/114</a></p></li>
+<li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/pull/348">https://github.com/pystatgen/sgkit/pull/348</a></p></li>
+</ul>
 </div>
 </div>
 </div>
