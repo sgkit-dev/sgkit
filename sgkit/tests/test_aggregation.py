@@ -1,5 +1,6 @@
 from typing import Any
 
+import dask.array as da
 import numpy as np
 import pytest
 import xarray as xr
@@ -98,6 +99,7 @@ def test_count_variant_alleles__chunked():
     # Coerce from numpy to multiple chunks in all dimensions
     ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))  # type: ignore[arg-type]
     ac2 = count_variant_alleles(ds)
+    assert isinstance(ac2["variant_allele_count"].data, da.Array)
     xr.testing.assert_equal(ac1, ac2)  # type: ignore[no-untyped-call]
 
 
@@ -207,6 +209,7 @@ def test_count_call_alleles__chunked():
     # Coerce from numpy to multiple chunks in all dimensions
     ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))  # type: ignore[arg-type]
     ac2 = count_call_alleles(ds)
+    assert isinstance(ac2["call_allele_count"].data, da.Array)
     xr.testing.assert_equal(ac1, ac2)  # type: ignore[no-untyped-call]
 
 
@@ -228,6 +231,20 @@ def test_count_cohort_alleles__multi_variant_multi_sample():
             [[[2, 0], [4, 0]], [[2, 0], [3, 1]], [[0, 2], [2, 2]], [[0, 2], [0, 4]]]
         ),
     )
+
+
+def test_count_cohort_alleles__chunked():
+    rs = np.random.RandomState(0)
+    calls = rs.randint(0, 1, size=(50, 10, 2))
+    ds = get_dataset(calls)
+    sample_cohort = np.repeat([0, 1], ds.dims["samples"] // 2)
+    ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
+    ac1 = count_cohort_alleles(ds)
+    # Coerce from numpy to multiple chunks in variants dimension only
+    ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, -1, -1))  # type: ignore[arg-type]
+    ac2 = count_cohort_alleles(ds)
+    assert isinstance(ac2["cohort_allele_count"].data, da.Array)
+    xr.testing.assert_equal(ac1, ac2)  # type: ignore[no-untyped-call]
 
 
 @pytest.mark.parametrize("precompute_variant_allele_count", [False, True])
