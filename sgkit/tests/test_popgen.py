@@ -92,6 +92,12 @@ def test_diversity__windowed(sample_size):
     )  # scikit-allel has final window missing
 
 
+def test_diversity__missing_call_genotype():
+    ds = xr.Dataset()
+    with pytest.raises(ValueError, match="call_genotype not present"):
+        diversity(ds)
+
+
 @pytest.mark.parametrize(
     "sample_size, n_cohorts",
     [(2, 2), (3, 2), (3, 3), (10, 2), (10, 3), (10, 4), (100, 2), (100, 3), (100, 4)],
