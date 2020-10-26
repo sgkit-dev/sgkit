@@ -51,7 +51,7 @@ def read_vcfzarr(path: PathType) -> xr.Dataset:
     # For variant alleles, combine REF and ALT into a single array
     variants_ref = da.from_zarr(vcfzarr["variants/REF"])
     variants_alt = da.from_zarr(vcfzarr["variants/ALT"])
-    variant_alleles = da.concatenate(
+    variant_allele = da.concatenate(
         [_ensure_2d(variants_ref), _ensure_2d(variants_alt)], axis=1
     )
 
@@ -61,7 +61,7 @@ def read_vcfzarr(path: PathType) -> xr.Dataset:
         variant_contig_names=variant_contig_names,
         variant_contig=variant_contig,
         variant_position=da.from_zarr(vcfzarr["variants/POS"]),
-        variant_alleles=variant_alleles,
+        variant_allele=variant_allele,
         sample_id=da.from_zarr(vcfzarr["samples"]).astype(str),
         call_genotype=da.from_zarr(vcfzarr["calldata/GT"]),
         variant_id=variants_id,

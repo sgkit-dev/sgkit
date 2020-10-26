@@ -294,7 +294,7 @@ def read_bgen(
     variant_contig, variant_contig_names = encode_contigs(variant_contig)
     variant_contig_names = list(variant_contig_names)
     variant_position = arrs["pos"]
-    variant_alleles = da.hstack((arrs["a1"][:, np.newaxis], arrs["a2"][:, np.newaxis]))
+    variant_allele = da.hstack((arrs["a1"][:, np.newaxis], arrs["a2"][:, np.newaxis]))
 
     call_genotype_probability = da.from_array(
         bgen_reader,
@@ -310,7 +310,7 @@ def read_bgen(
         variant_contig_names=variant_contig_names,
         variant_contig=variant_contig,
         variant_position=variant_position,
-        variant_alleles=variant_alleles,
+        variant_allele=variant_allele,
         sample_id=sample_id,
         call_dosage=call_dosage,
         call_genotype_probability=call_genotype_probability,
