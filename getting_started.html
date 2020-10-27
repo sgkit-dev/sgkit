@@ -440,9 +440,9 @@ across samples for each individual variant:</p>
 <span class="go">    variant_n_hom_ref         (variants) int64 11 3 13 3 6 8 ... 6 10 9 12 8 13</span>
 <span class="go">    variant_n_hom_alt         (variants) int64 7 9 12 11 6 17 ... 15 9 7 5 14 8</span>
 <span class="go">    variant_n_non_ref         (variants) int64 29 39 30 37 35 ... 32 29 31 35 27</span>
-<span class="go">    variant_allele_count      (variants, alleles) uint64 50 40 40 ... 53 50 40</span>
+<span class="go">    variant_allele_count      (variants, alleles) uint64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
 <span class="go">    variant_allele_total      (variants) int64 90 92 93 88 91 ... 92 88 92 92 90</span>
-<span class="go">    variant_allele_frequency  (variants, alleles) float64 0.5556 ... 0.4444</span>
+<span class="go">    variant_allele_frequency  (variants, alleles) float64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
 </pre></div>
 </div>
 <p>There are two ways that the results of every function are handled – either they are merged with the provided
@@ -485,7 +485,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">Dimensions:               (alleles: 2, ploidy: 2, samples: 50, variants: 100)</span>
 <span class="go">Dimensions without coordinates: alleles, ploidy, samples, variants</span>
 <span class="go">Data variables:</span>
-<span class="go">    variant_allele_count  (variants, alleles) uint64 50 40 40 52 ... 39 53 50 40</span>
+<span class="go">    variant_allele_count  (variants, alleles) uint64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
 <span class="go">    variant_allele        (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; b&#39;C&#39; ... b&#39;T&#39; b&#39;A&#39;</span>
 <span class="go">    call_genotype         (variants, samples, ploidy) int8 0 0 1 0 1 ... 0 1 0 0</span>
 
@@ -507,7 +507,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">Dimensions:               (alleles: 2, variants: 100)</span>
 <span class="go">Dimensions without coordinates: alleles, variants</span>
 <span class="go">Data variables:</span>
-<span class="go">    variant_allele_count  (variants, alleles) uint64 50 40 40 52 ... 39 53 50 40</span>
+<span class="go">    variant_allele_count  (variants, alleles) uint64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
 
 <span class="go"># This can be useful for merging multiple datasets manually</span>
 <span class="gp">In [36]: </span><span class="n">ds</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
@@ -516,7 +516,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">Dimensions:               (alleles: 2, ploidy: 2, samples: 50, variants: 100)</span>
 <span class="go">Dimensions without coordinates: alleles, ploidy, samples, variants</span>
 <span class="go">Data variables:</span>
-<span class="go">    variant_allele_count  (variants, alleles) uint64 50 40 40 52 ... 39 53 50 40</span>
+<span class="go">    variant_allele_count  (variants, alleles) uint64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
 <span class="go">    variant_allele        (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; b&#39;C&#39; ... b&#39;T&#39; b&#39;A&#39;</span>
 <span class="go">    call_genotype         (variants, samples, ploidy) int8 0 0 1 0 1 ... 0 1 0 0</span>
 </pre></div>
@@ -547,7 +547,7 @@ along with potential workarounds.</p>
 <span class="gp">In [40]: </span><span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span>
 <span class="gh">Out[40]: </span><span class="go"></span>
 <span class="go">&lt;xarray.DataArray &#39;variant_allele_count&#39; (variants: 1, alleles: 2)&gt;</span>
-<span class="go">array([[3, 2]], dtype=uint64)</span>
+<span class="go">dask.array&lt;sum-aggregate, shape=(1, 2), dtype=uint64, chunksize=(1, 2), chunktype=numpy.ndarray&gt;</span>
 <span class="go">Dimensions without coordinates: variants, alleles</span>
 </pre></div>
 </div>
@@ -638,9 +638,9 @@ Xarray and Pandas operations in a single pipeline:</p>
 <span class="go">    variant_n_hom_ref         (variants) int64 11 3 13 3 6 8 ... 6 10 9 12 8 13</span>
 <span class="go">    variant_n_hom_alt         (variants) int64 7 9 12 11 6 17 ... 15 9 7 5 14 8</span>
 <span class="go">    variant_n_non_ref         (variants) int64 29 39 30 37 35 ... 32 29 31 35 27</span>
-<span class="go">    variant_allele_count      (variants, alleles) uint64 50 40 40 ... 53 50 40</span>
+<span class="go">    variant_allele_count      (variants, alleles) uint64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
 <span class="go">    variant_allele_total      (variants) int64 90 92 93 88 91 ... 92 88 92 92 90</span>
-<span class="go">    variant_allele_frequency  (variants, alleles) float64 0.5556 ... 0.4444</span>
+<span class="go">    variant_allele_frequency  (variants, alleles) float64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
 <span class="go">    variant_contig            (variants) int64 0 0 0 0 0 0 0 0 ... 0 0 0 0 0 0 0</span>
 <span class="go">    variant_position          (variants) int64 0 1 2 3 4 5 ... 94 95 96 97 98 99</span>
 <span class="go">    variant_allele            (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; ... b&#39;T&#39; b&#39;A&#39;</span>
