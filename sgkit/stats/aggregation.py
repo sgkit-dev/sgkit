@@ -119,8 +119,7 @@ def count_call_alleles(
     --------
 
     >>> import sgkit as sg
-    >>> from sgkit.testing import simulate_genotype_call_dataset
-    >>> ds = simulate_genotype_call_dataset(n_variant=4, n_sample=2, seed=1)
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=4, n_sample=2, seed=1)
     >>> sg.display_genotypes(ds) # doctest: +NORMALIZE_WHITESPACE
     samples    S0   S1
     variants
@@ -193,8 +192,7 @@ def count_variant_alleles(
     --------
 
     >>> import sgkit as sg
-    >>> from sgkit.testing import simulate_genotype_call_dataset
-    >>> ds = simulate_genotype_call_dataset(n_variant=4, n_sample=2, seed=1)
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=4, n_sample=2, seed=1)
     >>> sg.display_genotypes(ds) # doctest: +NORMALIZE_WHITESPACE
     samples    S0   S1
     variants
@@ -248,6 +246,41 @@ def count_cohort_alleles(
     A dataset containing :data:`sgkit.variables.cohort_allele_count_spec`
     of allele counts with shape (variants, cohorts, alleles) and values corresponding to
     the number of non-missing occurrences of each allele.
+
+    Examples
+    --------
+
+    >>> import numpy as np
+    >>> import sgkit as sg
+    >>> import xarray as xr
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
+
+    >>> # Divide samples into two cohorts
+    >>> ds["sample_cohort"] = xr.DataArray(np.repeat([0, 1], ds.dims["samples"] // 2), dims="samples")
+    >>> sg.display_genotypes(ds) # doctest: +NORMALIZE_WHITESPACE
+    samples    S0   S1   S2   S3
+    variants
+    0         0/0  1/0  1/0  0/1
+    1         1/0  0/1  0/0  1/0
+    2         1/1  0/0  1/0  0/1
+    3         1/0  1/1  1/1  1/0
+    4         1/0  0/0  1/0  1/1
+
+    >>> sg.count_cohort_alleles(ds)["cohort_allele_count"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[[3, 1],
+            [2, 2]],
+    <BLANKLINE>
+            [[2, 2],
+            [3, 1]],
+    <BLANKLINE>
+            [[2, 2],
+            [2, 2]],
+    <BLANKLINE>
+            [[1, 3],
+            [1, 3]],
+    <BLANKLINE>
+            [[3, 1],
+            [1, 3]]])
     """
     ds = define_variable_if_absent(
         ds, variables.call_allele_count, call_allele_count, count_call_alleles
