@@ -9,7 +9,7 @@ def pairwise_distance(
     x: ArrayLike,
     metric: str = "euclidean",
 ) -> np.ndarray:
-    """Calculates the pairwise distance between all pairs of vectors in the
+    """Calculates the pairwise distance between all pairs of row vectors in the
     given two dimensional array x.
 
     To illustrate the algorithm consider the following (4, 5) two dimensional array:
@@ -51,10 +51,11 @@ def pairwise_distance(
     Returns
     -------
 
-    [array-like, shape: (M, N)]
+    [array-like, shape: (M, M)]
     A two dimensional distance matrix, which will be symmetric. The dimension
-    will be (M, N). The (i, j) position in the resulting array
-    (matrix) denotes the distance between ith and jth vectors.
+    will be (M, M). The (i, j) position in the resulting array
+    (matrix) denotes the distance between ith and jth row vectors
+    in the input array.
 
     Examples
     --------
@@ -82,7 +83,7 @@ def pairwise_distance(
     """
 
     try:
-        metric_ufunc = getattr(metrics, f"{metric}")
+        metric_ufunc = getattr(metrics, metric)
     except AttributeError:
         raise NotImplementedError(f"Given metric: {metric} is not implemented.")
 
