@@ -274,8 +274,8 @@ def read_plink(
     a2 = arr_bim["a2"].astype("str")
 
     # Note: column_stack not implemented in Dask, must use [v|h]stack
-    variant_alleles = da.hstack((a1[:, np.newaxis], a2[:, np.newaxis]))
-    variant_alleles = variant_alleles.astype("S")
+    variant_allele = da.hstack((a1[:, np.newaxis], a2[:, np.newaxis]))
+    variant_allele = variant_allele.astype("S")
     variant_id = arr_bim["variant_id"]
 
     sample_id = arr_fam["member_id"]
@@ -284,7 +284,7 @@ def read_plink(
         variant_contig_names=variant_contig_names,
         variant_contig=variant_contig,
         variant_position=variant_position,
-        variant_alleles=variant_alleles,
+        variant_allele=variant_allele,
         sample_id=sample_id,
         call_genotype=call_genotype,
         variant_id=variant_id,

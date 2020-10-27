@@ -18,7 +18,7 @@ def create_genotype_call_dataset(
     variant_contig_names: List[str],
     variant_contig: ArrayLike,
     variant_position: ArrayLike,
-    variant_alleles: ArrayLike,
+    variant_allele: ArrayLike,
     sample_id: ArrayLike,
     call_genotype: ArrayLike,
     call_genotype_phased: Optional[ArrayLike] = None,
@@ -36,7 +36,7 @@ def create_genotype_call_dataset(
     variant_position
         [array_like, element type: int]
         The reference position of the variant.
-    variant_alleles
+    variant_allele
         [array_like, element_type: zero-terminated bytes, e.g. "S1", or object]
         The possible alleles for the variant.
     sample_id
@@ -60,7 +60,7 @@ def create_genotype_call_dataset(
     data_vars: Dict[Hashable, Any] = {
         "variant_contig": ([DIM_VARIANT], variant_contig),
         "variant_position": ([DIM_VARIANT], variant_position),
-        "variant_allele": ([DIM_VARIANT, DIM_ALLELE], variant_alleles),
+        "variant_allele": ([DIM_VARIANT, DIM_ALLELE], variant_allele),
         "sample_id": ([DIM_SAMPLE], sample_id),
         "call_genotype": ([DIM_VARIANT, DIM_SAMPLE, DIM_PLOIDY], call_genotype),
         "call_genotype_mask": (
@@ -84,7 +84,7 @@ def create_genotype_dosage_dataset(
     variant_contig_names: List[str],
     variant_contig: ArrayLike,
     variant_position: ArrayLike,
-    variant_alleles: ArrayLike,
+    variant_allele: ArrayLike,
     sample_id: ArrayLike,
     call_dosage: ArrayLike,
     call_genotype_probability: ArrayLike,
@@ -102,7 +102,7 @@ def create_genotype_dosage_dataset(
     variant_position
         [array_like, element type: int]
         The reference position of the variant.
-    variant_alleles
+    variant_allele
         [array_like, element_type: zero-terminated bytes, e.g. "S1", or object]
         The possible alleles for the variant.
     sample_id
@@ -128,7 +128,7 @@ def create_genotype_dosage_dataset(
     data_vars: Dict[Hashable, Any] = {
         "variant_contig": ([DIM_VARIANT], variant_contig),
         "variant_position": ([DIM_VARIANT], variant_position),
-        "variant_allele": ([DIM_VARIANT, DIM_ALLELE], variant_alleles),
+        "variant_allele": ([DIM_VARIANT, DIM_ALLELE], variant_allele),
         "sample_id": ([DIM_SAMPLE], sample_id),
         "call_dosage": ([DIM_VARIANT, DIM_SAMPLE], call_dosage),
         "call_dosage_mask": ([DIM_VARIANT, DIM_SAMPLE], np.isnan(call_dosage)),
