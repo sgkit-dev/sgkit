@@ -406,7 +406,9 @@ def Tajimas_D(
     S = ((ac > 0).sum(axis=1) > 1).sum()
 
     # assume number of chromosomes sampled is constant for all variants
-    n = ac.sum(axis=1).max()
+    # NOTE: even tho ac has dtype uint, we promote the sum to float
+    #       because the computation below requires floats
+    n = ac.sum(axis=1, dtype="float").max()
 
     # (n-1)th harmonic number
     a1 = (1 / da.arange(1, n)).sum()
