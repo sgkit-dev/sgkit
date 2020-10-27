@@ -22,6 +22,7 @@ from .stats.popgen import Fst, Tajimas_D, divergence, diversity
 from .stats.preprocessing import filter_partial_calls
 from .stats.regenie import regenie
 from .testing import simulate_genotype_call_dataset
+from .window import window
 
 __all__ = [
     "DIM_ALLELE",
@@ -48,4 +49,5 @@ __all__ = [
     "simulate_genotype_call_dataset",
     "variables",
     "pca",
+    "window",
 ]
