@@ -22,14 +22,9 @@ def diversity(
 ) -> Dataset:
     """Compute diversity from cohort allele counts.
 
-    Because we're not providing any arguments on windowing, etc,
-    we return the total over the whole region. Maybe this isn't
-    the behaviour we want, but it's a starting point. Note that
-    this is different to the tskit default behaviour where we
-    normalise by the size of windows so that results
-    in different windows are comparable. However, we don't have
-    any information about the overall length of the sequence here
-    so we can't normalise by it.
+    By default, values of this statistic are calculated per variant.
+    To compute values in windows, call :func:`window` before calling
+    this function.
 
     Parameters
     ----------
@@ -48,12 +43,38 @@ def diversity(
 
     Returns
     -------
-    A dataset containing the diversity value, as defined by :data:`sgkit.variables.stat_diversity_spec`.
+    A dataset containing the diversity values, as defined by :data:`sgkit.variables.stat_diversity_spec`.
+    Shape (variants, cohorts), or (windows, cohorts) if windowing information is available.
 
     Warnings
     --------
     This method does not currently support datasets that are chunked along the
     samples dimension.
+
+    Examples
+    --------
+
+    >>> import numpy as np
+    >>> import sgkit as sg
+    >>> import xarray as xr
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
+
+    >>> # Divide samples into two cohorts
+    >>> sample_cohort = np.repeat([0, 1], ds.dims["samples"] // 2)
+    >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
+
+    >>> sg.diversity(ds)["stat_diversity"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[0.5       , 0.66666667],
+        [0.66666667, 0.5       ],
+        [0.66666667, 0.66666667],
+        [0.5       , 0.5       ],
+        [0.5       , 0.5       ]])
+
+    >>> # Divide into windows of size three (variants)
+    >>> ds = sg.window(ds, size=3, step=3)
+    >>> sg.diversity(ds)["stat_diversity"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[1.83333333, 1.83333333],
+        [1.        , 1.        ]])
     """
     ds = define_variable_if_absent(
         ds, variables.cohort_allele_count, cohort_allele_count, count_cohort_alleles
@@ -80,7 +101,7 @@ def diversity(
         )
         new_ds = Dataset(
             {
-                "stat_diversity": (
+                variables.stat_diversity: (
                     ("windows", "cohorts"),
                     div,
                 )
@@ -89,7 +110,7 @@ def diversity(
     else:
         new_ds = Dataset(
             {
-                "stat_diversity": (
+                variables.stat_diversity: (
                     ("variants", "cohorts"),
                     pi,
                 )
@@ -155,6 +176,10 @@ def divergence(
     except for the case where i and j are the same, in which case the entry
     is the diversity for cohort i.
 
+    By default, values of this statistic are calculated per variant.
+    To compute values in windows, call :func:`window` before calling
+    this function.
+
     Parameters
     ----------
     ds
@@ -174,11 +199,50 @@ def divergence(
     -------
     A dataset containing the divergence value between pairs of cohorts, as defined by
     :data:`sgkit.variables.stat_divergence_spec`.
+    Shape (variants, cohorts, cohorts), or (windows, cohorts, cohorts) if windowing
+    information is available.
 
     Warnings
     --------
     This method does not currently support datasets that are chunked along the
     samples dimension.
+
+    Examples
+    --------
+
+    >>> import numpy as np
+    >>> import sgkit as sg
+    >>> import xarray as xr
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
+
+    >>> # Divide samples into two cohorts
+    >>> sample_cohort = np.repeat([0, 1], ds.dims["samples"] // 2)
+    >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
+
+    >>> sg.divergence(ds)["stat_divergence"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[[0.5       , 0.5       ],
+            [0.5       , 0.66666667]],
+    <BLANKLINE>
+        [[0.66666667, 0.5       ],
+            [0.5       , 0.5       ]],
+    <BLANKLINE>
+        [[0.66666667, 0.5       ],
+            [0.5       , 0.66666667]],
+    <BLANKLINE>
+        [[0.5       , 0.375     ],
+            [0.375     , 0.5       ]],
+    <BLANKLINE>
+        [[0.5       , 0.625     ],
+            [0.625     , 0.5       ]]])
+
+    >>> # Divide into windows of size three (variants)
+    >>> ds = sg.window(ds, size=3, step=3)
+    >>> sg.divergence(ds)["stat_divergence"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[[1.83333333, 1.5       ],
+            [1.5       , 1.83333333]],
+    <BLANKLINE>
+        [[1.        , 1.        ],
+            [1.        , 1.        ]]])
     """
 
     ds = define_variable_if_absent(
@@ -205,7 +269,7 @@ def divergence(
         )
         new_ds = Dataset(
             {
-                "stat_divergence": (
+                variables.stat_divergence: (
                     ("windows", "cohorts_0", "cohorts_1"),
                     div,
                 )
@@ -214,7 +278,7 @@ def divergence(
     else:
         new_ds = Dataset(
             {
-                "stat_divergence": (
+                variables.stat_divergence: (
                     ("variants", "cohorts_0", "cohorts_1"),
                     d,
                 )
@@ -295,6 +359,10 @@ def Fst(
 ) -> Dataset:
     """Compute Fst between pairs of cohorts.
 
+    By default, values of this statistic are calculated per variant.
+    To compute values in windows, call :func:`window` before calling
+    this function.
+
     Parameters
     ----------
     ds
@@ -321,11 +389,50 @@ def Fst(
     -------
     A dataset containing the Fst value between pairs of cohorts, as defined by
     :data:`sgkit.variables.stat_Fst_spec`.
+    Shape (variants, cohorts, cohorts), or (windows, cohorts, cohorts) if windowing
+    information is available.
 
     Warnings
     --------
     This method does not currently support datasets that are chunked along the
     samples dimension.
+
+    Examples
+    --------
+
+    >>> import numpy as np
+    >>> import sgkit as sg
+    >>> import xarray as xr
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
+
+    >>> # Divide samples into two cohorts
+    >>> sample_cohort = np.repeat([0, 1], ds.dims["samples"] // 2)
+    >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
+
+    >>> sg.Fst(ds)["stat_Fst"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[[        nan, -0.16666667],
+            [-0.16666667,         nan]],
+    <BLANKLINE>
+        [[        nan, -0.16666667],
+            [-0.16666667,         nan]],
+    <BLANKLINE>
+        [[        nan, -0.33333333],
+            [-0.33333333,         nan]],
+    <BLANKLINE>
+        [[        nan, -0.33333333],
+            [-0.33333333,         nan]],
+    <BLANKLINE>
+        [[        nan,  0.2       ],
+            [ 0.2       ,         nan]]])
+
+    >>> # Divide into windows of size three (variants)
+    >>> ds = sg.window(ds, size=3, step=3)
+    >>> sg.Fst(ds)["stat_Fst"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[[        nan, -0.22222222],
+            [-0.22222222,         nan]],
+    <BLANKLINE>
+        [[        nan,  0.        ],
+            [ 0.        ,         nan]]])
     """
     known_estimators = {"Hudson": _Fst_Hudson, "Nei": _Fst_Nei}
     if estimator is not None and estimator not in known_estimators:
@@ -357,6 +464,10 @@ def Tajimas_D(
 ) -> Dataset:
     """Compute Tajimas' D for a genotype call dataset.
 
+    By default, values of this statistic are calculated per variant.
+    To compute values in windows, call :func:`window` before calling
+    this function.
+
     Parameters
     ----------
     ds
@@ -380,11 +491,37 @@ def Tajimas_D(
     Returns
     -------
     A dataset containing the Tajimas' D value, as defined by :data:`sgkit.variables.stat_Tajimas_D_spec`.
+    Shape (variants, cohorts), or (windows, cohorts) if windowing information is available.
 
     Warnings
     --------
     This method does not currently support datasets that are chunked along the
     samples dimension.
+
+    Examples
+    --------
+
+    >>> import numpy as np
+    >>> import sgkit as sg
+    >>> import xarray as xr
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
+
+    >>> # Divide samples into two cohorts
+    >>> sample_cohort = np.repeat([0, 1], ds.dims["samples"] // 2)
+    >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
+
+    >>> sg.Tajimas_D(ds)["stat_Tajimas_D"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[-3.35891429, -2.96698697],
+        [-2.96698697, -3.35891429],
+        [-2.96698697, -2.96698697],
+        [-3.35891429, -3.35891429],
+        [-3.35891429, -3.35891429]])
+
+    >>> # Divide into windows of size three (variants)
+    >>> ds = sg.window(ds, size=3, step=3)
+    >>> sg.Tajimas_D(ds)["stat_Tajimas_D"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[-0.22349574, -0.22349574],
+        [-2.18313233, -2.18313233]])
     """
     ds = define_variable_if_absent(
         ds, variables.variant_allele_count, variant_allele_count, count_variant_alleles
