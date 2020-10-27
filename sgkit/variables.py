@@ -299,19 +299,19 @@ referred to as "scores" or simply "principal components (PCs)" for a set of samp
 stat_Fst, stat_Fst_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("stat_Fst", ndim=3, kind="f")
 )
-"""TODO"""
+"""Fixation index (Fst) between pairs of cohorts."""
 stat_divergence, stat_divergence_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("stat_divergence", ndim=3, kind="f")
 )
-"""TODO"""
+"""Genetic divergence between pairs of cohorts."""
 stat_diversity, stat_diversity_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("stat_diversity", ndim=2, kind="f")
 )
-"""TODO"""
+"""Genetic diversity (also known as "Tajima’s pi") for cohorts."""
 stat_Tajimas_D, stat_Tajimas_D_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("stat_Tajimas_D", ndim={0, 2}, kind="f")
 )
-"""TODO"""
+"""Tajima’s D for cohorts."""
 traits, traits_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("traits", ndim={1, 2})
 )
