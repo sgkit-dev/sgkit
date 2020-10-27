@@ -208,12 +208,9 @@ def count_variant_alleles(
     """
     new_ds = Dataset(
         {
-            variables.variant_allele_count: (
-                ("variants", "alleles"),
-                count_call_alleles(ds, call_genotype=call_genotype)[
-                    variables.call_allele_count
-                ].sum(dim="samples"),
-            )
+            variables.variant_allele_count: count_call_alleles(
+                ds, call_genotype=call_genotype
+            )[variables.call_allele_count].sum(dim="samples")
         }
     )
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)

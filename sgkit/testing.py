@@ -79,7 +79,7 @@ def simulate_genotype_call_dataset(
         variant_contig_names=contig_names,
         variant_contig=contig,
         variant_position=position,
-        variant_alleles=alleles,
+        variant_allele=alleles,
         sample_id=sample_id,
         call_genotype=call_genotype,
     )
