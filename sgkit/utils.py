@@ -1,5 +1,5 @@
 import warnings
-from typing import Any, List, Set, Tuple, Union
+from typing import Any, Callable, Hashable, List, Optional, Set, Tuple, Union
 
 import numpy as np
 from xarray import Dataset
@@ -140,6 +140,44 @@ def merge_datasets(input: Dataset, output: Dataset) -> Dataset:
 def conditional_merge_datasets(input: Dataset, output: Dataset, merge: bool) -> Dataset:
     """Merge the input and output datasets only if `merge` is true, otherwise just return the output."""
     return merge_datasets(input, output) if merge else output
+
+
+def define_variable_if_absent(
+    ds: Dataset,
+    default_variable_name: Hashable,
+    variable_name: Optional[Hashable],
+    func: Callable[[Dataset], Dataset],
+) -> Dataset:
+    """Define a variable in a dataset using the given function if it's missing.
+
+    Parameters
+    ----------
+    ds : Dataset
+        The dataset to look for the variable, and used by the function to calculate the variable.
+    default_variable_name
+        The default name of the variable.
+    variable_name
+        The actual name of the variable, or None to use the default.
+    func
+        The function to calculate the variable.
+
+    Returns
+    -------
+    A new dataset containing the variable.
+
+    Raises
+    ------
+    ValueError
+        If a variable with a non-default name is missing from the dataset.
+    """
+    variable_name = variable_name or default_variable_name
+    if variable_name in ds:
+        return ds
+    if variable_name != default_variable_name:
+        raise ValueError(
+            f"Variable '{variable_name}' with non-default name is missing and will not be automatically defined."
+        )
+    return func(ds)
 
 
 def split_array_chunks(n: int, blocks: int) -> Tuple[int, ...]:

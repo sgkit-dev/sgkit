@@ -11,6 +11,7 @@ from hypothesis.extra.numpy import arrays
 from sgkit.utils import (
     MergeWarning,
     check_array_like,
+    define_variable_if_absent,
     encode_array,
     max_str_len,
     merge_datasets,
@@ -88,6 +89,32 @@ def test_merge_datasets():
     with pytest.warns(MergeWarning):
         ds = merge_datasets(ds, new_ds2)
         np.testing.assert_equal(ds["y"].values, np.ones(100))
+
+
+def test_define_variable_if_absent():
+    ds = xr.Dataset(dict(x=xr.DataArray(da.zeros(100))))
+
+    def def_y(ds):
+        ds["y"] = xr.DataArray(da.zeros(100))
+        return ds
+
+    ds = define_variable_if_absent(ds, "x", "x", lambda ds: ds)
+    assert "x" in ds
+    assert "y" not in ds
+
+    with pytest.raises(
+        ValueError,
+        match=r"Variable 'z' with non-default name is missing and will not be automatically defined.",
+    ):
+        define_variable_if_absent(ds, "y", "z", def_y)
+
+    ds = define_variable_if_absent(ds, "y", "y", def_y)
+    assert "x" in ds
+    assert "y" in ds
+
+    ds2 = define_variable_if_absent(ds, "y", None, def_y)
+    assert "x" in ds2
+    assert "y" in ds2
 
 
 @pytest.mark.parametrize(

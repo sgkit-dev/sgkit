@@ -8,7 +8,7 @@ from numpy import ndarray
 from xarray import Dataset
 
 from sgkit import variables
-from sgkit.stats.aggregation import genotype_count
+from sgkit.stats.aggregation import count_genotypes
 from sgkit.utils import conditional_merge_datasets
 
 
@@ -128,8 +128,6 @@ def hardy_weinberg_test(
     ds: Dataset,
     *,
     genotype_counts: Optional[Hashable] = None,
-    call_genotype: Hashable = variables.call_genotype,
-    call_genotype_mask: Hashable = variables.call_genotype_mask,
     ploidy: Optional[int] = None,
     alleles: Optional[int] = None,
     merge: bool = True
@@ -147,12 +145,6 @@ def hardy_weinberg_test(
         where `N` is equal to the number of variants and the 3 columns contain
         heterozygous, homozygous reference, and homozygous alternate counts
         (in that order) across all samples for a variant.
-    call_genotype
-        Input variable name holding call_genotype.
-        Defined by :data:`sgkit.variables.call_genotype_spec`.
-    call_genotype_mask
-        Input variable name holding call_genotype_mask.
-        Defined by :data:`sgkit.variables.call_genotype_mask_spec`
     ploidy
         Genotype ploidy, defaults to ``ploidy`` dimension of provided dataset.
         If the `ploidy` dimension is not present, then this value must be set explicitly.
@@ -215,21 +207,9 @@ def hardy_weinberg_test(
         obs = list(da.asarray(ds[genotype_counts]).T)
     # Otherwise compute genotype counts from calls
     else:
-        variables.validate(
-            ds,
-            {
-                call_genotype_mask: variables.call_genotype_mask_spec,
-                call_genotype: variables.call_genotype_spec,
-            },
-        )
-        ds_ct = genotype_count(
-            ds,
-            dim="samples",
-            call_genotype=call_genotype,
-            call_genotype_mask=call_genotype_mask,
-        )
+        ds = count_genotypes(ds, dim="samples")
         obs = [
-            da.asarray(ds_ct[v])
+            da.asarray(ds[v])
             for v in ["variant_n_het", "variant_n_hom_ref", "variant_n_hom_alt"]
         ]
     p = da.map_blocks(hardy_weinberg_p_value_vec_jit, *obs)
