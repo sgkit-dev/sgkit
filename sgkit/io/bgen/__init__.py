@@ -1,5 +1,5 @@
 try:
-    from .bgen_reader import bgen_to_zarr, read_bgen, rechunk_bgen  # noqa: F401
+    from .bgen_reader import bgen_to_zarr, read_bgen, rechunk_bgen
 
     __all__ = ["read_bgen", "bgen_to_zarr", "rechunk_bgen"]
 except ImportError as e:
