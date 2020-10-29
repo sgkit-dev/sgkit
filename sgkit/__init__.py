@@ -1,6 +1,6 @@
 from .display import display_genotypes
 from .io.vcfzarr_reader import read_vcfzarr
-from .model import (  # noqa: F401
+from .model import (
     DIM_ALLELE,
     DIM_PLOIDY,
     DIM_SAMPLE,
