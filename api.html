@@ -104,6 +104,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#methods">Methods</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.count_call_alleles.html">sgkit.count_call_alleles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.count_cohort_alleles.html">sgkit.count_cohort_alleles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.count_variant_alleles.html">sgkit.count_variant_alleles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.divergence.html">sgkit.divergence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.diversity.html">sgkit.diversity</a></li>
@@ -294,34 +295,37 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.count_call_alleles.html#sgkit.count_call_alleles" title="sgkit.count_call_alleles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_call_alleles</span></code></a>(ds, *[, call_genotype, merge])</p></td>
 <td><p>Compute per sample allele counts from genotype calls.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.count_variant_alleles.html#sgkit.count_variant_alleles" title="sgkit.count_variant_alleles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_variant_alleles</span></code></a>(ds, *[, …])</p></td>
-<td><p>Compute allele count from genotype calls.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.count_cohort_alleles.html#sgkit.count_cohort_alleles" title="sgkit.count_cohort_alleles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_cohort_alleles</span></code></a>(ds, *[, …])</p></td>
+<td><p>Compute per cohort allele counts from per-sample allele counts, or genotype calls.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.divergence.html#sgkit.divergence" title="sgkit.divergence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">divergence</span></code></a>(ds, *[, call_genotype, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.count_variant_alleles.html#sgkit.count_variant_alleles" title="sgkit.count_variant_alleles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_variant_alleles</span></code></a>(ds, *[, …])</p></td>
+<td><p>Compute allele count from per-sample allele counts, or genotype calls.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.divergence.html#sgkit.divergence" title="sgkit.divergence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">divergence</span></code></a>(ds, *[, cohort_allele_count, merge])</p></td>
 <td><p>Compute divergence between pairs of cohorts.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.diversity.html#sgkit.diversity" title="sgkit.diversity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diversity</span></code></a>(ds, *[, allele_counts, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.diversity.html#sgkit.diversity" title="sgkit.diversity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diversity</span></code></a>(ds, *[, cohort_allele_count, merge])</p></td>
 <td><p>Compute diversity from cohort allele counts.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.Fst.html#sgkit.Fst" title="sgkit.Fst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Fst</span></code></a>(ds, *[, estimator, call_genotype, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.Fst.html#sgkit.Fst" title="sgkit.Fst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Fst</span></code></a>(ds, *[, estimator, stat_divergence, merge])</p></td>
 <td><p>Compute Fst between pairs of cohorts.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.gwas_linear_regression.html#sgkit.gwas_linear_regression" title="sgkit.gwas_linear_regression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gwas_linear_regression</span></code></a>(ds, *, dosage, …[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.gwas_linear_regression.html#sgkit.gwas_linear_regression" title="sgkit.gwas_linear_regression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gwas_linear_regression</span></code></a>(ds, *, dosage, …[, …])</p></td>
 <td><p>Run linear regression to identify continuous trait associations with genetic variants.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.hardy_weinberg_test.html#sgkit.hardy_weinberg_test" title="sgkit.hardy_weinberg_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hardy_weinberg_test</span></code></a>(ds, *[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.hardy_weinberg_test.html#sgkit.hardy_weinberg_test" title="sgkit.hardy_weinberg_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hardy_weinberg_test</span></code></a>(ds, *[, …])</p></td>
 <td><p>Exact test for HWE as described in Wigginton et al.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.regenie.html#sgkit.regenie" title="sgkit.regenie"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regenie</span></code></a>(ds, *, dosage, covariates, traits[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.regenie.html#sgkit.regenie" title="sgkit.regenie"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regenie</span></code></a>(ds, *, dosage, covariates, traits[, …])</p></td>
 <td><p>Regenie trait transformation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variant_stats.html#sgkit.variant_stats" title="sgkit.variant_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variant_stats</span></code></a>(ds, *[, call_genotype_mask, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variant_stats.html#sgkit.variant_stats" title="sgkit.variant_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variant_stats</span></code></a>(ds, *[, call_genotype_mask, …])</p></td>
 <td><p>Compute quality control variant statistics from genotype calls.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.Tajimas_D.html#sgkit.Tajimas_D" title="sgkit.Tajimas_D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tajimas_D</span></code></a>(ds, *[, call_genotype, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.Tajimas_D.html#sgkit.Tajimas_D" title="sgkit.Tajimas_D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tajimas_D</span></code></a>(ds, *[, variant_allele_count, …])</p></td>
 <td><p>Compute Tajimas’ D for a genotype call dataset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pc_relate.html#sgkit.pc_relate" title="sgkit.pc_relate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pc_relate</span></code></a>(ds, *[, maf, call_genotype, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.pc_relate.html#sgkit.pc_relate" title="sgkit.pc_relate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pc_relate</span></code></a>(ds, *[, maf, call_genotype, …])</p></td>
 <td><p>Compute PC-Relate as described in Conomos, et al.</p></td>
 </tr>
 </tbody>

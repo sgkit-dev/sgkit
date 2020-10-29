@@ -38,7 +38,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sgkit.divergence" href="sgkit.divergence.html" />
-    <link rel="prev" title="sgkit.count_call_alleles" href="sgkit.count_call_alleles.html" /> 
+    <link rel="prev" title="sgkit.count_cohort_alleles" href="sgkit.count_cohort_alleles.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,6 +90,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api.html#io-imports">IO/imports</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#methods">Methods</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="sgkit.count_call_alleles.html">sgkit.count_call_alleles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.count_cohort_alleles.html">sgkit.count_cohort_alleles</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.count_variant_alleles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.divergence.html">sgkit.divergence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.diversity.html">sgkit.diversity</a></li>
@@ -180,15 +181,17 @@
 <h1>sgkit.count_variant_alleles<a class="headerlink" href="#sgkit-count-variant-alleles" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="sgkit.count_variant_alleles">
-<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">count_variant_alleles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">call_genotype</span><span class="o">=</span><span class="default_value">'call_genotype'</span></em>, <em class="sig-param"><span class="n">merge</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.count_variant_alleles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute allele count from genotype calls.</p>
+<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">count_variant_alleles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">call_allele_count</span><span class="o">=</span><span class="default_value">'call_allele_count'</span></em>, <em class="sig-param"><span class="n">merge</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.count_variant_alleles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute allele count from per-sample allele counts, or genotype calls.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Dataset containing genotype calls.</p>
 </dd>
-<dt><strong>call_genotype</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype'</span></code>)</dt><dd><p>Input variable name holding call_genotype as defined by
-<a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a></p>
+<dt><strong>call_allele_count</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_allele_count'</span></code>)</dt><dd><p>Input variable name holding call_allele_count as defined by
+<a class="reference internal" href="sgkit.variables.call_allele_count_spec.html#sgkit.variables.call_allele_count_spec" title="sgkit.variables.call_allele_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_allele_count_spec</span></code></a>.
+If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
+using <a class="reference internal" href="sgkit.count_call_alleles.html#sgkit.count_call_alleles" title="sgkit.count_call_alleles"><code class="xref py py-func docutils literal notranslate"><span class="pre">count_call_alleles()</span></code></a>.</p>
 </dd>
 <dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
@@ -201,8 +204,8 @@ See <a class="reference internal" href="../getting_started.html#dataset-merge"><
 <dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Array <cite>variant_allele_count</cite> of allele counts with
-shape (variants, alleles) and values corresponding to
+<dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.variant_allele_count_spec.html#sgkit.variables.variant_allele_count_spec" title="sgkit.variables.variant_allele_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_allele_count_spec</span></code></a>
+of allele counts with shape (variants, alleles) and values corresponding to
 the number of non-missing occurrences of each allele.</p>
 </dd>
 </dl>
@@ -241,7 +244,7 @@ the number of non-missing occurrences of each allele.</p>
         <a href="sgkit.divergence.html" class="btn btn-neutral float-right" title="sgkit.divergence" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="sgkit.count_call_alleles.html" class="btn btn-neutral float-left" title="sgkit.count_call_alleles" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="sgkit.count_cohort_alleles.html" class="btn btn-neutral float-left" title="sgkit.count_cohort_alleles" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

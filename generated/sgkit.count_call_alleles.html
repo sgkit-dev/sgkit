@@ -37,7 +37,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.count_variant_alleles" href="sgkit.count_variant_alleles.html" />
+    <link rel="next" title="sgkit.count_cohort_alleles" href="sgkit.count_cohort_alleles.html" />
     <link rel="prev" title="sgkit.read_vcfzarr" href="sgkit.read_vcfzarr.html" /> 
 </head>
 
@@ -90,6 +90,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api.html#io-imports">IO/imports</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#methods">Methods</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.count_call_alleles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.count_cohort_alleles.html">sgkit.count_cohort_alleles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.count_variant_alleles.html">sgkit.count_variant_alleles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.divergence.html">sgkit.divergence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.diversity.html">sgkit.diversity</a></li>
@@ -188,7 +189,8 @@
 <dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Dataset containing genotype calls.</p>
 </dd>
 <dt><strong>call_genotype</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype'</span></code>)</dt><dd><p>Input variable name holding call_genotype as defined by
-<a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a></p>
+<a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a>.
+Must be present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>.</p>
 </dd>
 <dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
@@ -201,8 +203,8 @@ See <a class="reference internal" href="../getting_started.html#dataset-merge"><
 <dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Array <cite>call_allele_count</cite> of allele counts with
-shape (variants, samples, alleles) and values corresponding to
+<dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.call_allele_count_spec.html#sgkit.variables.call_allele_count_spec" title="sgkit.variables.call_allele_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_allele_count_spec</span></code></a>
+of allele counts with shape (variants, samples, alleles) and values corresponding to
 the number of non-missing occurrences of each allele.</p>
 </dd>
 </dl>
@@ -245,7 +247,7 @@ the number of non-missing occurrences of each allele.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="sgkit.count_variant_alleles.html" class="btn btn-neutral float-right" title="sgkit.count_variant_alleles" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="sgkit.count_cohort_alleles.html" class="btn btn-neutral float-right" title="sgkit.count_cohort_alleles" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="sgkit.read_vcfzarr.html" class="btn btn-neutral float-left" title="sgkit.read_vcfzarr" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
