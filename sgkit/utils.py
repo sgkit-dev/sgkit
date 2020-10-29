@@ -110,7 +110,8 @@ class MergeWarning(UserWarning):
 
 
 def merge_datasets(input: Dataset, output: Dataset) -> Dataset:
-    """Merge the input and output datasets into a new dataset, giving precedence to variables in the output.
+    """Merge the input and output datasets into a new dataset, giving precedence to variables
+    and attributes in the output.
 
     Parameters
     ----------
@@ -123,8 +124,9 @@ def merge_datasets(input: Dataset, output: Dataset) -> Dataset:
     Returns
     -------
     Dataset
-        The merged dataset. If `input` and `output` have variables with the same name, a `MergeWarning`
-        is issued, and the variables from the `output` dataset are used.
+        The merged dataset. If `input` and `output` have variables (or attributes) with the same name,
+        a `MergeWarning` is issued, and the corresponding variables (or attributes) from the `output`
+        dataset are used.
     """
     input_vars = {str(v) for v in input.data_vars.keys()}
     output_vars = {str(v) for v in output.data_vars.keys()}
@@ -134,7 +136,18 @@ def merge_datasets(input: Dataset, output: Dataset) -> Dataset:
             f"The following variables in the input dataset will be replaced in the output: {', '.join(clobber_vars)}",
             MergeWarning,
         )
-    return output.merge(input, compat="override")
+    ds = output.merge(input, compat="override")
+    # input attrs are ignored during merge, so combine them with output, and assign to the new dataset
+    input_attr_keys = {str(v) for v in input.attrs.keys()}
+    output_attr_keys = {str(v) for v in output.attrs.keys()}
+    clobber_attr_keys = sorted(list(input_attr_keys & output_attr_keys))
+    if len(clobber_attr_keys) > 0:
+        warnings.warn(
+            f"The following global attributes in the input dataset will be replaced in the output: {', '.join(clobber_attr_keys)}",
+            MergeWarning,
+        )
+    combined_attrs = {**input.attrs, **output.attrs}
+    return ds.assign_attrs(combined_attrs)  # type: ignore[no-any-return, no-untyped-call]
 
 
 def conditional_merge_datasets(input: Dataset, output: Dataset, merge: bool) -> Dataset:
