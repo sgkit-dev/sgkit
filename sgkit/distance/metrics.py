@@ -13,6 +13,7 @@ from sgkit.typing import ArrayLike
         "void(int8[:], int8[:], float64[:])",
     ],
     "(n),(n)->()",
+    cache=True,
 )
 def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
     """Calculates the correlation between two vectors.
@@ -80,6 +81,7 @@ def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
         "void(int8[:], int8[:], float64[:])",
     ],
     "(n),(n)->()",
+    cache=True,
 )
 def euclidean(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
     """Calculates the euclidean distance between two vectors.

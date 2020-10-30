@@ -121,9 +121,7 @@ def diversity(
 
 # c = cohorts, k = alleles
 @guvectorize(  # type: ignore
-    ["void(int64[:, :], float64[:,:])"],
-    "(c, k)->(c,c)",
-    nopython=True,
+    ["void(int64[:, :], float64[:,:])"], "(c, k)->(c,c)", nopython=True, cache=True
 )
 def _divergence(ac: ArrayLike, out: ArrayLike) -> None:
     """Generalized U-function for computing divergence.
@@ -295,6 +293,7 @@ def divergence(
     ],
     "(c,c)->(c,c)",
     nopython=True,
+    cache=True,
 )
 def _Fst_Hudson(d: ArrayLike, out: ArrayLike) -> None:
     """Generalized U-function for computing Fst using Hudson's estimator.
@@ -326,6 +325,7 @@ def _Fst_Hudson(d: ArrayLike, out: ArrayLike) -> None:
     ],
     "(c,c)->(c,c)",
     nopython=True,
+    cache=True,
 )
 def _Fst_Nei(d: ArrayLike, out: ArrayLike) -> None:
     """Generalized U-function for computing Fst using Nei's estimator.
