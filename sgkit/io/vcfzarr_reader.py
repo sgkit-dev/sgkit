@@ -1,6 +1,6 @@
 import tempfile
 from pathlib import Path
-from typing import List, Optional
+from typing import Hashable, List, Optional
 
 import dask.array as da
 import xarray as xr
@@ -11,6 +11,7 @@ from sgkit.io.utils import concatenate_and_rechunk
 from ..model import DIM_VARIANT, create_genotype_call_dataset
 from ..typing import ArrayLike, PathType
 from ..utils import encode_array, max_str_len
+from .vcf.vcf_reader import zarrs_to_dataset
 
 
 def _ensure_2d(arr: ArrayLike) -> ArrayLike:
@@ -60,6 +61,7 @@ def vcfzarr_to_zarr(
     grouped_by_contig: bool = False,
     consolidated: bool = False,
     tempdir: Optional[PathType] = None,
+    concat_algorithm: Optional[str] = None,
 ) -> None:
     """Convert VCF Zarr files created using scikit-allel to a single Zarr on-disk store in sgkit Xarray format.
 
@@ -78,6 +80,10 @@ def vcfzarr_to_zarr(
     tempdir
         Temporary directory where intermediate files are stored. The default None means
         use the system default temporary directory.
+    concat_algorithm
+        The algorithm to use to concatenate and rechunk Zarr files. The default None means
+        use the optimized version suitable for large files, whereas ``xarray_internal`` will
+        use built-in Xarray APIs, which can exhibit high memory usage, see https://github.com/dask/dask/issues/6745.
     """
 
     if consolidated:
@@ -118,50 +124,16 @@ def vcfzarr_to_zarr(
                 contig_zarr_file = Path(tmpdir) / contig
                 ds.to_zarr(contig_zarr_file)
 
-                zarr_files.append(contig_zarr_file)
+                zarr_files.append(str(contig_zarr_file))
 
-            zarr_groups = [zarr.open_group(str(f)) for f in zarr_files]
-
-            first_zarr_group = zarr_groups[0]
-
-            with zarr.open_group(str(output)) as output_zarr:
-
-                var_to_attrs = {}  # attributes to copy
-                delayed = []  # do all the rechunking operations in one computation
-                for var in vars_to_rechunk:
-                    var_to_attrs[var] = first_zarr_group[var].attrs.asdict()
-                    dtype = None
-                    if var == "variant_id":
-                        kind = first_zarr_group[var].dtype.kind
-                        max_len = _get_max_len(zarr_groups, "max_variant_id_length")
-                        dtype = f"{kind}{max_len}"
-                    elif var == "variant_allele":
-                        kind = first_zarr_group[var].dtype.kind
-                        max_len = _get_max_len(zarr_groups, "max_variant_allele_length")
-                        dtype = f"{kind}{max_len}"
-
-                    arr = concatenate_and_rechunk(
-                        [group[var] for group in zarr_groups], dtype=dtype
-                    )
-                    d = arr.to_zarr(
-                        str(output),
-                        component=var,
-                        overwrite=True,
-                        compute=False,
-                        fill_value=None,
-                    )
-                    delayed.append(d)
-                da.compute(*delayed)
-
-                # copy variables that are not rechunked (e.g. sample_id)
-                for var in vars_to_copy:
-                    output_zarr[var] = first_zarr_group[var]
-                    output_zarr[var].attrs.update(first_zarr_group[var].attrs)
-
-                # copy attributes
-                output_zarr.attrs.update(first_zarr_group.attrs)
-                for (var, attrs) in var_to_attrs.items():
-                    output_zarr[var].attrs.update(attrs)
+            if concat_algorithm == "xarray_internal":
+                ds = zarrs_to_dataset(zarr_files)
+                ds.to_zarr(output, mode="w")
+            else:
+                # Use the optimized algorithm in `concatenate_and_rechunk`
+                _concat_zarrs_optimized(
+                    zarr_files, output, vars_to_rechunk, vars_to_copy
+                )
 
 
 def _vcfzarr_to_dataset(
@@ -222,7 +194,7 @@ def _vcfzarr_to_dataset(
             kind = arr.dtype.kind
             if kind in ["O", "U", "S"]:
                 # Compute fixed-length string dtype for array
-                if kind == "O":
+                if kind == "O" or var in ("variant_id", "variant_allele"):
                     kind = "S"
                 max_len = max_str_len(arr).values
                 dt = f"{kind}{max_len}"
@@ -239,3 +211,51 @@ def _vcfzarr_to_dataset(
 def _get_max_len(zarr_groups: List[zarr.Group], attr_name: str) -> int:
     max_len: int = max([group.attrs[attr_name] for group in zarr_groups])
     return max_len
+
+
+def _concat_zarrs_optimized(
+    zarr_files: List[str],
+    output: PathType,
+    vars_to_rechunk: List[Hashable],
+    vars_to_copy: List[Hashable],
+) -> None:
+    zarr_groups = [zarr.open_group(f) for f in zarr_files]
+
+    first_zarr_group = zarr_groups[0]
+
+    with zarr.open_group(str(output)) as output_zarr:
+
+        var_to_attrs = {}  # attributes to copy
+        delayed = []  # do all the rechunking operations in one computation
+        for var in vars_to_rechunk:
+            var_to_attrs[var] = first_zarr_group[var].attrs.asdict()
+            dtype = None
+            if var == "variant_id":
+                max_len = _get_max_len(zarr_groups, "max_variant_id_length")
+                dtype = f"S{max_len}"
+            elif var == "variant_allele":
+                max_len = _get_max_len(zarr_groups, "max_variant_allele_length")
+                dtype = f"S{max_len}"
+
+            arr = concatenate_and_rechunk(
+                [group[var] for group in zarr_groups], dtype=dtype
+            )
+            d = arr.to_zarr(
+                str(output),
+                component=var,
+                overwrite=True,
+                compute=False,
+                fill_value=None,
+            )
+            delayed.append(d)
+        da.compute(*delayed)
+
+        # copy variables that are not rechunked (e.g. sample_id)
+        for var in vars_to_copy:
+            output_zarr[var] = first_zarr_group[var]
+            output_zarr[var].attrs.update(first_zarr_group[var].attrs)
+
+        # copy attributes
+        output_zarr.attrs.update(first_zarr_group.attrs)
+        for (var, attrs) in var_to_attrs.items():
+            output_zarr[var].attrs.update(attrs)

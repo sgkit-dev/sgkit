@@ -76,7 +76,13 @@ def test_read_vcfzarr(shared_datadir):
     "vcfzarr_filename, grouped_by_contig",
     [("sample.vcf.zarr.zip", False), ("sample-grouped.vcf.zarr.zip", True)],
 )
-def test_vcfzarr_to_zarr(shared_datadir, tmp_path, vcfzarr_filename, grouped_by_contig):
+@pytest.mark.parametrize(
+    "concat_algorithm",
+    [None, "xarray_internal"],
+)
+def test_vcfzarr_to_zarr(
+    shared_datadir, tmp_path, vcfzarr_filename, grouped_by_contig, concat_algorithm
+):
     # The file sample-grouped.vcf.zarr.zip was created by running the following
     # in a python session with the scikit-allel package installed.
     #
@@ -89,7 +95,12 @@ def test_vcfzarr_to_zarr(shared_datadir, tmp_path, vcfzarr_filename, grouped_by_
 
     path = shared_datadir / vcfzarr_filename
     output = tmp_path.joinpath("vcf.zarr").as_posix()
-    vcfzarr_to_zarr(path, output, grouped_by_contig=grouped_by_contig)
+    vcfzarr_to_zarr(
+        path,
+        output,
+        grouped_by_contig=grouped_by_contig,
+        concat_algorithm=concat_algorithm,
+    )
 
     ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
 
@@ -119,15 +130,15 @@ def test_vcfzarr_to_zarr(shared_datadir, tmp_path, vcfzarr_filename, grouped_by_
     assert_array_equal(
         ds["variant_id"],
         [
-            ".",
-            ".",
-            "rs6054257",
-            ".",
-            "rs6040355",
-            ".",
-            "microsat1",
-            ".",
-            "rsTest",
+            b".",
+            b".",
+            b"rs6054257",
+            b".",
+            b"rs6040355",
+            b".",
+            b"microsat1",
+            b".",
+            b"rsTest",
         ],
     )
     assert_array_equal(
