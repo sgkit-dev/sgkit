@@ -304,7 +304,7 @@ def zarrs_to_dataset(
 
     storage_options = storage_options or {}
 
-    datasets = [xr.open_zarr(fsspec.get_mapper(path, **storage_options)) for path in urls]  # type: ignore[no-untyped-call]
+    datasets = [xr.open_zarr(fsspec.get_mapper(path, **storage_options), concat_characters=False) for path in urls]  # type: ignore[no-untyped-call]
 
     # Combine the datasets into one
     ds = xr.concat(datasets, dim="variants", data_vars="minimal")
