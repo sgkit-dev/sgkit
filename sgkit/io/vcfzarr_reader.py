@@ -192,7 +192,7 @@ def _vcfzarr_to_dataset(
         [_ensure_2d(variants_ref), _ensure_2d(variants_alt)], axis=1
     )
     # rechunk so there's a single chunk in alleles axis
-    variant_alleles = variant_alleles.rechunk((None, variant_alleles.shape[1]))
+    variant_allele = variant_allele.rechunk((None, variant_allele.shape[1]))
 
     if "variants/ID" in vcfzarr:
         variants_id = da.from_zarr(vcfzarr["variants/ID"]).astype(str)
@@ -203,7 +203,7 @@ def _vcfzarr_to_dataset(
         variant_contig_names=variant_contig_names,
         variant_contig=variant_contig,
         variant_position=variant_position,
-        variant_alleles=variant_alleles,
+        variant_allele=variant_allele,
         sample_id=da.from_zarr(vcfzarr["samples"]).astype(str),
         call_genotype=da.from_zarr(vcfzarr["calldata/GT"]),
         variant_id=variants_id,
