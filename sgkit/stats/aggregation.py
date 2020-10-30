@@ -24,6 +24,7 @@ Dimension = Literal["samples", "variants"]
     ],
     "(k),(n)->(n)",
     nopython=True,
+    cache=True,
 )
 def count_alleles(g: ArrayLike, _: ArrayLike, out: ArrayLike) -> None:
     """Generalized U-function for computing per sample allele counts.
@@ -61,6 +62,7 @@ def count_alleles(g: ArrayLike, _: ArrayLike, out: ArrayLike) -> None:
     ],
     "(n, k),(n),(c)->(c,k)",
     nopython=True,
+    cache=True,
 )
 def _count_cohort_alleles(
     ac: ArrayLike, cohorts: ArrayLike, _: ArrayLike, out: ArrayLike
