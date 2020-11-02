@@ -120,6 +120,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.display_genotypes.html">sgkit.display_genotypes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html">sgkit.simulate_genotype_call_dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.window.html">sgkit.window</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#variables">Variables</a><ul>
@@ -158,6 +159,8 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.variant_p_value_spec.html">sgkit.variables.variant_p_value_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.variant_position_spec.html">sgkit.variables.variant_position_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.variant_t_value_spec.html">sgkit.variables.variant_t_value_spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.window_start_spec.html">sgkit.variables.window_start_spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.window_stop_spec.html">sgkit.variables.window_stop_spec</a></li>
 </ul>
 </li>
 </ul>
@@ -345,6 +348,9 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset" title="sgkit.simulate_genotype_call_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_genotype_call_dataset</span></code></a>(n_variant, …)</p></td>
 <td><p>Simulate genotype calls and variant/sample data.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.window.html#sgkit.window" title="sgkit.window"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window</span></code></a>(ds, size, step[, merge])</p></td>
+<td><p>Add fixed-size windowing information to a dataset.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -460,6 +466,12 @@
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.variant_t_value_spec.html#sgkit.variables.variant_t_value_spec" title="sgkit.variables.variant_t_value_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.variant_t_value_spec</span></code></a></p></td>
 <td><p>T statistics for each beta.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.window_start_spec.html#sgkit.variables.window_start_spec" title="sgkit.variables.window_start_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.window_start_spec</span></code></a></p></td>
+<td><p>The index values of window start positions along the <code class="docutils literal notranslate"><span class="pre">variants</span></code> dimension.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.window_stop_spec.html#sgkit.variables.window_stop_spec" title="sgkit.variables.window_stop_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.window_stop_spec</span></code></a></p></td>
+<td><p>The index values of window stop positions along the <code class="docutils literal notranslate"><span class="pre">variants</span></code> dimension.</p></td>
 </tr>
 </tbody>
 </table>

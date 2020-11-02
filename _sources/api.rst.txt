@@ -63,6 +63,7 @@ Utilities
 
    display_genotypes
    simulate_genotype_call_dataset
+   window
 
 Variables
 =========
@@ -105,3 +106,5 @@ Variables
     variables.variant_p_value_spec
     variables.variant_position_spec
     variables.variant_t_value_spec
+    variables.window_start_spec
+    variables.window_stop_spec
