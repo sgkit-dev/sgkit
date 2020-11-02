@@ -6,12 +6,11 @@ import dask.array as da
 import xarray as xr
 import zarr
 
-from sgkit.io.utils import concatenate_and_rechunk
+from sgkit.io.utils import concatenate_and_rechunk, zarrs_to_dataset
 
 from ..model import DIM_VARIANT, create_genotype_call_dataset
 from ..typing import ArrayLike, PathType
 from ..utils import encode_array, max_str_len
-from .vcf.vcf_reader import zarrs_to_dataset
 
 
 def _ensure_2d(arr: ArrayLike) -> ArrayLike:
