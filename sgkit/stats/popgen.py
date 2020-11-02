@@ -7,7 +7,7 @@ from xarray import Dataset
 
 from sgkit.stats.utils import assert_array_shape
 from sgkit.typing import ArrayLike
-from sgkit.utils import conditional_merge_datasets
+from sgkit.utils import conditional_merge_datasets, define_variable_if_absent
 from sgkit.window import has_windows, window_statistic
 
 from .. import variables
@@ -17,8 +17,7 @@ from .aggregation import count_cohort_alleles, count_variant_alleles
 def diversity(
     ds: Dataset,
     *,
-    allele_counts: Hashable = variables.cohort_allele_count,
-    call_genotype: Hashable = variables.call_genotype,
+    cohort_allele_count: Hashable = variables.cohort_allele_count,
     merge: bool = True,
 ) -> Dataset:
     """Compute diversity from cohort allele counts.
@@ -36,12 +35,11 @@ def diversity(
     ----------
     ds
         Genotype call dataset.
-    allele_counts
-        cohort allele counts to use or calculate. Defined by
-        :data:`sgkit.variables.cohort_allele_count_spec`
-    call_genotype
-        Input variable name holding call_genotype as defined by
-        :data:`sgkit.variables.call_genotype_spec`
+    cohort_allele_count
+        Cohort allele count variable to use or calculate. Defined by
+        :data:`sgkit.variables.cohort_allele_count_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`count_cohort_alleles`.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -50,18 +48,19 @@ def diversity(
 
     Returns
     -------
-    diversity value, as defined by :data:`sgkit.variables.stat_diversity_spec`.
+    A dataset containing the diversity value, as defined by :data:`sgkit.variables.stat_diversity_spec`.
 
     Warnings
     --------
     This method does not currently support datasets that are chunked along the
     samples dimension.
     """
-    if allele_counts not in ds:
-        ds = count_cohort_alleles(ds, call_genotype=call_genotype)
-    else:
-        variables.validate(ds, {allele_counts: variables.cohort_allele_count_spec})
-    ac = ds[allele_counts]
+    ds = define_variable_if_absent(
+        ds, variables.cohort_allele_count, cohort_allele_count, count_cohort_alleles
+    )
+    variables.validate(ds, {cohort_allele_count: variables.cohort_allele_count_spec})
+
+    ac = ds[cohort_allele_count]
     an = ac.sum(axis=2)
     n_pairs = an * (an - 1) / 2
     n_same = (ac * (ac - 1) / 2).sum(axis=2)
@@ -147,8 +146,7 @@ def _divergence(ac: ArrayLike, out: ArrayLike) -> None:
 def divergence(
     ds: Dataset,
     *,
-    call_genotype: Hashable = variables.call_genotype,
-    allele_counts: Hashable = variables.cohort_allele_count,
+    cohort_allele_count: Hashable = variables.cohort_allele_count,
     merge: bool = True,
 ) -> Dataset:
     """Compute divergence between pairs of cohorts.
@@ -161,12 +159,11 @@ def divergence(
     ----------
     ds
         Genotype call dataset.
-    allele_counts
-        cohort allele counts to use or calculate. Defined by
-        :data:`sgkit.variables.cohort_allele_count_spec`
-    call_genotype
-        Input variable name holding call_genotype as defined by
-        :data:`sgkit.variables.call_genotype_spec`
+    cohort_allele_count
+        Cohort allele count variable to use or calculate. Defined by
+        :data:`sgkit.variables.cohort_allele_count_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`count_cohort_alleles`.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -175,7 +172,7 @@ def divergence(
 
     Returns
     -------
-    divergence value between pairs of cohorts, as defined by
+    A dataset containing the divergence value between pairs of cohorts, as defined by
     :data:`sgkit.variables.stat_divergence_spec`.
 
     Warnings
@@ -184,11 +181,11 @@ def divergence(
     samples dimension.
     """
 
-    if allele_counts not in ds:
-        ds = count_cohort_alleles(ds, call_genotype=call_genotype)
-    else:
-        variables.validate(ds, {allele_counts: variables.cohort_allele_count_spec})
-    ac = ds[allele_counts]
+    ds = define_variable_if_absent(
+        ds, variables.cohort_allele_count, cohort_allele_count, count_cohort_alleles
+    )
+    variables.validate(ds, {cohort_allele_count: variables.cohort_allele_count_spec})
+    ac = ds[cohort_allele_count]
 
     n_variants = ds.dims["variants"]
     n_cohorts = ds.dims["cohorts"]
@@ -293,8 +290,7 @@ def Fst(
     ds: Dataset,
     *,
     estimator: Optional[str] = None,
-    call_genotype: Hashable = variables.call_genotype,
-    allele_counts: Hashable = variables.cohort_allele_count,
+    stat_divergence: Hashable = variables.stat_divergence,
     merge: bool = True,
 ) -> Dataset:
     """Compute Fst between pairs of cohorts.
@@ -310,12 +306,11 @@ def Fst(
         (the same estimator as scikit-allel).
         Other supported estimators include ``Nei`` (1986), (the same estimator
         as tskit).
-    allele_counts
-        cohort allele counts to use or calculate. Defined by
-        :data:`sgkit.variables.cohort_allele_count_spec`
-    call_genotype
-        Input variable name holding call_genotype as defined by
-        :data:`sgkit.variables.call_genotype_spec`
+    stat_divergence
+        Divergence variable to use or calculate. Defined by
+        :data:`sgkit.variables.stat_divergence_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`divergence`.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -324,7 +319,7 @@ def Fst(
 
     Returns
     -------
-    Fst value between pairs of cohorts, as defined by
+    A dataset containing the Fst value between pairs of cohorts, as defined by
     :data:`sgkit.variables.stat_Fst_spec`.
 
     Warnings
@@ -338,16 +333,13 @@ def Fst(
             f"Estimator '{estimator}' is not a known estimator: {known_estimators.keys()}"
         )
     estimator = estimator or "Hudson"
-    if allele_counts not in ds:
-        ds = count_cohort_alleles(ds, call_genotype=call_genotype)
-    else:
-        variables.validate(ds, {allele_counts: variables.cohort_allele_count_spec})
+    ds = define_variable_if_absent(
+        ds, variables.stat_divergence, stat_divergence, divergence
+    )
+    variables.validate(ds, {stat_divergence: variables.stat_divergence_spec})
 
     n_cohorts = ds.dims["cohorts"]
-    gs = divergence(
-        ds, allele_counts=allele_counts, call_genotype=call_genotype, merge=False
-    ).stat_divergence
-    gs = da.asarray(gs)
+    gs = da.asarray(ds.stat_divergence)
     shape = (gs.chunks[0], n_cohorts, n_cohorts)
     fst = da.map_blocks(known_estimators[estimator], gs, chunks=shape, dtype=np.float64)
     # TODO: reinstate assert (first dim could be either variants or windows)
@@ -359,9 +351,8 @@ def Fst(
 def Tajimas_D(
     ds: Dataset,
     *,
-    call_genotype: Hashable = variables.call_genotype,
-    variant_allele_counts: Hashable = variables.variant_allele_count,
-    allele_counts: Hashable = variables.cohort_allele_count,
+    variant_allele_count: Hashable = variables.variant_allele_count,
+    stat_diversity: Hashable = variables.stat_diversity,
     merge: bool = True,
 ) -> Dataset:
     """Compute Tajimas' D for a genotype call dataset.
@@ -370,15 +361,16 @@ def Tajimas_D(
     ----------
     ds
         Genotype call dataset.
-    variant_allele_counts
-        variant allele counts to use or calculate. Defined by
-        :data:`sgkit.variables.variant_allele_counts_spec`
-    allele_counts
-        cohort allele counts to use or calculate. Defined by
-        :data:`sgkit.variables.cohort_allele_count_spec`
-    call_genotype
-        Input variable name holding call_genotype as defined by
-        :data:`sgkit.variables.call_genotype_spec`
+    variant_allele_count
+        Variant allele count variable to use or calculate. Defined by
+        :data:`sgkit.variables.variant_allele_count`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`count_variant_alleles`.
+    stat_diversity
+        Diversity variable to use or calculate. Defined by
+        :data:`sgkit.variables.stat_diversity_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`diversity`.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -387,20 +379,28 @@ def Tajimas_D(
 
     Returns
     -------
-    Tajimas' D value, as defined by :data:`sgkit.variables.stat_Tajimas_D_spec`.
+    A dataset containing the Tajimas' D value, as defined by :data:`sgkit.variables.stat_Tajimas_D_spec`.
 
     Warnings
     --------
     This method does not currently support datasets that are chunked along the
     samples dimension.
     """
-    if variant_allele_counts not in ds:
-        ds = count_variant_alleles(ds, call_genotype=call_genotype)
-    else:
-        variables.validate(
-            ds, {variant_allele_counts: variables.variant_allele_count_spec}
-        )
-    ac = ds[variant_allele_counts]
+    ds = define_variable_if_absent(
+        ds, variables.variant_allele_count, variant_allele_count, count_variant_alleles
+    )
+    ds = define_variable_if_absent(
+        ds, variables.stat_diversity, stat_diversity, diversity
+    )
+    variables.validate(
+        ds,
+        {
+            variant_allele_count: variables.variant_allele_count_spec,
+            stat_diversity: variables.stat_diversity_spec,
+        },
+    )
+
+    ac = ds[variant_allele_count]
 
     # count segregating
     S = ((ac > 0).sum(axis=1) > 1).sum()
@@ -416,10 +416,8 @@ def Tajimas_D(
     # calculate Watterson's theta (absolute value)
     theta = S / a1
 
-    # calculate diversity
-    div = diversity(
-        ds, allele_counts=allele_counts, call_genotype=call_genotype, merge=False
-    ).stat_diversity
+    # get diversity
+    div = ds[stat_diversity]
 
     # N.B., both theta estimates are usually divided by the number of
     # (accessible) bases but here we want the absolute difference

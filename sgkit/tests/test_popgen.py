@@ -10,10 +10,12 @@ from allel import hudson_fst
 from sgkit import (
     Fst,
     Tajimas_D,
+    count_cohort_alleles,
     count_variant_alleles,
     create_genotype_call_dataset,
     divergence,
     diversity,
+    variables,
 )
 from sgkit.window import window
 
@@ -50,14 +52,26 @@ def ts_to_dataset(ts, chunks=None, samples=None):
 
 @pytest.mark.parametrize("sample_size", [2, 3, 10, 100])
 @pytest.mark.parametrize("chunks", [(-1, -1), (10, -1)])
-def test_diversity(sample_size, chunks):
+@pytest.mark.parametrize(
+    "cohort_allele_count",
+    [None, variables.cohort_allele_count, "cohort_allele_count_non_default"],
+)
+def test_diversity(sample_size, chunks, cohort_allele_count):
     ts = msprime.simulate(sample_size, length=100, mutation_rate=0.05, random_seed=42)
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     ds = ds.chunk(dict(zip(["variants", "samples"], chunks)))
     sample_cohorts = np.full_like(ts.samples(), 0)
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
-    ds = ds.assign_coords({"cohorts": ["co_0"]})
-    ds = diversity(ds)
+    if cohort_allele_count is not None:
+        ds = count_cohort_alleles(ds, merge=False).rename(
+            {variables.cohort_allele_count: cohort_allele_count}
+        )
+        ds = ds.assign_coords({"cohorts": ["co_0"]})
+        ds = diversity(ds, cohort_allele_count=cohort_allele_count)
+    else:
+        ds = ds.assign_coords({"cohorts": ["co_0"]})
+        ds = diversity(ds)
+
     div = ds.stat_diversity.sum(axis=0, skipna=False).sel(cohorts="co_0").values
     ts_div = ts.diversity(span_normalise=False)
     np.testing.assert_allclose(div, ts_div)
@@ -90,6 +104,12 @@ def test_diversity__windowed(sample_size):
     np.testing.assert_allclose(
         div[:-1], ska_div
     )  # scikit-allel has final window missing
+
+
+def test_diversity__missing_call_genotype():
+    ds = xr.Dataset()
+    with pytest.raises(ValueError, match="call_genotype not present"):
+        diversity(ds)
 
 
 @pytest.mark.parametrize(

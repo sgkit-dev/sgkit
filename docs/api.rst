@@ -43,6 +43,7 @@ Methods
    :toctree: generated/
 
    count_call_alleles
+   count_cohort_alleles
    count_variant_alleles
    divergence
    diversity

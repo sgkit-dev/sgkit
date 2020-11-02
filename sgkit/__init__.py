@@ -8,7 +8,12 @@ from .model import (
     create_genotype_call_dataset,
     create_genotype_dosage_dataset,
 )
-from .stats.aggregation import count_call_alleles, count_variant_alleles, variant_stats
+from .stats.aggregation import (
+    count_call_alleles,
+    count_cohort_alleles,
+    count_variant_alleles,
+    variant_stats,
+)
 from .stats.association import gwas_linear_regression
 from .stats.hwe import hardy_weinberg_test
 from .stats.pc_relate import pc_relate
@@ -26,6 +31,7 @@ __all__ = [
     "create_genotype_call_dataset",
     "count_variant_alleles",
     "count_call_alleles",
+    "count_cohort_alleles",
     "create_genotype_dosage_dataset",
     "display_genotypes",
     "filter_partial_calls",
