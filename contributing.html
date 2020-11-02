@@ -115,6 +115,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#delayed-invariant-checks">Delayed invariant checks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mixed-ploidy">Mixed ploidy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#numba-guvectorize-usage">Numba guvectorize usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api-namespace">API namespace</a></li>
 </ul>
 </li>
 </ul>
@@ -218,6 +219,7 @@
 <li><p><a class="reference internal" href="#delayed-invariant-checks" id="id20">Delayed invariant checks</a></p></li>
 <li><p><a class="reference internal" href="#mixed-ploidy" id="id21">Mixed ploidy</a></p></li>
 <li><p><a class="reference internal" href="#numba-guvectorize-usage" id="id22">Numba guvectorize usage</a></p></li>
+<li><p><a class="reference internal" href="#api-namespace" id="id23">API namespace</a></p></li>
 </ul>
 </li>
 </ul>
@@ -475,6 +477,12 @@ useful if they were possible (they are not possible currently w/ Dask):</p>
 <li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/pull/114">https://github.com/pystatgen/sgkit/pull/114</a></p></li>
 <li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/pull/348">https://github.com/pystatgen/sgkit/pull/348</a></p></li>
 </ul>
+</div>
+<div class="section" id="api-namespace">
+<h3><a class="toc-backref" href="#id23">API namespace</a><a class="headerlink" href="#api-namespace" title="Permalink to this headline">¶</a></h3>
+<p>Sgkit controls API namespace via init files. To accommodate for mypy and docstrings
+we include both imports and <code class="docutils literal notranslate"><span class="pre">__all__</span></code> declaration. More on this decision in the issue:
+<a class="reference external" href="https://github.com/pystatgen/sgkit/issues/251">https://github.com/pystatgen/sgkit/issues/251</a></p>
 </div>
 </div>
 </div>
