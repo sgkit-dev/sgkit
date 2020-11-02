@@ -13,6 +13,7 @@ from sgkit.typing import ArrayLike
         "void(int8[:], int8[:], float64[:])",
     ],
     "(n),(n)->()",
+    nopython=True,
     cache=True,
 )
 def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
@@ -81,6 +82,7 @@ def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
         "void(int8[:], int8[:], float64[:])",
     ],
     "(n),(n)->()",
+    nopython=True,
     cache=True,
 )
 def euclidean(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
