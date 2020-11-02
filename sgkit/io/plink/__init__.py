@@ -1,5 +1,5 @@
 try:
-    from .plink_reader import read_plink  # noqa: F401
+    from .plink_reader import read_plink
 
     __all__ = ["read_plink"]
 except ImportError as e:

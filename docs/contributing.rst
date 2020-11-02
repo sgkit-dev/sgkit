@@ -323,3 +323,10 @@ Learning how to use ``guvectorize`` effectively:
 
 - https://github.com/pystatgen/sgkit/pull/114
 - https://github.com/pystatgen/sgkit/pull/348
+
+API namespace
+~~~~~~~~~~~~~
+
+Sgkit controls API namespace via init files. To accommodate for mypy and docstrings
+we include both imports and ``__all__`` declaration. More on this decision in the issue:
+https://github.com/pystatgen/sgkit/issues/251
