@@ -5,6 +5,7 @@ from typing import Hashable, List, Optional
 import dask.array as da
 import xarray as xr
 import zarr
+from typing_extensions import Literal
 
 from sgkit.io.utils import concatenate_and_rechunk, zarrs_to_dataset
 
@@ -60,7 +61,7 @@ def vcfzarr_to_zarr(
     grouped_by_contig: bool = False,
     consolidated: bool = False,
     tempdir: Optional[PathType] = None,
-    concat_algorithm: Optional[str] = None,
+    concat_algorithm: Optional[Literal["xarray_internal"]] = None,
 ) -> None:
     """Convert VCF Zarr files created using scikit-allel to a single Zarr on-disk store in sgkit Xarray format.
 
@@ -199,10 +200,8 @@ def _vcfzarr_to_dataset(
                 dt = f"{kind}{max_len}"
                 ds[var] = arr.astype(dt)  # type: ignore[no-untyped-call]
 
-                if var == "variant_id":
-                    ds.attrs["max_variant_id_length"] = max_len
-                if var == "variant_allele":
-                    ds.attrs["max_variant_allele_length"] = max_len
+                if var in {"variant_id", "variant_allele"}:
+                    ds.attrs[f"max_{var}_length"] = max_len
 
     return ds
 
