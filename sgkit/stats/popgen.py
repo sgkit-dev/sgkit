@@ -665,7 +665,7 @@ def pbs(
     variables.validate(ds, {stat_Fst: variables.stat_Fst_spec})
 
     fst = ds[variables.stat_Fst]
-    fst = fst.clip(min=0, max=0.99999)
+    fst = fst.clip(min=0, max=(1 - np.finfo(float).epsneg))
 
     t = -np.log(1 - fst)
     n_cohorts = ds.dims["cohorts"]
