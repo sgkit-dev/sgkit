@@ -489,6 +489,8 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">    call_allele_count     (variants, samples, alleles) uint8 dask.array&lt;chunksize=(100, 50, 2), meta=np.ndarray&gt;</span>
 <span class="go">    variant_allele        (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; b&#39;C&#39; ... b&#39;T&#39; b&#39;A&#39;</span>
 <span class="go">    call_genotype         (variants, samples, ploidy) int8 0 0 1 0 1 ... 0 1 0 0</span>
+<span class="go">Attributes:</span>
+<span class="go">    contigs:  [0]</span>
 
 <span class="go"># If an existing variable would be re-defined, a warning is thrown</span>
 <span class="gp">In [32]: </span><span class="kn">import</span> <span class="nn">warnings</span>
@@ -521,6 +523,8 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">    call_allele_count     (variants, samples, alleles) uint8 dask.array&lt;chunksize=(100, 50, 2), meta=np.ndarray&gt;</span>
 <span class="go">    variant_allele        (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; b&#39;C&#39; ... b&#39;T&#39; b&#39;A&#39;</span>
 <span class="go">    call_genotype         (variants, samples, ploidy) int8 0 0 1 0 1 ... 0 1 0 0</span>
+<span class="go">Attributes:</span>
+<span class="go">    contigs:  [0]</span>
 </pre></div>
 </div>
 </div>
@@ -646,6 +650,8 @@ Xarray and Pandas operations in a single pipeline:</p>
 <span class="go">    variant_contig            (variants) int64 0 0 0 0 0 0 0 0 ... 0 0 0 0 0 0 0</span>
 <span class="go">    variant_position          (variants) int64 0 1 2 3 4 5 ... 94 95 96 97 98 99</span>
 <span class="go">    variant_allele            (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; ... b&#39;T&#39; b&#39;A&#39;</span>
+<span class="go">Attributes:</span>
+<span class="go">    contigs:  [0]</span>
 
 <span class="go"># Show statistics for one of the arrays to be used as a filter</span>
 <span class="gp">In [55]: </span><span class="n">ds_qc</span><span class="o">.</span><span class="n">variant_call_rate</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
