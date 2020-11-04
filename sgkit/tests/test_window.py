@@ -72,12 +72,42 @@ def test_window():
         window(ds, 2, 2)
 
 
-def test_window__multiple_contigs():
-    ds = simulate_genotype_call_dataset(n_variant=15, n_sample=1, n_contig=3)
+@pytest.mark.parametrize(
+    "n_variant, n_contig, window_contigs_exp, window_starts_exp, window_stops_exp",
+    [
+        (
+            15,
+            3,
+            [0, 0, 0, 1, 1, 1, 2, 2, 2],
+            [0, 2, 4, 5, 7, 9, 10, 12, 14],
+            [2, 4, 5, 7, 9, 10, 12, 14, 15],
+        ),
+        (
+            15,
+            15,
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        ),
+        (
+            1,
+            1,
+            [0],
+            [0],
+            [1],
+        ),
+    ],
+)
+def test_window__multiple_contigs(
+    n_variant, n_contig, window_contigs_exp, window_starts_exp, window_stops_exp
+):
+    ds = simulate_genotype_call_dataset(
+        n_variant=n_variant, n_sample=1, n_contig=n_contig
+    )
     ds = window(ds, 2, 2)
-    np.testing.assert_equal(ds[window_contig].values, [0, 0, 0, 1, 1, 1, 2, 2, 2])
-    np.testing.assert_equal(ds[window_start].values, [0, 2, 4, 5, 7, 9, 10, 12, 14])
-    np.testing.assert_equal(ds[window_stop].values, [2, 4, 5, 7, 9, 10, 12, 14, 15])
+    np.testing.assert_equal(ds[window_contig].values, window_contigs_exp)
+    np.testing.assert_equal(ds[window_start].values, window_starts_exp)
+    np.testing.assert_equal(ds[window_stop].values, window_stops_exp)
 
 
 @pytest.mark.parametrize(
