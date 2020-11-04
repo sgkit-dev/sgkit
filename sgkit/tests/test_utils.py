@@ -78,17 +78,32 @@ def test_encode_array(
 
 
 def test_merge_datasets():
-    ds = xr.Dataset(dict(x=xr.DataArray(da.zeros(100))))
+    ds = xr.Dataset(dict(x=xr.DataArray(da.zeros(100))), attrs=dict(a="a1"))
 
-    new_ds1 = xr.Dataset(dict(y=xr.DataArray(da.zeros(100))))
-    new_ds2 = xr.Dataset(dict(y=xr.DataArray(da.ones(100))))
+    new_ds1 = xr.Dataset(dict(y=xr.DataArray(da.zeros(100))), attrs=dict(b="b1"))
 
     ds = merge_datasets(ds, new_ds1)
+    assert "x" in ds
     assert "y" in ds
+    assert ds.attrs["a"] == "a1"
+    assert ds.attrs["b"] == "b1"
 
+    new_ds2 = xr.Dataset(dict(y=xr.DataArray(da.ones(100))))
     with pytest.warns(MergeWarning):
         ds = merge_datasets(ds, new_ds2)
+        assert "x" in ds
         np.testing.assert_equal(ds["y"].values, np.ones(100))
+        assert ds.attrs["a"] == "a1"
+        assert ds.attrs["b"] == "b1"
+
+    new_ds3 = xr.Dataset(dict(z=xr.DataArray(da.zeros(100))), attrs=dict(b="b2"))
+    with pytest.warns(MergeWarning):
+        ds = merge_datasets(ds, new_ds3)
+        assert "x" in ds
+        assert "y" in ds
+        assert "z" in ds
+        assert ds.attrs["a"] == "a1"
+        assert ds.attrs["b"] == "b2"
 
 
 def test_define_variable_if_absent():

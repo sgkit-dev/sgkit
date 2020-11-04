@@ -9,6 +9,7 @@ import numpy as np
 import xarray as xr
 from cyvcf2 import VCF, Variant
 
+from sgkit.io.utils import zarrs_to_dataset
 from sgkit.io.vcf.utils import build_url, chunks, temporary_directory, url_filename
 from sgkit.model import DIM_VARIANT, create_genotype_call_dataset
 from sgkit.typing import PathType
@@ -273,63 +274,6 @@ def vcf_to_zarrs(
             tasks.append(task)
     dask.compute(*tasks)
     return parts
-
-
-def zarrs_to_dataset(
-    urls: Sequence[str],
-    chunk_length: int = 10_000,
-    chunk_width: int = 1_000,
-    storage_options: Optional[Dict[str, str]] = None,
-) -> xr.Dataset:
-    """Combine multiple Zarr stores into a single Xarray dataset.
-
-    The Zarr stores are concatenated and rechunked to produce a single combined dataset.
-
-    Parameters
-    ----------
-    urls
-        A list of URLs to the Zarr stores to combine, typically the return value of
-        :func:`vcf_to_zarrs`.
-    chunk_length
-        Length (number of variants) of chunks in which data are stored, by default 10,000.
-    chunk_width
-        Width (number of samples) to use when storing chunks in output, by default 1,000.
-    storage_options
-        Any additional parameters for the storage backend (see ``fsspec.open``).
-
-    Returns
-    -------
-    A dataset representing the combined dataset.
-    """
-
-    storage_options = storage_options or {}
-
-    datasets = [xr.open_zarr(fsspec.get_mapper(path, **storage_options)) for path in urls]  # type: ignore[no-untyped-call]
-
-    # Combine the datasets into one
-    ds = xr.concat(datasets, dim="variants", data_vars="minimal")
-
-    # This is a workaround to make rechunking work when the temp_chunk_length is different to chunk_length
-    # See https://github.com/pydata/xarray/issues/4380
-    for data_var in ds.data_vars:
-        if "variants" in ds[data_var].dims:
-            del ds[data_var].encoding["chunks"]
-
-    # Rechunk to uniform chunk size
-    ds: xr.Dataset = ds.chunk({"variants": chunk_length, "samples": chunk_width})
-
-    # Set variable length strings to fixed length ones to avoid xarray/conventions.py:188 warning
-    # (Also avoids this issue: https://github.com/pydata/xarray/issues/3476)
-    max_variant_id_length = max(ds.attrs["max_variant_id_length"] for ds in datasets)
-    max_variant_allele_length = max(
-        ds.attrs["max_variant_allele_length"] for ds in datasets
-    )
-    ds["variant_id"] = ds["variant_id"].astype(f"S{max_variant_id_length}")  # type: ignore[no-untyped-call]
-    ds["variant_allele"] = ds["variant_allele"].astype(f"S{max_variant_allele_length}")  # type: ignore[no-untyped-call]
-    del ds.attrs["max_variant_id_length"]
-    del ds.attrs["max_variant_allele_length"]
-
-    return ds
 
 
 def vcf_to_zarr(
