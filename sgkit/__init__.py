@@ -1,3 +1,5 @@
+from pkg_resources import DistributionNotFound, get_distribution
+
 from .display import display_genotypes
 from .io.vcfzarr_reader import read_vcfzarr
 from .model import (
@@ -23,6 +25,12 @@ from .stats.preprocessing import filter_partial_calls
 from .stats.regenie import regenie
 from .testing import simulate_genotype_call_dataset
 from .window import window
+
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    # package is not installed
+    pass
 
 __all__ = [
     "DIM_ALLELE",
