@@ -578,3 +578,107 @@ def Tajimas_D(
 
     new_ds = Dataset({variables.stat_Tajimas_D: D})
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+
+
+# c = cohorts
+@guvectorize(  # type: ignore
+    ["void(float32[:, :], float32[:,:,:])", "void(float64[:, :], float64[:,:,:])"],
+    "(c,c)->(c,c,c)",
+    nopython=True,
+    cache=True,
+)
+def _pbs(t: ArrayLike, out: ArrayLike) -> None:
+    """Generalized U-function for computing PBS."""
+    out[:, :, :] = np.nan  # (cohorts, cohorts, cohorts)
+    n_cohorts = t.shape[0]
+    # calculate PBS for each cohort triple
+    for i in range(n_cohorts):
+        for j in range(i + 1, n_cohorts):
+            for k in range(j + 1, n_cohorts):
+                ret = (t[i, j] + t[i, k] - t[j, k]) / 2
+                norm = 1 + (t[i, j] + t[i, k] + t[j, k]) / 2
+                ret = ret / norm
+                out[i, j, k] = ret
+
+
+def pbs(
+    ds: Dataset,
+    *,
+    stat_Fst: Hashable = variables.stat_Fst,
+    merge: bool = True,
+) -> Dataset:
+    """Compute the population branching statistic (PBS) between cohort triples.
+
+    By default, values of this statistic are calculated per variant.
+    To compute values in windows, call :func:`window` before calling
+    this function.
+
+    Parameters
+    ----------
+    ds
+        Genotype call dataset.
+    stat_Fst
+        Fst variable to use or calculate. Defined by
+        :data:`sgkit.variables.stat_Fst_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`Fst`.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing the PBS value between cohort triples, as defined by
+    :data:`sgkit.variables.stat_pbs_spec`.
+    Shape (variants, cohorts, cohorts, cohorts), or
+    (windows, cohorts, cohorts, cohorts) if windowing information is available.
+
+    Warnings
+    --------
+    This method does not currently support datasets that are chunked along the
+    samples dimension.
+
+    Examples
+    --------
+
+    >>> import numpy as np
+    >>> import sgkit as sg
+    >>> import xarray as xr
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=6)
+
+    >>> # Divide samples into three named cohorts
+    >>> n_cohorts = 3
+    >>> sample_cohort = np.repeat(range(n_cohorts), ds.dims["samples"] // n_cohorts)
+    >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
+    >>> cohort_names = [f"co_{i}" for i in range(n_cohorts)]
+    >>> ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names, "cohorts_2": cohort_names})
+
+    >>> # Divide into two windows of size three (variants)
+    >>> ds = sg.window(ds, size=3, step=3)
+    >>> sg.pbs(ds)["stat_pbs"].sel(cohorts_0="co_0", cohorts_1="co_1", cohorts_2="co_2").values # doctest: +NORMALIZE_WHITESPACE
+    array([ 0.      , -0.160898])
+    """
+
+    ds = define_variable_if_absent(ds, variables.stat_Fst, stat_Fst, Fst)
+    variables.validate(ds, {stat_Fst: variables.stat_Fst_spec})
+
+    fst = ds[variables.stat_Fst]
+    fst = fst.clip(min=0, max=(1 - np.finfo(float).epsneg))
+
+    t = -np.log(1 - fst)
+    n_cohorts = ds.dims["cohorts"]
+    n_windows = ds.dims["windows"]
+    assert_array_shape(t, n_windows, n_cohorts, n_cohorts)
+
+    # calculate PBS triples
+    t = da.asarray(t)
+    shape = (t.chunks[0], n_cohorts, n_cohorts, n_cohorts)
+    p = da.map_blocks(_pbs, t, chunks=shape, new_axis=3, dtype=np.float64)
+    assert_array_shape(p, n_windows, n_cohorts, n_cohorts, n_cohorts)
+
+    new_ds = Dataset(
+        {variables.stat_pbs: (["windows", "cohorts_0", "cohorts_1", "cohorts_2"], p)}
+    )
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
