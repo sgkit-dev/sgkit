@@ -53,6 +53,9 @@ def vcf_to_zarr_sequential(
     region: Optional[str] = None,
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
+    ploidy: int = 2,
+    mixed_ploidy: bool = False,
+    truncate_calls: bool = False,
 ) -> None:
 
     with open_vcf(input) as vcf:
@@ -62,7 +65,6 @@ def vcf_to_zarr_sequential(
         sample_id = np.array(vcf.samples, dtype=str)
         n_sample = len(sample_id)
         n_allele = alt_number + 1
-        n_ploidy = 2  # TODO: support more than diploid
 
         variant_contig_names = vcf.seqnames
 
@@ -79,7 +81,7 @@ def vcf_to_zarr_sequential(
 
         variant_contig = np.empty(chunk_length, dtype="i1")
         variant_position = np.empty(chunk_length, dtype="i4")
-        call_genotype = np.empty((chunk_length, n_sample, n_ploidy), dtype="i1")
+        call_genotype = np.empty((chunk_length, n_sample, ploidy), dtype="i1")
         call_genotype_phased = np.empty((chunk_length, n_sample), dtype=bool)
 
         first_variants_chunk = True
@@ -105,8 +107,14 @@ def vcf_to_zarr_sequential(
                     max_variant_allele_length, max(len(x) for x in alleles)
                 )
 
-                gt = variant.genotype.array()
-                call_genotype[i] = gt[..., 0:-1]
+                fill = -2 if mixed_ploidy else -1
+                gt = variant.genotype.array(fill=fill)
+                gt_length = gt.shape[-1] - 1
+                if (gt_length > ploidy) and not truncate_calls:
+                    raise ValueError("Genotype call longer than ploidy.")
+                n = min(call_genotype.shape[-1], gt_length)
+                call_genotype[i, ..., 0:n] = gt[..., 0:n]
+                call_genotype[i, ..., n:] = fill
                 call_genotype_phased[i] = gt[..., -1]
 
             # Truncate np arrays (if last chunk is smaller than chunk_length)
@@ -129,6 +137,7 @@ def vcf_to_zarr_sequential(
                 call_genotype=call_genotype,
                 call_genotype_phased=call_genotype_phased,
                 variant_id=variant_id,
+                mixed_ploidy=mixed_ploidy,
             )
             ds["variant_id_mask"] = (
                 [DIM_VARIANT],
@@ -141,10 +150,8 @@ def vcf_to_zarr_sequential(
                 # Enforce uniform chunks in the variants dimension
                 # Also chunk in the samples direction
                 encoding = dict(
-                    call_genotype=dict(chunks=(chunk_length, chunk_width, n_ploidy)),
-                    call_genotype_mask=dict(
-                        chunks=(chunk_length, chunk_width, n_ploidy)
-                    ),
+                    call_genotype=dict(chunks=(chunk_length, chunk_width, ploidy)),
+                    call_genotype_mask=dict(chunks=(chunk_length, chunk_width, ploidy)),
                     call_genotype_phased=dict(chunks=(chunk_length, chunk_width)),
                     variant_allele=dict(chunks=(chunk_length, n_allele)),
                     variant_contig=dict(chunks=(chunk_length,)),
@@ -171,6 +178,9 @@ def vcf_to_zarr_parallel(
     tempdir: Optional[PathType] = None,
     tempdir_storage_options: Optional[Dict[str, str]] = None,
     dask_fuse_avg_width: int = 50,
+    ploidy: int = 2,
+    mixed_ploidy: bool = False,
+    truncate_calls: bool = False,
 ) -> None:
     """Convert specified regions of one or more VCF files to zarr files, then concat, rechunk, write to zarr"""
 
@@ -188,6 +198,9 @@ def vcf_to_zarr_parallel(
             temp_chunk_length,
             chunk_width,
             tempdir_storage_options,
+            ploidy=ploidy,
+            mixed_ploidy=mixed_ploidy,
+            truncate_calls=truncate_calls,
         )
 
         ds = zarrs_to_dataset(paths, chunk_length, chunk_width, tempdir_storage_options)
@@ -204,6 +217,9 @@ def vcf_to_zarrs(
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
     output_storage_options: Optional[Dict[str, str]] = None,
+    ploidy: int = 2,
+    mixed_ploidy: bool = False,
+    truncate_calls: bool = False,
 ) -> Sequence[str]:
     """Convert VCF files to multiple Zarr on-disk stores, one per region.
 
@@ -225,6 +241,17 @@ def vcf_to_zarrs(
         Width (number of samples) to use when storing chunks in output, by default 1,000.
     output_storage_options
         Any additional parameters for the storage backend, for the output (see ``fsspec.open``).
+    ploidy : int
+        The (maximum) ploidy of genotypes in the VCF file.
+    mixed_ploidy : bool
+        If true, genotype calls with fewer alleles than the specified ploidy will be padded
+        with the non-allele sentinel value of -2. If false, calls with fewer alleles than
+        the specified ploidy will be treated as incomplete and will be padded with the
+        missing-allele sentinel value of -1.
+    truncate_calls : bool
+        If true, genotype calls with more alleles than the specified (maximum) ploidy value
+        will be truncated to size ploidy. If false, calls with more alleles than the
+        specified ploidy will raise an exception.
 
     Returns
     -------
@@ -270,6 +297,9 @@ def vcf_to_zarrs(
                 region=region,
                 chunk_length=chunk_length,
                 chunk_width=chunk_width,
+                ploidy=ploidy,
+                mixed_ploidy=mixed_ploidy,
+                truncate_calls=truncate_calls,
             )
             tasks.append(task)
     dask.compute(*tasks)
@@ -286,6 +316,9 @@ def vcf_to_zarr(
     temp_chunk_length: Optional[int] = None,
     tempdir: Optional[PathType] = None,
     tempdir_storage_options: Optional[Dict[str, str]] = None,
+    ploidy: int = 2,
+    mixed_ploidy: bool = False,
+    truncate_calls: bool = False,
 ) -> None:
     """Convert VCF files to a single Zarr on-disk store.
 
@@ -326,6 +359,17 @@ def vcf_to_zarr(
         use the system default temporary directory.
     tempdir_storage_options:
         Any additional parameters for the storage backend for tempdir (see ``fsspec.open``).
+    ploidy : int
+        The (maximum) ploidy of genotypes in the VCF file.
+    mixed_ploidy : bool
+        If true, genotype calls with fewer alleles than the specified ploidy will be padded
+        with the non-allele sentinel value of -2. If false, calls with fewer alleles than
+        the specified ploidy will be treated as incomplete and will be padded with the
+        missing-allele sentinel value of -1.
+    truncate_calls : bool
+        If true, genotype calls with more alleles than the specified (maximum) ploidy value
+        will be truncated to size ploidy. If false, calls with more alleles than the
+        specified ploidy will raise an exception.
     """
 
     if temp_chunk_length is not None:
@@ -343,6 +387,9 @@ def vcf_to_zarr(
             region=regions,
             chunk_length=chunk_length,
             chunk_width=chunk_width,
+            ploidy=ploidy,
+            mixed_ploidy=mixed_ploidy,
+            truncate_calls=truncate_calls,
         )
     else:
         vcf_to_zarr_parallel(

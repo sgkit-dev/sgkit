@@ -162,11 +162,18 @@ call_genotype, call_genotype_spec = SgkitVariables.register_variable(
 )
 """
 Call genotype. Encoded as allele values (0 for the reference, 1 for
-the first allele, 2 for the second allele), or -1 to indicate a
-missing value.
+the first allele, 2 for the second allele), -1 to indicate a
+missing value, or -2 to indicate a non allele in mixed ploidy datasets.
 """
 call_genotype_mask, call_genotype_mask_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("call_genotype_mask", kind="b", ndim=3)
+)
+"""TODO"""
+(
+    call_genotype_non_allele,
+    call_genotype_non_allele_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec("call_genotype_non_allele", kind="b", ndim=3)
 )
 """TODO"""
 call_genotype_phased, call_genotype_phased_spec = SgkitVariables.register_variable(
