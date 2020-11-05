@@ -8,11 +8,9 @@ pytest-mock
 hypothesis
 scikit-allel
 statsmodels
-zarr
 msprime
 scikit-learn
 partd
-fsspec
 bed-reader
 rechunker
 cbgen
