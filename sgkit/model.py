@@ -23,6 +23,7 @@ def create_genotype_call_dataset(
     call_genotype: ArrayLike,
     call_genotype_phased: Optional[ArrayLike] = None,
     variant_id: Optional[ArrayLike] = None,
+    mixed_ploidy: bool = False,
 ) -> xr.Dataset:
     """Create a dataset of genotype calls.
 
@@ -52,6 +53,9 @@ def create_genotype_call_dataset(
     variant_id
         [array_like, element type: str or object, optional]
         The unique identifier of the variant.
+    mixed_ploidy
+        Specify if the dataset contatins genotype calls with a mixture of ploidy levels
+        using the value -2 to indicate non-alleles.
 
     Returns
     -------
@@ -62,7 +66,11 @@ def create_genotype_call_dataset(
         "variant_position": ([DIM_VARIANT], variant_position),
         "variant_allele": ([DIM_VARIANT, DIM_ALLELE], variant_allele),
         "sample_id": ([DIM_SAMPLE], sample_id),
-        "call_genotype": ([DIM_VARIANT, DIM_SAMPLE, DIM_PLOIDY], call_genotype),
+        "call_genotype": (
+            [DIM_VARIANT, DIM_SAMPLE, DIM_PLOIDY],
+            call_genotype,
+            {"mixed_ploidy": mixed_ploidy},
+        ),
         "call_genotype_mask": (
             [DIM_VARIANT, DIM_SAMPLE, DIM_PLOIDY],
             call_genotype < 0,
@@ -72,6 +80,11 @@ def create_genotype_call_dataset(
         data_vars["call_genotype_phased"] = (
             [DIM_VARIANT, DIM_SAMPLE],
             call_genotype_phased,
+        )
+    if mixed_ploidy is True:
+        data_vars["call_genotype_non_allele"] = (
+            [DIM_VARIANT, DIM_SAMPLE, DIM_PLOIDY],
+            call_genotype < -1,
         )
     if variant_id is not None:
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
