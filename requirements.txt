@@ -6,3 +6,4 @@ scipy
 typing-extensions
 numba
 zarr
+fsspec
