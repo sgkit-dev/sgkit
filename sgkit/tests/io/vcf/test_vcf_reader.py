@@ -64,7 +64,7 @@ def test_vcf_to_zarr__small_vcf(shared_datadir, is_path, tmp_path):
             [[0, 0], [0, 0], [0, 0]],
             [[0, 1], [0, 2], [-1, -1]],
             [[0, 0], [0, 0], [-1, -1]],
-            [[0, -2], [0, 1], [0, 2]],  # -2 signifies non-allele
+            [[0, -1], [0, 1], [0, 2]],
         ],
         dtype="i1",
     )
@@ -307,3 +307,93 @@ def test_vcf_to_zarr__mutiple_partitioned_invalid_regions(
         match=r"multiple input regions must be a sequence of sequence of strings",
     ):
         vcf_to_zarr(paths, output, regions=regions, chunk_length=5_000)
+
+
+@pytest.mark.parametrize(
+    "ploidy,mixed_ploidy,truncate_calls",
+    [
+        (2, False, True),
+        (4, False, False),
+        (4, True, False),
+        (5, True, False),
+    ],
+)
+def test_vcf_to_zarr__mixed_ploidy_vcf(
+    shared_datadir, tmp_path, ploidy, mixed_ploidy, truncate_calls
+):
+    path = path_for_test(shared_datadir, "mixed.vcf.gz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(
+        path,
+        output,
+        chunk_length=5,
+        chunk_width=2,
+        ploidy=ploidy,
+        mixed_ploidy=mixed_ploidy,
+        truncate_calls=truncate_calls,
+    )
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    assert ds.attrs["contigs"] == ["CHR1", "CHR2", "CHR3"]
+    assert_array_equal(ds["variant_contig"], [0, 0])
+    assert_array_equal(ds["variant_position"], [2, 7])
+    assert_array_equal(
+        ds["variant_allele"],
+        [
+            ["A", "T", "", ""],
+            ["A", "C", "", ""],
+        ],
+    )
+    assert ds["variant_allele"].dtype == "O"
+    assert_array_equal(
+        ds["variant_id"],
+        [".", "."],
+    )
+    assert ds["variant_id"].dtype == "O"
+    assert_array_equal(
+        ds["variant_id_mask"],
+        [True, True],
+    )
+    assert_array_equal(ds["sample_id"], ["SAMPLE1", "SAMPLE2", "SAMPLE3"])
+
+    assert ds["call_genotype"].attrs["mixed_ploidy"] == mixed_ploidy
+    pad = -2 if mixed_ploidy else -1  # -2 indicates a non-allele
+    call_genotype = np.array(
+        [
+            [[0, 0, 1, 1, pad], [0, 0, pad, pad, pad], [0, 0, 0, 1, pad]],
+            [[0, 0, 1, 1, pad], [0, 1, pad, pad, pad], [0, 1, -1, -1, pad]],
+        ],
+        dtype="i1",
+    )
+    # truncate row vectors if lower ploidy
+    call_genotype = call_genotype[:, :, 0:ploidy]
+
+    assert_array_equal(ds["call_genotype"], call_genotype)
+    assert_array_equal(ds["call_genotype_mask"], call_genotype < 0)
+    if mixed_ploidy:
+        assert_array_equal(ds["call_genotype_non_allele"], call_genotype < -1)
+
+
+@pytest.mark.parametrize(
+    "ploidy,mixed_ploidy,truncate_calls",
+    [
+        (2, False, False),
+        (3, True, False),
+    ],
+)
+def test_vcf_to_zarr__mixed_ploidy_vcf_exception(
+    shared_datadir, tmp_path, ploidy, mixed_ploidy, truncate_calls
+):
+    path = path_for_test(shared_datadir, "mixed.vcf.gz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    with pytest.raises(ValueError) as excinfo:
+        vcf_to_zarr(
+            path,
+            output,
+            ploidy=ploidy,
+            mixed_ploidy=mixed_ploidy,
+            truncate_calls=truncate_calls,
+        )
+    assert "Genotype call longer than ploidy." == str(excinfo.value)
