@@ -109,7 +109,7 @@ def vcf_to_zarr_sequential(
 
                 fill = -2 if mixed_ploidy else -1
                 gt = variant.genotype.array(fill=fill)
-                gt_length = gt.shape[-1] - 1
+                gt_length = gt.shape[-1] - 1  # final element indicates phasing
                 if (gt_length > ploidy) and not truncate_calls:
                     raise ValueError("Genotype call longer than ploidy.")
                 n = min(call_genotype.shape[-1], gt_length)
@@ -241,15 +241,15 @@ def vcf_to_zarrs(
         Width (number of samples) to use when storing chunks in output, by default 1,000.
     output_storage_options
         Any additional parameters for the storage backend, for the output (see ``fsspec.open``).
-    ploidy : int
+    ploidy
         The (maximum) ploidy of genotypes in the VCF file.
-    mixed_ploidy : bool
-        If true, genotype calls with fewer alleles than the specified ploidy will be padded
+    mixed_ploidy
+        If True, genotype calls with fewer alleles than the specified ploidy will be padded
         with the non-allele sentinel value of -2. If false, calls with fewer alleles than
         the specified ploidy will be treated as incomplete and will be padded with the
         missing-allele sentinel value of -1.
-    truncate_calls : bool
-        If true, genotype calls with more alleles than the specified (maximum) ploidy value
+    truncate_calls
+        If True, genotype calls with more alleles than the specified (maximum) ploidy value
         will be truncated to size ploidy. If false, calls with more alleles than the
         specified ploidy will raise an exception.
 
@@ -359,15 +359,15 @@ def vcf_to_zarr(
         use the system default temporary directory.
     tempdir_storage_options:
         Any additional parameters for the storage backend for tempdir (see ``fsspec.open``).
-    ploidy : int
+    ploidy
         The (maximum) ploidy of genotypes in the VCF file.
-    mixed_ploidy : bool
-        If true, genotype calls with fewer alleles than the specified ploidy will be padded
+    mixed_ploidy
+        If True, genotype calls with fewer alleles than the specified ploidy will be padded
         with the non-allele sentinel value of -2. If false, calls with fewer alleles than
         the specified ploidy will be treated as incomplete and will be padded with the
         missing-allele sentinel value of -1.
-    truncate_calls : bool
-        If true, genotype calls with more alleles than the specified (maximum) ploidy value
+    truncate_calls
+        If True, genotype calls with more alleles than the specified (maximum) ploidy value
         will be truncated to size ploidy. If false, calls with more alleles than the
         specified ploidy will raise an exception.
     """

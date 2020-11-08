@@ -54,7 +54,7 @@ def create_genotype_call_dataset(
         [array_like, element type: str or object, optional]
         The unique identifier of the variant.
     mixed_ploidy
-        Specify if the dataset contatins genotype calls with a mixture of ploidy levels
+        Specify if the dataset contains genotype calls with a mixture of ploidy levels
         using the value -2 to indicate non-alleles.
 
     Returns
