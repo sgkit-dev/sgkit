@@ -6,6 +6,6 @@ except ImportError as e:  # pragma: no cover
     msg = (
         "sgkit plink requirements are not installed.\n\n"
         "Please install them via pip :\n\n"
-        "  pip install 'git+https://github.com/pystatgen/sgkit#egg=sgkit[plink]'"
+        "  pip install --pre 'sgkit[plink]'"
     )
     raise ImportError(str(e) + "\n\n" + msg) from e
