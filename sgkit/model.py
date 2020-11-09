@@ -1,7 +1,12 @@
 from typing import Any, Dict, Hashable, List, Optional
 
+import dask.array as da
 import numpy as np
 import xarray as xr
+from xarray import Dataset
+
+from sgkit.stats.utils import assert_array_shape
+from sgkit.utils import conditional_merge_datasets
 
 from . import variables
 from .typing import ArrayLike
@@ -145,3 +150,45 @@ def create_genotype_dosage_dataset(
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
     return variables.validate(xr.Dataset(data_vars=data_vars, attrs=attrs))
+
+
+def to_haplotype_calls(
+    ds: Dataset,
+    *,
+    call_genotype: Hashable = variables.call_genotype,
+    merge: bool = True,
+) -> Dataset:
+    """Convert a genotype calls representation to haplotype calls.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing genotype calls.
+    call_genotype
+        Input variable name holding call_genotype as defined by
+        :data:`sgkit.variables.call_genotype_spec`.
+        Must be present in ``ds``.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing haplotype calls, as defined by
+    :data:`sgkit.variables.call_haplotype_spec`, of shape (variants, haplotypes)
+    where haplotypes is the product of samples and ploidy.
+    """
+    variables.validate(ds, {call_genotype: variables.call_genotype_spec})
+    n_variants = ds.dims["variants"]
+    n_samples = ds.dims["samples"]
+    ploidy = ds.dims["ploidy"]
+    n_haplotypes = n_samples * ploidy
+    gt = ds[call_genotype]
+    gt = da.asarray(gt)
+    ht = gt.reshape((n_variants, -1))  # collapse samples and ploidy dimensions
+    assert_array_shape(ht, n_variants, n_haplotypes)
+
+    new_ds = Dataset({variables.call_haplotype: (["variants", "haplotypes"], ht)})
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)

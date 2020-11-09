@@ -9,7 +9,9 @@ from sgkit import (
     create_genotype_call_dataset,
     create_genotype_dosage_dataset,
     display_genotypes,
+    to_haplotype_calls,
 )
+from sgkit.testing import simulate_genotype_call_dataset
 
 
 def test_create_genotype_call_dataset():
@@ -103,4 +105,36 @@ def test_create_genotype_dosage_dataset():
     assert_array_equal(ds["call_genotype_probability"], call_genotype_probability)
     assert_array_equal(
         ds["call_genotype_probability_mask"], np.isnan(call_genotype_probability)
+    )
+
+
+def test_to_haplotype_calls():
+    ds = simulate_genotype_call_dataset(
+        n_variant=4, n_sample=3, n_ploidy=2, missing_pct=0.1
+    )
+    assert_array_equal(
+        ds["call_genotype"],
+        np.array(
+            [
+                [[0, 0], [1, 0], [1, 0]],
+                [[0, 1], [1, 0], [0, -1]],
+                [[-1, -1], [1, 0], [1, 1]],
+                [[0, 0], [1, 0], [0, 1]],
+            ],
+            dtype="i1",
+        ),
+    )
+
+    ds = to_haplotype_calls(ds)
+    assert_array_equal(
+        ds["call_haplotype"],
+        np.array(
+            [
+                [0, 0, 1, 0, 1, 0],
+                [0, 1, 1, 0, 0, -1],
+                [-1, -1, 1, 0, 1, 1],
+                [0, 0, 1, 0, 0, 1],
+            ],
+            dtype="i1",
+        ),
     )

@@ -204,6 +204,11 @@ completely missing genotype calls.
     ArrayLikeSpec("call_genotype_probability_mask", kind="b", ndim=3)
 )
 """TODO"""
+call_haplotype, call_haplotype_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("call_haplotype", kind="i", ndim=2)
+)
+"""Call haplotype. With shape (variants, haplotypes). Encoded
+in the same way as call genotype."""
 cohort_allele_count, cohort_allele_count_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("cohort_allele_count", kind="i", ndim=3)
 )

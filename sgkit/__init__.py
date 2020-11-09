@@ -7,6 +7,7 @@ from .model import (
     DIM_VARIANT,
     create_genotype_call_dataset,
     create_genotype_dosage_dataset,
+    to_haplotype_calls,
 )
 from .stats.aggregation import (
     count_call_alleles,
@@ -48,6 +49,7 @@ __all__ = [
     "pbs",
     "pc_relate",
     "simulate_genotype_call_dataset",
+    "to_haplotype_calls",
     "variables",
     "pca",
     "window",
