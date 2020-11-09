@@ -12,10 +12,10 @@ Installation
 
 Sgkit itself contains only Python code but many of the required dependencies use compiled code or have system
 package dependencies. For this reason, conda is the preferred installation method.  There is no sgkit conda
-package yet though (or pypi package for that matter) so the recommended setup instructions are::
+package yet though so the recommended setup instructions are::
 
     $ conda install -c conda-forge --file requirements.txt
-    $ pip install -e .
+    $ pip install --pre sgkit
 
 ..
 
