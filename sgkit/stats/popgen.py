@@ -76,7 +76,7 @@ def diversity(
         [0.5       , 0.5       ]])
 
     >>> # Divide into windows of size three (variants)
-    >>> ds = sg.window(ds, size=3, step=3)
+    >>> ds = sg.window(ds, size=3)
     >>> sg.diversity(ds)["stat_diversity"].values # doctest: +NORMALIZE_WHITESPACE
     array([[1.83333333, 1.83333333],
         [1.        , 1.        ]])
@@ -239,7 +239,7 @@ def divergence(
             [0.625     , 0.5       ]]])
 
     >>> # Divide into windows of size three (variants)
-    >>> ds = sg.window(ds, size=3, step=3)
+    >>> ds = sg.window(ds, size=3)
     >>> sg.divergence(ds)["stat_divergence"].values # doctest: +NORMALIZE_WHITESPACE
     array([[[1.83333333, 1.5       ],
             [1.5       , 1.83333333]],
@@ -431,7 +431,7 @@ def Fst(
             [ 0.2       ,         nan]]])
 
     >>> # Divide into windows of size three (variants)
-    >>> ds = sg.window(ds, size=3, step=3)
+    >>> ds = sg.window(ds, size=3)
     >>> sg.Fst(ds)["stat_Fst"].values # doctest: +NORMALIZE_WHITESPACE
     array([[[        nan, -0.22222222],
             [-0.22222222,         nan]],
@@ -523,7 +523,7 @@ def Tajimas_D(
         [-3.35891429, -3.35891429]])
 
     >>> # Divide into windows of size three (variants)
-    >>> ds = sg.window(ds, size=3, step=3)
+    >>> ds = sg.window(ds, size=3)
     >>> sg.Tajimas_D(ds)["stat_Tajimas_D"].values # doctest: +NORMALIZE_WHITESPACE
     array([[-0.22349574, -0.22349574],
         [-2.18313233, -2.18313233]])
@@ -661,7 +661,7 @@ def pbs(
     >>> ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names, "cohorts_2": cohort_names})
 
     >>> # Divide into two windows of size three (variants)
-    >>> ds = sg.window(ds, size=3, step=3)
+    >>> ds = sg.window(ds, size=3)
     >>> sg.pbs(ds)["stat_pbs"].sel(cohorts_0="co_0", cohorts_1="co_1", cohorts_2="co_2").values # doctest: +NORMALIZE_WHITESPACE
     array([ 0.      , -0.160898])
     """
