@@ -128,7 +128,7 @@ def diversity(
 @guvectorize(  # type: ignore
     ["void(int64[:, :], float64[:,:])"], "(c, k)->(c,c)", nopython=True, cache=True
 )
-def _divergence(ac: ArrayLike, out: ArrayLike) -> None:
+def _divergence(ac: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Generalized U-function for computing divergence.
 
     Parameters
@@ -300,7 +300,7 @@ def divergence(
     nopython=True,
     cache=True,
 )
-def _Fst_Hudson(d: ArrayLike, out: ArrayLike) -> None:
+def _Fst_Hudson(d: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Generalized U-function for computing Fst using Hudson's estimator.
 
     Parameters
@@ -332,7 +332,7 @@ def _Fst_Hudson(d: ArrayLike, out: ArrayLike) -> None:
     nopython=True,
     cache=True,
 )
-def _Fst_Nei(d: ArrayLike, out: ArrayLike) -> None:
+def _Fst_Nei(d: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Generalized U-function for computing Fst using Nei's estimator.
 
     Parameters
@@ -592,7 +592,7 @@ def Tajimas_D(
     nopython=True,
     cache=True,
 )
-def _pbs(t: ArrayLike, out: ArrayLike) -> None:
+def _pbs(t: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Generalized U-function for computing PBS."""
     out[:, :, :] = np.nan  # (cohorts, cohorts, cohorts)
     n_cohorts = t.shape[0]

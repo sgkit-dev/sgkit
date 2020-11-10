@@ -16,7 +16,7 @@ from sgkit.typing import ArrayLike
     nopython=True,
     cache=True,
 )
-def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
+def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Calculates the correlation between two vectors.
 
     Parameters
@@ -85,7 +85,7 @@ def correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
     nopython=True,
     cache=True,
 )
-def euclidean(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
+def euclidean(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Calculates the euclidean distance between two vectors.
 
     Parameters
