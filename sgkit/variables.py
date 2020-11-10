@@ -50,7 +50,7 @@ class SgkitVariables:
         Validate that xr_dataset contains array(s) of interest with alternative
         variable name(s). To validate all variables in the dataset, skip `specs`.
         """
-        ...
+        ...  # pragma: no cover
 
     @classmethod
     @overload
@@ -59,7 +59,7 @@ class SgkitVariables:
         Validate that xr_dataset contains array(s) of interest with default
         variable name(s). To validate all variables in the dataset, skip `specs`.
         """
-        ...
+        ...  # pragma: no cover
 
     @classmethod
     @overload
@@ -69,7 +69,7 @@ class SgkitVariables:
         name(s). Variable must be registered in `SgkitVariables.registered_variables`.
         To validate all variables in the dataset, skip `specs`.
         """
-        ...
+        ...  # pragma: no cover
 
     @classmethod
     def _validate(
