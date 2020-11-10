@@ -5,7 +5,7 @@ import pytest
 
 from sgkit import simulate_genotype_call_dataset
 from sgkit.utils import MergeWarning
-from sgkit.variables import window_start, window_stop
+from sgkit.variables import window_contig, window_start, window_stop
 from sgkit.window import (
     _get_chunked_windows,
     _get_windows,
@@ -64,11 +64,50 @@ def test_window():
     assert not has_windows(ds)
     ds = window(ds, 2, 2)
     assert has_windows(ds)
+    np.testing.assert_equal(ds[window_contig].values, [0, 0, 0, 0, 0])
     np.testing.assert_equal(ds[window_start].values, [0, 2, 4, 6, 8])
     np.testing.assert_equal(ds[window_stop].values, [2, 4, 6, 8, 10])
 
     with pytest.raises(MergeWarning):
         window(ds, 2, 2)
+
+
+@pytest.mark.parametrize(
+    "n_variant, n_contig, window_contigs_exp, window_starts_exp, window_stops_exp",
+    [
+        (
+            15,
+            3,
+            [0, 0, 0, 1, 1, 1, 2, 2, 2],
+            [0, 2, 4, 5, 7, 9, 10, 12, 14],
+            [2, 4, 5, 7, 9, 10, 12, 14, 15],
+        ),
+        (
+            15,
+            15,
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        ),
+        (
+            1,
+            1,
+            [0],
+            [0],
+            [1],
+        ),
+    ],
+)
+def test_window__multiple_contigs(
+    n_variant, n_contig, window_contigs_exp, window_starts_exp, window_stops_exp
+):
+    ds = simulate_genotype_call_dataset(
+        n_variant=n_variant, n_sample=1, n_contig=n_contig
+    )
+    ds = window(ds, 2, 2)
+    np.testing.assert_equal(ds[window_contig].values, window_contigs_exp)
+    np.testing.assert_equal(ds[window_start].values, window_starts_exp)
+    np.testing.assert_equal(ds[window_stop].values, window_stops_exp)
 
 
 @pytest.mark.parametrize(

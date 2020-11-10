@@ -5,7 +5,7 @@ import numpy as np
 from xarray import Dataset
 
 from sgkit.utils import conditional_merge_datasets
-from sgkit.variables import window_start, window_stop
+from sgkit.variables import window_contig, window_start, window_stop
 
 from .typing import ArrayLike, DType
 
@@ -48,12 +48,31 @@ def window(
       The index values of window stop positions.
     """
     n_variants = ds.dims["variants"]
+    n_contigs = len(ds.attrs["contigs"])
+    contig_ids = np.arange(n_contigs)
+    variant_contig = ds["variant_contig"]
+    contig_starts = np.searchsorted(variant_contig.values, contig_ids)
+    contig_bounds = np.append(contig_starts, [n_variants], axis=0)
 
-    length = n_variants
-    window_starts, window_stops = _get_windows(0, length, size, step)
+    contig_window_contigs = []
+    contig_window_starts = []
+    contig_window_stops = []
+    for i in range(n_contigs):
+        starts, stops = _get_windows(contig_bounds[i], contig_bounds[i + 1], size, step)
+        contig_window_starts.append(starts)
+        contig_window_stops.append(stops)
+        contig_window_contigs.append(np.full_like(starts, i))
+
+    window_contigs = np.concatenate(contig_window_contigs)
+    window_starts = np.concatenate(contig_window_starts)
+    window_stops = np.concatenate(contig_window_stops)
 
     new_ds = Dataset(
         {
+            window_contig: (
+                "windows",
+                window_contigs,
+            ),
             window_start: (
                 "windows",
                 window_starts,
@@ -71,7 +90,6 @@ def _get_windows(
     start: int, stop: int, size: int, step: int
 ) -> Tuple[ArrayLike, ArrayLike]:
     # Find the indexes for the start positions of all windows
-    # TODO: take contigs into account https://github.com/pystatgen/sgkit/issues/335
     window_starts = np.arange(start, stop, step)
     window_stops = np.clip(window_starts + size, start, stop)
     return window_starts, window_stops

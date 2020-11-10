@@ -413,6 +413,10 @@ variant_t_value, variant_t_value_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("variant_t_value")
 )
 """T statistics for each beta."""
+window_contig, window_contig_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("window_contig", kind="i", ndim=1)
+)
+"""The contig index of each window."""
 window_start, window_start_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("window_start", kind="i", ndim=1)
 )
