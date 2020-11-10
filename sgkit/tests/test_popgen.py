@@ -87,7 +87,7 @@ def test_diversity__windowed(sample_size):
     sample_cohorts = np.full_like(ts.samples(), 0)
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     ds = ds.assign_coords({"cohorts": ["co_0"]})
-    ds = window(ds, size=25, step=25)
+    ds = window(ds, size=25)
     ds = diversity(ds)
     div = ds["stat_diversity"].sel(cohorts="co_0").compute()
 
@@ -103,7 +103,7 @@ def test_diversity__windowed(sample_size):
     ds = count_variant_alleles(ts_to_dataset(ts))  # type: ignore[no-untyped-call]
     ac = ds["variant_allele_count"].values
     mpd = allel.mean_pairwise_difference(ac, fill=0)
-    ska_div = allel.moving_statistic(mpd, np.sum, size=25, step=25)
+    ska_div = allel.moving_statistic(mpd, np.sum, size=25)
     np.testing.assert_allclose(
         div[:-1], ska_div
     )  # scikit-allel has final window missing
@@ -159,7 +159,7 @@ def test_divergence__windowed(sample_size, n_cohorts, chunks):
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
-    ds = window(ds, size=25, step=25)
+    ds = window(ds, size=25)
     ds = divergence(ds)
     div = ds["stat_divergence"].values
     # test off-diagonal entries, by replacing diagonal with NaNs
@@ -192,7 +192,7 @@ def test_divergence__windowed_scikit_allel_comparison(sample_size, n_cohorts, ch
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
-    ds = window(ds, size=25, step=25)
+    ds = window(ds, size=25)
     ds = divergence(ds)
     div = ds["stat_divergence"].values
     # test off-diagonal entries, by replacing diagonal with NaNs
@@ -205,7 +205,7 @@ def test_divergence__windowed_scikit_allel_comparison(sample_size, n_cohorts, ch
     ac1 = ds1["variant_allele_count"].values
     ac2 = ds2["variant_allele_count"].values
     mpd = allel.mean_pairwise_difference_between(ac1, ac2, fill=0)
-    ska_div = allel.moving_statistic(mpd, np.sum, size=25, step=25)  # noqa: F841
+    ska_div = allel.moving_statistic(mpd, np.sum, size=25)  # noqa: F841
     # TODO: investigate why numbers are different
     np.testing.assert_allclose(
         div[:-1], ska_div
@@ -226,7 +226,7 @@ def test_Fst__Hudson(sample_size):
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
     n_variants = ds.dims["variants"]
-    ds = window(ds, size=n_variants, step=n_variants)  # single window
+    ds = window(ds, size=n_variants)  # single window
     ds = Fst(ds, estimator="Hudson")
     fst = ds.stat_Fst.sel(cohorts_0="co_0", cohorts_1="co_1").values
 
@@ -254,7 +254,7 @@ def test_Fst__Nei(sample_size, n_cohorts):
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
     n_variants = ds.dims["variants"]
-    ds = window(ds, size=n_variants, step=n_variants)  # single window
+    ds = window(ds, size=n_variants)  # single window
     ds = Fst(ds, estimator="Nei")
     fst = ds.stat_Fst.values
 
@@ -289,7 +289,7 @@ def test_Fst__windowed(sample_size, n_cohorts, chunks):
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
-    ds = window(ds, size=25, step=25)
+    ds = window(ds, size=25)
     fst_ds = Fst(ds, estimator="Nei")
     fst = fst_ds["stat_Fst"].values
 
@@ -312,7 +312,7 @@ def test_Fst__windowed(sample_size, n_cohorts, chunks):
 
     ac1 = fst_ds.cohort_allele_count.values[:, 0, :]
     ac2 = fst_ds.cohort_allele_count.values[:, 1, :]
-    ska_fst = allel.moving_hudson_fst(ac1, ac2, size=25, step=25)
+    ska_fst = allel.moving_hudson_fst(ac1, ac2, size=25)
 
     np.testing.assert_allclose(
         fst[:-1], ska_fst
@@ -326,7 +326,7 @@ def test_Tajimas_D(sample_size):
     sample_cohorts = np.full_like(ts.samples(), 0)
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     n_variants = ds.dims["variants"]
-    ds = window(ds, size=n_variants, step=n_variants)  # single window
+    ds = window(ds, size=n_variants)  # single window
     ds = Tajimas_D(ds)
     d = ds.stat_Tajimas_D.compute()
     ts_d = ts.Tajimas_D()
@@ -348,7 +348,7 @@ def test_pbs(sample_size, n_cohorts):
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
     n_variants = ds.dims["variants"]
-    ds = window(ds, size=n_variants, step=n_variants)  # single window
+    ds = window(ds, size=n_variants)  # single window
 
     ds = pbs(ds)
     stat_pbs = ds["stat_pbs"]
@@ -360,9 +360,7 @@ def test_pbs(sample_size, n_cohorts):
 
     ska_pbs_value = np.full([1, n_cohorts, n_cohorts, n_cohorts], np.nan)
     for i, j, k in itertools.combinations(range(n_cohorts), 3):
-        ska_pbs_value[0, i, j, k] = allel.pbs(
-            ac1, ac2, ac3, window_size=n_variants, window_step=n_variants
-        )
+        ska_pbs_value[0, i, j, k] = allel.pbs(ac1, ac2, ac3, window_size=n_variants)
 
     np.testing.assert_allclose(stat_pbs, ska_pbs_value)
 
@@ -382,7 +380,7 @@ def test_pbs__windowed(sample_size, n_cohorts, chunks):
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
-    ds = window(ds, size=25, step=25)
+    ds = window(ds, size=25)
 
     ds = pbs(ds)
     stat_pbs = ds["stat_pbs"].values
@@ -396,9 +394,7 @@ def test_pbs__windowed(sample_size, n_cohorts, chunks):
     n_windows = ds.dims["windows"] - 1
     ska_pbs_value = np.full([n_windows, n_cohorts, n_cohorts, n_cohorts], np.nan)
     for i, j, k in itertools.combinations(range(n_cohorts), 3):
-        ska_pbs_value[:, i, j, k] = allel.pbs(
-            ac1, ac2, ac3, window_size=25, window_step=25
-        )
+        ska_pbs_value[:, i, j, k] = allel.pbs(ac1, ac2, ac3, window_size=25)
 
     np.testing.assert_allclose(stat_pbs[:-1], ska_pbs_value)
 
@@ -418,7 +414,7 @@ def test_Garud_h(n_variants, n_samples, n_contigs, n_cohorts, chunks):
         [np.full_like(subset, i) for i, subset in enumerate(subsets)]
     )
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
-    ds = window(ds, size=3, step=3)
+    ds = window(ds, size=3)
 
     gh = Garud_h(ds)
     h1 = gh.stat_Garud_h1.values
@@ -431,7 +427,7 @@ def test_Garud_h(n_variants, n_samples, n_contigs, n_cohorts, chunks):
         gt = ds.call_genotype.values[:, sample_cohorts == c, :]
         ska_gt = allel.GenotypeArray(gt)
         ska_ha = ska_gt.to_haplotypes()
-        ska_h = allel.moving_garud_h(ska_ha, size=3, step=3)
+        ska_h = allel.moving_garud_h(ska_ha, size=3)
 
         np.testing.assert_allclose(h1[:, c], ska_h[0])
         np.testing.assert_allclose(h12[:, c], ska_h[1])

@@ -84,6 +84,16 @@ def test_window():
         window(ds, 2, 2)
 
 
+def test_window__default_step():
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=3, seed=0)
+    assert not has_windows(ds)
+    ds = window(ds, 2)
+    assert has_windows(ds)
+    np.testing.assert_equal(ds[window_contig].values, [0, 0, 0, 0, 0])
+    np.testing.assert_equal(ds[window_start].values, [0, 2, 4, 6, 8])
+    np.testing.assert_equal(ds[window_stop].values, [2, 4, 6, 8, 10])
+
+
 @pytest.mark.parametrize(
     "n_variant, n_contig, window_contigs_exp, window_starts_exp, window_stops_exp",
     [
