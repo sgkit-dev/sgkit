@@ -73,15 +73,24 @@ def test_read_vcfzarr(shared_datadir):
 
 
 @pytest.mark.parametrize(
-    "vcfzarr_filename, grouped_by_contig",
-    [("sample.vcf.zarr.zip", False), ("sample-grouped.vcf.zarr.zip", True)],
+    "vcfzarr_filename, grouped_by_contig, consolidated",
+    [
+        ("sample.vcf.zarr.zip", False, False),
+        ("sample-grouped.vcf.zarr.zip", True, False),
+        ("sample-grouped.vcf.zarr.zip", True, True),
+    ],
 )
 @pytest.mark.parametrize(
     "concat_algorithm",
     [None, "xarray_internal"],
 )
 def test_vcfzarr_to_zarr(
-    shared_datadir, tmp_path, vcfzarr_filename, grouped_by_contig, concat_algorithm
+    shared_datadir,
+    tmp_path,
+    vcfzarr_filename,
+    grouped_by_contig,
+    consolidated,
+    concat_algorithm,
 ):
     # The file sample-grouped.vcf.zarr.zip was created by running the following
     # in a python session with the scikit-allel package installed.
@@ -89,6 +98,7 @@ def test_vcfzarr_to_zarr(
     # import allel
     # for contig in ["19", "20", "X"]:
     #   allel.vcf_to_zarr("sample.vcf", "sample-grouped.vcf.zarr", group=contig, region=contig)
+    # zarr.consolidate_metadata("sample-grouped.vcf.zarr")
     #
     # Then (in a shell):
     # (cd sample-grouped.vcf.zarr; zip -r ../sample-grouped.vcf.zarr.zip .)
@@ -100,6 +110,7 @@ def test_vcfzarr_to_zarr(
         output,
         grouped_by_contig=grouped_by_contig,
         concat_algorithm=concat_algorithm,
+        consolidated=consolidated,
     )
 
     ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]

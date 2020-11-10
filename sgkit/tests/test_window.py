@@ -1,3 +1,5 @@
+import re
+
 import allel
 import dask.array as da
 import numpy as np
@@ -16,7 +18,8 @@ from sgkit.window import (
 
 
 @pytest.mark.parametrize(
-    "length, chunks, size, step", [(12, 6, 4, 4), (12, 6, 4, 2), (12, 5, 4, 4)]
+    "length, chunks, size, step",
+    [(12, 6, 4, 4), (12, 6, 4, 2), (12, 5, 4, 4), (12, 12, 4, 4)],
 )
 @pytest.mark.parametrize("dtype", [np.int64, np.float32, np.float64])
 def test_moving_statistic_1d(length, chunks, size, step, dtype):
@@ -57,6 +60,15 @@ def test_moving_statistic_2d(length, chunks, size, step, dtype):
     stat_sa = allel.moving_statistic(values_sa, sum_cols, size=size, step=step)
 
     np.testing.assert_equal(stat, stat_sa)
+
+
+def test_moving_statistic__min_chunksize_smaller_than_size():
+    values = da.from_array(np.arange(10), chunks=2)
+    with pytest.raises(
+        ValueError,
+        match=re.escape("Minimum chunk size (2) must not be smaller than size (3)."),
+    ):
+        moving_statistic(values, np.sum, size=3, step=3, dtype=values.dtype)
 
 
 def test_window():

@@ -143,6 +143,24 @@ def test_hwep_dataset__precomputed_counts(ds_neq: Dataset) -> None:
     assert np.all(p < 1e-8)
 
 
+def test_hwep_dataset__raise_on_missing_ploidy():
+    with pytest.raises(
+        ValueError,
+        match="`ploidy` parameter must be set when not present as dataset dimension.",
+    ):
+        ds = xr.Dataset({"x": (("alleles"), np.zeros((2,)))})
+        hwep_test(ds)
+
+
+def test_hwep_dataset__raise_on_missing_alleles():
+    with pytest.raises(
+        ValueError,
+        match="`alleles` parameter must be set when not present as dataset dimension.",
+    ):
+        ds = xr.Dataset({"x": (("ploidy"), np.zeros((2,)))})
+        hwep_test(ds)
+
+
 def test_hwep_dataset__raise_on_nondiploid():
     with pytest.raises(
         NotImplementedError, match="HWE test only implemented for diploid genotypes"

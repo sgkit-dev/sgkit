@@ -77,6 +77,8 @@ def test_variables__whole_ds(dummy_ds: xr.Dataset) -> None:
     spec_bar = ArrayLikeSpec("bar", kind="i", ndim=1)
     try:
         SgkitVariables.register_variable(spec_foo)
+        with pytest.raises(ValueError, match="`foo` already registered"):
+            SgkitVariables.register_variable(spec_foo)
         with pytest.raises(ValueError, match="No array spec registered for bar"):
             variables.validate(dummy_ds)
         SgkitVariables.register_variable(spec_bar)

@@ -11,7 +11,7 @@ try:
         "vcf_to_zarrs",
         "zarrs_to_dataset",
     ]
-except ImportError as e:
+except ImportError as e:  # pragma: no cover
     if platform.system() == "Windows":
         msg = (
             "sgkit-vcf is not supported on Windows.\n"
