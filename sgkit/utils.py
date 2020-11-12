@@ -1,8 +1,8 @@
 import warnings
 from typing import Any, Callable, Hashable, List, Optional, Set, Tuple, Union
 
-import numba
 import numpy as np
+from numba import guvectorize
 from xarray import Dataset
 
 from .typing import ArrayLike, DType
@@ -274,9 +274,19 @@ def max_str_len(a: ArrayLike) -> ArrayLike:
     return lens.max()
 
 
-@numba.njit(nogil=True, cache=True)  # type: ignore
-def hash_columns(x: ArrayLike) -> ArrayLike:
-    """Hash columns of ``x`` using the DJBX33A hash function.
+@guvectorize(  # type: ignore
+    [
+        "void(int8[:], int64[:])",
+        "void(int16[:], int64[:])",
+        "void(int32[:], int64[:])",
+        "void(int64[:], int64[:])",
+    ],
+    "(n)->()",
+    nopython=True,
+    cache=True,
+)
+def hash_array(x: ArrayLike, out: ArrayLike) -> None:
+    """Hash entries of ``x`` using the DJBX33A hash function.
 
     This is ~5 times faster than calling ``tobytes()`` followed
     by ``hash()`` on array columns. This function also does not
@@ -286,15 +296,12 @@ def hash_columns(x: ArrayLike) -> ArrayLike:
     Parameters
     ----------
     x
-        Array of shape (m, n) and type integer.
+        1D array of type integer.
 
     Returns
     -------
-    Array containing hash values of shape (n,) and type int64.
+    Array containing a single hash value of type int64.
     """
-    h = np.empty((x.shape[1]), dtype=np.int64)
-    for j in range(x.shape[1]):
-        h[j] = 5381
-        for i in range(x.shape[0]):
-            h[j] = h[j] * 33 + x[i, j]
-    return h
+    out[0] = 5381
+    for i in range(x.shape[0]):
+        out[0] = out[0] * 33 + x[i]

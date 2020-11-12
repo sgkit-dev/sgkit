@@ -13,7 +13,7 @@ from sgkit.utils import (
     check_array_like,
     define_variable_if_absent,
     encode_array,
-    hash_columns,
+    hash_array,
     max_str_len,
     merge_datasets,
     split_array_chunks,
@@ -211,21 +211,21 @@ def test_split_array_chunks__raise_on_n_lte_0():
         split_array_chunks(0, 0)
 
 
-@given(st.integers(1, 50), st.integers(2, 50))
+@given(st.integers(2, 50), st.integers(1, 50))
 @settings(deadline=None)  # avoid problem with numba jit compilation
-def test_hash_columns(n_rows, n_cols):
-    # construct an array with random repeated columns
-    x = np.random.randint(-2, 10, size=(n_rows, n_cols // 2))
-    cols = np.random.choice(x.shape[1], n_cols, replace=True)
-    x = x[:, cols]
+def test_hash_array(n_rows, n_cols):
+    # construct an array with random repeated rows
+    x = np.random.randint(-2, 10, size=(n_rows // 2, n_cols))
+    rows = np.random.choice(x.shape[0], n_rows, replace=True)
+    x = x[rows, :]
 
     # find unique column counts (exact method)
     _, expected_inverse, expected_counts = np.unique(
-        x, axis=1, return_inverse=True, return_counts=True
+        x, axis=0, return_inverse=True, return_counts=True
     )
 
     # hash columns, then find unique column counts using the hash values
-    h = hash_columns(x)
+    h = hash_array(x)
     _, inverse, counts = np.unique(h, return_inverse=True, return_counts=True)
 
     # counts[inverse] gives the count for each column in x
