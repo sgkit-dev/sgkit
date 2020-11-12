@@ -6,13 +6,12 @@ import numpy as np
 from numba import guvectorize
 from xarray import Dataset
 
-from sgkit import to_haplotype_calls
 from sgkit.stats.utils import assert_array_shape
 from sgkit.typing import ArrayLike
 from sgkit.utils import (
     conditional_merge_datasets,
     define_variable_if_absent,
-    hash_columns,
+    hash_array,
 )
 from sgkit.window import has_windows, window_statistic
 
@@ -693,13 +692,13 @@ def pbs(
 N_GARUD_H_STATS = 4  # H1, H12, H123, H2/H1
 
 
-def _Garud_h(k: ArrayLike) -> ArrayLike:
+def _Garud_h(haplotypes: ArrayLike) -> ArrayLike:
     # find haplotype counts (sorted in descending order)
-    counts = sorted(collections.Counter(k.tolist()).values(), reverse=True)
+    counts = sorted(collections.Counter(haplotypes.tolist()).values(), reverse=True)
     counts = np.array(counts)
 
     # find haplotype frequencies
-    n = k.shape[0]
+    n = haplotypes.shape[0]
     f = counts / n
 
     # compute H1
@@ -719,19 +718,20 @@ def _Garud_h(k: ArrayLike) -> ArrayLike:
 
 
 def _Garud_h_cohorts(
-    ht: ArrayLike, sample_cohort: ArrayLike, n_cohorts: int
+    gt: ArrayLike, sample_cohort: ArrayLike, n_cohorts: int
 ) -> ArrayLike:
-    k = hash_columns(ht)  # hash haplotypes
+    # transpose to hash columns (haplotypes)
+    haplotypes = hash_array(gt.transpose()).transpose().flatten()
     arr = np.empty((n_cohorts, N_GARUD_H_STATS))
     for c in range(n_cohorts):
-        arr[c, :] = _Garud_h(k[sample_cohort == c])
+        arr[c, :] = _Garud_h(haplotypes[sample_cohort == c])
     return arr
 
 
 def Garud_h(
     ds: Dataset,
     *,
-    call_haplotype: Hashable = variables.call_haplotype,
+    call_genotype: Hashable = variables.call_genotype,
     merge: bool = True,
 ) -> Dataset:
     """Compute the H1, H12, H123 and H2/H1 statistics for detecting signatures
@@ -745,11 +745,10 @@ def Garud_h(
     ----------
     ds
         Genotype call dataset.
-    call_haplotype
-        Call haplotype variable to use or calculate. Defined by
-        :data:`sgkit.variables.call_haplotype_spec`.
-        If the variable is not present in ``ds``, it will be computed
-        using :func:`to_haplotype_calls`.
+    call_genotype
+        Input variable name holding call_genotype as defined by
+        :data:`sgkit.variables.call_genotype_spec`.
+        Must be present in ``ds``.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -814,12 +813,9 @@ def Garud_h(
     if ds.dims["ploidy"] != 2:
         raise NotImplementedError("Garud H only implemented for diploid genotypes")
 
-    ds = define_variable_if_absent(
-        ds, variables.call_haplotype, call_haplotype, to_haplotype_calls
-    )
-    variables.validate(ds, {call_haplotype: variables.call_haplotype_spec})
+    variables.validate(ds, {call_genotype: variables.call_genotype_spec})
 
-    ht = ds[call_haplotype]
+    gt = ds[call_genotype]
 
     # convert sample cohorts to haplotype layout
     sc = ds.sample_cohort.values
@@ -828,14 +824,13 @@ def Garud_h(
 
     if has_windows(ds):
         gh = window_statistic(
-            ht,
-            lambda ht: _Garud_h_cohorts(ht, hsc, n_cohorts),
+            gt,
+            lambda gt: _Garud_h_cohorts(gt, hsc, n_cohorts),
             ds.window_start.values,
             ds.window_stop.values,
             dtype=np.float64,
             # first chunks dimension is windows, computed in window_statistic
             chunks=(-1, n_cohorts, N_GARUD_H_STATS),
-            new_axis=2,  # 2d -> 3d
         )
         n_windows = ds.window_start.shape[0]
         assert_array_shape(gh, n_windows, n_cohorts, N_GARUD_H_STATS)
@@ -861,9 +856,9 @@ def Garud_h(
         )
     else:
         # TODO: note this materializes all the data, so windowless should be discouraged/not supported
-        ht = ht.values
+        gt = gt.values
 
-        gh = _Garud_h_cohorts(ht, sample_cohort=hsc, n_cohorts=n_cohorts)
+        gh = _Garud_h_cohorts(gt, sample_cohort=hsc, n_cohorts=n_cohorts)
         assert_array_shape(gh, n_cohorts, N_GARUD_H_STATS)
 
         new_ds = Dataset(
