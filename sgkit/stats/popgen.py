@@ -813,6 +813,9 @@ def Garud_h(
     if ds.dims["ploidy"] != 2:
         raise NotImplementedError("Garud H only implemented for diploid genotypes")
 
+    if not has_windows(ds):
+        raise ValueError("Dataset must be windowed for Garud_h")
+
     variables.validate(ds, {call_genotype: variables.call_genotype_spec})
 
     gt = ds[call_genotype]
@@ -822,51 +825,36 @@ def Garud_h(
     hsc = np.stack((sc, sc), axis=1).ravel()  # TODO: assumes diploid
     n_cohorts = sc.max() + 1  # 0-based indexing
 
-    if has_windows(ds):
-        gh = window_statistic(
-            gt,
-            lambda gt: _Garud_h_cohorts(gt, hsc, n_cohorts),
-            ds.window_start.values,
-            ds.window_stop.values,
-            dtype=np.float64,
-            # first chunks dimension is windows, computed in window_statistic
-            chunks=(-1, n_cohorts, N_GARUD_H_STATS),
-        )
-        n_windows = ds.window_start.shape[0]
-        assert_array_shape(gh, n_windows, n_cohorts, N_GARUD_H_STATS)
-        new_ds = Dataset(
-            {
-                variables.stat_Garud_h1: (
-                    ("windows", "cohorts"),
-                    gh[:, :, 0],
-                ),
-                variables.stat_Garud_h12: (
-                    ("windows", "cohorts"),
-                    gh[:, :, 1],
-                ),
-                variables.stat_Garud_h123: (
-                    ("windows", "cohorts"),
-                    gh[:, :, 2],
-                ),
-                variables.stat_Garud_h2_h1: (
-                    ("windows", "cohorts"),
-                    gh[:, :, 3],
-                ),
-            }
-        )
-    else:
-        # TODO: note this materializes all the data, so windowless should be discouraged/not supported
-        gt = gt.values
+    gh = window_statistic(
+        gt,
+        lambda gt: _Garud_h_cohorts(gt, hsc, n_cohorts),
+        ds.window_start.values,
+        ds.window_stop.values,
+        dtype=np.float64,
+        # first chunks dimension is windows, computed in window_statistic
+        chunks=(-1, n_cohorts, N_GARUD_H_STATS),
+    )
+    n_windows = ds.window_start.shape[0]
+    assert_array_shape(gh, n_windows, n_cohorts, N_GARUD_H_STATS)
+    new_ds = Dataset(
+        {
+            variables.stat_Garud_h1: (
+                ("windows", "cohorts"),
+                gh[:, :, 0],
+            ),
+            variables.stat_Garud_h12: (
+                ("windows", "cohorts"),
+                gh[:, :, 1],
+            ),
+            variables.stat_Garud_h123: (
+                ("windows", "cohorts"),
+                gh[:, :, 2],
+            ),
+            variables.stat_Garud_h2_h1: (
+                ("windows", "cohorts"),
+                gh[:, :, 3],
+            ),
+        }
+    )
 
-        gh = _Garud_h_cohorts(gt, sample_cohort=hsc, n_cohorts=n_cohorts)
-        assert_array_shape(gh, n_cohorts, N_GARUD_H_STATS)
-
-        new_ds = Dataset(
-            {
-                variables.stat_Garud_h1: gh[:, 0],
-                variables.stat_Garud_h12: gh[:, 1],
-                variables.stat_Garud_h123: gh[:, 2],
-                variables.stat_Garud_h2_h1: gh[:, 3],
-            }
-        )
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
