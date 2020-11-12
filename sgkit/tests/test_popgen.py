@@ -405,38 +405,21 @@ def test_pbs__windowed(sample_size, n_cohorts, chunks):
 
 @pytest.mark.parametrize(
     "n_variants, n_samples, n_contigs, n_cohorts",
-    [(3, 5, 1, 1), (3, 5, 1, 2)],
+    [(3, 5, 1, 1)],
 )
-@pytest.mark.parametrize("chunks", [(-1, -1), (2, -1)])
-def test_Garud_h(n_variants, n_samples, n_contigs, n_cohorts, chunks):
+def test_Garud_h__no_windows(n_variants, n_samples, n_contigs, n_cohorts):
     # We can't use msprime since it doesn't generate diploid data, and Garud uses phased data
     ds = simulate_genotype_call_dataset(
         n_variant=n_variants, n_sample=n_samples, n_contig=n_contigs
     )
-    ds = ds.chunk(dict(zip(["variants", "samples"], chunks)))
     subsets = np.array_split(ds.samples.values, n_cohorts)
     sample_cohorts = np.concatenate(
         [np.full_like(subset, i) for i, subset in enumerate(subsets)]
     )
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
 
-    gh = Garud_h(ds)
-    h1 = gh.stat_Garud_h1.values
-    h12 = gh.stat_Garud_h12.values
-    h123 = gh.stat_Garud_h123.values
-    h2_h1 = gh.stat_Garud_h2_h1.values
-
-    # scikit-allel
-    for c in range(n_cohorts):
-        gt = ds.call_genotype.values[:, sample_cohorts == c, :]
-        ska_gt = allel.GenotypeArray(gt)
-        ska_ha = ska_gt.to_haplotypes()
-        ska_h = allel.garud_h(ska_ha)
-
-        np.testing.assert_allclose(h1[c], ska_h[0])
-        np.testing.assert_allclose(h12[c], ska_h[1])
-        np.testing.assert_allclose(h123[c], ska_h[2])
-        np.testing.assert_allclose(h2_h1[c], ska_h[3])
+    with pytest.raises(ValueError, match="Dataset must be windowed for Garud_h"):
+        Garud_h(ds)
 
 
 @pytest.mark.parametrize(
@@ -444,7 +427,7 @@ def test_Garud_h(n_variants, n_samples, n_contigs, n_cohorts, chunks):
     [(9, 5, 1, 1), (9, 5, 1, 2)],
 )
 @pytest.mark.parametrize("chunks", [(-1, -1), (5, -1)])
-def test_Garud_h__windowed(n_variants, n_samples, n_contigs, n_cohorts, chunks):
+def test_Garud_h(n_variants, n_samples, n_contigs, n_cohorts, chunks):
     ds = simulate_genotype_call_dataset(
         n_variant=n_variants, n_sample=n_samples, n_contig=n_contigs
     )
