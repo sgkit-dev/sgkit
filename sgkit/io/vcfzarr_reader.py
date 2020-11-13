@@ -169,7 +169,7 @@ def _vcfzarr_to_dataset(
     if "variants/ID" in vcfzarr:
         variants_id = da.from_zarr(vcfzarr["variants/ID"]).astype(str)
     else:
-        variants_id = None  # pragma: no cover
+        variants_id = None
 
     ds = create_genotype_call_dataset(
         variant_contig_names=variant_contig_names,

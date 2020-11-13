@@ -88,13 +88,18 @@ def zarrs_to_dataset(
 
     # Set variable length strings to fixed length ones to avoid xarray/conventions.py:188 warning
     # (Also avoids this issue: https://github.com/pydata/xarray/issues/3476)
-    max_variant_id_length = max(ds.attrs["max_variant_id_length"] for ds in datasets)
+
+    if "max_variant_id_length" in datasets[0].attrs:
+        max_variant_id_length = max(
+            ds.attrs["max_variant_id_length"] for ds in datasets
+        )
+        ds["variant_id"] = ds["variant_id"].astype(f"S{max_variant_id_length}")  # type: ignore[no-untyped-call]
+        del ds.attrs["max_variant_id_length"]
+
     max_variant_allele_length = max(
         ds.attrs["max_variant_allele_length"] for ds in datasets
     )
-    ds["variant_id"] = ds["variant_id"].astype(f"S{max_variant_id_length}")  # type: ignore[no-untyped-call]
     ds["variant_allele"] = ds["variant_allele"].astype(f"S{max_variant_allele_length}")  # type: ignore[no-untyped-call]
-    del ds.attrs["max_variant_id_length"]
     del ds.attrs["max_variant_allele_length"]
 
     return ds
