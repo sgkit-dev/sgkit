@@ -1,10 +1,34 @@
+import allel
 import numpy as np
 import pytest
 import xarray as xr
+import zarr
 from numpy.testing import assert_array_equal
 
 from sgkit import read_vcfzarr
 from sgkit.io.vcfzarr_reader import _ensure_2d, vcfzarr_to_zarr
+
+
+def create_vcfzarr(
+    shared_datadir, tmpdir, *, fields=None, grouped_by_contig=False, consolidated=False
+):
+    """Create a vcfzarr file using scikit-allel"""
+    vcf_path = shared_datadir / "sample.vcf"
+    output_path = tmpdir / "sample.vcf.zarr"
+    if grouped_by_contig:
+        for contig in ["19", "20", "X"]:
+            allel.vcf_to_zarr(
+                str(vcf_path),
+                str(output_path),
+                fields=fields,
+                group=contig,
+                region=contig,
+            )
+    else:
+        allel.vcf_to_zarr(str(vcf_path), str(output_path), fields=fields)
+    if consolidated:
+        zarr.consolidate_metadata(str(output_path))
+    return output_path
 
 
 def test_ensure_2d():
@@ -12,15 +36,9 @@ def test_ensure_2d():
     assert_array_equal(_ensure_2d(np.array([[0], [2], [1]])), np.array([[0], [2], [1]]))
 
 
-def test_read_vcfzarr(shared_datadir):
-    # The file sample.vcf.zarr.zip was created by running the following
-    # in a python session with the scikit-allel package installed.
-    #
-    # import allel
-    # allel.vcf_to_zarr("sample.vcf", "sample.vcf.zarr.zip")
-
-    path = shared_datadir / "sample.vcf.zarr.zip"
-    ds = read_vcfzarr(path)
+def test_read_vcfzarr(shared_datadir, tmpdir):
+    vcfzarr_path = create_vcfzarr(shared_datadir, tmpdir)  # type: ignore[no-untyped-call]
+    ds = read_vcfzarr(vcfzarr_path)
 
     assert ds.attrs["contigs"] == ["19", "20", "X"]
     assert_array_equal(ds["variant_contig"], [0, 0, 1, 1, 1, 1, 1, 1, 2])
@@ -73,11 +91,12 @@ def test_read_vcfzarr(shared_datadir):
 
 
 @pytest.mark.parametrize(
-    "vcfzarr_filename, grouped_by_contig, consolidated",
+    "grouped_by_contig, consolidated, has_variant_id",
     [
-        ("sample.vcf.zarr.zip", False, False),
-        ("sample-grouped.vcf.zarr.zip", True, False),
-        ("sample-grouped.vcf.zarr.zip", True, True),
+        (False, False, False),
+        (False, False, True),
+        (True, False, True),
+        (True, True, False),
     ],
 )
 @pytest.mark.parametrize(
@@ -86,27 +105,35 @@ def test_read_vcfzarr(shared_datadir):
 )
 def test_vcfzarr_to_zarr(
     shared_datadir,
-    tmp_path,
-    vcfzarr_filename,
+    tmpdir,
     grouped_by_contig,
     consolidated,
+    has_variant_id,
     concat_algorithm,
 ):
-    # The file sample-grouped.vcf.zarr.zip was created by running the following
-    # in a python session with the scikit-allel package installed.
-    #
-    # import allel
-    # for contig in ["19", "20", "X"]:
-    #   allel.vcf_to_zarr("sample.vcf", "sample-grouped.vcf.zarr", group=contig, region=contig)
-    # zarr.consolidate_metadata("sample-grouped.vcf.zarr")
-    #
-    # Then (in a shell):
-    # (cd sample-grouped.vcf.zarr; zip -r ../sample-grouped.vcf.zarr.zip .)
+    if has_variant_id:
+        fields = None
+    else:
+        fields = [
+            "variants/CHROM",
+            "variants/POS",
+            "variants/REF",
+            "variants/ALT",
+            "calldata/GT",
+            "samples",
+        ]
 
-    path = shared_datadir / vcfzarr_filename
-    output = tmp_path.joinpath("vcf.zarr").as_posix()
+    vcfzarr_path = create_vcfzarr(  # type: ignore[no-untyped-call]
+        shared_datadir,
+        tmpdir,
+        fields=fields,
+        grouped_by_contig=grouped_by_contig,
+        consolidated=consolidated,
+    )
+
+    output = str(tmpdir / "vcf.zarr")
     vcfzarr_to_zarr(
-        path,
+        vcfzarr_path,
         output,
         grouped_by_contig=grouped_by_contig,
         concat_algorithm=concat_algorithm,
@@ -138,24 +165,28 @@ def test_vcfzarr_to_zarr(
             [b"AC", b"A", b"ATG", b"C"],
         ],
     )
-    assert_array_equal(
-        ds["variant_id"],
-        [
-            b".",
-            b".",
-            b"rs6054257",
-            b".",
-            b"rs6040355",
-            b".",
-            b"microsat1",
-            b".",
-            b"rsTest",
-        ],
-    )
-    assert_array_equal(
-        ds["variant_id_mask"],
-        [True, True, False, True, False, True, False, True, False],
-    )
+    if has_variant_id:
+        assert_array_equal(
+            ds["variant_id"],
+            [
+                b".",
+                b".",
+                b"rs6054257",
+                b".",
+                b"rs6040355",
+                b".",
+                b"microsat1",
+                b".",
+                b"rsTest",
+            ],
+        )
+        assert_array_equal(
+            ds["variant_id_mask"],
+            [True, True, False, True, False, True, False, True, False],
+        )
+    else:
+        assert "variant_id" not in ds
+        assert "variant_id_mask" not in ds
 
     assert_array_equal(ds["sample_id"], ["NA00001", "NA00002", "NA00003"])
 
