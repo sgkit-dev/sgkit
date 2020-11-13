@@ -285,7 +285,7 @@ def max_str_len(a: ArrayLike) -> ArrayLike:
     nopython=True,
     cache=True,
 )
-def hash_array(x: ArrayLike, out: ArrayLike) -> None:
+def hash_array(x: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Hash entries of ``x`` using the DJBX33A hash function.
 
     This is ~5 times faster than calling ``tobytes()`` followed
