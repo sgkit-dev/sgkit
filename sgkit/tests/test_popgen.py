@@ -405,25 +405,6 @@ def test_pbs__windowed(sample_size, n_cohorts, chunks):
 
 @pytest.mark.parametrize(
     "n_variants, n_samples, n_contigs, n_cohorts",
-    [(3, 5, 1, 1)],
-)
-def test_Garud_h__no_windows(n_variants, n_samples, n_contigs, n_cohorts):
-    # We can't use msprime since it doesn't generate diploid data, and Garud uses phased data
-    ds = simulate_genotype_call_dataset(
-        n_variant=n_variants, n_sample=n_samples, n_contig=n_contigs
-    )
-    subsets = np.array_split(ds.samples.values, n_cohorts)
-    sample_cohorts = np.concatenate(
-        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
-    )
-    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
-
-    with pytest.raises(ValueError, match="Dataset must be windowed for Garud_h"):
-        Garud_h(ds)
-
-
-@pytest.mark.parametrize(
-    "n_variants, n_samples, n_contigs, n_cohorts",
     [(9, 5, 1, 1), (9, 5, 1, 2)],
 )
 @pytest.mark.parametrize("chunks", [(-1, -1), (5, -1)])
@@ -456,3 +437,18 @@ def test_Garud_h(n_variants, n_samples, n_contigs, n_cohorts, chunks):
         np.testing.assert_allclose(h12[:, c], ska_h[1])
         np.testing.assert_allclose(h123[:, c], ska_h[2])
         np.testing.assert_allclose(h2_h1[:, c], ska_h[3])
+
+
+def test_Garud_h__raise_on_non_diploid():
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=10, n_ploidy=3)
+    with pytest.raises(
+        NotImplementedError, match="Garud H only implemented for diploid genotypes"
+    ):
+        Garud_h(ds)
+
+
+def test_Garud_h__raise_on_no_windows():
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=10)
+
+    with pytest.raises(ValueError, match="Dataset must be windowed for Garud_h"):
+        Garud_h(ds)
