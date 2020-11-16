@@ -351,17 +351,21 @@ def test_pbs(sample_size, n_cohorts):
 
 
 @pytest.mark.parametrize(
-    "sample_size, n_cohorts",
-    [(10, 3), (20, 4)],
+    "sample_size, n_cohorts, cohorts, cohort_indexes",
+    [
+        (10, 3, None, None),
+        (20, 4, None, None),
+        (20, 4, [(0, 1, 2), (3, 1, 2)], [(0, 1, 2), (3, 1, 2)]),
+    ],
 )
 @pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
-def test_pbs__windowed(sample_size, n_cohorts, chunks):
+def test_pbs__windowed(sample_size, n_cohorts, cohorts, cohort_indexes, chunks):
     ts = msprime.simulate(sample_size, length=200, mutation_rate=0.05, random_seed=42)
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     ds, subsets = add_cohorts(ds, ts, n_cohorts, cohort_key_names=["cohorts_0", "cohorts_1", "cohorts_2"])  # type: ignore[no-untyped-call]
     ds = window(ds, size=25)
 
-    ds = pbs(ds)
+    ds = pbs(ds, cohorts=cohorts)
 
     # scikit-allel
     for i, j, k in itertools.combinations(range(n_cohorts), 3):
@@ -371,14 +375,17 @@ def test_pbs__windowed(sample_size, n_cohorts, chunks):
             .values
         )
 
-        ac_i = ds.cohort_allele_count.values[:, i, :]
-        ac_j = ds.cohort_allele_count.values[:, j, :]
-        ac_k = ds.cohort_allele_count.values[:, k, :]
+        if cohort_indexes is not None and (i, j, k) not in cohort_indexes:
+            np.testing.assert_array_equal(stat_pbs, np.full_like(stat_pbs, np.nan))
+        else:
+            ac_i = ds.cohort_allele_count.values[:, i, :]
+            ac_j = ds.cohort_allele_count.values[:, j, :]
+            ac_k = ds.cohort_allele_count.values[:, k, :]
 
-        ska_pbs_value = allel.pbs(ac_i, ac_j, ac_k, window_size=25)
+            ska_pbs_value = allel.pbs(ac_i, ac_j, ac_k, window_size=25)
 
-        # scikit-allel has final window missing
-        np.testing.assert_allclose(stat_pbs[:-1], ska_pbs_value)
+            # scikit-allel has final window missing
+            np.testing.assert_allclose(stat_pbs[:-1], ska_pbs_value)
 
 
 @pytest.mark.parametrize(
