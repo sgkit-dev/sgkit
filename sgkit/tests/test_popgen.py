@@ -362,18 +362,25 @@ def test_pbs__windowed(sample_size, n_cohorts, chunks):
         ac_j = ds.cohort_allele_count.values[:, j, :]
         ac_k = ds.cohort_allele_count.values[:, k, :]
 
-        ska_pbs_value = allel.pbs(ac_i, ac_j, ac_k, window_size=25, window_step=25)
+        ska_pbs_value = allel.pbs(ac_i, ac_j, ac_k, window_size=25)
 
         # scikit-allel has final window missing
         np.testing.assert_allclose(stat_pbs[:-1], ska_pbs_value)
 
 
 @pytest.mark.parametrize(
-    "n_variants, n_samples, n_contigs, n_cohorts",
-    [(9, 5, 1, 1), (9, 5, 1, 2)],
+    "n_variants, n_samples, n_contigs, n_cohorts, cohorts, cohort_indexes",
+    [
+        (9, 5, 1, 1, None, None),
+        (9, 5, 1, 2, None, None),
+        (9, 5, 1, 2, [1], [1]),
+        (9, 5, 1, 2, ["co_1"], [1]),
+    ],
 )
 @pytest.mark.parametrize("chunks", [(-1, -1), (5, -1)])
-def test_Garud_h(n_variants, n_samples, n_contigs, n_cohorts, chunks):
+def test_Garud_h(
+    n_variants, n_samples, n_contigs, n_cohorts, cohorts, cohort_indexes, chunks
+):
     ds = simulate_genotype_call_dataset(
         n_variant=n_variants, n_sample=n_samples, n_contig=n_contigs
     )
@@ -383,9 +390,12 @@ def test_Garud_h(n_variants, n_samples, n_contigs, n_cohorts, chunks):
         [np.full_like(subset, i) for i, subset in enumerate(subsets)]
     )
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
+    coords = {k: cohort_names for k in ["cohorts"]}
+    ds = ds.assign_coords(coords)  # type: ignore[no-untyped-call]
     ds = window(ds, size=3)
 
-    gh = Garud_h(ds)
+    gh = Garud_h(ds, cohorts=cohorts)
     h1 = gh.stat_Garud_h1.values
     h12 = gh.stat_Garud_h12.values
     h123 = gh.stat_Garud_h123.values
@@ -393,15 +403,24 @@ def test_Garud_h(n_variants, n_samples, n_contigs, n_cohorts, chunks):
 
     # scikit-allel
     for c in range(n_cohorts):
-        gt = ds.call_genotype.values[:, sample_cohorts == c, :]
-        ska_gt = allel.GenotypeArray(gt)
-        ska_ha = ska_gt.to_haplotypes()
-        ska_h = allel.moving_garud_h(ska_ha, size=3)
+        if cohort_indexes is not None and c not in cohort_indexes:
+            # cohorts that were not computed should be nan
+            np.testing.assert_array_equal(h1[:, c], np.full_like(h1[:, c], np.nan))
+            np.testing.assert_array_equal(h12[:, c], np.full_like(h12[:, c], np.nan))
+            np.testing.assert_array_equal(h123[:, c], np.full_like(h123[:, c], np.nan))
+            np.testing.assert_array_equal(
+                h2_h1[:, c], np.full_like(h2_h1[:, c], np.nan)
+            )
+        else:
+            gt = ds.call_genotype.values[:, sample_cohorts == c, :]
+            ska_gt = allel.GenotypeArray(gt)
+            ska_ha = ska_gt.to_haplotypes()
+            ska_h = allel.moving_garud_h(ska_ha, size=3)
 
-        np.testing.assert_allclose(h1[:, c], ska_h[0])
-        np.testing.assert_allclose(h12[:, c], ska_h[1])
-        np.testing.assert_allclose(h123[:, c], ska_h[2])
-        np.testing.assert_allclose(h2_h1[:, c], ska_h[3])
+            np.testing.assert_allclose(h1[:, c], ska_h[0])
+            np.testing.assert_allclose(h12[:, c], ska_h[1])
+            np.testing.assert_allclose(h123[:, c], ska_h[2])
+            np.testing.assert_allclose(h2_h1[:, c], ska_h[3])
 
 
 def test_Garud_h__raise_on_non_diploid():

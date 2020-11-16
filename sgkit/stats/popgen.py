@@ -1,5 +1,5 @@
 import collections
-from typing import Hashable, Optional
+from typing import Hashable, Optional, Sequence, Union
 
 import dask.array as da
 import numpy as np
@@ -718,12 +718,12 @@ def _Garud_h(haplotypes: ArrayLike) -> ArrayLike:
 
 
 def _Garud_h_cohorts(
-    gt: ArrayLike, sample_cohort: ArrayLike, n_cohorts: int
+    gt: ArrayLike, sample_cohort: ArrayLike, n_cohorts: int, ct: ArrayLike
 ) -> ArrayLike:
     # transpose to hash columns (haplotypes)
     haplotypes = hash_array(gt.transpose()).transpose().flatten()
-    arr = np.empty((n_cohorts, N_GARUD_H_STATS))
-    for c in range(n_cohorts):
+    arr = np.full((n_cohorts, N_GARUD_H_STATS), np.nan)
+    for c in np.nditer(ct):
         arr[c, :] = _Garud_h(haplotypes[sample_cohort == c])
     return arr
 
@@ -732,6 +732,7 @@ def Garud_h(
     ds: Dataset,
     *,
     call_genotype: Hashable = variables.call_genotype,
+    cohorts: Optional[Sequence[Union[int, str]]] = None,
     merge: bool = True,
 ) -> Dataset:
     """Compute the H1, H12, H123 and H2/H1 statistics for detecting signatures
@@ -749,6 +750,10 @@ def Garud_h(
         Input variable name holding call_genotype as defined by
         :data:`sgkit.variables.call_genotype_spec`.
         Must be present in ``ds``.
+    cohorts
+        The cohorts to compute statistics for, specified as a sequence of
+        cohort indexes or IDs. None (the default) means compute statistics
+        for all cohorts.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -824,10 +829,12 @@ def Garud_h(
     sc = ds.sample_cohort.values
     hsc = np.stack((sc, sc), axis=1).ravel()  # TODO: assumes diploid
     n_cohorts = sc.max() + 1  # 0-based indexing
+    cohorts = cohorts or range(n_cohorts)
+    ct = _cohorts_to_array(cohorts, ds.indexes.get("cohorts", None))
 
     gh = window_statistic(
         gt,
-        lambda gt: _Garud_h_cohorts(gt, hsc, n_cohorts),
+        lambda gt: _Garud_h_cohorts(gt, hsc, n_cohorts, ct),
         ds.window_start.values,
         ds.window_stop.values,
         dtype=np.float64,
