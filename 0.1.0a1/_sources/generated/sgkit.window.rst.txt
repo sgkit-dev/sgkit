@@ -1,0 +1,6 @@
+﻿sgkit.window
+============
+
+.. currentmodule:: sgkit
+
+.. autofunction:: window

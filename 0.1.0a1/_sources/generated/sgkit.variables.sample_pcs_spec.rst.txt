@@ -1,0 +1,6 @@
+﻿sgkit.variables.sample\_pcs\_spec
+=================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: sample_pcs_spec

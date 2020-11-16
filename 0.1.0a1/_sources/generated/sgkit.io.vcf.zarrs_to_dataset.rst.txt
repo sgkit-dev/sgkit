@@ -1,0 +1,6 @@
+﻿sgkit.io.vcf.zarrs\_to\_dataset
+===============================
+
+.. currentmodule:: sgkit.io.vcf
+
+.. autofunction:: zarrs_to_dataset
