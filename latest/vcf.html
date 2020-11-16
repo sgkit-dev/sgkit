@@ -1,0 +1,411 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Reading VCF &mdash; sgkit  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/typehints.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributing to sgkit" href="contributing.html" />
+    <link rel="prev" title="User Guide" href="user_guide.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> sgkit
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reading VCF</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#highlights">Highlights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multiple-files">Multiple files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#partitioning">Partitioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chunk-sizes">Chunk sizes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cloud-storage">Cloud storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#low-level-operation">Low-level operation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to sgkit</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sgkit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Reading VCF</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/vcf.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="reading-vcf">
+<span id="vcf"></span><h1>Reading VCF<a class="headerlink" href="#reading-vcf" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="table-of-contents">
+<p class="topic-title">Table of contents:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#highlights" id="id1">Highlights</a></p></li>
+<li><p><a class="reference internal" href="#installation" id="id2">Installation</a></p></li>
+<li><p><a class="reference internal" href="#usage" id="id3">Usage</a></p></li>
+<li><p><a class="reference internal" href="#multiple-files" id="id4">Multiple files</a></p></li>
+<li><p><a class="reference internal" href="#partitioning" id="id5">Partitioning</a></p></li>
+<li><p><a class="reference internal" href="#chunk-sizes" id="id6">Chunk sizes</a></p></li>
+<li><p><a class="reference internal" href="#cloud-storage" id="id7">Cloud storage</a></p></li>
+<li><p><a class="reference internal" href="#low-level-operation" id="id8">Low-level operation</a></p></li>
+</ul>
+</div>
+<p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function converts one or more VCF files to Zarr files stored in
+sgkit’s Xarray data representation.</p>
+<div class="section" id="highlights">
+<h2><a class="toc-backref" href="#id1">Highlights</a><a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Reads bgzip-compressed VCF and BCF files.</p></li>
+<li><p>Large VCF files can be partitioned into regions using a Tabix (<code class="docutils literal notranslate"><span class="pre">.tbi</span></code>) or CSI (<code class="docutils literal notranslate"><span class="pre">.csi</span></code>)
+index, and each region is processed in parallel using <a class="reference external" href="https://dask.org/">Dask</a>.</p></li>
+<li><p>VCF parsing is performed by <a class="reference external" href="https://github.com/brentp/cyvcf2">cyvcf2</a>,
+a Cython wrapper around <a class="reference external" href="https://github.com/samtools/htslib">htslib</a>,
+the industry-standard VCF library.</p></li>
+<li><p>Control over Zarr chunk sizes allows VCFs with a large number of samples
+to be converted efficiently.</p></li>
+<li><p>Input and output files can reside on local filesystems, Amazon S3, or
+Google Cloud Storage.</p></li>
+</ul>
+</div>
+<div class="section" id="installation">
+<h2><a class="toc-backref" href="#id2">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>VCF support is an “extra” feature within sgkit and requires additional
+dependencies. It relies on <code class="docutils literal notranslate"><span class="pre">cyvcf2</span></code> and <code class="docutils literal notranslate"><span class="pre">htslib</span></code>, so you will have to
+have, at a minimum, <code class="docutils literal notranslate"><span class="pre">libcurl</span></code> installed on your machine (you can check by typing <code class="docutils literal notranslate"><span class="pre">curl</span> <span class="pre">-V</span></code>).</p>
+<p>To install sgkit with VCF support using pip:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install --pre &#39;sgkit[vcf]&#39;
+</pre></div>
+</div>
+<p>There are <a class="reference external" href="https://github.com/brentp/cyvcf2#installation">installation instructions for cyvcf2</a>,
+which may be helpful if you encounter errors during installation.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Reading VCFs is not supported on Windows, since <code class="docutils literal notranslate"><span class="pre">cyvcf2</span></code> and <code class="docutils literal notranslate"><span class="pre">htslib</span></code> do
+not <a class="reference external" href="https://github.com/brentp/cyvcf2/issues/90">currently work on Windows</a>.
+As a workaround, consider using scikit-allel’s <code class="docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code> function
+to write a VCF in Zarr format, followed by <a class="reference internal" href="generated/sgkit.read_vcfzarr.html#sgkit.read_vcfzarr" title="sgkit.read_vcfzarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.read_vcfzarr()</span></code></a> to
+read the VCF as a <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.2.dev3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
+</div>
+</div>
+<div class="section" id="usage">
+<h2><a class="toc-backref" href="#id3">Usage</a><a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>To convert a single VCF or BCF file to Zarr, just specify the input and output file names:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">vcf_to_zarr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vcf_to_zarr</span><span class="p">(</span><span class="s2">&quot;CEUTrio.20.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="s2">&quot;output.zarr&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_zarr</span><span class="p">(</span><span class="s2">&quot;output.zarr&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span>
+<span class="go">&lt;xarray.Dataset&gt;</span>
+<span class="go">Dimensions:               (alleles: 4, ploidy: 2, samples: 1, variants: 19910)</span>
+<span class="go">Dimensions without coordinates: alleles, ploidy, samples, variants</span>
+<span class="go">Data variables:</span>
+<span class="go">    call_genotype         (variants, samples, ploidy) int8 dask.array&lt;chunksize=(10000, 1, 2), meta=np.ndarray&gt;</span>
+<span class="go">    call_genotype_mask    (variants, samples, ploidy) bool dask.array&lt;chunksize=(10000, 1, 2), meta=np.ndarray&gt;</span>
+<span class="go">    call_genotype_phased  (variants, samples) bool dask.array&lt;chunksize=(10000, 1), meta=np.ndarray&gt;</span>
+<span class="go">    sample_id             (samples) &lt;U7 dask.array&lt;chunksize=(1,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_allele        (variants, alleles) object dask.array&lt;chunksize=(10000, 4), meta=np.ndarray&gt;</span>
+<span class="go">    variant_contig        (variants) int8 dask.array&lt;chunksize=(10000,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_id            (variants) object dask.array&lt;chunksize=(10000,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_id_mask       (variants) bool dask.array&lt;chunksize=(10000,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_position      (variants) int32 dask.array&lt;chunksize=(10000,), meta=np.ndarray&gt;</span>
+<span class="go">Attributes:</span>
+<span class="go">    contigs:                    [&#39;20&#39;, &#39;21&#39;]</span>
+<span class="go">    max_variant_allele_length:  48</span>
+<span class="go">    max_variant_id_length:      1</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function can accept multiple files, and furthermore, each of these
+files can be partitioned to enable parallel processing.</p>
+</div>
+<div class="section" id="multiple-files">
+<h2><a class="toc-backref" href="#id4">Multiple files</a><a class="headerlink" href="#multiple-files" title="Permalink to this headline">¶</a></h2>
+<p>If there are multiple files, then pass a list:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">vcf_to_zarr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vcf_to_zarr</span><span class="p">([</span><span class="s2">&quot;CEUTrio.20.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="s2">&quot;CEUTrio.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">],</span> <span class="s2">&quot;output.zarr&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Processing multiple inputs is more work than a single file, since behind the scenes each input is
+converted to a separate temporary Zarr file on disk, then these files are concatenated and rechunked
+to form the final output Zarr file.</p>
+<p>In the single file case, the input VCF is converted to the output Zarr file in a single sequential
+pass with no need for intermediate temporary files. For small files this is fine, but for very large
+files it’s a good idea to partition them so the conversion runs faster.</p>
+</div>
+<div class="section" id="partitioning">
+<h2><a class="toc-backref" href="#id5">Partitioning</a><a class="headerlink" href="#partitioning" title="Permalink to this headline">¶</a></h2>
+<p>Partitioning a large VCF file involves breaking it into a number of roughly equal-sized parts that can
+be processed in parallel. The parts are specified using genomic regions that follow the regions format
+used in <a class="reference external" href="http://samtools.github.io/bcftools/bcftools.html">bcftools</a>: <code class="docutils literal notranslate"><span class="pre">chr:beg-end</span></code>,
+where positions are 1-based and inclusive.</p>
+<p>All files to be partitioned must have either a Tabix (<code class="docutils literal notranslate"><span class="pre">.tbi</span></code>) or CSI (<code class="docutils literal notranslate"><span class="pre">.csi</span></code>) index. If both are present
+for a particular file, then Tabix is used for finding partitions.</p>
+<p>The <a class="reference internal" href="generated/sgkit.io.vcf.partition_into_regions.html#sgkit.io.vcf.partition_into_regions" title="sgkit.io.vcf.partition_into_regions"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.partition_into_regions()</span></code></a> function will create a list of region strings for a VCF
+file, given a desired number of parts to split the file into:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">partition_into_regions</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">partition_into_regions</span><span class="p">(</span><span class="s2">&quot;CEUTrio.20.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="n">num_parts</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">[&#39;20:1-10108928&#39;, &#39;20:10108929-10207232&#39;, &#39;20:10207233-&#39;, &#39;21:1-10027008&#39;, &#39;21:10027009-10043392&#39;, &#39;21:10043393-10108928&#39;, &#39;21:10108929-10141696&#39;, &#39;21:10141697-10174464&#39;, &#39;21:10174465-10190848&#39;, &#39;21:10190849-10207232&#39;, &#39;21:10207233-&#39;]</span>
+</pre></div>
+</div>
+<p>It’s important to note that the number of regions returned may not be exactly the number of parts
+requested: it may be more or less. However, it is guaranteed that the regions will be contiguous and
+will cover the whole VCF file.</p>
+<p>The region strings are passed to <code class="docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code> so it can process the parts in parallel:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">partition_into_regions</span><span class="p">,</span> <span class="n">vcf_to_zarr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regions</span> <span class="o">=</span> <span class="n">partition_into_regions</span><span class="p">(</span><span class="s2">&quot;CEUTrio.20.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="n">num_parts</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vcf_to_zarr</span><span class="p">(</span><span class="s2">&quot;CEUTrio.20.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="s2">&quot;output.zarr&quot;</span><span class="p">,</span> <span class="n">regions</span><span class="o">=</span><span class="n">regions</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It’s also possible to produce parts that have an approximate target size (in bytes). This is useful
+if you are partitioning multiple files, and want all the parts to be roughly the same size.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">partition_into_regions</span><span class="p">,</span> <span class="n">vcf_to_zarr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CEUTrio.20.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="s2">&quot;CEUTrio.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regions</span> <span class="o">=</span> <span class="p">[</span><span class="n">partition_into_regions</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">target_part_size</span><span class="o">=</span><span class="mi">100_000</span><span class="p">)</span> <span class="k">for</span> <span class="nb">input</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vcf_to_zarr</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="s2">&quot;output.zarr&quot;</span><span class="p">,</span> <span class="n">regions</span><span class="o">=</span><span class="n">regions</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As a special case, <code class="docutils literal notranslate"><span class="pre">None</span></code> is used to represent a single partition.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">partition_into_regions</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">partition_into_regions</span><span class="p">(</span><span class="s2">&quot;CEUTrio.20.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="n">num_parts</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="chunk-sizes">
+<h2><a class="toc-backref" href="#id6">Chunk sizes</a><a class="headerlink" href="#chunk-sizes" title="Permalink to this headline">¶</a></h2>
+<p>One key advantage of using Zarr as a storage format is its ability to store
+large files in chunks, making it straightforward to process the data in
+parallel.</p>
+<p>You can control the chunk <em>length</em> (in the variants dimension) and <em>width</em>
+(in the samples dimension) by setting the <code class="docutils literal notranslate"><span class="pre">chunk_length</span></code> and <code class="docutils literal notranslate"><span class="pre">chunk_width</span></code>
+parameters to <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a>.</p>
+<p>Due to the way that VCF files are parsed, all of the sample data for a given
+chunk of variants are loaded into memory at one time. In other words,
+<code class="docutils literal notranslate"><span class="pre">chunk_length</span></code> is honored at read time, whereas <code class="docutils literal notranslate"><span class="pre">chunk_width</span></code> is honored
+at write time. For files with very large numbers of samples, this can
+exceed working memory. The solution is to also set <code class="docutils literal notranslate"><span class="pre">temp_chunk_length</span></code> to be a
+smaller number (than <code class="docutils literal notranslate"><span class="pre">chunk_length</span></code>), so that fewer variants are loaded
+into memory at one time, while still having the desired output chunk sizes
+(<code class="docutils literal notranslate"><span class="pre">chunk_length</span></code> and <code class="docutils literal notranslate"><span class="pre">chunk_width</span></code>). Note that <code class="docutils literal notranslate"><span class="pre">temp_chunk_length</span></code> must
+divide <code class="docutils literal notranslate"><span class="pre">chunk_length</span></code> evenly.</p>
+</div>
+<div class="section" id="cloud-storage">
+<h2><a class="toc-backref" href="#id7">Cloud storage</a><a class="headerlink" href="#cloud-storage" title="Permalink to this headline">¶</a></h2>
+<p>VCF files can be read from various file systems including cloud stores. However,
+since different underlying libraries are used in different functions, there are
+slight differences in configuration that are outlined here.</p>
+<p>The <a class="reference internal" href="generated/sgkit.io.vcf.partition_into_regions.html#sgkit.io.vcf.partition_into_regions" title="sgkit.io.vcf.partition_into_regions"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.partition_into_regions()</span></code></a> function uses <a class="reference external" href="https://filesystem-spec.readthedocs.io/en/latest/">fsspec</a>
+to read VCF metadata and their indexes. Therefore, to access files stored on Amazon S3 or Google Cloud Storage
+install the <code class="docutils literal notranslate"><span class="pre">s3fs</span></code> or <code class="docutils literal notranslate"><span class="pre">gcsfs</span></code> Python packages, and use <code class="docutils literal notranslate"><span class="pre">s3://</span></code> or <code class="docutils literal notranslate"><span class="pre">gs://</span></code> URLs.</p>
+<p>You can also pass <code class="docutils literal notranslate"><span class="pre">storage_options</span></code> to <a class="reference internal" href="generated/sgkit.io.vcf.partition_into_regions.html#sgkit.io.vcf.partition_into_regions" title="sgkit.io.vcf.partition_into_regions"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.partition_into_regions()</span></code></a> to configure the <code class="docutils literal notranslate"><span class="pre">fsspec</span></code> backend.
+This provides a way to pass any credentials or other necessary arguments needed to <code class="docutils literal notranslate"><span class="pre">s3fs</span></code> or <code class="docutils literal notranslate"><span class="pre">gcsfs</span></code>.</p>
+<p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function does <em>not</em> use <code class="docutils literal notranslate"><span class="pre">fsspec</span></code>, since it
+relies on <code class="docutils literal notranslate"><span class="pre">htslib</span></code> for file handling, and therefore has its own way of accessing
+cloud storage. You can access files stored on Amazon S3 or Google Cloud Storage
+using <code class="docutils literal notranslate"><span class="pre">s3://</span></code> or <code class="docutils literal notranslate"><span class="pre">gs://</span></code> URLs. Setting credentials or other options is
+typically achieved using environment variables for the underlying cloud store.</p>
+</div>
+<div class="section" id="low-level-operation">
+<h2><a class="toc-backref" href="#id8">Low-level operation</a><a class="headerlink" href="#low-level-operation" title="Permalink to this headline">¶</a></h2>
+<p>Calling <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> runs a two-step operation:</p>
+<ol class="arabic simple">
+<li><p>Write the output for each input region to a separate temporary Zarr store</p></li>
+<li><p>Concatenate and rechunk the temporary stores into the final output Zarr store</p></li>
+</ol>
+<p>Each step is run as a Dask computation, which means you can use any Dask configuration
+mechanisms to control aspects of the computation.</p>
+<p>For example, you can set the Dask scheduler to run on a cluster. In this case you
+would set the temporary Zarr store to be a cloud storage URL (by setting <code class="docutils literal notranslate"><span class="pre">tempdir</span></code>) so
+that all workers can access the store (both for reading and writing).</p>
+<p>For debugging, or for more control over the steps, consider using
+<a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarrs.html#sgkit.io.vcf.vcf_to_zarrs" title="sgkit.io.vcf.vcf_to_zarrs"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarrs()</span></code></a> followed by <a class="reference internal" href="generated/sgkit.io.vcf.zarrs_to_dataset.html#sgkit.io.vcf.zarrs_to_dataset" title="sgkit.io.vcf.zarrs_to_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.zarrs_to_dataset()</span></code></a>,
+then saving the dataset using Xarray’s <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.to_zarr.html#xarray.Dataset.to_zarr" title="(in xarray v0.16.2.dev3)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.to_zarr()</span></code></a> method.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing to sgkit" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="user_guide.html" class="btn btn-neutral float-left" title="User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sgkit developers
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

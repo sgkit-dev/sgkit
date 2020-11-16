@@ -1,0 +1,6 @@
+﻿sgkit.variables.dosage\_spec
+============================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: dosage_spec
