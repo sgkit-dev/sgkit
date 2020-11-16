@@ -268,7 +268,7 @@ def test_Fst__unknown_estimator():
 
 @pytest.mark.parametrize(
     "sample_size, n_cohorts",
-    [(10, 2)],
+    [(10, 2), (10, 3)],
 )
 @pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
 def test_Fst__windowed(sample_size, n_cohorts, chunks):
@@ -293,16 +293,18 @@ def test_Fst__windowed(sample_size, n_cohorts, chunks):
 
     np.testing.assert_allclose(fst, ts_fst)
 
+    # scikit-allel
     fst_ds = Fst(ds, estimator="Hudson")
-    fst = fst_ds["stat_Fst"].sel(cohorts_0="co_0", cohorts_1="co_1").values
+    for i, j in itertools.combinations(range(n_cohorts), 2):
+        fst = fst_ds["stat_Fst"].sel(cohorts_0=f"co_{i}", cohorts_1=f"co_{j}").values
 
-    ac1 = fst_ds.cohort_allele_count.values[:, 0, :]
-    ac2 = fst_ds.cohort_allele_count.values[:, 1, :]
-    ska_fst = allel.moving_hudson_fst(ac1, ac2, size=25)
+        ac_i = fst_ds.cohort_allele_count.values[:, i, :]
+        ac_j = fst_ds.cohort_allele_count.values[:, j, :]
+        ska_fst = allel.moving_hudson_fst(ac_i, ac_j, size=25)
 
-    np.testing.assert_allclose(
-        fst[:-1], ska_fst
-    )  # scikit-allel has final window missing
+        np.testing.assert_allclose(
+            fst[:-1], ska_fst
+        )  # scikit-allel has final window missing
 
 
 @pytest.mark.parametrize("sample_size", [2, 3, 10, 100])
@@ -320,56 +322,63 @@ def test_Tajimas_D(sample_size):
 
 @pytest.mark.parametrize(
     "sample_size, n_cohorts",
-    [(10, 3)],
+    [(10, 3), (20, 4)],
 )
 def test_pbs(sample_size, n_cohorts):
     ts = msprime.simulate(sample_size, length=100, mutation_rate=0.05, random_seed=42)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
-    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
+    ds, subsets = add_cohorts(ds, ts, n_cohorts, cohort_key_names=["cohorts_0", "cohorts_1", "cohorts_2"])  # type: ignore[no-untyped-call]
     n_variants = ds.dims["variants"]
     ds = window(ds, size=n_variants)  # single window
 
     ds = pbs(ds)
-    stat_pbs = ds["stat_pbs"]
 
     # scikit-allel
-    ac1 = ds.cohort_allele_count.values[:, 0, :]
-    ac2 = ds.cohort_allele_count.values[:, 1, :]
-    ac3 = ds.cohort_allele_count.values[:, 2, :]
-
-    ska_pbs_value = np.full([1, n_cohorts, n_cohorts, n_cohorts], np.nan)
     for i, j, k in itertools.combinations(range(n_cohorts), 3):
-        ska_pbs_value[0, i, j, k] = allel.pbs(ac1, ac2, ac3, window_size=n_variants)
+        stat_pbs = (
+            ds["stat_pbs"]
+            .sel(cohorts_0=f"co_{i}", cohorts_1=f"co_{j}", cohorts_2=f"co_{k}")
+            .values
+        )
 
-    np.testing.assert_allclose(stat_pbs, ska_pbs_value)
+        ac_i = ds.cohort_allele_count.values[:, i, :]
+        ac_j = ds.cohort_allele_count.values[:, j, :]
+        ac_k = ds.cohort_allele_count.values[:, k, :]
+
+        ska_pbs_value = allel.pbs(ac_i, ac_j, ac_k, window_size=n_variants)
+
+        np.testing.assert_allclose(stat_pbs, ska_pbs_value)
 
 
 @pytest.mark.parametrize(
     "sample_size, n_cohorts",
-    [(10, 3)],
+    [(10, 3), (20, 4)],
 )
 @pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
 def test_pbs__windowed(sample_size, n_cohorts, chunks):
     ts = msprime.simulate(sample_size, length=200, mutation_rate=0.05, random_seed=42)
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
-    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
+    ds, subsets = add_cohorts(ds, ts, n_cohorts, cohort_key_names=["cohorts_0", "cohorts_1", "cohorts_2"])  # type: ignore[no-untyped-call]
     ds = window(ds, size=25)
 
     ds = pbs(ds)
-    stat_pbs = ds["stat_pbs"].values
 
     # scikit-allel
-    ac1 = ds.cohort_allele_count.values[:, 0, :]
-    ac2 = ds.cohort_allele_count.values[:, 1, :]
-    ac3 = ds.cohort_allele_count.values[:, 2, :]
-
-    # scikit-allel has final window missing
-    n_windows = ds.dims["windows"] - 1
-    ska_pbs_value = np.full([n_windows, n_cohorts, n_cohorts, n_cohorts], np.nan)
     for i, j, k in itertools.combinations(range(n_cohorts), 3):
-        ska_pbs_value[:, i, j, k] = allel.pbs(ac1, ac2, ac3, window_size=25)
+        stat_pbs = (
+            ds["stat_pbs"]
+            .sel(cohorts_0=f"co_{i}", cohorts_1=f"co_{j}", cohorts_2=f"co_{k}")
+            .values
+        )
 
-    np.testing.assert_allclose(stat_pbs[:-1], ska_pbs_value)
+        ac_i = ds.cohort_allele_count.values[:, i, :]
+        ac_j = ds.cohort_allele_count.values[:, j, :]
+        ac_k = ds.cohort_allele_count.values[:, k, :]
+
+        ska_pbs_value = allel.pbs(ac_i, ac_j, ac_k, window_size=25, window_step=25)
+
+        # scikit-allel has final window missing
+        np.testing.assert_allclose(stat_pbs[:-1], ska_pbs_value)
 
 
 @pytest.mark.parametrize(
