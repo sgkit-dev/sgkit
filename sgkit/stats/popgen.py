@@ -1,11 +1,13 @@
 import collections
-from typing import Hashable, Optional, Sequence, Union
+import itertools
+from typing import Hashable, Optional, Sequence, Tuple, Union
 
 import dask.array as da
 import numpy as np
 from numba import guvectorize
 from xarray import Dataset
 
+from sgkit.cohorts import _cohorts_to_array
 from sgkit.stats.utils import assert_array_shape
 from sgkit.typing import ArrayLike
 from sgkit.utils import (
@@ -606,10 +608,39 @@ def _pbs(t: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
                 out[i, j, k] = ret
 
 
+# c = cohorts, ct = cohort_triples, i = index (size 3)
+@guvectorize(  # type: ignore
+    [
+        "void(float32[:, :], int32[:, :], float32[:,:,:])",
+        "void(float64[:, :], int32[:, :], float64[:,:,:])",
+    ],
+    "(c,c),(ct,i)->(c,c,c)",
+    nopython=True,
+    cache=True,
+)
+def _pbs_cohorts(
+    t: ArrayLike, ct: ArrayLike, out: ArrayLike
+) -> None:  # pragma: no cover
+    """Generalized U-function for computing PBS."""
+    out[:, :, :] = np.nan  # (cohorts, cohorts, cohorts)
+    n_cohort_triples = ct.shape[0]
+    for n in range(n_cohort_triples):
+        i = ct[n, 0]
+        j = ct[n, 1]
+        k = ct[n, 2]
+        ret = (t[i, j] + t[i, k] - t[j, k]) / 2
+        norm = 1 + (t[i, j] + t[i, k] + t[j, k]) / 2
+        ret = ret / norm
+        out[i, j, k] = ret
+
+
 def pbs(
     ds: Dataset,
     *,
     stat_Fst: Hashable = variables.stat_Fst,
+    cohorts: Optional[
+        Sequence[Union[Tuple[int, int, int], Tuple[str, str, str]]]
+    ] = None,
     merge: bool = True,
 ) -> Dataset:
     """Compute the population branching statistic (PBS) between cohort triples.
@@ -627,6 +658,10 @@ def pbs(
         :data:`sgkit.variables.stat_Fst_spec`.
         If the variable is not present in ``ds``, it will be computed
         using :func:`Fst`.
+    cohorts
+        The cohort triples to compute statistics for, specified as a sequence of
+        tuples of cohort indexes or IDs. None (the default) means compute statistics
+        for all cohorts.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -680,7 +715,13 @@ def pbs(
     # calculate PBS triples
     t = da.asarray(t)
     shape = (t.chunks[0], n_cohorts, n_cohorts, n_cohorts)
-    p = da.map_blocks(_pbs, t, chunks=shape, new_axis=3, dtype=np.float64)
+
+    cohorts = cohorts or list(itertools.combinations(range(n_cohorts), 3))  # type: ignore
+    ct = _cohorts_to_array(cohorts, ds.indexes.get("cohorts_0", None))
+
+    p = da.map_blocks(
+        lambda t: _pbs_cohorts(t, ct), t, chunks=shape, new_axis=3, dtype=np.float64
+    )
     assert_array_shape(p, n_windows, n_cohorts, n_cohorts, n_cohorts)
 
     new_ds = Dataset(
