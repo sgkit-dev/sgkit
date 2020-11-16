@@ -1,6 +1,0 @@
-﻿sgkit.variables.loco\_prediction\_spec
-======================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: loco_prediction_spec

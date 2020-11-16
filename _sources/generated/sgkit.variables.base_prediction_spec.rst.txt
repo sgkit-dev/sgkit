@@ -1,6 +1,0 @@
-﻿sgkit.variables.base\_prediction\_spec
-======================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: base_prediction_spec

@@ -1,6 +1,0 @@
-﻿sgkit.pc\_relate
-================
-
-.. currentmodule:: sgkit
-
-.. autofunction:: pc_relate

@@ -1,6 +1,0 @@
-﻿sgkit.variables.variant\_n\_het\_spec
-=====================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: variant_n_het_spec

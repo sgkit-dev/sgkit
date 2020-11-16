@@ -1,6 +1,0 @@
-﻿sgkit.variables.covariates\_spec
-================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: covariates_spec

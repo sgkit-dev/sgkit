@@ -1,6 +1,0 @@
-﻿sgkit.gwas\_linear\_regression
-==============================
-
-.. currentmodule:: sgkit
-
-.. autofunction:: gwas_linear_regression

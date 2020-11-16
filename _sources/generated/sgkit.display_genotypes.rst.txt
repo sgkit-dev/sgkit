@@ -1,6 +1,0 @@
-﻿sgkit.display\_genotypes
-========================
-
-.. currentmodule:: sgkit
-
-.. autofunction:: display_genotypes

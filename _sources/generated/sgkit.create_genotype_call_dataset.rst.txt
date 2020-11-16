@@ -1,6 +1,0 @@
-﻿sgkit.create\_genotype\_call\_dataset
-=====================================
-
-.. currentmodule:: sgkit
-
-.. autofunction:: create_genotype_call_dataset

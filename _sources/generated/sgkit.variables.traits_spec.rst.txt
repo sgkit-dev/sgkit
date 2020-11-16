@@ -1,6 +1,0 @@
-﻿sgkit.variables.traits\_spec
-============================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: traits_spec

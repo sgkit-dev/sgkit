@@ -1,6 +1,0 @@
-﻿sgkit.variables.sample\_id\_spec
-================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: sample_id_spec

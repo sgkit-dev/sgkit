@@ -1,6 +1,0 @@
-﻿sgkit.variables.variant\_call\_rate\_spec
-=========================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: variant_call_rate_spec

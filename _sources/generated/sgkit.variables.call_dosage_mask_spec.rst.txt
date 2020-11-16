@@ -1,6 +1,0 @@
-﻿sgkit.variables.call\_dosage\_mask\_spec
-========================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: call_dosage_mask_spec

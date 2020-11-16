@@ -1,2 +1,0 @@
-*:not(:hover) > .annotation.full  { display: none }
-*:hover       > .annotation.terse { display: none }

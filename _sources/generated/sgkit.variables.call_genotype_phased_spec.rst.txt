@@ -1,6 +1,0 @@
-﻿sgkit.variables.call\_genotype\_phased\_spec
-============================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: call_genotype_phased_spec

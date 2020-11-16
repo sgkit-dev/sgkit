@@ -1,6 +1,0 @@
-﻿sgkit.variables.call\_allele\_count\_spec
-=========================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: call_allele_count_spec

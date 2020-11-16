@@ -1,6 +1,0 @@
-﻿sgkit.variables.variant\_t\_value\_spec
-=======================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: variant_t_value_spec

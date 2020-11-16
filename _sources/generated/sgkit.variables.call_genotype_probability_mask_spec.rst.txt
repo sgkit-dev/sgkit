@@ -1,6 +1,0 @@
-﻿sgkit.variables.call\_genotype\_probability\_mask\_spec
-=======================================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: call_genotype_probability_mask_spec

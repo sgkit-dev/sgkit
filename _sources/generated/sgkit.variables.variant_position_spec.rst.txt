@@ -1,6 +1,0 @@
-﻿sgkit.variables.variant\_position\_spec
-=======================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: variant_position_spec

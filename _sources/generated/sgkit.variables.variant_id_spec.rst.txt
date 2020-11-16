@@ -1,6 +1,0 @@
-﻿sgkit.variables.variant\_id\_spec
-=================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: variant_id_spec

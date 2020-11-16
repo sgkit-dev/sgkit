@@ -1,6 +1,0 @@
-﻿sgkit.variables.variant\_n\_hom\_ref\_spec
-==========================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: variant_n_hom_ref_spec

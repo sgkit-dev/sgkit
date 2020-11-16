@@ -1,6 +1,0 @@
-﻿sgkit.count\_cohort\_alleles
-============================
-
-.. currentmodule:: sgkit
-
-.. autofunction:: count_cohort_alleles

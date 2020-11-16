@@ -1,6 +1,0 @@
-﻿sgkit.io.plink.read\_plink
-==========================
-
-.. currentmodule:: sgkit.io.plink
-
-.. autofunction:: read_plink

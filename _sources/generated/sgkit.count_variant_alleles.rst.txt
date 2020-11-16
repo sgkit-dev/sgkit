@@ -1,6 +1,0 @@
-﻿sgkit.count\_variant\_alleles
-=============================
-
-.. currentmodule:: sgkit
-
-.. autofunction:: count_variant_alleles
