@@ -31,12 +31,13 @@ jobs:
     - name: Commit documentation changes to gh-pages branch
       run: |
         git clone https://github.com/pystatgen/sgkit.git --branch gh-pages --single-branch gh-pages
-        cp -r docs/_build/html/* gh-pages/
+        mkdir -p gh-pages/latest
+        cp -r docs/_build/html/* gh-pages/latest
         cd gh-pages
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add .
-        git commit -m "Update documentation" -a || true # Ignore error if no changes present
+        git commit -m "Update latest documentation" -a || true # Ignore error if no changes present
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
