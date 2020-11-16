@@ -98,6 +98,8 @@ def pc_relate(
     Warnings
     --------
     This function is only applicable to diploid, biallelic datasets.
+    This version is compatible with the R implementation of PC Relate
+    method from the GENESIS package version 2.18.0.
 
     Returns
     -------
