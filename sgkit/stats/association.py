@@ -96,9 +96,10 @@ def linear_regression(
     T = B / np.sqrt(RSS / dof / XLPS)
     assert T.shape == (n_loop_covar, n_outcome)
     # Match to p-values
-    # Note: t dist not implemented in Dask so this will
-    # coerce result to numpy (`T` will still be da.Array)
-    P = 2 * stats.distributions.t.sf(np.abs(T), dof)
+    # Note: t dist not implemented in Dask so this must be delayed
+    P = da.map_blocks(
+        lambda t: 2 * stats.distributions.t.sf(np.abs(T), dof), T, dtype="float64"
+    )
     assert P.shape == (n_loop_covar, n_outcome)
 
     return LinearRegressionResult(beta=B, t_value=T, p_value=P)
