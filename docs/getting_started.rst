@@ -10,11 +10,9 @@ Getting Started
 Installation
 ------------
 
-Sgkit itself contains only Python code but many of the required dependencies use compiled code or have system
-package dependencies. For this reason, conda is the preferred installation method.  There is no sgkit conda
-package yet though so the recommended setup instructions are::
+You can install sgkit with `pip` - there is no conda package yet. Python 3.7 or 3.8 is required.
 
-    $ pip install --pre sgkit
+    $ pip install sgkit
 
 ..
 
