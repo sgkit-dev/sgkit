@@ -33,7 +33,7 @@ have, at a minimum, ``libcurl`` installed on your machine (you can check by typi
 
 To install sgkit with VCF support using pip::
 
-    $ pip install --pre 'sgkit[vcf]'
+    $ pip install 'sgkit[vcf]'
 
 There are `installation instructions for cyvcf2 <https://github.com/brentp/cyvcf2#installation>`_,
 which may be helpful if you encounter errors during installation.

@@ -121,12 +121,6 @@ Contributing to code
 *sgkit* maintains development standards that are similar to most PyData projects.  These standards include
 language support, testing, documentation, and style.
 
-Python versions
-~~~~~~~~~~~~~~~
-
-*sgkit* supports Python versions 3.7 and 3.8.
-
-
 Continuous Integration
 ~~~~~~~~~~~~~~~~~~~~~~
 
