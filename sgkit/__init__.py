@@ -1,6 +1,7 @@
 from pkg_resources import DistributionNotFound, get_distribution
 
 from .display import display_genotypes
+from .io.dataset import load_dataset, save_dataset
 from .io.vcfzarr_reader import read_vcfzarr
 from .model import (
     DIM_ALLELE,
@@ -59,4 +60,6 @@ __all__ = [
     "variables",
     "pca",
     "window",
+    "load_dataset",
+    "save_dataset",
 ]
