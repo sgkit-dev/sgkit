@@ -19,7 +19,7 @@ arrays within an :class:`xarray.Dataset` from ``bed``, ``bim``, and ``fam`` file
 PLINK IO support is an "extra" feature within sgkit and requires additional
 dependencies. To install sgkit with PLINK support using pip::
 
-    $ pip install --pre 'sgkit[plink]'
+    $ pip install 'sgkit[plink]'
 
 VCF
 ---

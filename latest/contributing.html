@@ -99,7 +99,6 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#contributing-to-code">Contributing to code</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#python-versions">Python versions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#continuous-integration">Continuous Integration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#test">Test</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#docstrings">Docstrings</a></li>
@@ -202,24 +201,23 @@
 </li>
 <li><p><a class="reference internal" href="#contributing-to-code" id="id8">Contributing to code</a></p>
 <ul>
-<li><p><a class="reference internal" href="#python-versions" id="id9">Python versions</a></p></li>
-<li><p><a class="reference internal" href="#continuous-integration" id="id10">Continuous Integration</a></p></li>
-<li><p><a class="reference internal" href="#test" id="id11">Test</a></p></li>
-<li><p><a class="reference internal" href="#docstrings" id="id12">Docstrings</a></p></li>
-<li><p><a class="reference internal" href="#coding-standards" id="id13">Coding standards</a></p></li>
-<li><p><a class="reference internal" href="#pr-git-ops" id="id14">PR/Git ops</a></p></li>
+<li><p><a class="reference internal" href="#continuous-integration" id="id9">Continuous Integration</a></p></li>
+<li><p><a class="reference internal" href="#test" id="id10">Test</a></p></li>
+<li><p><a class="reference internal" href="#docstrings" id="id11">Docstrings</a></p></li>
+<li><p><a class="reference internal" href="#coding-standards" id="id12">Coding standards</a></p></li>
+<li><p><a class="reference internal" href="#pr-git-ops" id="id13">PR/Git ops</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#contributing-to-documentation" id="id15">Contributing to documentation</a></p></li>
-<li><p><a class="reference internal" href="#review-process" id="id16">Review process</a></p></li>
-<li><p><a class="reference internal" href="#design-discussions" id="id17">Design discussions</a></p>
+<li><p><a class="reference internal" href="#contributing-to-documentation" id="id14">Contributing to documentation</a></p></li>
+<li><p><a class="reference internal" href="#review-process" id="id15">Review process</a></p></li>
+<li><p><a class="reference internal" href="#design-discussions" id="id16">Design discussions</a></p>
 <ul>
-<li><p><a class="reference internal" href="#dataset-subclassing" id="id18">Dataset subclassing</a></p></li>
-<li><p><a class="reference internal" href="#dataset-api-typing" id="id19">Dataset API typing</a></p></li>
-<li><p><a class="reference internal" href="#delayed-invariant-checks" id="id20">Delayed invariant checks</a></p></li>
-<li><p><a class="reference internal" href="#mixed-ploidy" id="id21">Mixed ploidy</a></p></li>
-<li><p><a class="reference internal" href="#numba-guvectorize-usage" id="id22">Numba guvectorize usage</a></p></li>
-<li><p><a class="reference internal" href="#api-namespace" id="id23">API namespace</a></p></li>
+<li><p><a class="reference internal" href="#dataset-subclassing" id="id17">Dataset subclassing</a></p></li>
+<li><p><a class="reference internal" href="#dataset-api-typing" id="id18">Dataset API typing</a></p></li>
+<li><p><a class="reference internal" href="#delayed-invariant-checks" id="id19">Delayed invariant checks</a></p></li>
+<li><p><a class="reference internal" href="#mixed-ploidy" id="id20">Mixed ploidy</a></p></li>
+<li><p><a class="reference internal" href="#numba-guvectorize-usage" id="id21">Numba guvectorize usage</a></p></li>
+<li><p><a class="reference internal" href="#api-namespace" id="id22">API namespace</a></p></li>
 </ul>
 </li>
 </ul>
@@ -313,18 +311,14 @@ as follows:</p>
 <h2><a class="toc-backref" href="#id8">Contributing to code</a><a class="headerlink" href="#contributing-to-code" title="Permalink to this headline">¶</a></h2>
 <p><em>sgkit</em> maintains development standards that are similar to most PyData projects.  These standards include
 language support, testing, documentation, and style.</p>
-<div class="section" id="python-versions">
-<h3><a class="toc-backref" href="#id9">Python versions</a><a class="headerlink" href="#python-versions" title="Permalink to this headline">¶</a></h3>
-<p><em>sgkit</em> supports Python versions 3.7 and 3.8.</p>
-</div>
 <div class="section" id="continuous-integration">
-<h3><a class="toc-backref" href="#id10">Continuous Integration</a><a class="headerlink" href="#continuous-integration" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id9">Continuous Integration</a><a class="headerlink" href="#continuous-integration" title="Permalink to this headline">¶</a></h3>
 <p><em>sgkit</em> uses GitHub Actions as a Continuous Integration (CI) service to check code
 contributions. Every push to every pull request on GitHub will run the tests,
 check test coverage, check coding standards, and check the documentation build.</p>
 </div>
 <div class="section" id="test">
-<h3><a class="toc-backref" href="#id11">Test</a><a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id10">Test</a><a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h3>
 <p><em>sgkit</em> employs extensive unit tests to ensure correctness of code both for today
 and for the future.</p>
 <p>Test coverage must be 100% for code to be accepted. You can measure the coverage
@@ -347,7 +341,7 @@ are not covered by tests.</p>
 </div>
 </div>
 <div class="section" id="docstrings">
-<h3><a class="toc-backref" href="#id12">Docstrings</a><a class="headerlink" href="#docstrings" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id11">Docstrings</a><a class="headerlink" href="#docstrings" title="Permalink to this headline">¶</a></h3>
 <p>User facing functions should follow the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">numpydoc</a> standard, including
 sections for <code class="docutils literal notranslate"><span class="pre">Parameters</span></code>, <code class="docutils literal notranslate"><span class="pre">Examples</span></code>, and general explanatory prose.</p>
 <p>The types for parameters and returns should not be added to the docstring,
@@ -365,7 +359,7 @@ by running <code class="docutils literal notranslate"><span class="pre">pytest</
 in the <em>setup.cfg</em> file).</p>
 </div>
 <div class="section" id="coding-standards">
-<h3><a class="toc-backref" href="#id13">Coding standards</a><a class="headerlink" href="#coding-standards" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id12">Coding standards</a><a class="headerlink" href="#coding-standards" title="Permalink to this headline">¶</a></h3>
 <p><em>sgkit</em> uses <a class="reference external" href="https://pre-commit.com/">pre-commit</a> to enforce coding standards. Pre-commit
 runs when you commit code to your local git repository, and the commit will only succeed
 if the change passes all the checks. It is also run for pull requests using CI.</p>
@@ -388,7 +382,7 @@ doing a git commit, run:</p>
 <p>You can omit <code class="docutils literal notranslate"><span class="pre">--all-files</span></code> to only check changed files.</p>
 </div>
 <div class="section" id="pr-git-ops">
-<h3><a class="toc-backref" href="#id14">PR/Git ops</a><a class="headerlink" href="#pr-git-ops" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id13">PR/Git ops</a><a class="headerlink" href="#pr-git-ops" title="Permalink to this headline">¶</a></h3>
 <p>We currently use <code class="docutils literal notranslate"><span class="pre">rebase</span></code> or <code class="docutils literal notranslate"><span class="pre">squash</span></code> PR merge strategies. This means that
 following certain git best practices will make your development life easier.</p>
 <ol class="arabic">
@@ -406,7 +400,7 @@ and specifically a very handy <a class="reference external" href="https://git-sc
 </div>
 </div>
 <div class="section" id="contributing-to-documentation">
-<h2><a class="toc-backref" href="#id15">Contributing to documentation</a><a class="headerlink" href="#contributing-to-documentation" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id14">Contributing to documentation</a><a class="headerlink" href="#contributing-to-documentation" title="Permalink to this headline">¶</a></h2>
 <p><em>sgkit</em> uses <a class="reference external" href="https://www.sphinx-doc.org/">Sphinx</a> for documentation, hosted at <a class="reference external" href="https://pystatgen.github.io/sgkit/">https://pystatgen.github.io/sgkit/</a>.
 Documentation is maintained in the RestructuredText markup language (<code class="docutils literal notranslate"><span class="pre">.rst</span></code>
 files) in <code class="docutils literal notranslate"><span class="pre">docs</span></code>.  The documentation consists both of prose
@@ -426,7 +420,7 @@ without warnings. You can do that locally with:</p>
 </div>
 </div>
 <div class="section" id="review-process">
-<h2><a class="toc-backref" href="#id16">Review process</a><a class="headerlink" href="#review-process" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id15">Review process</a><a class="headerlink" href="#review-process" title="Permalink to this headline">¶</a></h2>
 <p>Pull requests will be reviewed by a project maintainer. All changes to <em>sgkit</em> require
 approval by at least one maintainer.</p>
 <p>We use <a class="reference external" href="https://mergify.io/">mergify</a> to automate PR flow. A project
@@ -436,11 +430,11 @@ at least one +1 (from [committers](<a class="reference external" href="https://g
 and a clean build it will get merged automatically.</p>
 </div>
 <div class="section" id="design-discussions">
-<h2><a class="toc-backref" href="#id17">Design discussions</a><a class="headerlink" href="#design-discussions" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id16">Design discussions</a><a class="headerlink" href="#design-discussions" title="Permalink to this headline">¶</a></h2>
 <p>The information on these topics may be useful for developers in understanding the
 history behind the design choices that have been made within the project so far.</p>
 <div class="section" id="dataset-subclassing">
-<h3><a class="toc-backref" href="#id18">Dataset subclassing</a><a class="headerlink" href="#dataset-subclassing" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id17">Dataset subclassing</a><a class="headerlink" href="#dataset-subclassing" title="Permalink to this headline">¶</a></h3>
 <p>Debates on whether or not we should use Xarray objects directly or
 put them behind a layer of encapsulation:</p>
 <ul class="simple">
@@ -449,7 +443,7 @@ put them behind a layer of encapsulation:</p>
 </ul>
 </div>
 <div class="section" id="dataset-api-typing">
-<h3><a class="toc-backref" href="#id19">Dataset API typing</a><a class="headerlink" href="#dataset-api-typing" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id18">Dataset API typing</a><a class="headerlink" href="#dataset-api-typing" title="Permalink to this headline">¶</a></h3>
 <p>Discussions around bringing stricter array type enforcement into the API:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/issues/43">https://github.com/pystatgen/sgkit/issues/43</a></p></li>
@@ -458,7 +452,7 @@ put them behind a layer of encapsulation:</p>
 </ul>
 </div>
 <div class="section" id="delayed-invariant-checks">
-<h3><a class="toc-backref" href="#id20">Delayed invariant checks</a><a class="headerlink" href="#delayed-invariant-checks" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id19">Delayed invariant checks</a><a class="headerlink" href="#delayed-invariant-checks" title="Permalink to this headline">¶</a></h3>
 <p>Discussions on how to run sanity checks on arrays efficiently and why those checks would be
 useful if they were possible (they are not possible currently w/ Dask):</p>
 <ul class="simple">
@@ -467,11 +461,11 @@ useful if they were possible (they are not possible currently w/ Dask):</p>
 </ul>
 </div>
 <div class="section" id="mixed-ploidy">
-<h3><a class="toc-backref" href="#id21">Mixed ploidy</a><a class="headerlink" href="#mixed-ploidy" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id20">Mixed ploidy</a><a class="headerlink" href="#mixed-ploidy" title="Permalink to this headline">¶</a></h3>
 <p>Proposal for handling mixed ploidy: <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/243">https://github.com/pystatgen/sgkit/issues/243</a></p>
 </div>
 <div class="section" id="numba-guvectorize-usage">
-<h3><a class="toc-backref" href="#id22">Numba guvectorize usage</a><a class="headerlink" href="#numba-guvectorize-usage" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id21">Numba guvectorize usage</a><a class="headerlink" href="#numba-guvectorize-usage" title="Permalink to this headline">¶</a></h3>
 <p>Learning how to use <code class="docutils literal notranslate"><span class="pre">guvectorize</span></code> effectively:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/pull/114">https://github.com/pystatgen/sgkit/pull/114</a></p></li>
@@ -479,7 +473,7 @@ useful if they were possible (they are not possible currently w/ Dask):</p>
 </ul>
 </div>
 <div class="section" id="api-namespace">
-<h3><a class="toc-backref" href="#id23">API namespace</a><a class="headerlink" href="#api-namespace" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id22">API namespace</a><a class="headerlink" href="#api-namespace" title="Permalink to this headline">¶</a></h3>
 <p>Sgkit controls API namespace via init files. To accommodate for mypy and docstrings
 we include both imports and <code class="docutils literal notranslate"><span class="pre">__all__</span></code> declaration. More on this decision in the issue:
 <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/251">https://github.com/pystatgen/sgkit/issues/251</a></p>
