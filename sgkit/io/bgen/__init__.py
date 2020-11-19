@@ -6,6 +6,6 @@ except ImportError as e:  # pragma: no cover
     msg = (
         "sgkit bgen requirements are not installed.\n\n"
         "Please install them via pip :\n\n"
-        "  pip install --pre 'sgkit[bgen]'"
+        "  pip install 'sgkit[bgen]'"
     )
     raise ImportError(str(e) + "\n\n" + msg) from e
