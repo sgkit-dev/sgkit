@@ -21,6 +21,6 @@ except ImportError as e:  # pragma: no cover
         msg = (
             "sgkit-vcf requirements are not installed.\n\n"
             "Please install them via pip :\n\n"
-            "  pip install --pre 'sgkit[vcf]'"
+            "  pip install 'sgkit[vcf]'"
         )
     raise ImportError(str(e) + "\n\n" + msg) from e
