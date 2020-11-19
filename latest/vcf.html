@@ -97,6 +97,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#chunk-sizes">Chunk sizes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cloud-storage">Cloud storage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#low-level-operation">Low-level operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#polyploid-and-mixed-ploidy-vcf">Polyploid and mixed-ploidy VCF</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to sgkit</a></li>
@@ -178,6 +179,7 @@
 <li><p><a class="reference internal" href="#chunk-sizes" id="id6">Chunk sizes</a></p></li>
 <li><p><a class="reference internal" href="#cloud-storage" id="id7">Cloud storage</a></p></li>
 <li><p><a class="reference internal" href="#low-level-operation" id="id8">Low-level operation</a></p></li>
+<li><p><a class="reference internal" href="#polyploid-and-mixed-ploidy-vcf" id="id9">Polyploid and mixed-ploidy VCF</a></p></li>
 </ul>
 </div>
 <p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function converts one or more VCF files to Zarr files stored in
@@ -195,6 +197,7 @@ the industry-standard VCF library.</p></li>
 to be converted efficiently.</p></li>
 <li><p>Input and output files can reside on local filesystems, Amazon S3, or
 Google Cloud Storage.</p></li>
+<li><p>Support for polyploid and mixed-ploidy genotypes.</p></li>
 </ul>
 </div>
 <div class="section" id="installation">
@@ -349,6 +352,36 @@ that all workers can access the store (both for reading and writing).</p>
 <p>For debugging, or for more control over the steps, consider using
 <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarrs.html#sgkit.io.vcf.vcf_to_zarrs" title="sgkit.io.vcf.vcf_to_zarrs"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarrs()</span></code></a> followed by <a class="reference internal" href="generated/sgkit.io.vcf.zarrs_to_dataset.html#sgkit.io.vcf.zarrs_to_dataset" title="sgkit.io.vcf.zarrs_to_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.zarrs_to_dataset()</span></code></a>,
 then saving the dataset using Xarray’s <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.to_zarr.html#xarray.Dataset.to_zarr" title="(in xarray v0.16.2.dev3)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.to_zarr()</span></code></a> method.</p>
+</div>
+<div class="section" id="polyploid-and-mixed-ploidy-vcf">
+<h2><a class="toc-backref" href="#id9">Polyploid and mixed-ploidy VCF</a><a class="headerlink" href="#polyploid-and-mixed-ploidy-vcf" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function can be used to convert polyploid VCF
+data to Zarr files stored in sgkit’s Xarray data representation by specifying the
+ploidy of the dataset using the <code class="docutils literal notranslate"><span class="pre">ploidy</span></code> parameter.</p>
+<p>By default, sgkit expects VCF files to have a consistent ploidy level across all samples
+and variants.
+Manual specification of ploidy is necessary because, within the VCF standard,
+ploidy is indicated by the length of each genotype call and hence it may not be
+consistent throughout the entire VCF file.</p>
+<p>If a genotype call of lower than specified ploidy is encountered it will be treated
+as an incomplete genotype.
+For example, if a VCF is being processed assuming a ploidy of four (i.e. tetraploid)
+then the diploid genotype <code class="docutils literal notranslate"><span class="pre">0/1</span></code> will be treated as the incomplete tetraploid
+genotype <code class="docutils literal notranslate"><span class="pre">0/1/./.</span></code>.</p>
+<p>If a genotype call of higher than specified ploidy is encountered an exception is raised.
+This exception can be avoided using the <code class="docutils literal notranslate"><span class="pre">truncate_calls</span></code> parameter in which case the
+additional alleles will be skipped.</p>
+<p>Conversion of mixed-ploidy VCF files is also supported by <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a>
+by use of the <code class="docutils literal notranslate"><span class="pre">mixed_ploidy</span></code> parameter.
+In this case <code class="docutils literal notranslate"><span class="pre">ploidy</span></code> specifies the maximum allowed ploidy and lower ploidy
+genotype calls within the VCF file will be preserved within the resulting dataset.</p>
+<p>Note that many statistical genetics methods available for diploid data are not generalized
+to polyploid and or mixed-ploidy data.
+Therefore, some methods available in sgkit may only be applicable to diploid or fixed-ploidy
+datasets.</p>
+<p>Methods that are generalized to polyploid and mixed-ploidy data may make assumptions
+such as polysomic inheritance and hence it is necessary to understand the type of polyploidy
+present within any given dataset.</p>
 </div>
 </div>
 
