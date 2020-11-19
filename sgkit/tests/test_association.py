@@ -1,6 +1,7 @@
 import warnings
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
+import dask.array as da
 import numpy as np
 import pandas as pd
 import pytest
@@ -8,6 +9,7 @@ import xarray as xr
 from pandas import DataFrame
 from xarray import Dataset
 
+from sgkit import variables
 from sgkit.stats.association import gwas_linear_regression, linear_regression
 from sgkit.typing import ArrayLike
 
@@ -169,6 +171,18 @@ def test_gwas_linear_regression__validate_statistics(ds):
         add_intercept=False,
     )
     validate(dfp, dft)
+
+
+def test_gwas_linear_regression__lazy_results(ds):
+    res = gwas_linear_regression(
+        ds, dosage="dosage", covariates="covar_0", traits="trait_0"
+    )
+    for v in [
+        variables.variant_beta,
+        variables.variant_t_value,
+        variables.variant_p_value,
+    ]:
+        assert isinstance(res[v].data, da.Array)
 
 
 def test_gwas_linear_regression__multi_trait(ds):
