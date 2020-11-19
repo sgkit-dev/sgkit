@@ -22,6 +22,7 @@ Highlights
   to be converted efficiently.
 * Input and output files can reside on local filesystems, Amazon S3, or
   Google Cloud Storage.
+* Support for polyploid and mixed-ploidy genotypes.
 
 Installation
 ------------
@@ -192,3 +193,40 @@ that all workers can access the store (both for reading and writing).
 For debugging, or for more control over the steps, consider using
 :func:`sgkit.io.vcf.vcf_to_zarrs` followed by :func:`sgkit.io.vcf.zarrs_to_dataset`,
 then saving the dataset using Xarray's :meth:`xarray.Dataset.to_zarr` method.
+
+Polyploid and mixed-ploidy VCF
+------------------------------
+
+The :func:`sgkit.io.vcf.vcf_to_zarr` function can be used to convert polyploid VCF
+data to Zarr files stored in sgkit's Xarray data representation by specifying the
+ploidy of the dataset using the ``ploidy`` parameter.
+
+By default, sgkit expects VCF files to have a consistent ploidy level across all samples
+and variants.
+Manual specification of ploidy is necessary because, within the VCF standard,
+ploidy is indicated by the length of each genotype call and hence it may not be
+consistent throughout the entire VCF file.
+
+If a genotype call of lower than specified ploidy is encountered it will be treated
+as an incomplete genotype.
+For example, if a VCF is being processed assuming a ploidy of four (i.e. tetraploid)
+then the diploid genotype ``0/1`` will be treated as the incomplete tetraploid
+genotype ``0/1/./.``.
+
+If a genotype call of higher than specified ploidy is encountered an exception is raised.
+This exception can be avoided using the ``truncate_calls`` parameter in which case the
+additional alleles will be skipped.
+
+Conversion of mixed-ploidy VCF files is also supported by :func:`sgkit.io.vcf.vcf_to_zarr`
+by use of the ``mixed_ploidy`` parameter.
+In this case ``ploidy`` specifies the maximum allowed ploidy and lower ploidy
+genotype calls within the VCF file will be preserved within the resulting dataset.
+
+Note that many statistical genetics methods available for diploid data are not generalized
+to polyploid and or mixed-ploidy data.
+Therefore, some methods available in sgkit may only be applicable to diploid or fixed-ploidy
+datasets.
+
+Methods that are generalized to polyploid and mixed-ploidy data may make assumptions
+such as polysomic inheritance and hence it is necessary to understand the type of polyploidy
+present within any given dataset.
