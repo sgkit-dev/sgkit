@@ -98,7 +98,7 @@ def linear_regression(
     # Match to p-values
     # Note: t dist not implemented in Dask so this must be delayed
     P = da.map_blocks(
-        lambda t: 2 * stats.distributions.t.sf(np.abs(T), dof), T, dtype="float64"
+        lambda t: 2 * stats.distributions.t.sf(np.abs(t), dof), T, dtype="float64"
     )
     assert P.shape == (n_loop_covar, n_outcome)
 
