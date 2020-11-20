@@ -37,6 +37,7 @@ class SgkitVariables:
         if spec.default_name in cls.registered_variables:
             raise ValueError(f"`{spec.default_name}` already registered")
         cls.registered_variables[spec.default_name] = spec
+        print(spec.__doc__)
         return spec.default_name, spec
 
     @classmethod

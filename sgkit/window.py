@@ -1,4 +1,4 @@
-from typing import Any, Callable, Iterable, Tuple, Union
+from typing import Any, Callable, Iterable, Optional, Tuple, Union
 
 import dask.array as da
 import numpy as np
@@ -15,7 +15,7 @@ from .typing import ArrayLike, DType
 def window(
     ds: Dataset,
     size: int,
-    step: int,
+    step: Optional[int] = None,
     merge: bool = True,
 ) -> Dataset:
     """Add fixed-size windowing information to a dataset.
@@ -32,6 +32,7 @@ def window(
         The window size (number of variants).
     step
         The distance (number of variants) between start positions of windows.
+        Defaults to ``size``.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -47,6 +48,7 @@ def window(
     - :data:`sgkit.variables.window_stop_spec` (windows):
       The index values of window stop positions.
     """
+    step = step or size
     n_variants = ds.dims["variants"]
     n_contigs = len(ds.attrs["contigs"])
     contig_ids = np.arange(n_contigs)
