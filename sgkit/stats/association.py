@@ -96,7 +96,8 @@ def linear_regression(
     T = B / np.sqrt(RSS / dof / XLPS)
     assert T.shape == (n_loop_covar, n_outcome)
     # Match to p-values
-    # Note: t dist not implemented in Dask so this must be delayed
+    # Note: t dist not implemented in Dask so this must be delayed,
+    # see https://github.com/dask/dask/issues/6857
     P = da.map_blocks(
         lambda t: 2 * stats.distributions.t.sf(np.abs(t), dof), T, dtype="float64"
     )
