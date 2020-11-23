@@ -147,13 +147,14 @@ def _divergence(ac: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     for i in range(n_cohorts):
         for j in range(i + 1, n_cohorts):
             n_pairs = an[i] * an[j]
-            n_same = 0
-            for k in range(n_alleles):
-                n_same += ac[i, k] * ac[j, k]
-            n_diff = n_pairs - n_same
-            div = n_diff / n_pairs
-            out[i, j] = div
-            out[j, i] = div
+            if n_pairs != 0.0:
+                n_same = 0
+                for k in range(n_alleles):
+                    n_same += ac[i, k] * ac[j, k]
+                n_diff = n_pairs - n_same
+                div = n_diff / n_pairs
+                out[i, j] = div
+                out[j, i] = div
 
     # calculate the diversity for each cohort
     for i in range(n_cohorts):

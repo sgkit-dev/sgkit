@@ -22,6 +22,8 @@ from sgkit import (
 )
 from sgkit.window import window
 
+from .test_aggregation import get_dataset
+
 
 def ts_to_dataset(ts, chunks=None, samples=None):
     """
@@ -210,6 +212,17 @@ def test_divergence__windowed_scikit_allel_comparison(sample_size, n_cohorts, ch
     np.testing.assert_allclose(
         div[:-1], ska_div
     )  # scikit-allel has final window missing
+
+
+def test_divergence__missing_calls():
+    ds = get_dataset(
+        [
+            [[0, 0], [-1, -1], [-1, -1]],  # all of cohort 1 calls are missing
+        ]
+    )
+    ds["sample_cohort"] = xr.DataArray(np.array([0, 1, 1]), dims="samples")
+    ds = divergence(ds)
+    np.testing.assert_equal(ds["stat_divergence"].values[0, 1], np.nan)
 
 
 @pytest.mark.parametrize("sample_size", [2, 3, 10, 100])
