@@ -216,13 +216,14 @@ def test_count_call_alleles__chunked():
 def test_count_cohort_alleles__multi_variant_multi_sample():
     ds = get_dataset(
         [
-            [[0, 0], [0, 0], [0, 0]],
-            [[0, 0], [0, 0], [0, 1]],
-            [[1, 1], [0, 1], [1, 0]],
-            [[1, 1], [1, 1], [1, 1]],
+            [[0, 0], [0, 0], [0, 0], [0, 0]],
+            [[0, 0], [0, 0], [0, 1], [0, 1]],
+            [[1, 1], [0, 1], [1, 0], [1, 0]],
+            [[1, 1], [1, 1], [1, 1], [1, 1]],
         ]
     )
-    ds["sample_cohort"] = xr.DataArray(np.array([0, 1, 1]), dims="samples")
+    # -1 means that the sample is not in any cohort
+    ds["sample_cohort"] = xr.DataArray(np.array([0, 1, 1, -1]), dims="samples")
     ds = count_cohort_alleles(ds)
     ac = ds.cohort_allele_count
     np.testing.assert_equal(

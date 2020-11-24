@@ -88,7 +88,9 @@ def _count_cohort_alleles(
     n_samples, n_alleles = ac.shape
     for i in range(n_samples):
         for j in range(n_alleles):
-            out[cohorts[i], j] += ac[i, j]
+            c = cohorts[i]
+            if c >= 0:
+                out[c, j] += ac[i, j]
 
 
 def count_call_alleles(
