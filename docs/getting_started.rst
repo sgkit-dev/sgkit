@@ -241,7 +241,86 @@ shows how it can be used in the context of doing something simple like counting 
     # This how many sgkit functions handle missing data internally:
     sg.variant_stats(ds).variant_n_het.item(0)
 
+Windowing
+~~~~~~~~~
 
+It is common to compute statistics in windows along the genome. Some :ref:`api_methods` in sgkit
+are "windowing aware" and will compute values for windows defined in a dataset. If no windows
+are defined then the values will typically be computed for each variant. It is therefore
+important to define windows *before* computing statistics on a dataset.
+
+Windows are intervals that span the ``variants`` dimension in a dataset, and they are defined
+using the :func:`sgkit.window` function. Currently only fixed-sized windows are supported, by
+providing the ``size`` argument, which refers to the number of variants in each window. An
+optional ``step`` argument may be provided to control the spacing between windows. By default,
+it is the same as the ``size``, giving contiguous windows.
+
+This example shows the effect of computing the diversity statistic: first with no windows defined,
+then with windows.
+
+.. ipython:: python
+    :okwarning:
+
+    import sgkit as sg
+    import xarray as xr
+    ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50)
+
+    # Define a single cohort for all samples
+    ds["sample_cohort"] = xr.DataArray(np.full(ds.dims['samples'], 0), dims="samples")
+
+    # The diversity statistic is computed for every variant since no windows are defined
+    sg.diversity(ds, merge=False)
+
+    # Define windows of size 20 variants. This creates a new dimension called `windows`, and
+    # some new variables for internal use.
+    ds = sg.window(ds, 20)
+
+    # The diversity statistic is now computed for every window
+    sg.diversity(ds, merge=False)
+
+Cohorts
+~~~~~~~
+
+During analysis we often want to be able to group samples into populations, and compute statistics
+based on these groups. Groups of samples are referred to as *cohorts* in sgkit.
+
+Cohorts are defined by a mapping from samples to cohort index. The following example creates
+a ``sample_cohort`` variable to group a dataset of ten samples into three cohorts. Note that first
+value is ``-1``, which means the corresponding sample is not in any of the three cohorts, and
+will be ignored when computing cohort statistics.
+
+.. ipython:: python
+    :okwarning:
+
+    import sgkit as sg
+    import xarray as xr
+    ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=10)
+    ds["sample_cohort"] = xr.DataArray(np.array([-1, 0, 1, 1, 1, 1, 0, 2, 2, 2]), dims="samples")
+
+Typically the ``sample_cohort`` variable is derived from a dataframe that has the sample/cohort
+mapping.
+
+Cohort-level statistics can have repeated ``cohorts`` dimensions. :func:`sgkit.Fst`, for example,
+produces statistics for *pairs* of cohorts, which is represented as a variable with dimensions
+``(windows, cohorts_0, cohorts_1)``, making it possible to read off the value of the statistic
+for any pair of cohorts.
+
+It's convenient to name cohorts, to avoid errors that can occur when using index values. This
+example shows how to give cohorts names.
+
+.. ipython:: python
+    :okwarning:
+
+    ds = sg.window(ds, 20)
+    ds = sg.Fst(ds)
+
+    cohort_names = ["Africa", "Asia", "Europe"]
+    ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names})
+    ds.stat_Fst.sel(cohorts_0="Africa", cohorts_1="Asia").values
+
+Methods that work with cohorts will, by default, operate over all cohorts at once. Sometimes
+however you might only want to run the computation for a subset of cohorts, in which case you can
+explicitly specify the cohorts when calling the function.
 
 Chaining operations
 ~~~~~~~~~~~~~~~~~~~
@@ -265,12 +344,15 @@ Xarray and Pandas operations in a single pipeline:
     ds_qc.variant_call_rate.to_series().describe()
 
     # Build a pipeline that filters on call rate and computes Fst between two cohorts
+    # for windows of size 20 variants
     (
         ds
         # Add call rate and other statistics
         .pipe(sg.variant_stats)
         # Apply filter to include variants present across > 80% of samples
         .pipe(lambda ds: ds.sel(variants=ds.variant_call_rate > .8))
+        # Create windows of size 20 variants
+        .pipe(lambda ds: sg.window(ds, 20))
         # Assign a "cohort" variable that splits samples into two groups
         .assign(sample_cohort=np.repeat([0, 1], ds.dims['samples'] // 2))
         # Compute Fst between the groups
