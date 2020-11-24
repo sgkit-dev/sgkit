@@ -210,6 +210,19 @@ def test_vcf_to_zarr__parallel_temp_chunk_length_not_divisible(
         )
 
 
+def test_vcf_to_zarr__target_part_size_and_regions_not_allowed(
+    shared_datadir, tmp_path
+):
+    path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", False)
+    output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
+    regions = ["20", "21"]
+
+    with pytest.raises(
+        ValueError, match=r"Only one of target_part_size or regions may be specified"
+    ):
+        vcf_to_zarr(path, output, target_part_size=40_000, regions=regions)
+
+
 @pytest.mark.parametrize(
     "is_path",
     [True, False],
@@ -225,6 +238,27 @@ def test_vcf_to_zarr__parallel_partitioned(shared_datadir, is_path, tmp_path):
     regions = partition_into_regions(path, num_parts=4)
 
     vcf_to_zarr(path, output, regions=regions, chunk_length=1_000, chunk_width=1_000)
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    assert ds["sample_id"].shape == (2535,)
+    assert ds["variant_id"].shape == (1406,)
+
+
+@pytest.mark.parametrize(
+    "is_path",
+    [True, False],
+)
+def test_vcf_to_zarr__parallel_partitioned_by_size(shared_datadir, is_path, tmp_path):
+    path = path_for_test(
+        shared_datadir,
+        "1000G.phase3.broad.withGenotypes.chr20.10100000.vcf.gz",
+        is_path,
+    )
+    output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
+
+    vcf_to_zarr(
+        path, output, target_part_size=4_000_000, chunk_length=1_000, chunk_width=1_000
+    )
     ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
 
     assert ds["sample_id"].shape == (2535,)
@@ -272,6 +306,33 @@ def test_vcf_to_zarr__multiple_partitioned(shared_datadir, is_path, tmp_path):
     regions = [partition_into_regions(path, num_parts=2) for path in paths]
 
     vcf_to_zarr(paths, output, regions=regions, chunk_length=5_000)
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    assert ds["sample_id"].shape == (1,)
+    assert ds["call_genotype"].shape == (19910, 1, 2)
+    assert ds["call_genotype_mask"].shape == (19910, 1, 2)
+    assert ds["call_genotype_phased"].shape == (19910, 1)
+    assert ds["variant_allele"].shape == (19910, 4)
+    assert ds["variant_contig"].shape == (19910,)
+    assert ds["variant_id"].shape == (19910,)
+    assert ds["variant_id_mask"].shape == (19910,)
+    assert ds["variant_position"].shape == (19910,)
+
+    assert ds.chunks["variants"] == (5000, 5000, 5000, 4910)
+
+
+@pytest.mark.parametrize(
+    "is_path",
+    [True, False],
+)
+def test_vcf_to_zarr__multiple_partitioned_by_size(shared_datadir, is_path, tmp_path):
+    paths = [
+        path_for_test(shared_datadir, "CEUTrio.20.gatk3.4.g.vcf.bgz", is_path),
+        path_for_test(shared_datadir, "CEUTrio.21.gatk3.4.g.vcf.bgz", is_path),
+    ]
+    output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
+
+    vcf_to_zarr(paths, output, target_part_size=40_000, chunk_length=5_000)
     ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
 
     assert ds["sample_id"].shape == (1,)

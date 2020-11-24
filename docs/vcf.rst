@@ -128,6 +128,13 @@ if you are partitioning multiple files, and want all the parts to be roughly the
     >>> regions = [partition_into_regions(input, target_part_size=100_000) for input in inputs]
     >>> vcf_to_zarr(inputs, "output.zarr", regions=regions)
 
+The same result can be obtained more simply by specifying ``target_part_size`` in the call to
+``vcf_to_zarr``:
+
+    >>> from sgkit.io.vcf import vcf_to_zarr
+    >>> inputs = ["CEUTrio.20.gatk3.4.g.vcf.bgz", "CEUTrio.21.gatk3.4.g.vcf.bgz"]
+    >>> vcf_to_zarr(inputs, "output.zarr", target_part_size=100_000)
+
 As a special case, ``None`` is used to represent a single partition.
 
     >>> from sgkit.io.vcf import partition_into_regions
