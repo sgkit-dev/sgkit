@@ -33,12 +33,24 @@ def _cohorts_to_array(
     Returns
     -------
     An array of shape ``(len(cohorts), tuple_len)``, where ``tuple_len`` is the length
-    of the tuples, or 1 if ``cohorts`` is a sequence of values.,
+    of the tuples, or 1 if ``cohorts`` is a sequence of values.
 
     Raises
     ------
     ValueError
         If the cohort tuples are not all the same length.
+
+    Examples
+    --------
+
+    >>> import pandas as pd
+    >>> from sgkit.cohorts import _cohorts_to_array
+    >>> _cohorts_to_array([(0, 1), (2, 1)]) # doctest: +SKIP
+    array([[0, 1],
+           [2, 1]], dtype=int32)
+    >>> _cohorts_to_array([("c0", "c1"), ("c2", "c1")], pd.Index(["c0", "c1", "c2"])) # doctest: +SKIP
+    array([[0, 1],
+           [2, 1]], dtype=int32)
     """
     if len(cohorts) == 0:
         return np.array([], np.int32)
