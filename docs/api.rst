@@ -81,6 +81,7 @@ Variables
     variables.call_genotype_phased_spec
     variables.call_genotype_probability_spec
     variables.call_genotype_probability_mask_spec
+    variables.cohort_allele_count_spec
     variables.covariates_spec
     variables.dosage_spec
     variables.genotype_counts_spec
@@ -89,10 +90,14 @@ Variables
     variables.pc_relate_phi_spec
     variables.sample_id_spec
     variables.sample_pcs_spec
+    variables.stat_divergence_spec
+    variables.stat_diversity_spec
+    variables.stat_Fst_spec
     variables.stat_Garud_h1_spec
     variables.stat_Garud_h12_spec
     variables.stat_Garud_h123_spec
     variables.stat_Garud_h2_h1_spec
+    variables.stat_Tajimas_D_spec
     variables.traits_spec
     variables.variant_allele_spec
     variables.variant_allele_count_spec

@@ -27,7 +27,7 @@ jobs:
     - name: Build Sphinx documentation
       run: |
         cd docs
-        make html SPHINXOPTS="-W --keep-going"
+        make html SPHINXOPTS="-W --keep-going -n"
     - name: Commit documentation changes to gh-pages branch
       run: |
         git clone https://github.com/pystatgen/sgkit.git --branch gh-pages --single-branch gh-pages

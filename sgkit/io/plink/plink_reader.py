@@ -142,38 +142,38 @@ def read_plink(
 
     Parameters
     ----------
-    path : Optional[PathType]
+    path
         Path to PLINK file set.
         This should not include a suffix, i.e. if the files are
         at `data.{bed,fam,bim}` then only 'data' should be
         provided (suffixes are added internally).
         Either this path must be provided or all 3 of
         `bed_path`, `bim_path` and `fam_path`.
-    bed_path: Optional[PathType]
+    bed_path
         Path to PLINK bed file.
         This should be a full path including the `.bed` extension
         and cannot be specified in conjunction with `path`.
-    bim_path: Optional[PathType]
+    bim_path
         Path to PLINK bim file.
         This should be a full path including the `.bim` extension
         and cannot be specified in conjunction with `path`.
-    fam_path: Optional[PathType]
+    fam_path
         Path to PLINK fam file.
         This should be a full path including the `.fam` extension
         and cannot be specified in conjunction with `path`.
-    chunks : Union[str, int, tuple], optional
+    chunks
         Chunk size for genotype (i.e. `.bed`) data, by default "auto"
-    fam_sep : str, optional
+    fam_sep
         Delimiter for `.fam` file, by default " "
-    bim_sep : str, optional
+    bim_sep
         Delimiter for `.bim` file, by default "\t"
-    bim_int_contig : bool, optional
+    bim_int_contig
         Whether or not the contig/chromosome name in the `.bim`
         file should be interpreted as an integer, by default False.
         If False, then the `variant/contig` field in the resulting
         dataset will contain the indexes of corresponding strings
         encountered in the first `.bim` field.
-    count_a1 : bool, optional
+    count_a1
         Whether or not allele counts should be for A1 or A2,
         by default True. Typically A1 is the minor allele
         and should be counted instead of A2. This is not enforced
@@ -181,11 +181,11 @@ def read_plink(
         to ensure that A1 is in fact an alternate/minor/effect
         allele. See https://www.cog-genomics.org/plink/1.9/formats
         for more details.
-    lock : bool, optional
+    lock
         Whether or not to synchronize concurrent reads of `.bed`
         file blocks, by default False. This is passed through to
         [dask.array.from_array](https://docs.dask.org/en/latest/array-api.html#dask.array.from_array).
-    persist : bool, optional
+    persist
         Whether or not to persist `.fam` and `.bim` information in
         memory, by default True. This is an important performance
         consideration as the plain text files for this data will
