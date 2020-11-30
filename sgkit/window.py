@@ -1,9 +1,10 @@
-from typing import Any, Callable, Iterable, Optional, Tuple, Union
+from typing import Any, Callable, Hashable, Iterable, Optional, Tuple, Union
 
 import dask.array as da
 import numpy as np
 from xarray import Dataset
 
+from sgkit import variables
 from sgkit.utils import conditional_merge_datasets, create_dataset
 from sgkit.variables import window_contig, window_start, window_stop
 
@@ -12,27 +13,32 @@ from .typing import ArrayLike, DType
 # Window definition (user code)
 
 
-def window(
+def window_by_index(
     ds: Dataset,
+    *,
     size: int,
     step: Optional[int] = None,
+    variant_contig: Hashable = variables.variant_contig,
     merge: bool = True,
 ) -> Dataset:
-    """Add fixed-size windowing information to a dataset.
+    """Add window information to a dataset, measured by number of variants.
 
     Windows are defined over the ``variants`` dimension, and are
     used by some downstream functions to calculate statistics for
-    each window.
+    each window. Windows never span contigs.
 
     Parameters
     ----------
     ds
         Genotype call dataset.
     size
-        The window size (number of variants).
+        The window size, measured by number of variants.
     step
         The distance (number of variants) between start positions of windows.
         Defaults to ``size``.
+    variant_contig
+        Name of variable containing variant contig indexes.
+        Defined by :data:`sgkit.variables.variant_contig_spec`.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -43,12 +49,84 @@ def window(
     -------
     A dataset containing the following variables:
 
+    - :data:`sgkit.variables.window_contig_spec` (windows):
+      The index values of window contigs.
     - :data:`sgkit.variables.window_start_spec` (windows):
       The index values of window start positions.
     - :data:`sgkit.variables.window_stop_spec` (windows):
       The index values of window stop positions.
     """
     step = step or size
+    return _window_per_contig(ds, variant_contig, merge, _get_windows, size, step)
+
+
+window = window_by_index
+
+
+def window_by_position(
+    ds: Dataset,
+    *,
+    size: int,
+    offset: int = 0,
+    variant_contig: Hashable = variables.variant_contig,
+    variant_position: Hashable = variables.variant_position,
+    merge: bool = True,
+) -> Dataset:
+    """Add window information to a dataset, measured by distance along the genome.
+
+    Windows are defined over the ``variants`` dimension, and are
+    used by some downstream functions to calculate statistics for
+    each window. Windows never span contigs.
+
+    Parameters
+    ----------
+    ds
+        Genotype call dataset.
+    size
+        The window size, measured by number of base pairs.
+    offset
+        The window offset, measured by number of base pairs. Defaults
+        to no offset. For centered windows, use a negative offset that
+        is half the window size.
+    variant_contig
+        Name of variable containing variant contig indexes.
+        Defined by :data:`sgkit.variables.variant_contig_spec`.
+    variant_position
+        Name of variable containing variant positions.
+        Must be monotonically increasing within a contig.
+        Defined by :data:`sgkit.variables.variant_position_spec`.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing the following variables:
+
+    - :data:`sgkit.variables.window_contig_spec` (windows):
+      The index values of window contigs.
+    - :data:`sgkit.variables.window_start_spec` (windows):
+      The index values of window start positions.
+    - :data:`sgkit.variables.window_stop_spec` (windows):
+      The index values of window stop positions.
+    """
+
+    positions = ds[variant_position].values
+    return _window_per_contig(
+        ds, variant_contig, merge, _get_windows_by_position, size, offset, positions
+    )
+
+
+def _window_per_contig(
+    ds: Dataset,
+    variant_contig: Hashable,
+    merge: bool,
+    windowing_fn: Callable[..., Any],
+    *args: Any,
+    **kwargs: Any,
+) -> Dataset:
     n_variants = ds.dims["variants"]
     n_contigs = len(ds.attrs["contigs"])
     contig_ids = np.arange(n_contigs)
@@ -60,7 +138,9 @@ def window(
     contig_window_starts = []
     contig_window_stops = []
     for i in range(n_contigs):
-        starts, stops = _get_windows(contig_bounds[i], contig_bounds[i + 1], size, step)
+        starts, stops = windowing_fn(
+            contig_bounds[i], contig_bounds[i + 1], *args, **kwargs
+        )
         contig_window_starts.append(starts)
         contig_window_stops.append(stops)
         contig_window_contigs.append(np.full_like(starts, i))
@@ -94,6 +174,18 @@ def _get_windows(
     # Find the indexes for the start positions of all windows
     window_starts = np.arange(start, stop, step)
     window_stops = np.clip(window_starts + size, start, stop)
+    return window_starts, window_stops
+
+
+def _get_windows_by_position(
+    start: int, stop: int, size: int, offset: int, positions: ArrayLike
+) -> Tuple[ArrayLike, ArrayLike]:
+    contig_pos = positions[start:stop]
+    if offset == 0:
+        window_starts = np.arange(contig_pos.shape[0]) + start
+    else:
+        window_starts = np.searchsorted(contig_pos, contig_pos + offset) + start
+    window_stops = np.searchsorted(contig_pos, contig_pos + offset + size) + start
     return window_starts, window_stops
 
 
