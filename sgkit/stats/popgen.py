@@ -482,7 +482,7 @@ def Tajimas_D(
         Genotype call dataset.
     variant_allele_count
         Variant allele count variable to use or calculate. Defined by
-        :data:`sgkit.variables.variant_allele_count`.
+        :data:`sgkit.variables.variant_allele_count_spec`.
         If the variable is not present in ``ds``, it will be computed
         using :func:`count_variant_alleles`.
     stat_diversity

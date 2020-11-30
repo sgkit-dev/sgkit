@@ -29,7 +29,7 @@ jobs:
     - name: Check for Sphinx doc warnings
       run: |
         cd docs
-        make html SPHINXOPTS="-W --keep-going"
+        make html SPHINXOPTS="-W --keep-going -n"
     - name: Test with pytest and coverage
       run: |
         pytest -v --cov=sgkit --cov-report=term-missing
