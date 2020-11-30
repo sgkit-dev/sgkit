@@ -21,7 +21,7 @@ from .stats.association import gwas_linear_regression
 from .stats.hwe import hardy_weinberg_test
 from .stats.pc_relate import pc_relate
 from .stats.pca import pca
-from .stats.popgen import Fst, Garud_h, Tajimas_D, divergence, diversity, pbs
+from .stats.popgen import Fst, Garud_H, Tajimas_D, divergence, diversity, pbs
 from .stats.preprocessing import filter_partial_calls
 from .stats.regenie import regenie
 from .testing import simulate_genotype_call_dataset
@@ -52,7 +52,7 @@ __all__ = [
     "diversity",
     "divergence",
     "Fst",
-    "Garud_h",
+    "Garud_H",
     "Tajimas_D",
     "pbs",
     "pc_relate",

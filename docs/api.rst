@@ -48,7 +48,7 @@ Methods
    divergence
    diversity
    Fst
-   Garud_h
+   Garud_H
    gwas_linear_regression
    hardy_weinberg_test
    regenie
