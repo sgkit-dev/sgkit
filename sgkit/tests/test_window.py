@@ -13,7 +13,8 @@ from sgkit.window import (
     _get_windows,
     has_windows,
     moving_statistic,
-    window,
+    window_by_index,
+    window_by_position,
 )
 
 
@@ -71,23 +72,23 @@ def test_moving_statistic__min_chunksize_smaller_than_size():
         moving_statistic(values, np.sum, size=3, step=3, dtype=values.dtype)
 
 
-def test_window():
+def test_window_by_index():
     ds = simulate_genotype_call_dataset(n_variant=10, n_sample=3, seed=0)
     assert not has_windows(ds)
-    ds = window(ds, 2, 2)
+    ds = window_by_index(ds, size=2, step=2)
     assert has_windows(ds)
     np.testing.assert_equal(ds[window_contig].values, [0, 0, 0, 0, 0])
     np.testing.assert_equal(ds[window_start].values, [0, 2, 4, 6, 8])
     np.testing.assert_equal(ds[window_stop].values, [2, 4, 6, 8, 10])
 
     with pytest.raises(MergeWarning):
-        window(ds, 2, 2)
+        window_by_index(ds, size=2, step=2)
 
 
-def test_window__default_step():
+def test_window_by_index__default_step():
     ds = simulate_genotype_call_dataset(n_variant=10, n_sample=3, seed=0)
     assert not has_windows(ds)
-    ds = window(ds, 2)
+    ds = window_by_index(ds, size=2)
     assert has_windows(ds)
     np.testing.assert_equal(ds[window_contig].values, [0, 0, 0, 0, 0])
     np.testing.assert_equal(ds[window_start].values, [0, 2, 4, 6, 8])
@@ -120,13 +121,13 @@ def test_window__default_step():
         ),
     ],
 )
-def test_window__multiple_contigs(
+def test_window_by_index__multiple_contigs(
     n_variant, n_contig, window_contigs_exp, window_starts_exp, window_stops_exp
 ):
     ds = simulate_genotype_call_dataset(
         n_variant=n_variant, n_sample=1, n_contig=n_contig
     )
-    ds = window(ds, 2, 2)
+    ds = window_by_index(ds, size=2, step=2)
     np.testing.assert_equal(ds[window_contig].values, window_contigs_exp)
     np.testing.assert_equal(ds[window_start].values, window_starts_exp)
     np.testing.assert_equal(ds[window_stop].values, window_stops_exp)
@@ -193,3 +194,43 @@ def test_get_chunked_windows(
     )
     np.testing.assert_equal(rel_window_starts_actual, rel_window_starts_exp)
     np.testing.assert_equal(windows_per_chunk_actual, windows_per_chunk_exp)
+
+
+def test_window_by_position():
+    ds = simulate_genotype_call_dataset(n_variant=5, n_sample=3, seed=0)
+    assert not has_windows(ds)
+    ds["variant_position"] = (
+        ["variants"],
+        np.array([1, 4, 6, 8, 12]),
+    )
+    ds = window_by_position(ds, size=5)
+    assert has_windows(ds)
+    np.testing.assert_equal(ds[window_contig].values, [0, 0, 0, 0, 0])
+    np.testing.assert_equal(ds[window_start].values, [0, 1, 2, 3, 4])
+    np.testing.assert_equal(ds[window_stop].values, [2, 4, 4, 5, 5])
+
+
+def test_window_by_position__multiple_contigs():
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=3, n_contig=2)
+    ds["variant_position"] = (
+        ["variants"],
+        np.array([1, 4, 6, 8, 12, 1, 21, 25, 40, 55]),
+    )
+    ds = window_by_position(ds, size=10)
+    assert has_windows(ds)
+    np.testing.assert_equal(ds[window_contig].values, [0, 0, 0, 0, 0, 1, 1, 1, 1, 1])
+    np.testing.assert_equal(ds[window_start].values, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    np.testing.assert_equal(ds[window_stop].values, [4, 5, 5, 5, 5, 6, 8, 8, 9, 10])
+
+
+def test_window_by_position__offset():
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=3, n_contig=2)
+    ds["variant_position"] = (
+        ["variants"],
+        np.array([1, 4, 6, 8, 12, 1, 21, 25, 40, 55]),
+    )
+    ds = window_by_position(ds, size=10, offset=-5)
+    assert has_windows(ds)
+    np.testing.assert_equal(ds[window_contig].values, [0, 0, 0, 0, 0, 1, 1, 1, 1, 1])
+    np.testing.assert_equal(ds[window_start].values, [0, 0, 0, 1, 3, 5, 6, 6, 8, 9])
+    np.testing.assert_equal(ds[window_stop].values, [2, 4, 4, 5, 5, 6, 8, 8, 9, 10])

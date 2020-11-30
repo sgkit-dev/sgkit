@@ -156,7 +156,7 @@ def test_vs_skallel(args):
 
     ds = simulate_genotype_call_dataset(n_variant=x.shape[0], n_sample=x.shape[1])
     ds["dosage"] = (["variants", "samples"], da.asarray(x).rechunk({0: chunks}))
-    ds = window(ds, size, step)
+    ds = window(ds, size=size, step=step)
 
     ldm = ld_matrix(ds, threshold=threshold)
     has_duplicates = ldm.compute().duplicated(subset=["i", "j"]).any()
