@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>sgkit.Fst &mdash; sgkit  documentation</title>
+  <title>sgkit.Garud_H &mdash; sgkit  documentation</title>
   
 
   
@@ -37,8 +37,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.Garud_H" href="sgkit.Garud_H.html" />
-    <link rel="prev" title="sgkit.diversity" href="sgkit.diversity.html" /> 
+    <link rel="next" title="sgkit.gwas_linear_regression" href="sgkit.gwas_linear_regression.html" />
+    <link rel="prev" title="sgkit.Fst" href="sgkit.Fst.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -94,8 +94,8 @@
 <li class="toctree-l3"><a class="reference internal" href="sgkit.count_variant_alleles.html">sgkit.count_variant_alleles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.divergence.html">sgkit.divergence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.diversity.html">sgkit.diversity</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.Fst</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sgkit.Garud_H.html">sgkit.Garud_H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.Fst.html">sgkit.Fst</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.Garud_H</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.gwas_linear_regression.html">sgkit.gwas_linear_regression</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.hardy_weinberg_test.html">sgkit.hardy_weinberg_test</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.regenie.html">sgkit.regenie</a></li>
@@ -159,13 +159,13 @@
         
           <li><a href="../api.html">API reference</a> &raquo;</li>
         
-      <li>sgkit.Fst</li>
+      <li>sgkit.Garud_H</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/generated/sgkit.Fst.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/generated/sgkit.Garud_H.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -178,13 +178,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sgkit-fst">
-<h1>sgkit.Fst<a class="headerlink" href="#sgkit-fst" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="sgkit-garud-h">
+<h1>sgkit.Garud_H<a class="headerlink" href="#sgkit-garud-h" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="sgkit.Fst">
-<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">Fst</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">estimator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stat_divergence</span><span class="o">=</span><span class="default_value">'stat_divergence'</span></em>, <em class="sig-param"><span class="n">merge</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.Fst" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute Fst between pairs of cohorts.</p>
-<p>By default, values of this statistic are calculated per variant.
+<dt id="sgkit.Garud_H">
+<code class="sig-prename descclassname">sgkit.</code><code class="sig-name descname">Garud_H</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">call_genotype</span><span class="o">=</span><span class="default_value">'call_genotype'</span></em>, <em class="sig-param"><span class="n">cohorts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">merge</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.Garud_H" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the H1, H12, H123 and H2/H1 statistics for detecting signatures
+of soft sweeps, as defined in Garud et al. (2015).</p>
+<p>By default, values of this statistic are calculated across all variants.
 To compute values in windows, call <a class="reference internal" href="sgkit.window.html#sgkit.window" title="sgkit.window"><code class="xref py py-func docutils literal notranslate"><span class="pre">window()</span></code></a> before calling
 this function.</p>
 <dl class="field-list simple">
@@ -192,17 +193,13 @@ this function.</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Genotype call dataset.</p>
 </dd>
-<dt><strong>estimator</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Determines the formula to use for computing Fst.
-If None (the default), or <code class="docutils literal notranslate"><span class="pre">Hudson</span></code>, Fst is calculated
-using the method of Hudson (1992) elaborated by Bhatia et al. (2013),
-(the same estimator as scikit-allel).
-Other supported estimators include <code class="docutils literal notranslate"><span class="pre">Nei</span></code> (1986), (the same estimator
-as tskit).</p>
+<dt><strong>call_genotype</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype'</span></code>)</dt><dd><p>Input variable name holding call_genotype as defined by
+<a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a>.
+Must be present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>.</p>
 </dd>
-<dt><strong>stat_divergence</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'stat_divergence'</span></code>)</dt><dd><p>Divergence variable to use or calculate. Defined by
-<code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_divergence_spec</span></code>.
-If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
-using <a class="reference internal" href="sgkit.divergence.html#sgkit.divergence" title="sgkit.divergence"><code class="xref py py-func docutils literal notranslate"><span class="pre">divergence()</span></code></a>.</p>
+<dt><strong>cohorts</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>The cohorts to compute statistics for, specified as a sequence of
+cohort indexes or IDs. None (the default) means compute statistics
+for all cohorts.</p>
 </dd>
 <dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
@@ -215,16 +212,38 @@ See <a class="reference internal" href="../getting_started.html#dataset-merge"><
 <dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.16.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A dataset containing the Fst value between pairs of cohorts, as defined by
-<code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Fst_spec</span></code>.
-Shape (variants, cohorts, cohorts), or (windows, cohorts, cohorts) if windowing
-information is available.</p>
+<dd class="field-odd"><p><p>A dataset containing the following variables:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><cite>stat_Garud_h1</cite> (windows, cohorts): Garud H1 statistic.</dt><dd><p>Defined by <a class="reference internal" href="sgkit.variables.stat_Garud_h1_spec.html#sgkit.variables.stat_Garud_h1_spec" title="sgkit.variables.stat_Garud_h1_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Garud_h1_spec</span></code></a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><cite>stat_Garud_h12</cite> (windows, cohorts): Garud H12 statistic.</dt><dd><p>Defined by <a class="reference internal" href="sgkit.variables.stat_Garud_h12_spec.html#sgkit.variables.stat_Garud_h12_spec" title="sgkit.variables.stat_Garud_h12_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Garud_h12_spec</span></code></a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><cite>stat_Garud_h123</cite> (windows, cohorts): Garud H123 statistic.</dt><dd><p>Defined by <a class="reference internal" href="sgkit.variables.stat_Garud_h123_spec.html#sgkit.variables.stat_Garud_h123_spec" title="sgkit.variables.stat_Garud_h123_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Garud_h123_spec</span></code></a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><cite>stat_Garud_h2_h1</cite> (windows, cohorts): Garud H2/H1 statistic.</dt><dd><p>Defined by <a class="reference internal" href="sgkit.variables.stat_Garud_h2_h1_spec.html#sgkit.variables.stat_Garud_h2_h1_spec" title="sgkit.variables.stat_Garud_h2_h1_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Garud_h2_h1_spec</span></code></a>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.9)"><strong>NotImplementedError</strong></a> – If the dataset is not diploid.</p>
 </dd>
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>This method does not currently support datasets that are chunked along the
-samples dimension.</p>
+<p>This function is currently only implemented for diploid datasets.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -238,31 +257,23 @@ samples dimension.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_cohort&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">sample_cohort</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">Fst</span><span class="p">(</span><span class="n">ds</span><span class="p">)[</span><span class="s2">&quot;stat_Fst&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
-<span class="go">array([[[        nan, -0.16666667],</span>
-<span class="go">        [-0.16666667,         nan]],</span>
-
-<span class="go">    [[        nan, -0.16666667],</span>
-<span class="go">        [-0.16666667,         nan]],</span>
-
-<span class="go">    [[        nan, -0.33333333],</span>
-<span class="go">        [-0.33333333,         nan]],</span>
-
-<span class="go">    [[        nan, -0.33333333],</span>
-<span class="go">        [-0.33333333,         nan]],</span>
-
-<span class="go">    [[        nan,  0.2       ],</span>
-<span class="go">        [ 0.2       ,         nan]]])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Divide into windows of size three (variants)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Divide into windows of size three (variants)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">Fst</span><span class="p">(</span><span class="n">ds</span><span class="p">)[</span><span class="s2">&quot;stat_Fst&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
-<span class="go">array([[[        nan, -0.22222222],</span>
-<span class="go">        [-0.22222222,         nan]],</span>
-
-<span class="go">    [[        nan,  0.        ],</span>
-<span class="go">        [ 0.        ,         nan]]])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">gh</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">Garud_H</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gh</span><span class="p">[</span><span class="s2">&quot;stat_Garud_h1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([[0.25 , 0.375],</span>
+<span class="go">    [0.375, 0.375]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gh</span><span class="p">[</span><span class="s2">&quot;stat_Garud_h12&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([[0.375, 0.625],</span>
+<span class="go">    [0.625, 0.625]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gh</span><span class="p">[</span><span class="s2">&quot;stat_Garud_h123&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([[0.625, 1.   ],</span>
+<span class="go">    [1.   , 1.   ]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gh</span><span class="p">[</span><span class="s2">&quot;stat_Garud_h2_h1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([[0.75      , 0.33333333],</span>
+<span class="go">    [0.33333333, 0.33333333]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -277,10 +288,10 @@ samples dimension.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="sgkit.Garud_H.html" class="btn btn-neutral float-right" title="sgkit.Garud_H" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="sgkit.gwas_linear_regression.html" class="btn btn-neutral float-right" title="sgkit.gwas_linear_regression" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="sgkit.diversity.html" class="btn btn-neutral float-left" title="sgkit.diversity" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="sgkit.Fst.html" class="btn btn-neutral float-left" title="sgkit.Fst" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
