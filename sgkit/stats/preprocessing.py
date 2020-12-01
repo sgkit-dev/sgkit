@@ -172,7 +172,11 @@ def filter_partial_calls(
     """
     variables.validate(ds, {call_genotype: variables.call_genotype_spec})
     G = ds[call_genotype]
-    P = (G < 0).any(axis=-1)
+    mixed_ploidy = G.attrs.get("mixed_ploidy", False)
+    if mixed_ploidy:
+        P = (G == -1).any(axis=-1) & (G >= -1)
+    else:
+        P = (G < 0).any(axis=-1)
     F = xr.where(P, -1, G)  # type: ignore[no-untyped-call]
     new_ds = Dataset(
         {
@@ -180,4 +184,5 @@ def filter_partial_calls(
             variables.call_genotype_complete_mask: F < 0,
         }
     )
+    new_ds[variables.call_genotype_complete].attrs["mixed_ploidy"] = mixed_ploidy
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
