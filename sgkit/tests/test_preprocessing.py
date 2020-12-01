@@ -123,3 +123,44 @@ def test_filter_partial_calls():
         mask_filtered,
         np.array([[[0, 0], [0, 0], [0, 0]], [[1, 1], [1, 1], [1, 1]]], dtype=np.bool),
     )
+
+
+def test_filter_partial_calls__mixed_ploidy():
+    calls = np.array(
+        [
+            [[0, 0, 0, 0], [0, 1, -2, -2], [1, 0, 0, 0]],
+            [[-1, 0, -2, -2], [0, -1, -1, -1], [-1, -1, -1, -1]],
+        ]
+    )
+    ds = simulate_genotype_call_dataset(*calls.shape)
+    dims = ds["call_genotype"].dims
+    ds["call_genotype"] = xr.DataArray(calls, dims=dims, attrs={"mixed_ploidy": True})
+    ds["call_genotype_mask"] = xr.DataArray(calls < 0, dims=dims)
+
+    ds2 = sgkit.stats.preprocessing.filter_partial_calls(ds)
+
+    calls_filtered = ds2["call_genotype_complete"]
+    mask_filtered = ds2["call_genotype_complete_mask"]
+
+    np.testing.assert_array_equal(
+        calls_filtered,
+        np.array(
+            [
+                [[0, 0, 0, 0], [0, 1, -2, -2], [1, 0, 0, 0]],
+                [[-1, -1, -2, -2], [-1, -1, -1, -1], [-1, -1, -1, -1]],
+            ]
+        ),
+    )
+
+    np.testing.assert_array_equal(
+        mask_filtered,
+        np.array(
+            [
+                [[0, 0, 0, 0], [0, 0, 1, 1], [0, 0, 0, 0]],
+                [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]],
+            ],
+            dtype=np.bool,
+        ),
+    )
+
+    assert ds["call_genotype"].attrs["mixed_ploidy"] is True
