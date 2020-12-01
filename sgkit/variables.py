@@ -263,10 +263,34 @@ pc_relate_phi, pc_relate_phi_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("pc_relate_phi", ndim=2, kind="f")
 )
 """PC Relate kinship coefficient matrix."""
+sample_call_rate, sample_call_rate_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_call_rate", ndim=1, kind="f")
+)
+"""The fraction of variants with called genotypes."""
 sample_id, sample_id_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("sample_id", kind={"S", "U", "O"}, ndim=1)
 )
 """The unique identifier of the sample."""
+sample_n_called, sample_n_called_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_n_called", ndim=1, kind="i")
+)
+"""The number of variants with called genotypes."""
+sample_n_het, sample_n_het_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_n_het", ndim=1, kind="i")
+)
+"""The number of variants with heterozygous calls."""
+sample_n_hom_alt, sample_n_hom_alt_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_n_hom_alt", ndim=1, kind="i")
+)
+"""The number of variants with homozygous alternate calls."""
+sample_n_hom_ref, sample_n_hom_ref_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_n_hom_ref", ndim=1, kind="i")
+)
+"""The number of variants with homozygous reference calls."""
+sample_n_non_ref, sample_n_non_ref_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_n_non_ref", ndim=1, kind="i")
+)
+"""The number of variants that are not homozygous reference calls."""
 sample_pcs, sample_pcs_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("sample_pcs", ndim=2, kind="f")
 )

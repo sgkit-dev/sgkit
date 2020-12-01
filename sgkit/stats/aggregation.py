@@ -470,3 +470,75 @@ def variant_stats(
         ]
     )
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+
+
+def sample_stats(
+    ds: Dataset,
+    *,
+    call_genotype_mask: Hashable = variables.call_genotype_mask,
+    call_genotype: Hashable = variables.call_genotype,
+    variant_allele_count: Hashable = variables.variant_allele_count,
+    merge: bool = True,
+) -> Dataset:
+    """Compute quality control sample statistics from genotype calls.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing genotype calls.
+    call_genotype
+        Input variable name holding call_genotype.
+        Defined by :data:`sgkit.variables.call_genotype_spec`.
+        Must be present in ``ds``.
+    call_genotype_mask
+        Input variable name holding call_genotype_mask.
+        Defined by :data:`sgkit.variables.call_genotype_mask_spec`
+        Must be present in ``ds``.
+    variant_allele_count
+        Input variable name holding variant_allele_count,
+        as defined by :data:`sgkit.variables.variant_allele_count_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`count_variant_alleles`.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing the following variables:
+
+    - :data:`sgkit.variables.sample_n_called_spec` (samples):
+      The number of variants with called genotypes.
+    - :data:`sgkit.variables.sample_call_rate_spec` (samples):
+      The fraction of variants with called genotypes.
+    - :data:`sgkit.variables.sample_n_het_spec` (samples):
+      The number of variants with heterozygous calls.
+    - :data:`sgkit.variables.sample_n_hom_ref_spec` (samples):
+      The number of variants with homozygous reference calls.
+    - :data:`sgkit.variables.sample_n_hom_alt_spec` (samples):
+      The number of variants with homozygous alternate calls.
+    - :data:`sgkit.variables.sample_n_non_ref_spec` (samples):
+      The number of variants that are not homozygous reference calls.
+    """
+    variables.validate(
+        ds,
+        {
+            call_genotype: variables.call_genotype_spec,
+            call_genotype_mask: variables.call_genotype_mask_spec,
+        },
+    )
+    new_ds = xr.merge(
+        [
+            call_rate(ds, dim="variants", call_genotype_mask=call_genotype_mask),
+            count_genotypes(
+                ds,
+                dim="variants",
+                call_genotype=call_genotype,
+                call_genotype_mask=call_genotype_mask,
+                merge=False,
+            ),
+        ]
+    )
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)

@@ -15,6 +15,7 @@ from .stats.aggregation import (
     count_call_alleles,
     count_cohort_alleles,
     count_variant_alleles,
+    sample_stats,
     variant_stats,
 )
 from .stats.association import gwas_linear_regression
@@ -48,6 +49,7 @@ __all__ = [
     "read_vcfzarr",
     "regenie",
     "hardy_weinberg_test",
+    "sample_stats",
     "variant_stats",
     "diversity",
     "divergence",
