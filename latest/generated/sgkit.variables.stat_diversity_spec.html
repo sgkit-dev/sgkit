@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>sgkit.variables.variant_n_hom_ref_spec &mdash; sgkit  documentation</title>
+  <title>sgkit.variables.stat_diversity_spec &mdash; sgkit  documentation</title>
   
 
   
@@ -37,8 +37,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.variables.variant_n_non_ref_spec" href="sgkit.variables.variant_n_non_ref_spec.html" />
-    <link rel="prev" title="sgkit.variables.variant_n_hom_alt_spec" href="sgkit.variables.variant_n_hom_alt_spec.html" /> 
+    <link rel="next" title="sgkit.variables.stat_Fst_spec" href="sgkit.variables.stat_Fst_spec.html" />
+    <link rel="prev" title="sgkit.variables.stat_divergence_spec" href="sgkit.variables.stat_divergence_spec.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -110,7 +110,7 @@
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variables.sample_id_spec.html">sgkit.variables.sample_id_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variables.sample_pcs_spec.html">sgkit.variables.sample_pcs_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variables.stat_divergence_spec.html">sgkit.variables.stat_divergence_spec</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sgkit.variables.stat_diversity_spec.html">sgkit.variables.stat_diversity_spec</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.variables.stat_diversity_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variables.stat_Fst_spec.html">sgkit.variables.stat_Fst_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variables.stat_Garud_h1_spec.html">sgkit.variables.stat_Garud_h1_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variables.stat_Garud_h12_spec.html">sgkit.variables.stat_Garud_h12_spec</a></li>
@@ -130,7 +130,7 @@
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variables.variant_n_called_spec.html">sgkit.variables.variant_n_called_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variables.variant_n_het_spec.html">sgkit.variables.variant_n_het_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variables.variant_n_hom_alt_spec.html">sgkit.variables.variant_n_hom_alt_spec</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">sgkit.variables.variant_n_hom_ref_spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sgkit.variables.variant_n_hom_ref_spec.html">sgkit.variables.variant_n_hom_ref_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variables.variant_n_non_ref_spec.html">sgkit.variables.variant_n_non_ref_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variables.variant_p_value_spec.html">sgkit.variables.variant_p_value_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sgkit.variables.variant_position_spec.html">sgkit.variables.variant_position_spec</a></li>
@@ -192,13 +192,13 @@
         
           <li><a href="../api.html">API reference</a> &raquo;</li>
         
-      <li>sgkit.variables.variant_n_hom_ref_spec</li>
+      <li>sgkit.variables.stat_diversity_spec</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/generated/sgkit.variables.variant_n_hom_ref_spec.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/generated/sgkit.variables.stat_diversity_spec.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -211,12 +211,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sgkit-variables-variant-n-hom-ref-spec">
-<h1>sgkit.variables.variant_n_hom_ref_spec<a class="headerlink" href="#sgkit-variables-variant-n-hom-ref-spec" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="sgkit-variables-stat-diversity-spec">
+<h1>sgkit.variables.stat_diversity_spec<a class="headerlink" href="#sgkit-variables-stat-diversity-spec" title="Permalink to this headline">¶</a></h1>
 <dl class="py data">
-<dt id="sgkit.variables.variant_n_hom_ref_spec">
-<code class="sig-prename descclassname">sgkit.variables.</code><code class="sig-name descname">variant_n_hom_ref_spec</code><em class="property"> = ArrayLikeSpec(default_name='variant_n_hom_ref', kind='i', ndim=1)</em><a class="headerlink" href="#sgkit.variables.variant_n_hom_ref_spec" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of samples with homozygous reference calls.</p>
+<dt id="sgkit.variables.stat_diversity_spec">
+<code class="sig-prename descclassname">sgkit.variables.</code><code class="sig-name descname">stat_diversity_spec</code><em class="property"> = ArrayLikeSpec(default_name='stat_diversity', kind='f', ndim=2)</em><a class="headerlink" href="#sgkit.variables.stat_diversity_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Genetic diversity (also known as “Tajima’s pi”) for cohorts.</p>
 </dd></dl>
 
 </div>
@@ -229,10 +229,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="sgkit.variables.variant_n_non_ref_spec.html" class="btn btn-neutral float-right" title="sgkit.variables.variant_n_non_ref_spec" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="sgkit.variables.stat_Fst_spec.html" class="btn btn-neutral float-right" title="sgkit.variables.stat_Fst_spec" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="sgkit.variables.variant_n_hom_alt_spec.html" class="btn btn-neutral float-left" title="sgkit.variables.variant_n_hom_alt_spec" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="sgkit.variables.stat_divergence_spec.html" class="btn btn-neutral float-left" title="sgkit.variables.stat_divergence_spec" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
