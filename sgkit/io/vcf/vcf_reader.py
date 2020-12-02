@@ -401,6 +401,9 @@ def vcf_to_zarr(
             temp_chunk_length=temp_chunk_length,
             tempdir=tempdir,
             tempdir_storage_options=tempdir_storage_options,
+            ploidy=ploidy,
+            mixed_ploidy=mixed_ploidy,
+            truncate_calls=truncate_calls,
         )
 
 
