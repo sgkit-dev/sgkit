@@ -5,6 +5,7 @@ import pytest
 import xarray as xr
 from numpy.testing import assert_array_equal
 
+from sgkit import load_dataset
 from sgkit.io.vcf import partition_into_regions, vcf_to_zarr
 
 from .utils import path_for_test
@@ -310,16 +311,18 @@ def test_vcf_to_zarr__mutiple_partitioned_invalid_regions(
 
 
 @pytest.mark.parametrize(
-    "ploidy,mixed_ploidy,truncate_calls",
+    "ploidy,mixed_ploidy,truncate_calls,regions",
     [
-        (2, False, True),
-        (4, False, False),
-        (4, True, False),
-        (5, True, False),
+        (2, False, True, None),
+        (4, False, False, None),
+        (4, False, False, ["CHR1:0-5", "CHR1:5-10"]),
+        (4, True, False, None),
+        (4, True, False, ["CHR1:0-5", "CHR1:5-10"]),
+        (5, True, False, None),
     ],
 )
 def test_vcf_to_zarr__mixed_ploidy_vcf(
-    shared_datadir, tmp_path, ploidy, mixed_ploidy, truncate_calls
+    shared_datadir, tmp_path, ploidy, mixed_ploidy, truncate_calls, regions
 ):
     path = path_for_test(shared_datadir, "mixed.vcf.gz")
     output = tmp_path.joinpath("vcf.zarr").as_posix()
@@ -327,30 +330,35 @@ def test_vcf_to_zarr__mixed_ploidy_vcf(
     vcf_to_zarr(
         path,
         output,
+        regions=regions,
         chunk_length=5,
         chunk_width=2,
         ploidy=ploidy,
         mixed_ploidy=mixed_ploidy,
         truncate_calls=truncate_calls,
     )
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = load_dataset(output)
 
+    variant_dtype = "|S1" if regions else "O"
     assert ds.attrs["contigs"] == ["CHR1", "CHR2", "CHR3"]
     assert_array_equal(ds["variant_contig"], [0, 0])
     assert_array_equal(ds["variant_position"], [2, 7])
     assert_array_equal(
         ds["variant_allele"],
-        [
-            ["A", "T", "", ""],
-            ["A", "C", "", ""],
-        ],
+        np.array(
+            [
+                ["A", "T", "", ""],
+                ["A", "C", "", ""],
+            ],
+            dtype=variant_dtype,
+        ),
     )
-    assert ds["variant_allele"].dtype == "O"
+    assert ds["variant_allele"].dtype == variant_dtype
     assert_array_equal(
         ds["variant_id"],
-        [".", "."],
+        np.array([".", "."], dtype=variant_dtype),
     )
-    assert ds["variant_id"].dtype == "O"
+    assert ds["variant_id"].dtype == variant_dtype
     assert_array_equal(
         ds["variant_id_mask"],
         [True, True],
