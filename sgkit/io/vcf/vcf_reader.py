@@ -1,3 +1,4 @@
+import functools
 import itertools
 from contextlib import contextmanager
 from pathlib import Path
@@ -381,30 +382,24 @@ def vcf_to_zarr(
     if (isinstance(input, str) or isinstance(input, Path)) and (
         regions is None or isinstance(regions, str)
     ):
-        vcf_to_zarr_sequential(
-            input,
-            output,
-            region=regions,
-            chunk_length=chunk_length,
-            chunk_width=chunk_width,
-            ploidy=ploidy,
-            mixed_ploidy=mixed_ploidy,
-            truncate_calls=truncate_calls,
-        )
+        convert_func = vcf_to_zarr_sequential
     else:
-        vcf_to_zarr_parallel(
-            input,
-            output,
-            regions=regions,
-            chunk_length=chunk_length,
-            chunk_width=chunk_width,
+        convert_func = functools.partial(
+            vcf_to_zarr_parallel,
             temp_chunk_length=temp_chunk_length,
             tempdir=tempdir,
             tempdir_storage_options=tempdir_storage_options,
-            ploidy=ploidy,
-            mixed_ploidy=mixed_ploidy,
-            truncate_calls=truncate_calls,
         )
+    convert_func(
+        input,  # type: ignore
+        output,
+        regions,  # type: ignore
+        chunk_length=chunk_length,
+        chunk_width=chunk_width,
+        ploidy=ploidy,
+        mixed_ploidy=mixed_ploidy,
+        truncate_calls=truncate_calls,
+    )
 
 
 def count_variants(path: PathType, region: Optional[str] = None) -> int:
