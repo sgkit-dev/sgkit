@@ -482,7 +482,7 @@ def Tajimas_D(
         Genotype call dataset.
     variant_allele_count
         Variant allele count variable to use or calculate. Defined by
-        :data:`sgkit.variables.variant_allele_count`.
+        :data:`sgkit.variables.variant_allele_count_spec`.
         If the variable is not present in ``ds``, it will be computed
         using :func:`count_variant_alleles`.
     stat_diversity
@@ -770,7 +770,7 @@ def _Garud_h_cohorts(
     return arr
 
 
-def Garud_h(
+def Garud_H(
     ds: Dataset,
     *,
     call_genotype: Hashable = variables.call_genotype,
@@ -842,7 +842,7 @@ def Garud_h(
     >>> # Divide into windows of size three (variants)
     >>> ds = sg.window(ds, size=3, step=3)
 
-    >>> gh = sg.Garud_h(ds)
+    >>> gh = sg.Garud_H(ds)
     >>> gh["stat_Garud_h1"].values # doctest: +NORMALIZE_WHITESPACE
     array([[0.25 , 0.375],
         [0.375, 0.375]])
@@ -861,7 +861,7 @@ def Garud_h(
         raise NotImplementedError("Garud H only implemented for diploid genotypes")
 
     if not has_windows(ds):
-        raise ValueError("Dataset must be windowed for Garud_h")
+        raise ValueError("Dataset must be windowed for Garud_H")
 
     variables.validate(ds, {call_genotype: variables.call_genotype_spec})
 

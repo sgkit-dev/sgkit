@@ -254,7 +254,7 @@ the affected pages.
 The documentation build is checked by CI to ensure that it builds
 without warnings. You can do that locally with::
 
-   make clean html SPHINXOPTS="-W --keep-going"
+   make clean html SPHINXOPTS="-W --keep-going -n"
 
 .. _Sphinx: https://www.sphinx-doc.org/
 

@@ -104,6 +104,7 @@ def pc_relate(
     Returns
     -------
     Dataset containing (S = num samples):
+
     :data:`sgkit.variables.pc_relate_phi_spec`: (S,S) ArrayLike
     pairwise recent kinship coefficient matrix as float in [-0.5, 0.5].
 

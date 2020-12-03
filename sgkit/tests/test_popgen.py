@@ -9,7 +9,7 @@ from allel import hudson_fst
 
 from sgkit import (
     Fst,
-    Garud_h,
+    Garud_H,
     Tajimas_D,
     count_cohort_alleles,
     count_variant_alleles,
@@ -415,7 +415,7 @@ def test_Garud_h(
     ds = ds.assign_coords(coords)  # type: ignore[no-untyped-call]
     ds = window(ds, size=3)
 
-    gh = Garud_h(ds, cohorts=cohorts)
+    gh = Garud_H(ds, cohorts=cohorts)
     h1 = gh.stat_Garud_h1.values
     h12 = gh.stat_Garud_h12.values
     h123 = gh.stat_Garud_h123.values
@@ -448,11 +448,11 @@ def test_Garud_h__raise_on_non_diploid():
     with pytest.raises(
         NotImplementedError, match="Garud H only implemented for diploid genotypes"
     ):
-        Garud_h(ds)
+        Garud_H(ds)
 
 
 def test_Garud_h__raise_on_no_windows():
     ds = simulate_genotype_call_dataset(n_variant=10, n_sample=10)
 
-    with pytest.raises(ValueError, match="Dataset must be windowed for Garud_h"):
-        Garud_h(ds)
+    with pytest.raises(ValueError, match="Dataset must be windowed for Garud_H"):
+        Garud_H(ds)

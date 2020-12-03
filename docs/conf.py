@@ -93,6 +93,8 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 autosummary_generate = True
 
+nitpick_ignore = [("py:class", "sgkit.display.GenotypeDisplay")]
+
 
 # FIXME: Workaround for linking xarray module
 # For some reason, intersphinx is not able to to link xarray objects.
