@@ -113,6 +113,7 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.gwas_linear_regression.html">sgkit.gwas_linear_regression</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.hardy_weinberg_test.html">sgkit.hardy_weinberg_test</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.regenie.html">sgkit.regenie</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.sample_stats.html">sgkit.sample_stats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variant_stats.html">sgkit.variant_stats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.Tajimas_D.html">sgkit.Tajimas_D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.pc_relate.html">sgkit.pc_relate</a></li>
@@ -141,7 +142,13 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.loco_prediction_spec.html">sgkit.variables.loco_prediction_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.meta_prediction_spec.html">sgkit.variables.meta_prediction_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.pc_relate_phi_spec.html">sgkit.variables.pc_relate_phi_spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.sample_call_rate_spec.html">sgkit.variables.sample_call_rate_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.sample_id_spec.html">sgkit.variables.sample_id_spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.sample_n_called_spec.html">sgkit.variables.sample_n_called_spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.sample_n_het_spec.html">sgkit.variables.sample_n_het_spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.sample_n_hom_alt_spec.html">sgkit.variables.sample_n_hom_alt_spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.sample_n_hom_ref_spec.html">sgkit.variables.sample_n_hom_ref_spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.sample_n_non_ref_spec.html">sgkit.variables.sample_n_non_ref_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.sample_pcs_spec.html">sgkit.variables.sample_pcs_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.stat_divergence_spec.html">sgkit.variables.stat_divergence_spec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/sgkit.variables.stat_diversity_spec.html">sgkit.variables.stat_diversity_spec</a></li>
@@ -335,13 +342,16 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.regenie.html#sgkit.regenie" title="sgkit.regenie"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regenie</span></code></a>(ds, *, dosage, covariates, traits[, …])</p></td>
 <td><p>Regenie trait transformation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variant_stats.html#sgkit.variant_stats" title="sgkit.variant_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variant_stats</span></code></a>(ds, *[, call_genotype_mask, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.sample_stats.html#sgkit.sample_stats" title="sgkit.sample_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_stats</span></code></a>(ds, *[, call_genotype_mask, …])</p></td>
+<td><p>Compute quality control sample statistics from genotype calls.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variant_stats.html#sgkit.variant_stats" title="sgkit.variant_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variant_stats</span></code></a>(ds, *[, call_genotype_mask, …])</p></td>
 <td><p>Compute quality control variant statistics from genotype calls.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.Tajimas_D.html#sgkit.Tajimas_D" title="sgkit.Tajimas_D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tajimas_D</span></code></a>(ds, *[, variant_allele_count, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.Tajimas_D.html#sgkit.Tajimas_D" title="sgkit.Tajimas_D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tajimas_D</span></code></a>(ds, *[, variant_allele_count, …])</p></td>
 <td><p>Compute Tajimas’ D for a genotype call dataset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pc_relate.html#sgkit.pc_relate" title="sgkit.pc_relate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pc_relate</span></code></a>(ds, *[, maf, call_genotype, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.pc_relate.html#sgkit.pc_relate" title="sgkit.pc_relate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pc_relate</span></code></a>(ds, *[, maf, call_genotype, …])</p></td>
 <td><p>Compute PC-Relate as described in Conomos, et al.</p></td>
 </tr>
 </tbody>
@@ -423,8 +433,26 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.pc_relate_phi_spec.html#sgkit.variables.pc_relate_phi_spec" title="sgkit.variables.pc_relate_phi_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.pc_relate_phi_spec</span></code></a></p></td>
 <td><p>PC Relate kinship coefficient matrix.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.sample_id_spec.html#sgkit.variables.sample_id_spec" title="sgkit.variables.sample_id_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.sample_id_spec</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.sample_call_rate_spec.html#sgkit.variables.sample_call_rate_spec" title="sgkit.variables.sample_call_rate_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.sample_call_rate_spec</span></code></a></p></td>
+<td><p>The fraction of variants with called genotypes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.sample_id_spec.html#sgkit.variables.sample_id_spec" title="sgkit.variables.sample_id_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.sample_id_spec</span></code></a></p></td>
 <td><p>The unique identifier of the sample.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.sample_n_called_spec.html#sgkit.variables.sample_n_called_spec" title="sgkit.variables.sample_n_called_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.sample_n_called_spec</span></code></a></p></td>
+<td><p>The number of variants with called genotypes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.sample_n_het_spec.html#sgkit.variables.sample_n_het_spec" title="sgkit.variables.sample_n_het_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.sample_n_het_spec</span></code></a></p></td>
+<td><p>The number of variants with heterozygous calls.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.sample_n_hom_alt_spec.html#sgkit.variables.sample_n_hom_alt_spec" title="sgkit.variables.sample_n_hom_alt_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.sample_n_hom_alt_spec</span></code></a></p></td>
+<td><p>The number of variants with homozygous alternate calls.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.sample_n_hom_ref_spec.html#sgkit.variables.sample_n_hom_ref_spec" title="sgkit.variables.sample_n_hom_ref_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.sample_n_hom_ref_spec</span></code></a></p></td>
+<td><p>The number of variants with homozygous reference calls.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.sample_n_non_ref_spec.html#sgkit.variables.sample_n_non_ref_spec" title="sgkit.variables.sample_n_non_ref_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.sample_n_non_ref_spec</span></code></a></p></td>
+<td><p>The number of variants that are not homozygous reference calls.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.sample_pcs_spec.html#sgkit.variables.sample_pcs_spec" title="sgkit.variables.sample_pcs_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.sample_pcs_spec</span></code></a></p></td>
 <td><p>Sample PCs (PCxS).</p></td>

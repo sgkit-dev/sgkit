@@ -1,0 +1,6 @@
+﻿sgkit.variables.sample\_n\_hom\_alt\_spec
+=========================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: sample_n_hom_alt_spec

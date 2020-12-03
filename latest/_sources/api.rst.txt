@@ -52,6 +52,7 @@ Methods
    gwas_linear_regression
    hardy_weinberg_test
    regenie
+   sample_stats
    variant_stats
    Tajimas_D
    pc_relate
@@ -88,7 +89,13 @@ Variables
     variables.loco_prediction_spec
     variables.meta_prediction_spec
     variables.pc_relate_phi_spec
+    variables.sample_call_rate_spec
     variables.sample_id_spec
+    variables.sample_n_called_spec
+    variables.sample_n_het_spec
+    variables.sample_n_hom_alt_spec
+    variables.sample_n_hom_ref_spec
+    variables.sample_n_non_ref_spec
     variables.sample_pcs_spec
     variables.stat_divergence_spec
     variables.stat_diversity_spec
