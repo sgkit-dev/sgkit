@@ -250,15 +250,15 @@ def read_bgen(
     -------
     A dataset containing the following variables:
 
-    - :data:`sgkit.variables.variant_id` (variants)
-    - :data:`sgkit.variables.variant_contig` (variants)
-    - :data:`sgkit.variables.variant_position` (variants)
-    - :data:`sgkit.variables.variant_allele` (variants)
-    - :data:`sgkit.variables.sample_id` (samples)
-    - :data:`sgkit.variables.call_dosage` (variants, samples)
-    - :data:`sgkit.variables.call_dosage_mask` (variants, samples)
-    - :data:`sgkit.variables.call_genotype_probability` (variants, samples, genotypes)
-    - :data:`sgkit.variables.call_genotype_probability_mask` (variants, samples, genotypes)
+    - :data:`sgkit.variables.variant_id_spec` (variants)
+    - :data:`sgkit.variables.variant_contig_spec` (variants)
+    - :data:`sgkit.variables.variant_position_spec` (variants)
+    - :data:`sgkit.variables.variant_allele_spec` (variants)
+    - :data:`sgkit.variables.sample_id_spec` (samples)
+    - :data:`sgkit.variables.call_dosage_spec` (variants, samples)
+    - :data:`sgkit.variables.call_dosage_mask_spec` (variants, samples)
+    - :data:`sgkit.variables.call_genotype_probability_spec` (variants, samples, genotypes)
+    - :data:`sgkit.variables.call_genotype_probability_mask_spec` (variants, samples, genotypes)
 
     """
     if isinstance(chunks, tuple) and len(chunks) != 3:
@@ -445,30 +445,30 @@ def rechunk_bgen(
 
     Parameters
     ----------
-    ds : Dataset
+    ds
         Dataset to rechunk, typically the result from `read_bgen`.
-    output : Union[PathType, MutableMapping[str, bytes]]
+    output
         Zarr store or path to directory in file system.
-    chunk_length : int
+    chunk_length
         Length (number of variants) of chunks in which data are stored, by default 10_000.
-    chunk_width : int
+    chunk_width
         Width (number of samples) to use when storing chunks in output, by default 1_000.
-    compressor : Optional[Any]
+    compressor
         Zarr compressor, no compression is used when set as None.
-    probability_dtype : DType
+    probability_dtype
         Data type used to encode genotype probabilities, must be either uint8 or uint16.
         Setting this parameter results in a loss of precision. If None, probabilities
         will not be altered when stored.
-    max_mem : str
+    max_mem
         The amount of memory (in bytes) that workers are allowed to use. A string
         (e.g. 100MB) can also be used.
-    pack : bool
+    pack
         Whether or not to optimize variable representations by removing unnecessary
         dimensions and elements. This includes storing 2 genotypes instead of 3, omitting
         dosage and collapsing the genotype probability mask to 2 dimensions. All of
         the above are restored in the resulting Dataset at the expense of extra
         computations on read.
-    tempdir : Optional[PathType]
+    tempdir
         Temporary directory where intermediate files are stored. The default None means
         use the system default temporary directory.
 
@@ -538,58 +538,48 @@ def bgen_to_zarr(
     pack: bool = True,
     tempdir: Optional[PathType] = None,
 ) -> Dataset:
-    """Rechunk BGEN dataset as Zarr.
+    """Convert a BGEN file to a Zarr on-disk store.
 
-    This function will use the algorithm https://rechunker.readthedocs.io/en/latest/
-    to rechunk certain fields in a provided Dataset for better downstream performance.
-    Depending on the system memory available (and the `max_mem` setting) this
-    rechunking may occur without the need of any intermediate data store. Otherwise,
-    approximately as much disk space is required as was needed to store the original
-    BGEN data. Experiments show that this Zarr representation is ~20% larger even
-    with all available optimizations and fairly aggressive compression (i.e. the
-    default `clevel` 7).
-
-    Note that this function is not evaluated lazily. The rechunking algorithm
-    will run inline so calls to it may be slow. The resulting Dataset is
-    generated based on the final, serialized Zarr data.
+    This function is a convenience for calling :func:`read_bgen` followed by
+    :func:`rechunk_bgen`.
 
     Parameters
     ----------
-    input : PathType
+    input
         Path to local BGEN dataset.
-    output : Union[PathType, MutableMapping[str, bytes]]
+    output
         Zarr store or path to directory in file system.
-    region : Optional[Mapping[Hashable, Any]]
+    region
         Indexers on dataset dimensions used to define a subset of data to convert.
         Must be None or a dict with keys matching dimension names and values
         equal to integers or slice objects. This is passed directly to `Dataset.isel`
         so it has the same semantics.
-    chunk_length : int
+    chunk_length
         Length (number of variants) of chunks in which data are stored, by default 10_000.
-    chunk_width : int
+    chunk_width
         Width (number of samples) to use when storing chunks in output, by default 1_000.
-    temp_chunk_length : int
+    temp_chunk_length
         Length of chunks used in raw BGEN read, by default 100. This defines the vertical
         chunking (i.e. in the variants dimension) used when reading the raw data and because
         there is no horizontal chunking at this phase (i.e. in the samples dimension), this
         value should be much smaller than the target `chunk_length`.
-    compressor : Optional[Any]
+    compressor
         Zarr compressor, by default Blosc + zstd with compression level 7. No compression
         is used when set as None.
-    probability_dtype : DType
+    probability_dtype
         Data type used to encode genotype probabilities, must be either uint8 or uint16.
         Setting this parameter results in a loss of precision. If None, probabilities
         will not be altered when stored.
-    max_mem : str
+    max_mem
         The amount of memory (in bytes) that workers are allowed to use. A string
         (e.g. 100MB) can also be used.
-    pack : bool
+    pack
         Whether or not to optimize variable representations by removing unnecessary
         dimensions and elements. This includes storing 2 genotypes instead of 3, omitting
         dosage and collapsing the genotype probability mask to 2 dimensions. All of
         the above are restored in the resulting Dataset at the expense of extra
         computations on read.
-    tempdir : Optional[PathType]
+    tempdir
         Temporary directory where intermediate files are stored. The default None means
         use the system default temporary directory.
 

@@ -19,6 +19,7 @@ from .stats.aggregation import (
     variant_stats,
 )
 from .stats.association import gwas_linear_regression
+from .stats.conversion import convert_probability_to_call
 from .stats.hwe import hardy_weinberg_test
 from .stats.pc_relate import pc_relate
 from .stats.pca import pca
@@ -39,6 +40,7 @@ __all__ = [
     "DIM_SAMPLE",
     "DIM_VARIANT",
     "create_genotype_call_dataset",
+    "convert_probability_to_call",
     "count_variant_alleles",
     "count_call_alleles",
     "count_cohort_alleles",
