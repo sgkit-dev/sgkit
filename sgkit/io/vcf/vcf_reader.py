@@ -391,14 +391,12 @@ def vcf_to_zarr(
         if regions is not None:
             raise ValueError("Only one of target_part_size or regions may be specified")
         if isinstance(input, str) or isinstance(input, Path):
-            regions = partition_into_regions(
-                Path(input), target_part_size=target_part_size
-            )
+            regions = partition_into_regions(input, target_part_size=target_part_size)
         else:
             # Multiple inputs
             inputs = input
             regions = [
-                partition_into_regions(Path(input), target_part_size=target_part_size)
+                partition_into_regions(input, target_part_size=target_part_size)
                 for input in inputs
             ]
 
