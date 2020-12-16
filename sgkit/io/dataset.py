@@ -1,4 +1,5 @@
-from typing import Any, Dict, Optional
+from pathlib import Path
+from typing import Any, Dict, MutableMapping, Optional, Union
 
 import fsspec
 import xarray as xr
@@ -9,7 +10,7 @@ from sgkit.typing import PathType
 
 def save_dataset(
     ds: Dataset,
-    path: PathType,
+    store: Union[PathType, MutableMapping[str, bytes]],
     storage_options: Optional[Dict[str, str]] = None,
     **kwargs: Any
 ) -> None:
@@ -22,18 +23,18 @@ def save_dataset(
     ----------
     ds
         Dataset to save.
-    path
-        Path to directory in file system to save to.
+    store
+        Zarr store or path to directory in file system to save to.
     storage_options:
         Any additional parameters for the storage backend (see ``fsspec.open``).
     kwargs
         Additional arguments to pass to :meth:`xarray.Dataset.to_zarr`.
     """
-    if isinstance(path, str):
+    if isinstance(store, str):
         storage_options = storage_options or {}
-        store = fsspec.get_mapper(path, **storage_options)
-    else:
-        store = str(path)
+        store = fsspec.get_mapper(store, **storage_options)
+    elif isinstance(store, Path):
+        store = str(store)
     for v in ds:
         # Workaround for https://github.com/pydata/xarray/issues/4380
         ds[v].encoding.pop("chunks", None)
@@ -41,7 +42,8 @@ def save_dataset(
 
 
 def load_dataset(
-    path: PathType, storage_options: Optional[Dict[str, str]] = None
+    store: Union[PathType, MutableMapping[str, bytes]],
+    storage_options: Optional[Dict[str, str]] = None,
 ) -> Dataset:
     """Load a dataset from Zarr storage.
 
@@ -50,21 +52,21 @@ def load_dataset(
 
     Parameters
     ----------
-    path
-        Path to directory in file system to load from.
+    store
+        Zarr store or path to directory in file system to load from.
     storage_options:
         Any additional parameters for the storage backend (see ``fsspec.open``).
 
     Returns
     -------
     Dataset
-        The dataset loaded from the file system.
+        The dataset loaded from the Zarr store or file system.
     """
-    if isinstance(path, str):
+    if isinstance(store, str):
         storage_options = storage_options or {}
-        store = fsspec.get_mapper(path, **storage_options)
-    else:
-        store = str(path)
+        store = fsspec.get_mapper(store, **storage_options)
+    elif isinstance(store, Path):
+        store = str(store)
     ds: Dataset = xr.open_zarr(store, concat_characters=False)  # type: ignore[no-untyped-call]
     for v in ds:
         # Workaround for https://github.com/pydata/xarray/issues/4386

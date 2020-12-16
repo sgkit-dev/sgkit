@@ -1,3 +1,5 @@
+from typing import MutableMapping
+
 import pytest
 import xarray as xr
 from xarray import Dataset
@@ -31,3 +33,16 @@ def test_save_and_load_dataset(tmp_path, is_path):
         path2 = str(path2)
     save_dataset(ds2, path2)
     assert_identical(ds, load_dataset(path2))
+
+
+def test_save_and_load_dataset__mutable_mapping():
+    store: MutableMapping[str, bytes] = {}
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=10)
+    save_dataset(ds, store)
+    ds2 = load_dataset(store)
+    assert_identical(ds, ds2)
+
+    # save and load again to test https://github.com/pydata/xarray/issues/4386
+    store2: MutableMapping[str, bytes] = {}
+    save_dataset(ds2, store2)
+    assert_identical(ds, load_dataset(store2))
