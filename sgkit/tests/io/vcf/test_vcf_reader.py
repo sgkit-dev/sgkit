@@ -210,19 +210,6 @@ def test_vcf_to_zarr__parallel_temp_chunk_length_not_divisible(
         )
 
 
-def test_vcf_to_zarr__target_part_size_and_regions_not_allowed(
-    shared_datadir, tmp_path
-):
-    path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", False)
-    output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
-    regions = ["20", "21"]
-
-    with pytest.raises(
-        ValueError, match=r"Only one of target_part_size or regions may be specified"
-    ):
-        vcf_to_zarr(path, output, target_part_size=40_000, regions=regions)
-
-
 @pytest.mark.parametrize(
     "is_path",
     [True, False],

@@ -312,7 +312,7 @@ def vcf_to_zarr(
     input: Union[PathType, Sequence[PathType]],
     output: Union[PathType, MutableMapping[str, bytes]],
     *,
-    target_part_size: Optional[int] = None,
+    target_part_size: Optional[int] = 100_000_000,
     regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]] = None,
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
@@ -325,13 +325,13 @@ def vcf_to_zarr(
 ) -> None:
     """Convert VCF files to a single Zarr on-disk store.
 
-    For a single input and a single region, the conversion is carried out sequentially,
-    unless `target_part_size` is specified.
+    By default, the conversion is carried out in parallel, by writing the output for each
+    part to a separate, intermediate Zarr store in ``tempdir``. Then, in a second step
+    the intermediate outputs are concatenated and rechunked into the final output Zarr
+    store in ``output``.
 
-    For multiple outputs or regions, or if `target_part_size` is specified, the conversion
-    is carried out in parallel, by writing the output for each part to a separate,
-    intermediate Zarr store in ``tempdir``. Then, in a second step the intermediate outputs
-    are concatenated and rechunked into the final output Zarr store in ``output``.
+    Conversion is carried out sequentially if ``target_part_size`` is None, and ``regions``
+    is None.
 
     For more control over these two steps, consider using :func:`vcf_to_zarrs` followed by
     :func:`zarrs_to_dataset`, then saving the dataset using Xarray's
@@ -347,13 +347,14 @@ def vcf_to_zarr(
         Zarr store or path to directory in file system.
     target_part_size
         The desired size, in bytes, of each (compressed) part of the input to be
-        processed in parallel. The default None, means that the input will be processed
-        sequentially, or in parts specified by ``regions``. Cannot be specified if
-        ``regions`` is also specified.
+        processed in parallel. Defaults to 100MB. A value of None means that the input
+        will be processed sequentially. The setting will be ignored if ``regions`` is
+        also specified.
     regions
         Genomic region or regions to extract variants for. For multiple inputs, multiple
         input regions are specified as a sequence of values which may be None, or a
-        sequence of region strings.
+        sequence of region strings. Takes priority over ``target_part_size`` if both
+        are not None.
     chunk_length
         Length (number of variants) of chunks in which data are stored, by default 10,000.
     chunk_width
@@ -387,9 +388,7 @@ def vcf_to_zarr(
                 f"Temporary chunk length in variant dimension ({temp_chunk_length}) "
                 f"must evenly divide target chunk length {chunk_length}"
             )
-    if target_part_size is not None:
-        if regions is not None:
-            raise ValueError("Only one of target_part_size or regions may be specified")
+    if regions is None and target_part_size is not None:
         if isinstance(input, str) or isinstance(input, Path):
             regions = partition_into_regions(input, target_part_size=target_part_size)
         else:
