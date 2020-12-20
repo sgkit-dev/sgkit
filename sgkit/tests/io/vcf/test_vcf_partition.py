@@ -48,13 +48,23 @@ def test_partition_into_regions__num_parts_large(shared_datadir, is_path):
 
 
 @pytest.mark.parametrize(
+    "target_part_size",
+    [
+        100_000,
+        "100KB",
+        "100 kB",
+    ],
+)
+@pytest.mark.parametrize(
     "is_path",
     [True, False],
 )
-def test_partition_into_regions__target_part_size(shared_datadir, is_path):
+def test_partition_into_regions__target_part_size(
+    shared_datadir, is_path, target_part_size
+):
     vcf_path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", is_path)
 
-    regions = partition_into_regions(vcf_path, target_part_size=100_000)
+    regions = partition_into_regions(vcf_path, target_part_size=target_part_size)
     assert regions is not None
     assert len(regions) == 5
 

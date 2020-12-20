@@ -244,7 +244,7 @@ def test_vcf_to_zarr__parallel_partitioned_by_size(shared_datadir, is_path, tmp_
     output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
 
     vcf_to_zarr(
-        path, output, target_part_size=4_000_000, chunk_length=1_000, chunk_width=1_000
+        path, output, target_part_size="4MB", chunk_length=1_000, chunk_width=1_000
     )
     ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
 
@@ -263,7 +263,7 @@ def test_vcf_to_zarr__multiple(shared_datadir, is_path, tmp_path):
     ]
     output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
 
-    vcf_to_zarr(paths, output, chunk_length=5_000)
+    vcf_to_zarr(paths, output, target_part_size=None, chunk_length=5_000)
     ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
 
     assert ds["sample_id"].shape == (1,)
@@ -319,7 +319,7 @@ def test_vcf_to_zarr__multiple_partitioned_by_size(shared_datadir, is_path, tmp_
     ]
     output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
 
-    vcf_to_zarr(paths, output, target_part_size=40_000, chunk_length=5_000)
+    vcf_to_zarr(paths, output, target_part_size="40KB", chunk_length=5_000)
     ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
 
     assert ds["sample_id"].shape == (1,)

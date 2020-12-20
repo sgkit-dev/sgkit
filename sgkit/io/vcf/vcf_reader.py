@@ -312,7 +312,7 @@ def vcf_to_zarr(
     input: Union[PathType, Sequence[PathType]],
     output: Union[PathType, MutableMapping[str, bytes]],
     *,
-    target_part_size: Optional[int] = 100_000_000,
+    target_part_size: Union[None, int, str] = "auto",
     regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]] = None,
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
@@ -347,9 +347,9 @@ def vcf_to_zarr(
         Zarr store or path to directory in file system.
     target_part_size
         The desired size, in bytes, of each (compressed) part of the input to be
-        processed in parallel. Defaults to 100MB. A value of None means that the input
-        will be processed sequentially. The setting will be ignored if ``regions`` is
-        also specified.
+        processed in parallel. Defaults to ``"auto"``, which will pick a good size
+        (currently 100MB). A value of None means that the input will be processed
+        sequentially. The setting will be ignored if ``regions`` is also specified.
     regions
         Genomic region or regions to extract variants for. For multiple inputs, multiple
         input regions are specified as a sequence of values which may be None, or a
@@ -389,6 +389,8 @@ def vcf_to_zarr(
                 f"must evenly divide target chunk length {chunk_length}"
             )
     if regions is None and target_part_size is not None:
+        if target_part_size == "auto":
+            target_part_size = "100MB"
         if isinstance(input, str) or isinstance(input, Path):
             regions = partition_into_regions(input, target_part_size=target_part_size)
         else:
