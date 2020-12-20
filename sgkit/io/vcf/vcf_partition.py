@@ -1,5 +1,6 @@
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence, Union
 
+import dask
 import fsspec
 import numpy as np
 from cyvcf2 import VCF
@@ -71,7 +72,7 @@ def partition_into_regions(
     *,
     index_path: Optional[PathType] = None,
     num_parts: Optional[int] = None,
-    target_part_size: Optional[int] = None,
+    target_part_size: Union[None, int, str] = None,
     storage_options: Optional[Dict[str, str]] = None,
 ) -> Optional[Sequence[str]]:
     """
@@ -97,7 +98,9 @@ def partition_into_regions(
     num_parts
         The desired number of parts to partition the VCF file into, by default None
     target_part_size
-        The desired size, in bytes, of each (compressed) part of the partitioned VCF, by default None
+        The desired size, in bytes, of each (compressed) part of the partitioned VCF, by default None.
+        If the value is a string, it may be specified using standard abbreviations, e.g. ``100MB`` is
+        equivalent to ``100_000_000``.
     storage_options:
         Any additional parameters for the storage backend (see ``fsspec.open``).
 
@@ -124,8 +127,10 @@ def partition_into_regions(
     if num_parts is not None and num_parts < 1:
         raise ValueError("num_parts must be positive")
 
-    if target_part_size is not None and target_part_size < 1:
-        raise ValueError("target_part_size must be positive")
+    if target_part_size is not None:
+        target_part_size_bytes: int = dask.utils.parse_bytes(target_part_size)
+        if target_part_size_bytes < 1:
+            raise ValueError("target_part_size must be positive")
 
     if index_path is None:
         index_path = get_tabix_path(vcf_path, storage_options=storage_options)
@@ -137,12 +142,12 @@ def partition_into_regions(
     # Calculate the desired part file boundaries
     file_length = get_file_length(vcf_path, storage_options=storage_options)
     if num_parts is not None:
-        target_part_size = file_length // num_parts
-    elif target_part_size is not None:
-        num_parts = ceildiv(file_length, target_part_size)
+        target_part_size_bytes = file_length // num_parts
+    elif target_part_size_bytes is not None:
+        num_parts = ceildiv(file_length, target_part_size_bytes)
     if num_parts == 1:
         return None
-    part_lengths = np.array([i * target_part_size for i in range(num_parts)])  # type: ignore
+    part_lengths = np.array([i * target_part_size_bytes for i in range(num_parts)])
 
     # Get the file offsets from .tbi/.csi
     index = read_index(index_path, storage_options=storage_options)
