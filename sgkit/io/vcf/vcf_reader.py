@@ -93,10 +93,17 @@ def vcf_to_zarr_sequential(
             variant_allele = []
 
             for i, variant in enumerate(variants_chunk):
+                if variant.genotype is None:
+                    raise ValueError("Genotype information missing from VCF.")
                 variant_id = variant.ID if variant.ID is not None else "."
                 variant_ids.append(variant_id)
                 max_variant_id_length = max(max_variant_id_length, len(variant_id))
-                variant_contig[i] = variant_contig_names.index(variant.CHROM)
+                try:
+                    variant_contig[i] = variant_contig_names.index(variant.CHROM)
+                except ValueError:
+                    raise ValueError(
+                        f"Contig '{variant.CHROM}' is not defined in the header."
+                    )
                 variant_position[i] = variant.POS
 
                 alleles = [variant.REF] + variant.ALT
