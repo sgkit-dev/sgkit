@@ -453,3 +453,26 @@ def test_vcf_to_zarr__mixed_ploidy_vcf_exception(
             truncate_calls=truncate_calls,
         )
     assert "Genotype call longer than ploidy." == str(excinfo.value)
+
+
+def test_vcf_to_zarr__no_genotypes(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "no_genotypes.vcf")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    with pytest.raises(
+        ValueError,
+        match=r"Genotype information missing from VCF.",
+    ):
+        vcf_to_zarr(path, output)
+
+
+def test_vcf_to_zarr__contig_not_defined_in_header(shared_datadir, tmp_path):
+    # sample.vcf does not define the contigs in the header, and isn't indexed
+    path = path_for_test(shared_datadir, "sample.vcf")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    with pytest.raises(
+        ValueError,
+        match=r"Contig '19' is not defined in the header.",
+    ):
+        vcf_to_zarr(path, output)
