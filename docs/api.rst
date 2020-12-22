@@ -7,6 +7,17 @@ This page provides an auto-generated summary of sgkits's API.
 IO/imports
 ==========
 
+BGEN
+-----
+
+.. currentmodule:: sgkit.io.bgen
+.. autosummary::
+   :toctree: generated/
+
+   bgen_to_zarr
+   read_bgen
+   rechunk_bgen
+
 PLINK
 -----
 
@@ -42,6 +53,7 @@ Methods
 .. autosummary::
    :toctree: generated/
 
+   convert_probability_to_call
    count_call_alleles
    count_cohort_alleles
    count_variant_alleles
