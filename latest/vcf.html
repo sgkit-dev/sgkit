@@ -295,6 +295,13 @@ if you are partitioning multiple files, and want all the parts to be roughly the
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vcf_to_zarr</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="s2">&quot;output.zarr&quot;</span><span class="p">,</span> <span class="n">regions</span><span class="o">=</span><span class="n">regions</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>The same result can be obtained more simply by specifying <code class="docutils literal notranslate"><span class="pre">target_part_size</span></code> in the call to
+<code class="docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">vcf_to_zarr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CEUTrio.20.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="s2">&quot;CEUTrio.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vcf_to_zarr</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="s2">&quot;output.zarr&quot;</span><span class="p">,</span> <span class="n">target_part_size</span><span class="o">=</span><span class="mi">100_000</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>As a special case, <code class="docutils literal notranslate"><span class="pre">None</span></code> is used to represent a single partition.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">partition_into_regions</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">partition_into_regions</span><span class="p">(</span><span class="s2">&quot;CEUTrio.20.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="n">num_parts</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
