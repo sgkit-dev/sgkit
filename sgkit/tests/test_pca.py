@@ -245,7 +245,7 @@ def test_pca__randomized_allel_comparison(shape, chunks, n_components):
         iterated_power=5,
         random_state=0,
     )
-    assert ds_sg["sample_pca_projection"].values.dtype == np.float64
+    assert ds_sg["sample_pca_projection"].values.dtype == np.float32
     assert ds_sk["sample_pca_projection"].values.dtype == np.float32
     validate_allel_comparison(ds_sg, ds_sk)
 

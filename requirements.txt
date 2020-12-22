@@ -1,7 +1,7 @@
 numpy
 xarray
-dask[array] == 2.30.0
-distributed == 2.30.0
+dask[array]
+distributed
 dask-ml
 scipy
 typing-extensions
