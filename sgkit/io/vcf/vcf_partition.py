@@ -132,13 +132,6 @@ def partition_into_regions(
         if target_part_size_bytes < 1:
             raise ValueError("target_part_size must be positive")
 
-    if index_path is None:
-        index_path = get_tabix_path(vcf_path, storage_options=storage_options)
-        if index_path is None:
-            index_path = get_csi_path(vcf_path, storage_options=storage_options)
-            if index_path is None:
-                raise ValueError("Cannot find .tbi or .csi file.")
-
     # Calculate the desired part file boundaries
     file_length = get_file_length(vcf_path, storage_options=storage_options)
     if num_parts is not None:
@@ -148,6 +141,13 @@ def partition_into_regions(
     if num_parts == 1:
         return None
     part_lengths = np.array([i * target_part_size_bytes for i in range(num_parts)])
+
+    if index_path is None:
+        index_path = get_tabix_path(vcf_path, storage_options=storage_options)
+        if index_path is None:
+            index_path = get_csi_path(vcf_path, storage_options=storage_options)
+            if index_path is None:
+                raise ValueError("Cannot find .tbi or .csi file.")
 
     # Get the file offsets from .tbi/.csi
     index = read_index(index_path, storage_options=storage_options)

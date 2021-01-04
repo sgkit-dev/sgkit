@@ -113,6 +113,18 @@ def test_vcf_to_zarr__large_vcf(shared_datadir, is_path, tmp_path):
     assert ds["variant_id"].dtype == "O"
 
 
+def test_vcf_to_zarr__plain_vcf_with_no_index(shared_datadir, tmp_path):
+    path = path_for_test(
+        shared_datadir,
+        "mixed.vcf",
+    )
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(path, output, truncate_calls=True)
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    assert ds["sample_id"].shape == (3,)
+
+
 @pytest.mark.parametrize(
     "is_path",
     [True, False],
