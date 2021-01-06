@@ -28,8 +28,7 @@ Installation
 ------------
 
 VCF support is an "extra" feature within sgkit and requires additional
-dependencies. It relies on ``cyvcf2`` and ``htslib``, so you will have to
-have, at a minimum, ``libcurl`` installed on your machine (you can check by typing ``curl -V``).
+dependencies, notably ``cyvcf2``.
 
 To install sgkit with VCF support using pip::
 
