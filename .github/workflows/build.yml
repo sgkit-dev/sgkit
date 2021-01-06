@@ -19,7 +19,6 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update -y
-        sudo apt install -y libcurl4-openssl-dev  # Needed for htslib (via cyvcf2)
         sudo apt install libgsl-dev   # Needed for msprime < 1.0. Binary wheels include GSL for >= 1.0
         sudo apt install graphviz  # Needed for documentation
         python -m pip install --upgrade pip
