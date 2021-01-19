@@ -1,10 +1,11 @@
 import warnings
-from typing import Any, Callable, Hashable, List, Optional, Set, Tuple, Union
+from typing import Any, Callable, Hashable, List, Mapping, Optional, Set, Tuple, Union
 
 import numpy as np
 from numba import guvectorize
 from xarray import Dataset
 
+from . import variables
 from .typing import ArrayLike, DType
 
 
@@ -192,6 +193,36 @@ def define_variable_if_absent(
             f"Variable '{variable_name}' with non-default name is missing and will not be automatically defined."
         )
     return func(ds)
+
+
+def create_dataset(
+    data_vars: Mapping[Hashable, Any] = None,  # type: ignore[assignment]
+    coords: Mapping[Hashable, Any] = None,  # type: ignore[assignment]
+    attrs: Mapping[Hashable, Any] = None,  # type: ignore[assignment]
+) -> Dataset:
+    """Create an Xarray dataset and validate its variables.
+
+    This is a wrapper around `xarray.Dataset`, with the additional
+    convenience of validating variables against the ones defined by sgkit,
+    and annotating these variables with a `comment` attribute containing
+    their doc comments.
+
+    Parameters
+    ----------
+    data_vars
+        A mapping defining data variables.
+    coords
+        A mapping defining coordinates.
+    attrs
+        Global attributes.
+
+    Returns
+    -------
+    A new dataset.
+    """
+    ds = Dataset(data_vars, coords, attrs)
+    ds = variables.annotate(ds)
+    return ds
 
 
 def split_array_chunks(n: int, blocks: int) -> Tuple[int, ...]:

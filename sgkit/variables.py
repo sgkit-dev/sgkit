@@ -79,26 +79,63 @@ class SgkitVariables:
         xr_dataset: xr.Dataset,
         *specs: Union[Spec, Mapping[Hashable, Spec], Hashable],
     ) -> xr.Dataset:
+        return cls._check_dataset(xr_dataset, False, *specs)
+
+    @classmethod
+    def _annotate(
+        cls,
+        xr_dataset: xr.Dataset,
+        *specs: Union[Spec, Mapping[Hashable, Spec], Hashable],
+    ) -> xr.Dataset:
+        """
+        Validate that xr_dataset contains array(s) of interest with variable
+        name(s), and annotate variables with a `comment` attribute containing
+        their doc comments.
+        Variable must be registered in `SgkitVariables.registered_variables`.
+        To validate all variables in the dataset, skip `specs`.
+        """
+        return cls._check_dataset(xr_dataset, True, *specs)
+
+    @classmethod
+    def _check_dataset(
+        cls,
+        xr_dataset: xr.Dataset,
+        add_comment_attr: bool,
+        *specs: Union[Spec, Mapping[Hashable, Spec], Hashable],
+    ) -> xr.Dataset:
         if len(specs) == 0:
             specs = tuple(xr_dataset.variables.keys())
             logger.debug(f"No specs provided, will validate all variables: {specs}")
         for s in specs:
             if isinstance(s, Spec):
-                cls._check_field(xr_dataset, s, s.default_name)
+                cls._check_field(
+                    xr_dataset, s, s.default_name, add_comment_attr=add_comment_attr
+                )
             elif isinstance(s, Mapping):
                 for fname, field_spec in s.items():
-                    cls._check_field(xr_dataset, field_spec, fname)
+                    cls._check_field(
+                        xr_dataset, field_spec, fname, add_comment_attr=add_comment_attr
+                    )
             elif s:
                 try:
                     field_spec = cls.registered_variables[s]
                 except KeyError:
                     raise ValueError(f"No array spec registered for {s}")
-                cls._check_field(xr_dataset, field_spec, field_spec.default_name)
+                cls._check_field(
+                    xr_dataset,
+                    field_spec,
+                    field_spec.default_name,
+                    add_comment_attr=add_comment_attr,
+                )
         return xr_dataset
 
     @classmethod
     def _check_field(
-        cls, xr_dataset: xr.Dataset, field_spec: Spec, field: Hashable
+        cls,
+        xr_dataset: xr.Dataset,
+        field_spec: Spec,
+        field: Hashable,
+        add_comment_attr: bool = False,
     ) -> None:
         from sgkit.utils import check_array_like
 
@@ -112,7 +149,7 @@ class SgkitVariables:
             check_array_like(
                 xr_dataset[field], kind=field_spec.kind, ndim=field_spec.ndim
             )
-            if field_spec.__doc__ is not None:
+            if add_comment_attr and field_spec.__doc__ is not None:
                 xr_dataset[field].attrs["comment"] = field_spec.__doc__.strip()
         except (TypeError, ValueError) as e:
             raise ValueError(
@@ -121,7 +158,10 @@ class SgkitVariables:
 
 
 validate = SgkitVariables._validate
-"""Shortcut for the SgkitVariables.validate"""
+"""Shortcut for SgkitVariables.validate"""
+
+annotate = SgkitVariables._annotate
+"""Shortcut for SgkitVariables.annotate"""
 
 """
 We define xr.Dataset variables used in the sgkit methods below,
