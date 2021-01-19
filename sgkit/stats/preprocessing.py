@@ -9,7 +9,7 @@ from xarray import Dataset
 from sgkit import variables
 
 from ..typing import ArrayLike
-from ..utils import conditional_merge_datasets
+from ..utils import conditional_merge_datasets, create_dataset
 
 
 class PattersonScaler(BaseEstimator, TransformerMixin):  # type: ignore[misc]
@@ -178,11 +178,11 @@ def filter_partial_calls(
     else:
         P = (G < 0).any(axis=-1)
     F = xr.where(P, -1, G)  # type: ignore[no-untyped-call]
-    new_ds = Dataset(
+    new_ds = create_dataset(
         {
             variables.call_genotype_complete: F,
             variables.call_genotype_complete_mask: F < 0,
         }
     )
     new_ds[variables.call_genotype_complete].attrs["mixed_ploidy"] = mixed_ploidy
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    return conditional_merge_datasets(ds, new_ds, merge)

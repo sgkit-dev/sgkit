@@ -5,7 +5,7 @@ from xarray import Dataset
 
 from sgkit import variables
 from sgkit.typing import ArrayLike
-from sgkit.utils import conditional_merge_datasets
+from sgkit.utils import conditional_merge_datasets, create_dataset
 
 
 @guvectorize(  # type: ignore
@@ -119,10 +119,10 @@ def convert_probability_to_call(
         GP = GP.rechunk((None, None, -1))
     K = da.empty(2, dtype=np.uint8)
     GT = _convert_probability_to_call(GP, K, threshold)
-    new_ds = Dataset(
+    new_ds = create_dataset(
         {
             variables.call_genotype: (("variants", "samples", "ploidy"), GT),
             variables.call_genotype_mask: (("variants", "samples", "ploidy"), GT < 0),
         }
     )
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    return conditional_merge_datasets(ds, new_ds, merge)

@@ -2,14 +2,13 @@ from typing import Hashable, Optional
 
 import dask.array as da
 import numpy as np
-import xarray as xr
 from numba import njit
 from numpy import ndarray
 from xarray import Dataset
 
 from sgkit import variables
 from sgkit.stats.aggregation import count_genotypes
-from sgkit.utils import conditional_merge_datasets
+from sgkit.utils import conditional_merge_datasets, create_dataset
 
 
 def hardy_weinberg_p_value(obs_hets: int, obs_hom1: int, obs_hom2: int) -> float:
@@ -213,5 +212,5 @@ def hardy_weinberg_test(
             for v in ["variant_n_het", "variant_n_hom_ref", "variant_n_hom_alt"]
         ]
     p = da.map_blocks(hardy_weinberg_p_value_vec_jit, *obs)
-    new_ds = xr.Dataset({variables.variant_hwe_p_value: ("variants", p)})
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    new_ds = create_dataset({variables.variant_hwe_p_value: ("variants", p)})
+    return conditional_merge_datasets(ds, new_ds, merge)

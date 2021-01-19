@@ -3,13 +3,12 @@ from typing import Hashable, Optional, Sequence, Union
 
 import dask.array as da
 import numpy as np
-import xarray as xr
 from dask.array import Array, stats
 from xarray import Dataset
 
 from .. import variables
 from ..typing import ArrayLike
-from ..utils import conditional_merge_datasets
+from ..utils import conditional_merge_datasets, create_dataset
 from .utils import concat_2d
 
 
@@ -222,11 +221,11 @@ def gwas_linear_regression(
     Y = Y.rechunk((None, -1))
 
     res = linear_regression(G.T, X, Y)
-    new_ds = xr.Dataset(
+    new_ds = create_dataset(
         {
             variables.variant_beta: (("variants", "traits"), res.beta),
             variables.variant_t_value: (("variants", "traits"), res.t_value),
             variables.variant_p_value: (("variants", "traits"), res.p_value),
         }
     )
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    return conditional_merge_datasets(ds, new_ds, merge)

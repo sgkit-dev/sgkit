@@ -4,7 +4,7 @@ import dask.array as da
 import numpy as np
 from xarray import Dataset
 
-from sgkit.utils import conditional_merge_datasets
+from sgkit.utils import conditional_merge_datasets, create_dataset
 from sgkit.variables import window_contig, window_start, window_stop
 
 from .typing import ArrayLike, DType
@@ -69,7 +69,7 @@ def window(
     window_starts = np.concatenate(contig_window_starts)
     window_stops = np.concatenate(contig_window_stops)
 
-    new_ds = Dataset(
+    new_ds = create_dataset(
         {
             window_contig: (
                 "windows",
