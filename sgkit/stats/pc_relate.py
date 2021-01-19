@@ -5,7 +5,7 @@ import xarray as xr
 
 from sgkit import variables
 from sgkit.typing import ArrayLike
-from sgkit.utils import conditional_merge_datasets
+from sgkit.utils import conditional_merge_datasets, create_dataset
 
 
 def gramian(a: ArrayLike) -> ArrayLike:
@@ -173,5 +173,5 @@ def pc_relate(
     phi = gramian(centered_af) / gramian(stddev)
     # NOTE: phi is of shape (S x S), S = num samples
     assert phi.shape == (call_g.shape[1],) * 2
-    new_ds = xr.Dataset({variables.pc_relate_phi: (("sample_x", "sample_y"), phi)})
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    new_ds = create_dataset({variables.pc_relate_phi: (("sample_x", "sample_y"), phi)})
+    return conditional_merge_datasets(ds, new_ds, merge)

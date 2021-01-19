@@ -9,7 +9,7 @@ from xarray import Dataset
 
 from .. import variables
 from ..typing import ArrayLike
-from ..utils import conditional_merge_datasets, split_array_chunks
+from ..utils import conditional_merge_datasets, create_dataset, split_array_chunks
 from .utils import (
     assert_array_shape,
     assert_block_shape,
@@ -722,7 +722,7 @@ def regenie_transform(
             dims=("contigs", "samples", "outcomes"),
             attrs={"description": DESC_LOCO_PRED},
         )
-    return xr.Dataset(data_vars)
+    return create_dataset(data_vars)
 
 
 def regenie(
@@ -886,4 +886,4 @@ def regenie(
         orthogonalize=orthogonalize,
         **kwargs,
     )
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    return conditional_merge_datasets(ds, new_ds, merge)

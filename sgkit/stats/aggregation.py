@@ -10,7 +10,11 @@ from xarray import Dataset
 from sgkit import variables
 from sgkit.stats.utils import assert_array_shape
 from sgkit.typing import ArrayLike
-from sgkit.utils import conditional_merge_datasets, define_variable_if_absent
+from sgkit.utils import (
+    conditional_merge_datasets,
+    create_dataset,
+    define_variable_if_absent,
+)
 
 Dimension = Literal["samples", "variants"]
 
@@ -152,7 +156,7 @@ def count_call_alleles(
     G = da.asarray(ds[call_genotype])
     shape = (G.chunks[0], G.chunks[1], n_alleles)
     N = da.empty(n_alleles, dtype=np.uint8)
-    new_ds = Dataset(
+    new_ds = create_dataset(
         {
             variables.call_allele_count: (
                 ("variants", "samples", "alleles"),
@@ -162,7 +166,7 @@ def count_call_alleles(
             )
         }
     )
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    return conditional_merge_datasets(ds, new_ds, merge)
 
 
 def count_variant_alleles(
@@ -218,10 +222,10 @@ def count_variant_alleles(
     )
     variables.validate(ds, {call_allele_count: variables.call_allele_count_spec})
 
-    new_ds = Dataset(
+    new_ds = create_dataset(
         {variables.variant_allele_count: ds[call_allele_count].sum(dim="samples")}
     )
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    return conditional_merge_datasets(ds, new_ds, merge)
 
 
 def count_cohort_alleles(
@@ -313,10 +317,10 @@ def count_cohort_alleles(
     AC = da.stack([AC.blocks[:, i] for i in range(AC.numblocks[1])]).sum(axis=0)
     assert_array_shape(AC, n_variants, n_cohorts, n_alleles)
 
-    new_ds = Dataset(
+    new_ds = create_dataset(
         {variables.cohort_allele_count: (("variants", "cohorts", "alleles"), AC)}
     )
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    return conditional_merge_datasets(ds, new_ds, merge)
 
 
 def _swap(dim: Dimension) -> Dimension:
@@ -326,7 +330,7 @@ def _swap(dim: Dimension) -> Dimension:
 def call_rate(ds: Dataset, dim: Dimension, call_genotype_mask: Hashable) -> Dataset:
     odim = _swap(dim)[:-1]
     n_called = (~ds[call_genotype_mask].any(dim="ploidy")).sum(dim=dim)
-    return xr.Dataset(
+    return create_dataset(
         {f"{odim}_n_called": n_called, f"{odim}_call_rate": n_called / ds.dims[dim]}
     )
 
@@ -353,7 +357,7 @@ def count_genotypes(
     n_het = ~(n_hom_alt | n_hom_ref)
     # This would 0 out the `het` case with any missing calls
     agg = lambda x: xr.where(M, False, x).sum(dim=dim)  # type: ignore[no-untyped-call]
-    new_ds = Dataset(
+    new_ds = create_dataset(
         {
             f"{odim}_n_het": agg(n_het),  # type: ignore[no-untyped-call]
             f"{odim}_n_hom_ref": agg(n_hom_ref),  # type: ignore[no-untyped-call]
@@ -361,7 +365,7 @@ def count_genotypes(
             f"{odim}_n_non_ref": agg(n_non_ref),  # type: ignore[no-untyped-call]
         }
     )
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    return conditional_merge_datasets(ds, new_ds, merge)
 
 
 def allele_frequency(
@@ -386,7 +390,7 @@ def allele_frequency(
 
     data_vars[variables.variant_allele_total] = AN
     data_vars[variables.variant_allele_frequency] = AC / AN
-    return Dataset(data_vars)
+    return create_dataset(data_vars)
 
 
 def variant_stats(

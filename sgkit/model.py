@@ -3,8 +3,8 @@ from typing import Any, Dict, Hashable, List, Optional
 import numpy as np
 import xarray as xr
 
-from . import variables
 from .typing import ArrayLike
+from .utils import create_dataset
 
 DIM_VARIANT = "variants"
 DIM_SAMPLE = "samples"
@@ -89,7 +89,7 @@ def create_genotype_call_dataset(
     if variant_id is not None:
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
-    return variables.validate(xr.Dataset(data_vars=data_vars, attrs=attrs))
+    return create_dataset(data_vars=data_vars, attrs=attrs)
 
 
 def create_genotype_dosage_dataset(
@@ -157,4 +157,4 @@ def create_genotype_dosage_dataset(
     if variant_id is not None:
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
-    return variables.validate(xr.Dataset(data_vars=data_vars, attrs=attrs))
+    return create_dataset(data_vars=data_vars, attrs=attrs)

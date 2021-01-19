@@ -12,6 +12,7 @@ from sgkit.stats.utils import assert_array_shape
 from sgkit.typing import ArrayLike
 from sgkit.utils import (
     conditional_merge_datasets,
+    create_dataset,
     define_variable_if_absent,
     hash_array,
 )
@@ -106,7 +107,7 @@ def diversity(
             dtype=pi.dtype,
             axis=0,
         )
-        new_ds = Dataset(
+        new_ds = create_dataset(
             {
                 variables.stat_diversity: (
                     ("windows", "cohorts"),
@@ -115,7 +116,7 @@ def diversity(
             }
         )
     else:
-        new_ds = Dataset(
+        new_ds = create_dataset(
             {
                 variables.stat_diversity: (
                     ("variants", "cohorts"),
@@ -123,7 +124,7 @@ def diversity(
                 )
             }
         )
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    return conditional_merge_datasets(ds, new_ds, merge)
 
 
 # c = cohorts, k = alleles
@@ -273,7 +274,7 @@ def divergence(
             dtype=d.dtype,
             axis=0,
         )
-        new_ds = Dataset(
+        new_ds = create_dataset(
             {
                 variables.stat_divergence: (
                     ("windows", "cohorts_0", "cohorts_1"),
@@ -282,7 +283,7 @@ def divergence(
             }
         )
     else:
-        new_ds = Dataset(
+        new_ds = create_dataset(
             {
                 variables.stat_divergence: (
                     ("variants", "cohorts_0", "cohorts_1"),
@@ -290,7 +291,7 @@ def divergence(
                 )
             }
         )
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    return conditional_merge_datasets(ds, new_ds, merge)
 
 
 # c = cohorts
@@ -459,8 +460,10 @@ def Fst(
     fst = da.map_blocks(known_estimators[estimator], gs, chunks=shape, dtype=np.float64)
     # TODO: reinstate assert (first dim could be either variants or windows)
     # assert_array_shape(fst, n_windows, n_cohorts, n_cohorts)
-    new_ds = Dataset({variables.stat_Fst: (("windows", "cohorts_0", "cohorts_1"), fst)})
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    new_ds = create_dataset(
+        {variables.stat_Fst: (("windows", "cohorts_0", "cohorts_1"), fst)}
+    )
+    return conditional_merge_datasets(ds, new_ds, merge)
 
 
 def Tajimas_D(
@@ -584,8 +587,8 @@ def Tajimas_D(
         # finally calculate Tajima's D
         D = d / d_stdev
 
-    new_ds = Dataset({variables.stat_Tajimas_D: D})
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    new_ds = create_dataset({variables.stat_Tajimas_D: D})
+    return conditional_merge_datasets(ds, new_ds, merge)
 
 
 # c = cohorts
@@ -725,10 +728,10 @@ def pbs(
     )
     assert_array_shape(p, n_windows, n_cohorts, n_cohorts, n_cohorts)
 
-    new_ds = Dataset(
+    new_ds = create_dataset(
         {variables.stat_pbs: (["windows", "cohorts_0", "cohorts_1", "cohorts_2"], p)}
     )
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    return conditional_merge_datasets(ds, new_ds, merge)
 
 
 N_GARUD_H_STATS = 4  # H1, H12, H123, H2/H1
@@ -885,7 +888,7 @@ def Garud_H(
     )
     n_windows = ds.window_start.shape[0]
     assert_array_shape(gh, n_windows, n_cohorts, N_GARUD_H_STATS)
-    new_ds = Dataset(
+    new_ds = create_dataset(
         {
             variables.stat_Garud_h1: (
                 ("windows", "cohorts"),
@@ -906,4 +909,4 @@ def Garud_H(
         }
     )
 
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+    return conditional_merge_datasets(ds, new_ds, merge)
