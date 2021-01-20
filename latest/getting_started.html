@@ -310,6 +310,7 @@ information on this specific variable and any others, see <a class="reference in
 <span class="go">Dimensions without coordinates: variants, samples, ploidy</span>
 <span class="go">Attributes:</span>
 <span class="go">    mixed_ploidy:  False</span>
+<span class="go">    comment:       Call genotype. Encoded as allele values (0 for the referen...</span>
 
 <span class="go"># Access the array underlying a single variable (this would return dask.array.Array if chunked)</span>
 <span class="gp">In [9]: </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="o">.</span><span class="n">data</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
@@ -336,12 +337,15 @@ information on this specific variable and any others, see <a class="reference in
 <span class="go">Dimensions without coordinates: ploidy</span>
 <span class="go">Attributes:</span>
 <span class="go">    mixed_ploidy:  False</span>
+<span class="go">    comment:       Call genotype. Encoded as allele values (0 for the referen...</span>
 
 <span class="gp">In [12]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_allele</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">allele_indexes</span><span class="p">]</span>
 <span class="gh">Out[12]: </span><span class="go"></span>
 <span class="go">&lt;xarray.DataArray &#39;variant_allele&#39; (ploidy: 2)&gt;</span>
 <span class="go">array([b&#39;T&#39;, b&#39;T&#39;], dtype=&#39;|S1&#39;)</span>
 <span class="go">Dimensions without coordinates: ploidy</span>
+<span class="go">Attributes:</span>
+<span class="go">    comment:  The possible alleles for the variant.</span>
 
 <span class="go"># Get a single item from an array as a Python scalar</span>
 <span class="gp">In [13]: </span><span class="n">ds</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -559,6 +563,7 @@ along with potential workarounds.</p>
 <span class="go">Dimensions without coordinates: variants, samples, ploidy</span>
 <span class="go">Attributes:</span>
 <span class="go">    mixed_ploidy:  False</span>
+<span class="go">    comment:       Call genotype. Encoded as allele values (0 for the referen...</span>
 
 <span class="go"># Here, you can see that the missing calls above are not included in the allele counts</span>
 <span class="gp">In [40]: </span><span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span>
@@ -566,6 +571,8 @@ along with potential workarounds.</p>
 <span class="go">&lt;xarray.DataArray &#39;variant_allele_count&#39; (variants: 1, alleles: 2)&gt;</span>
 <span class="go">dask.array&lt;sum-aggregate, shape=(1, 2), dtype=uint64, chunksize=(1, 2), chunktype=numpy.ndarray&gt;</span>
 <span class="go">Dimensions without coordinates: variants, alleles</span>
+<span class="go">Attributes:</span>
+<span class="go">    comment:  Variant allele counts. With shape (variants, alleles) and value...</span>
 </pre></div>
 </div>
 <p>A primary design goal in sgkit is to facilitate ad hoc analysis. There are many useful functions in
@@ -595,6 +602,7 @@ shows how it can be used in the context of doing something simple like counting 
 <span class="go">Dimensions without coordinates: variants, samples, ploidy</span>
 <span class="go">Attributes:</span>
 <span class="go">    mixed_ploidy:  False</span>
+<span class="go">    comment:       Call genotype. Encoded as allele values (0 for the referen...</span>
 
 <span class="go"># This array represents only locations where the above calls are missing</span>
 <span class="gp">In [45]: </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype_mask</span>
@@ -605,6 +613,8 @@ shows how it can be used in the context of doing something simple like counting 
 <span class="go">        [False, False],</span>
 <span class="go">        [False, False]]])</span>
 <span class="go">Dimensions without coordinates: variants, samples, ploidy</span>
+<span class="go">Attributes:</span>
+<span class="go">    comment:  TODO</span>
 
 <span class="go"># Determine which calls are heterozygous</span>
 <span class="gp">In [46]: </span><span class="n">is_heterozygous</span> <span class="o">=</span> <span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
@@ -837,6 +847,8 @@ until one of the following occurs:</p>
 <span class="go">&lt;xarray.DataArray &#39;variant_position&#39; (variants: 100)&gt;</span>
 <span class="go">dask.array&lt;xarray-variant_position, shape=(100,), dtype=int64, chunksize=(50,), chunktype=numpy.ndarray&gt;</span>
 <span class="go">Dimensions without coordinates: variants</span>
+<span class="go">Attributes:</span>
+<span class="go">    comment:  The reference position of the variant.</span>
 
 <span class="go"># Call compute via the dask.array API</span>
 <span class="gp">In [78]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">compute</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]</span>
@@ -852,6 +864,8 @@ until one of the following occurs:</p>
 <span class="go">&lt;xarray.DataArray &#39;variant_position&#39; (variants: 5)&gt;</span>
 <span class="go">array([0, 1, 2, 3, 4])</span>
 <span class="go">Dimensions without coordinates: variants</span>
+<span class="go">Attributes:</span>
+<span class="go">    comment:  The reference position of the variant.</span>
 </pre></div>
 </div>
 <p>Unlike this simplified example, real datasets often contain a mixture of chunked and unchunked arrays. Sgkit
@@ -889,6 +903,8 @@ for more examples and information, as well as the Dask tutorials on
 <span class="go">       [37, 51],</span>
 <span class="go">       [45, 46]], dtype=uint64)</span>
 <span class="go">Dimensions without coordinates: variants, alleles</span>
+<span class="go">Attributes:</span>
+<span class="go">    comment:  Variant allele counts. With shape (variants, alleles) and value...</span>
 </pre></div>
 </div>
 <p>Monitoring resource utilization with <a class="reference external" href="https://docs.dask.org/en/latest/diagnostics-local.html#resourceprofiler">ResourceProfiler</a>
