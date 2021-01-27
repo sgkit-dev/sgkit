@@ -1,0 +1,36 @@
+name: Upstream
+
+on:
+  push:
+  schedule:
+    - cron: "0 1 * * *"
+  # manual trigger
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'pystatgen'
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install deps and sgkit
+      run: |
+        sudo apt update -y
+        sudo apt install libgsl-dev   # Needed for msprime < 1.0. Binary wheels include GSL for >= 1.0
+        python -m pip install --upgrade pip
+        python .github/scripts/upstream_install.py
+        python -m pip install -r requirements-dev.txt
+
+    - name: Test with pytest
+      run: |
+        python -m pip freeze
+        pytest -v
