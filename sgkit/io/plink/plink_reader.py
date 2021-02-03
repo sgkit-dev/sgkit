@@ -84,7 +84,7 @@ class BedReader(object):
         call1 = np.where(arr < 0, -1, np.where(arr == 2, 1, 0))
         arr = np.stack([call0, call1], axis=-1)
         # Apply final slice to 3D result
-        return arr[:, :, idx[-1]]
+        return arr[:, :, idx[-1]]  # type: ignore[no-any-return]
 
     def close(self) -> None:
         # This is not actually crucial since a Bed instance with no
@@ -265,7 +265,7 @@ def read_plink(
     # Otherwise create index for contig names based
     # on order of appearance in underlying .bim file
     else:
-        variant_contig, variant_contig_names = encode_array(arr_bim["contig"].compute())
+        variant_contig, variant_contig_names = encode_array(arr_bim["contig"].compute())  # type: ignore
         variant_contig = variant_contig.astype("int16")
         variant_contig_names = list(variant_contig_names)
 

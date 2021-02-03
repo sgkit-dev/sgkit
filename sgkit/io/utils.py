@@ -183,7 +183,7 @@ def concatenate_and_rechunk(
 
 def _zarr_index(offsets: ArrayLike, pos: int) -> int:
     """Return the index of the zarr file that pos falls in"""
-    index: int = np.searchsorted(offsets, pos, side="right") - 1
+    index: int = np.searchsorted(offsets, pos, side="right") - 1  # type: ignore[assignment]
     return index
 
 

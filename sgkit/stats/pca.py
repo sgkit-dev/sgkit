@@ -130,7 +130,7 @@ def pca_stats(ds: Dataset, est: BaseEstimator, *, merge: bool = True) -> Dataset
     if "sample_pca_component" in new_ds and "sample_pca_explained_variance" in new_ds:
         new_ds[variables.sample_pca_loading] = new_ds[
             variables.sample_pca_component
-        ] * np.sqrt(new_ds[variables.sample_pca_explained_variance])
+        ] * np.sqrt(new_ds[variables.sample_pca_explained_variance].data)
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
 
 

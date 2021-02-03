@@ -145,7 +145,7 @@ class BgenReader:
                     res = np.zeros((len(all_vaddr), len(probs), 3), dtype=self.dtype)
                 res[i] = probs
             res = res[..., idx[2]]  # type: ignore[index]
-            return np.squeeze(res, axis=squeeze_dims)
+            return np.squeeze(res, axis=squeeze_dims)  # type: ignore[no-any-return]
 
 
 def _split_alleles(allele_ids: bytes) -> List[bytes]:
@@ -362,7 +362,7 @@ def encode_variables(
             # 16 bits will cause overflow/underflow
             # See https://en.wikipedia.org/wiki/Floating-point_arithmetic#Internal_representation
             # *bits precision column for single precision floats
-            if dtype not in [np.uint8, np.uint16]:
+            if dtype not in [np.uint8, np.uint16]:  # type: ignore[comparison-overlap]
                 raise ValueError(
                     "Probability integer dtype invalid, must "
                     f"be uint8 or uint16 not {probability_dtype}"

@@ -85,7 +85,7 @@ def test_patterson_scaler__missing_data(dtype, use_nan):
         ac = np.where(ac < 0, np.nan, ac)
     scaler = sgkit.stats.preprocessing.PattersonScaler().fit(ac)
     # Read means from columns of array; scale = sqrt(mean/2 * (1 - mean/2))
-    np.testing.assert_equal(scaler.mean_, np.array([1] * 3 + [np.nan]))
+    np.testing.assert_equal(scaler.mean_, np.array([1.0] * 3 + [np.nan]))
     np.testing.assert_equal(scaler.scale_, np.array([0.5] * 3 + [np.nan]))
     np.testing.assert_equal(
         scaler.transform(ac),
@@ -121,7 +121,7 @@ def test_filter_partial_calls():
 
     np.testing.assert_array_equal(
         mask_filtered,
-        np.array([[[0, 0], [0, 0], [0, 0]], [[1, 1], [1, 1], [1, 1]]], dtype=np.bool),
+        np.array([[[0, 0], [0, 0], [0, 0]], [[1, 1], [1, 1], [1, 1]]], dtype=bool),
     )
 
 
@@ -159,7 +159,7 @@ def test_filter_partial_calls__mixed_ploidy():
                 [[0, 0, 0, 0], [0, 0, 1, 1], [0, 0, 0, 0]],
                 [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]],
             ],
-            dtype=np.bool,
+            dtype=bool,
         ),
     )
 

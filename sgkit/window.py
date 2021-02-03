@@ -106,7 +106,7 @@ def has_windows(ds: Dataset) -> bool:
 
 
 def moving_statistic(
-    values: ArrayLike,
+    values: da.Array,
     statistic: Callable[..., ArrayLike],
     size: int,
     step: int,
