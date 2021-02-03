@@ -196,7 +196,7 @@ def _vcfzarr_to_dataset(
                 # Compute fixed-length string dtype for array
                 if kind == "O" or var in ("variant_id", "variant_allele"):
                     kind = "S"
-                max_len = max_str_len(arr).values
+                max_len = max_str_len(arr).values  # type: ignore[union-attr]
                 dt = f"{kind}{max_len}"
                 ds[var] = arr.astype(dt)  # type: ignore[no-untyped-call]
 

@@ -48,7 +48,7 @@ def hardy_weinberg_p_value(obs_hets: int, obs_hom1: int, obs_hom2: int) -> float
     het_probs = np.zeros(obs_mac + 1, dtype=np.float64)
 
     if obs_n == 0:
-        return np.nan  # type: ignore[no-any-return]
+        return np.nan
 
     # Identify distribution midpoint
     mid = int(obs_mac * (2 * obs_n - obs_mac) / (2 * obs_n))
@@ -91,7 +91,7 @@ def hardy_weinberg_p_value(obs_hets: int, obs_hom1: int, obs_hom2: int) -> float
         curr_hets += 2
 
     if prob_sum <= 0:  # pragma: no cover
-        return np.nan  # type: ignore[no-any-return]
+        return np.nan
     het_probs = het_probs / prob_sum
     p = het_probs[het_probs <= het_probs[obs_hets]].sum()
     p = max(min(1.0, p), 0.0)

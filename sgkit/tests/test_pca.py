@@ -29,7 +29,7 @@ def simulate_cohort_genotypes(
         ]
     )
     # Sample allele counts in [0, 1, 2]
-    return rs.binomial(2, af.T).astype("int8")
+    return rs.binomial(2, af.T).astype("int8")  # type: ignore[no-any-return]
 
 
 def simulate_dataset(

@@ -598,7 +598,7 @@ def regenie_transform(
     *,
     variant_block_size: Optional[Union[int, Tuple[int, ...]]] = None,
     sample_block_size: Optional[Union[int, Tuple[int, ...]]] = None,
-    alphas: Optional[Sequence[float]] = None,
+    alphas: Optional[ArrayLike] = None,
     add_intercept: bool = True,
     orthogonalize: bool = False,
     normalize: bool = False,

@@ -100,4 +100,4 @@ def pairwise_distance(
         concatenate=True,
     )
     x_distance = da.triu(x_distance, 1) + da.triu(x_distance).T
-    return x_distance.compute()
+    return x_distance.compute()  # type: ignore[no-any-return]
