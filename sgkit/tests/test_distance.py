@@ -10,7 +10,7 @@ from scipy.spatial.distance import (  # type: ignore
     squareform,
 )
 
-from sgkit.distance.api import pairwise_distance
+from sgkit.distance.api import MetricTypes, pairwise_distance
 from sgkit.typing import ArrayLike
 
 
@@ -115,7 +115,7 @@ def test_distance_ndarray() -> None:
     ],
 )
 def test_missing_values(
-    metric: str,
+    metric: MetricTypes,
     metric_func: typing.Callable[[ArrayLike, ArrayLike], np.float64],
     dtype: str,
 ) -> None:
@@ -146,7 +146,7 @@ def test_missing_values(
         ("correlation", "f8", "float64"),
     ],
 )
-def test_data_types(metric: str, dtype: str, expected: str) -> None:
+def test_data_types(metric: MetricTypes, dtype: str, expected: str) -> None:
     x = get_vectors(dtype=dtype)
     distance_matrix = pairwise_distance(x, metric=metric)
     assert distance_matrix.dtype.name == expected
@@ -155,7 +155,7 @@ def test_data_types(metric: str, dtype: str, expected: str) -> None:
 def test_undefined_metric() -> None:
     x = get_vectors(array_type="np")
     with pytest.raises(NotImplementedError):
-        pairwise_distance(x, metric="not-implemented-metric")
+        pairwise_distance(x, metric="not-implemented-metric")  # type: ignore[arg-type]
 
 
 def test_wrong_dimension_array() -> None:
