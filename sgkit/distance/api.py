@@ -97,12 +97,18 @@ def pairwise_distance(
     if x.ndim != 2:
         raise ValueError(f"2-dimensional array expected, got '{x.ndim}'")
 
+    # setting this variable outside of _pairwise to avoid it's recreation
+    # in every iteration, which eventually leads to increase in dask
+    # graph serialisation/deserialisation time significantly
     metric_param = np.empty(n_map_param, dtype=x.dtype)
 
     def _pairwise(f: ArrayLike, g: ArrayLike) -> ArrayLike:
         result: ArrayLike = metric_map_func(f[:, None, :], g, metric_param)
         return result[..., np.newaxis]
 
+    # concatenate in blockwise leads to high memory footprints, so instead
+    # we perform blockwise without contraction followed by reduction.
+    # More about this issue: https://github.com/dask/dask/issues/6874
     out = da.blockwise(
         _pairwise,
         "ijk",
