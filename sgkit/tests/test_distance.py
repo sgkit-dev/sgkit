@@ -148,7 +148,7 @@ def test_missing_values(
 )
 def test_data_types(metric: MetricTypes, dtype: str, expected: str) -> None:
     x = get_vectors(dtype=dtype)
-    distance_matrix = pairwise_distance(x, metric=metric)
+    distance_matrix = pairwise_distance(x, metric=metric).compute()
     assert distance_matrix.dtype.name == expected
 
 
