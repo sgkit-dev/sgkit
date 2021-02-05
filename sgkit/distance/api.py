@@ -13,6 +13,7 @@ MetricTypes = Literal["euclidean", "correlation"]
 def pairwise_distance(
     x: ArrayLike,
     metric: MetricTypes = "euclidean",
+    split_every: typing.Optional[int] = None,
 ) -> da.array:
     """Calculates the pairwise distance between all pairs of row vectors in the
     given two dimensional array x.
@@ -52,6 +53,13 @@ def pairwise_distance(
     metric
         The distance metric to use. The distance function can be
         'euclidean' or 'correlation'.
+    split_every
+        Determines the depth of the recursive aggregation in the reduction
+        step. This argument is directly passed to the call to``dask.reduction``
+        function in the reduce step of the map reduce.
+
+        Omit to let dask heuristically decide a good default. A default can
+        also be set globally with the split_every key in dask.config.
 
     Returns
     -------
@@ -104,6 +112,8 @@ def pairwise_distance(
 
     def _pairwise(f: ArrayLike, g: ArrayLike) -> ArrayLike:
         result: ArrayLike = metric_map_func(f[:, None, :], g, metric_param)
+        # Adding a new axis to help combine chunks along this axis in the
+        # reduction step (see the _aggregate and _combine functions below).
         return result[..., np.newaxis]
 
     # concatenate in blockwise leads to high memory footprints, so instead
@@ -121,6 +131,9 @@ def pairwise_distance(
     )
 
     def _aggregate(x_chunk: ArrayLike, **_: typing.Any) -> ArrayLike:
+        """Last function to be executed when resolving the dask graph,
+        producing the final output. It is always invoked, even when the reduced
+        Array counts a single chunk along the reduced axes."""
         x_chunk = x_chunk.reshape(x_chunk.shape[:-2] + (-1, n_map_param))
         result: ArrayLike = metric_reduce_func(x_chunk)
         return result
@@ -129,7 +142,13 @@ def pairwise_distance(
         return x_chunk
 
     def _combine(x_chunk: ArrayLike, **_: typing.Any) -> ArrayLike:
-        return x_chunk.sum(-1)[..., np.newaxis]
+        """Function used for intermediate recursive aggregation (see
+        split_every argument to ``da.reduction below``).  If the
+        reduction can be performed in less than 3 steps, it will
+        not be invoked at all."""
+        # reduce chunks by summing along the -2 axis
+        x_chunk_reshaped = x_chunk.reshape(x_chunk.shape[:-2] + (-1, n_map_param))
+        return x_chunk_reshaped.sum(axis=-2)[..., np.newaxis]
 
     r = da.reduction(
         out,
@@ -139,6 +158,7 @@ def pairwise_distance(
         axis=-1,
         dtype=x.dtype,
         meta=np.ndarray((0, 0), dtype=x.dtype),
+        split_every=split_every,
         name="pairwise",
     )
 
