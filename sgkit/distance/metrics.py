@@ -27,7 +27,9 @@ N_MAP_PARAM = {
     nopython=True,
     cache=True,
 )
-def euclidean_map(x: ArrayLike, y: ArrayLike, _: ArrayLike, out: ArrayLike) -> None:
+def euclidean_map(
+    x: ArrayLike, y: ArrayLike, _: ArrayLike, out: ArrayLike
+) -> None:  # pragma: no cover
     """Euclidean distance "map" function for partial vector pairs.
 
     Parameters
@@ -55,7 +57,7 @@ def euclidean_map(x: ArrayLike, y: ArrayLike, _: ArrayLike, out: ArrayLike) -> N
     out[:] = square_sum
 
 
-def euclidean_reduce(v: ArrayLike) -> ArrayLike:
+def euclidean_reduce(v: ArrayLike) -> ArrayLike:  # pragma: no cover
     """Corresponding "reduce" function for euclidean distance.
 
     Parameters
@@ -83,7 +85,9 @@ def euclidean_reduce(v: ArrayLike) -> ArrayLike:
     nopython=True,
     cache=True,
 )
-def correlation_map(x: ArrayLike, y: ArrayLike, _: ArrayLike, out: ArrayLike) -> None:
+def correlation_map(
+    x: ArrayLike, y: ArrayLike, _: ArrayLike, out: ArrayLike
+) -> None:  # pragma: no cover
     """Pearson correlation "map" function for partial vector pairs.
 
     Parameters
@@ -143,7 +147,7 @@ def correlation_map(x: ArrayLike, y: ArrayLike, _: ArrayLike, out: ArrayLike) ->
     nopython=True,
     cache=True,
 )
-def correlation_reduce(v: ArrayLike, out: ArrayLike) -> None:
+def correlation_reduce(v: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Corresponding "reduce" function for pearson correlation
     Parameters
     ----------
