@@ -71,7 +71,9 @@ def linear_regression(
     # what are effectively OLS residuals rather than matrix inverse
     # to avoid need for MxM array; additionally, dask.lstsq fails
     # with numpy arrays
-    XLP = XL - XC @ da.linalg.lstsq(XC, XL)[0]
+    LS = XC @ da.linalg.lstsq(XC, XL)[0]
+    assert XL.chunksize == LS.chunksize
+    XLP = XL - LS
     assert XLP.shape == (n_obs, n_loop_covar)
     YP = Y - XC @ da.linalg.lstsq(XC, Y)[0]
     assert YP.shape == (n_obs, n_outcome)
@@ -213,8 +215,10 @@ def gwas_linear_regression(
     # Note: dask qr decomp (used by lstsq) requires no chunking in one
     # dimension, and because dim 0 will be far greater than the number
     # of covariates for the large majority of use cases, chunking
-    # should be removed from dim 1
-    X = X.rechunk((None, -1))
+    # should be removed from dim 1. Also, dim 0 should have the same chunking
+    # as G dim 1, so that when XLP is computed in linear_regression() the
+    # two arrays have the same chunking.
+    X = X.rechunk((G.chunksize[1], -1))
 
     Y = da.asarray(concat_2d(ds[list(traits)], dims=("samples", "traits")))
     # Like covariates, traits must also be tall-skinny arrays
