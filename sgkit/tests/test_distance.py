@@ -98,6 +98,27 @@ def test_distance_euclidean(
     np.testing.assert_almost_equal(distance_matrix, expected_matrix)
 
 
+@pytest.mark.parametrize(
+    "size, chunk, split_every, metric",
+    [
+        ((100, 100), (25, 10), 5, "euclidean"),
+        ((100, 100), (20, 25), 3, "euclidean"),
+        ((100, 100), (25, 10), 5, "correlation"),
+        ((100, 100), (20, 25), 3, "correlation"),
+    ],
+)
+def test_pairwise_split_every(
+    size: typing.Tuple[int, int],
+    chunk: typing.Tuple[int, int],
+    split_every: int,
+    metric: MetricTypes,
+) -> None:
+    x = get_vectors(size=size, chunk=chunk)
+    distance_matrix = pairwise_distance(x, metric=metric, split_every=split_every)
+    expected_matrix = squareform(pdist(x, metric=metric))
+    np.testing.assert_almost_equal(distance_matrix, expected_matrix)
+
+
 def test_distance_ndarray() -> None:
     x = get_vectors(array_type="np")
     distance_matrix = pairwise_distance(x, metric="euclidean")
