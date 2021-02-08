@@ -9,7 +9,8 @@ on:
 
 jobs:
   win_build:
-
+    # Scheduled runs only on the origin org
+    if: (github.event_name == 'schedule' && github.repository_owner == 'pystatgen') || (github.event_name != 'schedule')
     runs-on: windows-latest
     strategy:
       matrix:
