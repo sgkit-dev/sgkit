@@ -10,7 +10,7 @@ from scipy.spatial.distance import (  # type: ignore
     squareform,
 )
 
-from sgkit.distance.api import pairwise_distance
+from sgkit.distance.api import MetricTypes, pairwise_distance
 from sgkit.typing import ArrayLike
 
 
@@ -98,6 +98,27 @@ def test_distance_euclidean(
     np.testing.assert_almost_equal(distance_matrix, expected_matrix)
 
 
+@pytest.mark.parametrize(
+    "size, chunk, split_every, metric",
+    [
+        ((100, 100), (25, 10), 5, "euclidean"),
+        ((100, 100), (20, 25), 3, "euclidean"),
+        ((100, 100), (25, 10), 5, "correlation"),
+        ((100, 100), (20, 25), 3, "correlation"),
+    ],
+)
+def test_pairwise_split_every(
+    size: typing.Tuple[int, int],
+    chunk: typing.Tuple[int, int],
+    split_every: int,
+    metric: MetricTypes,
+) -> None:
+    x = get_vectors(size=size, chunk=chunk)
+    distance_matrix = pairwise_distance(x, metric=metric, split_every=split_every)
+    expected_matrix = squareform(pdist(x, metric=metric))
+    np.testing.assert_almost_equal(distance_matrix, expected_matrix)
+
+
 def test_distance_ndarray() -> None:
     x = get_vectors(array_type="np")
     distance_matrix = pairwise_distance(x, metric="euclidean")
@@ -115,7 +136,7 @@ def test_distance_ndarray() -> None:
     ],
 )
 def test_missing_values(
-    metric: str,
+    metric: MetricTypes,
     metric_func: typing.Callable[[ArrayLike, ArrayLike], np.float64],
     dtype: str,
 ) -> None:
@@ -136,20 +157,31 @@ def test_missing_values(
 
 
 @pytest.mark.parametrize(
-    "dtype, expected",
+    "metric, dtype, expected",
     [
-        ("i8", "float64"),
-        ("f4", "float32"),
-        ("f8", "float64"),
+        ("euclidean", "i8", "float64"),
+        ("euclidean", "f4", "float32"),
+        ("euclidean", "f8", "float64"),
+        ("correlation", "i8", "float64"),
+        ("correlation", "f4", "float32"),
+        ("correlation", "f8", "float64"),
     ],
 )
-def test_data_types(dtype, expected):
+def test_data_types(metric: MetricTypes, dtype: str, expected: str) -> None:
     x = get_vectors(dtype=dtype)
-    distance_matrix = pairwise_distance(x)
+    distance_matrix = pairwise_distance(x, metric=metric).compute()
     assert distance_matrix.dtype.name == expected
 
 
 def test_undefined_metric() -> None:
     x = get_vectors(array_type="np")
     with pytest.raises(NotImplementedError):
-        pairwise_distance(x, metric="not-implemented-metric")
+        pairwise_distance(x, metric="not-implemented-metric")  # type: ignore[arg-type]
+
+
+def test_wrong_dimension_array() -> None:
+    with pytest.raises(ValueError):
+        pairwise_distance(da.arange(6).reshape(1, 2, 3))
+
+    with pytest.raises(ValueError):
+        pairwise_distance(da.arange(10))

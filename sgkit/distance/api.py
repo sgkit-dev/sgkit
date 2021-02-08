@@ -1,14 +1,20 @@
+import typing
+
 import dask.array as da
 import numpy as np
+from typing_extensions import Literal
 
 from sgkit.distance import metrics
 from sgkit.typing import ArrayLike
 
+MetricTypes = Literal["euclidean", "correlation"]
+
 
 def pairwise_distance(
     x: ArrayLike,
-    metric: str = "euclidean",
-) -> np.ndarray:
+    metric: MetricTypes = "euclidean",
+    split_every: typing.Optional[int] = None,
+) -> da.array:
     """Calculates the pairwise distance between all pairs of row vectors in the
     given two dimensional array x.
 
@@ -47,6 +53,13 @@ def pairwise_distance(
     metric
         The distance metric to use. The distance function can be
         'euclidean' or 'correlation'.
+    split_every
+        Determines the depth of the recursive aggregation in the reduction
+        step. This argument is directly passed to the call to``dask.reduction``
+        function in the reduce step of the map reduce.
+
+        Omit to let dask heuristically decide a good default. A default can
+        also be set globally with the split_every key in dask.config.
 
     Returns
     -------
@@ -63,41 +76,91 @@ def pairwise_distance(
     >>> from sgkit.distance.api import pairwise_distance
     >>> import dask.array as da
     >>> x = da.array([[6, 4, 1,], [4, 5, 2], [9, 7, 3]]).rechunk(2, 2)
-    >>> pairwise_distance(x, metric='euclidean')
+    >>> pairwise_distance(x, metric='euclidean').compute()
     array([[0.        , 2.44948974, 4.69041576],
            [2.44948974, 0.        , 5.47722558],
            [4.69041576, 5.47722558, 0.        ]])
 
     >>> import numpy as np
     >>> x = np.array([[6, 4, 1,], [4, 5, 2], [9, 7, 3]])
-    >>> pairwise_distance(x, metric='euclidean')
+    >>> pairwise_distance(x, metric='euclidean').compute()
     array([[0.        , 2.44948974, 4.69041576],
            [2.44948974, 0.        , 5.47722558],
            [4.69041576, 5.47722558, 0.        ]])
 
     >>> x = np.array([[6, 4, 1,], [4, 5, 2], [9, 7, 3]])
-    >>> pairwise_distance(x, metric='correlation')
-    array([[1.11022302e-16, 2.62956526e-01, 2.82353505e-03],
-           [2.62956526e-01, 0.00000000e+00, 2.14285714e-01],
-           [2.82353505e-03, 2.14285714e-01, 0.00000000e+00]])
+    >>> pairwise_distance(x, metric='correlation').compute()
+    array([[-4.44089210e-16,  2.62956526e-01,  2.82353505e-03],
+           [ 2.62956526e-01,  0.00000000e+00,  2.14285714e-01],
+           [ 2.82353505e-03,  2.14285714e-01,  0.00000000e+00]])
     """
-
     try:
-        metric_ufunc = getattr(metrics, metric)
+        metric_map_func = getattr(metrics, f"{metric}_map")
+        metric_reduce_func = getattr(metrics, f"{metric}_reduce")
+        n_map_param = metrics.N_MAP_PARAM[metric]
     except AttributeError:
         raise NotImplementedError(f"Given metric: {metric} is not implemented.")
 
     x = da.asarray(x)
-    x_distance = da.blockwise(
-        # Lambda wraps reshape for broadcast
-        lambda _x, _y: metric_ufunc(_x[:, None, :], _y),
+    if x.ndim != 2:
+        raise ValueError(f"2-dimensional array expected, got '{x.ndim}'")
+
+    # setting this variable outside of _pairwise to avoid it's recreation
+    # in every iteration, which eventually leads to increase in dask
+    # graph serialisation/deserialisation time significantly
+    metric_param = np.empty(n_map_param, dtype=x.dtype)
+
+    def _pairwise(f: ArrayLike, g: ArrayLike) -> ArrayLike:
+        result: ArrayLike = metric_map_func(f[:, None, :], g, metric_param)
+        # Adding a new axis to help combine chunks along this axis in the
+        # reduction step (see the _aggregate and _combine functions below).
+        return result[..., np.newaxis]
+
+    # concatenate in blockwise leads to high memory footprints, so instead
+    # we perform blockwise without contraction followed by reduction.
+    # More about this issue: https://github.com/dask/dask/issues/6874
+    out = da.blockwise(
+        _pairwise,
+        "ijk",
+        x,
+        "ik",
+        x,
         "jk",
-        x,
-        "ji",
-        x,
-        "ki",
-        dtype="float64",
-        concatenate=True,
+        dtype=x.dtype,
+        concatenate=False,
     )
-    x_distance = da.triu(x_distance, 1) + da.triu(x_distance).T
-    return x_distance.compute()  # type: ignore[no-any-return]
+
+    def _aggregate(x_chunk: ArrayLike, **_: typing.Any) -> ArrayLike:
+        """Last function to be executed when resolving the dask graph,
+        producing the final output. It is always invoked, even when the reduced
+        Array counts a single chunk along the reduced axes."""
+        x_chunk = x_chunk.reshape(x_chunk.shape[:-2] + (-1, n_map_param))
+        result: ArrayLike = metric_reduce_func(x_chunk)
+        return result
+
+    def _chunk(x_chunk: ArrayLike, **_: typing.Any) -> ArrayLike:
+        return x_chunk
+
+    def _combine(x_chunk: ArrayLike, **_: typing.Any) -> ArrayLike:
+        """Function used for intermediate recursive aggregation (see
+        split_every argument to ``da.reduction below``).  If the
+        reduction can be performed in less than 3 steps, it will
+        not be invoked at all."""
+        # reduce chunks by summing along the -2 axis
+        x_chunk_reshaped = x_chunk.reshape(x_chunk.shape[:-2] + (-1, n_map_param))
+        return x_chunk_reshaped.sum(axis=-2)[..., np.newaxis]
+
+    r = da.reduction(
+        out,
+        chunk=_chunk,
+        combine=_combine,
+        aggregate=_aggregate,
+        axis=-1,
+        dtype=x.dtype,
+        meta=np.ndarray((0, 0), dtype=x.dtype),
+        split_every=split_every,
+        name="pairwise",
+    )
+
+    t = da.triu(r)
+    return t + t.T
