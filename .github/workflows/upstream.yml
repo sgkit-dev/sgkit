@@ -9,8 +9,9 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # This workflow only runs on the origin org
     if: github.repository_owner == 'pystatgen'
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.7, 3.8]
