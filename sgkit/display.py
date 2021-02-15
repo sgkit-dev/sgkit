@@ -127,6 +127,15 @@ def truncate(ds: xr.Dataset, max_sizes: Mapping[Hashable, int]) -> xr.Dataset:
     return ds_abbr
 
 
+def set_index_if_unique(ds: xr.Dataset, dim: str, index: str) -> xr.Dataset:
+    ds_with_index = ds.set_index({dim: index})
+    idx = ds_with_index.get_index(dim)
+    if len(idx) != len(idx.unique()):
+        # index is not unique so don't use it
+        return ds
+    return ds_with_index
+
+
 def display_genotypes(
     ds: xr.Dataset, max_variants: int = 60, max_samples: int = 10
 ) -> GenotypeDisplay:
@@ -161,11 +170,12 @@ def display_genotypes(
     ds_calls = ds.copy()
 
     # Set indexes only if not already set (allows users to have different row/col labels)
+    # and if setting them produces a unique index
     if isinstance(ds_calls.get_index("samples"), pd.RangeIndex):
-        ds_calls = ds_calls.set_index(samples="sample_id")
+        ds_calls = set_index_if_unique(ds_calls, "samples", "sample_id")
     if isinstance(ds_calls.get_index("variants"), pd.RangeIndex):
         variant_index = "variant_id" if "variant_id" in ds_calls else "variant_position"
-        ds_calls = ds_calls.set_index(variants=variant_index)
+        ds_calls = set_index_if_unique(ds_calls, "variants", variant_index)
 
     # Restrict to genotype call variables
     if "call_genotype_phased" in ds_calls:

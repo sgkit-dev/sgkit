@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 from sgkit import display_genotypes
@@ -56,6 +57,60 @@ variants
   </tbody>
 </table>""".strip()
     assert expected_html in disp._repr_html_()
+
+
+def test_display_genotypes__variant_ids():
+    ds = simulate_genotype_call_dataset(n_variant=3, n_sample=3, seed=0)
+    # set some variant IDs
+    ds["variant_id"] = (["variants"], np.array(["V0", "V1", "V2"]))
+    ds["variant_id_mask"] = (["variants"], np.array([False, False, False]))
+    disp = display_genotypes(ds)
+    assert (
+        str(disp)
+        == """
+samples    S0   S1   S2
+variants               
+V0        0/0  1/0  1/0
+V1        0/1  1/0  0/1
+V2        0/0  1/0  1/1
+""".strip()  # noqa: W291
+    )
+
+
+def test_display_genotypes__missing_variant_ids():
+    ds = simulate_genotype_call_dataset(n_variant=3, n_sample=3, seed=0)
+    # set some variant IDs
+    ds["variant_id"] = (["variants"], np.array(["."] * 3))
+    ds["variant_id_mask"] = (["variants"], np.array([False] * 3))
+    disp = display_genotypes(ds)
+    assert (
+        str(disp)
+        == """
+samples    S0   S1   S2
+variants               
+0         0/0  1/0  1/0
+1         0/1  1/0  0/1
+2         0/0  1/0  1/1
+""".strip()  # noqa: W291
+    )
+
+
+def test_display_genotypes__duplicate_variant_ids():
+    ds = simulate_genotype_call_dataset(n_variant=3, n_sample=3, seed=0)
+    # set some variant IDs
+    ds["variant_id"] = (["variants"], np.array(["V0", "V1", "V1"]))
+    ds["variant_id_mask"] = (["variants"], np.array([False, False, False]))
+    disp = display_genotypes(ds)
+    assert (
+        str(disp)
+        == """
+samples    S0   S1   S2
+variants               
+0         0/0  1/0  1/0
+1         0/1  1/0  0/1
+2         0/0  1/0  1/1
+""".strip()  # noqa: W291
+    )
 
 
 def test_display_genotypes__truncated_rows():
