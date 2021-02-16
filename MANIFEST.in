@@ -1,4 +1,3 @@
 prune .github
-prune sgkit/tests
 prune validation
 exclude .coveragerc .gitignore .mergify.yml .pre-commit-config.yaml conftest.py

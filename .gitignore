@@ -137,3 +137,5 @@ dmypy.json
 docs/generated
 docs/mydask.png
 docs/order.png
+benchmarks/html
+benchmarks/results
