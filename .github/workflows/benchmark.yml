@@ -43,7 +43,7 @@ jobs:
           then
             cp -r $RESULTS_DIR/$MACHINE_NAME/* benchmarks/results/$MACHINE_NAME/
           else
-            echo "results/ directory does not exists in the benchmarks repository"
+            echo "results/ directory does not exist in the benchmarks repository"
           fi
           asv publish --config $ASV_CONFIG -v
           cp -r benchmarks/html/* ~/$BENCHMARKS_REPO/
