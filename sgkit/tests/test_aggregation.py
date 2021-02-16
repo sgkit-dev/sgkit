@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List, Union
 
 import dask.array as da
 import numpy as np
@@ -17,7 +17,9 @@ from sgkit.testing import simulate_genotype_call_dataset
 from sgkit.typing import ArrayLike
 
 
-def get_dataset(calls: ArrayLike, **kwargs: Any) -> Dataset:
+def get_dataset(
+    calls: Union[ArrayLike, List[List[List[int]]]], **kwargs: Any
+) -> Dataset:
     calls = np.asarray(calls)
     ds = simulate_genotype_call_dataset(
         n_variant=calls.shape[0], n_sample=calls.shape[1], **kwargs
