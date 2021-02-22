@@ -92,6 +92,34 @@ def test_vcf_to_zarr__small_vcf(shared_datadir, is_path, tmp_path):
     "is_path",
     [True, False],
 )
+def test_vcf_to_zarr__alt_number(shared_datadir, is_path, tmp_path):
+    path = path_for_test(shared_datadir, "sample.vcf.gz", is_path)
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(path, output, chunk_length=5, chunk_width=2, alt_number=1)
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    # extra alt alleles are silently dropped
+    assert_array_equal(
+        ds["variant_allele"],
+        [
+            ["A", "C"],
+            ["A", "G"],
+            ["G", "A"],
+            ["T", "A"],
+            ["A", "G"],
+            ["T", ""],
+            ["G", "GA"],
+            ["T", ""],
+            ["AC", "A"],
+        ],
+    )
+
+
+@pytest.mark.parametrize(
+    "is_path",
+    [True, False],
+)
 def test_vcf_to_zarr__large_vcf(shared_datadir, is_path, tmp_path):
     path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", is_path)
     output = tmp_path.joinpath("vcf.zarr").as_posix()
