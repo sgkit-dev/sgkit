@@ -58,12 +58,10 @@ def vcf_to_zarr_sequential(
     ploidy: int = 2,
     mixed_ploidy: bool = False,
     truncate_calls: bool = False,
+    alt_number: int = DEFAULT_ALT_NUMBER,
 ) -> None:
 
     with open_vcf(input) as vcf:
-
-        alt_number = DEFAULT_ALT_NUMBER
-
         sample_id = np.array(vcf.samples, dtype=str)
         n_sample = len(sample_id)
         n_allele = alt_number + 1
@@ -190,6 +188,7 @@ def vcf_to_zarr_parallel(
     ploidy: int = 2,
     mixed_ploidy: bool = False,
     truncate_calls: bool = False,
+    alt_number: int = DEFAULT_ALT_NUMBER,
 ) -> None:
     """Convert specified regions of one or more VCF files to zarr files, then concat, rechunk, write to zarr"""
 
@@ -210,6 +209,7 @@ def vcf_to_zarr_parallel(
             ploidy=ploidy,
             mixed_ploidy=mixed_ploidy,
             truncate_calls=truncate_calls,
+            alt_number=alt_number,
         )
 
         ds = zarrs_to_dataset(paths, chunk_length, chunk_width, tempdir_storage_options)
@@ -229,6 +229,7 @@ def vcf_to_zarrs(
     ploidy: int = 2,
     mixed_ploidy: bool = False,
     truncate_calls: bool = False,
+    alt_number: int = DEFAULT_ALT_NUMBER,
 ) -> Sequence[str]:
     """Convert VCF files to multiple Zarr on-disk stores, one per region.
 
@@ -261,6 +262,9 @@ def vcf_to_zarrs(
         If True, genotype calls with more alleles than the specified (maximum) ploidy value
         will be truncated to size ploidy. If false, calls with more alleles than the
         specified ploidy will raise an exception.
+    alt_number
+        The (maximum) number of alternate alleles in the VCF file. Any records with more than
+        this number of alternate alleles will have the extra alleles dropped.
 
     Returns
     -------
@@ -309,6 +313,7 @@ def vcf_to_zarrs(
                 ploidy=ploidy,
                 mixed_ploidy=mixed_ploidy,
                 truncate_calls=truncate_calls,
+                alt_number=alt_number,
             )
             tasks.append(task)
     dask.compute(*tasks)
@@ -329,6 +334,7 @@ def vcf_to_zarr(
     ploidy: int = 2,
     mixed_ploidy: bool = False,
     truncate_calls: bool = False,
+    alt_number: int = DEFAULT_ALT_NUMBER,
 ) -> None:
     """Convert VCF files to a single Zarr on-disk store.
 
@@ -387,6 +393,9 @@ def vcf_to_zarr(
         If True, genotype calls with more alleles than the specified (maximum) ploidy value
         will be truncated to size ploidy. If false, calls with more alleles than the
         specified ploidy will raise an exception.
+    alt_number
+        The (maximum) number of alternate alleles in the VCF file. Any records with more than
+        this number of alternate alleles will have the extra alleles dropped.
     """
 
     if temp_chunk_length is not None:
@@ -428,6 +437,7 @@ def vcf_to_zarr(
         ploidy=ploidy,
         mixed_ploidy=mixed_ploidy,
         truncate_calls=truncate_calls,
+        alt_number=alt_number,
     )
 
 
