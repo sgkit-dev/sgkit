@@ -2,7 +2,7 @@ import functools
 import itertools
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Dict, Iterator, MutableMapping, Optional, Sequence, Union
+from typing import Dict, Hashable, Iterator, MutableMapping, Optional, Sequence, Union
 
 import dask
 import fsspec
@@ -158,17 +158,22 @@ def vcf_to_zarr_sequential(
             if first_variants_chunk:
                 # Enforce uniform chunks in the variants dimension
                 # Also chunk in the samples direction
-                encoding = dict(
-                    call_genotype=dict(chunks=(chunk_length, chunk_width, ploidy)),
-                    call_genotype_mask=dict(chunks=(chunk_length, chunk_width, ploidy)),
-                    call_genotype_phased=dict(chunks=(chunk_length, chunk_width)),
-                    variant_allele=dict(chunks=(chunk_length, n_allele)),
-                    variant_contig=dict(chunks=(chunk_length,)),
-                    variant_id=dict(chunks=(chunk_length,)),
-                    variant_id_mask=dict(chunks=(chunk_length,)),
-                    variant_position=dict(chunks=(chunk_length,)),
-                    sample_id=dict(chunks=(chunk_width,)),
-                )
+
+                def get_chunk_size(dim: Hashable, size: int) -> int:
+                    if dim == "variants":
+                        return chunk_length
+                    elif dim == "samples":
+                        return chunk_width
+                    else:
+                        return size
+
+                encoding = {}
+                for var in ds.data_vars:
+                    var_chunks = tuple(
+                        get_chunk_size(dim, size)
+                        for (dim, size) in zip(ds[var].dims, ds[var].shape)
+                    )
+                    encoding[var] = dict(chunks=var_chunks)
 
                 ds.to_zarr(output, mode="w", encoding=encoding)
                 first_variants_chunk = False
