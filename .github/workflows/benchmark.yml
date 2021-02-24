@@ -30,9 +30,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install asv
 
+      - name: Set and log asv machine configuration
+        run: |
+          asv machine --yes --config benchmarks/asv.conf.json
+          echo "Machine Configuration:"
+          cat ~/.asv-machine.json
+          rm ~/.asv-machine.json
+
+          echo "Setting machine name to $MACHINE_NAME"
+          asv machine --machine $MACHINE_NAME --yes --config $ASV_CONFIG -v
+
       - name: Run benchmarks
         run: |
-          asv machine --machine $MACHINE_NAME --yes --config $ASV_CONFIG -v
           asv run --config $ASV_CONFIG -v
 
       - name: Copy benchmarks to benchmarks repo directory
