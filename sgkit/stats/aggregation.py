@@ -546,3 +546,169 @@ def sample_stats(
         ]
     )
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+
+
+def infer_non_alleles(
+    ds: Dataset,
+    *,
+    call_genotype: Hashable = variables.call_genotype,
+    merge: bool = True,
+) -> Dataset:
+    variables.validate(ds, {call_genotype: variables.call_genotype_spec})
+    mixed_ploidy = ds[variables.call_genotype].attrs.get("mixed_ploidy", False)
+    if mixed_ploidy:
+        call_genotype_non_allele = ds[call_genotype] < -1
+    else:
+        call_genotype_non_allele = xr.full_like(ds[call_genotype], False, "b1")
+    new_ds = create_dataset(
+        {variables.call_genotype_non_allele: call_genotype_non_allele}
+    )
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+
+
+def infer_call_ploidy(
+    ds: Dataset,
+    *,
+    call_genotype: Hashable = variables.call_genotype,
+    call_genotype_non_allele: Hashable = variables.call_genotype_non_allele,
+    merge: bool = True,
+) -> Dataset:
+    """Infer the ploidy of each call genotype based on the number of
+    non-allele values in each call genotype.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing genotype calls.
+    call_genotype
+        Input variable name holding call_genotype as defined by
+        :data:`sgkit.variables.call_genotype_spec`.
+        Must be present in ``ds``.
+    call_genotype_non_allele
+        Input variable name holding call_genotype_non_allele as defined by
+        :data:`sgkit.variables.call_genotype_non_allele_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`infer_non_alleles`.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing :data:`sgkit.variables.call_ploidy_spec`.
+    """
+    ds = define_variable_if_absent(
+        ds,
+        variables.call_genotype_non_allele,
+        call_genotype_non_allele,
+        infer_non_alleles,
+    )
+    mixed_ploidy = ds[variables.call_genotype].attrs.get("mixed_ploidy", False)
+    if mixed_ploidy:
+        call_ploidy = (~ds[call_genotype_non_allele]).sum(axis=-1)  # type: ignore[operator]
+    else:
+        ploidy = ds[variables.call_genotype].shape[-1]
+        call_ploidy = xr.full_like(ds[variables.call_genotype][..., 0], ploidy)
+
+    new_ds = create_dataset({variables.call_ploidy: call_ploidy})
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+
+
+def infer_variant_ploidy(
+    ds: Dataset,
+    *,
+    call_genotype: Hashable = variables.call_genotype,
+    call_ploidy: Hashable = variables.call_ploidy,
+    merge: bool = True,
+) -> Dataset:
+    """Infer the ploidy at each variant across all samples based on
+    the number of non-allele values in call genotypes.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing genotype calls.
+    call_genotype
+        Input variable name holding call_genotype as defined by
+        :data:`sgkit.variables.call_genotype_spec`.
+        Must be present in ``ds``.
+    call_ploidy
+        Input variable name holding call_ploidy as defined by
+        :data:`sgkit.variables.call_ploidy_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`infer_call_ploidy`.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing :data:`sgkit.variables.variant_ploidy_spec`.
+    """
+    ds = define_variable_if_absent(
+        ds, variables.call_ploidy, call_ploidy, infer_call_ploidy
+    )
+    # validate against spec
+    mixed_ploidy = ds[variables.call_genotype].attrs.get("mixed_ploidy", False)
+    if mixed_ploidy:
+        variant_ploidy_fixed = (ds[call_ploidy][:, 0] == ds[call_ploidy]).all(axis=-1)
+        variant_ploidy = xr.where(variant_ploidy_fixed, ds[call_ploidy][:, 0], -1)  # type: ignore[no-untyped-call]
+    else:
+        ploidy = ds[variables.call_genotype].shape[-1]
+        variant_ploidy = xr.full_like(ds[call_ploidy][:, 0, ...], ploidy)
+
+    new_ds = create_dataset({variables.variant_ploidy: variant_ploidy})
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+
+
+def infer_sample_ploidy(
+    ds: Dataset,
+    *,
+    call_genotype: Hashable = variables.call_genotype,
+    call_ploidy: Hashable = variables.call_ploidy,
+    merge: bool = True,
+) -> Dataset:
+    """Infer the ploidy of each sample across all variants based on
+    the number of non-allele values in call genotypes.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing genotype calls.
+    call_genotype
+        Input variable name holding call_genotype as defined by
+        :data:`sgkit.variables.call_genotype_spec`.
+        Must be present in ``ds``.
+    call_ploidy
+        Input variable name holding call_ploidy as defined by
+        :data:`sgkit.variables.call_ploidy_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`infer_call_ploidy`.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing :data:`sgkit.variables.sample_ploidy_spec`.
+    """
+    ds = define_variable_if_absent(
+        ds, variables.call_ploidy, call_ploidy, infer_call_ploidy
+    )
+    # validate against spec
+    mixed_ploidy = ds[variables.call_genotype].attrs.get("mixed_ploidy", False)
+    if mixed_ploidy:
+        sample_ploidy_fixed = (ds[call_ploidy][0, :] == ds[call_ploidy]).all(axis=-1)
+        sample_ploidy = xr.where(sample_ploidy_fixed, ds[call_ploidy][0, :], -1)  # type: ignore[no-untyped-call]
+    else:
+        ploidy = ds[variables.call_genotype].shape[-1]
+        sample_ploidy = xr.full_like(ds[call_ploidy][0, ...], ploidy)
+
+    new_ds = create_dataset({variables.sample_ploidy: sample_ploidy})
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)

@@ -295,6 +295,15 @@ completely missing genotype calls.
     )
 )
 
+call_ploidy, call_ploidy_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "call_ploidy",
+        kind="i",
+        ndim=2,
+        __doc__="Call genotype ploidy.",
+    )
+)
+
 cohort_allele_count, cohort_allele_count_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("cohort_allele_count", kind="i", ndim=3, __doc__="""TODO""")
 )
@@ -500,6 +509,15 @@ referred to as "scores" or simply "principal components (PCs)" for a set of samp
     )
 )
 
+sample_ploidy, sample_ploidy_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "sample_ploidy",
+        kind="i",
+        ndim=1,
+        __doc__="""Ploidy of each sample calculated from call genotypes across all variants
+with -1 indicating variable ploidy.""",
+    )
+)
 
 stat_Fst, stat_Fst_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
@@ -741,6 +759,16 @@ variant_position, variant_position_spec = SgkitVariables.register_variable(
 )
 variant_t_value, variant_t_value_spec = SgkitVariables.register_variable(
     ArrayLikeSpec("variant_t_value", __doc__="""T statistics for each beta.""")
+)
+
+variant_ploidy, variant_ploidy_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "variant_ploidy",
+        kind="i",
+        ndim=1,
+        __doc__="""Ploidy of each variant calculated from call genotypes across all samples
+with -1 indicating variable ploidy.""",
+    )
 )
 
 window_contig, window_contig_spec = SgkitVariables.register_variable(
