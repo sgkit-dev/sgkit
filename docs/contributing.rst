@@ -258,17 +258,17 @@ without warnings. You can do that locally with::
 
 .. _Sphinx: https://www.sphinx-doc.org/
 
-Contributing to Benchmarks
---------------------------
+Benchmarks
+----------
 
 *sgkit* uses asv_ (Airspeed Velocity) for micro benchmarking.
 Airspeed Velocity manages building the environment via conda itself. The
-recipe for the same is defined in the `benchmarks/asv.conf.json`
+recipe for the same is defined in the ``benchmarks/asv.conf.json``
 configuration file. The benchmarks should be written in the ``benchmarks/``
 directory. For more information on different types of benchmarks have a look
 at the ``asv`` documentation here: https://asv.readthedocs.io/en/stable/writing_benchmarks.html#writing-benchmarks
 
-The results of benchmarks are uploaded to benchmarks repository: https://github.com/pystatgen/sgkit-benchmarks
+The results of benchmarks are uploaded to benchmarks repository: https://github.com/pystatgen/sgkit-benchmarks-asv
 via Github Actions. They can be seen on the static site here: https://pystatgen.github.io/sgkit-benchmarks-asv
 
 You can run the benchmark suite locally with::
