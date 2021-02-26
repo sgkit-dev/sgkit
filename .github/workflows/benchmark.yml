@@ -7,8 +7,7 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-  # TODO: Update repo to pystatgen/sgkit-benchmarks
-  BENCHMARKS_REPO: aktech/sgkit-benchmarks
+  BENCHMARKS_REPO: pystatgen/sgkit-benchmarks-asv
   ASV_CONFIG: benchmarks/asv.conf.json
   MACHINE_NAME: github-actions  # to identify github actions machine as hostname changes everytime
 
