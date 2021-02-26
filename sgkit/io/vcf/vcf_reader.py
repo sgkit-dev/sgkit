@@ -61,6 +61,7 @@ def vcf_to_zarr_sequential(
     mixed_ploidy: bool = False,
     truncate_calls: bool = False,
     max_alt_alleles: int = DEFAULT_MAX_ALT_ALLELES,
+    add_str_max_length_attrs: bool = False,
 ) -> None:
 
     with open_vcf(input) as vcf:
@@ -152,8 +153,9 @@ def vcf_to_zarr_sequential(
                 [DIM_VARIANT],
                 variant_id_mask,
             )
-            ds.attrs["max_variant_id_length"] = max_variant_id_length
-            ds.attrs["max_variant_allele_length"] = max_variant_allele_length
+            if add_str_max_length_attrs:
+                ds.attrs["max_length_variant_id"] = max_variant_id_length
+                ds.attrs["max_length_variant_allele"] = max_variant_allele_length
 
             if first_variants_chunk:
                 # Enforce uniform chunks in the variants dimension
@@ -321,6 +323,7 @@ def vcf_to_zarrs(
                 mixed_ploidy=mixed_ploidy,
                 truncate_calls=truncate_calls,
                 max_alt_alleles=max_alt_alleles,
+                add_str_max_length_attrs=True,
             )
             tasks.append(task)
     dask.compute(*tasks)

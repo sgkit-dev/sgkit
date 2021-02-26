@@ -201,7 +201,7 @@ def _vcfzarr_to_dataset(
                 ds[var] = arr.astype(dt)
 
                 if var in {"variant_id", "variant_allele"}:
-                    ds.attrs[f"max_{var}_length"] = max_len
+                    ds.attrs[f"max_length_{var}"] = max_len
 
     return ds
 
@@ -228,11 +228,8 @@ def _concat_zarrs_optimized(
         for var in vars_to_rechunk:
             var_to_attrs[var] = first_zarr_group[var].attrs.asdict()
             dtype = None
-            if var == "variant_id":
-                max_len = _get_max_len(zarr_groups, "max_variant_id_length")
-                dtype = f"S{max_len}"
-            elif var == "variant_allele":
-                max_len = _get_max_len(zarr_groups, "max_variant_allele_length")
+            if var in {"variant_id", "variant_allele"}:
+                max_len = _get_max_len(zarr_groups, f"max_length_{var}")
                 dtype = f"S{max_len}"
 
             arr = concatenate_and_rechunk(
