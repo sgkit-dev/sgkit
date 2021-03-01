@@ -92,11 +92,11 @@ def test_vcf_to_zarr__small_vcf(shared_datadir, is_path, tmp_path):
     "is_path",
     [True, False],
 )
-def test_vcf_to_zarr__alt_number(shared_datadir, is_path, tmp_path):
+def test_vcf_to_zarr__max_alt_alleles(shared_datadir, is_path, tmp_path):
     path = path_for_test(shared_datadir, "sample.vcf.gz", is_path)
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
-    vcf_to_zarr(path, output, chunk_length=5, chunk_width=2, alt_number=1)
+    vcf_to_zarr(path, output, chunk_length=5, chunk_width=2, max_alt_alleles=1)
     ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
 
     # extra alt alleles are silently dropped
