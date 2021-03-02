@@ -1,6 +1,6 @@
 import tempfile
 from pathlib import Path
-from typing import Any, Hashable, List, Optional, Tuple
+from typing import Any, Dict, Hashable, List, Optional, Tuple
 
 import dask.array as da
 import xarray as xr
@@ -9,7 +9,7 @@ from typing_extensions import Literal
 
 from sgkit.io.utils import concatenate_and_rechunk, str_is_int, zarrs_to_dataset
 
-from ..model import DIM_VARIANT, create_genotype_call_dataset
+from ..model import DIM_SAMPLE, DIM_VARIANT, create_genotype_call_dataset
 from ..typing import ArrayLike, PathType
 from ..utils import encode_array, max_str_len
 
@@ -20,7 +20,10 @@ def _ensure_2d(arr: ArrayLike) -> ArrayLike:
     return arr
 
 
-def read_vcfzarr(path: PathType) -> xr.Dataset:
+def read_vcfzarr(
+    path: PathType,
+    field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
+) -> xr.Dataset:
     """Read a VCF Zarr file created using scikit-allel.
 
     Loads VCF variant, sample, and genotype data as Dask arrays within a Dataset
@@ -33,6 +36,18 @@ def read_vcfzarr(path: PathType) -> xr.Dataset:
     ----------
     path
         Path to the Zarr file.
+    field_defs
+        Per-field information that overrides the field definitions in the VCF header, or
+        provides extra information needed in the dataset representation. Definitions
+        are a represented as a dictionary whose keys are the field names, and values are
+        dictionaries with any of the following keys: ``Number``, ``Type``, ``Description``,
+        ``dimension``. The first three correspond to VCF header values, and ``dimension`` is
+        the name of the final dimension in the array for the case where ``Number`` is a fixed
+        integer larger than 1. For example,
+        ``{"INFO/AC": {"Number": "A"}, "FORMAT/HQ": {"dimension": "haplotypes"}}``
+        overrides the ``INFO/AC`` field to be Number ``A`` (useful if the VCF defines it as
+        having variable length with ``.``), and names the final dimension of the ``HQ`` array
+        (which is defined as Number 2 in the VCF header) as ``haplotypes``.
 
     Returns
     -------
@@ -50,7 +65,7 @@ def read_vcfzarr(path: PathType) -> xr.Dataset:
     vcfzarr = zarr.open_group(str(path), mode="r")
 
     # don't fix strings since it requires a pass over the whole dataset
-    return _vcfzarr_to_dataset(vcfzarr, fix_strings=False)
+    return _vcfzarr_to_dataset(vcfzarr, fix_strings=False, field_defs=field_defs)
 
 
 def vcfzarr_to_zarr(
@@ -141,6 +156,7 @@ def _vcfzarr_to_dataset(
     contig: Optional[str] = None,
     variant_contig_names: Optional[List[str]] = None,
     fix_strings: bool = True,
+    field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> xr.Dataset:
 
     variant_position = da.from_zarr(vcfzarr["variants/POS"])
@@ -149,7 +165,7 @@ def _vcfzarr_to_dataset(
         # Get the contigs from variants/CHROM
         variants_chrom = da.from_zarr(vcfzarr["variants/CHROM"]).astype(str)
         variant_contig, variant_contig_names = encode_array(variants_chrom.compute())
-        variant_contig = variant_contig.astype("int16")
+        variant_contig = variant_contig.astype("i1")
         variant_contig_names = list(variant_contig_names)
     else:
         # Single contig: contig names were passed in
@@ -188,6 +204,31 @@ def _vcfzarr_to_dataset(
             variants_id == ".",
         )
 
+    # Add any other fields
+    field_defs = field_defs or {}
+    default_info_fields = ["ALT", "CHROM", "ID", "POS", "REF", "QUAL", "FILTER_PASS"]
+    default_format_fields = ["GT"]
+    for key in set(vcfzarr["variants"].array_keys()) - set(default_info_fields):
+        category = "INFO"
+        vcfzarr_key = f"variants/{key}"
+        variable_name = f"variant_{key}"
+        dims = [DIM_VARIANT]
+        field = f"{category}/{key}"
+        field_def = field_defs.get(field, {})
+        _add_field_to_dataset(
+            category, key, vcfzarr_key, variable_name, dims, field_def, vcfzarr, ds
+        )
+    for key in set(vcfzarr["calldata"].array_keys()) - set(default_format_fields):
+        category = "FORMAT"
+        vcfzarr_key = f"calldata/{key}"
+        variable_name = f"call_{key}"
+        dims = [DIM_VARIANT, DIM_SAMPLE]
+        field = f"{category}/{key}"
+        field_def = field_defs.get(field, {})
+        _add_field_to_dataset(
+            category, key, vcfzarr_key, variable_name, dims, field_def, vcfzarr, ds
+        )
+
     # Fix string types to include length
     if fix_strings:
         for (var, arr) in ds.data_vars.items():
@@ -204,6 +245,38 @@ def _vcfzarr_to_dataset(
                     ds.attrs[f"max_length_{var}"] = max_len
 
     return ds
+
+
+def _add_field_to_dataset(
+    category: str,
+    key: str,
+    vcfzarr_key: str,
+    variable_name: str,
+    dims: List[str],
+    field_def: Dict[str, Any],
+    vcfzarr: zarr.Array,
+    ds: xr.Dataset,
+) -> None:
+    if "ID" not in vcfzarr[vcfzarr_key].attrs:
+        # only convert fields that were defined in the original VCF
+        return
+    vcf_number = field_def.get("Number", vcfzarr[vcfzarr_key].attrs["Number"])
+    dimension, _ = vcf_number_to_dimension_and_size(
+        # max_alt_alleles is not relevant since size is not used here
+        vcf_number,
+        category,
+        key,
+        field_def,
+        max_alt_alleles=0,
+    )
+    if dimension is not None:
+        dims.append(dimension)
+    array = da.from_zarr(vcfzarr[vcfzarr_key])
+    ds[variable_name] = (dims, array)
+    if "Description" in vcfzarr[vcfzarr_key].attrs:
+        description = vcfzarr[vcfzarr_key].attrs["Description"]
+        if len(description) > 0:
+            ds[variable_name].attrs["comment"] = description
 
 
 def _get_max_len(zarr_groups: List[zarr.Group], attr_name: str) -> int:
