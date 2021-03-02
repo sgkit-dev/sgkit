@@ -1,13 +1,13 @@
 import tempfile
 from pathlib import Path
-from typing import Hashable, List, Optional
+from typing import Any, Hashable, List, Optional, Tuple
 
 import dask.array as da
 import xarray as xr
 import zarr
 from typing_extensions import Literal
 
-from sgkit.io.utils import concatenate_and_rechunk, zarrs_to_dataset
+from sgkit.io.utils import concatenate_and_rechunk, str_is_int, zarrs_to_dataset
 
 from ..model import DIM_VARIANT, create_genotype_call_dataset
 from ..typing import ArrayLike, PathType
@@ -254,3 +254,24 @@ def _concat_zarrs_optimized(
         output_zarr.attrs.update(first_zarr_group.attrs)
         for (var, attrs) in var_to_attrs.items():
             output_zarr[var].attrs.update(attrs)
+
+
+def vcf_number_to_dimension_and_size(
+    vcf_number: str, category: str, key: str, field_def: Any, max_alt_alleles: int
+) -> Tuple[Optional[str], int]:
+    if vcf_number in ("0", "1"):
+        return (None, 1)
+    elif vcf_number == "A":
+        return ("alt_alleles", max_alt_alleles)
+    elif vcf_number == "R":
+        return ("alleles", max_alt_alleles + 1)
+    elif str_is_int(vcf_number):
+        if "dimension" in field_def:
+            dimension = field_def["dimension"]
+            return (dimension, int(vcf_number))
+        raise ValueError(
+            f"{category} field '{key}' is defined as Number '{vcf_number}', but no dimension name is defined in field_defs."
+        )
+    raise ValueError(
+        f"{category} field '{key}' is defined as Number '{vcf_number}', which is not supported."
+    )

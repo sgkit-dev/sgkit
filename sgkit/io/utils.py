@@ -202,3 +202,12 @@ def _slice_zarrs(
             slices.append((i1, slice(0, stop - offsets[i1])))
         parts = [zarrs[i][(sel, *locs[1:])] for (i, sel) in slices]
         return np.concatenate(parts)
+
+
+def str_is_int(x: str) -> bool:
+    """Test if a string can be parsed as an int"""
+    try:
+        int(x)
+        return True
+    except ValueError:
+        return False

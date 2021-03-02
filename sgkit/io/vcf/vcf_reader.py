@@ -1,8 +1,19 @@
 import functools
 import itertools
 from contextlib import contextmanager
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Hashable, Iterator, MutableMapping, Optional, Sequence, Union
+from typing import (
+    Any,
+    Dict,
+    Hashable,
+    Iterator,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import dask
 import fsspec
@@ -13,8 +24,10 @@ from cyvcf2 import VCF, Variant
 from sgkit.io.utils import zarrs_to_dataset
 from sgkit.io.vcf import partition_into_regions
 from sgkit.io.vcf.utils import build_url, chunks, temporary_directory, url_filename
-from sgkit.model import DIM_VARIANT, create_genotype_call_dataset
-from sgkit.typing import PathType
+from sgkit.io.vcfzarr_reader import vcf_number_to_dimension_and_size
+from sgkit.model import DIM_SAMPLE, DIM_VARIANT, create_genotype_call_dataset
+from sgkit.typing import ArrayLike, DType, PathType
+from sgkit.utils import max_str_len
 
 DEFAULT_MAX_ALT_ALLELES = (
     3  # equivalent to DEFAULT_ALT_NUMBER in vcf_read.py in scikit_allel
@@ -51,6 +64,163 @@ def get_region_start(region: str) -> int:
     return int(start)
 
 
+def _get_vcf_field_defs(vcf: VCF, category: str) -> Dict[str, Any]:
+    """Get a dictionary of field definitions for a category (e.g. INFO or FORMAT)
+    from the VCF header."""
+    return {
+        h["ID"]: h.info(extra=True)
+        for h in vcf.header_iter()
+        if h["HeaderType"] == category
+    }
+
+
+def _expand_wildcard_fields(vcf: VCF, fields: Sequence[str]) -> Sequence[str]:
+    """Expand 'INFO/*' and 'FORMAT/*' to the full list of fields from the VCF header."""
+    new_fields = []
+    for field in fields:
+        if field == "INFO/*":
+            info_fields = [
+                f"INFO/{key}" for key in _get_vcf_field_defs(vcf, "INFO").keys()
+            ]
+            new_fields.extend(info_fields)
+        elif field == "FORMAT/*":
+            format_fields = set(
+                [f"FORMAT/{key}" for key in _get_vcf_field_defs(vcf, "FORMAT").keys()]
+            )
+            # genotype is handled specially
+            format_fields = format_fields - set(("FORMAT/GT",))
+            new_fields.extend(format_fields)
+        else:
+            new_fields.append(field)
+    return new_fields
+
+
+def _vcf_type_to_numpy_type_and_fill_value(
+    vcf_type: str, category: str, key: str
+) -> Tuple[DType, Any]:
+    """Convert the VCF Type to a NumPy dtype and fill value."""
+    if vcf_type == "Flag":
+        return "bool", False
+    elif vcf_type == "Integer":
+        return "i4", -1
+    elif vcf_type == "Float":
+        return "f4", np.nan
+    elif vcf_type == "String":
+        return "O", ""
+    raise ValueError(
+        f"{category} field '{key}' is defined as Type '{vcf_type}', which is not supported."
+    )
+
+
+@dataclass
+class VcfFieldHandler:
+    """Converts a VCF INFO or FORMAT fields to a dataset variable."""
+
+    category: str
+    key: str
+    variable_name: str
+    description: str
+    dims: Sequence[str]
+    fill_value: Any
+    array: ArrayLike
+
+    @classmethod
+    def for_field(
+        cls, vcf: VCF, field: str, chunk_length: int, field_def: Dict[str, Any]
+    ) -> "VcfFieldHandler":
+        if not any(field.startswith(prefix) for prefix in ["INFO/", "FORMAT/"]):
+            raise ValueError("VCF field must be prefixed with 'INFO/' or 'FORMAT/'")
+        category = field.split("/")[0]
+        vcf_field_defs = _get_vcf_field_defs(vcf, category)
+        key = field[len(f"{category}/") :]
+        if key not in vcf_field_defs:
+            raise ValueError(f"{category} field '{key}' is not defined in the header.")
+        vcf_number = field_def.get("Number", vcf_field_defs[key]["Number"])
+        dimension, size = vcf_number_to_dimension_and_size(
+            vcf_number, category, key, field_def, DEFAULT_MAX_ALT_ALLELES
+        )
+        vcf_type = field_def.get("Type", vcf_field_defs[key]["Type"])
+        description = field_def.get(
+            "Description", vcf_field_defs[key]["Description"].strip('"')
+        )
+        dtype, fill_value = _vcf_type_to_numpy_type_and_fill_value(
+            vcf_type, category, key
+        )
+        chunksize: Tuple[int, ...]
+        if category == "INFO":
+            variable_name = f"variant_{key}"
+            dims = [DIM_VARIANT]
+            chunksize = (chunk_length,)
+        elif category == "FORMAT":
+            variable_name = f"call_{key}"
+            dims = [DIM_VARIANT, DIM_SAMPLE]
+            n_sample = len(vcf.samples)
+            chunksize = (chunk_length, n_sample)
+        if dimension is not None:
+            dims.append(dimension)
+            chunksize += (size,)
+
+        array = np.full(chunksize, fill_value, dtype=dtype)
+
+        return cls(
+            category,
+            key,
+            variable_name,
+            description,
+            dims,
+            fill_value,
+            array,
+        )
+
+    def add_variant(self, i: int, variant: Any) -> None:
+        if self.category == "INFO":
+            val = variant.INFO.get(self.key)
+            if val is not None:
+                assert self.array.ndim in (1, 2)
+                if self.array.ndim == 1:
+                    self.array[i] = val
+                elif self.array.ndim == 2:
+                    self.array[i] = self.fill_value
+                    a = np.array(val, dtype=self.array.dtype)
+                    if a.ndim == 0:
+                        a = a.reshape(1)  # ensure 1D
+                    a = a[: self.array.shape[-1]]  # trim to fit
+                    self.array[i, : a.shape[-1]] = a
+            else:
+                self.array[i] = self.fill_value
+        elif self.category == "FORMAT":
+            val = variant.format(self.key)
+            if val is not None:
+                assert self.array.ndim in (2, 3)
+                if self.array.ndim == 2:
+                    self.array[i] = val[..., 0]
+                elif self.array.ndim == 3:
+                    self.array[i] = self.fill_value
+                    a = val
+                    a = a[..., : self.array.shape[-1]]  # trim to fit
+                    self.array[i, ..., : a.shape[-1]] = a
+            else:
+                self.array[i] = self.fill_value
+
+    def truncate_array(self, length: int) -> None:
+        self.array = self.array[:length]
+
+    def update_dataset(
+        self, ds: xr.Dataset, add_str_max_length_attrs: bool = False
+    ) -> None:
+        # cyvcf2 represents missing Integer values as the minimum int32 value
+        # so change these to be the fill value
+        if self.array.dtype == np.int32:
+            self.array[self.array == np.iinfo(np.int32).min] = self.fill_value
+
+        ds[self.variable_name] = (self.dims, self.array)
+        if len(self.description) > 0:
+            ds[self.variable_name].attrs["comment"] = self.description
+        if add_str_max_length_attrs and self.array.dtype.kind == "O":
+            max_length = max_str_len(self.array)
+            ds.attrs[f"max_length_{self.variable_name}"] = max_length
+
+
 def vcf_to_zarr_sequential(
     input: PathType,
     output: Union[PathType, MutableMapping[str, bytes]],
@@ -61,6 +231,8 @@ def vcf_to_zarr_sequential(
     mixed_ploidy: bool = False,
     truncate_calls: bool = False,
     max_alt_alleles: int = DEFAULT_MAX_ALT_ALLELES,
+    fields: Optional[Sequence[str]] = None,
+    field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
     add_str_max_length_attrs: bool = False,
 ) -> None:
 
@@ -86,6 +258,16 @@ def vcf_to_zarr_sequential(
         variant_position = np.empty(chunk_length, dtype="i4")
         call_genotype = np.empty((chunk_length, n_sample, ploidy), dtype="i1")
         call_genotype_phased = np.empty((chunk_length, n_sample), dtype=bool)
+
+        fields = fields or []
+        fields = _expand_wildcard_fields(vcf, fields)
+        field_defs = field_defs or {}
+        field_handlers = [
+            VcfFieldHandler.for_field(
+                vcf, field, chunk_length, field_defs.get(field, {})
+            )
+            for field in fields
+        ]
 
         first_variants_chunk = True
         for variants_chunk in chunks(region_filter(variants, region), chunk_length):
@@ -127,12 +309,18 @@ def vcf_to_zarr_sequential(
                 call_genotype[i, ..., n:] = fill
                 call_genotype_phased[i] = gt[..., -1]
 
+                for field_handler in field_handlers:
+                    field_handler.add_variant(i, variant)
+
             # Truncate np arrays (if last chunk is smaller than chunk_length)
             if i + 1 < chunk_length:
                 variant_contig = variant_contig[: i + 1]
                 variant_position = variant_position[: i + 1]
                 call_genotype = call_genotype[: i + 1]
                 call_genotype_phased = call_genotype_phased[: i + 1]
+
+                for field_handler in field_handlers:
+                    field_handler.truncate_array(i + 1)
 
             variant_id = np.array(variant_ids, dtype="O")
             variant_id_mask = variant_id == "."
@@ -153,6 +341,8 @@ def vcf_to_zarr_sequential(
                 [DIM_VARIANT],
                 variant_id_mask,
             )
+            for field_handler in field_handlers:
+                field_handler.update_dataset(ds, add_str_max_length_attrs)
             if add_str_max_length_attrs:
                 ds.attrs["max_length_variant_id"] = max_variant_id_length
                 ds.attrs["max_length_variant_allele"] = max_variant_allele_length
@@ -198,6 +388,8 @@ def vcf_to_zarr_parallel(
     mixed_ploidy: bool = False,
     truncate_calls: bool = False,
     max_alt_alleles: int = DEFAULT_MAX_ALT_ALLELES,
+    fields: Optional[Sequence[str]] = None,
+    field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> None:
     """Convert specified regions of one or more VCF files to zarr files, then concat, rechunk, write to zarr"""
 
@@ -219,6 +411,8 @@ def vcf_to_zarr_parallel(
             mixed_ploidy=mixed_ploidy,
             truncate_calls=truncate_calls,
             max_alt_alleles=max_alt_alleles,
+            fields=fields,
+            field_defs=field_defs,
         )
 
         ds = zarrs_to_dataset(paths, chunk_length, chunk_width, tempdir_storage_options)
@@ -239,6 +433,8 @@ def vcf_to_zarrs(
     mixed_ploidy: bool = False,
     truncate_calls: bool = False,
     max_alt_alleles: int = DEFAULT_MAX_ALT_ALLELES,
+    fields: Optional[Sequence[str]] = None,
+    field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> Sequence[str]:
     """Convert VCF files to multiple Zarr on-disk stores, one per region.
 
@@ -274,6 +470,21 @@ def vcf_to_zarrs(
     max_alt_alleles
         The (maximum) number of alternate alleles in the VCF file. Any records with more than
         this number of alternate alleles will have the extra alleles dropped.
+    fields
+        Extra fields to extract data for. A list of strings, with ``INFO`` or ``FORMAT`` prefixes.
+        Wildcards are permitted too, for example: ``["INFO/*", "FORMAT/DP"]``.
+    field_defs
+        Per-field information that overrides the field definitions in the VCF header, or
+        provides extra information needed in the dataset representation. Definitions
+        are a represented as a dictionary whose keys are the field names, and values are
+        dictionaries with any of the following keys: ``Number``, ``Type``, ``Description``,
+        ``dimension``. The first three correspond to VCF header values, and ``dimension`` is
+        the name of the final dimension in the array for the case where ``Number`` is a fixed
+        integer larger than 1. For example,
+        ``{"INFO/AC": {"Number": "A"}, "FORMAT/HQ": {"dimension": "haplotypes"}}``
+        overrides the ``INFO/AC`` field to be Number ``A`` (useful if the VCF defines it as
+        having variable length with ``.``), and names the final dimension of the ``HQ`` array
+        (which is defined as Number 2 in the VCF header) as ``haplotypes``.
 
     Returns
     -------
@@ -323,6 +534,8 @@ def vcf_to_zarrs(
                 mixed_ploidy=mixed_ploidy,
                 truncate_calls=truncate_calls,
                 max_alt_alleles=max_alt_alleles,
+                fields=fields,
+                field_defs=field_defs,
                 add_str_max_length_attrs=True,
             )
             tasks.append(task)
@@ -345,6 +558,8 @@ def vcf_to_zarr(
     mixed_ploidy: bool = False,
     truncate_calls: bool = False,
     max_alt_alleles: int = DEFAULT_MAX_ALT_ALLELES,
+    fields: Optional[Sequence[str]] = None,
+    field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> None:
     """Convert VCF files to a single Zarr on-disk store.
 
@@ -406,6 +621,21 @@ def vcf_to_zarr(
     max_alt_alleles
         The (maximum) number of alternate alleles in the VCF file. Any records with more than
         this number of alternate alleles will have the extra alleles dropped.
+    fields
+        Extra fields to extract data for. A list of strings, with ``INFO`` or ``FORMAT`` prefixes.
+        Wildcards are permitted too, for example: ``["INFO/*", "FORMAT/DP"]``.
+    field_defs
+        Per-field information that overrides the field definitions in the VCF header, or
+        provides extra information needed in the dataset representation. Definitions
+        are a represented as a dictionary whose keys are the field names, and values are
+        dictionaries with any of the following keys: ``Number``, ``Type``, ``Description``,
+        ``dimension``. The first three correspond to VCF header values, and ``dimension`` is
+        the name of the final dimension in the array for the case where ``Number`` is a fixed
+        integer larger than 1. For example,
+        ``{"INFO/AC": {"Number": "A"}, "FORMAT/HQ": {"dimension": "haplotypes"}}``
+        overrides the ``INFO/AC`` field to be Number ``A`` (useful if the VCF defines it as
+        having variable length with ``.``), and names the final dimension of the ``HQ`` array
+        (which is defined as Number 2 in the VCF header) as ``haplotypes``.
     """
 
     if temp_chunk_length is not None:
@@ -448,6 +678,8 @@ def vcf_to_zarr(
         mixed_ploidy=mixed_ploidy,
         truncate_calls=truncate_calls,
         max_alt_alleles=max_alt_alleles,
+        fields=fields,
+        field_defs=field_defs,
     )
 
 

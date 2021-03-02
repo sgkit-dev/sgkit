@@ -3,7 +3,7 @@ from typing import MutableMapping
 import numpy as np
 import pytest
 import xarray as xr
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_allclose, assert_array_equal
 
 from sgkit import load_dataset
 from sgkit.io.vcf import partition_into_regions, vcf_to_zarr
@@ -516,3 +516,241 @@ def test_vcf_to_zarr__contig_not_defined_in_header(shared_datadir, tmp_path):
         match=r"Contig '19' is not defined in the header.",
     ):
         vcf_to_zarr(path, output)
+
+
+def test_vcf_to_zarr__fields(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "sample.vcf.gz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(
+        path,
+        output,
+        chunk_length=5,
+        chunk_width=2,
+        fields=["INFO/DP", "INFO/AA", "INFO/DB", "FORMAT/DP"],
+    )
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    assert_array_equal(ds["variant_DP"], [-1, -1, 14, 11, 10, 13, 9, -1, -1])
+    assert ds["variant_DP"].attrs["comment"] == "Total Depth"
+
+    assert_array_equal(ds["variant_AA"], ["", "", "", "", "T", "T", "G", "", ""])
+    assert ds["variant_AA"].attrs["comment"] == "Ancestral Allele"
+
+    assert_array_equal(
+        ds["variant_DB"], [False, False, True, False, True, False, False, False, False]
+    )
+    assert ds["variant_DB"].attrs["comment"] == "dbSNP membership, build 129"
+
+    dp = np.array(
+        [
+            [-1, -1, -1],
+            [-1, -1, -1],
+            [1, 8, 5],
+            [3, 5, 3],
+            [6, 0, 4],
+            [-1, 4, 2],
+            [4, 2, 3],
+            [-1, -1, -1],
+            [-1, -1, -1],
+        ],
+        dtype="i4",
+    )
+    assert_array_equal(ds["call_DP"], dp)
+    assert ds["call_DP"].attrs["comment"] == "Read Depth"
+
+
+def test_vcf_to_zarr__parallel_with_fields(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+    regions = ["20", "21"]
+
+    vcf_to_zarr(
+        path,
+        output,
+        regions=regions,
+        chunk_length=5_000,
+        temp_chunk_length=2_500,
+        fields=["INFO/MQ", "FORMAT/PGT"],
+    )
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    # select a small region to check
+    ds = ds.set_index(variants=("variant_contig", "variant_position")).sel(
+        variants=slice((0, 10001661), (0, 10001670))
+    )
+    assert_allclose(ds["variant_MQ"], [58.33, np.nan, 57.45])
+    assert ds["variant_MQ"].attrs["comment"] == "RMS Mapping Quality"
+
+    assert_array_equal(ds["call_PGT"], [[b"0|1"], [b""], [b"0|1"]])
+    assert (
+        ds["call_PGT"].attrs["comment"]
+        == "Physical phasing haplotype information, describing how the alternate alleles are phased in relation to one another"
+    )
+
+
+def test_vcf_to_zarr__field_defs(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "sample.vcf.gz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(
+        path,
+        output,
+        fields=["INFO/DP"],
+        field_defs={"INFO/DP": {"Description": "Combined depth across samples"}},
+    )
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    assert_array_equal(ds["variant_DP"], [-1, -1, 14, 11, 10, 13, 9, -1, -1])
+    assert ds["variant_DP"].attrs["comment"] == "Combined depth across samples"
+
+    vcf_to_zarr(
+        path,
+        output,
+        fields=["INFO/DP"],
+        field_defs={"INFO/DP": {"Description": ""}},  # blank description
+    )
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    assert_array_equal(ds["variant_DP"], [-1, -1, 14, 11, 10, 13, 9, -1, -1])
+    assert "comment" not in ds["variant_DP"].attrs
+
+
+def test_vcf_to_zarr__field_number_A(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "sample.vcf.gz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(
+        path,
+        output,
+        fields=["INFO/AC"],
+        field_defs={"INFO/AC": {"Number": "A"}},
+    )
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    assert_array_equal(
+        ds["variant_AC"],
+        [
+            [-1, -1, -1],
+            [-1, -1, -1],
+            [-1, -1, -1],
+            [-1, -1, -1],
+            [-1, -1, -1],
+            [-1, -1, -1],
+            [3, 1, -1],
+            [-1, -1, -1],
+            [-1, -1, -1],
+        ],
+    )
+    assert (
+        ds["variant_AC"].attrs["comment"]
+        == "Allele count in genotypes, for each ALT allele, in the same order as listed"
+    )
+
+
+def test_vcf_to_zarr__field_number_R(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "CEUTrio.21.gatk3.4.g.vcf.bgz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(
+        path,
+        output,
+        fields=["FORMAT/AD"],
+        field_defs={"FORMAT/AD": {"Number": "R"}},
+    )
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    # select a small region to check
+    ds = ds.set_index(variants="variant_position").sel(
+        variants=slice(10002764, 10002793)
+    )
+
+    ad = np.array(
+        [
+            [[40, 14, 0, -1]],
+            [[-1, -1, -1, -1]],
+            [[65, 8, 5, 0]],
+            [[-1, -1, -1, -1]],
+        ],
+    )
+    assert_array_equal(ds["call_AD"], ad)
+    assert (
+        ds["call_AD"].attrs["comment"]
+        == "Allelic depths for the ref and alt alleles in the order listed"
+    )
+
+
+def test_vcf_to_zarr__field_number_fixed(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "sample.vcf.gz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    # HQ Number is 2
+    vcf_to_zarr(
+        path,
+        output,
+        fields=["FORMAT/HQ"],
+        field_defs={"FORMAT/HQ": {"dimension": "haplotypes"}},
+    )
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    assert_array_equal(
+        ds["call_HQ"],
+        [
+            [[10, 15], [10, 10], [3, 3]],
+            [[10, 10], [10, 10], [3, 3]],
+            [[51, 51], [51, 51], [-1, -1]],
+            [[58, 50], [65, 3], [-1, -1]],
+            [[23, 27], [18, 2], [-1, -1]],
+            [[56, 60], [51, 51], [-1, -1]],
+            [[-1, -1], [-1, -1], [-1, -1]],
+            [[-1, -1], [-1, -1], [-1, -1]],
+            [[-1, -1], [-1, -1], [-1, -1]],
+        ],
+    )
+    assert ds["call_HQ"].attrs["comment"] == "Haplotype Quality"
+
+
+def test_vcf_to_zarr__fields_errors(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "sample.vcf.gz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    with pytest.raises(
+        ValueError,
+        match=r"VCF field must be prefixed with 'INFO/' or 'FORMAT/'",
+    ):
+        vcf_to_zarr(path, output, fields=["DP"])
+
+    with pytest.raises(
+        ValueError,
+        match=r"INFO field 'XX' is not defined in the header.",
+    ):
+        vcf_to_zarr(path, output, fields=["INFO/XX"])
+
+    with pytest.raises(
+        ValueError,
+        match=r"FORMAT field 'XX' is not defined in the header.",
+    ):
+        vcf_to_zarr(path, output, fields=["FORMAT/XX"])
+
+    with pytest.raises(
+        ValueError,
+        match=r"INFO field 'AC' is defined as Number '.', which is not supported.",
+    ):
+        vcf_to_zarr(path, output, fields=["INFO/AC"])
+
+    with pytest.raises(
+        ValueError,
+        match=r"FORMAT field 'HQ' is defined as Number '2', but no dimension name is defined in field_defs.",
+    ):
+        vcf_to_zarr(path, output, fields=["FORMAT/HQ"])
+
+    with pytest.raises(
+        ValueError,
+        match=r"INFO field 'AN' is defined as Type 'Blah', which is not supported.",
+    ):
+        vcf_to_zarr(
+            path,
+            output,
+            fields=["INFO/AN"],
+            field_defs={"INFO/AN": {"Type": "Blah"}},
+        )
