@@ -101,7 +101,7 @@ def test_count_variant_alleles__chunked():
     ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))  # type: ignore[arg-type]
     ac2 = count_variant_alleles(ds)
     assert isinstance(ac2["variant_allele_count"].data, da.Array)
-    xr.testing.assert_equal(ac1, ac2)  # type: ignore[no-untyped-call]
+    xr.testing.assert_equal(ac1, ac2)
 
 
 def test_count_variant_alleles__no_merge():
@@ -211,7 +211,7 @@ def test_count_call_alleles__chunked():
     ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))  # type: ignore[arg-type]
     ac2 = count_call_alleles(ds)
     assert isinstance(ac2["call_allele_count"].data, da.Array)
-    xr.testing.assert_equal(ac1, ac2)  # type: ignore[no-untyped-call]
+    xr.testing.assert_equal(ac1, ac2)
 
 
 def test_count_cohort_alleles__multi_variant_multi_sample():
@@ -246,7 +246,7 @@ def test_count_cohort_alleles__chunked():
     ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, -1, -1))  # type: ignore[arg-type]
     ac2 = count_cohort_alleles(ds)
     assert isinstance(ac2["cohort_allele_count"].data, da.Array)
-    xr.testing.assert_equal(ac1, ac2)  # type: ignore[no-untyped-call]
+    xr.testing.assert_equal(ac1, ac2)
 
 
 @pytest.mark.parametrize("precompute_variant_allele_count", [False, True])

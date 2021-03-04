@@ -71,5 +71,5 @@ def load_dataset(
     for v in ds:
         # Workaround for https://github.com/pydata/xarray/issues/4386
         if v.endswith("_mask"):  # type: ignore
-            ds[v] = ds[v].astype(bool)  # type: ignore[no-untyped-call]
+            ds[v] = ds[v].astype(bool)
     return ds

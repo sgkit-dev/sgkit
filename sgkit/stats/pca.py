@@ -339,5 +339,5 @@ def _allele_counts(
     if check_missing and ((AC < 0) | AC.isnull()).any().compute().item(0):
         raise ValueError("Input data cannot contain missing values")
     if AC.dtype.kind != "f":
-        AC = AC.astype(dtype)  # type: ignore[no-untyped-call]
+        AC = AC.astype(dtype)
     return AC
