@@ -102,13 +102,13 @@ def zarrs_to_dataset(
         max_variant_id_length = max(
             ds.attrs["max_variant_id_length"] for ds in datasets
         )
-        ds["variant_id"] = ds["variant_id"].astype(f"S{max_variant_id_length}")  # type: ignore[no-untyped-call]
+        ds["variant_id"] = ds["variant_id"].astype(f"S{max_variant_id_length}")
         del ds.attrs["max_variant_id_length"]
 
     max_variant_allele_length = max(
         ds.attrs["max_variant_allele_length"] for ds in datasets
     )
-    ds["variant_allele"] = ds["variant_allele"].astype(f"S{max_variant_allele_length}")  # type: ignore[no-untyped-call]
+    ds["variant_allele"] = ds["variant_allele"].astype(f"S{max_variant_allele_length}")
     del ds.attrs["max_variant_allele_length"]
 
     return ds

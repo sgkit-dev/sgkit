@@ -10,7 +10,7 @@ from sgkit.testing import simulate_genotype_call_dataset
 
 def assert_identical(ds1: Dataset, ds2: Dataset) -> None:
     """Assert two Datasets are identical, including dtypes for all variables."""
-    xr.testing.assert_identical(ds1, ds2)  # type: ignore[no-untyped-call]
+    xr.testing.assert_identical(ds1, ds2)
     assert all([ds1[v].dtype == ds2[v].dtype for v in ds1.data_vars])
 
 

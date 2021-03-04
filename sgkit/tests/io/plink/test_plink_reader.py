@@ -27,7 +27,7 @@ def test_read_multi_path(shared_datadir, ds1):
         bim_sep="\t",
         fam_sep="\t",
     )
-    xr.testing.assert_equal(ds1, ds2)  # type: ignore[no-untyped-call]
+    xr.testing.assert_equal(ds1, ds2)
 
 
 def test_read_ids(ds1):

@@ -231,7 +231,7 @@ def test_rechunk_from_zarr__self_consistent(shared_datadir, tmp_path):
     ds, dsr, store = _rechunk_bgen(
         shared_datadir, tmp_path, probability_dtype=None, pack=False
     )
-    xr.testing.assert_allclose(ds.compute(), dsr.compute())  # type: ignore[no-untyped-call]
+    xr.testing.assert_allclose(ds.compute(), dsr.compute())
 
 
 @pytest.mark.parametrize("dtype", ["uint8", "uint16"])
@@ -257,7 +257,7 @@ def test_rechunk_bgen__variable_packing(shared_datadir, tmp_path):
     )
     # A minor tolerance is necessary here when packing is enabled
     # because one of the genotype probabilities is constructed from the others
-    xr.testing.assert_allclose(ds.compute(), dsr.compute(), atol=1e-6)  # type: ignore[no-untyped-call]
+    xr.testing.assert_allclose(ds.compute(), dsr.compute(), atol=1e-6)
 
 
 @pytest.mark.parametrize("dtype", ["uint32", "int8", "float32"])

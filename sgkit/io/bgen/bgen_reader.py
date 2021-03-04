@@ -396,7 +396,7 @@ def pack_variables(ds: Dataset) -> Dataset:
 
 def unpack_variables(ds: Dataset, dtype: DType = "float32") -> Dataset:
     # Restore homozygous reference GP
-    gp = ds["call_genotype_probability"].astype(dtype)  # type: ignore[no-untyped-call]
+    gp = ds["call_genotype_probability"].astype(dtype)
     if gp.sizes["genotypes"] != 2:
         raise ValueError(
             "Expecting variable 'call_genotype_probability' to have genotypes "
@@ -408,7 +408,7 @@ def unpack_variables(ds: Dataset, dtype: DType = "float32") -> Dataset:
     )
 
     # Restore dosage
-    ds["call_dosage"] = gp[..., 0] + 2 * gp[..., 1]
+    ds["call_dosage"] = gp[..., 0] + 2 * gp[..., 1]  # type: ignore[operator]
     ds["call_dosage_mask"] = ds["call_genotype_probability_mask"]
     ds["call_genotype_probability_mask"] = ds[
         "call_genotype_probability_mask"

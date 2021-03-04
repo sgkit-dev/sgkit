@@ -205,7 +205,7 @@ def test_pca__stability(stability_test_result, chunks, algorithm):
     )
     # Results are expected to change slightly with chunking, but they
     # will change drastically (far more than 1e-5) if a sign flip occurs
-    xr.testing.assert_allclose(expected, actual, atol=1e-5)  # type: ignore[no-untyped-call]
+    xr.testing.assert_allclose(expected, actual, atol=1e-5)
 
 
 @pytest.mark.parametrize("shape", [(80, 30), (30, 80)])

@@ -198,7 +198,7 @@ def _vcfzarr_to_dataset(
                     kind = "S"
                 max_len = max_str_len(arr).values  # type: ignore[union-attr]
                 dt = f"{kind}{max_len}"
-                ds[var] = arr.astype(dt)  # type: ignore[no-untyped-call]
+                ds[var] = arr.astype(dt)
 
                 if var in {"variant_id", "variant_allele"}:
                     ds.attrs[f"max_{var}_length"] = max_len
