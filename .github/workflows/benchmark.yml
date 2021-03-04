@@ -64,4 +64,4 @@ jobs:
           git config --global user.email "project@pystatgen.org"
           git config --global user.name "sgkit benchmark bot"
           git commit -m "Update benchmarks"
-          git push origin master
+          git push origin main
