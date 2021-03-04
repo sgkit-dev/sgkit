@@ -258,6 +258,61 @@ without warnings. You can do that locally with::
 
 .. _Sphinx: https://www.sphinx-doc.org/
 
+Benchmarks
+----------
+
+*sgkit* uses asv_ (Airspeed Velocity) for micro benchmarking.
+Airspeed Velocity manages building the environment via conda itself. The
+recipe for the same is defined in the ``benchmarks/asv.conf.json``
+configuration file. The benchmarks should be written in the ``benchmarks/``
+directory. For more information on different types of benchmarks have a look
+at the ``asv`` documentation here: https://asv.readthedocs.io/en/stable/writing_benchmarks.html#writing-benchmarks
+
+The results of benchmarks are uploaded to benchmarks repository: https://github.com/pystatgen/sgkit-benchmarks-asv
+via Github Actions. They can be seen on the static site here: https://pystatgen.github.io/sgkit-benchmarks-asv
+
+You can run the benchmark suite locally with::
+
+   asv run --config benchmarks/asv.conf.json
+
+You can generate the html of the results via::
+
+  asv publish --config benchmarks/asv.conf.json -v
+
+The resulting HTML files end up in the ``benchmarks/html`` directory and the
+results in ``benchmarks/results`` directory.
+
+You can see the results of the benchmarks in the browser by running a local
+server::
+
+  asv preview --config benchmarks/asv.conf.json -v
+
+.. _asv: https://www.sphinx-doc.org/
+
+The benchmark machine is the Github Actions machine, which has roughly the
+following configurations::
+
+  {
+      "arch": "x86_64",
+      "cpu": "Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz",
+      "machine": "fv-az183-669",
+      "num_cpu": "2",
+      "os": "Linux 5.4.0-1039-azure",
+      "ram": "7121276",
+      "version": 1
+  }
+
+The above configuration was determined by running the following command on
+Github Actions, on one of the runs::
+
+  asv machine --yes
+
+The configuration above does changes slightly in every run, for example we
+could get a machine with different cpu like say the one with 2.30GHz or the one
+with slightly less RAM (not a huge deviation from above though). As of now it
+is not possible to fix this, unless we use a custom machine for benchmarking,
+hence minor deviation in benchmarks performance should be consumed with a pinch
+of salt.
 
 Review process
 --------------
