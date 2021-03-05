@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, Hashable, List, Optional, Tuple
 
+import dask
 import dask.array as da
 import xarray as xr
 import zarr
@@ -296,39 +297,112 @@ def _concat_zarrs_optimized(
 
     first_zarr_group = zarr_groups[0]
 
+    # create the top-level group
+    zarr.open_group(str(output), mode="w")
+
+    # copy variables that are to be rechunked
+    # NOTE: that this uses _to_zarr function defined here that is needed to avoid
+    # race conditions between writing the array contents and its metadata
+    # see https://github.com/pystatgen/sgkit/pull/486
+    delayed = []  # do all the rechunking operations in one computation
+    for var in vars_to_rechunk:
+        dtype = None
+        if var in {"variant_id", "variant_allele"}:
+            max_len = _get_max_len(zarr_groups, f"max_length_{var}")
+            dtype = f"S{max_len}"
+
+        arr = concatenate_and_rechunk(
+            [group[var] for group in zarr_groups], dtype=dtype
+        )
+        d = _to_zarr(  # type: ignore[no-untyped-call]
+            arr,
+            str(output),
+            component=var,
+            overwrite=True,
+            compute=False,
+            fill_value=None,
+            attrs=first_zarr_group[var].attrs.asdict(),
+        )
+        delayed.append(d)
+    da.compute(*delayed)
+
+    # copy unchanged variables and top-level metadata
     with zarr.open_group(str(output)) as output_zarr:
-
-        var_to_attrs = {}  # attributes to copy
-        delayed = []  # do all the rechunking operations in one computation
-        for var in vars_to_rechunk:
-            var_to_attrs[var] = first_zarr_group[var].attrs.asdict()
-            dtype = None
-            if var in {"variant_id", "variant_allele"}:
-                max_len = _get_max_len(zarr_groups, f"max_length_{var}")
-                dtype = f"S{max_len}"
-
-            arr = concatenate_and_rechunk(
-                [group[var] for group in zarr_groups], dtype=dtype
-            )
-            d = arr.to_zarr(
-                str(output),
-                component=var,
-                overwrite=True,
-                compute=False,
-                fill_value=None,
-            )
-            delayed.append(d)
-        da.compute(*delayed)
 
         # copy variables that are not rechunked (e.g. sample_id)
         for var in vars_to_copy:
             output_zarr[var] = first_zarr_group[var]
             output_zarr[var].attrs.update(first_zarr_group[var].attrs)
 
-        # copy attributes
+        # copy top-level attributes
         output_zarr.attrs.update(first_zarr_group.attrs)
-        for (var, attrs) in var_to_attrs.items():
-            output_zarr[var].attrs.update(attrs)
+
+
+def _to_zarr(  # type: ignore[no-untyped-def]
+    arr,
+    url,
+    component=None,
+    storage_options=None,
+    overwrite=False,
+    compute=True,
+    return_stored=False,
+    attrs=None,
+    **kwargs,
+):
+    """Extension of dask.array.core.to_zarr that can set attributes on the resulting Zarr array,
+    in the same Dask operation.
+    """
+
+    # call Dask version with compute=False just to check preconditions
+    da.to_zarr(
+        arr,
+        url,
+        component=component,
+        storage_options=storage_options,
+        overwrite=overwrite,
+        compute=False,
+        return_stored=return_stored,
+        **kwargs,
+    )
+
+    storage_options = storage_options or {}
+    if isinstance(url, str):
+        from dask.bytes.core import get_mapper
+
+        mapper = get_mapper(url, **storage_options)
+    else:
+        # assume the object passed is already a mapper
+        mapper = url  # pragma: no cover
+    chunks = [c[0] for c in arr.chunks]
+    z = dask.delayed(_zarr_create_with_attrs)(
+        shape=arr.shape,
+        chunks=chunks,
+        dtype=arr.dtype,
+        store=mapper,
+        path=component,
+        overwrite=overwrite,
+        attrs=attrs,
+        **kwargs,
+    )
+    return arr.store(z, lock=False, compute=compute, return_stored=return_stored)
+
+
+def _zarr_create_with_attrs(  # type: ignore[no-untyped-def]
+    shape, chunks, dtype, store, path, overwrite, attrs, **kwargs
+):
+    # Create the zarr group and update its attributes within the same task (thread)
+    arr = zarr.create(
+        shape=shape,
+        chunks=chunks,
+        dtype=dtype,
+        store=store,
+        path=path,
+        overwrite=overwrite,
+        **kwargs,
+    )
+    if attrs is not None:
+        arr.attrs.update(attrs)
+    return arr
 
 
 def vcf_number_to_dimension_and_size(
