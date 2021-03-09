@@ -33,7 +33,7 @@ from sgkit.io.vcf import vcf_to_zarr
 
 def assert_identical(ds1: Dataset, ds2: Dataset) -> None:
     """Assert two Datasets are identical, including dtypes for all variables, except strings."""
-    xr.testing.assert_identical(ds1, ds2)  # type: ignore[no-untyped-call]
+    xr.testing.assert_identical(ds1, ds2)
     # check all types except strings (since they may differ e.g. "O" vs "U")
     assert all(
         [
