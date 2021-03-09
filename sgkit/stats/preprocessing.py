@@ -120,8 +120,7 @@ def filter_partial_calls(
     Parameters
     ----------
     ds
-        Genotype call dataset such as from
-        :func:`sgkit.create_genotype_call_dataset`.
+        Dataset containing genotype calls.
     call_genotype
         Input variable name holding call_genotype as defined by
         :data:`sgkit.variables.call_genotype_spec`
@@ -133,8 +132,8 @@ def filter_partial_calls(
 
     Returns
     -------
-    Dataset containing `call_genotype_complete` and
-    `call_genotype_complete_mask` in which partial genotype calls are
+    Dataset containing :data:`sgkit.variables.call_genotype_complete_spec` and
+    :data:`sgkit.variables.call_genotype_complete_mask_spec` in which partial genotype calls are
     replaced with completely missing genotype calls.
 
     Examples
@@ -163,9 +162,9 @@ def filter_partial_calls(
 
     Notes
     -----
-    The returned dataset will still contain the initial `call_genotype` and
-    `call_genotype_mask` variables. Many sgkit functions will default to
-    using `call_genotype` and/or `call_genotype_mask`, hence it is necessary
+    The returned dataset will still contain the initial ``call_genotype`` and
+    ``call_genotype_mask`` variables. Many sgkit functions will default to
+    using ``call_genotype`` and/or ``call_genotype_mask``, hence it is necessary
     to overwrite these variables (see the example) or explicitly pass the new
     variables as function arguments in order to remove partial calls from
     futher analysis.

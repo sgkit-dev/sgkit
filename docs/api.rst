@@ -7,6 +7,8 @@ This page provides an auto-generated summary of sgkits's API.
 IO/imports
 ==========
 
+See :ref:`reading_genetic_data`
+
 BGEN
 -----
 
@@ -34,16 +36,35 @@ VCF
 .. autosummary::
    :toctree: generated/
 
-   partition_into_regions
    vcf_to_zarr
+
+For more low-level control:
+
+.. currentmodule:: sgkit.io.vcf
+.. autosummary::
+   :toctree: generated/
+
+   partition_into_regions
    vcf_to_zarrs
    zarrs_to_dataset
+
+For converting from `scikit-allel's VCF Zarr representation <https://scikit-allel.readthedocs.io/en/stable/io.html#allel.vcf_to_zarr>`_ to sgkit's Zarr representation:
 
 .. currentmodule:: sgkit
 .. autosummary::
    :toctree: generated/
 
    read_vcfzarr
+
+Dataset
+-------
+
+.. currentmodule:: sgkit
+.. autosummary::
+   :toctree: generated/
+
+   load_dataset
+   save_dataset
 
 .. _api_methods:
 
@@ -53,7 +74,6 @@ Methods
 .. autosummary::
    :toctree: generated/
 
-   convert_probability_to_call
    count_call_alleles
    count_cohort_alleles
    count_variant_alleles
@@ -63,11 +83,11 @@ Methods
    Garud_H
    gwas_linear_regression
    hardy_weinberg_test
+   pc_relate
    regenie
    sample_stats
-   variant_stats
    Tajimas_D
-   pc_relate
+   variant_stats
 
 Utilities
 =========
@@ -75,7 +95,9 @@ Utilities
 .. autosummary::
    :toctree: generated/
 
+   convert_probability_to_call
    display_genotypes
+   filter_partial_calls
    simulate_genotype_call_dataset
    window
 
@@ -89,6 +111,8 @@ Variables
     variables.call_allele_count_spec
     variables.call_dosage_spec
     variables.call_dosage_mask_spec
+    variables.call_genotype_complete_spec
+    variables.call_genotype_complete_mask_spec
     variables.call_genotype_spec
     variables.call_genotype_mask_spec
     variables.call_genotype_phased_spec

@@ -31,7 +31,7 @@ to facilitate interactive analysis of large-scale datasets. The main libraries w
 - `CuPy <https://docs.cupy.dev/en/stable/>`_: Numpy-like array interface for CUDA GPUs
 
 Data structures
-~~~~~~~~~~~~~~~
+---------------
 
 Sgkit uses Xarray `Dataset <http://xarray.pydata.org/en/stable/data-structures.html#dataset>`_ objects to model genetic data.
 Users are free to manipulate quantities within these objects as they see fit and a set of conventions for variable names,
@@ -121,7 +121,7 @@ sgkit utilities as well as the Pandas/Xarray integration:
 This last example alludes to representations of missing data that are explained further in :ref:`missing_data`.
 
 Genetic methods
-~~~~~~~~~~~~~~~
+---------------
 
 Genetic methods in sgkit are nearly always applied to individual ``Dataset`` objects.  For a full list of
 available methods, see :ref:`api_methods`.
@@ -136,54 +136,12 @@ across samples for each individual variant:
     sg.variant_stats(ds, merge=False)
 
 There are two ways that the results of every function are handled -- either they are merged with the provided
-dataset or they are returned in a separate dataset.  See :ref:`dataset_merge` below for more details.
-
-.. _dataset_merge:
-
-Dataset merge behavior
-~~~~~~~~~~~~~~~~~~~~~~
-
-Generally, method functions in sgkit compute some new variables based on the
-input dataset, then return a new output dataset that consists of the input
-dataset plus the new computed variables. The input dataset is unchanged.
-
-This behavior can be controlled using the ``merge`` parameter. If set to ``True``
-(the default), then the function will merge the input dataset and the computed
-output variables into a single dataset. Output variables will overwrite any
-input variables with the same name, and a warning will be issued in this case.
-If ``False``, the function will return only the computed output variables.
-
-Examples:
-
-.. ipython:: python
-    :okwarning:
-
-    import sgkit as sg
-    ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
-    ds = ds[['variant_allele', 'call_genotype']]
-    ds
-
-    # By default, new variables are merged into a copy of the provided dataset
-    ds = sg.count_variant_alleles(ds)
-    ds
-
-    # If an existing variable would be re-defined, a warning is thrown
-    import warnings
-    ds = sg.count_variant_alleles(ds)
-    with warnings.catch_warnings(record=True) as w:
-        ds = sg.count_variant_alleles(ds)
-        print(f"{w[0].category.__name__}: {w[0].message}")
-
-    # New variables can also be returned in their own dataset
-    sg.count_variant_alleles(ds, merge=False)
-
-    # This can be useful for merging multiple datasets manually
-    ds.merge(sg.count_variant_alleles(ds, merge=False))
+dataset or they are returned in a separate dataset.  See :ref:`dataset_merge` for more details.
 
 .. _missing_data:
 
 Missing data
-~~~~~~~~~~~~
+------------
 
 Missing data in sgkit is represented using a sentinel value within data arrays
 (``-1`` in integer arrays and ``NaN`` in float arrays) as well as a companion boolean mask array
@@ -242,7 +200,7 @@ shows how it can be used in the context of doing something simple like counting 
     sg.variant_stats(ds).variant_n_het.item(0)
 
 Windowing
-~~~~~~~~~
+---------
 
 It is common to compute statistics in windows along the genome. Some :ref:`api_methods` in sgkit
 are "windowing aware" and will compute values for windows defined in a dataset. If no windows
@@ -279,7 +237,7 @@ then with windows.
     sg.diversity(ds, merge=False)
 
 Cohorts
-~~~~~~~
+-------
 
 During analysis we often want to be able to group samples into populations, and compute statistics
 based on these groups. Groups of samples are referred to as *cohorts* in sgkit.
@@ -323,7 +281,7 @@ however you might only want to run the computation for a subset of cohorts, in w
 explicitly specify the cohorts when calling the function.
 
 Chaining operations
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 `Method chaining <https://tomaugspurger.github.io/method-chaining.html>`_ is a common practice with Python
 data tools that improves code readability and reduces the probability of introducing accidental namespace collisions.
@@ -366,7 +324,7 @@ variables, and then merge these new variables into a copy of the provided datase
 See :ref:`dataset_merge` for more details.
 
 Chunked arrays
-~~~~~~~~~~~~~~
+--------------
 
 Chunked arrays are required when working on large datasets. Libraries for managing chunked arrays such as `Dask Array <https://docs.dask.org/en/latest/array.html>`_
 and `Zarr <https://zarr.readthedocs.io/en/stable/>`_ make it possible to implement blockwise algorithms that operate
@@ -417,85 +375,10 @@ for more examples and information, as well as the Dask tutorials on
 `delayed array execution <https://tutorial.dask.org/03_array.html#dask.array-contains-these-algorithms>`_ and
 `lazy execution in Dask graphs <https://tutorial.dask.org/01x_lazy.html>`_.
 
-
-Monitoring operations
-~~~~~~~~~~~~~~~~~~~~~
-
-The simplest way to monitor operations when running sgkit on a single host is to use `Dask local diagnostics <https://docs.dask.org/en/latest/diagnostics-local.html>`_.
-
-As an example, this code shows how to track the progress of a single sgkit function:
-
-.. ipython:: python
-    :okwarning:
-
-    import sgkit as sg
-    from dask.diagnostics import ProgressBar
-    ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
-    with ProgressBar():
-        ac = sg.count_variant_alleles(ds).variant_allele_count.compute()
-    ac[:5]
-
-Monitoring resource utilization with `ResourceProfiler <https://docs.dask.org/en/latest/diagnostics-local.html#resourceprofiler>`_
-and profiling task streams with `Profiler <https://docs.dask.org/en/latest/diagnostics-local.html#profiler>`_ are other
-commonly used local diagnostics.
-
-For similar monitoring in a distributed cluster, see `Dask distributed diagnostics <https://docs.dask.org/en/latest/diagnostics-distributed.html>`_.
-
-Visualizing computations
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-Dask allows you to `visualize the task graph <https://docs.dask.org/en/latest/graphviz.html>`_ of a computation
-before running it, which can be handy when trying to understand where the bottlenecks are.
-
-In most cases the number of tasks is too large to visualize, so it's useful to restrict
-the graph just a few chunks, as shown in this example.
-
-.. ipython:: python
-    :okwarning:
-
-    import sgkit as sg
-    ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
-    # Rechunk to illustrate multiple tasks
-    ds = ds.chunk({"variants": 25, "samples": 25})
-    counts = sg.count_call_alleles(ds).call_allele_count.data
-
-    # Restrict to first 3 chunks in variants dimension
-    counts = counts[:3*counts.chunksize[0],...]
-
-    counts.visualize(optimize_graph=True)
-
-.. image:: _static/mydask.png
-    :width: 600
-    :align: center
-
-By passing keyword arguments to ``visualize`` we can see the order tasks will run in:
-
-.. ipython:: python
-
-    # Graph where colors indicate task ordering
-    counts.visualize(filename="order", optimize_graph=True, color="order", cmap="autumn", node_attr={"penwidth": "4"})
-
-.. image:: _static/order.png
-    :width: 600
-    :align: center
-
-Task order number is shown in circular boxes, colored from red to yellow.
-
-
-Custom naming conventions
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-TODO: Show to use a custom naming convention via Xarray renaming features.
-
 .. _genetic_variables:
 
 Genetic variables
-~~~~~~~~~~~~~~~~~
+-----------------
 
 TODO: Link to and explain ``sgkit.variables`` in https://github.com/pystatgen/sgkit/pull/276.
-
-Reading genetic data
-~~~~~~~~~~~~~~~~~~~~
-
-TODO: Explain sgkit-{plink,vcf,bgen} once repos are consolidated and move this to a more prominent position in the docs.
 

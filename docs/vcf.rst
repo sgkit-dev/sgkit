@@ -49,10 +49,10 @@ Usage
 
 To convert a single VCF or BCF file to Zarr, just specify the input and output file names::
 
+    >>> import sgkit as sg
     >>> from sgkit.io.vcf import vcf_to_zarr
     >>> vcf_to_zarr("CEUTrio.20.21.gatk3.4.g.vcf.bgz", "output.zarr")
-    >>> import xarray as xr
-    >>> ds = xr.open_zarr("output.zarr")
+    >>> ds = sg.load_dataset("output.zarr")
     >>> ds
     <xarray.Dataset>
     Dimensions:               (alleles: 4, ploidy: 2, samples: 1, variants: 19910)

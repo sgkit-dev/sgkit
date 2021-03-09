@@ -74,6 +74,7 @@ def convert_probability_to_call(
     merge: bool = True,
 ) -> Dataset:
     """
+    Convert genotype probabilities to hard calls.
 
     Parameters
     ----------
