@@ -48,6 +48,8 @@ def read_vcfzarr(
         overrides the ``INFO/AC`` field to be Number ``A`` (useful if the VCF defines it as
         having variable length with ``.``), and names the final dimension of the ``HQ`` array
         (which is defined as Number 2 in the VCF header) as ``haplotypes``.
+        (Note that Number ``A`` is the number of alternate alleles, see section 1.4.2 of the
+        VCF spec https://samtools.github.io/hts-specs/VCFv4.3.pdf.)
 
     Returns
     -------
