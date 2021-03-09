@@ -103,6 +103,7 @@ def _vcf_type_to_numpy_type_and_fill_value(
         return "bool", False
     elif vcf_type == "Integer":
         return "i4", -1
+    # the VCF spec defines Float as 32 bit, and in BCF is stored as 32 bit
     elif vcf_type == "Float":
         return "f4", np.nan
     elif vcf_type == "String":
@@ -485,6 +486,8 @@ def vcf_to_zarrs(
         overrides the ``INFO/AC`` field to be Number ``A`` (useful if the VCF defines it as
         having variable length with ``.``), and names the final dimension of the ``HQ`` array
         (which is defined as Number 2 in the VCF header) as ``haplotypes``.
+        (Note that Number ``A`` is the number of alternate alleles, see section 1.4.2 of the
+        VCF spec https://samtools.github.io/hts-specs/VCFv4.3.pdf.)
 
     Returns
     -------
@@ -636,6 +639,8 @@ def vcf_to_zarr(
         overrides the ``INFO/AC`` field to be Number ``A`` (useful if the VCF defines it as
         having variable length with ``.``), and names the final dimension of the ``HQ`` array
         (which is defined as Number 2 in the VCF header) as ``haplotypes``.
+        (Note that Number ``A`` is the number of alternate alleles, see section 1.4.2 of the
+        VCF spec https://samtools.github.io/hts-specs/VCFv4.3.pdf.)
     """
 
     if temp_chunk_length is not None:
