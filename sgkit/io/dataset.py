@@ -47,7 +47,7 @@ def load_dataset(
 ) -> Dataset:
     """Load a dataset from Zarr storage.
 
-    This function is a thin wrapper around :meth:`xarray.open_zarr`
+    This function is a thin wrapper around :func:`xarray.open_zarr`
     that uses sensible defaults and makes it easier to use in a pipeline.
 
     Parameters

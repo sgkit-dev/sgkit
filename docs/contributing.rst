@@ -23,12 +23,16 @@ Discussion forums
 Conversation about *sgkit* happens in the following places:
 
 1.  `GitHub Issue Tracker`_: for discussions around new features or bugs
-2.  `Python for Statistical Genetics forum`_: for general discussion
+2.  `GitHub Discussions`_: for general discussions, and questions like "how do I do X",
+    or "what's the best way to do Y"?
+3.  `Python for Statistical Genetics forum`_: for general discussion (deprecated)
 
-Discussions on the forum tend to be about higher-level themes, and statistical genetics in
+
+Discussions on GitHub Discussions (and previously the forum) tend to be about higher-level themes, and statistical genetics in
 general. Coding details should be discussed on GitHub issues and pull requests.
 
 .. _`GitHub Issue Tracker`: https://github.com/pystatgen/sgkit/issues
+.. _`GitHub Discussions`: https://github.com/pystatgen/sgkit/discussions
 .. _`Python for Statistical Genetics forum`: https://discourse.pystatgen.org/
 
 
@@ -42,10 +46,6 @@ non-exhaustive list follows:
 
 *  https://github.com/pystatgen/sgkit: The main code repository containing the
    data representations (in Xarray), algorithms, and most documentation
-*  https://github.com/pystatgen/sgkit-bgen: Code for reading BGEN format files
-   into *sgkit*'s Xarray represention
-*  https://github.com/pystatgen/sgkit-plink: Code for reading PLINK format files
-   into *sgkit*'s Xarray represention
 
 Git and GitHub can be challenging at first.  Fortunately good materials exist
 on the internet.  Rather than repeat these materials here, we refer you to
@@ -321,10 +321,9 @@ Pull requests will be reviewed by a project maintainer. All changes to *sgkit* r
 approval by at least one maintainer.
 
 We use `mergify <https://mergify.io/>`_ to automate PR flow. A project
-[committer](https://github.com/orgs/pystatgen/teams/committers) (reviewer) could decide
-to automatically merge a PR by labeling it with ``auto-merge``, and when the PR gets:
-at least one +1 (from [committers](https://github.com/orgs/pystatgen/teams/committers))
-and a clean build it will get merged automatically.
+`committer <https://github.com/orgs/pystatgen/teams/committers>`_ (reviewer) can decide
+to automatically merge a PR by labeling it with ``auto-merge``, and then when the PR gets
+at least one approval from a committer and a clean build it will get merged automatically.
 
 Design discussions
 ------------------

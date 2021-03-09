@@ -117,6 +117,8 @@ intersphinx_mapping = dict(
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
+html_theme_options = {"logo_only": True}
+html_logo = "_static/sgkit_white_trnsprnt.png"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

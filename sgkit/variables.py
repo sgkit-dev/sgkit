@@ -213,7 +213,12 @@ call_dosage, call_dosage_spec = SgkitVariables.register_variable(
 )
 
 call_dosage_mask, call_dosage_mask_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("call_dosage_mask", kind="b", ndim=2, __doc__="""TODO""")
+    ArrayLikeSpec(
+        "call_dosage_mask",
+        kind="b",
+        ndim=2,
+        __doc__="""A flag for each call indicating which values are missing.""",
+    )
 )
 
 call_genotype, call_genotype_spec = SgkitVariables.register_variable(
@@ -230,7 +235,12 @@ missing value, or -2 to indicate a non allele in mixed ploidy datasets.
 )
 
 call_genotype_mask, call_genotype_mask_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("call_genotype_mask", kind="b", ndim=3, __doc__="""TODO""")
+    ArrayLikeSpec(
+        "call_genotype_mask",
+        kind="b",
+        ndim=3,
+        __doc__="""A flag for each call indicating which values are missing.""",
+    )
 )
 
 (
@@ -276,14 +286,24 @@ completely missing genotype calls.
     call_genotype_complete_mask,
     call_genotype_complete_mask_spec,
 ) = SgkitVariables.register_variable(
-    ArrayLikeSpec("call_genotype_complete_mask", kind="b", ndim=3, __doc__="""TODO""")
+    ArrayLikeSpec(
+        "call_genotype_complete_mask",
+        kind="b",
+        ndim=3,
+        __doc__="""A flag for each call indicating which values are missing.""",
+    )
 )
 
 (
     call_genotype_probability,
     call_genotype_probability_spec,
 ) = SgkitVariables.register_variable(
-    ArrayLikeSpec("call_genotype_probability", kind="f", ndim=3, __doc__="""TODO""")
+    ArrayLikeSpec(
+        "call_genotype_probability",
+        kind="f",
+        ndim=3,
+        __doc__="""Genotype probabilities.""",
+    )
 )
 
 (
@@ -291,7 +311,10 @@ completely missing genotype calls.
     call_genotype_probability_mask_spec,
 ) = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "call_genotype_probability_mask", kind="b", ndim=3, __doc__="""TODO"""
+        "call_genotype_probability_mask",
+        kind="b",
+        ndim=3,
+        __doc__="""A flag for each call indicating which values are missing.""",
     )
 )
 
@@ -305,7 +328,9 @@ call_ploidy, call_ploidy_spec = SgkitVariables.register_variable(
 )
 
 cohort_allele_count, cohort_allele_count_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("cohort_allele_count", kind="i", ndim=3, __doc__="""TODO""")
+    ArrayLikeSpec(
+        "cohort_allele_count", kind="i", ndim=3, __doc__="""Cohort allele counts."""
+    )
 )
 
 covariates, covariates_spec = SgkitVariables.register_variable(
