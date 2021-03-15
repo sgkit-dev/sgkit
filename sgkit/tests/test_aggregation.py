@@ -10,6 +10,9 @@ from sgkit.stats.aggregation import (
     count_call_alleles,
     count_cohort_alleles,
     count_variant_alleles,
+    infer_call_ploidy,
+    infer_sample_ploidy,
+    infer_variant_ploidy,
     sample_stats,
     variant_stats,
 )
@@ -291,3 +294,58 @@ def test_sample_stats(precompute_variant_allele_count):
     np.testing.assert_equal(ss["sample_n_hom_alt"], np.array([0, 1]))
     np.testing.assert_equal(ss["sample_n_het"], np.array([3, 1]))
     np.testing.assert_equal(ss["sample_n_non_ref"], np.array([3, 2]))
+
+
+def test_infer_call_ploidy():
+    ds = get_dataset(
+        [
+            [[0, 0, 0, 0], [0, 1, -2, -2], [1, 0, 0, 0]],
+            [[-1, 0, -2, -2], [0, -1, -1, -1], [-1, -1, -1, -1]],
+        ],
+        n_ploidy=4,
+    )
+    # test as fixed ploidy
+    cp = infer_call_ploidy(ds).call_ploidy
+    np.testing.assert_equal(cp, np.array([[4, 4, 4], [4, 4, 4]]))
+
+    # test as mixed ploidy
+    ds.call_genotype.attrs["mixed_ploidy"] = True
+    cp = infer_call_ploidy(ds).call_ploidy
+    np.testing.assert_equal(cp, np.array([[4, 2, 4], [2, 4, 4]]))
+
+
+def test_infer_sample_ploidy():
+    ds = get_dataset(
+        [
+            [[0, 0, -2, -2], [0, 1, -2, -2], [1, 0, 0, 0]],
+            [[-1, 0, -2, -2], [0, -1, -1, -1], [-1, -1, -1, -1]],
+        ],
+        n_ploidy=4,
+    )
+    # test as fixed ploidy
+    sp = infer_sample_ploidy(ds).sample_ploidy
+    np.testing.assert_equal(sp, np.array([4, 4, 4]))
+
+    # test as mixed ploidy
+    ds.call_genotype.attrs["mixed_ploidy"] = True
+    sp = infer_sample_ploidy(ds).sample_ploidy
+    np.testing.assert_equal(sp, np.array([2, -1, 4]))
+
+
+def test_infer_variant_ploidy():
+    ds = get_dataset(
+        [
+            [[0, 0, 0, 0], [0, 1, -2, -2], [1, 0, 0, 0]],
+            [[0, 0, 0, 0], [0, 1, -1, -1], [1, 0, 0, 0]],
+            [[-1, 0, -2, -2], [0, -1, -2, -2], [-1, -1, -2, -2]],
+        ],
+        n_ploidy=4,
+    )
+    # test as fixed ploidy
+    vp = infer_variant_ploidy(ds).variant_ploidy
+    np.testing.assert_equal(vp, np.array([4, 4, 4]))
+
+    # test as mixed ploidy
+    ds.call_genotype.attrs["mixed_ploidy"] = True
+    vp = infer_variant_ploidy(ds).variant_ploidy
+    np.testing.assert_equal(vp, np.array([-1, 4, 2]))
