@@ -217,7 +217,7 @@ def test_gwas_linear_regression__scalar_vars(ds: xr.Dataset) -> None:
     res_list = gwas_linear_regression(
         ds, dosage="dosage", covariates=["covar_0"], traits=["trait_0"]
     )
-    xr.testing.assert_equal(res_scalar, res_list)  # type: ignore[no-untyped-call]
+    xr.testing.assert_equal(res_scalar, res_list)
 
 
 def test_linear_regression__raise_on_non_2D():

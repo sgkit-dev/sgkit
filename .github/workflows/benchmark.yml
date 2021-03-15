@@ -1,0 +1,67 @@
+name: Benchmarks
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+  BENCHMARKS_REPO: pystatgen/sgkit-benchmarks-asv
+  ASV_CONFIG: benchmarks/asv.conf.json
+  MACHINE_NAME: github-actions  # to identify github actions machine as hostname changes everytime
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # To fetch all commits to be able to generate benchmarks html
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Install dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install libgsl-dev
+          python -m pip install --upgrade pip
+          pip install asv
+
+      - name: Set and log asv machine configuration
+        run: |
+          asv machine --yes --config benchmarks/asv.conf.json
+          echo "Machine Configuration:"
+          cat ~/.asv-machine.json
+          rm ~/.asv-machine.json
+
+          echo "Setting machine name to $MACHINE_NAME"
+          asv machine --machine $MACHINE_NAME --yes --config $ASV_CONFIG -v
+
+      - name: Run benchmarks
+        run: |
+          asv run --config $ASV_CONFIG -v
+
+      - name: Copy benchmarks to benchmarks repo directory
+        run: |
+          git clone https://$GITHUB_TOKEN@github.com/$BENCHMARKS_REPO.git ~/$BENCHMARKS_REPO
+          RESULTS_DIR=~/$BENCHMARKS_REPO/results
+          if [ -d "$RESULTS_DIR" ]
+          then
+            cp -r $RESULTS_DIR/$MACHINE_NAME/* benchmarks/results/$MACHINE_NAME/
+          else
+            echo "results/ directory does not exist in the benchmarks repository"
+          fi
+          asv publish --config $ASV_CONFIG -v
+          cp -r benchmarks/html/* ~/$BENCHMARKS_REPO/
+          cp -r benchmarks/results ~/$BENCHMARKS_REPO/
+
+      - name: Push benchmarks
+        run: |
+          cd ~/$BENCHMARKS_REPO
+          git add .
+          git config --global user.email "project@pystatgen.org"
+          git config --global user.name "sgkit benchmark bot"
+          git commit -m "Update benchmarks"
+          git push origin main

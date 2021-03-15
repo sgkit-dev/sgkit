@@ -40,7 +40,7 @@ def test_convert_probability_to_call(chunks: int, dtype: str) -> None:
         ],
         chunks,
     )
-    ds[variables.call_genotype_probability] = ds[  # type: ignore[no-untyped-call]
+    ds[variables.call_genotype_probability] = ds[
         variables.call_genotype_probability
     ].astype(dtype)
     ds = convert_probability_to_call(ds)

@@ -97,19 +97,12 @@ def zarrs_to_dataset(
 
     # Set variable length strings to fixed length ones to avoid xarray/conventions.py:188 warning
     # (Also avoids this issue: https://github.com/pydata/xarray/issues/3476)
-
-    if "max_variant_id_length" in datasets[0].attrs:
-        max_variant_id_length = max(
-            ds.attrs["max_variant_id_length"] for ds in datasets
-        )
-        ds["variant_id"] = ds["variant_id"].astype(f"S{max_variant_id_length}")  # type: ignore[no-untyped-call]
-        del ds.attrs["max_variant_id_length"]
-
-    max_variant_allele_length = max(
-        ds.attrs["max_variant_allele_length"] for ds in datasets
-    )
-    ds["variant_allele"] = ds["variant_allele"].astype(f"S{max_variant_allele_length}")  # type: ignore[no-untyped-call]
-    del ds.attrs["max_variant_allele_length"]
+    for attr in datasets[0].attrs:
+        if attr.startswith("max_length_"):
+            variable_name = attr[len("max_length_") :]
+            max_length = max(ds.attrs[attr] for ds in datasets)
+            ds[variable_name] = ds[variable_name].astype(f"S{max_length}")
+            del ds.attrs[attr]
 
     return ds
 
@@ -209,3 +202,12 @@ def _slice_zarrs(
             slices.append((i1, slice(0, stop - offsets[i1])))
         parts = [zarrs[i][(sel, *locs[1:])] for (i, sel) in slices]
         return np.concatenate(parts)
+
+
+def str_is_int(x: str) -> bool:
+    """Test if a string can be parsed as an int"""
+    try:
+        int(x)
+        return True
+    except ValueError:
+        return False
