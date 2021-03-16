@@ -6,6 +6,7 @@ import dask
 import dask.array as da
 import xarray as xr
 import zarr
+from fsspec import get_mapper
 from typing_extensions import Literal
 
 from sgkit.io.utils import concatenate_and_rechunk, str_is_int, zarrs_to_dataset
@@ -367,8 +368,6 @@ def _to_zarr(  # type: ignore[no-untyped-def]
 
     storage_options = storage_options or {}
     if isinstance(url, str):
-        from dask.bytes.core import get_mapper
-
         mapper = get_mapper(url, **storage_options)
     else:
         # assume the object passed is already a mapper
