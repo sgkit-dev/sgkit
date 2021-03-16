@@ -1,6 +1,7 @@
-sphinx
-sphinx_rtd_theme
+pydata-sphinx-theme
+sphinx >= 3.3
 sphinx_autodoc_typehints
+sphinx-book-theme
 scanpydoc
 ipython
 matplotlib
