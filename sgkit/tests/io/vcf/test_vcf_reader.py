@@ -734,6 +734,12 @@ def test_vcf_to_zarr__fields_errors(shared_datadir, tmp_path):
 
     with pytest.raises(
         ValueError,
+        match=r"FORMAT field 'XX' is not defined in the header.",
+    ):
+        vcf_to_zarr(path, output, exclude_fields=["FORMAT/XX"])
+
+    with pytest.raises(
+        ValueError,
         match=r"INFO field 'AC' is defined as Number '.', which is not supported.",
     ):
         vcf_to_zarr(path, output, fields=["INFO/AC"])
