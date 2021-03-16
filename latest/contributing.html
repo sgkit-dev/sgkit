@@ -39,7 +39,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Reading VCF" href="vcf.html" /> 
+    <link rel="prev" title="sgkit.variables.window_stop_spec" href="generated/sgkit.variables.window_stop_spec.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -53,9 +53,12 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> sgkit
+            <a href="index.html">
           
 
+          
+            
+            <img src="_static/sgkit_white_trnsprnt.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -87,9 +90,9 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vcf.html">Reading VCF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing to sgkit</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#discussion-forums">Discussion forums</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code-repositories">Code repositories</a></li>
@@ -240,9 +243,11 @@ This page provides resources on how best to contribute.</p>
 <p>Conversation about <em>sgkit</em> happens in the following places:</p>
 <ol class="arabic simple">
 <li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/issues">GitHub Issue Tracker</a>: for discussions around new features or bugs</p></li>
-<li><p><a class="reference external" href="https://discourse.pystatgen.org/">Python for Statistical Genetics forum</a>: for general discussion</p></li>
+<li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/discussions">GitHub Discussions</a>: for general discussions, and questions like “how do I do X”,
+or “what’s the best way to do Y”?</p></li>
+<li><p><a class="reference external" href="https://discourse.pystatgen.org/">Python for Statistical Genetics forum</a>: for general discussion (deprecated)</p></li>
 </ol>
-<p>Discussions on the forum tend to be about higher-level themes, and statistical genetics in
+<p>Discussions on GitHub Discussions (and previously the forum) tend to be about higher-level themes, and statistical genetics in
 general. Coding details should be discussed on GitHub issues and pull requests.</p>
 </div>
 <div class="section" id="code-repositories">
@@ -254,10 +259,6 @@ non-exhaustive list follows:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/pystatgen/sgkit">https://github.com/pystatgen/sgkit</a>: The main code repository containing the
 data representations (in Xarray), algorithms, and most documentation</p></li>
-<li><p><a class="reference external" href="https://github.com/pystatgen/sgkit-bgen">https://github.com/pystatgen/sgkit-bgen</a>: Code for reading BGEN format files
-into <em>sgkit</em>’s Xarray represention</p></li>
-<li><p><a class="reference external" href="https://github.com/pystatgen/sgkit-plink">https://github.com/pystatgen/sgkit-plink</a>: Code for reading PLINK format files
-into <em>sgkit</em>’s Xarray represention</p></li>
 </ul>
 <p>Git and GitHub can be challenging at first.  Fortunately good materials exist
 on the internet.  Rather than repeat these materials here, we refer you to
@@ -480,10 +481,9 @@ of salt.</p>
 <p>Pull requests will be reviewed by a project maintainer. All changes to <em>sgkit</em> require
 approval by at least one maintainer.</p>
 <p>We use <a class="reference external" href="https://mergify.io/">mergify</a> to automate PR flow. A project
-[committer](<a class="reference external" href="https://github.com/orgs/pystatgen/teams/committers">https://github.com/orgs/pystatgen/teams/committers</a>) (reviewer) could decide
-to automatically merge a PR by labeling it with <code class="docutils literal notranslate"><span class="pre">auto-merge</span></code>, and when the PR gets:
-at least one +1 (from [committers](<a class="reference external" href="https://github.com/orgs/pystatgen/teams/committers">https://github.com/orgs/pystatgen/teams/committers</a>))
-and a clean build it will get merged automatically.</p>
+<a class="reference external" href="https://github.com/orgs/pystatgen/teams/committers">committer</a> (reviewer) can decide
+to automatically merge a PR by labeling it with <code class="docutils literal notranslate"><span class="pre">auto-merge</span></code>, and then when the PR gets
+at least one approval from a committer and a clean build it will get merged automatically.</p>
 </div>
 <div class="section" id="design-discussions">
 <h2><a class="toc-backref" href="#id17">Design discussions</a><a class="headerlink" href="#design-discussions" title="Permalink to this headline">¶</a></h2>
@@ -543,7 +543,7 @@ we include both imports and <code class="docutils literal notranslate"><span cla
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="vcf.html" class="btn btn-neutral float-left" title="Reading VCF" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="generated/sgkit.variables.window_stop_spec.html" class="btn btn-neutral float-left" title="sgkit.variables.window_stop_spec" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

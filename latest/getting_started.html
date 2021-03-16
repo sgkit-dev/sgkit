@@ -39,7 +39,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="API reference" href="api.html" />
+    <link rel="next" title="User Guide" href="user_guide.html" />
     <link rel="prev" title="sgkit: Statistical genetics toolkit in Python" href="index.html" /> 
 </head>
 
@@ -54,9 +54,12 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> sgkit
+            <a href="index.html">
           
 
+          
+            
+            <img src="_static/sgkit_white_trnsprnt.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -89,27 +92,20 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#data-structures">Data structures</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#genetic-methods">Genetic methods</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dataset-merge-behavior">Dataset merge behavior</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#missing-data">Missing data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#windowing">Windowing</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cohorts">Cohorts</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#chaining-operations">Chaining operations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#chunked-arrays">Chunked arrays</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#monitoring-operations">Monitoring operations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#visualizing-computations">Visualizing computations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#custom-naming-conventions">Custom naming conventions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#genetic-variables">Genetic variables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#reading-genetic-data">Reading genetic data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-structures">Data structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#genetic-methods">Genetic methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#missing-data">Missing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#windowing">Windowing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cohorts">Cohorts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chaining-operations">Chaining operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chunked-arrays">Chunked arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#genetic-variables">Genetic variables</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vcf.html">Reading VCF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to sgkit</a></li>
 </ul>
 
@@ -184,23 +180,15 @@
 <p class="topic-title">Table of contents:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#installation" id="id5">Installation</a></p></li>
-<li><p><a class="reference internal" href="#overview" id="id6">Overview</a></p>
-<ul>
+<li><p><a class="reference internal" href="#overview" id="id6">Overview</a></p></li>
 <li><p><a class="reference internal" href="#data-structures" id="id7">Data structures</a></p></li>
 <li><p><a class="reference internal" href="#genetic-methods" id="id8">Genetic methods</a></p></li>
-<li><p><a class="reference internal" href="#dataset-merge-behavior" id="id9">Dataset merge behavior</a></p></li>
-<li><p><a class="reference internal" href="#missing-data" id="id10">Missing data</a></p></li>
-<li><p><a class="reference internal" href="#windowing" id="id11">Windowing</a></p></li>
-<li><p><a class="reference internal" href="#cohorts" id="id12">Cohorts</a></p></li>
-<li><p><a class="reference internal" href="#chaining-operations" id="id13">Chaining operations</a></p></li>
-<li><p><a class="reference internal" href="#chunked-arrays" id="id14">Chunked arrays</a></p></li>
-<li><p><a class="reference internal" href="#monitoring-operations" id="id15">Monitoring operations</a></p></li>
-<li><p><a class="reference internal" href="#visualizing-computations" id="id16">Visualizing computations</a></p></li>
-<li><p><a class="reference internal" href="#custom-naming-conventions" id="id17">Custom naming conventions</a></p></li>
-<li><p><a class="reference internal" href="#genetic-variables" id="id18">Genetic variables</a></p></li>
-<li><p><a class="reference internal" href="#reading-genetic-data" id="id19">Reading genetic data</a></p></li>
-</ul>
-</li>
+<li><p><a class="reference internal" href="#missing-data" id="id9">Missing data</a></p></li>
+<li><p><a class="reference internal" href="#windowing" id="id10">Windowing</a></p></li>
+<li><p><a class="reference internal" href="#cohorts" id="id11">Cohorts</a></p></li>
+<li><p><a class="reference internal" href="#chaining-operations" id="id12">Chaining operations</a></p></li>
+<li><p><a class="reference internal" href="#chunked-arrays" id="id13">Chunked arrays</a></p></li>
+<li><p><a class="reference internal" href="#genetic-variables" id="id14">Genetic variables</a></p></li>
 </ul>
 </div>
 <div class="section" id="installation">
@@ -223,8 +211,9 @@ to facilitate interactive analysis of large-scale datasets. The main libraries w
 <li><p><a class="reference external" href="https://pandas.pydata.org/docs/">Pandas</a>: Tabular data frame manipulation</p></li>
 <li><p><a class="reference external" href="https://docs.cupy.dev/en/stable/">CuPy</a>: Numpy-like array interface for CUDA GPUs</p></li>
 </ul>
+</div>
 <div class="section" id="data-structures">
-<h3><a class="toc-backref" href="#id7">Data structures</a><a class="headerlink" href="#data-structures" title="Permalink to this headline">¶</a></h3>
+<h2><a class="toc-backref" href="#id7">Data structures</a><a class="headerlink" href="#data-structures" title="Permalink to this headline">¶</a></h2>
 <p>Sgkit uses Xarray <a class="reference external" href="http://xarray.pydata.org/en/stable/data-structures.html#dataset">Dataset</a> objects to model genetic data.
 Users are free to manipulate quantities within these objects as they see fit and a set of conventions for variable names,
 dimensions and underlying data types is provided to aid in workflow standardization. The example below illustrates a
@@ -432,7 +421,7 @@ sgkit utilities as well as the Pandas/Xarray integration:</p>
 <p>This last example alludes to representations of missing data that are explained further in <a class="reference internal" href="#missing-data"><span class="std std-ref">Missing data</span></a>.</p>
 </div>
 <div class="section" id="genetic-methods">
-<h3><a class="toc-backref" href="#id8">Genetic methods</a><a class="headerlink" href="#genetic-methods" title="Permalink to this headline">¶</a></h3>
+<h2><a class="toc-backref" href="#id8">Genetic methods</a><a class="headerlink" href="#genetic-methods" title="Permalink to this headline">¶</a></h2>
 <p>Genetic methods in sgkit are nearly always applied to individual <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> objects.  For a full list of
 available methods, see <a class="reference internal" href="api.html#api-methods"><span class="std std-ref">Methods</span></a>.</p>
 <p>In this example, the <code class="docutils literal notranslate"><span class="pre">variant_stats</span></code> method is applied to a dataset to compute a number of statistics
@@ -459,102 +448,22 @@ across samples for each individual variant:</p>
 </pre></div>
 </div>
 <p>There are two ways that the results of every function are handled – either they are merged with the provided
-dataset or they are returned in a separate dataset.  See <a class="reference internal" href="#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> below for more details.</p>
-</div>
-<div class="section" id="dataset-merge-behavior">
-<span id="dataset-merge"></span><h3><a class="toc-backref" href="#id9">Dataset merge behavior</a><a class="headerlink" href="#dataset-merge-behavior" title="Permalink to this headline">¶</a></h3>
-<p>Generally, method functions in sgkit compute some new variables based on the
-input dataset, then return a new output dataset that consists of the input
-dataset plus the new computed variables. The input dataset is unchanged.</p>
-<p>This behavior can be controlled using the <code class="docutils literal notranslate"><span class="pre">merge</span></code> parameter. If set to <code class="docutils literal notranslate"><span class="pre">True</span></code>
-(the default), then the function will merge the input dataset and the computed
-output variables into a single dataset. Output variables will overwrite any
-input variables with the same name, and a warning will be issued in this case.
-If <code class="docutils literal notranslate"><span class="pre">False</span></code>, the function will return only the computed output variables.</p>
-<p>Examples:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [26]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
-
-<span class="gp">In [27]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=.</span><span class="mi">1</span><span class="p">)</span>
-
-<span class="gp">In [28]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[[</span><span class="s1">&#39;variant_allele&#39;</span><span class="p">,</span> <span class="s1">&#39;call_genotype&#39;</span><span class="p">]]</span>
-
-<span class="gp">In [29]: </span><span class="n">ds</span>
-<span class="gh">Out[29]: </span><span class="go"></span>
-<span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:         (alleles: 2, ploidy: 2, samples: 50, variants: 100)</span>
-<span class="go">Dimensions without coordinates: alleles, ploidy, samples, variants</span>
-<span class="go">Data variables:</span>
-<span class="go">    variant_allele  (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; b&#39;C&#39; ... b&#39;T&#39; b&#39;T&#39; b&#39;A&#39;</span>
-<span class="go">    call_genotype   (variants, samples, ploidy) int8 0 0 1 0 1 0 ... 0 1 0 1 0 0</span>
-<span class="go">Attributes:</span>
-<span class="go">    contigs:  [0]</span>
-
-<span class="go"># By default, new variables are merged into a copy of the provided dataset</span>
-<span class="gp">In [30]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-
-<span class="gp">In [31]: </span><span class="n">ds</span>
-<span class="gh">Out[31]: </span><span class="go"></span>
-<span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:               (alleles: 2, ploidy: 2, samples: 50, variants: 100)</span>
-<span class="go">Dimensions without coordinates: alleles, ploidy, samples, variants</span>
-<span class="go">Data variables:</span>
-<span class="go">    variant_allele_count  (variants, alleles) uint64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
-<span class="go">    call_allele_count     (variants, samples, alleles) uint8 dask.array&lt;chunksize=(100, 50, 2), meta=np.ndarray&gt;</span>
-<span class="go">    variant_allele        (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; b&#39;C&#39; ... b&#39;T&#39; b&#39;A&#39;</span>
-<span class="go">    call_genotype         (variants, samples, ploidy) int8 0 0 1 0 1 ... 0 1 0 0</span>
-<span class="go">Attributes:</span>
-<span class="go">    contigs:  [0]</span>
-
-<span class="go"># If an existing variable would be re-defined, a warning is thrown</span>
-<span class="gp">In [32]: </span><span class="kn">import</span> <span class="nn">warnings</span>
-
-<span class="gp">In [33]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-
-<span class="gp">In [34]: </span><span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">w</span><span class="p">:</span>
-<span class="gp">   ....: </span>    <span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-<span class="gp">   ....: </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="gp">   ....: </span>
-<span class="go">MergeWarning: The following variables in the input dataset will be replaced in the output: variant_allele_count</span>
-
-<span class="go"># New variables can also be returned in their own dataset</span>
-<span class="gp">In [35]: </span><span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="gh">Out[35]: </span><span class="go"></span>
-<span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:               (alleles: 2, variants: 100)</span>
-<span class="go">Dimensions without coordinates: alleles, variants</span>
-<span class="go">Data variables:</span>
-<span class="go">    variant_allele_count  (variants, alleles) uint64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
-
-<span class="go"># This can be useful for merging multiple datasets manually</span>
-<span class="gp">In [36]: </span><span class="n">ds</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
-<span class="gh">Out[36]: </span><span class="go"></span>
-<span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:               (alleles: 2, ploidy: 2, samples: 50, variants: 100)</span>
-<span class="go">Dimensions without coordinates: alleles, ploidy, samples, variants</span>
-<span class="go">Data variables:</span>
-<span class="go">    variant_allele_count  (variants, alleles) uint64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
-<span class="go">    call_allele_count     (variants, samples, alleles) uint8 dask.array&lt;chunksize=(100, 50, 2), meta=np.ndarray&gt;</span>
-<span class="go">    variant_allele        (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; b&#39;C&#39; ... b&#39;T&#39; b&#39;A&#39;</span>
-<span class="go">    call_genotype         (variants, samples, ploidy) int8 0 0 1 0 1 ... 0 1 0 0</span>
-<span class="go">Attributes:</span>
-<span class="go">    contigs:  [0]</span>
-</pre></div>
-</div>
+dataset or they are returned in a separate dataset.  See <a class="reference internal" href="user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
 </div>
 <div class="section" id="missing-data">
-<span id="id2"></span><h3><a class="toc-backref" href="#id10">Missing data</a><a class="headerlink" href="#missing-data" title="Permalink to this headline">¶</a></h3>
+<span id="id2"></span><h2><a class="toc-backref" href="#id9">Missing data</a><a class="headerlink" href="#missing-data" title="Permalink to this headline">¶</a></h2>
 <p>Missing data in sgkit is represented using a sentinel value within data arrays
 (<code class="docutils literal notranslate"><span class="pre">-1</span></code> in integer arrays and <code class="docutils literal notranslate"><span class="pre">NaN</span></code> in float arrays) as well as a companion boolean mask array
 (<code class="docutils literal notranslate"><span class="pre">True</span></code> where data is missing).  These sentinel values are handled transparently in
 most sgkit functions and where this isn’t possible, limitations related to it are documented
 along with potential workarounds.</p>
 <p>This example demonstrates one such function where missing calls are ignored:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [37]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [26]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 
-<span class="gp">In [38]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_ploidy</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">In [27]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_ploidy</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
-<span class="gp">In [39]: </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span>
-<span class="gh">Out[39]: </span><span class="go"></span>
+<span class="gp">In [28]: </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span>
+<span class="gh">Out[28]: </span><span class="go"></span>
 <span class="go">&lt;xarray.DataArray &#39;call_genotype&#39; (variants: 1, samples: 4, ploidy: 2)&gt;</span>
 <span class="go">array([[[ 0,  0],</span>
 <span class="go">        [ 1,  1],</span>
@@ -566,8 +475,8 @@ along with potential workarounds.</p>
 <span class="go">    comment:       Call genotype. Encoded as allele values (0 for the referen...</span>
 
 <span class="go"># Here, you can see that the missing calls above are not included in the allele counts</span>
-<span class="gp">In [40]: </span><span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span>
-<span class="gh">Out[40]: </span><span class="go"></span>
+<span class="gp">In [29]: </span><span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span>
+<span class="gh">Out[29]: </span><span class="go"></span>
 <span class="go">&lt;xarray.DataArray &#39;variant_allele_count&#39; (variants: 1, alleles: 2)&gt;</span>
 <span class="go">dask.array&lt;sum-aggregate, shape=(1, 2), dtype=uint64, chunksize=(1, 2), chunktype=numpy.ndarray&gt;</span>
 <span class="go">Dimensions without coordinates: variants, alleles</span>
@@ -585,15 +494,15 @@ about compiling their own functions (see <a class="reference internal" href="use
 Using Xarray functions and the boolean mask is generally enough to accomplish most tasks, and this
 mask is often more efficient to operate on due to its high on-disk compression ratio.  This example
 shows how it can be used in the context of doing something simple like counting heterozygous calls:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [41]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [30]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 
-<span class="gp">In [42]: </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="gp">In [31]: </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
-<span class="gp">In [43]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_ploidy</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=.</span><span class="mi">2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">In [32]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_ploidy</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=.</span><span class="mi">2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="go"># This array contains the allele indexes called for a sample</span>
-<span class="gp">In [44]: </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span>
-<span class="gh">Out[44]: </span><span class="go"></span>
+<span class="gp">In [33]: </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span>
+<span class="gh">Out[33]: </span><span class="go"></span>
 <span class="go">&lt;xarray.DataArray &#39;call_genotype&#39; (variants: 1, samples: 4, ploidy: 2)&gt;</span>
 <span class="go">array([[[-1,  0],</span>
 <span class="go">        [ 1,  1],</span>
@@ -605,8 +514,8 @@ shows how it can be used in the context of doing something simple like counting 
 <span class="go">    comment:       Call genotype. Encoded as allele values (0 for the referen...</span>
 
 <span class="go"># This array represents only locations where the above calls are missing</span>
-<span class="gp">In [45]: </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype_mask</span>
-<span class="gh">Out[45]: </span><span class="go"></span>
+<span class="gp">In [34]: </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype_mask</span>
+<span class="gh">Out[34]: </span><span class="go"></span>
 <span class="go">&lt;xarray.DataArray &#39;call_genotype_mask&#39; (variants: 1, samples: 4, ploidy: 2)&gt;</span>
 <span class="go">array([[[ True, False],</span>
 <span class="go">        [False, False],</span>
@@ -614,36 +523,36 @@ shows how it can be used in the context of doing something simple like counting 
 <span class="go">        [False, False]]])</span>
 <span class="go">Dimensions without coordinates: variants, samples, ploidy</span>
 <span class="go">Attributes:</span>
-<span class="go">    comment:  TODO</span>
+<span class="go">    comment:  A flag for each call indicating which values are missing.</span>
 
 <span class="go"># Determine which calls are heterozygous</span>
-<span class="gp">In [46]: </span><span class="n">is_heterozygous</span> <span class="o">=</span> <span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">In [35]: </span><span class="n">is_heterozygous</span> <span class="o">=</span> <span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 
-<span class="gp">In [47]: </span><span class="n">is_heterozygous</span>
-<span class="gh">Out[47]: </span><span class="go"></span>
+<span class="gp">In [36]: </span><span class="n">is_heterozygous</span>
+<span class="gh">Out[36]: </span><span class="go"></span>
 <span class="go">&lt;xarray.DataArray &#39;call_genotype&#39; (variants: 1, samples: 4)&gt;</span>
 <span class="go">array([[ True, False,  True, False]])</span>
 <span class="go">Dimensions without coordinates: variants, samples</span>
 
 <span class="go"># Count the number of heterozygous samples for the lone variant</span>
-<span class="gp">In [48]: </span><span class="n">is_heterozygous</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="gh">Out[48]: </span><span class="go">2</span>
+<span class="gp">In [37]: </span><span class="n">is_heterozygous</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gh">Out[37]: </span><span class="go">2</span>
 
 <span class="go"># This is almost correct except that the calls for the first sample aren&#39;t</span>
 <span class="go"># really heterozygous, one of them is just missing.  Conditional logic like</span>
 <span class="go"># this can be used to isolate those values and replace them in the result:</span>
-<span class="gp">In [49]: </span><span class="n">xr</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype_mask</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;ploidy&#39;</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="n">is_heterozygous</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="gh">Out[49]: </span><span class="go">1</span>
+<span class="gp">In [38]: </span><span class="n">xr</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype_mask</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;ploidy&#39;</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="n">is_heterozygous</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gh">Out[38]: </span><span class="go">1</span>
 
 <span class="go"># Now the result is correct -- only the third sample is heterozygous so the count should be 1.</span>
 <span class="go"># This how many sgkit functions handle missing data internally:</span>
-<span class="gp">In [50]: </span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_n_het</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="gh">Out[50]: </span><span class="go">1</span>
+<span class="gp">In [39]: </span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_n_het</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gh">Out[39]: </span><span class="go">1</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="windowing">
-<h3><a class="toc-backref" href="#id11">Windowing</a><a class="headerlink" href="#windowing" title="Permalink to this headline">¶</a></h3>
+<h2><a class="toc-backref" href="#id10">Windowing</a><a class="headerlink" href="#windowing" title="Permalink to this headline">¶</a></h2>
 <p>It is common to compute statistics in windows along the genome. Some <a class="reference internal" href="api.html#api-methods"><span class="std std-ref">Methods</span></a> in sgkit
 are “windowing aware” and will compute values for windows defined in a dataset. If no windows
 are defined then the values will typically be computed for each variant. It is therefore
@@ -655,18 +564,18 @@ optional <code class="docutils literal notranslate"><span class="pre">step</span
 it is the same as the <code class="docutils literal notranslate"><span class="pre">size</span></code>, giving contiguous windows.</p>
 <p>This example shows the effect of computing the diversity statistic: first with no windows defined,
 then with windows.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [51]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [40]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 
-<span class="gp">In [52]: </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="gp">In [41]: </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
-<span class="gp">In [53]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="gp">In [42]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 
 <span class="go"># Define a single cohort for all samples</span>
-<span class="gp">In [54]: </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_cohort&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s1">&#39;samples&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span>
+<span class="gp">In [43]: </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_cohort&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s1">&#39;samples&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span>
 
 <span class="go"># The diversity statistic is computed for every variant since no windows are defined</span>
-<span class="gp">In [55]: </span><span class="n">sg</span><span class="o">.</span><span class="n">diversity</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="gh">Out[55]: </span><span class="go"></span>
+<span class="gp">In [44]: </span><span class="n">sg</span><span class="o">.</span><span class="n">diversity</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gh">Out[44]: </span><span class="go"></span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
 <span class="go">Dimensions:         (cohorts: 1, variants: 100)</span>
 <span class="go">Dimensions without coordinates: cohorts, variants</span>
@@ -675,11 +584,11 @@ then with windows.</p>
 
 <span class="go"># Define windows of size 20 variants. This creates a new dimension called `windows`, and</span>
 <span class="go"># some new variables for internal use.</span>
-<span class="gp">In [56]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="gp">In [45]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
 
 <span class="go"># The diversity statistic is now computed for every window</span>
-<span class="gp">In [57]: </span><span class="n">sg</span><span class="o">.</span><span class="n">diversity</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="gh">Out[57]: </span><span class="go"></span>
+<span class="gp">In [46]: </span><span class="n">sg</span><span class="o">.</span><span class="n">diversity</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gh">Out[46]: </span><span class="go"></span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
 <span class="go">Dimensions:         (cohorts: 1, windows: 5)</span>
 <span class="go">Dimensions without coordinates: cohorts, windows</span>
@@ -689,20 +598,20 @@ then with windows.</p>
 </div>
 </div>
 <div class="section" id="cohorts">
-<h3><a class="toc-backref" href="#id12">Cohorts</a><a class="headerlink" href="#cohorts" title="Permalink to this headline">¶</a></h3>
+<h2><a class="toc-backref" href="#id11">Cohorts</a><a class="headerlink" href="#cohorts" title="Permalink to this headline">¶</a></h2>
 <p>During analysis we often want to be able to group samples into populations, and compute statistics
 based on these groups. Groups of samples are referred to as <em>cohorts</em> in sgkit.</p>
 <p>Cohorts are defined by a mapping from samples to cohort index. The following example creates
 a <code class="docutils literal notranslate"><span class="pre">sample_cohort</span></code> variable to group a dataset of ten samples into three cohorts. Note that first
 value is <code class="docutils literal notranslate"><span class="pre">-1</span></code>, which means the corresponding sample is not in any of the three cohorts, and
 will be ignored when computing cohort statistics.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [58]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [47]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 
-<span class="gp">In [59]: </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="gp">In [48]: </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
-<span class="gp">In [60]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">In [49]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 
-<span class="gp">In [61]: </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_cohort&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span>
+<span class="gp">In [50]: </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_cohort&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Typically the <code class="docutils literal notranslate"><span class="pre">sample_cohort</span></code> variable is derived from a dataframe that has the sample/cohort
@@ -713,16 +622,16 @@ produces statistics for <em>pairs</em> of cohorts, which is represented as a var
 for any pair of cohorts.</p>
 <p>It’s convenient to name cohorts, to avoid errors that can occur when using index values. This
 example shows how to give cohorts names.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [62]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [51]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
 
-<span class="gp">In [63]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">Fst</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">In [52]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">Fst</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 
-<span class="gp">In [64]: </span><span class="n">cohort_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Africa&quot;</span><span class="p">,</span> <span class="s2">&quot;Asia&quot;</span><span class="p">,</span> <span class="s2">&quot;Europe&quot;</span><span class="p">]</span>
+<span class="gp">In [53]: </span><span class="n">cohort_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Africa&quot;</span><span class="p">,</span> <span class="s2">&quot;Asia&quot;</span><span class="p">,</span> <span class="s2">&quot;Europe&quot;</span><span class="p">]</span>
 
-<span class="gp">In [65]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">({</span><span class="s2">&quot;cohorts_0&quot;</span><span class="p">:</span> <span class="n">cohort_names</span><span class="p">,</span> <span class="s2">&quot;cohorts_1&quot;</span><span class="p">:</span> <span class="n">cohort_names</span><span class="p">})</span>
+<span class="gp">In [54]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">({</span><span class="s2">&quot;cohorts_0&quot;</span><span class="p">:</span> <span class="n">cohort_names</span><span class="p">,</span> <span class="s2">&quot;cohorts_1&quot;</span><span class="p">:</span> <span class="n">cohort_names</span><span class="p">})</span>
 
-<span class="gp">In [66]: </span><span class="n">ds</span><span class="o">.</span><span class="n">stat_Fst</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">cohorts_0</span><span class="o">=</span><span class="s2">&quot;Africa&quot;</span><span class="p">,</span> <span class="n">cohorts_1</span><span class="o">=</span><span class="s2">&quot;Asia&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
-<span class="gh">Out[66]: </span><span class="go">array([ 0.00823045, -0.02510823,  0.04372041,  0.12240725, -0.11305475])</span>
+<span class="gp">In [55]: </span><span class="n">ds</span><span class="o">.</span><span class="n">stat_Fst</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">cohorts_0</span><span class="o">=</span><span class="s2">&quot;Africa&quot;</span><span class="p">,</span> <span class="n">cohorts_1</span><span class="o">=</span><span class="s2">&quot;Asia&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+<span class="gh">Out[55]: </span><span class="go">array([ 0.00823045, -0.02510823,  0.04372041,  0.12240725, -0.11305475])</span>
 </pre></div>
 </div>
 <p>Methods that work with cohorts will, by default, operate over all cohorts at once. Sometimes
@@ -730,20 +639,20 @@ however you might only want to run the computation for a subset of cohorts, in w
 explicitly specify the cohorts when calling the function.</p>
 </div>
 <div class="section" id="chaining-operations">
-<h3><a class="toc-backref" href="#id13">Chaining operations</a><a class="headerlink" href="#chaining-operations" title="Permalink to this headline">¶</a></h3>
+<h2><a class="toc-backref" href="#id12">Chaining operations</a><a class="headerlink" href="#chaining-operations" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://tomaugspurger.github.io/method-chaining.html">Method chaining</a> is a common practice with Python
 data tools that improves code readability and reduces the probability of introducing accidental namespace collisions.
 Sgkit functions are compatible with this idiom by default and this example shows to use it in conjunction with
 Xarray and Pandas operations in a single pipeline:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [67]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [56]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 
-<span class="gp">In [68]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=.</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">In [57]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=.</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="go"># Use `pipe` to apply a single sgkit function to a dataset</span>
-<span class="gp">In [69]: </span><span class="n">ds_qc</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">)</span><span class="o">.</span><span class="n">drop_dims</span><span class="p">(</span><span class="s1">&#39;samples&#39;</span><span class="p">)</span>
+<span class="gp">In [58]: </span><span class="n">ds_qc</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">)</span><span class="o">.</span><span class="n">drop_dims</span><span class="p">(</span><span class="s1">&#39;samples&#39;</span><span class="p">)</span>
 
-<span class="gp">In [70]: </span><span class="n">ds_qc</span>
-<span class="gh">Out[70]: </span><span class="go"></span>
+<span class="gp">In [59]: </span><span class="n">ds_qc</span>
+<span class="gh">Out[59]: </span><span class="go"></span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
 <span class="go">Dimensions:                   (alleles: 2, variants: 100)</span>
 <span class="go">Dimensions without coordinates: alleles, variants</span>
@@ -764,8 +673,8 @@ Xarray and Pandas operations in a single pipeline:</p>
 <span class="go">    contigs:  [0]</span>
 
 <span class="go"># Show statistics for one of the arrays to be used as a filter</span>
-<span class="gp">In [71]: </span><span class="n">ds_qc</span><span class="o">.</span><span class="n">variant_call_rate</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
-<span class="gh">Out[71]: </span><span class="go"></span>
+<span class="gp">In [60]: </span><span class="n">ds_qc</span><span class="o">.</span><span class="n">variant_call_rate</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="gh">Out[60]: </span><span class="go"></span>
 <span class="go">count    100.000000</span>
 <span class="go">mean       0.804800</span>
 <span class="go">std        0.063125</span>
@@ -778,7 +687,7 @@ Xarray and Pandas operations in a single pipeline:</p>
 
 <span class="go"># Build a pipeline that filters on call rate and computes Fst between two cohorts</span>
 <span class="go"># for windows of size 20 variants</span>
-<span class="gp">In [72]: </span><span class="p">(</span>
+<span class="gp">In [61]: </span><span class="p">(</span>
 <span class="gp">   ....: </span>    <span class="n">ds</span>
 <span class="gp">   ....: </span>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">)</span>
 <span class="gp">   ....: </span>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="k">lambda</span> <span class="n">ds</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">variants</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">variant_call_rate</span> <span class="o">&gt;</span> <span class="o">.</span><span class="mi">8</span><span class="p">))</span>
@@ -788,7 +697,7 @@ Xarray and Pandas operations in a single pipeline:</p>
 <span class="gp">   ....: </span>    <span class="o">.</span><span class="n">stat_Fst</span><span class="o">.</span><span class="n">values</span>
 <span class="gp">   ....: </span><span class="p">)</span>
 <span class="gp">   ....: </span>
-<span class="gh">Out[72]: </span><span class="go"></span>
+<span class="gh">Out[61]: </span><span class="go"></span>
 <span class="go">array([[[        nan,  0.00091611],</span>
 <span class="go">        [ 0.00091611,         nan]],</span>
 
@@ -801,10 +710,10 @@ Xarray and Pandas operations in a single pipeline:</p>
 </div>
 <p>This is possible because sgkit functions nearly always take a <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> as the first argument, create new
 variables, and then merge these new variables into a copy of the provided dataset in the returned value.
-See <a class="reference internal" href="#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
+See <a class="reference internal" href="user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
 </div>
 <div class="section" id="chunked-arrays">
-<h3><a class="toc-backref" href="#id14">Chunked arrays</a><a class="headerlink" href="#chunked-arrays" title="Permalink to this headline">¶</a></h3>
+<h2><a class="toc-backref" href="#id13">Chunked arrays</a><a class="headerlink" href="#chunked-arrays" title="Permalink to this headline">¶</a></h2>
 <p>Chunked arrays are required when working on large datasets. Libraries for managing chunked arrays such as <a class="reference external" href="https://docs.dask.org/en/latest/array.html">Dask Array</a>
 and <a class="reference external" href="https://zarr.readthedocs.io/en/stable/">Zarr</a> make it possible to implement blockwise algorithms that operate
 on subsets of arrays (in parallel) without ever requiring them to fit entirely in memory.</p>
@@ -819,15 +728,15 @@ until one of the following occurs:</p>
 <li><p>Individual dask arrays are retrieved through the <code class="docutils literal notranslate"><span class="pre">DataArray.data</span></code> attribute and forced to evaluate via <a class="reference external" href="https://distributed.dask.org/en/latest/api.html#distributed.Client.compute">Client.compute</a>, <a class="reference external" href="https://tutorial.dask.org/03_array.html#Example">dask.array.Array.compute</a> or by coercing them to another array type (e.g. using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html">np.asarray</a>)</p></li>
 </ul>
 <p>This example shows a few of these features:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [73]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [62]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 
-<span class="gp">In [74]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=.</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">In [63]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=.</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="go"># Chunk our original in-memory dataset using a blocksize of 50 in all dimensions.</span>
-<span class="gp">In [75]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">chunks</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="gp">In [64]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">chunks</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 
-<span class="gp">In [76]: </span><span class="n">ds</span>
-<span class="gh">Out[76]: </span><span class="go"></span>
+<span class="gp">In [65]: </span><span class="n">ds</span>
+<span class="gh">Out[65]: </span><span class="go"></span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
 <span class="go">Dimensions:             (alleles: 2, ploidy: 2, samples: 50, variants: 100)</span>
 <span class="go">Dimensions without coordinates: alleles, ploidy, samples, variants</span>
@@ -842,8 +751,8 @@ until one of the following occurs:</p>
 <span class="go">    contigs:  [0]</span>
 
 <span class="go"># Show the chunked array representing base pair position</span>
-<span class="gp">In [77]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span>
-<span class="gh">Out[77]: </span><span class="go"></span>
+<span class="gp">In [66]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span>
+<span class="gh">Out[66]: </span><span class="go"></span>
 <span class="go">&lt;xarray.DataArray &#39;variant_position&#39; (variants: 100)&gt;</span>
 <span class="go">dask.array&lt;xarray-variant_position, shape=(100,), dtype=int64, chunksize=(50,), chunktype=numpy.ndarray&gt;</span>
 <span class="go">Dimensions without coordinates: variants</span>
@@ -851,16 +760,16 @@ until one of the following occurs:</p>
 <span class="go">    comment:  The reference position of the variant.</span>
 
 <span class="go"># Call compute via the dask.array API</span>
-<span class="gp">In [78]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">compute</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]</span>
-<span class="gh">Out[78]: </span><span class="go">array([0, 1, 2, 3, 4])</span>
+<span class="gp">In [67]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">compute</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="gh">Out[67]: </span><span class="go">array([0, 1, 2, 3, 4])</span>
 
 <span class="go"># Coerce to numpy via Xarray</span>
-<span class="gp">In [79]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
-<span class="gh">Out[79]: </span><span class="go">array([0, 1, 2, 3, 4])</span>
+<span class="gp">In [68]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="gh">Out[68]: </span><span class="go">array([0, 1, 2, 3, 4])</span>
 
 <span class="go"># Compute without unboxing from xarray.DataArray</span>
-<span class="gp">In [80]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">compute</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]</span>
-<span class="gh">Out[80]: </span><span class="go"></span>
+<span class="gp">In [69]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">compute</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="gh">Out[69]: </span><span class="go"></span>
 <span class="go">&lt;xarray.DataArray &#39;variant_position&#39; (variants: 5)&gt;</span>
 <span class="go">array([0, 1, 2, 3, 4])</span>
 <span class="go">Dimensions without coordinates: variants</span>
@@ -877,85 +786,9 @@ for more examples and information, as well as the Dask tutorials on
 <a class="reference external" href="https://tutorial.dask.org/03_array.html#dask.array-contains-these-algorithms">delayed array execution</a> and
 <a class="reference external" href="https://tutorial.dask.org/01x_lazy.html">lazy execution in Dask graphs</a>.</p>
 </div>
-<div class="section" id="monitoring-operations">
-<h3><a class="toc-backref" href="#id15">Monitoring operations</a><a class="headerlink" href="#monitoring-operations" title="Permalink to this headline">¶</a></h3>
-<p>The simplest way to monitor operations when running sgkit on a single host is to use <a class="reference external" href="https://docs.dask.org/en/latest/diagnostics-local.html">Dask local diagnostics</a>.</p>
-<p>As an example, this code shows how to track the progress of a single sgkit function:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [81]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
-
-<span class="gp">In [82]: </span><span class="kn">from</span> <span class="nn">dask.diagnostics</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
-
-<span class="gp">In [83]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=.</span><span class="mi">1</span><span class="p">)</span>
-
-<span class="gp">In [84]: </span><span class="k">with</span> <span class="n">ProgressBar</span><span class="p">():</span>
-<span class="gp">   ....: </span>    <span class="n">ac</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-<span class="gp">   ....: </span>
-
-<span class="go">[                                        ] | 0% Completed |  0.0s</span>
-<span class="go">[########################################] | 100% Completed |  0.1s</span>
-
-<span class="gp">In [85]: </span><span class="n">ac</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
-<span class="gh">Out[85]: </span><span class="go"></span>
-<span class="go">&lt;xarray.DataArray &#39;variant_allele_count&#39; (variants: 5, alleles: 2)&gt;</span>
-<span class="go">array([[50, 40],</span>
-<span class="go">       [40, 52],</span>
-<span class="go">       [48, 45],</span>
-<span class="go">       [37, 51],</span>
-<span class="go">       [45, 46]], dtype=uint64)</span>
-<span class="go">Dimensions without coordinates: variants, alleles</span>
-<span class="go">Attributes:</span>
-<span class="go">    comment:  Variant allele counts. With shape (variants, alleles) and value...</span>
-</pre></div>
-</div>
-<p>Monitoring resource utilization with <a class="reference external" href="https://docs.dask.org/en/latest/diagnostics-local.html#resourceprofiler">ResourceProfiler</a>
-and profiling task streams with <a class="reference external" href="https://docs.dask.org/en/latest/diagnostics-local.html#profiler">Profiler</a> are other
-commonly used local diagnostics.</p>
-<p>For similar monitoring in a distributed cluster, see <a class="reference external" href="https://docs.dask.org/en/latest/diagnostics-distributed.html">Dask distributed diagnostics</a>.</p>
-</div>
-<div class="section" id="visualizing-computations">
-<h3><a class="toc-backref" href="#id16">Visualizing computations</a><a class="headerlink" href="#visualizing-computations" title="Permalink to this headline">¶</a></h3>
-<p>Dask allows you to <a class="reference external" href="https://docs.dask.org/en/latest/graphviz.html">visualize the task graph</a> of a computation
-before running it, which can be handy when trying to understand where the bottlenecks are.</p>
-<p>In most cases the number of tasks is too large to visualize, so it’s useful to restrict
-the graph just a few chunks, as shown in this example.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [86]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
-
-<span class="gp">In [87]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=.</span><span class="mi">1</span><span class="p">)</span>
-
-<span class="go"># Rechunk to illustrate multiple tasks</span>
-<span class="gp">In [88]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">chunk</span><span class="p">({</span><span class="s2">&quot;variants&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="s2">&quot;samples&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">})</span>
-
-<span class="gp">In [89]: </span><span class="n">counts</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_call_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">call_allele_count</span><span class="o">.</span><span class="n">data</span>
-
-<span class="go"># Restrict to first 3 chunks in variants dimension</span>
-<span class="gp">In [90]: </span><span class="n">counts</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[:</span><span class="mi">3</span><span class="o">*</span><span class="n">counts</span><span class="o">.</span><span class="n">chunksize</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="o">...</span><span class="p">]</span>
-
-<span class="gp">In [91]: </span><span class="n">counts</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">optimize_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gh">Out[91]: </span><span class="go">&lt;IPython.core.display.Image object&gt;</span>
-</pre></div>
-</div>
-<a class="reference internal image-reference" href="_images/mydask.png"><img alt="_images/mydask.png" class="align-center" src="_images/mydask.png" style="width: 600px;" /></a>
-<p>By passing keyword arguments to <code class="docutils literal notranslate"><span class="pre">visualize</span></code> we can see the order tasks will run in:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="go"># Graph where colors indicate task ordering</span>
-<span class="gp">In [92]: </span><span class="n">counts</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;order&quot;</span><span class="p">,</span> <span class="n">optimize_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;order&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;autumn&quot;</span><span class="p">,</span> <span class="n">node_attr</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;penwidth&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">})</span>
-<span class="gh">Out[92]: </span><span class="go">&lt;IPython.core.display.Image object&gt;</span>
-</pre></div>
-</div>
-<a class="reference internal image-reference" href="_images/order.png"><img alt="_images/order.png" class="align-center" src="_images/order.png" style="width: 600px;" /></a>
-<p>Task order number is shown in circular boxes, colored from red to yellow.</p>
-</div>
-<div class="section" id="custom-naming-conventions">
-<h3><a class="toc-backref" href="#id17">Custom naming conventions</a><a class="headerlink" href="#custom-naming-conventions" title="Permalink to this headline">¶</a></h3>
-<p>TODO: Show to use a custom naming convention via Xarray renaming features.</p>
-</div>
 <div class="section" id="genetic-variables">
-<span id="id4"></span><h3><a class="toc-backref" href="#id18">Genetic variables</a><a class="headerlink" href="#genetic-variables" title="Permalink to this headline">¶</a></h3>
+<span id="id4"></span><h2><a class="toc-backref" href="#id14">Genetic variables</a><a class="headerlink" href="#genetic-variables" title="Permalink to this headline">¶</a></h2>
 <p>TODO: Link to and explain <code class="docutils literal notranslate"><span class="pre">sgkit.variables</span></code> in <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/276">https://github.com/pystatgen/sgkit/pull/276</a>.</p>
-</div>
-<div class="section" id="reading-genetic-data">
-<h3><a class="toc-backref" href="#id19">Reading genetic data</a><a class="headerlink" href="#reading-genetic-data" title="Permalink to this headline">¶</a></h3>
-<p>TODO: Explain sgkit-{plink,vcf,bgen} once repos are consolidated and move this to a more prominent position in the docs.</p>
-</div>
 </div>
 </div>
 
@@ -965,7 +798,7 @@ the graph just a few chunks, as shown in this example.</p>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="api.html" class="btn btn-neutral float-right" title="API reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="user_guide.html" class="btn btn-neutral float-right" title="User Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="index.html" class="btn btn-neutral float-left" title="sgkit: Statistical genetics toolkit in Python" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

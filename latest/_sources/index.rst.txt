@@ -18,9 +18,9 @@ both popular Python genetics toolkits with a respective focus on population and 
     :caption: Contents:
 
     getting_started
-    api
     user_guide
     vcf
+    api
     contributing
 
 Indices and tables
