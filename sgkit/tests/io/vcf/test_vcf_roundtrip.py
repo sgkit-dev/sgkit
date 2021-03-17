@@ -112,36 +112,65 @@ def test_DP_field(shared_datadir, tmpdir):
 
 
 @pytest.mark.parametrize(
-    "vcf_file",
+    "vcf_file,allel_exclude_fields,sgkit_exclude_fields",
     [
-        "sample.vcf.gz",
-        "CEUTrio.20.21.gatk3.4.g.vcf.bgz",
-        "mixed.vcf.gz",
-        "1000G.phase3.broad.withGenotypes.chr20.10100000.vcf.gz",
-        "NA12878.prod.chr20snippet.g.vcf.gz",
+        ("sample.vcf.gz", None, None),
+        ("mixed.vcf.gz", None, None),
+        # exclude PL since it has Number=G, which is not yet supported
+        ("CEUTrio.20.21.gatk3.4.g.vcf.bgz", ["calldata/PL"], ["FORMAT/PL"]),
     ],
 )
-def test_all_fields(shared_datadir, tmpdir, vcf_file):
+def test_all_fields(
+    shared_datadir, tmpdir, vcf_file, allel_exclude_fields, sgkit_exclude_fields
+):
+    # change scikit-allel type defaults back to the VCF default
     types = {
         "calldata/DP": "i4",
         "calldata/GQ": "i4",
         "calldata/HQ": "i4",
-    }  # override scikit-allel defaults
+        "calldata/AD": "i4",
+    }
     allel_vcfzarr_path = create_allel_vcfzarr(
-        shared_datadir, tmpdir, fields=["*"], types=types
+        shared_datadir,
+        tmpdir,
+        vcf_file=vcf_file,
+        fields=["*"],
+        exclude_fields=allel_exclude_fields,
+        types=types,
     )
 
     field_defs = {
         "INFO/AF": {"Number": "A"},
         "INFO/AC": {"Number": "A"},
+        "FORMAT/AD": {"Number": "R"},
         "FORMAT/HQ": {"dimension": "haplotypes"},
+        "FORMAT/SB": {"dimension": "strand_biases"},
     }
     allel_ds = sg.read_vcfzarr(allel_vcfzarr_path, field_defs=field_defs)
 
     sg_vcfzarr_path = create_sg_vcfzarr(
-        shared_datadir, tmpdir, fields=["INFO/*", "FORMAT/*"], field_defs=field_defs
+        shared_datadir,
+        tmpdir,
+        vcf_file=vcf_file,
+        fields=["INFO/*", "FORMAT/*"],
+        exclude_fields=sgkit_exclude_fields,
+        field_defs=field_defs,
+        truncate_calls=True,
     )
     sg_ds = sg.load_dataset(str(sg_vcfzarr_path))
     sg_ds = sg_ds.drop_vars("call_genotype_phased")  # not included in scikit-allel
+
+    # scikit-allel only records contigs for which there are actual variants,
+    # whereas sgkit records contigs from the header
+    allel_ds_contigs = set(allel_ds.attrs["contigs"])
+    sg_ds_contigs = set(sg_ds.attrs["contigs"])
+    assert allel_ds_contigs <= sg_ds_contigs
+    del allel_ds.attrs["contigs"]
+    del sg_ds.attrs["contigs"]
+
+    if allel_ds_contigs < sg_ds_contigs:
+        # variant_contig variables are not comparable, so remove them before comparison
+        del allel_ds["variant_contig"]
+        del sg_ds["variant_contig"]
 
     assert_identical(allel_ds, sg_ds)
