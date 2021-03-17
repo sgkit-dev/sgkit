@@ -14,6 +14,7 @@ def pairwise_distance(
     x: ArrayLike,
     metric: MetricTypes = "euclidean",
     split_every: typing.Optional[int] = None,
+    target="cpu"
 ) -> da.array:
     """Calculates the pairwise distance between all pairs of row vectors in the
     given two dimensional array x.
@@ -60,6 +61,8 @@ def pairwise_distance(
 
         Omit to let dask heuristically decide a good default. A default can
         also be set globally with the split_every key in dask.config.
+    target
+        The architechture to run the calculation on, either of cpu or gpu
 
     Returns
     -------
@@ -94,12 +97,17 @@ def pairwise_distance(
            [ 2.62956526e-01,  0.00000000e+00,  2.14285714e-01],
            [ 2.82353505e-03,  2.14285714e-01,  0.00000000e+00]])
     """
+    valid_targets = {'cpu', 'gpu'}
+    if target not in valid_targets:
+        raise ValueError(f"Invalid Target, expected one of {valid_targets}, got: {target}")
     try:
-        getattr(metrics, f"{metric}_map")
-        getattr(metrics, f"{metric}_reduce")
+        map_func_name = f"{metric}_map_{target}"
+        reduce_func_name = f"{metric}_reduce_{target}"
+        getattr(metrics, map_func_name)
+        getattr(metrics, reduce_func_name)
         n_map_param = metrics.N_MAP_PARAM[metric]
     except AttributeError:
-        raise NotImplementedError(f"Given metric: {metric} is not implemented.")
+        raise NotImplementedError(f"Given metric: '{metric}' is not implemented for '{target}'.")
 
     x = da.asarray(x)
     if x.ndim != 2:
@@ -110,19 +118,32 @@ def pairwise_distance(
     # graph serialisation/deserialisation time significantly
     metric_param = np.empty(n_map_param, dtype=x.dtype)
 
-    def _pairwise(f: ArrayLike, g: ArrayLike) -> ArrayLike:
-        result: ArrayLike = getattr(metrics, f"{metric}_map")(
+    def _pairwise_cpu(f: ArrayLike, g: ArrayLike) -> ArrayLike:
+        result: ArrayLike = getattr(metrics, map_func_name)(
             f[:, None, :], g, metric_param
         )
         # Adding a new axis to help combine chunks along this axis in the
         # reduction step (see the _aggregate and _combine functions below).
         return result[..., np.newaxis]
 
+    def _pairwise_gpu(f, g):
+        f.strides = (f.strides[-1] * f.shape[-1], f.strides[-1])
+        g.strides = (g.strides[-1] * g.shape[-1], g.strides[-1])
+        f = np.ascontiguousarray(f)
+        g = np.ascontiguousarray(g)
+        result = getattr(metrics, map_func_name)(f, g)
+        result = result.reshape(result.shape[:-1] + (result.shape[-1], 1))
+        return result[..., np.newaxis]
+
+    pairwise_func = _pairwise_cpu
+    if target == "gpu":
+        pairwise_func = _pairwise_gpu
+
     # concatenate in blockwise leads to high memory footprints, so instead
     # we perform blockwise without contraction followed by reduction.
     # More about this issue: https://github.com/dask/dask/issues/6874
     out = da.blockwise(
-        _pairwise,
+        pairwise_func,
         "ijk",
         x,
         "ik",
@@ -137,7 +158,7 @@ def pairwise_distance(
         producing the final output. It is always invoked, even when the reduced
         Array counts a single chunk along the reduced axes."""
         x_chunk = x_chunk.reshape(x_chunk.shape[:-2] + (-1, n_map_param))
-        result: ArrayLike = getattr(metrics, f"{metric}_reduce")(x_chunk)
+        result: ArrayLike = getattr(metrics, reduce_func_name)(x_chunk)
         return result
 
     def _chunk(x_chunk: ArrayLike, **_: typing.Any) -> ArrayLike:
