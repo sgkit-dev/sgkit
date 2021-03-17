@@ -95,8 +95,8 @@ def pairwise_distance(
            [ 2.82353505e-03,  2.14285714e-01,  0.00000000e+00]])
     """
     try:
-        metric_map_func = getattr(metrics, f"{metric}_map")
-        metric_reduce_func = getattr(metrics, f"{metric}_reduce")
+        getattr(metrics, f"{metric}_map")
+        getattr(metrics, f"{metric}_reduce")
         n_map_param = metrics.N_MAP_PARAM[metric]
     except AttributeError:
         raise NotImplementedError(f"Given metric: {metric} is not implemented.")
@@ -111,7 +111,9 @@ def pairwise_distance(
     metric_param = np.empty(n_map_param, dtype=x.dtype)
 
     def _pairwise(f: ArrayLike, g: ArrayLike) -> ArrayLike:
-        result: ArrayLike = metric_map_func(f[:, None, :], g, metric_param)
+        result: ArrayLike = getattr(metrics, f"{metric}_map")(
+            f[:, None, :], g, metric_param
+        )
         # Adding a new axis to help combine chunks along this axis in the
         # reduction step (see the _aggregate and _combine functions below).
         return result[..., np.newaxis]
@@ -135,7 +137,7 @@ def pairwise_distance(
         producing the final output. It is always invoked, even when the reduced
         Array counts a single chunk along the reduced axes."""
         x_chunk = x_chunk.reshape(x_chunk.shape[:-2] + (-1, n_map_param))
-        result: ArrayLike = metric_reduce_func(x_chunk)
+        result: ArrayLike = getattr(metrics, f"{metric}_reduce")(x_chunk)
         return result
 
     def _chunk(x_chunk: ArrayLike, **_: typing.Any) -> ArrayLike:
