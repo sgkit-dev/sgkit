@@ -13,6 +13,8 @@ env:
 
 jobs:
   build:
+    # This workflow only runs on the origin org
+    if: github.repository_owner == 'pystatgen'  
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
