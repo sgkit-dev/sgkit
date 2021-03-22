@@ -8,13 +8,14 @@ from sgkit.distance import metrics
 from sgkit.typing import ArrayLike
 
 MetricTypes = Literal["euclidean", "correlation"]
+TargetTypes = Literal["cpu", "gpu"]
 
 
 def pairwise_distance(
     x: ArrayLike,
     metric: MetricTypes = "euclidean",
     split_every: typing.Optional[int] = None,
-    target="cpu"
+    target: TargetTypes = "cpu"
 ) -> da.array:
     """Calculates the pairwise distance between all pairs of row vectors in the
     given two dimensional array x.
@@ -62,7 +63,7 @@ def pairwise_distance(
         Omit to let dask heuristically decide a good default. A default can
         also be set globally with the split_every key in dask.config.
     target
-        The architechture to run the calculation on, either of cpu or gpu
+        The architecture to run the calculation on, either of cpu or gpu
 
     Returns
     -------
