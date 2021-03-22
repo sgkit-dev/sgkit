@@ -3,6 +3,8 @@ import typing
 import dask.array as da
 import numpy as np
 import pytest
+
+from numba import cuda
 from scipy.spatial.distance import (  # type: ignore
     correlation,
     euclidean,
@@ -10,8 +12,20 @@ from scipy.spatial.distance import (  # type: ignore
     squareform,
 )
 
-from sgkit.distance.api import MetricTypes, pairwise_distance
+from sgkit.distance.api import MetricTypes, pairwise_distance, TargetTypes
 from sgkit.typing import ArrayLike
+
+
+def detect_cuda_driver():
+    try:
+        return cuda.detect()
+    except cuda.CudaSupportError:
+        return False
+
+
+def skip_gpu_tests_if_no_gpu(target):
+    if target == "gpu" and not detect_cuda_driver():
+        pytest.skip("Cuda driver not found")
 
 
 def get_vectors(
@@ -64,16 +78,21 @@ def create_distance_matrix(
 
 
 @pytest.mark.parametrize(
-    "size, chunk",
+    "size, chunk, target",
     [
-        ((100, 100), (20, 10)),
-        ((100, 100), (25, 10)),
-        ((100, 100), (50, 10)),
+        ((100, 100), (20, 10), "cpu"),
+        ((100, 100), (25, 10), "cpu"),
+        ((100, 100), (50, 10), "cpu"),
+
+        ((100, 100), (25, 10), "gpu"),
+        ((100, 100), (50, 10), "gpu"),
+        ((100, 100), (50, 10), "gpu"),
     ],
 )
 def test_distance_correlation(
-    size: typing.Tuple[int, int], chunk: typing.Tuple[int, int]
+        size: typing.Tuple[int, int], chunk: typing.Tuple[int, int], target: TargetTypes
 ) -> None:
+    skip_gpu_tests_if_no_gpu(target)
     x = get_vectors(size=size, chunk=chunk)
     distance_matrix = pairwise_distance(x, metric="correlation")
     distance_array = pdist(x, metric="correlation")
@@ -82,18 +101,23 @@ def test_distance_correlation(
 
 
 @pytest.mark.parametrize(
-    "size, chunk",
+    "size, chunk, target",
     [
-        ((100, 100), (20, 10)),
-        ((100, 100), (25, 10)),
-        ((100, 100), (50, 10)),
+        ((100, 100), (20, 10), "cpu"),
+        ((100, 100), (25, 10), "cpu"),
+        ((100, 100), (50, 10), "cpu"),
+
+        ((100, 100), (25, 10), "gpu"),
+        ((100, 100), (50, 10), "gpu"),
+        ((100, 100), (50, 10), "gpu"),
     ],
 )
 def test_distance_euclidean(
-    size: typing.Tuple[int, int], chunk: typing.Tuple[int, int]
+    size: typing.Tuple[int, int], chunk: typing.Tuple[int, int], target: TargetTypes
 ) -> None:
+    skip_gpu_tests_if_no_gpu(target)
     x = get_vectors(size=size, chunk=chunk)
-    distance_matrix = pairwise_distance(x, metric="euclidean")
+    distance_matrix = pairwise_distance(x, metric="euclidean", target=target)
     expected_matrix = squareform(pdist(x))
     np.testing.assert_almost_equal(distance_matrix, expected_matrix)
 

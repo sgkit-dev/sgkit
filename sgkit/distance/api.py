@@ -2,6 +2,9 @@ import typing
 
 import dask.array as da
 import numpy as np
+
+from numba import cuda
+from numba.cuda import CudaSupportError
 from typing_extensions import Literal
 
 from sgkit.distance import metrics
