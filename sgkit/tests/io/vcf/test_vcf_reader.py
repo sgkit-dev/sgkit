@@ -623,6 +623,7 @@ def test_vcf_to_zarr__field_number_A(shared_datadir, tmp_path):
     vcf_to_zarr(
         path,
         output,
+        max_alt_alleles=2,
         fields=["INFO/AC"],
         field_defs={"INFO/AC": {"Number": "A"}},
     )
@@ -631,15 +632,15 @@ def test_vcf_to_zarr__field_number_A(shared_datadir, tmp_path):
     assert_array_equal(
         ds["variant_AC"],
         [
-            [-1, -1, -1],
-            [-1, -1, -1],
-            [-1, -1, -1],
-            [-1, -1, -1],
-            [-1, -1, -1],
-            [-1, -1, -1],
-            [3, 1, -1],
-            [-1, -1, -1],
-            [-1, -1, -1],
+            [-1, -1],
+            [-1, -1],
+            [-1, -1],
+            [-1, -1],
+            [-1, -1],
+            [-1, -1],
+            [3, 1],
+            [-1, -1],
+            [-1, -1],
         ],
     )
     assert (
