@@ -74,23 +74,30 @@ def _get_vcf_field_defs(vcf: VCF, category: str) -> Dict[str, Any]:
     }
 
 
-def _expand_wildcard_fields(vcf: VCF, fields: Sequence[str]) -> Sequence[str]:
+def _normalize_fields(vcf: VCF, fields: Sequence[str]) -> Sequence[str]:
     """Expand 'INFO/*' and 'FORMAT/*' to the full list of fields from the VCF header."""
+    info_fields = [f"INFO/{key}" for key in _get_vcf_field_defs(vcf, "INFO").keys()]
+    format_fields = set(
+        [f"FORMAT/{key}" for key in _get_vcf_field_defs(vcf, "FORMAT").keys()]
+    )
+    # genotype is handled specially
+    format_fields = format_fields - set(("FORMAT/GT",))
+
     new_fields = []
     for field in fields:
+        if not any(field.startswith(prefix) for prefix in ["INFO/", "FORMAT/"]):
+            raise ValueError("VCF field must be prefixed with 'INFO/' or 'FORMAT/'")
+        category = field.split("/")[0]
+        key = field[len(f"{category}/") :]
         if field == "INFO/*":
-            info_fields = [
-                f"INFO/{key}" for key in _get_vcf_field_defs(vcf, "INFO").keys()
-            ]
             new_fields.extend(info_fields)
         elif field == "FORMAT/*":
-            format_fields = set(
-                [f"FORMAT/{key}" for key in _get_vcf_field_defs(vcf, "FORMAT").keys()]
-            )
-            # genotype is handled specially
-            format_fields = format_fields - set(("FORMAT/GT",))
             new_fields.extend(format_fields)
         else:
+            if field not in info_fields and field not in format_fields:
+                raise ValueError(
+                    f"{category} field '{key}' is not defined in the header."
+                )
             new_fields.append(field)
     return new_fields
 
@@ -129,13 +136,9 @@ class VcfFieldHandler:
     def for_field(
         cls, vcf: VCF, field: str, chunk_length: int, field_def: Dict[str, Any]
     ) -> "VcfFieldHandler":
-        if not any(field.startswith(prefix) for prefix in ["INFO/", "FORMAT/"]):
-            raise ValueError("VCF field must be prefixed with 'INFO/' or 'FORMAT/'")
         category = field.split("/")[0]
         vcf_field_defs = _get_vcf_field_defs(vcf, category)
         key = field[len(f"{category}/") :]
-        if key not in vcf_field_defs:
-            raise ValueError(f"{category} field '{key}' is not defined in the header.")
         vcf_number = field_def.get("Number", vcf_field_defs[key]["Number"])
         dimension, size = vcf_number_to_dimension_and_size(
             vcf_number, category, key, field_def, DEFAULT_MAX_ALT_ALLELES
@@ -233,6 +236,7 @@ def vcf_to_zarr_sequential(
     truncate_calls: bool = False,
     max_alt_alleles: int = DEFAULT_MAX_ALT_ALLELES,
     fields: Optional[Sequence[str]] = None,
+    exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
     add_str_max_length_attrs: bool = False,
 ) -> None:
@@ -261,7 +265,10 @@ def vcf_to_zarr_sequential(
         call_genotype_phased = np.empty((chunk_length, n_sample), dtype=bool)
 
         fields = fields or []
-        fields = _expand_wildcard_fields(vcf, fields)
+        fields = _normalize_fields(vcf, fields)
+        exclude_fields = exclude_fields or []
+        exclude_fields = _normalize_fields(vcf, exclude_fields)
+        fields = [f for f in fields if f not in exclude_fields]
         field_defs = field_defs or {}
         field_handlers = [
             VcfFieldHandler.for_field(
@@ -390,6 +397,7 @@ def vcf_to_zarr_parallel(
     truncate_calls: bool = False,
     max_alt_alleles: int = DEFAULT_MAX_ALT_ALLELES,
     fields: Optional[Sequence[str]] = None,
+    exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> None:
     """Convert specified regions of one or more VCF files to zarr files, then concat, rechunk, write to zarr"""
@@ -413,6 +421,7 @@ def vcf_to_zarr_parallel(
             truncate_calls=truncate_calls,
             max_alt_alleles=max_alt_alleles,
             fields=fields,
+            exclude_fields=exclude_fields,
             field_defs=field_defs,
         )
 
@@ -435,6 +444,7 @@ def vcf_to_zarrs(
     truncate_calls: bool = False,
     max_alt_alleles: int = DEFAULT_MAX_ALT_ALLELES,
     fields: Optional[Sequence[str]] = None,
+    exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> Sequence[str]:
     """Convert VCF files to multiple Zarr on-disk stores, one per region.
@@ -538,6 +548,7 @@ def vcf_to_zarrs(
                 truncate_calls=truncate_calls,
                 max_alt_alleles=max_alt_alleles,
                 fields=fields,
+                exclude_fields=exclude_fields,
                 field_defs=field_defs,
                 add_str_max_length_attrs=True,
             )
@@ -562,6 +573,7 @@ def vcf_to_zarr(
     truncate_calls: bool = False,
     max_alt_alleles: int = DEFAULT_MAX_ALT_ALLELES,
     fields: Optional[Sequence[str]] = None,
+    exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> None:
     """Convert VCF files to a single Zarr on-disk store.
@@ -684,6 +696,7 @@ def vcf_to_zarr(
         truncate_calls=truncate_calls,
         max_alt_alleles=max_alt_alleles,
         fields=fields,
+        exclude_fields=exclude_fields,
         field_defs=field_defs,
     )
 
