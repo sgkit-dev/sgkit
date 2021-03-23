@@ -171,6 +171,10 @@ def test_gwas_linear_regression__validate_statistics(ds):
     )
     validate(dfp, dft)
 
+    ds = _generate_test_dataset(p=0)
+    dfp, dft = _get_statistics(ds, covariates=[], add_intercept=True)
+    validate(dfp, dft)
+
 
 def test_gwas_linear_regression__lazy_results(ds):
     res = gwas_linear_regression(
@@ -218,6 +222,14 @@ def test_gwas_linear_regression__scalar_vars(ds: xr.Dataset) -> None:
         ds, dosage="dosage", covariates=["covar_0"], traits=["trait_0"]
     )
     xr.testing.assert_equal(res_scalar, res_list)
+
+
+def test_gwas_linear_regression__raise_on_no_intercept_and_empty_covariates():
+    ds = _generate_test_dataset(p=0)
+    with pytest.raises(
+        ValueError, match="add_intercept must be True if no covariates specified"
+    ):
+        _get_statistics(ds, covariates=[], add_intercept=False)
 
 
 def test_linear_regression__raise_on_non_2D():
