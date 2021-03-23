@@ -15,6 +15,7 @@ from .stats.aggregation import (
     count_call_alleles,
     count_cohort_alleles,
     count_variant_alleles,
+    individual_heterozygosity,
     sample_stats,
     variant_stats,
 )
@@ -23,7 +24,15 @@ from .stats.conversion import convert_probability_to_call
 from .stats.hwe import hardy_weinberg_test
 from .stats.pc_relate import pc_relate
 from .stats.pca import pca
-from .stats.popgen import Fst, Garud_H, Tajimas_D, divergence, diversity, pbs
+from .stats.popgen import (
+    Fst,
+    Garud_H,
+    Tajimas_D,
+    divergence,
+    diversity,
+    observed_heterozygosity,
+    pbs,
+)
 from .stats.preprocessing import filter_partial_calls
 from .stats.regenie import regenie
 from .testing import simulate_genotype_call_dataset
@@ -51,6 +60,7 @@ __all__ = [
     "read_vcfzarr",
     "regenie",
     "hardy_weinberg_test",
+    "individual_heterozygosity",
     "sample_stats",
     "variant_stats",
     "diversity",
@@ -62,6 +72,7 @@ __all__ = [
     "pc_relate",
     "simulate_genotype_call_dataset",
     "variables",
+    "observed_heterozygosity",
     "pca",
     "window",
     "load_dataset",

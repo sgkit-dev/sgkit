@@ -318,6 +318,17 @@ completely missing genotype calls.
     )
 )
 
+call_heterozygosity, call_heterozygosity_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "call_heterozygosity",
+        kind="f",
+        ndim=2,
+        __doc__="""
+Observed heterozygosity of each call genotype.
+""",
+    )
+)
+
 call_ploidy, call_ploidy_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "call_ploidy",
@@ -604,6 +615,20 @@ stat_Garud_h2_h1, stat_Garud_h2_h1_spec = SgkitVariables.register_variable(
         ndim={1, 2},
         kind="f",
         __doc__="""Garud H2/H1 statistic for cohorts.""",
+    )
+)
+
+(
+    stat_observed_heterozygosity,
+    stat_observed_heterozygosity_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_observed_heterozygosity",
+        kind="f",
+        ndim=2,
+        __doc__="""
+Observed heterozygosity for cohorts.
+""",
     )
 )
 
