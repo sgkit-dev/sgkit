@@ -209,9 +209,15 @@ def gwas_linear_regression(
 
     G = _get_loop_covariates(ds, dosage=dosage, call_genotype=call_genotype)
 
-    X = da.asarray(concat_2d(ds[list(covariates)], dims=("samples", "covariates")))
-    if add_intercept:
-        X = da.concatenate([da.ones((X.shape[0], 1), dtype=X.dtype), X], axis=1)
+    if len(covariates) == 0:
+        if add_intercept:
+            X = da.ones((ds.dims["samples"], 1), dtype=float)
+        else:
+            raise ValueError("add_intercept must be True if no covariates specified")
+    else:
+        X = da.asarray(concat_2d(ds[list(covariates)], dims=("samples", "covariates")))
+        if add_intercept:
+            X = da.concatenate([da.ones((X.shape[0], 1), dtype=X.dtype), X], axis=1)
     # Note: dask qr decomp (used by lstsq) requires no chunking in one
     # dimension, and because dim 0 will be far greater than the number
     # of covariates for the large majority of use cases, chunking
