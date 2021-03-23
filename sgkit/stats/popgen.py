@@ -19,7 +19,11 @@ from sgkit.utils import (
 from sgkit.window import has_windows, window_statistic
 
 from .. import variables
-from .aggregation import count_cohort_alleles, count_variant_alleles
+from .aggregation import (
+    count_cohort_alleles,
+    count_variant_alleles,
+    individual_heterozygosity,
+)
 
 
 def diversity(
@@ -909,4 +913,157 @@ def Garud_H(
         }
     )
 
+    return conditional_merge_datasets(ds, new_ds, merge)
+
+
+@guvectorize(  # type: ignore
+    [
+        "void(float64[:], int32[:], uint8[:], float64[:])",
+        "void(float64[:], int64[:], uint8[:], float64[:])",
+    ],
+    "(n),(n),(c)->(c)",
+    nopython=True,
+    cache=True,
+)
+def _cohort_observed_heterozygosity(
+    hi: ArrayLike, cohorts: ArrayLike, _: ArrayLike, out: ArrayLike
+) -> None:  # pragma: no cover
+    """Generalized U-function for computing cohort observed heterozygosity.
+
+    Parameters
+    ----------
+    hi
+        Individual sample heterozygosity of shape (samples,).
+    cohorts
+        Cohort indexes for samples of shape (samples,).
+    _
+        Dummy variable of type `uint8` and shape (cohorts,) used to
+        define the number of cohorts.
+    out
+        Observed heterozygosity with shape (cohorts,) and values corresponding
+        to the mean individual heterozygosity of each cohort.
+    """
+    out[:] = 0
+    _[:] = 0
+    n_samples = len(hi)
+    n_cohorts = len(out)
+    for i in range(n_samples):
+        h = hi[i]
+        if not np.isnan(h):
+            c = cohorts[i]
+            out[c] += h
+            _[c] += 1
+    for j in range(n_cohorts):
+        n = _[j]
+        if n:
+            out[j] /= n
+        else:
+            out[j] = np.nan
+
+
+def observed_heterozygosity(
+    ds: Dataset,
+    *,
+    call_heterozygosity: Hashable = variables.call_heterozygosity,
+    merge: bool = True,
+) -> Dataset:
+    """Compute per cohort observed heterozygosity.
+
+    By default, values of this statistic are calculated per variant.
+    To compute values in windows, call :func:`window` before calling
+    this function.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing genotype calls.
+    call_heterozygosity
+        Input variable name holding call_heterozygosity as defined by
+        :data:`sgkit.variables.call_heterozygosity_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`individual_heterozygosity`.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+    Returns
+    -------
+    A dataset containing :data:`sgkit.variables.stat_heterozygosity_observed_spec`
+    of per cohort observed heterozygosity with shape (variants, cohorts)
+    containing values within the inteval [0, 1] or nan.
+
+    Examples
+    --------
+
+    >>> import numpy as np
+    >>> import sgkit as sg
+    >>> import xarray as xr
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
+
+    >>> # Divide samples into two cohorts
+    >>> sample_cohort = np.repeat([0, 1], ds.dims["samples"] // 2)
+    >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
+
+    >>> sg.observed_heterozygosity(ds)["stat_observed_heterozygosity"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[0.5, 1. ],
+        [1. , 0.5],
+        [0. , 1. ],
+        [0.5, 0.5],
+        [0.5, 0.5]])
+
+    >>> # Divide into windows of size three (variants)
+    >>> ds = sg.window(ds, size=3)
+    >>> sg.observed_heterozygosity(ds)["stat_observed_heterozygosity"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[1.5, 2.5],
+        [1. , 1. ]])
+    """
+    ds = define_variable_if_absent(
+        ds,
+        variables.call_heterozygosity,
+        call_heterozygosity,
+        individual_heterozygosity,
+    )
+    variables.validate(ds, {call_heterozygosity: variables.call_heterozygosity_spec})
+    hi = da.asarray(ds[call_heterozygosity])
+    sc = da.asarray(ds["sample_cohort"])
+    n_cohorts = sc.max().compute() + 1
+    shape = (hi.chunks[0], n_cohorts)
+    n = da.zeros(n_cohorts, dtype=np.uint8)
+    ho = da.map_blocks(
+        _cohort_observed_heterozygosity,
+        hi,
+        sc,
+        n,
+        chunks=shape,
+        drop_axis=1,
+        new_axis=1,
+        dtype=np.float64,
+    )
+    if has_windows(ds):
+        ho_sum = window_statistic(
+            ho,
+            np.sum,
+            ds.window_start.values,
+            ds.window_stop.values,
+            dtype=ho.dtype,
+            axis=0,
+        )
+        new_ds = create_dataset(
+            {
+                variables.stat_observed_heterozygosity: (
+                    ("windows", "cohorts"),
+                    ho_sum,
+                )
+            }
+        )
+    else:
+        new_ds = create_dataset(
+            {
+                variables.stat_observed_heterozygosity: (
+                    ("variants", "cohorts"),
+                    ho,
+                )
+            }
+        )
     return conditional_merge_datasets(ds, new_ds, merge)

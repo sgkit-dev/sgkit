@@ -712,3 +712,73 @@ def infer_sample_ploidy(
 
     new_ds = create_dataset({variables.sample_ploidy: sample_ploidy})
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+
+
+def individual_heterozygosity(
+    ds: Dataset,
+    *,
+    call_allele_count: Hashable = variables.call_allele_count,
+    merge: bool = True,
+) -> Dataset:
+    """Compute per sample observed heterozygosity.
+
+    Individual heterozygosity is defined as the probability that
+    two alleles drawn at random without replacement are not identical
+    in state. Therefore, individual heterozygosity is defined for
+    diploid and polyploid calls but will return nan in the case of
+    haploid calls.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing genotype calls.
+    call_allele_count
+        Input variable name holding call_allele_count as defined by
+        :data:`sgkit.variables.call_allele_count_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`count_call_alleles`.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+    Returns
+    -------
+    A dataset containing :data:`sgkit.variables.call_heterozygosity_spec`
+    of per genotype observed heterozygosity with shape (variants, samples)
+    containing values within the inteval [0, 1] or nan if ploidy < 2.
+
+    Examples
+    --------
+
+    >>> import sgkit as sg
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=4, n_sample=2, seed=1)
+    >>> sg.display_genotypes(ds) # doctest: +NORMALIZE_WHITESPACE
+    samples    S0   S1
+    variants
+    0         1/0  1/0
+    1         1/0  1/1
+    2         0/1  1/0
+    3         0/0  0/0
+
+    >>> sg.individual_heterozygosity(ds)["call_heterozygosity"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[1., 1.],
+           [1., 0.],
+           [1., 1.],
+           [0., 0.]])
+    """
+    ds = define_variable_if_absent(
+        ds, variables.call_allele_count, call_allele_count, count_call_alleles
+    )
+    variables.validate(ds, {call_allele_count: variables.call_allele_count_spec})
+
+    AC = da.asarray(ds.call_allele_count)
+    K = AC.sum(axis=-1)
+    # use nan denominator to avoid divide by zero with K - 1
+    K2 = da.where(K > 1, K, np.nan)
+    AF = AC / K2[..., None]
+    HI = (1 - da.sum(da.power(AF, 2), axis=-1)) * (K / (K2 - 1))
+    new_ds = create_dataset(
+        {variables.call_heterozygosity: (("variants", "samples"), HI)}
+    )
+    return conditional_merge_datasets(ds, new_ds, merge)
