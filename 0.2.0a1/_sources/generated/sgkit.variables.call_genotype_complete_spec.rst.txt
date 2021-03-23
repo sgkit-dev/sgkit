@@ -1,0 +1,6 @@
+﻿sgkit.variables.call\_genotype\_complete\_spec
+==============================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: call_genotype_complete_spec

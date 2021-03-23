@@ -1,0 +1,6 @@
+﻿sgkit.regenie
+=============
+
+.. currentmodule:: sgkit
+
+.. autofunction:: regenie

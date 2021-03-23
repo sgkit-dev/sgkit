@@ -1,0 +1,6 @@
+﻿sgkit.hardy\_weinberg\_test
+===========================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: hardy_weinberg_test

@@ -1,0 +1,6 @@
+﻿sgkit.Fst
+=========
+
+.. currentmodule:: sgkit
+
+.. autofunction:: Fst

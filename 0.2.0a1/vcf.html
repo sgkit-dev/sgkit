@@ -1,0 +1,913 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reading VCF</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.c441f2ba0852f4cabcb80105e3a46ae6.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/typehints.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API reference" href="api.html" />
+    <link rel="prev" title="User Guide" href="user_guide.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="index.html">
+  
+  <img src="_static/sgkit_trnsprnt.png" class="logo" alt="logo">
+  
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <p class="caption collapsible-parent">
+ <span class="caption-text">
+  Contents:
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="getting_started.html">
+   Getting Started
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="user_guide.html">
+   User Guide
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Reading VCF
+  </a>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="api.html">
+   API reference
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.io.bgen.bgen_to_zarr.html">
+     sgkit.io.bgen.bgen_to_zarr
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.io.bgen.read_bgen.html">
+     sgkit.io.bgen.read_bgen
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.io.bgen.rechunk_bgen.html">
+     sgkit.io.bgen.rechunk_bgen
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.io.plink.read_plink.html">
+     sgkit.io.plink.read_plink
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html">
+     sgkit.io.vcf.vcf_to_zarr
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.io.vcf.partition_into_regions.html">
+     sgkit.io.vcf.partition_into_regions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarrs.html">
+     sgkit.io.vcf.vcf_to_zarrs
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.io.vcf.zarrs_to_dataset.html">
+     sgkit.io.vcf.zarrs_to_dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.read_vcfzarr.html">
+     sgkit.read_vcfzarr
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.load_dataset.html">
+     sgkit.load_dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.save_dataset.html">
+     sgkit.save_dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.count_call_alleles.html">
+     sgkit.count_call_alleles
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.count_cohort_alleles.html">
+     sgkit.count_cohort_alleles
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.count_variant_alleles.html">
+     sgkit.count_variant_alleles
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.divergence.html">
+     sgkit.divergence
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.diversity.html">
+     sgkit.diversity
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.Fst.html">
+     sgkit.Fst
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.Garud_H.html">
+     sgkit.Garud_H
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.gwas_linear_regression.html">
+     sgkit.gwas_linear_regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.hardy_weinberg_test.html">
+     sgkit.hardy_weinberg_test
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.pc_relate.html">
+     sgkit.pc_relate
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.regenie.html">
+     sgkit.regenie
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.sample_stats.html">
+     sgkit.sample_stats
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.Tajimas_D.html">
+     sgkit.Tajimas_D
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variant_stats.html">
+     sgkit.variant_stats
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.convert_probability_to_call.html">
+     sgkit.convert_probability_to_call
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.display_genotypes.html">
+     sgkit.display_genotypes
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.filter_partial_calls.html">
+     sgkit.filter_partial_calls
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html">
+     sgkit.simulate_genotype_call_dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.window.html">
+     sgkit.window
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.base_prediction_spec.html">
+     sgkit.variables.base_prediction_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.call_allele_count_spec.html">
+     sgkit.variables.call_allele_count_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.call_dosage_spec.html">
+     sgkit.variables.call_dosage_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.call_dosage_mask_spec.html">
+     sgkit.variables.call_dosage_mask_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.call_genotype_complete_spec.html">
+     sgkit.variables.call_genotype_complete_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.call_genotype_complete_mask_spec.html">
+     sgkit.variables.call_genotype_complete_mask_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.call_genotype_spec.html">
+     sgkit.variables.call_genotype_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.call_genotype_mask_spec.html">
+     sgkit.variables.call_genotype_mask_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.call_genotype_phased_spec.html">
+     sgkit.variables.call_genotype_phased_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.call_genotype_probability_spec.html">
+     sgkit.variables.call_genotype_probability_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.call_genotype_probability_mask_spec.html">
+     sgkit.variables.call_genotype_probability_mask_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.cohort_allele_count_spec.html">
+     sgkit.variables.cohort_allele_count_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.covariates_spec.html">
+     sgkit.variables.covariates_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.dosage_spec.html">
+     sgkit.variables.dosage_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.genotype_counts_spec.html">
+     sgkit.variables.genotype_counts_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.loco_prediction_spec.html">
+     sgkit.variables.loco_prediction_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.meta_prediction_spec.html">
+     sgkit.variables.meta_prediction_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.pc_relate_phi_spec.html">
+     sgkit.variables.pc_relate_phi_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.sample_call_rate_spec.html">
+     sgkit.variables.sample_call_rate_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.sample_id_spec.html">
+     sgkit.variables.sample_id_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.sample_n_called_spec.html">
+     sgkit.variables.sample_n_called_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.sample_n_het_spec.html">
+     sgkit.variables.sample_n_het_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.sample_n_hom_alt_spec.html">
+     sgkit.variables.sample_n_hom_alt_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.sample_n_hom_ref_spec.html">
+     sgkit.variables.sample_n_hom_ref_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.sample_n_non_ref_spec.html">
+     sgkit.variables.sample_n_non_ref_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.sample_pcs_spec.html">
+     sgkit.variables.sample_pcs_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.stat_divergence_spec.html">
+     sgkit.variables.stat_divergence_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.stat_diversity_spec.html">
+     sgkit.variables.stat_diversity_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.stat_Fst_spec.html">
+     sgkit.variables.stat_Fst_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.stat_Garud_h1_spec.html">
+     sgkit.variables.stat_Garud_h1_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.stat_Garud_h12_spec.html">
+     sgkit.variables.stat_Garud_h12_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.stat_Garud_h123_spec.html">
+     sgkit.variables.stat_Garud_h123_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.stat_Garud_h2_h1_spec.html">
+     sgkit.variables.stat_Garud_h2_h1_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.stat_Tajimas_D_spec.html">
+     sgkit.variables.stat_Tajimas_D_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.traits_spec.html">
+     sgkit.variables.traits_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_allele_spec.html">
+     sgkit.variables.variant_allele_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_allele_count_spec.html">
+     sgkit.variables.variant_allele_count_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_allele_frequency_spec.html">
+     sgkit.variables.variant_allele_frequency_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_allele_total_spec.html">
+     sgkit.variables.variant_allele_total_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_beta_spec.html">
+     sgkit.variables.variant_beta_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_call_rate_spec.html">
+     sgkit.variables.variant_call_rate_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_contig_spec.html">
+     sgkit.variables.variant_contig_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_hwe_p_value_spec.html">
+     sgkit.variables.variant_hwe_p_value_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_id_spec.html">
+     sgkit.variables.variant_id_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_n_called_spec.html">
+     sgkit.variables.variant_n_called_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_n_het_spec.html">
+     sgkit.variables.variant_n_het_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_n_hom_alt_spec.html">
+     sgkit.variables.variant_n_hom_alt_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_n_hom_ref_spec.html">
+     sgkit.variables.variant_n_hom_ref_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_n_non_ref_spec.html">
+     sgkit.variables.variant_n_non_ref_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_p_value_spec.html">
+     sgkit.variables.variant_p_value_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_position_spec.html">
+     sgkit.variables.variant_position_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.variant_t_value_spec.html">
+     sgkit.variables.variant_t_value_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.window_start_spec.html">
+     sgkit.variables.window_start_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.window_stop_spec.html">
+     sgkit.variables.window_stop_spec
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="contributing.html">
+   Contributing to sgkit
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="_sources/vcf.rst.txt"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#highlights">
+   Highlights
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#installation">
+   Installation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#usage">
+   Usage
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#multiple-files">
+   Multiple files
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#partitioning">
+   Partitioning
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#chunk-sizes">
+   Chunk sizes
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#cloud-storage">
+   Cloud storage
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#low-level-operation">
+   Low-level operation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#polyploid-and-mixed-ploidy-vcf">
+   Polyploid and mixed-ploidy VCF
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="reading-vcf">
+<span id="vcf"></span><h1>Reading VCF<a class="headerlink" href="#reading-vcf" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="table-of-contents">
+<p class="topic-title">Table of contents:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#highlights" id="id1">Highlights</a></p></li>
+<li><p><a class="reference internal" href="#installation" id="id2">Installation</a></p></li>
+<li><p><a class="reference internal" href="#usage" id="id3">Usage</a></p></li>
+<li><p><a class="reference internal" href="#multiple-files" id="id4">Multiple files</a></p></li>
+<li><p><a class="reference internal" href="#partitioning" id="id5">Partitioning</a></p></li>
+<li><p><a class="reference internal" href="#chunk-sizes" id="id6">Chunk sizes</a></p></li>
+<li><p><a class="reference internal" href="#cloud-storage" id="id7">Cloud storage</a></p></li>
+<li><p><a class="reference internal" href="#low-level-operation" id="id8">Low-level operation</a></p></li>
+<li><p><a class="reference internal" href="#polyploid-and-mixed-ploidy-vcf" id="id9">Polyploid and mixed-ploidy VCF</a></p></li>
+</ul>
+</div>
+<p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function converts one or more VCF files to Zarr files stored in
+sgkit’s Xarray data representation.</p>
+<div class="section" id="highlights">
+<h2><a class="toc-backref" href="#id1">Highlights</a><a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Reads bgzip-compressed VCF and BCF files.</p></li>
+<li><p>Large VCF files can be partitioned into regions using a Tabix (<code class="docutils literal notranslate"><span class="pre">.tbi</span></code>) or CSI (<code class="docutils literal notranslate"><span class="pre">.csi</span></code>)
+index, and each region is processed in parallel using <a class="reference external" href="https://dask.org/">Dask</a>.</p></li>
+<li><p>VCF parsing is performed by <a class="reference external" href="https://github.com/brentp/cyvcf2">cyvcf2</a>,
+a Cython wrapper around <a class="reference external" href="https://github.com/samtools/htslib">htslib</a>,
+the industry-standard VCF library.</p></li>
+<li><p>Control over Zarr chunk sizes allows VCFs with a large number of samples
+to be converted efficiently.</p></li>
+<li><p>Input and output files can reside on local filesystems, Amazon S3, or
+Google Cloud Storage.</p></li>
+<li><p>Support for polyploid and mixed-ploidy genotypes.</p></li>
+</ul>
+</div>
+<div class="section" id="installation">
+<h2><a class="toc-backref" href="#id2">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>VCF support is an “extra” feature within sgkit and requires additional
+dependencies, notably <code class="docutils literal notranslate"><span class="pre">cyvcf2</span></code>.</p>
+<p>To install sgkit with VCF support using pip:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install &#39;sgkit[vcf]&#39;
+</pre></div>
+</div>
+<p>There are <a class="reference external" href="https://github.com/brentp/cyvcf2#installation">installation instructions for cyvcf2</a>,
+which may be helpful if you encounter errors during installation.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Reading VCFs is not supported on Windows, since <code class="docutils literal notranslate"><span class="pre">cyvcf2</span></code> and <code class="docutils literal notranslate"><span class="pre">htslib</span></code> do
+not <a class="reference external" href="https://github.com/brentp/cyvcf2/issues/90">currently work on Windows</a>.
+As a workaround, consider using scikit-allel’s <code class="docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code> function
+to write a VCF in Zarr format, followed by <a class="reference internal" href="generated/sgkit.read_vcfzarr.html#sgkit.read_vcfzarr" title="sgkit.read_vcfzarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.read_vcfzarr()</span></code></a> to
+read the VCF as a <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.17.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
+</div>
+</div>
+<div class="section" id="usage">
+<h2><a class="toc-backref" href="#id3">Usage</a><a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>To convert a single VCF or BCF file to Zarr, just specify the input and output file names:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">vcf_to_zarr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vcf_to_zarr</span><span class="p">(</span><span class="s2">&quot;CEUTrio.20.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="s2">&quot;output.zarr&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;output.zarr&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span>
+<span class="go">&lt;xarray.Dataset&gt;</span>
+<span class="go">Dimensions:               (alleles: 4, ploidy: 2, samples: 1, variants: 19910)</span>
+<span class="go">Dimensions without coordinates: alleles, ploidy, samples, variants</span>
+<span class="go">Data variables:</span>
+<span class="go">    call_genotype         (variants, samples, ploidy) int8 dask.array&lt;chunksize=(10000, 1, 2), meta=np.ndarray&gt;</span>
+<span class="go">    call_genotype_mask    (variants, samples, ploidy) bool dask.array&lt;chunksize=(10000, 1, 2), meta=np.ndarray&gt;</span>
+<span class="go">    call_genotype_phased  (variants, samples) bool dask.array&lt;chunksize=(10000, 1), meta=np.ndarray&gt;</span>
+<span class="go">    sample_id             (samples) &lt;U7 dask.array&lt;chunksize=(1,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_allele        (variants, alleles) object dask.array&lt;chunksize=(10000, 4), meta=np.ndarray&gt;</span>
+<span class="go">    variant_contig        (variants) int8 dask.array&lt;chunksize=(10000,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_id            (variants) object dask.array&lt;chunksize=(10000,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_id_mask       (variants) bool dask.array&lt;chunksize=(10000,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_position      (variants) int32 dask.array&lt;chunksize=(10000,), meta=np.ndarray&gt;</span>
+<span class="go">Attributes:</span>
+<span class="go">    contigs:                    [&#39;20&#39;, &#39;21&#39;]</span>
+<span class="go">    max_variant_allele_length:  48</span>
+<span class="go">    max_variant_id_length:      1</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function can accept multiple files, and furthermore, each of these
+files can be partitioned to enable parallel processing.</p>
+</div>
+<div class="section" id="multiple-files">
+<h2><a class="toc-backref" href="#id4">Multiple files</a><a class="headerlink" href="#multiple-files" title="Permalink to this headline">¶</a></h2>
+<p>If there are multiple files, then pass a list:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">vcf_to_zarr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vcf_to_zarr</span><span class="p">([</span><span class="s2">&quot;CEUTrio.20.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="s2">&quot;CEUTrio.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">],</span> <span class="s2">&quot;output.zarr&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Processing multiple inputs is more work than a single file, since behind the scenes each input is
+converted to a separate temporary Zarr file on disk, then these files are concatenated and rechunked
+to form the final output Zarr file.</p>
+<p>In the single file case, the input VCF is converted to the output Zarr file in a single sequential
+pass with no need for intermediate temporary files. For small files this is fine, but for very large
+files it’s a good idea to partition them so the conversion runs faster.</p>
+</div>
+<div class="section" id="partitioning">
+<h2><a class="toc-backref" href="#id5">Partitioning</a><a class="headerlink" href="#partitioning" title="Permalink to this headline">¶</a></h2>
+<p>Partitioning a large VCF file involves breaking it into a number of roughly equal-sized parts that can
+be processed in parallel. The parts are specified using genomic regions that follow the regions format
+used in <a class="reference external" href="http://samtools.github.io/bcftools/bcftools.html">bcftools</a>: <code class="docutils literal notranslate"><span class="pre">chr:beg-end</span></code>,
+where positions are 1-based and inclusive.</p>
+<p>All files to be partitioned must have either a Tabix (<code class="docutils literal notranslate"><span class="pre">.tbi</span></code>) or CSI (<code class="docutils literal notranslate"><span class="pre">.csi</span></code>) index. If both are present
+for a particular file, then Tabix is used for finding partitions.</p>
+<p>The <a class="reference internal" href="generated/sgkit.io.vcf.partition_into_regions.html#sgkit.io.vcf.partition_into_regions" title="sgkit.io.vcf.partition_into_regions"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.partition_into_regions()</span></code></a> function will create a list of region strings for a VCF
+file, given a desired number of parts to split the file into:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">partition_into_regions</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">partition_into_regions</span><span class="p">(</span><span class="s2">&quot;CEUTrio.20.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="n">num_parts</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">[&#39;20:1-10108928&#39;, &#39;20:10108929-10207232&#39;, &#39;20:10207233-&#39;, &#39;21:1-10027008&#39;, &#39;21:10027009-10043392&#39;, &#39;21:10043393-10108928&#39;, &#39;21:10108929-10141696&#39;, &#39;21:10141697-10174464&#39;, &#39;21:10174465-10190848&#39;, &#39;21:10190849-10207232&#39;, &#39;21:10207233-&#39;]</span>
+</pre></div>
+</div>
+<p>It’s important to note that the number of regions returned may not be exactly the number of parts
+requested: it may be more or less. However, it is guaranteed that the regions will be contiguous and
+will cover the whole VCF file.</p>
+<p>The region strings are passed to <code class="docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code> so it can process the parts in parallel:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">partition_into_regions</span><span class="p">,</span> <span class="n">vcf_to_zarr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regions</span> <span class="o">=</span> <span class="n">partition_into_regions</span><span class="p">(</span><span class="s2">&quot;CEUTrio.20.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="n">num_parts</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vcf_to_zarr</span><span class="p">(</span><span class="s2">&quot;CEUTrio.20.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="s2">&quot;output.zarr&quot;</span><span class="p">,</span> <span class="n">regions</span><span class="o">=</span><span class="n">regions</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It’s also possible to produce parts that have an approximate target size (in bytes). This is useful
+if you are partitioning multiple files, and want all the parts to be roughly the same size.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">partition_into_regions</span><span class="p">,</span> <span class="n">vcf_to_zarr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CEUTrio.20.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="s2">&quot;CEUTrio.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regions</span> <span class="o">=</span> <span class="p">[</span><span class="n">partition_into_regions</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">target_part_size</span><span class="o">=</span><span class="mi">100_000</span><span class="p">)</span> <span class="k">for</span> <span class="nb">input</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vcf_to_zarr</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="s2">&quot;output.zarr&quot;</span><span class="p">,</span> <span class="n">regions</span><span class="o">=</span><span class="n">regions</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The same result can be obtained more simply by specifying <code class="docutils literal notranslate"><span class="pre">target_part_size</span></code> in the call to
+<code class="docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">vcf_to_zarr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CEUTrio.20.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="s2">&quot;CEUTrio.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vcf_to_zarr</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="s2">&quot;output.zarr&quot;</span><span class="p">,</span> <span class="n">target_part_size</span><span class="o">=</span><span class="mi">100_000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As a special case, <code class="docutils literal notranslate"><span class="pre">None</span></code> is used to represent a single partition.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">partition_into_regions</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">partition_into_regions</span><span class="p">(</span><span class="s2">&quot;CEUTrio.20.21.gatk3.4.g.vcf.bgz&quot;</span><span class="p">,</span> <span class="n">num_parts</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="chunk-sizes">
+<h2><a class="toc-backref" href="#id6">Chunk sizes</a><a class="headerlink" href="#chunk-sizes" title="Permalink to this headline">¶</a></h2>
+<p>One key advantage of using Zarr as a storage format is its ability to store
+large files in chunks, making it straightforward to process the data in
+parallel.</p>
+<p>You can control the chunk <em>length</em> (in the variants dimension) and <em>width</em>
+(in the samples dimension) by setting the <code class="docutils literal notranslate"><span class="pre">chunk_length</span></code> and <code class="docutils literal notranslate"><span class="pre">chunk_width</span></code>
+parameters to <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a>.</p>
+<p>Due to the way that VCF files are parsed, all of the sample data for a given
+chunk of variants are loaded into memory at one time. In other words,
+<code class="docutils literal notranslate"><span class="pre">chunk_length</span></code> is honored at read time, whereas <code class="docutils literal notranslate"><span class="pre">chunk_width</span></code> is honored
+at write time. For files with very large numbers of samples, this can
+exceed working memory. The solution is to also set <code class="docutils literal notranslate"><span class="pre">temp_chunk_length</span></code> to be a
+smaller number (than <code class="docutils literal notranslate"><span class="pre">chunk_length</span></code>), so that fewer variants are loaded
+into memory at one time, while still having the desired output chunk sizes
+(<code class="docutils literal notranslate"><span class="pre">chunk_length</span></code> and <code class="docutils literal notranslate"><span class="pre">chunk_width</span></code>). Note that <code class="docutils literal notranslate"><span class="pre">temp_chunk_length</span></code> must
+divide <code class="docutils literal notranslate"><span class="pre">chunk_length</span></code> evenly.</p>
+</div>
+<div class="section" id="cloud-storage">
+<h2><a class="toc-backref" href="#id7">Cloud storage</a><a class="headerlink" href="#cloud-storage" title="Permalink to this headline">¶</a></h2>
+<p>VCF files can be read from various file systems including cloud stores. However,
+since different underlying libraries are used in different functions, there are
+slight differences in configuration that are outlined here.</p>
+<p>The <a class="reference internal" href="generated/sgkit.io.vcf.partition_into_regions.html#sgkit.io.vcf.partition_into_regions" title="sgkit.io.vcf.partition_into_regions"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.partition_into_regions()</span></code></a> function uses <a class="reference external" href="https://filesystem-spec.readthedocs.io/en/latest/">fsspec</a>
+to read VCF metadata and their indexes. Therefore, to access files stored on Amazon S3 or Google Cloud Storage
+install the <code class="docutils literal notranslate"><span class="pre">s3fs</span></code> or <code class="docutils literal notranslate"><span class="pre">gcsfs</span></code> Python packages, and use <code class="docutils literal notranslate"><span class="pre">s3://</span></code> or <code class="docutils literal notranslate"><span class="pre">gs://</span></code> URLs.</p>
+<p>You can also pass <code class="docutils literal notranslate"><span class="pre">storage_options</span></code> to <a class="reference internal" href="generated/sgkit.io.vcf.partition_into_regions.html#sgkit.io.vcf.partition_into_regions" title="sgkit.io.vcf.partition_into_regions"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.partition_into_regions()</span></code></a> to configure the <code class="docutils literal notranslate"><span class="pre">fsspec</span></code> backend.
+This provides a way to pass any credentials or other necessary arguments needed to <code class="docutils literal notranslate"><span class="pre">s3fs</span></code> or <code class="docutils literal notranslate"><span class="pre">gcsfs</span></code>.</p>
+<p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function does <em>not</em> use <code class="docutils literal notranslate"><span class="pre">fsspec</span></code>, since it
+relies on <code class="docutils literal notranslate"><span class="pre">htslib</span></code> for file handling, and therefore has its own way of accessing
+cloud storage. You can access files stored on Amazon S3 or Google Cloud Storage
+using <code class="docutils literal notranslate"><span class="pre">s3://</span></code> or <code class="docutils literal notranslate"><span class="pre">gs://</span></code> URLs. Setting credentials or other options is
+typically achieved using environment variables for the underlying cloud store.</p>
+</div>
+<div class="section" id="low-level-operation">
+<h2><a class="toc-backref" href="#id8">Low-level operation</a><a class="headerlink" href="#low-level-operation" title="Permalink to this headline">¶</a></h2>
+<p>Calling <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> runs a two-step operation:</p>
+<ol class="arabic simple">
+<li><p>Write the output for each input region to a separate temporary Zarr store</p></li>
+<li><p>Concatenate and rechunk the temporary stores into the final output Zarr store</p></li>
+</ol>
+<p>Each step is run as a Dask computation, which means you can use any Dask configuration
+mechanisms to control aspects of the computation.</p>
+<p>For example, you can set the Dask scheduler to run on a cluster. In this case you
+would set the temporary Zarr store to be a cloud storage URL (by setting <code class="docutils literal notranslate"><span class="pre">tempdir</span></code>) so
+that all workers can access the store (both for reading and writing).</p>
+<p>For debugging, or for more control over the steps, consider using
+<a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarrs.html#sgkit.io.vcf.vcf_to_zarrs" title="sgkit.io.vcf.vcf_to_zarrs"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarrs()</span></code></a> followed by <a class="reference internal" href="generated/sgkit.io.vcf.zarrs_to_dataset.html#sgkit.io.vcf.zarrs_to_dataset" title="sgkit.io.vcf.zarrs_to_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.zarrs_to_dataset()</span></code></a>,
+then saving the dataset using Xarray’s <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.to_zarr.html#xarray.Dataset.to_zarr" title="(in xarray v0.17.1.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.to_zarr()</span></code></a> method.</p>
+</div>
+<div class="section" id="polyploid-and-mixed-ploidy-vcf">
+<h2><a class="toc-backref" href="#id9">Polyploid and mixed-ploidy VCF</a><a class="headerlink" href="#polyploid-and-mixed-ploidy-vcf" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function can be used to convert polyploid VCF
+data to Zarr files stored in sgkit’s Xarray data representation by specifying the
+ploidy of the dataset using the <code class="docutils literal notranslate"><span class="pre">ploidy</span></code> parameter.</p>
+<p>By default, sgkit expects VCF files to have a consistent ploidy level across all samples
+and variants.
+Manual specification of ploidy is necessary because, within the VCF standard,
+ploidy is indicated by the length of each genotype call and hence it may not be
+consistent throughout the entire VCF file.</p>
+<p>If a genotype call of lower than specified ploidy is encountered it will be treated
+as an incomplete genotype.
+For example, if a VCF is being processed assuming a ploidy of four (i.e. tetraploid)
+then the diploid genotype <code class="docutils literal notranslate"><span class="pre">0/1</span></code> will be treated as the incomplete tetraploid
+genotype <code class="docutils literal notranslate"><span class="pre">0/1/./.</span></code>.</p>
+<p>If a genotype call of higher than specified ploidy is encountered an exception is raised.
+This exception can be avoided using the <code class="docutils literal notranslate"><span class="pre">truncate_calls</span></code> parameter in which case the
+additional alleles will be skipped.</p>
+<p>Conversion of mixed-ploidy VCF files is also supported by <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a>
+by use of the <code class="docutils literal notranslate"><span class="pre">mixed_ploidy</span></code> parameter.
+In this case <code class="docutils literal notranslate"><span class="pre">ploidy</span></code> specifies the maximum allowed ploidy and lower ploidy
+genotype calls within the VCF file will be preserved within the resulting dataset.</p>
+<p>Note that many statistical genetics methods available for diploid data are not generalized
+to polyploid and or mixed-ploidy data.
+Therefore, some methods available in sgkit may only be applicable to diploid or fixed-ploidy
+datasets.</p>
+<p>Methods that are generalized to polyploid and mixed-ploidy data may make assumptions
+such as polysomic inheritance and hence it is necessary to understand the type of polyploidy
+present within any given dataset.</p>
+</div>
+</div>
+
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="user_guide.html" title="previous page">User Guide</a>
+    <a class='right-next' id="next-link" href="api.html" title="next page">API reference</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By sgkit developers<br/>
+        
+            &copy; Copyright 2020, sgkit developers.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

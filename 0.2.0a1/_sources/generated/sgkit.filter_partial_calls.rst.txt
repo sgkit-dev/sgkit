@@ -1,0 +1,6 @@
+﻿sgkit.filter\_partial\_calls
+============================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: filter_partial_calls

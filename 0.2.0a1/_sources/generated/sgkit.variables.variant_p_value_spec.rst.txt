@@ -1,0 +1,6 @@
+﻿sgkit.variables.variant\_p\_value\_spec
+=======================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: variant_p_value_spec

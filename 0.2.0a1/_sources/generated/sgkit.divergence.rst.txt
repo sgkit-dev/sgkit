@@ -1,0 +1,6 @@
+﻿sgkit.divergence
+================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: divergence

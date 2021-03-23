@@ -1,0 +1,6 @@
+﻿sgkit.load\_dataset
+===================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: load_dataset

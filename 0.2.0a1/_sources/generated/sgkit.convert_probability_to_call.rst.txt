@@ -1,0 +1,6 @@
+﻿sgkit.convert\_probability\_to\_call
+====================================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: convert_probability_to_call
