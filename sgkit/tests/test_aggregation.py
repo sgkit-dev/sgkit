@@ -10,6 +10,7 @@ from sgkit.stats.aggregation import (
     count_call_alleles,
     count_cohort_alleles,
     count_variant_alleles,
+    individual_heterozygosity,
     infer_call_ploidy,
     infer_sample_ploidy,
     infer_variant_ploidy,
@@ -349,3 +350,48 @@ def test_infer_variant_ploidy():
     ds.call_genotype.attrs["mixed_ploidy"] = True
     vp = infer_variant_ploidy(ds).variant_ploidy
     np.testing.assert_equal(vp, np.array([-1, 4, 2]))
+
+
+def test_individual_heterozygosity():
+    ds = individual_heterozygosity(
+        get_dataset(
+            [
+                [[0, 0, -2, -2, -2, -2], [0, 0, 0, 0, -2, -2], [0, 0, 0, 0, 0, 0]],
+                [[0, 1, -2, -2, -2, -2], [0, 0, 0, 1, -2, -2], [0, 0, 0, 0, 0, 1]],
+                [[1, 1, -2, -2, -2, -2], [0, 0, 1, 1, -2, -2], [0, 0, 0, 0, 1, 1]],
+                [[0, -1, -2, -2, -2, -2], [0, 1, 1, 1, -2, -2], [0, 0, 0, 1, 1, 1]],
+                [[-1, 1, -2, -2, -2, -2], [1, 1, 1, 1, -2, -2], [0, 0, 0, 0, 1, 2]],
+                [[-1, -1, -2, -2, -2, -2], [0, 0, 1, 2, -2, -2], [0, 0, 0, 1, 1, 2]],
+                [[-1, -1, -2, -2, -2, -2], [0, 1, 2, 2, -2, -2], [0, 0, 1, 1, 2, 2]],
+                [[-1, -1, -2, -2, -2, -2], [0, 0, -1, -1, -2, -2], [0, 0, 0, 1, 2, 3]],
+                [[-1, -1, -2, -2, -2, -2], [0, 1, -1, -1, -2, -2], [0, 0, 1, 1, 2, 3]],
+                [[-1, -1, -2, -2, -2, -2], [0, -1, -1, -1, -2, -2], [0, 0, 1, 2, 3, 4]],
+                [
+                    [-1, -1, -2, -2, -2, -2],
+                    [-1, -1, -1, -1, -2, -2],
+                    [0, 1, 2, 3, 4, 5],
+                ],
+            ],
+            n_ploidy=6,
+            n_allele=6,
+        )
+    )
+    hi = ds["call_heterozygosity"]
+    np.testing.assert_almost_equal(
+        hi,
+        np.array(
+            [
+                [0, 0, 0],
+                [1, 3 / 6, 5 / 15],
+                [0, 4 / 6, 8 / 15],
+                [np.nan, 3 / 6, 9 / 15],
+                [np.nan, 0, 9 / 15],
+                [np.nan, 5 / 6, 11 / 15],
+                [np.nan, 5 / 6, 12 / 15],
+                [np.nan, 0, 12 / 15],
+                [np.nan, 1, 13 / 15],
+                [np.nan, np.nan, 14 / 15],
+                [np.nan, np.nan, 1],
+            ]
+        ),
+    )
