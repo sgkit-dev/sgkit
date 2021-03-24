@@ -203,8 +203,9 @@ def euclidean_map_gpu(f, g):
     d_out = cuda.to_device(out)
     #     d_out = cuda.device_array_like(d_a)
 
-    blocks_per_grid = (32, 32)
     threads_per_block = (32, 32)
+    blocks_per_grid = (math.ceil(out.shape[0] / threads_per_block[0]), math.ceil(out.shape[1] / threads_per_block[1]))
+
     euclidean_map_kernel[blocks_per_grid, threads_per_block](d_a, d_b, d_out)
     # wait for all threads to complete
     cuda.synchronize()
