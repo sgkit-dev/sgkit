@@ -84,9 +84,9 @@ def create_distance_matrix(
         ((100, 100), (25, 10), "cpu"),
         ((100, 100), (50, 10), "cpu"),
 
-        ((100, 100), (25, 10), "gpu"),
-        ((100, 100), (50, 10), "gpu"),
-        ((100, 100), (50, 10), "gpu"),
+        pytest.param((100, 100), (25, 10), "gpu", marks=pytest.mark.gpu),
+        pytest.param((100, 100), (50, 10), "gpu", marks=pytest.mark.gpu),
+        pytest.param((100, 100), (50, 10), "gpu", marks=pytest.mark.gpu),
     ],
 )
 def test_distance_correlation(
@@ -107,9 +107,9 @@ def test_distance_correlation(
         ((100, 100), (25, 10), "cpu"),
         ((100, 100), (50, 10), "cpu"),
 
-        ((100, 100), (25, 10), "gpu"),
-        ((100, 100), (50, 10), "gpu"),
-        ((100, 100), (50, 10), "gpu"),
+        pytest.param((100, 100), (25, 10), "gpu", marks=pytest.mark.gpu),
+        pytest.param((100, 100), (50, 10), "gpu", marks=pytest.mark.gpu),
+        pytest.param((100, 100), (50, 10), "gpu", marks=pytest.mark.gpu),
     ],
 )
 def test_distance_euclidean(
@@ -151,18 +151,23 @@ def test_distance_ndarray() -> None:
 
 
 @pytest.mark.parametrize(
-    "metric, metric_func, dtype",
+    "metric, metric_func, dtype, target",
     [
-        ("euclidean", euclidean, "f8"),
-        ("euclidean", euclidean, "i8"),
-        ("correlation", correlation, "f8"),
-        ("correlation", correlation, "i8"),
+        ("euclidean", euclidean, "f8", 'cpu'),
+        ("euclidean", euclidean, "i8", 'cpu'),
+
+        pytest.param("euclidean", euclidean, "f8", 'gpu', marks=pytest.mark.gpu),
+        pytest.param("euclidean", euclidean, "i8", 'gpu', marks=pytest.mark.gpu),
+
+        ("correlation", correlation, "f8", 'cpu'),
+        ("correlation", correlation, "i8", 'cpu'),
     ],
 )
 def test_missing_values(
     metric: MetricTypes,
     metric_func: typing.Callable[[ArrayLike, ArrayLike], np.float64],
     dtype: str,
+    target: TargetTypes
 ) -> None:
     x = get_vectors(array_type="np", dtype=dtype)
 
@@ -175,25 +180,30 @@ def test_missing_values(
             -100, -1
         )
 
-    distance_matrix = pairwise_distance(x, metric=metric)
+    distance_matrix = pairwise_distance(x, metric=metric, target=target)
     expected_matrix = create_distance_matrix(x, metric_func)
     np.testing.assert_almost_equal(distance_matrix, expected_matrix)
 
 
 @pytest.mark.parametrize(
-    "metric, dtype, expected",
+    "metric, dtype, expected, target",
     [
-        ("euclidean", "i8", "float64"),
-        ("euclidean", "f4", "float32"),
-        ("euclidean", "f8", "float64"),
-        ("correlation", "i8", "float64"),
-        ("correlation", "f4", "float32"),
-        ("correlation", "f8", "float64"),
+        ("euclidean", "i8", "float64", "cpu"),
+        ("euclidean", "f4", "float32", "cpu"),
+        ("euclidean", "f8", "float64", "cpu"),
+
+        pytest.param("euclidean", "i8", "float64", "gpu", marks=pytest.mark.gpu),
+        pytest.param("euclidean", "f4", "float32", "gpu", marks=pytest.mark.gpu),
+        pytest.param("euclidean", "f8", "float64", "gpu", marks=pytest.mark.gpu),
+
+        ("correlation", "i8", "float64", "cpu"),
+        ("correlation", "f4", "float32", "cpu"),
+        ("correlation", "f8", "float64", "cpu"),
     ],
 )
-def test_data_types(metric: MetricTypes, dtype: str, expected: str) -> None:
+def test_data_types(metric: MetricTypes, dtype: str, expected: str, target: TargetTypes) -> None:
     x = get_vectors(dtype=dtype)
-    distance_matrix = pairwise_distance(x, metric=metric).compute()
+    distance_matrix = pairwise_distance(x, metric=metric, target=target).compute()
     assert distance_matrix.dtype.name == expected
 
 
