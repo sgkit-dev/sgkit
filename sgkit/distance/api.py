@@ -131,8 +131,6 @@ def pairwise_distance(
         return result[..., np.newaxis]
 
     def _pairwise_gpu(f, g):
-        f.strides = (f.strides[-1] * f.shape[-1], f.strides[-1])
-        g.strides = (g.strides[-1] * g.shape[-1], g.strides[-1])
         f = np.ascontiguousarray(f)
         g = np.ascontiguousarray(g)
         result = getattr(metrics, map_func_name)(f, g)
