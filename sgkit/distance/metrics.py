@@ -187,7 +187,7 @@ def _euclidean_distance(a, b):
 @cuda.jit
 def euclidean_map_kernel(x, y, out) -> None:
     i1, i2 = cuda.grid(2)
-    if i1 >= x.shape[0] or i2 >= y.shape[0]:
+    if i1 >= out.shape[0] or i2 >= out.shape[1]:
         # Quit if (x, y) is outside of valid output array boundary
         return
     out[i1][i2] = _euclidean_distance(x[i1], y[i2])

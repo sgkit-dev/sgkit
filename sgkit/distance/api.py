@@ -131,6 +131,9 @@ def pairwise_distance(
         return result[..., np.newaxis]
 
     def _pairwise_gpu(f, g):
+        # Numba's 0.54.0 version is required, which is not released yet
+        # We install numba from numba conda channel: conda install -c numba/label/dev numba
+        # Relevant issue https://github.com/numba/numba/issues/6824
         f = np.ascontiguousarray(f)
         g = np.ascontiguousarray(g)
         result = getattr(metrics, map_func_name)(f, g)
