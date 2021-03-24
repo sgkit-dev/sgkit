@@ -193,22 +193,30 @@ def euclidean_map_kernel(x, y, out) -> None:
     out[i1][i2] = _euclidean_distance(x[i1], y[i2])
 
 
+@cuda.jit
+def euclidean_reduce_kernel(x, y, out) -> None:
+    i1, i2 = cuda.grid(2)
+    if i1 >= out.shape[0] or i2 >= out.shape[1]:
+        # Quit if (x, y) is outside of valid output array boundary
+        return
+    out[i1][i2] = _euclidean_distance(x[i1], y[i2])
+
+
 def euclidean_map_gpu(f, g):
     # move input data to the device
     d_a = cuda.to_device(f)
     d_b = cuda.to_device(g)
     # create output data on the device
     out = np.zeros((f.shape[0], g.shape[0]))
-    #     print(f"out_shape: {out.shape}")
     d_out = cuda.to_device(out)
-    #     d_out = cuda.device_array_like(d_a)
 
     threads_per_block = (32, 32)
-    blocks_per_grid = (math.ceil(out.shape[0] / threads_per_block[0]), math.ceil(out.shape[1] / threads_per_block[1]))
+    blocks_per_grid = (
+        math.ceil(out.shape[0] / threads_per_block[0]),
+        math.ceil(out.shape[1] / threads_per_block[1])
+    )
 
     euclidean_map_kernel[blocks_per_grid, threads_per_block](d_a, d_b, d_out)
-    # wait for all threads to complete
-    cuda.synchronize()
     # copy the output array back to the host system
     # and print it
     d_out_host = d_out.copy_to_host()
