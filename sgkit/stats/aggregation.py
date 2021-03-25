@@ -720,13 +720,13 @@ def individual_heterozygosity(
     call_allele_count: Hashable = variables.call_allele_count,
     merge: bool = True,
 ) -> Dataset:
-    """Compute per sample observed heterozygosity.
+    """Compute per call individual heterozygosity.
 
-    Individual heterozygosity is defined as the probability that
-    two alleles drawn at random without replacement are not identical
-    in state. Therefore, individual heterozygosity is defined for
-    diploid and polyploid calls but will return nan in the case of
-    haploid calls.
+    Individual heterozygosity is the probability that two alleles
+    drawn at random without replacement, from an individual at a
+    given site, are not identical in state. Therefore, individual
+    heterozygosity is defined for diploid and polyploid calls but
+    will return nan in the case of haploid calls.
 
     Parameters
     ----------
@@ -746,7 +746,7 @@ def individual_heterozygosity(
     -------
     A dataset containing :data:`sgkit.variables.call_heterozygosity_spec`
     of per genotype observed heterozygosity with shape (variants, samples)
-    containing values within the inteval [0, 1] or nan if ploidy < 2.
+    containing values within the interval [0, 1] or nan if ploidy < 2.
 
     Examples
     --------
@@ -777,7 +777,7 @@ def individual_heterozygosity(
     # use nan denominator to avoid divide by zero with K - 1
     K2 = da.where(K > 1, K, np.nan)
     AF = AC / K2[..., None]
-    HI = (1 - da.sum(da.power(AF, 2), axis=-1)) * (K / (K2 - 1))
+    HI = (1 - da.sum(AF ** 2, axis=-1)) * (K / (K2 - 1))
     new_ds = create_dataset(
         {variables.call_heterozygosity: (("variants", "samples"), HI)}
     )
