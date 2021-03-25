@@ -587,3 +587,36 @@ def test_observed_heterozygosity__windowed(chunks):
             ]
         ),
     )
+
+
+@pytest.mark.parametrize("window_size", [10, 13])
+@pytest.mark.parametrize(
+    "n_variant,n_sample,missing_pct", [(30, 20, 0), (47, 17, 0.25)]
+)
+def test_observed_heterozygosity__scikit_allel_comparison(
+    n_variant, n_sample, missing_pct, window_size
+):
+    ds = simulate_genotype_call_dataset(
+        n_variant=n_variant,
+        n_sample=n_sample,
+        n_ploidy=2,
+        missing_pct=missing_pct,
+        seed=1,
+    )
+    ds["sample_cohort"] = (
+        ["samples"],
+        np.zeros(n_sample, int),
+    )
+    ds = window(ds, size=window_size)
+    ho_sg = observed_heterozygosity(ds)["stat_observed_heterozygosity"].values
+    if n_sample % window_size:
+        # scikit-allel will drop the ragged end
+        ho_sg = ho_sg[0:-1]
+    # calculate with scikit-allel
+    ho_sa = allel.moving_statistic(
+        allel.heterozygosity_observed(ds["call_genotype"]),
+        np.sum,
+        size=window_size,
+    )
+    # add cohort dimension to scikit-allel result
+    np.testing.assert_almost_equal(ho_sg, ho_sa[..., None])
