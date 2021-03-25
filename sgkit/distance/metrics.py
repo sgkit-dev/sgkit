@@ -6,8 +6,10 @@ dictionary below.
 """
 
 import math
+from typing import Any
+
 import numpy as np
-from numba import guvectorize, cuda
+from numba import cuda, guvectorize
 
 from sgkit.typing import ArrayLike
 
@@ -175,53 +177,120 @@ def correlation_reduce_cpu(v: ArrayLike, out: ArrayLike) -> None:  # pragma: no 
     out[0] = value
 
 
-@cuda.jit(device=True)
-def _euclidean_distance(a, b):
-    square_sum = 0.0
-    for i in range(a.shape[0]):
-        if a[i] >= 0 and b[i] >= 0:
-            square_sum += (a[i] - b[i]) ** 2
-    return square_sum
+def call_metric_kernel(
+    f: ArrayLike, g: ArrayLike, metric: str, metric_kernel: Any
+) -> ArrayLike:
+    # Numba's 0.54.0 version is required, which is not released yet
+    # We install numba from numba conda channel: conda install -c numba/label/dev numba
+    # Relevant issue https://github.com/numba/numba/issues/6824
+    f = np.ascontiguousarray(f)
+    g = np.ascontiguousarray(g)
 
-
-@cuda.jit
-def euclidean_map_kernel(x, y, out) -> None:
-    i1, i2 = cuda.grid(2)
-    if i1 >= out.shape[0] or i2 >= out.shape[1]:
-        # Quit if (x, y) is outside of valid output array boundary
-        return
-    out[i1][i2] = _euclidean_distance(x[i1], y[i2])
-
-
-@cuda.jit
-def euclidean_reduce_kernel(x, y, out) -> None:
-    i1, i2 = cuda.grid(2)
-    if i1 >= out.shape[0] or i2 >= out.shape[1]:
-        # Quit if (x, y) is outside of valid output array boundary
-        return
-    out[i1][i2] = _euclidean_distance(x[i1], y[i2])
-
-
-def euclidean_map_gpu(f, g):
     # move input data to the device
     d_a = cuda.to_device(f)
     d_b = cuda.to_device(g)
     # create output data on the device
-    out = np.zeros((f.shape[0], g.shape[0]), dtype=f.dtype)
+    out = np.zeros((f.shape[0], g.shape[0], N_MAP_PARAM[metric]), dtype=f.dtype)
     d_out = cuda.to_device(out)
+
+    # TODO: Consider using cupy for directly creating zeros on GPU
+    # d_out = cp.zeros((f.shape[0], g.shape[0], N_MAP_PARAM[metric]), dtype=f.dtype)
 
     threads_per_block = (32, 32)
     blocks_per_grid = (
         math.ceil(out.shape[0] / threads_per_block[0]),
-        math.ceil(out.shape[1] / threads_per_block[1])
+        math.ceil(out.shape[1] / threads_per_block[1]),
     )
 
-    euclidean_map_kernel[blocks_per_grid, threads_per_block](d_a, d_b, d_out)
+    metric_kernel[blocks_per_grid, threads_per_block](d_a, d_b, d_out)
     # copy the output array back to the host system
-    # and print it
     d_out_host = d_out.copy_to_host()
     return d_out_host
 
 
-def euclidean_reduce_gpu(v):
+@cuda.jit(device=True)  # type: ignore
+def _correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
+    m = x.shape[0]
+    # Note: assigning variable and only saving the final value in the
+    # array made this significantly faster.
+    v0 = 0.0
+    v1 = 0.0
+    v2 = 0.0
+    v3 = 0.0
+    v4 = 0.0
+    v5 = 0.0
+
+    for i in range(m):
+        if x[i] >= 0 and y[i] >= 0:
+            v0 += x[i]
+            v1 += y[i]
+            v2 += x[i] * x[i]
+            v3 += y[i] * y[i]
+            v4 += x[i] * y[i]
+            v5 += 1
+
+    out[0] = v0
+    out[1] = v1
+    out[2] = v2
+    out[3] = v3
+    out[4] = v4
+    out[5] = v5
+
+
+@cuda.jit  # type: ignore
+def correlation_map_kernel(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
+    i1, i2 = cuda.grid(2)
+    if i1 >= out.shape[0] or i2 >= out.shape[1]:
+        # Quit if (x, y) is outside of valid output array boundary
+        return
+
+    _correlation(x[i1], y[i2], out[i1][i2])
+
+
+def correlation_map_gpu(f: ArrayLike, g: ArrayLike) -> ArrayLike:
+    """Pearson correlation "map" function for partial vector pairs on GPU
+
+    Parameters
+    ----------
+    f
+        An array chunk, a partial vector
+    g
+        Another array chunk, a partial vector
+
+    Returns
+    -------
+    An ndarray, which contains the output of the calculation of the application
+    of pearson correlation on the given pair of chunks, without the aggregation.
+    """
+
+    return call_metric_kernel(f, g, "correlation", correlation_map_kernel)
+
+
+def correlation_reduce_gpu(v: ArrayLike) -> None:
+    return correlation_reduce_cpu(v)  # type: ignore
+
+
+@cuda.jit(device=True)  # type: ignore
+def _euclidean_distance(a: ArrayLike, b: ArrayLike, out: ArrayLike) -> None:
+    square_sum = 0.0
+    for i in range(a.shape[0]):
+        if a[i] >= 0 and b[i] >= 0:
+            square_sum += (a[i] - b[i]) ** 2
+    out[0] = square_sum
+
+
+@cuda.jit  # type: ignore
+def euclidean_map_kernel(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
+    i1, i2 = cuda.grid(2)
+    if i1 >= out.shape[0] or i2 >= out.shape[1]:
+        # Quit if (x, y) is outside of valid output array boundary
+        return
+    _euclidean_distance(x[i1], y[i2], out[i1][i2])
+
+
+def euclidean_map_gpu(f: ArrayLike, g: ArrayLike) -> ArrayLike:
+    return call_metric_kernel(f, g, "euclidean", euclidean_map_kernel)
+
+
+def euclidean_reduce_gpu(v: ArrayLike) -> ArrayLike:
     return euclidean_reduce_cpu(v)
