@@ -969,6 +969,12 @@ def observed_heterozygosity(
 ) -> Dataset:
     """Compute per cohort observed heterozygosity.
 
+    The observed heterozygosity of a cohort is the mean of individual
+    heterozygosity values among all samples of that cohort as described
+    in :func:`individual_heterozygosity`. Calls with a nan value for
+    individual heterozygosity are ignored when calculating the cohort
+    mean.
+
     By default, values of this statistic are calculated per variant.
     To compute values in windows, call :func:`window` before calling
     this function.
