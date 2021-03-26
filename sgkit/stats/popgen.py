@@ -955,7 +955,7 @@ def _cohort_observed_heterozygosity(
             _[c] += 1
     for j in range(n_cohorts):
         n = _[j]
-        if n:
+        if n != 0:
             out[j] /= n
         else:
             out[j] = np.nan
