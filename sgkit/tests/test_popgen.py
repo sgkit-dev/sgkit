@@ -593,15 +593,16 @@ def test_observed_heterozygosity__windowed(chunks):
 @pytest.mark.parametrize(
     "n_variant,n_sample,missing_pct", [(30, 20, 0), (47, 17, 0.25)]
 )
+@pytest.mark.parametrize("seed", [1, 3, 7])
 def test_observed_heterozygosity__scikit_allel_comparison(
-    n_variant, n_sample, missing_pct, window_size
+    n_variant, n_sample, missing_pct, window_size, seed
 ):
     ds = simulate_genotype_call_dataset(
         n_variant=n_variant,
         n_sample=n_sample,
         n_ploidy=2,
         missing_pct=missing_pct,
-        seed=1,
+        seed=seed,
     )
     ds["sample_cohort"] = (
         ["samples"],
