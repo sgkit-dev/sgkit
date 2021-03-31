@@ -260,6 +260,7 @@ def test_variant_stats(precompute_variant_allele_count):
     ds = get_dataset(
         [[[1, 0], [-1, -1]], [[1, 0], [1, 1]], [[0, 1], [1, 0]], [[-1, -1], [0, 0]]]
     )
+    ds = ds.set_index({"variants": ("variant_contig", "variant_position")})
     if precompute_variant_allele_count:
         ds = count_variant_alleles(ds)
     vs = variant_stats(ds)
