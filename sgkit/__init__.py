@@ -1,6 +1,7 @@
 from pkg_resources import DistributionNotFound, get_distribution
 
 from .display import display_genotypes
+from .distance.api import pairwise_distance
 from .io.dataset import load_dataset, save_dataset
 from .io.vcfzarr_reader import read_vcfzarr
 from .model import (
@@ -83,4 +84,5 @@ __all__ = [
     "window",
     "load_dataset",
     "save_dataset",
+    "pairwise_distance",
 ]
