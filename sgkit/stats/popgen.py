@@ -995,7 +995,7 @@ def observed_heterozygosity(
         See :ref:`dataset_merge` for more details.
     Returns
     -------
-    A dataset containing :data:`sgkit.variables.stat_heterozygosity_observed_spec`
+    A dataset containing :data:`sgkit.variables.stat_observed_heterozygosity_spec`
     of per cohort observed heterozygosity with shape (variants, cohorts)
     containing values within the inteval [0, 1] or nan.
 
