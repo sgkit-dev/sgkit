@@ -282,17 +282,28 @@ def correlation_reduce_gpu(v: ArrayLike) -> None:
 
 @cuda.jit(device=True)  # type: ignore
 def _euclidean_distance(a: ArrayLike, b: ArrayLike, out: ArrayLike) -> None:
-    square_sum = 0.0
-    for i in range(a.shape[0]):
-        if a[i] >= 0 and b[i] >= 0:
-            square_sum += (a[i] - b[i]) ** 2
+    square_sum = types.float32(0)
+
+    zero = types.uint32(0)
+    a_shape_0 = types.uint32(a.shape[types.uint32(0)])
+    i = types.uint32(0)
+
+    while i < a_shape_0:
+        if a[i] >= zero and b[i] >= zero:
+            square_sum += (a[i] - b[i]) ** types.uint32(2)
+        i = types.uint32(i + types.uint32(1))
     out[0] = square_sum
 
 
 @cuda.jit  # type: ignore
 def euclidean_map_kernel(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
-    i1, i2 = cuda.grid(2)
-    if i1 >= out.shape[0] or i2 >= out.shape[1]:
+    i1 = types.uint32(cuda.grid(2)[types.uint32(0)])
+    i2 = types.uint32(cuda.grid(2)[types.uint32(1)])
+
+    out_shape_0 = types.uint32(out.shape[types.uint32(0)])
+    out_shape_1 = types.uint32(out.shape[types.uint32(1)])
+
+    if i1 >= out_shape_0 or i2 >= out_shape_1:
         # Quit if (x, y) is outside of valid output array boundary
         return
     _euclidean_distance(x[i1], y[i2], out[i1][i2])
