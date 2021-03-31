@@ -8,14 +8,14 @@ from sgkit.distance import metrics
 from sgkit.typing import ArrayLike
 
 MetricTypes = Literal["euclidean", "correlation"]
-TargetTypes = Literal["cpu", "gpu"]
+DeviceTypes = Literal["cpu", "gpu"]
 
 
 def pairwise_distance(
     x: ArrayLike,
     metric: MetricTypes = "euclidean",
     split_every: typing.Optional[int] = None,
-    target: TargetTypes = "cpu",
+    device: DeviceTypes = "cpu",
 ) -> da.array:
     """Calculates the pairwise distance between all pairs of row vectors in the
     given two dimensional array x.
@@ -62,7 +62,7 @@ def pairwise_distance(
 
         Omit to let dask heuristically decide a good default. A default can
         also be set globally with the split_every key in dask.config.
-    target
+    device
         The architecture to run the calculation on, either of cpu or gpu
 
     Returns
@@ -98,20 +98,20 @@ def pairwise_distance(
            [ 2.62956526e-01,  0.00000000e+00,  2.14285714e-01],
            [ 2.82353505e-03,  2.14285714e-01,  0.00000000e+00]])
     """
-    valid_targets = {"cpu", "gpu"}
-    if target not in valid_targets:
+    valid_devices = DeviceTypes.__args__  # type: ignore[attr-defined]
+    if device not in valid_devices:
         raise ValueError(
-            f"Invalid Target, expected one of {valid_targets}, got: {target}"
+            f"Invalid Device, expected one of {valid_devices}, got: {device}"
         )
     try:
-        map_func_name = f"{metric}_map_{target}"
-        reduce_func_name = f"{metric}_reduce_{target}"
-        getattr(metrics, map_func_name)
-        getattr(metrics, reduce_func_name)
+        map_func_name = f"{metric}_map_{device}"
+        reduce_func_name = f"{metric}_reduce_{device}"
+        map_func = getattr(metrics, map_func_name)
+        reduce_func = getattr(metrics, reduce_func_name)
         n_map_param = metrics.N_MAP_PARAM[metric]
     except AttributeError:
         raise NotImplementedError(
-            f"Given metric: '{metric}' is not implemented for '{target}'."
+            f"Given metric: '{metric}' is not implemented for '{device}'."
         )
 
     x = da.asarray(x)
@@ -124,20 +124,18 @@ def pairwise_distance(
     metric_param = np.empty(n_map_param, dtype=x.dtype)
 
     def _pairwise_cpu(f: ArrayLike, g: ArrayLike) -> ArrayLike:
-        result: ArrayLike = getattr(metrics, map_func_name)(
-            f[:, None, :], g, metric_param
-        )
+        result: ArrayLike = map_func(f[:, None, :], g, metric_param)
         # Adding a new axis to help combine chunks along this axis in the
         # reduction step (see the _aggregate and _combine functions below).
         return result[..., np.newaxis]
 
-    def _pairwise_gpu(f: ArrayLike, g: ArrayLike) -> ArrayLike:
-        result = getattr(metrics, map_func_name)(f, g)
+    def _pairwise_gpu(f: ArrayLike, g: ArrayLike) -> ArrayLike:  # pragma: no cover
+        result = map_func(f, g)
         return result[..., np.newaxis]
 
     pairwise_func = _pairwise_cpu
-    if target == "gpu":
-        pairwise_func = _pairwise_gpu
+    if device == "gpu":
+        pairwise_func = _pairwise_gpu  # pragma: no cover
 
     # concatenate in blockwise leads to high memory footprints, so instead
     # we perform blockwise without contraction followed by reduction.
@@ -156,9 +154,19 @@ def pairwise_distance(
     def _aggregate(x_chunk: ArrayLike, **_: typing.Any) -> ArrayLike:
         """Last function to be executed when resolving the dask graph,
         producing the final output. It is always invoked, even when the reduced
-        Array counts a single chunk along the reduced axes."""
+        Array counts a single chunk along the reduced axes.
+
+        Parameters
+        ----------
+        x_chunk
+            [array-like, shape: (M, M, N, 1)]
+            An array like two dimensional matrix. The dimension is as follows:
+            M is the chunk size on axis=0 for `x` (input for `pairwise_distance`
+            function).
+            N: is the number of chunks along axis=1
+        """
         x_chunk = x_chunk.reshape(x_chunk.shape[:-2] + (-1, n_map_param))
-        result: ArrayLike = getattr(metrics, reduce_func_name)(x_chunk)
+        result: ArrayLike = reduce_func(x_chunk)
         return result
 
     def _chunk(x_chunk: ArrayLike, **_: typing.Any) -> ArrayLike:
