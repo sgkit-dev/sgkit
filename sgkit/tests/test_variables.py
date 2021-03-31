@@ -16,12 +16,19 @@ def test_variables__variables_registered():
 
 @pytest.fixture()
 def dummy_ds():
-    return xr.Dataset({"foo": np.asarray([1, 2, 3]), "bar": np.asarray([1, 2, 3])})
+    # foo is a data variable, bar is a coordinate
+    return xr.Dataset(
+        {
+            "foo": ("d1", np.asarray([1, 2, 3])),
+            "bar": np.asarray([1, 2, 3]),
+        }
+    )
 
 
 def test_variables__no_spec(dummy_ds: xr.Dataset) -> None:
     with pytest.raises(ValueError, match="No array spec registered for foo"):
         variables.validate(dummy_ds, "foo")
+    variables.validate(dummy_ds, "bar")  # no spec needed for coordinates or indexes
 
 
 def test_variables__validate_by_name(dummy_ds: xr.Dataset) -> None:
@@ -79,8 +86,6 @@ def test_variables__whole_ds(dummy_ds: xr.Dataset) -> None:
         SgkitVariables.register_variable(spec_foo)
         with pytest.raises(ValueError, match="`foo` already registered"):
             SgkitVariables.register_variable(spec_foo)
-        with pytest.raises(ValueError, match="No array spec registered for bar"):
-            variables.validate(dummy_ds)
         SgkitVariables.register_variable(spec_bar)
         variables.validate(dummy_ds)
     finally:

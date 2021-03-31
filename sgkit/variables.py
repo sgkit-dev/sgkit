@@ -119,14 +119,17 @@ class SgkitVariables:
             elif s:
                 try:
                     field_spec = cls.registered_variables[s]
+                    cls._check_field(
+                        xr_dataset,
+                        field_spec,
+                        field_spec.default_name,
+                        add_comment_attr=add_comment_attr,
+                    )
                 except KeyError:
-                    raise ValueError(f"No array spec registered for {s}")
-                cls._check_field(
-                    xr_dataset,
-                    field_spec,
-                    field_spec.default_name,
-                    add_comment_attr=add_comment_attr,
-                )
+                    if s in xr_dataset.indexes.keys():
+                        logger.debug(f"Ignoring missing spec for index: {s}")
+                    else:
+                        raise ValueError(f"No array spec registered for {s}")
         return xr_dataset
 
     @classmethod
