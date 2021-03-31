@@ -9,7 +9,7 @@ import math
 from typing import Any
 
 import numpy as np
-from numba import cuda, guvectorize
+from numba import cuda, guvectorize, types
 
 from sgkit.typing import ArrayLike
 
@@ -210,24 +210,29 @@ def call_metric_kernel(
 
 @cuda.jit(device=True)  # type: ignore
 def _correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
-    m = x.shape[0]
     # Note: assigning variable and only saving the final value in the
     # array made this significantly faster.
-    v0 = 0.0
-    v1 = 0.0
-    v2 = 0.0
-    v3 = 0.0
-    v4 = 0.0
-    v5 = 0.0
+    v0 = types.float32(0)
+    v1 = types.float32(0)
+    v2 = types.float32(0)
+    v3 = types.float32(0)
+    v4 = types.float32(0)
+    v5 = types.float32(0)
 
-    for i in range(m):
-        if x[i] >= 0 and y[i] >= 0:
+    m = types.uint32(x.shape[types.uint32(0)])
+    i = types.uint32(0)
+
+    zero = types.uint32(0)
+
+    while i < m:
+        if x[i] >= zero and y[i] >= zero:
             v0 += x[i]
             v1 += y[i]
             v2 += x[i] * x[i]
             v3 += y[i] * y[i]
             v4 += x[i] * y[i]
             v5 += 1
+        i = types.uint32(i + types.uint32(1))
 
     out[0] = v0
     out[1] = v1
@@ -239,8 +244,13 @@ def _correlation(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
 
 @cuda.jit  # type: ignore
 def correlation_map_kernel(x: ArrayLike, y: ArrayLike, out: ArrayLike) -> None:
-    i1, i2 = cuda.grid(2)
-    if i1 >= out.shape[0] or i2 >= out.shape[1]:
+    i1 = types.uint32(cuda.grid(2)[types.uint32(0)])
+    i2 = types.uint32(cuda.grid(2)[types.uint32(1)])
+
+    out_shape_0 = types.uint32(out.shape[types.uint32(0)])
+    out_shape_1 = types.uint32(out.shape[types.uint32(1)])
+
+    if i1 >= out_shape_0 or i2 >= out_shape_1:
         # Quit if (x, y) is outside of valid output array boundary
         return
 
