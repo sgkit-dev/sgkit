@@ -83,6 +83,8 @@ Methods
    Garud_H
    gwas_linear_regression
    hardy_weinberg_test
+   individual_heterozygosity
+   observed_heterozygosity
    pc_relate
    regenie
    sample_stats
@@ -118,6 +120,7 @@ Variables
     variables.call_genotype_phased_spec
     variables.call_genotype_probability_spec
     variables.call_genotype_probability_mask_spec
+    variables.call_heterozygosity_spec
     variables.cohort_allele_count_spec
     variables.covariates_spec
     variables.dosage_spec
@@ -140,6 +143,7 @@ Variables
     variables.stat_Garud_h12_spec
     variables.stat_Garud_h123_spec
     variables.stat_Garud_h2_h1_spec
+    variables.stat_observed_heterozygosity_spec
     variables.stat_Tajimas_D_spec
     variables.traits_spec
     variables.variant_allele_spec

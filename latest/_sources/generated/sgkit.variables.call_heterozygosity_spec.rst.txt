@@ -1,0 +1,6 @@
+﻿sgkit.variables.call\_heterozygosity\_spec
+==========================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: call_heterozygosity_spec

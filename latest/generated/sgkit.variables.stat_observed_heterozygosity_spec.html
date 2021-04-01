@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sgkit.convert_probability_to_call</title>
+    <title>sgkit.variables.stat_observed_heterozygosity_spec</title>
     
   <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -38,8 +38,8 @@
     <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.display_genotypes" href="sgkit.display_genotypes.html" />
-    <link rel="prev" title="sgkit.variant_stats" href="sgkit.variant_stats.html" />
+    <link rel="next" title="sgkit.variables.stat_Tajimas_D_spec" href="sgkit.variables.stat_Tajimas_D_spec.html" />
+    <link rel="prev" title="sgkit.variables.stat_Garud_h2_h1_spec" href="sgkit.variables.stat_Garud_h2_h1_spec.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -228,8 +228,8 @@
      sgkit.variant_stats
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.convert_probability_to_call.html">
      sgkit.convert_probability_to_call
     </a>
    </li>
@@ -423,8 +423,8 @@
      sgkit.variables.stat_Garud_h2_h1_spec
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.stat_observed_heterozygosity_spec.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      sgkit.variables.stat_observed_heterozygosity_spec
     </a>
    </li>
@@ -582,7 +582,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../_sources/generated/sgkit.convert_probability_to_call.rst.txt"><button type="button"
+        <a class="dropdown-buttons" href="../_sources/generated/sgkit.variables.stat_observed_heterozygosity_spec.rst.txt"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
@@ -615,52 +615,12 @@
         
               <div>
                 
-  <div class="section" id="sgkit-convert-probability-to-call">
-<h1>sgkit.convert_probability_to_call<a class="headerlink" href="#sgkit-convert-probability-to-call" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
-<dt id="sgkit.convert_probability_to_call">
-<code class="sig-prename descclassname"><span class="pre">sgkit.</span></code><code class="sig-name descname"><span class="pre">convert_probability_to_call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype_probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype_probability'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.convert_probability_to_call" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert genotype probabilities to hard calls.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.17.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.17.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Dataset containing genotype probabilities, such as from <a class="reference internal" href="sgkit.io.bgen.read_bgen.html#sgkit.io.bgen.read_bgen" title="sgkit.io.bgen.read_bgen"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.bgen.read_bgen()</span></code></a>.</p>
-</dd>
-<dt><strong>call_genotype_probability</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype_probability'</span></code>)</dt><dd><p>Genotype probability variable to be converted as defined by
-<a class="reference internal" href="sgkit.variables.call_genotype_probability_spec.html#sgkit.variables.call_genotype_probability_spec" title="sgkit.variables.call_genotype_probability_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_probability_spec</span></code></a>.</p>
-</dd>
-<dt><strong>threshold</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">0.9</span></code>)</dt><dd><p>Probability threshold in [0, 1] that must be met or exceeded by at least one genotype
-probability in order for any calls to be made – all values will be -1 (missing)
-otherwise. Setting this value to less than or equal to 0 disables any effect it has.
-Default value is 0.9.</p>
-</dd>
-<dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
-output variables into a single dataset, otherwise return only
-the computed output variables.
-See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.17.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.17.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><p>A dataset containing the following variables:</p>
-<ul class="simple">
-<li><dl class="simple">
-<dt><cite>call_genotype</cite> (variants, samples, ploidy): Converted hard calls.</dt><dd><p>Defined by <a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a>.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>call_genotype_mask</cite> (variants, samples, ploidy): Mask for converted hard calls.</dt><dd><p>Defined by <a class="reference internal" href="sgkit.variables.call_genotype_mask_spec.html#sgkit.variables.call_genotype_mask_spec" title="sgkit.variables.call_genotype_mask_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_mask_spec</span></code></a>.</p>
-</dd>
-</dl>
-</li>
-</ul>
-</p>
-</dd>
-</dl>
+  <div class="section" id="sgkit-variables-stat-observed-heterozygosity-spec">
+<h1>sgkit.variables.stat_observed_heterozygosity_spec<a class="headerlink" href="#sgkit-variables-stat-observed-heterozygosity-spec" title="Permalink to this headline">¶</a></h1>
+<dl class="py data">
+<dt id="sgkit.variables.stat_observed_heterozygosity_spec">
+<code class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></code><code class="sig-name descname"><span class="pre">stat_observed_heterozygosity_spec</span></code><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='stat_observed_heterozygosity',</span> <span class="pre">kind='f',</span> <span class="pre">ndim=2)</span></em><a class="headerlink" href="#sgkit.variables.stat_observed_heterozygosity_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Observed heterozygosity for cohorts.</p>
 </dd></dl>
 
 </div>
@@ -671,8 +631,8 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
         
         <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="sgkit.variant_stats.html" title="previous page">sgkit.variant_stats</a>
-    <a class='right-next' id="next-link" href="sgkit.display_genotypes.html" title="next page">sgkit.display_genotypes</a>
+    <a class='left-prev' id="prev-link" href="sgkit.variables.stat_Garud_h2_h1_spec.html" title="previous page">sgkit.variables.stat_Garud_h2_h1_spec</a>
+    <a class='right-next' id="next-link" href="sgkit.variables.stat_Tajimas_D_spec.html" title="next page">sgkit.variables.stat_Tajimas_D_spec</a>
 
         </div>
         
