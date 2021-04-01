@@ -134,14 +134,19 @@ class VcfFieldHandler:
 
     @classmethod
     def for_field(
-        cls, vcf: VCF, field: str, chunk_length: int, field_def: Dict[str, Any]
+        cls,
+        vcf: VCF,
+        field: str,
+        chunk_length: int,
+        max_alt_alleles: int,
+        field_def: Dict[str, Any],
     ) -> "VcfFieldHandler":
         category = field.split("/")[0]
         vcf_field_defs = _get_vcf_field_defs(vcf, category)
         key = field[len(f"{category}/") :]
         vcf_number = field_def.get("Number", vcf_field_defs[key]["Number"])
         dimension, size = vcf_number_to_dimension_and_size(
-            vcf_number, category, key, field_def, DEFAULT_MAX_ALT_ALLELES
+            vcf_number, category, key, field_def, max_alt_alleles
         )
         vcf_type = field_def.get("Type", vcf_field_defs[key]["Type"])
         description = field_def.get(
@@ -272,7 +277,7 @@ def vcf_to_zarr_sequential(
         field_defs = field_defs or {}
         field_handlers = [
             VcfFieldHandler.for_field(
-                vcf, field, chunk_length, field_defs.get(field, {})
+                vcf, field, chunk_length, max_alt_alleles, field_defs.get(field, {})
             )
             for field in fields
         ]
