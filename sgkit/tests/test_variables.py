@@ -91,3 +91,11 @@ def test_variables__whole_ds(dummy_ds: xr.Dataset) -> None:
     finally:
         SgkitVariables.registered_variables.pop("foo", None)
         SgkitVariables.registered_variables.pop("bar", None)
+
+
+def test_variables_in_multi_index(dummy_ds: xr.Dataset) -> None:
+    # create a multi index
+    ds = dummy_ds.set_index({"ind": ("foo", "bar")})
+
+    spec = ArrayLikeSpec("foo", kind="i", ndim=1)
+    variables.validate(ds, spec)
