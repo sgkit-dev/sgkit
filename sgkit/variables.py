@@ -146,18 +146,18 @@ class SgkitVariables:
             field_spec, ArrayLikeSpec
         ), "ArrayLikeSpec is the only currently supported variable spec"
 
-        if field not in xr_dataset:
-            raise ValueError(f"{field} not present in {xr_dataset}")
         try:
-            check_array_like(
-                xr_dataset[field], kind=field_spec.kind, ndim=field_spec.ndim
-            )
-            if add_comment_attr and field_spec.__doc__ is not None:
-                xr_dataset[field].attrs["comment"] = field_spec.__doc__.strip()
-        except (TypeError, ValueError) as e:
-            raise ValueError(
-                f"{field} does not match the spec, see the error above for more detail"
-            ) from e
+            arr = xr_dataset[field]
+            try:
+                check_array_like(arr, kind=field_spec.kind, ndim=field_spec.ndim)
+                if add_comment_attr and field_spec.__doc__ is not None:
+                    arr.attrs["comment"] = field_spec.__doc__.strip()
+            except (TypeError, ValueError) as e:
+                raise ValueError(
+                    f"{field} does not match the spec, see the error above for more detail"
+                ) from e
+        except KeyError:
+            raise ValueError(f"{field} not present in {xr_dataset}")
 
 
 validate = SgkitVariables._validate
