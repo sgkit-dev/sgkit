@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>Getting Started</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
@@ -67,7 +68,7 @@
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form>
 <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
-    <p class="caption collapsible-parent">
+    <p>
  <span class="caption-text">
   Contents:
  </span>
@@ -675,7 +676,7 @@
         
               <div>
                 
-  <div class="section" id="getting-started">
+  <section id="getting-started">
 <span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of contents:</p>
@@ -692,14 +693,14 @@
 <li><p><a class="reference internal" href="#genetic-variables" id="id14">Genetic variables</a></p></li>
 </ul>
 </div>
-<div class="section" id="installation">
+<section id="installation">
 <h2><a class="toc-backref" href="#id5">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>You can install sgkit with <cite>pip</cite> - there is no conda package yet. Python 3.7 or 3.8 is required.</p>
 <blockquote>
 <div><p>$ pip install sgkit</p>
 </div></blockquote>
-</div>
-<div class="section" id="overview">
+</section>
+<section id="overview">
 <h2><a class="toc-backref" href="#id6">Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>Sgkit is a general purpose toolkit for quantitative and population genetics.
 The primary goal of sgkit is to take advantage of powerful tools in the <a class="reference external" href="https://pydata.org/">PyData ecosystem</a>
@@ -712,8 +713,8 @@ to facilitate interactive analysis of large-scale datasets. The main libraries w
 <li><p><a class="reference external" href="https://pandas.pydata.org/docs/">Pandas</a>: Tabular data frame manipulation</p></li>
 <li><p><a class="reference external" href="https://docs.cupy.dev/en/stable/">CuPy</a>: Numpy-like array interface for CUDA GPUs</p></li>
 </ul>
-</div>
-<div class="section" id="data-structures">
+</section>
+<section id="data-structures">
 <h2><a class="toc-backref" href="#id7">Data structures</a><a class="headerlink" href="#data-structures" title="Permalink to this headline">¶</a></h2>
 <p>Sgkit uses Xarray <a class="reference external" href="http://xarray.pydata.org/en/stable/data-structures.html#dataset">Dataset</a> objects to model genetic data.
 Users are free to manipulate quantities within these objects as they see fit and a set of conventions for variable names,
@@ -920,8 +921,8 @@ sgkit utilities as well as the Pandas/Xarray integration:</p>
 </div>
 <a class="reference internal image-reference" href="_images/call_rate_example.png"><img alt="_images/call_rate_example.png" src="_images/call_rate_example.png" style="width: 6in; height: 3in;" /></a>
 <p>This last example alludes to representations of missing data that are explained further in <a class="reference internal" href="#missing-data"><span class="std std-ref">Missing data</span></a>.</p>
-</div>
-<div class="section" id="genetic-methods">
+</section>
+<section id="genetic-methods">
 <h2><a class="toc-backref" href="#id8">Genetic methods</a><a class="headerlink" href="#genetic-methods" title="Permalink to this headline">¶</a></h2>
 <p>Genetic methods in sgkit are nearly always applied to individual <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> objects.  For a full list of
 available methods, see <a class="reference internal" href="api.html#api-methods"><span class="std std-ref">Methods</span></a>.</p>
@@ -950,8 +951,8 @@ across samples for each individual variant:</p>
 </div>
 <p>There are two ways that the results of every function are handled – either they are merged with the provided
 dataset or they are returned in a separate dataset.  See <a class="reference internal" href="user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
-</div>
-<div class="section" id="missing-data">
+</section>
+<section id="missing-data">
 <span id="id2"></span><h2><a class="toc-backref" href="#id9">Missing data</a><a class="headerlink" href="#missing-data" title="Permalink to this headline">¶</a></h2>
 <p>Missing data in sgkit is represented using a sentinel value within data arrays
 (<code class="docutils literal notranslate"><span class="pre">-1</span></code> in integer arrays and <code class="docutils literal notranslate"><span class="pre">NaN</span></code> in float arrays) as well as a companion boolean mask array
@@ -1051,8 +1052,8 @@ shows how it can be used in the context of doing something simple like counting 
 <span class="gh">Out[39]: </span><span class="go">1</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="windowing">
+</section>
+<section id="windowing">
 <h2><a class="toc-backref" href="#id10">Windowing</a><a class="headerlink" href="#windowing" title="Permalink to this headline">¶</a></h2>
 <p>It is common to compute statistics in windows along the genome. Some <a class="reference internal" href="api.html#api-methods"><span class="std std-ref">Methods</span></a> in sgkit
 are “windowing aware” and will compute values for windows defined in a dataset. If no windows
@@ -1097,8 +1098,8 @@ then with windows.</p>
 <span class="go">    stat_diversity  (windows, cohorts) float64 dask.array&lt;chunksize=(5, 1), meta=np.ndarray&gt;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="cohorts">
+</section>
+<section id="cohorts">
 <h2><a class="toc-backref" href="#id11">Cohorts</a><a class="headerlink" href="#cohorts" title="Permalink to this headline">¶</a></h2>
 <p>During analysis we often want to be able to group samples into populations, and compute statistics
 based on these groups. Groups of samples are referred to as <em>cohorts</em> in sgkit.</p>
@@ -1138,8 +1139,8 @@ example shows how to give cohorts names.</p>
 <p>Methods that work with cohorts will, by default, operate over all cohorts at once. Sometimes
 however you might only want to run the computation for a subset of cohorts, in which case you can
 explicitly specify the cohorts when calling the function.</p>
-</div>
-<div class="section" id="chaining-operations">
+</section>
+<section id="chaining-operations">
 <h2><a class="toc-backref" href="#id12">Chaining operations</a><a class="headerlink" href="#chaining-operations" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://tomaugspurger.github.io/method-chaining.html">Method chaining</a> is a common practice with Python
 data tools that improves code readability and reduces the probability of introducing accidental namespace collisions.
@@ -1212,8 +1213,8 @@ Xarray and Pandas operations in a single pipeline:</p>
 <p>This is possible because sgkit functions nearly always take a <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> as the first argument, create new
 variables, and then merge these new variables into a copy of the provided dataset in the returned value.
 See <a class="reference internal" href="user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
-</div>
-<div class="section" id="chunked-arrays">
+</section>
+<section id="chunked-arrays">
 <h2><a class="toc-backref" href="#id13">Chunked arrays</a><a class="headerlink" href="#chunked-arrays" title="Permalink to this headline">¶</a></h2>
 <p>Chunked arrays are required when working on large datasets. Libraries for managing chunked arrays such as <a class="reference external" href="https://docs.dask.org/en/latest/array.html">Dask Array</a>
 and <a class="reference external" href="https://zarr.readthedocs.io/en/stable/">Zarr</a> make it possible to implement blockwise algorithms that operate
@@ -1286,12 +1287,12 @@ on a <code class="docutils literal notranslate"><span class="pre">Dataset</span>
 for more examples and information, as well as the Dask tutorials on
 <a class="reference external" href="https://tutorial.dask.org/03_array.html#dask.array-contains-these-algorithms">delayed array execution</a> and
 <a class="reference external" href="https://tutorial.dask.org/01x_lazy.html">lazy execution in Dask graphs</a>.</p>
-</div>
-<div class="section" id="genetic-variables">
+</section>
+<section id="genetic-variables">
 <span id="id4"></span><h2><a class="toc-backref" href="#id14">Genetic variables</a><a class="headerlink" href="#genetic-variables" title="Permalink to this headline">¶</a></h2>
 <p>TODO: Link to and explain <code class="docutils literal notranslate"><span class="pre">sgkit.variables</span></code> in <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/276">https://github.com/pystatgen/sgkit/pull/276</a>.</p>
-</div>
-</div>
+</section>
+</section>
 
 
               </div>
