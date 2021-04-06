@@ -18,3 +18,4 @@ cyvcf2; platform_system != "Windows"
 yarl
 matplotlib
 asv
+networkx
