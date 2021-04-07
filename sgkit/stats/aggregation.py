@@ -588,7 +588,8 @@ def infer_call_ploidy(
         Input variable name holding call_genotype_non_allele as defined by
         :data:`sgkit.variables.call_genotype_non_allele_spec`.
         If the variable is not present in ``ds``, it will be computed
-        using :func:`infer_non_alleles`.
+        assuming that allele values less than -1 are non-alleles in mixed ploidy
+        datasets, or that no non-alleles are present in fixed ploidy datasets.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
