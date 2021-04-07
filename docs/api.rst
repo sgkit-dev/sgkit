@@ -100,6 +100,9 @@ Utilities
    convert_probability_to_call
    display_genotypes
    filter_partial_calls
+   infer_call_ploidy
+   infer_sample_ploidy
+   infer_variant_ploidy
    simulate_genotype_call_dataset
    window
 
@@ -117,10 +120,12 @@ Variables
     variables.call_genotype_complete_mask_spec
     variables.call_genotype_spec
     variables.call_genotype_mask_spec
+    variables.call_genotype_non_allele_spec
     variables.call_genotype_phased_spec
     variables.call_genotype_probability_spec
     variables.call_genotype_probability_mask_spec
     variables.call_heterozygosity_spec
+    variables.call_ploidy_spec
     variables.cohort_allele_count_spec
     variables.covariates_spec
     variables.dosage_spec
@@ -136,6 +141,7 @@ Variables
     variables.sample_n_hom_ref_spec
     variables.sample_n_non_ref_spec
     variables.sample_pcs_spec
+    variables.sample_ploidy_spec
     variables.stat_divergence_spec
     variables.stat_diversity_spec
     variables.stat_Fst_spec
@@ -161,6 +167,7 @@ Variables
     variables.variant_n_hom_ref_spec
     variables.variant_n_non_ref_spec
     variables.variant_p_value_spec
+    variables.variant_ploidy_spec
     variables.variant_position_spec
     variables.variant_t_value_spec
     variables.window_start_spec
