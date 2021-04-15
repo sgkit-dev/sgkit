@@ -1,6 +1,9 @@
 pydata-sphinx-theme
 sphinx >= 3.3
-sphinx_autodoc_typehints
+sphinx_autodoc_typehints 
+# Work around problem with autodoc_typehints
+# https://github.com/theislab/scanpydoc/pull/32
+git+https://github.com/theislab/scanpydoc.git#egg=scanpydoc
 sphinx-book-theme
 scanpydoc
 ipython
