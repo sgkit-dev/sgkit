@@ -14,7 +14,7 @@ env:
 jobs:
   build:
     # This workflow only runs on the origin org
-    if: github.repository_owner == 'pystatgen'  
+    if: github.repository_owner == 'pystatgen'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -27,7 +27,6 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update -y
-          sudo apt install libgsl-dev
           python -m pip install --upgrade pip
           pip install asv
 

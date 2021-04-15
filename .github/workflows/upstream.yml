@@ -26,7 +26,6 @@ jobs:
     - name: Install deps and sgkit
       run: |
         sudo apt update -y
-        sudo apt install libgsl-dev   # Needed for msprime < 1.0. Binary wheels include GSL for >= 1.0
         python -m pip install --upgrade pip
         python .github/scripts/upstream_install.py
         python -m pip install -r requirements-dev.txt
