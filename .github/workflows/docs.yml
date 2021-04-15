@@ -2,7 +2,7 @@ name: Docs
 
 on:
   push:
-    branches:    
+    branches:
       - master
 
 jobs:
@@ -19,7 +19,6 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update -y
-        sudo apt install libgsl-dev   # Needed for msprime < 1.0. Binary wheels include GSL for >= 1.0
         sudo apt install graphviz  # Needed for documentation
         python -m pip install --upgrade pip
         pip install -r requirements.txt -r requirements-dev.txt -r requirements-doc.txt

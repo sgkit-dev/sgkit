@@ -8,7 +8,7 @@ pytest-mock
 hypothesis
 scikit-allel
 statsmodels
-msprime
+msprime>=1.0
 scikit-learn
 partd
 bed-reader
