@@ -1,6 +1,7 @@
 import itertools
 
 import allel
+import dask.array as da
 import msprime  # type: ignore
 import numpy as np
 import pytest
@@ -16,6 +17,7 @@ from sgkit import (
     create_genotype_call_dataset,
     divergence,
     diversity,
+    observed_heterozygosity,
     pbs,
     simulate_genotype_call_dataset,
     variables,
@@ -456,3 +458,166 @@ def test_Garud_h__raise_on_no_windows():
 
     with pytest.raises(ValueError, match="Dataset must be windowed for Garud_H"):
         Garud_H(ds)
+
+
+@pytest.mark.parametrize("chunks", [((4,), (6,), (4,)), ((2, 2), (3, 3), (2, 2))])
+def test_observed_heterozygosity(chunks):
+    ds = simulate_genotype_call_dataset(
+        n_variant=4,
+        n_sample=6,
+        n_ploidy=4,
+    )
+    ds["call_genotype"] = (
+        ["variants", "samples", "ploidy"],
+        da.asarray(
+            [
+                [
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [1, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [0, 0, 0, 0],
+                    [1, 1, 1, 1],
+                ],
+                [
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 1],
+                    [0, 0, 1, 1],
+                    [0, 0, 1, 1],
+                    [1, 0, 1, 0],
+                    [0, 1, 0, 1],
+                ],
+                [
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 1, 2, 3],
+                    [0, 1, 2, 3],
+                    [0, 1, 2, 3],
+                    [4, 5, 6, 7],
+                ],
+                [
+                    [0, 0, -1, -1],
+                    [0, 1, -1, -1],
+                    [0, 0, 1, 1],
+                    [-1, -1, -1, -1],
+                    [0, -1, -1, -1],
+                    [-1, -1, -1, -1],
+                ],
+            ]
+        ).rechunk(chunks),
+    )
+    ds.call_genotype_mask.values = ds.call_genotype < 0
+    ds["sample_cohort"] = (
+        ["samples"],
+        da.asarray([0, 0, 1, 1, 2, 2]).rechunk(chunks[1]),
+    )
+    ho = observed_heterozygosity(ds)["stat_observed_heterozygosity"]
+    np.testing.assert_almost_equal(
+        ho,
+        np.array(
+            [
+                [0, 0, 0],
+                [1 / 4, 2 / 3, 2 / 3],
+                [0, 1, 1],
+                [1 / 2, 4 / 6, np.nan],
+            ]
+        ),
+    )
+
+
+@pytest.mark.parametrize("chunks", [((4,), (6,), (4,)), ((2, 2), (3, 3), (2, 2))])
+def test_observed_heterozygosity__windowed(chunks):
+    ds = simulate_genotype_call_dataset(
+        n_variant=4,
+        n_sample=6,
+        n_ploidy=4,
+    )
+    ds["call_genotype"] = (
+        ["variants", "samples", "ploidy"],
+        da.asarray(
+            [
+                [
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [1, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [0, 0, 0, 0],
+                    [1, 1, 1, 1],
+                ],
+                [
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 1],
+                    [0, 0, 1, 1],
+                    [0, 0, 1, 1],
+                    [1, 0, 1, 0],
+                    [0, 1, 0, 1],
+                ],
+                [
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 1, 2, 3],
+                    [0, 1, 2, 3],
+                    [0, 1, 2, 3],
+                    [4, 5, 6, 7],
+                ],
+                [
+                    [0, 0, -1, -1],
+                    [0, 1, -1, -1],
+                    [0, 0, 1, 1],
+                    [-1, -1, -1, -1],
+                    [0, -1, -1, -1],
+                    [-1, -1, -1, -1],
+                ],
+            ]
+        ).rechunk(chunks),
+    )
+    ds.call_genotype_mask.values = ds.call_genotype < 0
+    ds["sample_cohort"] = (
+        ["samples"],
+        da.asarray([0, 0, 1, 1, 2, 2]).rechunk(chunks[1]),
+    )
+    ds = window(ds, size=2)
+    ho = observed_heterozygosity(ds)["stat_observed_heterozygosity"]
+    np.testing.assert_almost_equal(
+        ho,
+        np.array(
+            [
+                [1 / 4, 2 / 3, 2 / 3],
+                [1 / 2, 5 / 3, np.nan],
+            ]
+        ),
+    )
+
+
+@pytest.mark.parametrize("window_size", [10, 13])
+@pytest.mark.parametrize(
+    "n_variant,n_sample,missing_pct", [(30, 20, 0), (47, 17, 0.25)]
+)
+@pytest.mark.parametrize("seed", [1, 3, 7])
+def test_observed_heterozygosity__scikit_allel_comparison(
+    n_variant, n_sample, missing_pct, window_size, seed
+):
+    ds = simulate_genotype_call_dataset(
+        n_variant=n_variant,
+        n_sample=n_sample,
+        n_ploidy=2,
+        missing_pct=missing_pct,
+        seed=seed,
+    )
+    ds["sample_cohort"] = (
+        ["samples"],
+        np.zeros(n_sample, int),
+    )
+    ds = window(ds, size=window_size)
+    ho_sg = observed_heterozygosity(ds)["stat_observed_heterozygosity"].values
+    if n_sample % window_size:
+        # scikit-allel will drop the ragged end
+        ho_sg = ho_sg[0:-1]
+    # calculate with scikit-allel
+    ho_sa = allel.moving_statistic(
+        allel.heterozygosity_observed(ds["call_genotype"]),
+        np.sum,
+        size=window_size,
+    )
+    # add cohort dimension to scikit-allel result
+    np.testing.assert_almost_equal(ho_sg, ho_sa[..., None])

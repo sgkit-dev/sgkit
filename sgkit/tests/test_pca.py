@@ -108,6 +108,16 @@ def test_pca__default_allele_counts(sample_dataset):
     ).compute()
 
 
+def test_pca__default_allele_counts_with_index(sample_dataset):
+    pca.pca(
+        sample_dataset.drop_vars("call_alternate_allele_count").set_index(
+            {"variants": ("variant_contig", "variant_position")}
+        ),
+        n_components=2,
+        merge=False,
+    ).compute()
+
+
 def test_pca__raise_on_no_ploidy(sample_dataset):
     with pytest.raises(ValueError, match="`ploidy` must be specified explicitly"):
         pca.pca_est(sample_dataset.drop_dims("ploidy"), n_components=2, ploidy=None)

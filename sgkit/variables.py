@@ -119,14 +119,17 @@ class SgkitVariables:
             elif s:
                 try:
                     field_spec = cls.registered_variables[s]
+                    cls._check_field(
+                        xr_dataset,
+                        field_spec,
+                        field_spec.default_name,
+                        add_comment_attr=add_comment_attr,
+                    )
                 except KeyError:
-                    raise ValueError(f"No array spec registered for {s}")
-                cls._check_field(
-                    xr_dataset,
-                    field_spec,
-                    field_spec.default_name,
-                    add_comment_attr=add_comment_attr,
-                )
+                    if s in xr_dataset.indexes.keys():
+                        logger.debug(f"Ignoring missing spec for index: {s}")
+                    else:
+                        raise ValueError(f"No array spec registered for {s}")
         return xr_dataset
 
     @classmethod
@@ -143,18 +146,18 @@ class SgkitVariables:
             field_spec, ArrayLikeSpec
         ), "ArrayLikeSpec is the only currently supported variable spec"
 
-        if field not in xr_dataset:
-            raise ValueError(f"{field} not present in {xr_dataset}")
         try:
-            check_array_like(
-                xr_dataset[field], kind=field_spec.kind, ndim=field_spec.ndim
-            )
-            if add_comment_attr and field_spec.__doc__ is not None:
-                xr_dataset[field].attrs["comment"] = field_spec.__doc__.strip()
-        except (TypeError, ValueError) as e:
-            raise ValueError(
-                f"{field} does not match the spec, see the error above for more detail"
-            ) from e
+            arr = xr_dataset[field]
+            try:
+                check_array_like(arr, kind=field_spec.kind, ndim=field_spec.ndim)
+                if add_comment_attr and field_spec.__doc__ is not None:
+                    arr.attrs["comment"] = field_spec.__doc__.strip()
+            except (TypeError, ValueError) as e:
+                raise ValueError(
+                    f"{field} does not match the spec, see the error above for more detail"
+                ) from e
+        except KeyError:
+            raise ValueError(f"{field} not present in {xr_dataset}")
 
 
 validate = SgkitVariables._validate
@@ -315,6 +318,17 @@ completely missing genotype calls.
         kind="b",
         ndim=3,
         __doc__="""A flag for each call indicating which values are missing.""",
+    )
+)
+
+call_heterozygosity, call_heterozygosity_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "call_heterozygosity",
+        kind="f",
+        ndim=2,
+        __doc__="""
+Observed heterozygosity of each call genotype.
+""",
     )
 )
 
@@ -604,6 +618,20 @@ stat_Garud_h2_h1, stat_Garud_h2_h1_spec = SgkitVariables.register_variable(
         ndim={1, 2},
         kind="f",
         __doc__="""Garud H2/H1 statistic for cohorts.""",
+    )
+)
+
+(
+    stat_observed_heterozygosity,
+    stat_observed_heterozygosity_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_observed_heterozygosity",
+        kind="f",
+        ndim=2,
+        __doc__="""
+Observed heterozygosity for cohorts.
+""",
     )
 )
 
