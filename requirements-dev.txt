@@ -12,7 +12,7 @@ msprime
 scikit-learn
 partd
 bed-reader
-rechunker
+rechunker == 0.3.3
 cbgen
 cyvcf2; platform_system != "Windows"
 yarl
