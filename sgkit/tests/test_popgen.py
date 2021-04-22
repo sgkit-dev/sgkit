@@ -346,10 +346,9 @@ def test_Fst__windowed(sample_size, n_cohorts, chunks):
         )  # scikit-allel has final window missing
 
 
+# Skipping values > 2, because of this issue:
 # https://github.com/pystatgen/sgkit/issues/522
-# This is failing for n > 2
-@pytest.mark.skip()
-@pytest.mark.parametrize("sample_size", [2, 3, 10, 100])
+@pytest.mark.parametrize("sample_size", [2])
 def test_Tajimas_D(sample_size):
     ts = simulate_ts(sample_size)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
