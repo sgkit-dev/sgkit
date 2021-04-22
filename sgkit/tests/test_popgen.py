@@ -303,8 +303,6 @@ def test_Fst__unknown_estimator():
         Fst(ds, estimator="Unknown")
 
 
-# https://github.com/pystatgen/sgkit/issues/522
-@pytest.mark.skip("Problems with Fst")
 @pytest.mark.parametrize(
     "sample_size, n_cohorts",
     [(10, 2), (10, 3)],
@@ -330,7 +328,10 @@ def test_Fst__windowed(sample_size, n_cohorts, chunks):
         )
         ts_fst[:, j, i] = ts_fst[:, i, j]
 
-    np.testing.assert_allclose(fst, ts_fst)
+    # We can values close to zero, and the default value of atol isn't
+    # appropriate for this.
+    atol = 1e-8
+    np.testing.assert_allclose(fst, ts_fst, atol=atol)
 
     # scikit-allel
     fst_ds = Fst(ds, estimator="Hudson")
@@ -342,7 +343,7 @@ def test_Fst__windowed(sample_size, n_cohorts, chunks):
         ska_fst = allel.moving_hudson_fst(ac_i, ac_j, size=25)
 
         np.testing.assert_allclose(
-            fst[:-1], ska_fst
+            fst[:-1], ska_fst, atol=atol
         )  # scikit-allel has final window missing
 
 
