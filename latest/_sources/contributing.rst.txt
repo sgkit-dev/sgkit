@@ -88,12 +88,7 @@ Contributions to *sgkit* can then be made by submitting pull requests on GitHub.
 Install
 ~~~~~~~
 
-To build the library you need to first install GSL (GNU Scientific Library),
-which is required for ``msprime``. Since it's a system package and installation
-may vary depending on the operating system, the instructions for the same can be
-found on `msprime docs. <https://msprime.readthedocs.io/en/stable/installation.html#installing-system-requirements>`_
-
-You can install rest of the necessary requirements using pip::
+You can install the necessary requirements using pip::
 
   cd sgkit
   pip install -r requirements.txt -r requirements-dev.txt -r requirements-doc.txt
