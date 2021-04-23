@@ -347,9 +347,8 @@ def test_Fst__windowed(sample_size, n_cohorts, chunks):
         )  # scikit-allel has final window missing
 
 
-# Skipping values > 2, because of this issue:
-# https://github.com/pystatgen/sgkit/issues/522
-@pytest.mark.parametrize("sample_size", [2])
+@pytest.mark.parametrize("sample_size", [2, 3, 5, 10, 100])
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_Tajimas_D(sample_size):
     ts = simulate_ts(sample_size)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
@@ -359,6 +358,18 @@ def test_Tajimas_D(sample_size):
     ds = Tajimas_D(ds)
     d = ds.stat_Tajimas_D.compute()
     ts_d = ts.Tajimas_D()
+    np.testing.assert_allclose(d, ts_d)
+
+
+@pytest.mark.skip("Windows not implemented in Tajimas D (#563)")
+@pytest.mark.parametrize("sample_size", [2, 3, 5, 10, 100])
+def test_Tajimas_D_per_site(sample_size):
+    ts = simulate_ts(sample_size, random_seed=1234)
+    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    ds, subsets = add_cohorts(ds, ts, cohort_key_names=None)  # type: ignore[no-untyped-call]
+    ds = Tajimas_D(ds)
+    d = ds.stat_Tajimas_D.compute()
+    ts_d = ts.Tajimas_D(windows="sites")
     np.testing.assert_allclose(d, ts_d)
 
 

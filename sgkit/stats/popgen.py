@@ -554,8 +554,11 @@ def Tajimas_D(
 
     ac = ds[variant_allele_count]
 
-    # count segregating
-    S = ((ac > 0).sum(axis=1) > 1).sum()
+    # count segregating. Note that this uses the definition in tskit,
+    # which is the number of alleles - 1. In the biallelic case this
+    # gives us the number of non-monomorphic sites.
+    # FIXME this needs to be windowed: # 563
+    S = ((ac > 0).sum(axis=1) - 1).sum()
 
     # assume number of chromosomes sampled is constant for all variants
     # NOTE: even tho ac has dtype uint, we promote the sum to float
@@ -583,14 +586,12 @@ def Tajimas_D(
     c2 = b2 - ((n + 2) / (a1 * n)) + (a2 / (a1 ** 2))
     e1 = c1 / a1
     e2 = c2 / (a1 ** 2 + a2)
-    d_stdev = np.sqrt((e1 * S) + (e2 * S * (S - 1)))
+    d_stdev = da.sqrt((e1 * S) + (e2 * S * (S - 1)))
 
-    if d_stdev == 0:
-        D = np.nan
-    else:
-        # finally calculate Tajima's D
-        D = d / d_stdev
-
+    # Let IEEE decide the semantics of division by zero here. The return value
+    # will be -inf, nan or +inf, depending on the value of the numerator.
+    # Currently this will raise a RuntimeWarning, if we divide by zero.
+    D = d / d_stdev
     new_ds = create_dataset({variables.stat_Tajimas_D: D})
     return conditional_merge_datasets(ds, new_ds, merge)
 
