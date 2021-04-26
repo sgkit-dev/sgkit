@@ -7,6 +7,7 @@ from numba import njit
 from sgkit.typing import ArrayLike
 
 
+# Note that float32 types are used in this function to get an exact match with scikit-allel's equivalent function.
 @njit(nogil=True, fastmath=True, cache=True, locals={"m0": numba.float32, "m1": numba.float32, "v0": numba.float32, "v1": numba.float32, "cov": numba.float32, "n": numba.int32})  # type: ignore
 def rogers_huff_r_between(gn0: ArrayLike, gn1: ArrayLike) -> float:  # pragma: no cover
     """Rogers Huff R
