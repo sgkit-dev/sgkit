@@ -77,19 +77,23 @@ def ld_matrix(
     *,
     dosage: Hashable = variables.dosage,
     threshold: Optional[float] = None,
-    scores: Optional[ArrayLike] = None,
+    ld_score: Optional[Hashable] = None,
 ) -> DataFrame:  # TODO: return Dataset
 
     if not has_windows(ds):
         raise ValueError("Dataset must be windowed for ld_matrix")
 
-    # TODO: make scores a variable (so it can be validated)
     variables.validate(ds, {dosage: variables.dosage_spec})
 
-    x = ds[dosage]
-    x = da.asarray(x)
+    x = da.asarray(ds[dosage])
 
     threshold = threshold or np.nan
+
+    if ld_score is not None:
+        variables.validate(ds, {ld_score: variables.ld_score_spec})
+        scores = da.asarray(ds[ld_score])
+    else:
+        scores = None
 
     # Find windows in each chunk
     window_starts = ds.window_start.values
@@ -334,9 +338,9 @@ def ld_prune(
     *,
     dosage: Hashable = variables.dosage,
     threshold: float = 0.2,
-    scores: Optional[ArrayLike] = None,
+    ld_score: Optional[Hashable] = None,
 ) -> Dataset:
 
-    ldm = ld_matrix(ds, dosage=dosage, threshold=threshold, scores=scores)
+    ldm = ld_matrix(ds, dosage=dosage, threshold=threshold, ld_score=ld_score)
     mis = maximal_independent_set(ldm)
     return mis

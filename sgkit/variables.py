@@ -387,6 +387,17 @@ across all samples for a variant.
     )
 )
 
+ld_score, ld_score_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "ld_score",
+        ndim=1,
+        kind="f",
+        __doc__="""
+Scores to prioritize variant selection when constructing an LD matrix.
+""",
+    )
+)
+
 loco_prediction, loco_prediction_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "loco_prediction",
