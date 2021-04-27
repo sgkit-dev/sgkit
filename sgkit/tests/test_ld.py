@@ -10,7 +10,7 @@ from hypothesis import Phase, example, given, settings
 from hypothesis import strategies as st
 from hypothesis.extra.numpy import arrays
 
-from sgkit import window
+from sgkit import variables, window
 from sgkit.stats.ld import (
     ld_matrix,
     ld_prune,
@@ -175,8 +175,9 @@ def test_scores():
     scores = np.ones(10, dtype="float32")
     scores[2] = 0
     scores[3] = 2
+    ds[variables.ld_score] = (["variants"], scores)
 
-    idx_drop_ds = ld_prune(ds, scores=scores)
+    idx_drop_ds = ld_prune(ds, ld_score=variables.ld_score)
     idx_drop = np.sort(idx_drop_ds.index_to_drop.data)
 
     npt.assert_equal(idx_drop, [2, 8])
