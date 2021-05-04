@@ -78,7 +78,43 @@ def ld_matrix(
     dosage: Hashable = variables.dosage,
     threshold: Optional[float] = None,
     ld_score: Optional[Hashable] = None,
-) -> DataFrame:  # TODO: return Dataset
+) -> DataFrame:
+    """Compute a sparse linkage disequilibrium (LD) matrix.
+
+    This method computes the Rogers Huff R2 value for each pair of variants in
+    a window, and returns those that exceed the provided threshold, as a sparse
+    matrix dataframe.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing genotype dosages.
+    dosage
+        Name of genetic dosage variable.
+        Defined by :data:`sgkit.variables.dosage_spec`.
+    threshold
+        R2 threshold below which no variant pairs will be returned. This should almost
+        always be something at least slightly above 0 to avoid the large density very
+        near zero LD present in most datasets.
+    ld_score
+        Optional name of variable to use to prioritize variant selection
+        (e.g. minor allele frequency). Defaults to None.
+        Defined by :data:`sgkit.variables.ld_score_spec`.
+
+    Returns
+    -------
+    Upper triangle (including diagonal) of LD matrix as COO in dataframe.  Fields:
+
+    - ``i``: Row (variant) index 1
+    - ``j``: Row (variant) index 2
+    - ``value``: R2 value
+    - ``cmp``: If ``ld_score`` is provided, this is 1, 0, or -1 indicating whether or not ``i > j`` (1), ``i < j`` (-1), or ``i == j`` (0)
+
+    Raises
+    ------
+    ValueError
+        If the dataset is not windowed.
+    """
 
     if not has_windows(ds):
         raise ValueError("Dataset must be windowed for ld_matrix")
@@ -309,28 +345,37 @@ def _maximal_independent_set(
     return _maximal_independent_set_jit(idi, idj, cmp)
 
 
-def maximal_independent_set(ds: Dataset) -> Dataset:
-    """Numba MIS
+def maximal_independent_set(df: DataFrame) -> Dataset:
+    """Compute a maximal independent set of variants.
 
     This method is based on the PLINK algorithm that selects independent
     vertices from a graph implied by excessive LD between variants.
 
-    For an outline of this process, see [this discussion]
-    (https://groups.google.com/forum/#!msg/plink2-users/w5TuZo2fgsQ/WbNnE16_xDIJ).
+    For an outline of this process, see
+    `this discussion <https://groups.google.com/forum/#!msg/plink2-users/w5TuZo2fgsQ/WbNnE16_xDIJ>`_.
+
+    Parameters
+    ----------
+    df
+        Dataframe containing a sparse matrix of R2 values, typically from :func:`sgkit.ld_matrix`.
 
     Raises
     ------
-    ValueError if `i` and `j` are not sorted ascending (and in that order)
+    ValueError
+        If ``i`` and ``j`` are not sorted ascending (and in that order)
 
     Returns
     -------
-    Dataset
+    A dataset containing the indexes of variants to drop, as defined by
+    :data:`sgkit.variables.ld_prune_index_to_drop_spec`.
     """
-    args = [np.asarray(ds[c]) for c in ["i", "j"]]
-    if "cmp" in ds:
-        args.append(np.asarray(ds["cmp"]))
+    args = [np.asarray(df[c]) for c in ["i", "j"]]
+    if "cmp" in df:
+        args.append(np.asarray(df["cmp"]))
     drop = _maximal_independent_set(*args)
-    return Dataset({"index_to_drop": ("index", np.asarray(drop))})
+    return Dataset(
+        {variables.ld_prune_index_to_drop: ("variant_indexes", np.asarray(drop))}
+    )
 
 
 def ld_prune(
@@ -340,7 +385,62 @@ def ld_prune(
     threshold: float = 0.2,
     ld_score: Optional[Hashable] = None,
 ) -> Dataset:
+    """Prune variants in linkage disequilibrium (LD).
 
+    This method uses a sparse LD matrix to find a maximally independent set (MIS)
+    of variants, and returns a dataset containing only those variants.
+
+    No information about which variants are pruned is returned by this method.
+    Consider using :func:`sgkit.ld_matrix` and :func:`sgkit.maximal_independent_set`
+    to get more insight into the variants that are pruned.
+
+    Note: This result is not a true MIS if ``ld_score`` is provided and are based on
+    minor allele frequency or anything else that is not identical for all variants.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing genotype dosages.
+    dosage
+        Name of genetic dosage variable.
+        Defined by :data:`sgkit.variables.dosage_spec`.
+    threshold
+        R2 threshold below which no variant pairs will be returned. This should almost
+        always be something at least slightly above 0 to avoid the large density very
+        near zero LD present in most datasets.
+    ld_score
+        Optional name of variable to use to prioritize variant selection
+        (e.g. minor allele frequency). Defaults to None.
+        Defined by :data:`sgkit.variables.ld_score_spec`.
+
+    Returns
+    -------
+    A dataset where the variants in linkage disequilibrium have been removed.
+
+    Raises
+    ------
+    ValueError
+        If the dataset is not windowed.
+
+    Examples
+    --------
+
+    >>> import numpy as np
+    >>> import sgkit as sg
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=10, n_sample=4)
+    >>> ds.dims["variants"]
+    10
+
+    >>> # Calculate dosage
+    >>> ds["dosage"] = ds["call_genotype"].sum(dim="ploidy")
+
+    >>> # Divide into windows of size five (variants)
+    >>> ds = sg.window(ds, size=5)
+
+    >>> pruned_ds = sg.ld_prune(ds)
+    >>> pruned_ds.dims["variants"]
+    6
+    """
     ldm = ld_matrix(ds, dosage=dosage, threshold=threshold, ld_score=ld_score)
     mis = maximal_independent_set(ldm)
-    return mis
+    return ds.sel(variants=~ds.variants.isin(mis.ld_prune_index_to_drop))
