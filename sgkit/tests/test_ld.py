@@ -14,6 +14,7 @@ from sgkit import variables, window
 from sgkit.stats.ld import (
     ld_matrix,
     ld_prune,
+    maximal_independent_set,
     rogers_huff_r2_between,
     rogers_huff_r_between,
 )
@@ -154,8 +155,10 @@ def test_vs_skallel(args):
     ds["dosage"] = (["variants", "samples"], da.asarray(x).rechunk({0: chunks}))
     ds = window(ds, size, step)
 
-    idx_drop_ds = ld_prune(ds, threshold=threshold)
-    idx_drop = np.sort(idx_drop_ds.index_to_drop.data)
+    ldm = ld_matrix(ds, threshold=threshold)
+    idx_drop_ds = maximal_independent_set(ldm)
+
+    idx_drop = np.sort(idx_drop_ds.ld_prune_index_to_drop.data)
     m = allel.locate_unlinked(x, size=size, step=step, threshold=threshold)
     idx_drop_ska = np.sort(np.argwhere(~m).squeeze(axis=1))
 
@@ -177,10 +180,15 @@ def test_scores():
     ds["dosage"] = (["variants", "samples"], x)
     ds = window(ds, size=10)
 
-    idx_drop_ds = ld_prune(ds)
-    idx_drop = np.sort(idx_drop_ds.index_to_drop.data)
+    ldm = ld_matrix(ds, threshold=0.2)
+    idx_drop_ds = maximal_independent_set(ldm)
+    idx_drop = np.sort(idx_drop_ds.ld_prune_index_to_drop.data)
 
     npt.assert_equal(idx_drop, [3, 8])
+
+    # check ld_prune removes correct variants
+    pruned_ds = ld_prune(ds, threshold=0.2)
+    npt.assert_equal(pruned_ds.variant_position.values, [0, 1, 2, 4, 5, 6, 7, 9])
 
     # break tie between 3rd and 4th so 4th wins
     scores = np.ones(10, dtype="float32")
@@ -188,7 +196,12 @@ def test_scores():
     scores[3] = 2
     ds[variables.ld_score] = (["variants"], scores)
 
-    idx_drop_ds = ld_prune(ds, ld_score=variables.ld_score)
-    idx_drop = np.sort(idx_drop_ds.index_to_drop.data)
+    ldm = ld_matrix(ds, threshold=0.2, ld_score=variables.ld_score)
+    idx_drop_ds = maximal_independent_set(ldm)
+    idx_drop = np.sort(idx_drop_ds.ld_prune_index_to_drop.data)
 
     npt.assert_equal(idx_drop, [2, 8])
+
+    # check ld_prune removes correct variants
+    pruned_ds = ld_prune(ds, threshold=0.2, ld_score=variables.ld_score)
+    npt.assert_equal(pruned_ds.variant_position.values, [0, 1, 3, 4, 5, 6, 7, 9])

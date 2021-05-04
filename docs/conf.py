@@ -16,6 +16,7 @@ import os
 import sys
 from pathlib import Path
 
+import dask.dataframe
 import xarray
 from sphinx.util import logging
 
@@ -102,8 +103,10 @@ nitpick_ignore = [("py:class", "sgkit.display.GenotypeDisplay")]
 xarray.Dataset.__module__ = "xarray"
 xarray.DataArray.__module__ = "xarray"
 
+dask.dataframe.DataFrame.__module__ = "dask.dataframe"
 
 intersphinx_mapping = dict(
+    dask=("https://docs.dask.org/en/stable/", None),
     xarray=("https://xarray.pydata.org/en/stable/", None),
     zarr=("https://zarr.readthedocs.io/en/stable", None),
     numpy=("https://numpy.org/doc/stable/", None),

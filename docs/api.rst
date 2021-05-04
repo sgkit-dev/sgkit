@@ -84,6 +84,9 @@ Methods
    gwas_linear_regression
    hardy_weinberg_test
    individual_heterozygosity
+   ld_matrix
+   ld_prune
+   maximal_independent_set
    observed_heterozygosity
    pc_relate
    regenie
@@ -130,6 +133,8 @@ Variables
     variables.covariates_spec
     variables.dosage_spec
     variables.genotype_counts_spec
+    variables.ld_prune_index_to_drop_spec
+    variables.ld_score_spec
     variables.loco_prediction_spec
     variables.meta_prediction_spec
     variables.pc_relate_phi_spec
