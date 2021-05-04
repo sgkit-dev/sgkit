@@ -387,6 +387,17 @@ across all samples for a variant.
     )
 )
 
+ld_prune_index_to_drop, ld_prune_index_to_drop_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "ld_prune_index_to_drop",
+        ndim=1,
+        kind="i",
+        __doc__="""
+Variant indexes to drop for LD prune.
+""",
+    )
+)
+
 ld_score, ld_score_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "ld_score",
