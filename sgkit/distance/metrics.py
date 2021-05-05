@@ -193,6 +193,18 @@ def call_metric_kernel(
     out = np.zeros((f.shape[0], g.shape[0], N_MAP_PARAM[metric]), dtype=f.dtype)
     d_out = cuda.to_device(out)
 
+    # https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#features-and-technical-specifications__technical-specifications-per-compute-capability
+    # These apply to compute capability 2.0 and higher and all GPUs NVIDIA has
+    # shipped in the past 10+ years have compute capability > 3.0.
+    # One way to get the compute capability programmatically is via:
+    # from numba import cuda
+    # cuda.get_current_device().compute_capability
+
+    # In future when we have an average GPU with ability to have
+    # more number of threads per block, we can increase this to that value
+    # or parameterise this from the pairwise function or get the maximum
+    # possible value for a given compute capability.
+
     threads_per_block = (32, 32)
     blocks_per_grid = (
         math.ceil(out.shape[0] / threads_per_block[0]),
@@ -211,6 +223,9 @@ def _correlation(
 ) -> None:  # pragma: no cover.
     # Note: assigning variable and only saving the final value in the
     # array made this significantly faster.
+
+    # aggressively making all variables explicitly typed
+    # makes it more performant by a factor of ~2-3x
     v0 = types.float32(0)
     v1 = types.float32(0)
     v2 = types.float32(0)
