@@ -17,7 +17,7 @@ from sgkit.typing import ArrayLike
 
 def detect_cuda_driver() -> bool:
     try:
-        return bool(len(cuda.list_devices()))
+        return len(cuda.list_devices()) > 0
     except cuda.CudaSupportError:
         return False
 
