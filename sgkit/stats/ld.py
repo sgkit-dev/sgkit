@@ -10,9 +10,15 @@ from sgkit.typing import ArrayLike
 # Note that float32 types are used in this function to get an exact match with scikit-allel's equivalent function.
 @njit(nogil=True, fastmath=True, cache=True, locals={"m0": numba.float32, "m1": numba.float32, "v0": numba.float32, "v1": numba.float32, "cov": numba.float32, "n": numba.int32})  # type: ignore
 def rogers_huff_r_between(gn0: ArrayLike, gn1: ArrayLike) -> float:  # pragma: no cover
-    """Rogers Huff R
+    """Rogers Huff *r*.
 
-    From https://github.com/cggh/scikit-allel/blob/961254bd583572eed7f9bd01060e53a8648e620c/allel/opt/stats.pyx
+    Estimate the linkage disequilibrium parameter *r* for each pair of variants
+    between the two input arrays, using the method of Rogers and Huff (2008).
+
+    Note that this function can return floating point NaN and infinity values,
+    so callers should use ``np.isfinite`` to check for these cases.
+
+    Based on https://github.com/cggh/scikit-allel/blob/961254bd583572eed7f9bd01060e53a8648e620c/allel/opt/stats.pyx
     """
     # initialise variables
     m0 = m1 = v0 = v1 = cov = 0.0
@@ -46,11 +52,9 @@ def rogers_huff_r_between(gn0: ArrayLike, gn1: ArrayLike) -> float:  # pragma: n
     v1 -= m1 * m1
 
     d = math.sqrt(v0 * v1)
-    if d < np.finfo(np.float32).tiny:
-        return np.nan
 
-    # compute correlation coeficient
-    r = cov / d
+    # compute correlation coefficient
+    r: float = np.divide(cov, d)
 
     return r
 
