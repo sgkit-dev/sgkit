@@ -101,7 +101,7 @@ def test_threshold():
     # Should be 6 comparisons (2->3,7,8 3->7,8 7->8)
     assert len(df) == 6
     # Only 2->3 and 7->8 are perfectly correlated
-    assert len(df[df["value"] == 1.0]) == 2
+    assert len(df[abs(df["value"] - 1.0) < 1e-06]) == 2
     # Do the same with a threshold
     df = ldm_df(x, size=10, threshold=0.5)
     assert len(df) == 2
