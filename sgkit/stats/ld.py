@@ -238,7 +238,7 @@ def _ld_matrix_jit(
                     elif scores[i1] < scores[i2]:
                         cmp = np.int8(-1)
 
-                if no_threshold or res >= threshold:
+                if no_threshold or (res >= threshold and np.isfinite(res)):
                     rows.append(
                         (index_dtype(index), index_dtype(other), value_dtype(res), cmp)
                     )
