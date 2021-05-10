@@ -385,7 +385,7 @@ def allele_frequency(
         data_vars[variables.variant_allele_count] = AC
 
     M = ds[call_genotype_mask].stack(calls=("samples", "ploidy"))
-    AN = (~M).sum(dim="calls")  # type: ignore
+    AN = (~M).sum(dim="calls")
     assert AN.shape == (ds.dims["variants"],)
 
     data_vars[variables.variant_allele_total] = AN
@@ -608,7 +608,7 @@ def infer_call_ploidy(
     )
     mixed_ploidy = ds[variables.call_genotype].attrs.get("mixed_ploidy", False)
     if mixed_ploidy:
-        call_ploidy = (~ds[call_genotype_non_allele]).sum(axis=-1)  # type: ignore[operator]
+        call_ploidy = (~ds[call_genotype_non_allele]).sum(axis=-1)
     else:
         ploidy = ds[variables.call_genotype].shape[-1]
         call_ploidy = xr.full_like(ds[variables.call_genotype][..., 0], ploidy)
