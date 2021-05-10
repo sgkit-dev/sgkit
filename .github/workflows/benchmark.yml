@@ -3,7 +3,7 @@ name: Benchmarks
 on:
   push:
     branches:
-      - master
+      - main
 
 env:
   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

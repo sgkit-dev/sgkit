@@ -1,7 +1,7 @@
 pull_request_rules:
   - name: automatic merge
     conditions:
-      - base=master
+      - base=main
       - status-success=build (3.7)
       - status-success=build (3.8)
       - status-success=win_build (3.7)
