@@ -94,6 +94,11 @@ You can install the necessary requirements using pip::
   pip install -r requirements.txt -r requirements-dev.txt -r requirements-doc.txt
 
 
+If you have a Nvidia GPU you will need to make sure that it is configured properly,
+as in you have cudatoolkit installed, the instructions for the same can be found on
+`nvidia docs. <https://developer.nvidia.com/cuda-toolkit>`_
+
+
 Also install pre-commit, which is used to enforce coding standards::
 
    pre-commit install

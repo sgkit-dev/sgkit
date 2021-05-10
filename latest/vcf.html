@@ -754,7 +754,7 @@ which may be helpful if you encounter errors during installation.</p>
 not <a class="reference external" href="https://github.com/brentp/cyvcf2/issues/90">currently work on Windows</a>.
 As a workaround, consider using scikit-allel’s <code class="docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code> function
 to write a VCF in Zarr format, followed by <a class="reference internal" href="generated/sgkit.read_vcfzarr.html#sgkit.read_vcfzarr" title="sgkit.read_vcfzarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.read_vcfzarr()</span></code></a> to
-read the VCF as a <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.17.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
+read the VCF as a <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.18.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
 </div>
 </div>
 <div class="section" id="usage">
@@ -895,7 +895,7 @@ would set the temporary Zarr store to be a cloud storage URL (by setting <code c
 that all workers can access the store (both for reading and writing).</p>
 <p>For debugging, or for more control over the steps, consider using
 <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarrs.html#sgkit.io.vcf.vcf_to_zarrs" title="sgkit.io.vcf.vcf_to_zarrs"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarrs()</span></code></a> followed by <a class="reference internal" href="generated/sgkit.io.vcf.zarrs_to_dataset.html#sgkit.io.vcf.zarrs_to_dataset" title="sgkit.io.vcf.zarrs_to_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.zarrs_to_dataset()</span></code></a>,
-then saving the dataset using Xarray’s <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.to_zarr.html#xarray.Dataset.to_zarr" title="(in xarray v0.17.1.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.to_zarr()</span></code></a> method.</p>
+then saving the dataset using Xarray’s <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.to_zarr.html#xarray.Dataset.to_zarr" title="(in xarray v0.18.1.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.to_zarr()</span></code></a> method.</p>
 </div>
 <div class="section" id="polyploid-and-mixed-ploidy-vcf">
 <h2><a class="toc-backref" href="#id9">Polyploid and mixed-ploidy VCF</a><a class="headerlink" href="#polyploid-and-mixed-ploidy-vcf" title="Permalink to this headline">¶</a></h2>
