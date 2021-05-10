@@ -16,7 +16,7 @@ def gramian(a: ArrayLike) -> ArrayLike:
 def _impute_genotype_call_with_variant_mean(
     call_g: xr.DataArray, call_g_mask: xr.DataArray
 ) -> xr.DataArray:
-    call_g_present = ~call_g_mask  # type: ignore[operator]
+    call_g_present = ~call_g_mask
     variant_mean = call_g.where(call_g_present).mean(dim="samples")
     imputed_call_g: xr.DataArray = call_g.where(call_g_present, variant_mean)
     return imputed_call_g
