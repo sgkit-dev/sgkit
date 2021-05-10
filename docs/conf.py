@@ -82,7 +82,7 @@ html_context = dict(
     display_github=False,  # Integrate GitHub
     github_user="pystatgen",  # Username
     github_repo="sgkit",  # Repo name
-    github_version="master",  # Version
+    github_version="main",  # Version
     conf_py_path="/docs/",  # Path in the checkout to the docs root
 )
 
