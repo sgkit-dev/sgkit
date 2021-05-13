@@ -31,3 +31,10 @@ def test_rogers_huff_r_between():
     assert np.isnan(rogers_huff_r_between(gna[0], gnb[0]))
     assert np.isnan(rogers_huff_r2_between(gna[0], gnb[0]))
     assert np.isnan(allel.rogers_huff_r_between(gna, gnb))
+
+    # a case where scikit-allel is different due to its use of float32
+    gna = np.full((1, 49), 2)
+    gnb = np.full((1, 49), 2)
+    npt.assert_allclose(rogers_huff_r_between(gna[0], gnb[0]), 1.0, rtol=1e-06)
+    npt.assert_allclose(rogers_huff_r2_between(gna[0], gnb[0]), 1.0, rtol=1e-06)
+    assert np.isnan(allel.rogers_huff_r_between(gna, gnb))

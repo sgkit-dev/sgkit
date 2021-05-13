@@ -1,14 +1,12 @@
 import math
 
-import numba
 import numpy as np
 from numba import njit
 
 from sgkit.typing import ArrayLike
 
 
-# Note that float32 types are used in this function to get an exact match with scikit-allel's equivalent function.
-@njit(nogil=True, fastmath=True, cache=True, locals={"m0": numba.float32, "m1": numba.float32, "v0": numba.float32, "v1": numba.float32, "cov": numba.float32, "n": numba.int32})  # type: ignore
+@njit(nogil=True, fastmath=True, cache=True)  # type: ignore
 def rogers_huff_r_between(gn0: ArrayLike, gn1: ArrayLike) -> float:  # pragma: no cover
     """Rogers Huff *r*.
 
@@ -18,7 +16,8 @@ def rogers_huff_r_between(gn0: ArrayLike, gn1: ArrayLike) -> float:  # pragma: n
     Note that this function can return floating point NaN and infinity values,
     so callers should use ``np.isfinite`` to check for these cases.
 
-    Based on https://github.com/cggh/scikit-allel/blob/961254bd583572eed7f9bd01060e53a8648e620c/allel/opt/stats.pyx
+    Based on https://github.com/cggh/scikit-allel/blob/961254bd583572eed7f9bd01060e53a8648e620c/allel/opt/stats.pyx,
+    however, the implementation here uses float64 not float32, so may differ in some cases.
     """
     # initialise variables
     m0 = m1 = v0 = v1 = cov = 0.0
