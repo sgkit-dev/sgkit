@@ -129,7 +129,10 @@ def test_ld_matrix__raise_on_no_windows():
 
 @st.composite
 def ld_prune_args(draw):
-    n_rows, n_cols = draw(st.integers(2, 100)), draw(st.integers(2, 100))
+    # Note that n_cols is kept relatively small, to avoid differences in precision
+    # with scikit-allel, which uses float32 for the Rogers Huff function.
+    # See case in test_rogers_huff_r_between test.
+    n_rows, n_cols = draw(st.integers(2, 100)), draw(st.integers(2, 40))
     x = draw(arrays(np.uint8, shape=(n_rows, n_cols), elements=st.integers(0, 2)))
     assert x.ndim == 2
     window = draw(st.integers(1, x.shape[0]))
