@@ -1,0 +1,46 @@
+name: Build GPU
+
+on:
+  push:
+  pull_request:
+  schedule:
+    # Run at the end of every day
+    - cron: "0 0 * * *"
+
+jobs:
+  build:
+
+    runs-on: [self-hosted, gpu]
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run Nvidia-smi
+        run: |
+          nvidia-smi
+
+      - name: Set up Python
+        uses: conda-incubator/setup-miniconda@v2
+        env:
+          CONDA: /home/runnerx/miniconda3
+        with:
+          python-version: ${{ matrix.python-version }}
+          miniconda-version: "latest"
+
+      - name: Install dependencies
+        shell: bash -l {0}
+        run: |
+          conda install -c conda-forge gsl
+          conda install -c numba/label/dev numba
+          conda install -c anaconda cudatoolkit
+
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run GPU tagged tests
+        shell: bash -l {0}
+        run: |
+          pytest -m gpu -v
