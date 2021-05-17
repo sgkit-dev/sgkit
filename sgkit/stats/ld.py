@@ -394,7 +394,7 @@ def ld_prune(
     Consider using :func:`sgkit.ld_matrix` and :func:`sgkit.maximal_independent_set`
     to get more insight into the variants that are pruned.
 
-    Note: This result is not a true MIS if ``ld_score`` is provided and are based on
+    Note: This result is not a true MIS if ``ld_score`` is provided and comparisons are based on
     minor allele frequency or anything else that is not identical for all variants.
 
     Parameters
