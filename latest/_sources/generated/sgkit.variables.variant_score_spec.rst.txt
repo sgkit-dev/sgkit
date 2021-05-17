@@ -1,0 +1,6 @@
+﻿sgkit.variables.variant\_score\_spec
+====================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: variant_score_spec

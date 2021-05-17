@@ -1,0 +1,6 @@
+﻿sgkit.variables.ld\_prune\_index\_to\_drop\_spec
+================================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: ld_prune_index_to_drop_spec
