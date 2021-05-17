@@ -1,7 +1,10 @@
 name: Build GPU
 
 on:
+  workflow_dispatch:
   push:
+    branches:
+      - main
   pull_request:
   schedule:
     # Run at the end of every day
