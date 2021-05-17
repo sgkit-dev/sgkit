@@ -144,6 +144,11 @@ Variables
     variables.sample_n_hom_alt_spec
     variables.sample_n_hom_ref_spec
     variables.sample_n_non_ref_spec
+    variables.sample_pca_component_spec
+    variables.sample_pca_explained_variance_spec
+    variables.sample_pca_explained_variance_ratio_spec
+    variables.sample_pca_loading_spec
+    variables.sample_pca_projection_spec
     variables.sample_pcs_spec
     variables.sample_ploidy_spec
     variables.stat_divergence_spec
@@ -154,6 +159,7 @@ Variables
     variables.stat_Garud_h123_spec
     variables.stat_Garud_h2_h1_spec
     variables.stat_observed_heterozygosity_spec
+    variables.stat_pbs_spec
     variables.stat_Tajimas_D_spec
     variables.traits_spec
     variables.variant_allele_spec
@@ -175,5 +181,6 @@ Variables
     variables.variant_position_spec
     variables.variant_score_spec
     variables.variant_t_value_spec
+    variables.window_contig_spec
     variables.window_start_spec
     variables.window_stop_spec
