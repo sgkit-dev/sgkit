@@ -26,6 +26,7 @@ from .stats.aggregation import (
 from .stats.association import gwas_linear_regression
 from .stats.conversion import convert_probability_to_call
 from .stats.hwe import hardy_weinberg_test
+from .stats.ld import ld_matrix, ld_prune, maximal_independent_set
 from .stats.pc_relate import pc_relate
 from .stats.pca import pca
 from .stats.popgen import (
@@ -68,6 +69,9 @@ __all__ = [
     "infer_call_ploidy",
     "infer_sample_ploidy",
     "infer_variant_ploidy",
+    "ld_matrix",
+    "ld_prune",
+    "maximal_independent_set",
     "sample_stats",
     "variant_stats",
     "diversity",
