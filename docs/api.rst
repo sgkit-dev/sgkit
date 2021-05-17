@@ -134,7 +134,6 @@ Variables
     variables.dosage_spec
     variables.genotype_counts_spec
     variables.ld_prune_index_to_drop_spec
-    variables.ld_score_spec
     variables.loco_prediction_spec
     variables.meta_prediction_spec
     variables.pc_relate_phi_spec
@@ -174,6 +173,7 @@ Variables
     variables.variant_p_value_spec
     variables.variant_ploidy_spec
     variables.variant_position_spec
+    variables.variant_score_spec
     variables.variant_t_value_spec
     variables.window_start_spec
     variables.window_stop_spec

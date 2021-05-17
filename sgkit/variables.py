@@ -398,17 +398,6 @@ Variant indexes to drop for LD prune.
     )
 )
 
-ld_score, ld_score_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec(
-        "ld_score",
-        ndim=1,
-        kind="f",
-        __doc__="""
-Scores to prioritize variant selection when constructing an LD matrix.
-""",
-    )
-)
-
 loco_prediction, loco_prediction_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "loco_prediction",
@@ -843,6 +832,17 @@ variant_ploidy, variant_ploidy_spec = SgkitVariables.register_variable(
         ndim=1,
         __doc__="""Ploidy of each variant calculated from call genotypes across all samples
 with -1 indicating variable ploidy.""",
+    )
+)
+
+variant_score, variant_score_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "variant_score",
+        ndim=1,
+        kind="f",
+        __doc__="""
+Scores to prioritize variant selection when constructing an LD matrix.
+""",
     )
 )
 
