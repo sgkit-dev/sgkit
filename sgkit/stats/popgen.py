@@ -952,8 +952,9 @@ def _cohort_observed_heterozygosity(
         h = hi[i]
         if not np.isnan(h):
             c = cohorts[i]
-            out[c] += h
-            _[c] += 1
+            if c >= 0:
+                out[c] += h
+                _[c] += 1
     for j in range(n_cohorts):
         n = _[j]
         if n != 0:

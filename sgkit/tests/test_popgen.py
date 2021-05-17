@@ -577,7 +577,15 @@ def test_observed_heterozygosity(chunks):
 
 
 @pytest.mark.parametrize("chunks", [((4,), (6,), (4,)), ((2, 2), (3, 3), (2, 2))])
-def test_observed_heterozygosity__windowed(chunks):
+@pytest.mark.parametrize(
+    "cohorts,expectation",
+    [
+        ([0, 0, 1, 1, 2, 2], [[1 / 4, 2 / 3, 2 / 3], [1 / 2, 5 / 3, np.nan]]),
+        ([2, 2, 1, 1, 0, 0], [[2 / 3, 2 / 3, 1 / 4], [np.nan, 5 / 3, 1 / 2]]),
+        ([-1, -1, 1, 1, 0, 0], [[2 / 3, 2 / 3], [np.nan, 5 / 3]]),
+    ],
+)
+def test_observed_heterozygosity__windowed(chunks, cohorts, expectation):
     ds = simulate_genotype_call_dataset(
         n_variant=4,
         n_sample=6,
@@ -625,18 +633,13 @@ def test_observed_heterozygosity__windowed(chunks):
     ds.call_genotype_mask.values = ds.call_genotype < 0
     ds["sample_cohort"] = (
         ["samples"],
-        da.asarray([0, 0, 1, 1, 2, 2]).rechunk(chunks[1]),
+        da.asarray(cohorts).rechunk(chunks[1]),
     )
     ds = window(ds, size=2)
     ho = observed_heterozygosity(ds)["stat_observed_heterozygosity"]
     np.testing.assert_almost_equal(
         ho,
-        np.array(
-            [
-                [1 / 4, 2 / 3, 2 / 3],
-                [1 / 2, 5 / 3, np.nan],
-            ]
-        ),
+        np.array(expectation),
     )
 
 
