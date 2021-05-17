@@ -159,6 +159,8 @@ def test_vs_skallel(args):
     ds = window(ds, size, step)
 
     ldm = ld_matrix(ds, threshold=threshold)
+    has_duplicates = ldm.compute().duplicated(subset=["i", "j"]).any()
+    assert not has_duplicates
     idx_drop_ds = maximal_independent_set(ldm)
 
     idx_drop = np.sort(idx_drop_ds.ld_prune_index_to_drop.data)
@@ -197,14 +199,14 @@ def test_scores():
     scores = np.ones(10, dtype="float32")
     scores[2] = 0
     scores[3] = 2
-    ds[variables.ld_score] = (["variants"], scores)
+    ds[variables.variant_score] = (["variants"], scores)
 
-    ldm = ld_matrix(ds, threshold=0.2, ld_score=variables.ld_score)
+    ldm = ld_matrix(ds, threshold=0.2, variant_score=variables.variant_score)
     idx_drop_ds = maximal_independent_set(ldm)
     idx_drop = np.sort(idx_drop_ds.ld_prune_index_to_drop.data)
 
     npt.assert_equal(idx_drop, [2, 8])
 
     # check ld_prune removes correct variants
-    pruned_ds = ld_prune(ds, threshold=0.2, ld_score=variables.ld_score)
+    pruned_ds = ld_prune(ds, threshold=0.2, variant_score=variables.variant_score)
     npt.assert_equal(pruned_ds.variant_position.values, [0, 1, 3, 4, 5, 6, 7, 9])

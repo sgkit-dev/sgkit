@@ -77,7 +77,7 @@ def ld_matrix(
     *,
     dosage: Hashable = variables.dosage,
     threshold: Optional[float] = None,
-    ld_score: Optional[Hashable] = None,
+    variant_score: Optional[Hashable] = None,
 ) -> DataFrame:
     """Compute a sparse linkage disequilibrium (LD) matrix.
 
@@ -88,7 +88,7 @@ def ld_matrix(
     Parameters
     ----------
     ds
-        Dataset containing genotype dosages.
+        Dataset containing genotype dosages. Must already be windowed with :func:`window`.
     dosage
         Name of genetic dosage variable.
         Defined by :data:`sgkit.variables.dosage_spec`.
@@ -96,10 +96,10 @@ def ld_matrix(
         R2 threshold below which no variant pairs will be returned. This should almost
         always be something at least slightly above 0 to avoid the large density very
         near zero LD present in most datasets.
-    ld_score
+    variant_score
         Optional name of variable to use to prioritize variant selection
         (e.g. minor allele frequency). Defaults to None.
-        Defined by :data:`sgkit.variables.ld_score_spec`.
+        Defined by :data:`sgkit.variables.variant_score_spec`.
 
     Returns
     -------
@@ -108,7 +108,7 @@ def ld_matrix(
     - ``i``: Row (variant) index 1
     - ``j``: Row (variant) index 2
     - ``value``: R2 value
-    - ``cmp``: If ``ld_score`` is provided, this is 1, 0, or -1 indicating whether or not ``i > j`` (1), ``i < j`` (-1), or ``i == j`` (0)
+    - ``cmp``: If ``variant_score`` is provided, this is 1, 0, or -1 indicating whether or not ``i > j`` (1), ``i < j`` (-1), or ``i == j`` (0)
 
     Raises
     ------
@@ -117,7 +117,9 @@ def ld_matrix(
     """
 
     if not has_windows(ds):
-        raise ValueError("Dataset must be windowed for ld_matrix")
+        raise ValueError(
+            "Dataset must be windowed for ld_matrix. See the sgkit.window function."
+        )
 
     variables.validate(ds, {dosage: variables.dosage_spec})
 
@@ -125,9 +127,9 @@ def ld_matrix(
 
     threshold = threshold or np.nan
 
-    if ld_score is not None:
-        variables.validate(ds, {ld_score: variables.ld_score_spec})
-        scores = da.asarray(ds[ld_score])
+    if variant_score is not None:
+        variables.validate(ds, {variant_score: variables.variant_score_spec})
+        scores = da.asarray(ds[variant_score])
     else:
         scores = None
 
@@ -216,7 +218,11 @@ def _ld_matrix_jit(
     for ti in range(len(chunk_window_starts)):
         window_start = chunk_window_starts[ti]
         window_stop = chunk_window_stops[ti]
-        max_window_start = min(window_stop, chunk_max_window_start)
+        max_window_start = window_stop
+        if ti < len(chunk_window_starts) - 1:
+            next_window_start = chunk_window_starts[ti + 1]
+            max_window_start = min(max_window_start, next_window_start)
+        max_window_start = min(max_window_start, chunk_max_window_start)
 
         # Iterate over each pair of positions in this window.
         # However, since windows can overlap, the outer loop (i1) should only iterate up to
@@ -359,6 +365,10 @@ def maximal_independent_set(df: DataFrame) -> Dataset:
     df
         Dataframe containing a sparse matrix of R2 values, typically from :func:`sgkit.ld_matrix`.
 
+    Warnings
+    --------
+    This algorithm will materialize the whole input dataframe (the LD matrix) in memory.
+
     Raises
     ------
     ValueError
@@ -383,7 +393,7 @@ def ld_prune(
     *,
     dosage: Hashable = variables.dosage,
     threshold: float = 0.2,
-    ld_score: Optional[Hashable] = None,
+    variant_score: Optional[Hashable] = None,
 ) -> Dataset:
     """Prune variants in linkage disequilibrium (LD).
 
@@ -394,13 +404,13 @@ def ld_prune(
     Consider using :func:`sgkit.ld_matrix` and :func:`sgkit.maximal_independent_set`
     to get more insight into the variants that are pruned.
 
-    Note: This result is not a true MIS if ``ld_score`` is provided and comparisons are based on
+    Note: This result is not a true MIS if ``variant_score`` is provided and comparisons are based on
     minor allele frequency or anything else that is not identical for all variants.
 
     Parameters
     ----------
     ds
-        Dataset containing genotype dosages.
+        Dataset containing genotype dosages. Must already be windowed with :func:`window`.
     dosage
         Name of genetic dosage variable.
         Defined by :data:`sgkit.variables.dosage_spec`.
@@ -408,10 +418,10 @@ def ld_prune(
         R2 threshold below which no variant pairs will be returned. This should almost
         always be something at least slightly above 0 to avoid the large density very
         near zero LD present in most datasets.
-    ld_score
+    variant_score
         Optional name of variable to use to prioritize variant selection
         (e.g. minor allele frequency). Defaults to None.
-        Defined by :data:`sgkit.variables.ld_score_spec`.
+        Defined by :data:`sgkit.variables.variant_score_spec`.
 
     Returns
     -------
@@ -441,6 +451,6 @@ def ld_prune(
     >>> pruned_ds.dims["variants"]
     6
     """
-    ldm = ld_matrix(ds, dosage=dosage, threshold=threshold, ld_score=ld_score)
+    ldm = ld_matrix(ds, dosage=dosage, threshold=threshold, variant_score=variant_score)
     mis = maximal_independent_set(ldm)
     return ds.sel(variants=~ds.variants.isin(mis.ld_prune_index_to_drop))
