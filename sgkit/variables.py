@@ -361,9 +361,9 @@ one of several possible quantities, e.g.:
     )
 )
 
-genotype_counts, genotype_counts_spec = SgkitVariables.register_variable(
+genotype_count, genotype_count_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "genotype_counts",
+        "genotype_count",
         ndim=2,
         kind="i",
         __doc__="""

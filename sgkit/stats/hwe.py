@@ -126,7 +126,7 @@ hardy_weinberg_p_value_vec_jit = njit(
 def hardy_weinberg_test(
     ds: Dataset,
     *,
-    genotype_counts: Optional[Hashable] = None,
+    genotype_count: Optional[Hashable] = None,
     ploidy: Optional[int] = None,
     alleles: Optional[int] = None,
     merge: bool = True
@@ -137,7 +137,7 @@ def hardy_weinberg_test(
     ----------
     ds
         Dataset containing genotype calls or precomputed genotype counts.
-    genotype_counts
+    genotype_count
         Name of variable containing precomputed genotype counts, by default
         None. If not provided, these counts will be computed automatically
         from genotype calls. If present, must correspond to an (`N`, 3) array
@@ -201,9 +201,9 @@ def hardy_weinberg_test(
         raise NotImplementedError("HWE test only implemented for biallelic genotypes")
 
     # Use precomputed genotype counts if provided
-    if genotype_counts is not None:
-        variables.validate(ds, {genotype_counts: variables.genotype_counts_spec})
-        obs = list(da.asarray(ds[genotype_counts]).T)
+    if genotype_count is not None:
+        variables.validate(ds, {genotype_count: variables.genotype_count_spec})
+        obs = list(da.asarray(ds[genotype_count]).T)
     # Otherwise compute genotype counts from calls
     else:
         ds = count_genotypes(ds, dim="samples")

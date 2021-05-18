@@ -132,7 +132,7 @@ Variables
     variables.cohort_allele_count_spec
     variables.covariates_spec
     variables.dosage_spec
-    variables.genotype_counts_spec
+    variables.genotype_count_spec
     variables.ld_prune_index_to_drop_spec
     variables.regenie_loco_prediction_spec
     variables.regenie_meta_prediction_spec
