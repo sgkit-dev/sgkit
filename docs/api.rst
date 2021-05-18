@@ -112,6 +112,8 @@ Utilities
 Variables
 =========
 
+By convention, variable names are singular in sgkit. For example, ``genotype_count``, *not* ``genotype_counts``.
+
 .. autosummary::
    :toctree: generated/
 
