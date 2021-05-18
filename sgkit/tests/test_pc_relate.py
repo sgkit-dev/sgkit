@@ -122,7 +122,7 @@ def test_pc_relate__identical_sample_should_be_05() -> None:
     g.call_genotype.loc[dict(samples=8)] = g.call_genotype.isel(samples=0)
     phi = pc_relate(g)
     assert phi.pc_relate_phi.shape == (n_samples, n_samples)
-    assert np.allclose(phi.pc_relate_phi.isel(sample_x=8, sample_y=0), 0.5, atol=0.1)
+    assert np.allclose(phi.pc_relate_phi.isel(samples_0=8, samples_1=0), 0.5, atol=0.1)
 
 
 def test_pc_relate__parent_child_relationship() -> None:
@@ -164,7 +164,7 @@ def test_pc_relate__parent_child_relationship() -> None:
         ds["pc_relate_phi"]
         .to_series()
         .reset_index()
-        .pipe(lambda df: df.loc[df.sample_x >= df.sample_y]["pc_relate_phi"])
+        .pipe(lambda df: df.loc[df.samples_0 >= df.samples_1]["pc_relate_phi"])
         .pipe(
             pd.cut,
             bins=[p for phi in [0, 0.25, 0.5] for p in [phi - 0.1, phi + 0.1]],

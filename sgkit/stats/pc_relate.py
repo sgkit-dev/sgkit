@@ -107,6 +107,7 @@ def pc_relate(
 
     :data:`sgkit.variables.pc_relate_phi_spec`: (S,S) ArrayLike
     pairwise recent kinship coefficient matrix as float in [-0.5, 0.5].
+    The dimensions are named ``samples_0`` and ``samples_1``.
 
     References
     ----------
@@ -173,5 +174,7 @@ def pc_relate(
     phi = gramian(centered_af) / gramian(stddev)
     # NOTE: phi is of shape (S x S), S = num samples
     assert phi.shape == (call_g.shape[1],) * 2
-    new_ds = create_dataset({variables.pc_relate_phi: (("sample_x", "sample_y"), phi)})
+    new_ds = create_dataset(
+        {variables.pc_relate_phi: (("samples_0", "samples_1"), phi)}
+    )
     return conditional_merge_datasets(ds, new_ds, merge)
