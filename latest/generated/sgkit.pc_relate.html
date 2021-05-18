@@ -286,8 +286,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.base_prediction_spec.html">
-     sgkit.variables.base_prediction_spec
+    <a class="reference internal" href="sgkit.variables.regenie_base_prediction_spec.html">
+     sgkit.variables.regenie_base_prediction_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -371,8 +371,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.genotype_counts_spec.html">
-     sgkit.variables.genotype_counts_spec
+    <a class="reference internal" href="sgkit.variables.genotype_count_spec.html">
+     sgkit.variables.genotype_count_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -381,13 +381,13 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.loco_prediction_spec.html">
-     sgkit.variables.loco_prediction_spec
+    <a class="reference internal" href="sgkit.variables.regenie_loco_prediction_spec.html">
+     sgkit.variables.regenie_loco_prediction_spec
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.meta_prediction_spec.html">
-     sgkit.variables.meta_prediction_spec
+    <a class="reference internal" href="sgkit.variables.regenie_meta_prediction_spec.html">
+     sgkit.variables.regenie_meta_prediction_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -431,8 +431,33 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.sample_pcs_spec.html">
-     sgkit.variables.sample_pcs_spec
+    <a class="reference internal" href="sgkit.variables.sample_pca_component_spec.html">
+     sgkit.variables.sample_pca_component_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_explained_variance_spec.html">
+     sgkit.variables.sample_pca_explained_variance_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_explained_variance_ratio_spec.html">
+     sgkit.variables.sample_pca_explained_variance_ratio_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_loading_spec.html">
+     sgkit.variables.sample_pca_loading_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_projection_spec.html">
+     sgkit.variables.sample_pca_projection_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pc_spec.html">
+     sgkit.variables.sample_pc_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -481,6 +506,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.stat_pbs_spec.html">
+     sgkit.variables.stat_pbs_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="sgkit.variables.stat_Tajimas_D_spec.html">
      sgkit.variables.stat_Tajimas_D_spec
     </a>
@@ -511,8 +541,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.variant_beta_spec.html">
-     sgkit.variables.variant_beta_spec
+    <a class="reference internal" href="sgkit.variables.variant_linreg_beta_spec.html">
+     sgkit.variables.variant_linreg_beta_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -561,8 +591,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.variant_p_value_spec.html">
-     sgkit.variables.variant_p_value_spec
+    <a class="reference internal" href="sgkit.variables.variant_linreg_p_value_spec.html">
+     sgkit.variables.variant_linreg_p_value_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -581,8 +611,13 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.variant_t_value_spec.html">
-     sgkit.variables.variant_t_value_spec
+    <a class="reference internal" href="sgkit.variables.variant_linreg_t_value_spec.html">
+     sgkit.variables.variant_linreg_t_value_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.window_contig_spec.html">
+     sgkit.variables.window_contig_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -680,7 +715,7 @@
 <h1>sgkit.pc_relate<a class="headerlink" href="#sgkit-pc-relate" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="sgkit.pc_relate">
-<code class="sig-prename descclassname"><span class="pre">sgkit.</span></code><code class="sig-name descname"><span class="pre">pc_relate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype_mask'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_pcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sample_pcs'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.pc_relate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">sgkit.</span></code><code class="sig-name descname"><span class="pre">pc_relate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype_mask'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_pc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sample_pc'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.pc_relate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute PC-Relate as described in Conomos, et al. 2016 [1].</p>
 <p>This method computes the kinship coefficient matrix. The kinship coefficient for
 a pair of individuals <code class="docutils literal notranslate"><span class="pre">i</span></code> and <code class="docutils literal notranslate"><span class="pre">j</span></code> is commonly defined to be the probability that
@@ -743,8 +778,8 @@ Defined by <a class="reference internal" href="sgkit.variables.call_genotype_spe
 <dt><strong>call_genotype_mask</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype_mask'</span></code>)</dt><dd><p>Input variable name holding call_genotype_mask.
 Defined by <a class="reference internal" href="sgkit.variables.call_genotype_mask_spec.html#sgkit.variables.call_genotype_mask_spec" title="sgkit.variables.call_genotype_mask_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_mask_spec</span></code></a></p>
 </dd>
-<dt><strong>sample_pcs</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'sample_pcs'</span></code>)</dt><dd><p>Input variable name holding sample_pcs.
-Defined by <a class="reference internal" href="sgkit.variables.sample_pcs_spec.html#sgkit.variables.sample_pcs_spec" title="sgkit.variables.sample_pcs_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_pcs_spec</span></code></a></p>
+<dt><strong>sample_pc</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'sample_pc'</span></code>)</dt><dd><p>Input variable name holding sample principal components.
+Defined by <a class="reference internal" href="sgkit.variables.sample_pc_spec.html#sgkit.variables.sample_pc_spec" title="sgkit.variables.sample_pc_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_pc_spec</span></code></a></p>
 </dd>
 <dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only

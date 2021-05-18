@@ -286,8 +286,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.base_prediction_spec.html">
-     sgkit.variables.base_prediction_spec
+    <a class="reference internal" href="sgkit.variables.regenie_base_prediction_spec.html">
+     sgkit.variables.regenie_base_prediction_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -371,8 +371,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.genotype_counts_spec.html">
-     sgkit.variables.genotype_counts_spec
+    <a class="reference internal" href="sgkit.variables.genotype_count_spec.html">
+     sgkit.variables.genotype_count_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -381,13 +381,13 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.loco_prediction_spec.html">
-     sgkit.variables.loco_prediction_spec
+    <a class="reference internal" href="sgkit.variables.regenie_loco_prediction_spec.html">
+     sgkit.variables.regenie_loco_prediction_spec
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.meta_prediction_spec.html">
-     sgkit.variables.meta_prediction_spec
+    <a class="reference internal" href="sgkit.variables.regenie_meta_prediction_spec.html">
+     sgkit.variables.regenie_meta_prediction_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -431,8 +431,33 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.sample_pcs_spec.html">
-     sgkit.variables.sample_pcs_spec
+    <a class="reference internal" href="sgkit.variables.sample_pca_component_spec.html">
+     sgkit.variables.sample_pca_component_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_explained_variance_spec.html">
+     sgkit.variables.sample_pca_explained_variance_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_explained_variance_ratio_spec.html">
+     sgkit.variables.sample_pca_explained_variance_ratio_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_loading_spec.html">
+     sgkit.variables.sample_pca_loading_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_projection_spec.html">
+     sgkit.variables.sample_pca_projection_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pc_spec.html">
+     sgkit.variables.sample_pc_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -481,6 +506,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.stat_pbs_spec.html">
+     sgkit.variables.stat_pbs_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="sgkit.variables.stat_Tajimas_D_spec.html">
      sgkit.variables.stat_Tajimas_D_spec
     </a>
@@ -511,8 +541,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.variant_beta_spec.html">
-     sgkit.variables.variant_beta_spec
+    <a class="reference internal" href="sgkit.variables.variant_linreg_beta_spec.html">
+     sgkit.variables.variant_linreg_beta_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -561,8 +591,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.variant_p_value_spec.html">
-     sgkit.variables.variant_p_value_spec
+    <a class="reference internal" href="sgkit.variables.variant_linreg_p_value_spec.html">
+     sgkit.variables.variant_linreg_p_value_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -581,8 +611,13 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.variant_t_value_spec.html">
-     sgkit.variables.variant_t_value_spec
+    <a class="reference internal" href="sgkit.variables.variant_linreg_t_value_spec.html">
+     sgkit.variables.variant_linreg_t_value_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.window_contig_spec.html">
+     sgkit.variables.window_contig_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -680,14 +715,14 @@
 <h1>sgkit.hardy_weinberg_test<a class="headerlink" href="#sgkit-hardy-weinberg-test" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="sgkit.hardy_weinberg_test">
-<code class="sig-prename descclassname"><span class="pre">sgkit.</span></code><code class="sig-name descname"><span class="pre">hardy_weinberg_test</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genotype_counts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ploidy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alleles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.hardy_weinberg_test" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">sgkit.</span></code><code class="sig-name descname"><span class="pre">hardy_weinberg_test</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genotype_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ploidy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alleles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.hardy_weinberg_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exact test for HWE as described in Wigginton et al. 2005 [1].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.18.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.18.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Dataset containing genotype calls or precomputed genotype counts.</p>
 </dd>
-<dt><strong>genotype_counts</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Name of variable containing precomputed genotype counts, by default
+<dt><strong>genotype_count</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Name of variable containing precomputed genotype counts, by default
 None. If not provided, these counts will be computed automatically
 from genotype calls. If present, must correspond to an (<cite>N</cite>, 3) array
 where <cite>N</cite> is equal to the number of variants and the 3 columns contain

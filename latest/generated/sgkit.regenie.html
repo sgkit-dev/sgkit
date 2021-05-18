@@ -286,8 +286,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.base_prediction_spec.html">
-     sgkit.variables.base_prediction_spec
+    <a class="reference internal" href="sgkit.variables.regenie_base_prediction_spec.html">
+     sgkit.variables.regenie_base_prediction_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -371,8 +371,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.genotype_counts_spec.html">
-     sgkit.variables.genotype_counts_spec
+    <a class="reference internal" href="sgkit.variables.genotype_count_spec.html">
+     sgkit.variables.genotype_count_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -381,13 +381,13 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.loco_prediction_spec.html">
-     sgkit.variables.loco_prediction_spec
+    <a class="reference internal" href="sgkit.variables.regenie_loco_prediction_spec.html">
+     sgkit.variables.regenie_loco_prediction_spec
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.meta_prediction_spec.html">
-     sgkit.variables.meta_prediction_spec
+    <a class="reference internal" href="sgkit.variables.regenie_meta_prediction_spec.html">
+     sgkit.variables.regenie_meta_prediction_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -431,8 +431,33 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.sample_pcs_spec.html">
-     sgkit.variables.sample_pcs_spec
+    <a class="reference internal" href="sgkit.variables.sample_pca_component_spec.html">
+     sgkit.variables.sample_pca_component_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_explained_variance_spec.html">
+     sgkit.variables.sample_pca_explained_variance_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_explained_variance_ratio_spec.html">
+     sgkit.variables.sample_pca_explained_variance_ratio_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_loading_spec.html">
+     sgkit.variables.sample_pca_loading_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_projection_spec.html">
+     sgkit.variables.sample_pca_projection_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pc_spec.html">
+     sgkit.variables.sample_pc_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -481,6 +506,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.stat_pbs_spec.html">
+     sgkit.variables.stat_pbs_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="sgkit.variables.stat_Tajimas_D_spec.html">
      sgkit.variables.stat_Tajimas_D_spec
     </a>
@@ -511,8 +541,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.variant_beta_spec.html">
-     sgkit.variables.variant_beta_spec
+    <a class="reference internal" href="sgkit.variables.variant_linreg_beta_spec.html">
+     sgkit.variables.variant_linreg_beta_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -561,8 +591,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.variant_p_value_spec.html">
-     sgkit.variables.variant_p_value_spec
+    <a class="reference internal" href="sgkit.variables.variant_linreg_p_value_spec.html">
+     sgkit.variables.variant_linreg_p_value_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -581,8 +611,13 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.variant_t_value_spec.html">
-     sgkit.variables.variant_t_value_spec
+    <a class="reference internal" href="sgkit.variables.variant_linreg_t_value_spec.html">
+     sgkit.variables.variant_linreg_t_value_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.window_contig_spec.html">
+     sgkit.variables.window_contig_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -752,22 +787,22 @@ must be continuous.</p>
 <dd class="field-even"><p><p>A dataset containing the following variables:</p>
 <ul class="simple">
 <li><dl class="simple">
-<dt><cite>base_prediction</cite> (blocks, alphas, samples, outcomes): Stage 1</dt><dd><p>predictions from ridge regression reduction. Defined by
-<a class="reference internal" href="sgkit.variables.base_prediction_spec.html#sgkit.variables.base_prediction_spec" title="sgkit.variables.base_prediction_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.base_prediction_spec</span></code></a>.</p>
+<dt><cite>regenie_base_prediction</cite> (blocks, alphas, samples, outcomes): Stage 1</dt><dd><p>predictions from ridge regression reduction. Defined by
+<a class="reference internal" href="sgkit.variables.regenie_base_prediction_spec.html#sgkit.variables.regenie_base_prediction_spec" title="sgkit.variables.regenie_base_prediction_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.regenie_base_prediction_spec</span></code></a>.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><cite>meta_prediction</cite> (samples, outcomes): Stage 2 predictions from</dt><dd><p>the best meta estimator trained on the out-of-sample Stage 1
-predictions. Defined by <a class="reference internal" href="sgkit.variables.meta_prediction_spec.html#sgkit.variables.meta_prediction_spec" title="sgkit.variables.meta_prediction_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.meta_prediction_spec</span></code></a>.</p>
+<dt><cite>regenie_meta_prediction</cite> (samples, outcomes): Stage 2 predictions from</dt><dd><p>the best meta estimator trained on the out-of-sample Stage 1
+predictions. Defined by <a class="reference internal" href="sgkit.variables.regenie_meta_prediction_spec.html#sgkit.variables.regenie_meta_prediction_spec" title="sgkit.variables.regenie_meta_prediction_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.regenie_meta_prediction_spec</span></code></a>.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><cite>loco_prediction</cite> (contigs, samples, outcomes): LOCO predictions</dt><dd><p>resulting from Stage 2 predictions ignoring effects for variant
+<dt><cite>regenie_loco_prediction</cite> (contigs, samples, outcomes): LOCO predictions</dt><dd><p>resulting from Stage 2 predictions ignoring effects for variant
 blocks on held out contigs. This will be absent if the
 data provided does not contain at least 2 contigs. Defined by
-<a class="reference internal" href="sgkit.variables.loco_prediction_spec.html#sgkit.variables.loco_prediction_spec" title="sgkit.variables.loco_prediction_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.loco_prediction_spec</span></code></a>.</p>
+<a class="reference internal" href="sgkit.variables.regenie_loco_prediction_spec.html#sgkit.variables.regenie_loco_prediction_spec" title="sgkit.variables.regenie_loco_prediction_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.regenie_loco_prediction_spec</span></code></a>.</p>
 </dd>
 </dl>
 </li>
@@ -792,12 +827,12 @@ data provided does not contain at least 2 contigs. Defined by
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">regenie</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">dosage</span><span class="o">=</span><span class="s2">&quot;call_dosage&quot;</span><span class="p">,</span> <span class="n">covariates</span><span class="o">=</span><span class="s2">&quot;sample_covariate&quot;</span><span class="p">,</span> <span class="n">traits</span><span class="o">=</span><span class="s2">&quot;sample_trait&quot;</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span> 
 <span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:          (alphas: 5, blocks: 2, contigs: 2, outcomes: 5, samples: 50)</span>
+<span class="go">Dimensions:                  (alphas: 5, blocks: 2, contigs: 2, outcomes: 5, samples: 50)</span>
 <span class="go">Dimensions without coordinates: alphas, blocks, contigs, outcomes, samples</span>
 <span class="go">Data variables:</span>
-<span class="go">    base_prediction  (blocks, alphas, samples, outcomes) float64 0.3343 ... -...</span>
-<span class="go">    meta_prediction  (samples, outcomes) float64 -0.4588 0.78 ... -0.3984 0.3734</span>
-<span class="go">    loco_prediction  (contigs, samples, outcomes) float64 0.4886 ... -0.01498</span>
+<span class="go">    regenie_base_prediction  (blocks, alphas, samples, outcomes) float64 0.33...</span>
+<span class="go">    regenie_meta_prediction  (samples, outcomes) float64 -0.4588 0.78 ... 0.3734</span>
+<span class="go">    regenie_loco_prediction  (contigs, samples, outcomes) float64 0.4886 ... ...</span>
 </pre></div>
 </div>
 <p class="rubric">References</p>

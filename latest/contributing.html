@@ -285,8 +285,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/sgkit.variables.base_prediction_spec.html">
-     sgkit.variables.base_prediction_spec
+    <a class="reference internal" href="generated/sgkit.variables.regenie_base_prediction_spec.html">
+     sgkit.variables.regenie_base_prediction_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -370,8 +370,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/sgkit.variables.genotype_counts_spec.html">
-     sgkit.variables.genotype_counts_spec
+    <a class="reference internal" href="generated/sgkit.variables.genotype_count_spec.html">
+     sgkit.variables.genotype_count_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -380,13 +380,13 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/sgkit.variables.loco_prediction_spec.html">
-     sgkit.variables.loco_prediction_spec
+    <a class="reference internal" href="generated/sgkit.variables.regenie_loco_prediction_spec.html">
+     sgkit.variables.regenie_loco_prediction_spec
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/sgkit.variables.meta_prediction_spec.html">
-     sgkit.variables.meta_prediction_spec
+    <a class="reference internal" href="generated/sgkit.variables.regenie_meta_prediction_spec.html">
+     sgkit.variables.regenie_meta_prediction_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -430,8 +430,33 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/sgkit.variables.sample_pcs_spec.html">
-     sgkit.variables.sample_pcs_spec
+    <a class="reference internal" href="generated/sgkit.variables.sample_pca_component_spec.html">
+     sgkit.variables.sample_pca_component_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.sample_pca_explained_variance_spec.html">
+     sgkit.variables.sample_pca_explained_variance_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.sample_pca_explained_variance_ratio_spec.html">
+     sgkit.variables.sample_pca_explained_variance_ratio_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.sample_pca_loading_spec.html">
+     sgkit.variables.sample_pca_loading_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.sample_pca_projection_spec.html">
+     sgkit.variables.sample_pca_projection_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.sample_pc_spec.html">
+     sgkit.variables.sample_pc_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -480,6 +505,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.stat_pbs_spec.html">
+     sgkit.variables.stat_pbs_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="generated/sgkit.variables.stat_Tajimas_D_spec.html">
      sgkit.variables.stat_Tajimas_D_spec
     </a>
@@ -510,8 +540,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/sgkit.variables.variant_beta_spec.html">
-     sgkit.variables.variant_beta_spec
+    <a class="reference internal" href="generated/sgkit.variables.variant_linreg_beta_spec.html">
+     sgkit.variables.variant_linreg_beta_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -560,8 +590,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/sgkit.variables.variant_p_value_spec.html">
-     sgkit.variables.variant_p_value_spec
+    <a class="reference internal" href="generated/sgkit.variables.variant_linreg_p_value_spec.html">
+     sgkit.variables.variant_linreg_p_value_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -580,8 +610,13 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/sgkit.variables.variant_t_value_spec.html">
-     sgkit.variables.variant_t_value_spec
+    <a class="reference internal" href="generated/sgkit.variables.variant_linreg_t_value_spec.html">
+     sgkit.variables.variant_linreg_t_value_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.window_contig_spec.html">
+     sgkit.variables.window_contig_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -772,6 +807,11 @@
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#dataset-variables">
+     Dataset variables
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#delayed-invariant-checks">
      Delayed invariant checks
     </a>
@@ -835,10 +875,11 @@
 <ul>
 <li><p><a class="reference internal" href="#dataset-subclassing" id="id18">Dataset subclassing</a></p></li>
 <li><p><a class="reference internal" href="#dataset-api-typing" id="id19">Dataset API typing</a></p></li>
-<li><p><a class="reference internal" href="#delayed-invariant-checks" id="id20">Delayed invariant checks</a></p></li>
-<li><p><a class="reference internal" href="#mixed-ploidy" id="id21">Mixed ploidy</a></p></li>
-<li><p><a class="reference internal" href="#numba-guvectorize-usage" id="id22">Numba guvectorize usage</a></p></li>
-<li><p><a class="reference internal" href="#api-namespace" id="id23">API namespace</a></p></li>
+<li><p><a class="reference internal" href="#dataset-variables" id="id20">Dataset variables</a></p></li>
+<li><p><a class="reference internal" href="#delayed-invariant-checks" id="id21">Delayed invariant checks</a></p></li>
+<li><p><a class="reference internal" href="#mixed-ploidy" id="id22">Mixed ploidy</a></p></li>
+<li><p><a class="reference internal" href="#numba-guvectorize-usage" id="id23">Numba guvectorize usage</a></p></li>
+<li><p><a class="reference internal" href="#api-namespace" id="id24">API namespace</a></p></li>
 </ul>
 </li>
 </ul>
@@ -1118,8 +1159,12 @@ put them behind a layer of encapsulation:</p>
 <li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/pull/276">https://github.com/pystatgen/sgkit/pull/276</a></p></li>
 </ul>
 </div>
+<div class="section" id="dataset-variables">
+<h3><a class="toc-backref" href="#id20">Dataset variables</a><a class="headerlink" href="#dataset-variables" title="Permalink to this headline">¶</a></h3>
+<p>Naming conventions for variables: <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/295">https://github.com/pystatgen/sgkit/issues/295</a></p>
+</div>
 <div class="section" id="delayed-invariant-checks">
-<h3><a class="toc-backref" href="#id20">Delayed invariant checks</a><a class="headerlink" href="#delayed-invariant-checks" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id21">Delayed invariant checks</a><a class="headerlink" href="#delayed-invariant-checks" title="Permalink to this headline">¶</a></h3>
 <p>Discussions on how to run sanity checks on arrays efficiently and why those checks would be
 useful if they were possible (they are not possible currently w/ Dask):</p>
 <ul class="simple">
@@ -1128,11 +1173,11 @@ useful if they were possible (they are not possible currently w/ Dask):</p>
 </ul>
 </div>
 <div class="section" id="mixed-ploidy">
-<h3><a class="toc-backref" href="#id21">Mixed ploidy</a><a class="headerlink" href="#mixed-ploidy" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id22">Mixed ploidy</a><a class="headerlink" href="#mixed-ploidy" title="Permalink to this headline">¶</a></h3>
 <p>Proposal for handling mixed ploidy: <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/243">https://github.com/pystatgen/sgkit/issues/243</a></p>
 </div>
 <div class="section" id="numba-guvectorize-usage">
-<h3><a class="toc-backref" href="#id22">Numba guvectorize usage</a><a class="headerlink" href="#numba-guvectorize-usage" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id23">Numba guvectorize usage</a><a class="headerlink" href="#numba-guvectorize-usage" title="Permalink to this headline">¶</a></h3>
 <p>Learning how to use <code class="docutils literal notranslate"><span class="pre">guvectorize</span></code> effectively:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/pull/114">https://github.com/pystatgen/sgkit/pull/114</a></p></li>
@@ -1140,7 +1185,7 @@ useful if they were possible (they are not possible currently w/ Dask):</p>
 </ul>
 </div>
 <div class="section" id="api-namespace">
-<h3><a class="toc-backref" href="#id23">API namespace</a><a class="headerlink" href="#api-namespace" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id24">API namespace</a><a class="headerlink" href="#api-namespace" title="Permalink to this headline">¶</a></h3>
 <p>Sgkit controls API namespace via init files. To accommodate for mypy and docstrings
 we include both imports and <code class="docutils literal notranslate"><span class="pre">__all__</span></code> declaration. More on this decision in the issue:
 <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/251">https://github.com/pystatgen/sgkit/issues/251</a></p>
