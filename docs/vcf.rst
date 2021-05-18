@@ -30,7 +30,7 @@ Installation
 VCF support is an "extra" feature within sgkit and requires additional
 dependencies, notably ``cyvcf2``.
 
-To install sgkit with VCF support using pip::
+To install sgkit with VCF support using pip (there is no conda package)::
 
     $ pip install 'sgkit[vcf]'
 

@@ -16,8 +16,15 @@ Reading genetic data
 Installation
 ------------
 
-Sgkit can read standard genetic file formats, including VCF, PLINK, and BGEN. Support for reading
-these formats is not installed by default, and requires additional dependencies, which can be installed
+Sgkit can read standard genetic file formats, including VCF, PLINK, and BGEN.
+
+If sgkit has been installed using conda, support for reading BGEN and PLINK is included, but
+VCF is not, and should be installed using pip as follows::
+
+    $ pip install 'sgkit[vcf]'
+
+If sgkit has been installed using pip, then support for reading these formats is
+not included, and requires additional dependencies, which can be installed
 as an "extra" feature using pip, as follows.
 
 To install sgkit with BGEN support::
