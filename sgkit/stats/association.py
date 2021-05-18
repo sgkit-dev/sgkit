@@ -177,11 +177,11 @@ def gwas_linear_regression(
     -------
     Dataset containing (N = num variants, O = num traits):
 
-    variant_beta : [array-like, shape: (N, O)]
+    variant_linreg_beta : [array-like, shape: (N, O)]
         Beta values associated with each variant and trait
-    variant_t_value : [array-like, shape: (N, O)]
+    variant_linreg_t_value : [array-like, shape: (N, O)]
         T statistics for each beta
-    variant_p_value : [array-like, shape: (N, O)]
+    variant_linreg_p_value : [array-like, shape: (N, O)]
         P values as float in [0, 1]
 
     References
@@ -233,9 +233,9 @@ def gwas_linear_regression(
     res = linear_regression(G.T, X, Y)
     new_ds = create_dataset(
         {
-            variables.variant_beta: (("variants", "traits"), res.beta),
-            variables.variant_t_value: (("variants", "traits"), res.t_value),
-            variables.variant_p_value: (("variants", "traits"), res.p_value),
+            variables.variant_linreg_beta: (("variants", "traits"), res.beta),
+            variables.variant_linreg_t_value: (("variants", "traits"), res.t_value),
+            variables.variant_linreg_p_value: (("variants", "traits"), res.p_value),
         }
     )
     return conditional_merge_datasets(ds, new_ds, merge)

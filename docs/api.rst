@@ -166,7 +166,7 @@ Variables
     variables.variant_allele_count_spec
     variables.variant_allele_frequency_spec
     variables.variant_allele_total_spec
-    variables.variant_beta_spec
+    variables.variant_linreg_beta_spec
     variables.variant_call_rate_spec
     variables.variant_contig_spec
     variables.variant_hwe_p_value_spec
@@ -176,11 +176,11 @@ Variables
     variables.variant_n_hom_alt_spec
     variables.variant_n_hom_ref_spec
     variables.variant_n_non_ref_spec
-    variables.variant_p_value_spec
+    variables.variant_linreg_p_value_spec
     variables.variant_ploidy_spec
     variables.variant_position_spec
     variables.variant_score_spec
-    variables.variant_t_value_spec
+    variables.variant_linreg_t_value_spec
     variables.window_contig_spec
     variables.window_start_spec
     variables.window_stop_spec

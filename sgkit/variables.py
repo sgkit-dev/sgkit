@@ -725,9 +725,9 @@ variant_allele_total, variant_allele_total_spec = SgkitVariables.register_variab
     )
 )
 
-variant_beta, variant_beta_spec = SgkitVariables.register_variable(
+variant_linreg_beta, variant_linreg_beta_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "variant_beta",
+        "variant_linreg_beta",
         __doc__="""Beta values associated with each variant and trait.""",
     )
 )
@@ -816,9 +816,9 @@ variant_n_non_ref, variant_n_non_ref_spec = SgkitVariables.register_variable(
     )
 )
 
-variant_p_value, variant_p_value_spec = SgkitVariables.register_variable(
+variant_linreg_p_value, variant_linreg_p_value_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "variant_p_value", kind="f", __doc__="""P values as float in [0, 1]."""
+        "variant_linreg_p_value", kind="f", __doc__="""P values as float in [0, 1]."""
     )
 )
 
@@ -830,8 +830,8 @@ variant_position, variant_position_spec = SgkitVariables.register_variable(
         __doc__="""The reference position of the variant.""",
     )
 )
-variant_t_value, variant_t_value_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("variant_t_value", __doc__="""T statistics for each beta.""")
+variant_linreg_t_value, variant_linreg_t_value_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("variant_linreg_t_value", __doc__="""T statistics for each beta.""")
 )
 
 variant_ploidy, variant_ploidy_spec = SgkitVariables.register_variable(
