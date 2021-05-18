@@ -27,7 +27,7 @@ def test_pc_relate__genotype_inputs_checks() -> None:
         pc_relate(g_non_biallelic)
 
     g_no_pcs = simulate_genotype_call_dataset(100, 10)
-    with pytest.raises(ValueError, match="sample_pcs not present"):
+    with pytest.raises(ValueError, match="sample_pc not present"):
         pc_relate(g_no_pcs)
 
     with pytest.raises(ValueError, match="call_genotype not present"):
@@ -104,7 +104,7 @@ def test_pc_relate__values_within_range() -> None:
     g = simulate_genotype_call_dataset(1000, n_samples)
     call_g, _ = _collapse_ploidy(g)
     pcs = PCA(n_components=2, svd_solver="full").fit_transform(call_g.T)
-    g["sample_pcs"] = (("components", "samples"), pcs.T)
+    g["sample_pc"] = (("components", "samples"), pcs.T)
     phi = pc_relate(g)
     assert phi.pc_relate_phi.shape == (n_samples, n_samples)
     data_np = phi.pc_relate_phi.data.compute()  # to be able to use fancy indexing below
@@ -117,7 +117,7 @@ def test_pc_relate__identical_sample_should_be_05() -> None:
     g = simulate_genotype_call_dataset(1000, n_samples, missing_pct=0.1)
     call_g, _ = _collapse_ploidy(g)
     pcs = PCA(n_components=2, svd_solver="full").fit_transform(call_g.T)
-    g["sample_pcs"] = (("components", "samples"), pcs.T)
+    g["sample_pc"] = (("components", "samples"), pcs.T)
     # Add identical sample
     g.call_genotype.loc[dict(samples=8)] = g.call_genotype.isel(samples=0)
     phi = pc_relate(g)
@@ -156,7 +156,7 @@ def test_pc_relate__parent_child_relationship() -> None:
     # Infer kinship
     call_g, _ = _collapse_ploidy(ds)
     pcs = PCA(n_components=2, svd_solver="full").fit_transform(call_g.T)
-    ds["sample_pcs"] = (("components", "samples"), pcs.T)
+    ds["sample_pc"] = (("components", "samples"), pcs.T)
     ds["pc_relate_phi"] = pc_relate(ds)["pc_relate_phi"].compute()
 
     # Check that all coefficients are in expected ranges
