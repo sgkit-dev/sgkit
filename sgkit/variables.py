@@ -182,18 +182,6 @@ summary page. The rest of the docstring will appear on the variable
 specific page.
 """
 
-base_prediction, base_prediction_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec(
-        "base_prediction",
-        ndim=4,
-        kind="f",
-        __doc__="""
-REGENIE's base prediction (blocks, alphas, samples, outcomes). Stage 1
-predictions from ridge regression reduction.
-""",
-    )
-)
-
 call_allele_count, call_allele_count_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "call_allele_count",
@@ -373,9 +361,9 @@ one of several possible quantities, e.g.:
     )
 )
 
-genotype_counts, genotype_counts_spec = SgkitVariables.register_variable(
+genotype_count, genotype_count_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "genotype_counts",
+        "genotype_count",
         ndim=2,
         kind="i",
         __doc__="""
@@ -398,13 +386,31 @@ Variant indexes to drop for LD prune.
     )
 )
 
-loco_prediction, loco_prediction_spec = SgkitVariables.register_variable(
+(
+    regenie_base_prediction,
+    regenie_base_prediction_spec,
+) = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "loco_prediction",
+        "regenie_base_prediction",
+        ndim=4,
+        kind="f",
+        __doc__="""
+REGENIE's base prediction (blocks, alphas, samples, outcomes). Stage 1
+predictions from ridge regression reduction.
+""",
+    )
+)
+
+(
+    regenie_loco_prediction,
+    regenie_loco_prediction_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "regenie_loco_prediction",
         ndim=3,
         kind="f",
         __doc__="""
-REGENIE's loco_prediction (contigs, samples, outcomes). LOCO predictions
+REGENIE's regenie_loco_prediction (contigs, samples, outcomes). LOCO predictions
 resulting from Stage 2 predictions ignoring effects for variant blocks on
 held out contigs. This will be absent if the data provided does not contain
 at least 2 contigs.
@@ -412,13 +418,16 @@ at least 2 contigs.
     )
 )
 
-meta_prediction, meta_prediction_spec = SgkitVariables.register_variable(
+(
+    regenie_meta_prediction,
+    regenie_meta_prediction_spec,
+) = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "meta_prediction",
+        "regenie_meta_prediction",
         ndim=2,
         kind="f",
         __doc__="""
-REGENIE's meta_prediction (samples, outcomes). Stage 2 predictions from
+REGENIE's regenie_meta_prediction (samples, outcomes). Stage 2 predictions from
 the best meta estimator trained on the out-of-sample Stage 1 predictions.
 """,
     )
@@ -496,8 +505,8 @@ sample_n_non_ref, sample_n_non_ref_spec = SgkitVariables.register_variable(
     )
 )
 
-sample_pcs, sample_pcs_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("sample_pcs", ndim=2, kind="f", __doc__="""Sample PCs (PCxS).""")
+sample_pc, sample_pc_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("sample_pc", ndim=2, kind="f", __doc__="""Sample PCs (PCxS).""")
 )
 
 sample_pca_component, sample_pca_component_spec = SgkitVariables.register_variable(
@@ -716,9 +725,9 @@ variant_allele_total, variant_allele_total_spec = SgkitVariables.register_variab
     )
 )
 
-variant_beta, variant_beta_spec = SgkitVariables.register_variable(
+variant_linreg_beta, variant_linreg_beta_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "variant_beta",
+        "variant_linreg_beta",
         __doc__="""Beta values associated with each variant and trait.""",
     )
 )
@@ -807,9 +816,9 @@ variant_n_non_ref, variant_n_non_ref_spec = SgkitVariables.register_variable(
     )
 )
 
-variant_p_value, variant_p_value_spec = SgkitVariables.register_variable(
+variant_linreg_p_value, variant_linreg_p_value_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "variant_p_value", kind="f", __doc__="""P values as float in [0, 1]."""
+        "variant_linreg_p_value", kind="f", __doc__="""P values as float in [0, 1]."""
     )
 )
 
@@ -821,8 +830,8 @@ variant_position, variant_position_spec = SgkitVariables.register_variable(
         __doc__="""The reference position of the variant.""",
     )
 )
-variant_t_value, variant_t_value_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("variant_t_value", __doc__="""T statistics for each beta.""")
+variant_linreg_t_value, variant_linreg_t_value_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec("variant_linreg_t_value", __doc__="""T statistics for each beta.""")
 )
 
 variant_ploidy, variant_ploidy_spec = SgkitVariables.register_variable(

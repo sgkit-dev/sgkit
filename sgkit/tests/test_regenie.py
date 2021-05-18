@@ -269,8 +269,8 @@ def check_simulation_result(
             _glow_adj_scaling=True,
             _glow_adj_alpha=True,
         )
-        YBP = res["base_prediction"].data
-        YMP = res["meta_prediction"].data
+        YBP = res["regenie_base_prediction"].data
+        YMP = res["regenie_meta_prediction"].data
 
         # Check equality of stage 1 and 2 transformations
         check_stage_1_results(YBP, ds_config, ps_config, result_dir)
@@ -300,7 +300,7 @@ def test_regenie__no_loco_with_one_contig():
     )
     res = regenie_sim(ds=ds, merge=False)
     assert len(res) == 2
-    assert "loco_prediction" not in res
+    assert "regenie_loco_prediction" not in res
 
 
 def test_regenie__32bit_float(ds):
@@ -321,7 +321,7 @@ def test_regenie__custom_variant_block_size(ds):
     vbs = (50, 25, 25)
     assert sum(vbs) == ds.dims["variants"]
     res = regenie_sim(ds=ds, variant_block_size=vbs)
-    assert res["base_prediction"].sizes["blocks"] == 3
+    assert res["regenie_base_prediction"].sizes["blocks"] == 3
 
 
 def test_regenie__raise_on_bad_variant_block_size(ds):
@@ -352,7 +352,7 @@ def test_regenie__block_size_1(ds):
     # only one element to ensure that no unwanted squeezing occurs
     vbs, sbs = ds.dims["variants"] - 1, ds.dims["samples"] - 1
     res = regenie_sim(ds=ds, variant_block_size=vbs, sample_block_size=sbs)
-    assert res["base_prediction"].sizes["blocks"] == 2
+    assert res["regenie_base_prediction"].sizes["blocks"] == 2
 
 
 def test_ridge_regression():

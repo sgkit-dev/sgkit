@@ -21,7 +21,7 @@ def test_same_as_the_reference_implementation() -> None:
     pcs = da.from_array(
         pd.read_csv(d.joinpath("pcs.csv").as_posix(), usecols=[1, 2]).to_numpy()
     ).T
-    ds["sample_pcs"] = (("components", "samples"), pcs)
+    ds["sample_pc"] = (("components", "samples"), pcs)
     phi = pc_relate(ds).pc_relate_phi.compute()
 
     n_samples = 90

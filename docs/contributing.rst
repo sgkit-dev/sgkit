@@ -349,6 +349,10 @@ Discussions around bringing stricter array type enforcement into the API:
 - https://github.com/pystatgen/sgkit/pull/124
 - https://github.com/pystatgen/sgkit/pull/276
 
+Dataset variables
+~~~~~~~~~~~~~~~~~
+
+Naming conventions for variables: https://github.com/pystatgen/sgkit/issues/295
 
 Delayed invariant checks
 ~~~~~~~~~~~~~~~~~~~~~~~~

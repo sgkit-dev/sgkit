@@ -629,12 +629,12 @@ def regenie_transform(
     -------
     A dataset containing the following variables:
 
-    - `base_prediction` (blocks, alphas, samples, outcomes): Stage 1
+    - `regenie_base_prediction` (blocks, alphas, samples, outcomes): Stage 1
         predictions from ridge regression reduction .
-    - `meta_prediction` (samples, outcomes): Stage 2 predictions from
+    - `regenie_meta_prediction` (samples, outcomes): Stage 2 predictions from
         the best meta estimator trained on the out-of-sample Stage 1
         predictions.
-    - `loco_prediction` (contigs, samples, outcomes): LOCO predictions
+    - `regenie_loco_prediction` (contigs, samples, outcomes): LOCO predictions
         resulting from Stage 2 predictions ignoring effects for variant
         blocks on held out contigs. This will be absent if the
         data provided does not contain at least 2 contigs.
@@ -708,16 +708,16 @@ def regenie_transform(
     YP3 = _stage_3(B2, YP1, X, Y, contigs, variant_chunk_start)
 
     data_vars: Dict[Hashable, Any] = {}
-    data_vars[variables.base_prediction] = xr.DataArray(
+    data_vars[variables.regenie_base_prediction] = xr.DataArray(
         YP1,
         dims=("blocks", "alphas", "samples", "outcomes"),
         attrs={"description": DESC_BASE_PRED},
     )
-    data_vars[variables.meta_prediction] = xr.DataArray(
+    data_vars[variables.regenie_meta_prediction] = xr.DataArray(
         YP2, dims=("samples", "outcomes"), attrs={"description": DESC_META_PRED}
     )
     if YP3 is not None:
-        data_vars[variables.loco_prediction] = xr.DataArray(
+        data_vars[variables.regenie_loco_prediction] = xr.DataArray(
             YP3,
             dims=("contigs", "samples", "outcomes"),
             attrs={"description": DESC_LOCO_PRED},
@@ -807,19 +807,19 @@ def regenie(
     -------
     A dataset containing the following variables:
 
-    - `base_prediction` (blocks, alphas, samples, outcomes): Stage 1
+    - `regenie_base_prediction` (blocks, alphas, samples, outcomes): Stage 1
         predictions from ridge regression reduction. Defined by
-        :data:`sgkit.variables.base_prediction_spec`.
+        :data:`sgkit.variables.regenie_base_prediction_spec`.
 
-    - `meta_prediction` (samples, outcomes): Stage 2 predictions from
+    - `regenie_meta_prediction` (samples, outcomes): Stage 2 predictions from
         the best meta estimator trained on the out-of-sample Stage 1
-        predictions. Defined by :data:`sgkit.variables.meta_prediction_spec`.
+        predictions. Defined by :data:`sgkit.variables.regenie_meta_prediction_spec`.
 
-    - `loco_prediction` (contigs, samples, outcomes): LOCO predictions
+    - `regenie_loco_prediction` (contigs, samples, outcomes): LOCO predictions
         resulting from Stage 2 predictions ignoring effects for variant
         blocks on held out contigs. This will be absent if the
         data provided does not contain at least 2 contigs. Defined by
-        :data:`sgkit.variables.loco_prediction_spec`.
+        :data:`sgkit.variables.regenie_loco_prediction_spec`.
 
     Raises
     ------
@@ -842,12 +842,12 @@ def regenie(
     >>> res = regenie(ds, dosage="call_dosage", covariates="sample_covariate", traits="sample_trait", merge=False)
     >>> res.compute() # doctest: +NORMALIZE_WHITESPACE
     <xarray.Dataset>
-    Dimensions:          (alphas: 5, blocks: 2, contigs: 2, outcomes: 5, samples: 50)
+    Dimensions:                  (alphas: 5, blocks: 2, contigs: 2, outcomes: 5, samples: 50)
     Dimensions without coordinates: alphas, blocks, contigs, outcomes, samples
     Data variables:
-        base_prediction  (blocks, alphas, samples, outcomes) float64 0.3343 ... -...
-        meta_prediction  (samples, outcomes) float64 -0.4588 0.78 ... -0.3984 0.3734
-        loco_prediction  (contigs, samples, outcomes) float64 0.4886 ... -0.01498
+        regenie_base_prediction  (blocks, alphas, samples, outcomes) float64 0.33...
+        regenie_meta_prediction  (samples, outcomes) float64 -0.4588 0.78 ... 0.3734
+        regenie_loco_prediction  (contigs, samples, outcomes) float64 0.4886 ... ...
 
     References
     ----------

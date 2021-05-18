@@ -138,8 +138,8 @@ def test_hwep_dataset__precomputed_counts(ds_neq: Dataset) -> None:
     ac = ds["call_genotype"].sum(dim="ploidy")
     cts = [1, 0, 2]  # arg order: hets, hom1, hom2
     gtc = xr.concat([(ac == ct).sum(dim="samples") for ct in cts], dim="counts").T
-    ds = ds.assign(**{"variant_genotype_counts": gtc})
-    p = hwep_test(ds, genotype_counts="variant_genotype_counts", merge=False)[
+    ds = ds.assign(**{"variant_genotype_count": gtc})
+    p = hwep_test(ds, genotype_count="variant_genotype_count", merge=False)[
         "variant_hwe_p_value"
     ].values
     assert np.all(p < 1e-8)

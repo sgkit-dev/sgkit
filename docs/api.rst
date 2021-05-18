@@ -112,10 +112,12 @@ Utilities
 Variables
 =========
 
+By convention, variable names are singular in sgkit. For example, ``genotype_count``, *not* ``genotype_counts``.
+
 .. autosummary::
    :toctree: generated/
 
-    variables.base_prediction_spec
+    variables.regenie_base_prediction_spec
     variables.call_allele_count_spec
     variables.call_dosage_spec
     variables.call_dosage_mask_spec
@@ -132,10 +134,10 @@ Variables
     variables.cohort_allele_count_spec
     variables.covariates_spec
     variables.dosage_spec
-    variables.genotype_counts_spec
+    variables.genotype_count_spec
     variables.ld_prune_index_to_drop_spec
-    variables.loco_prediction_spec
-    variables.meta_prediction_spec
+    variables.regenie_loco_prediction_spec
+    variables.regenie_meta_prediction_spec
     variables.pc_relate_phi_spec
     variables.sample_call_rate_spec
     variables.sample_id_spec
@@ -144,7 +146,12 @@ Variables
     variables.sample_n_hom_alt_spec
     variables.sample_n_hom_ref_spec
     variables.sample_n_non_ref_spec
-    variables.sample_pcs_spec
+    variables.sample_pca_component_spec
+    variables.sample_pca_explained_variance_spec
+    variables.sample_pca_explained_variance_ratio_spec
+    variables.sample_pca_loading_spec
+    variables.sample_pca_projection_spec
+    variables.sample_pc_spec
     variables.sample_ploidy_spec
     variables.stat_divergence_spec
     variables.stat_diversity_spec
@@ -154,13 +161,14 @@ Variables
     variables.stat_Garud_h123_spec
     variables.stat_Garud_h2_h1_spec
     variables.stat_observed_heterozygosity_spec
+    variables.stat_pbs_spec
     variables.stat_Tajimas_D_spec
     variables.traits_spec
     variables.variant_allele_spec
     variables.variant_allele_count_spec
     variables.variant_allele_frequency_spec
     variables.variant_allele_total_spec
-    variables.variant_beta_spec
+    variables.variant_linreg_beta_spec
     variables.variant_call_rate_spec
     variables.variant_contig_spec
     variables.variant_hwe_p_value_spec
@@ -170,10 +178,11 @@ Variables
     variables.variant_n_hom_alt_spec
     variables.variant_n_hom_ref_spec
     variables.variant_n_non_ref_spec
-    variables.variant_p_value_spec
+    variables.variant_linreg_p_value_spec
     variables.variant_ploidy_spec
     variables.variant_position_spec
     variables.variant_score_spec
-    variables.variant_t_value_spec
+    variables.variant_linreg_t_value_spec
+    variables.window_contig_spec
     variables.window_start_spec
     variables.window_stop_spec
