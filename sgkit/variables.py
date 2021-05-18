@@ -182,18 +182,6 @@ summary page. The rest of the docstring will appear on the variable
 specific page.
 """
 
-base_prediction, base_prediction_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec(
-        "base_prediction",
-        ndim=4,
-        kind="f",
-        __doc__="""
-REGENIE's base prediction (blocks, alphas, samples, outcomes). Stage 1
-predictions from ridge regression reduction.
-""",
-    )
-)
-
 call_allele_count, call_allele_count_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "call_allele_count",
@@ -398,13 +386,31 @@ Variant indexes to drop for LD prune.
     )
 )
 
-loco_prediction, loco_prediction_spec = SgkitVariables.register_variable(
+(
+    regenie_base_prediction,
+    regenie_base_prediction_spec,
+) = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "loco_prediction",
+        "regenie_base_prediction",
+        ndim=4,
+        kind="f",
+        __doc__="""
+REGENIE's base prediction (blocks, alphas, samples, outcomes). Stage 1
+predictions from ridge regression reduction.
+""",
+    )
+)
+
+(
+    regenie_loco_prediction,
+    regenie_loco_prediction_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "regenie_loco_prediction",
         ndim=3,
         kind="f",
         __doc__="""
-REGENIE's loco_prediction (contigs, samples, outcomes). LOCO predictions
+REGENIE's regenie_loco_prediction (contigs, samples, outcomes). LOCO predictions
 resulting from Stage 2 predictions ignoring effects for variant blocks on
 held out contigs. This will be absent if the data provided does not contain
 at least 2 contigs.
@@ -412,13 +418,16 @@ at least 2 contigs.
     )
 )
 
-meta_prediction, meta_prediction_spec = SgkitVariables.register_variable(
+(
+    regenie_meta_prediction,
+    regenie_meta_prediction_spec,
+) = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "meta_prediction",
+        "regenie_meta_prediction",
         ndim=2,
         kind="f",
         __doc__="""
-REGENIE's meta_prediction (samples, outcomes). Stage 2 predictions from
+REGENIE's regenie_meta_prediction (samples, outcomes). Stage 2 predictions from
 the best meta estimator trained on the out-of-sample Stage 1 predictions.
 """,
     )

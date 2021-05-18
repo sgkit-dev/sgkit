@@ -115,7 +115,7 @@ Variables
 .. autosummary::
    :toctree: generated/
 
-    variables.base_prediction_spec
+    variables.regenie_base_prediction_spec
     variables.call_allele_count_spec
     variables.call_dosage_spec
     variables.call_dosage_mask_spec
@@ -134,8 +134,8 @@ Variables
     variables.dosage_spec
     variables.genotype_counts_spec
     variables.ld_prune_index_to_drop_spec
-    variables.loco_prediction_spec
-    variables.meta_prediction_spec
+    variables.regenie_loco_prediction_spec
+    variables.regenie_meta_prediction_spec
     variables.pc_relate_phi_spec
     variables.sample_call_rate_spec
     variables.sample_id_spec
