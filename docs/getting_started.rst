@@ -10,9 +10,13 @@ Getting Started
 Installation
 ------------
 
-You can install sgkit with `pip` - there is no conda package yet. Python 3.7 or 3.8 is required.
+You can install sgkit with pip. Python 3.7, 3.8, or 3.9 is required::
 
     $ pip install sgkit
+
+Alternatively, you can use conda::
+
+    $ conda install -c conda-forge sgkit
 
 ..
 
