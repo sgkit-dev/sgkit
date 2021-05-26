@@ -23,12 +23,13 @@ import pandas as pd
 import xarray as xr
 import zarr
 from cbgen import bgen_file, bgen_metafile
+from numpy.typing import DTypeLike
 from rechunker import api as rechunker_api
 from xarray import Dataset
 
 from sgkit import create_genotype_dosage_dataset
 from sgkit.io.utils import dataframe_to_dict, encode_contigs
-from sgkit.typing import ArrayLike, DType, PathType
+from sgkit.typing import ArrayLike, PathType
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +61,7 @@ class BgenReader:
         self,
         path: PathType,
         metafile_path: Optional[PathType] = None,
-        dtype: DType = "float32",
+        dtype: DTypeLike = "float32",
     ) -> None:
         self.path = Path(path)
         self.metafile_path = (
@@ -202,8 +203,8 @@ def read_bgen(
     chunks: Union[str, int, Tuple[int, int, int]] = "auto",
     lock: bool = False,
     persist: bool = True,
-    contig_dtype: DType = "str",
-    gp_dtype: DType = "float32",
+    contig_dtype: DTypeLike = "str",
+    gp_dtype: DTypeLike = "float32",
 ) -> Dataset:
     """Read BGEN dataset.
 
@@ -394,7 +395,7 @@ def pack_variables(ds: Dataset) -> Dataset:
     return ds
 
 
-def unpack_variables(ds: Dataset, dtype: DType = "float32") -> Dataset:
+def unpack_variables(ds: Dataset, dtype: DTypeLike = "float32") -> Dataset:
     # Restore homozygous reference GP
     gp = ds["call_genotype_probability"].astype(dtype)
     if gp.sizes["genotypes"] != 2:
@@ -423,7 +424,7 @@ def rechunk_bgen(
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
     compressor: Optional[Any] = zarr.Blosc(cname="zstd", clevel=7, shuffle=2),
-    probability_dtype: Optional[DType] = "uint8",
+    probability_dtype: Optional[DTypeLike] = "uint8",
     max_mem: str = "4GB",
     pack: bool = True,
     tempdir: Optional[PathType] = None,
@@ -533,7 +534,7 @@ def bgen_to_zarr(
     chunk_width: int = 1_000,
     temp_chunk_length: int = 100,
     compressor: Optional[Any] = zarr.Blosc(cname="zstd", clevel=7, shuffle=2),
-    probability_dtype: Optional[DType] = "uint8",
+    probability_dtype: Optional[DTypeLike] = "uint8",
     max_mem: str = "4GB",
     pack: bool = True,
     tempdir: Optional[PathType] = None,

@@ -4,6 +4,7 @@ import dask.array as da
 import numpy as np
 import xarray as xr
 from dask_ml.decomposition import TruncatedSVD
+from numpy.typing import DTypeLike
 from sklearn.base import BaseEstimator
 from sklearn.pipeline import Pipeline
 from typing_extensions import Literal
@@ -11,7 +12,7 @@ from xarray import DataArray, Dataset
 
 from sgkit import variables
 
-from ..typing import ArrayLike, DType, RandomStateType
+from ..typing import ArrayLike, RandomStateType
 from ..utils import conditional_merge_datasets
 from .aggregation import count_call_alleles
 from .preprocessing import PattersonScaler
@@ -331,7 +332,7 @@ def _allele_counts(
     ds: Dataset,
     variable: str,
     check_missing: bool = True,
-    dtype: DType = "float32",
+    dtype: DTypeLike = "float32",
 ) -> DataArray:
     if variable not in ds:
         ds = count_call_alternate_alleles(ds)

@@ -3,15 +3,16 @@ from typing import Any, Callable, Hashable, List, Mapping, Optional, Set, Tuple,
 
 import numpy as np
 from numba import guvectorize
+from numpy.typing import DTypeLike
 from xarray import Dataset
 
 from . import variables
-from .typing import ArrayLike, DType
+from .typing import ArrayLike
 
 
 def check_array_like(
     a: Any,
-    dtype: Union[None, DType, Set[DType]] = None,
+    dtype: Union[None, DTypeLike, Set[DTypeLike]] = None,
     kind: Union[None, str, Set[str]] = None,
     ndim: Union[None, int, Set[int]] = None,
 ) -> None:

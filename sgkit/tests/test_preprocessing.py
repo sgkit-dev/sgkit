@@ -5,10 +5,11 @@ import dask.array as da
 import numpy as np
 import pytest
 import xarray as xr
+from numpy.typing import DTypeLike
 
 import sgkit.stats.preprocessing
 from sgkit import simulate_genotype_call_dataset
-from sgkit.typing import ArrayLike, DType
+from sgkit.typing import ArrayLike
 
 
 def simulate_alternate_allele_counts(
@@ -16,7 +17,7 @@ def simulate_alternate_allele_counts(
     n_sample: int,
     ploidy: int,
     chunks: Any = (10, 10),
-    dtype: DType = "i",
+    dtype: DTypeLike = "i",
     seed: int = 0,
 ) -> ArrayLike:
     rs = da.random.RandomState(seed)

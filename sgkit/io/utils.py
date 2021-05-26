@@ -6,13 +6,14 @@ import fsspec
 import numpy as np
 import xarray as xr
 import zarr
+from numpy.typing import DTypeLike
 
-from ..typing import ArrayLike, DType
+from ..typing import ArrayLike
 from ..utils import encode_array, max_str_len
 
 
 def dataframe_to_dict(
-    df: dd.DataFrame, dtype: Optional[Mapping[str, DType]] = None
+    df: dd.DataFrame, dtype: Optional[Mapping[str, DTypeLike]] = None
 ) -> Mapping[str, ArrayLike]:
     """ Convert dask dataframe to dictionary of arrays """
     arrs = {}
@@ -110,7 +111,7 @@ def zarrs_to_dataset(
 def concatenate_and_rechunk(
     zarrs: Sequence[zarr.Array],
     chunks: Optional[Tuple[int, ...]] = None,
-    dtype: DType = None,
+    dtype: DTypeLike = None,
 ) -> da.Array:
     """Perform a concatenate and rechunk operation on a collection of Zarr arrays
     to produce an array with a uniform chunking, suitable for saving as

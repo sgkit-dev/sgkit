@@ -8,10 +8,11 @@ import numpy as np
 import pandas as pd
 from dask.dataframe import DataFrame
 from numba import njit
+from numpy.typing import DTypeLike
 from xarray import Dataset
 
 from sgkit import variables
-from sgkit.typing import ArrayLike, DType
+from sgkit.typing import ArrayLike
 from sgkit.window import _get_chunked_windows, _sizes_to_start_offsets, has_windows
 
 
@@ -205,8 +206,8 @@ def _ld_matrix_jit(
     chunk_window_stops: ArrayLike,
     abs_chunk_start: int,
     chunk_max_window_start: int,
-    index_dtype: DType,
-    value_dtype: DType,
+    index_dtype: DTypeLike,
+    value_dtype: DTypeLike,
     threshold: float,
     scores: ArrayLike,
 ) -> List[Any]:  # pragma: no cover
@@ -246,7 +247,7 @@ def _ld_matrix_jit(
 
                 if no_threshold or (res >= threshold and np.isfinite(res)):
                     rows.append(
-                        (index_dtype(index), index_dtype(other), value_dtype(res), cmp)
+                        (index_dtype(index), index_dtype(other), value_dtype(res), cmp)  # type: ignore
                     )
 
     return rows
@@ -258,8 +259,8 @@ def _ld_matrix(
     chunk_window_stops: ArrayLike,
     abs_chunk_start: int,
     chunk_max_window_start: int,
-    index_dtype: DType,
-    value_dtype: DType,
+    index_dtype: DTypeLike,
+    value_dtype: DTypeLike,
     threshold: float = np.nan,
     scores: Optional[ArrayLike] = None,
 ) -> ArrayLike:

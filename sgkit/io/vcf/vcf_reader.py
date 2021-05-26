@@ -20,13 +20,14 @@ import fsspec
 import numpy as np
 import xarray as xr
 from cyvcf2 import VCF, Variant
+from numpy.typing import DTypeLike
 
 from sgkit.io.utils import zarrs_to_dataset
 from sgkit.io.vcf import partition_into_regions
 from sgkit.io.vcf.utils import build_url, chunks, temporary_directory, url_filename
 from sgkit.io.vcfzarr_reader import vcf_number_to_dimension_and_size
 from sgkit.model import DIM_SAMPLE, DIM_VARIANT, create_genotype_call_dataset
-from sgkit.typing import ArrayLike, DType, PathType
+from sgkit.typing import ArrayLike, PathType
 from sgkit.utils import max_str_len
 
 DEFAULT_MAX_ALT_ALLELES = (
@@ -104,7 +105,7 @@ def _normalize_fields(vcf: VCF, fields: Sequence[str]) -> Sequence[str]:
 
 def _vcf_type_to_numpy_type_and_fill_value(
     vcf_type: str, category: str, key: str
-) -> Tuple[DType, Any]:
+) -> Tuple[DTypeLike, Any]:
     """Convert the VCF Type to a NumPy dtype and fill value."""
     if vcf_type == "Flag":
         return "bool", False

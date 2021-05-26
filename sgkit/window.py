@@ -2,12 +2,13 @@ from typing import Any, Callable, Iterable, Optional, Tuple, Union
 
 import dask.array as da
 import numpy as np
+from numpy.typing import DTypeLike
 from xarray import Dataset
 
 from sgkit.utils import conditional_merge_datasets, create_dataset
 from sgkit.variables import window_contig, window_start, window_stop
 
-from .typing import ArrayLike, DType
+from .typing import ArrayLike
 
 # Window definition (user code)
 
@@ -110,7 +111,7 @@ def moving_statistic(
     statistic: Callable[..., ArrayLike],
     size: int,
     step: int,
-    dtype: DType,
+    dtype: DTypeLike,
     **kwargs: Any,
 ) -> da.Array:
     """A Dask implementation of scikit-allel's moving_statistic function."""
@@ -135,7 +136,7 @@ def window_statistic(
     statistic: Callable[..., ArrayLike],
     window_starts: ArrayLike,
     window_stops: ArrayLike,
-    dtype: DType,
+    dtype: DTypeLike,
     chunks: Any = None,
     new_axis: Union[None, int, Iterable[int]] = None,
     **kwargs: Any,
