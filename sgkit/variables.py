@@ -505,10 +505,6 @@ sample_n_non_ref, sample_n_non_ref_spec = SgkitVariables.register_variable(
     )
 )
 
-sample_pc, sample_pc_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("sample_pc", ndim=2, kind="f", __doc__="""Sample PCs (PCxS).""")
-)
-
 sample_pca_component, sample_pca_component_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "sample_pca_component",
