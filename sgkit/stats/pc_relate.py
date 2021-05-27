@@ -38,7 +38,7 @@ def pc_relate(
     maf: float = 0.01,
     call_genotype: Hashable = variables.call_genotype,
     call_genotype_mask: Hashable = variables.call_genotype_mask,
-    sample_pc: Hashable = variables.sample_pc,
+    sample_pc: Hashable = variables.sample_pca_projection,
     merge: bool = True
 ) -> xr.Dataset:
     """Compute PC-Relate as described in Conomos, et al. 2016 [1].
@@ -74,7 +74,7 @@ def pc_relate(
 
         - genotype calls: (SxVxD)
         - genotype calls mask: (SxVxD)
-        - sample PCs: (PCxS)
+        - sample PCs: (SxPC)
     maf
         individual minor allele frequency filter. If an individual's estimated
         individual-specific minor allele frequency at a SNP is less than this value,
@@ -88,7 +88,7 @@ def pc_relate(
         Defined by :data:`sgkit.variables.call_genotype_mask_spec`
     sample_pc
         Input variable name holding sample principal components.
-        Defined by :data:`sgkit.variables.sample_pc_spec`
+        Defined by :data:`sgkit.variables.sample_pca_projection_spec`
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -137,7 +137,7 @@ def pc_relate(
         {
             call_genotype: variables.call_genotype_spec,
             call_genotype_mask: variables.call_genotype_mask_spec,
-            sample_pc: variables.sample_pc_spec,
+            sample_pc: variables.sample_pca_projection_spec,
         },
     )
 
@@ -146,7 +146,7 @@ def pc_relate(
 
     # 𝔼[gs|V] = 1β0 + Vβ, where 1 is a length _s_ vector of 1s, and β = (β1,...,βD)^T
     # is a length D vector of regression coefficients for each of the PCs
-    pcs = ds[sample_pc]
+    pcs = ds[sample_pc].T
     pcsi = da.concatenate([da.ones((1, pcs.shape[1]), dtype=pcs.dtype), pcs], axis=0)
     # Note: dask qr decomp requires no chunking in one dimension, and because number of
     # components should be smaller than number of samples in most cases, we disable
