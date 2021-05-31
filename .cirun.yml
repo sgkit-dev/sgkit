@@ -12,10 +12,12 @@ runners:
     machine_image: ubuntu-minimal-2004-lts
     # preemptible instances seems quite less reliable.
     preemptible: false
+    # Path of the relevant workflow file
+    workflow: .github/workflows/build-gpu.yml
     # Number of runners to provision on every trigger on Actions job
-    # 2 because testing on Python 3.7 & 3.8
+    # 3 because testing on Python 3.7, 3.8, 3.9
     # See .github/workflows/build-gpu.yml
-    count: 2
+    count: 3
     # Adding the GPU label, this matches the runs-on param from .github/workflows/build-gpu.yml
     # So that this runner is selected for running .github/workflows/build-gpu.yml
     labels:
