@@ -133,9 +133,10 @@ def _get_statistics(
         )
         res = _sm_statistics(ds, i, add_intercept)
         df_pred.append(
-            dsr.to_dataframe()
+            dsr.isel(variants=i)
+            .to_dataframe()
             .rename(columns=lambda c: c.replace("variant_linreg_", ""))
-            .iloc[i]
+            .iloc[0]
             .to_dict()
         )
         # First result in satsmodels RegressionResultsWrapper for
