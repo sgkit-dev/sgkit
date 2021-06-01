@@ -451,6 +451,16 @@ sample_call_rate, sample_call_rate_spec = SgkitVariables.register_variable(
     )
 )
 
+sample_cohort, sample_cohort_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "sample_cohort",
+        ndim=1,
+        kind="i",
+        __doc__="""The index of the cohort that each sample belongs to.
+A negative value indicates a sample is not a member of any cohort.""",
+    )
+)
+
 sample_id, sample_id_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "sample_id",

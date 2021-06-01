@@ -232,6 +232,7 @@ def count_cohort_alleles(
     ds: Dataset,
     *,
     call_allele_count: Hashable = variables.call_allele_count,
+    sample_cohort: Hashable = variables.sample_cohort,
     merge: bool = True,
 ) -> Dataset:
     """Compute per cohort allele counts from per-sample allele counts, or genotype calls.
@@ -245,6 +246,9 @@ def count_cohort_alleles(
         :data:`sgkit.variables.call_allele_count_spec`.
         If the variable is not present in ``ds``, it will be computed
         using :func:`count_call_alleles`.
+    sample_cohort
+        Input variable name holding sample_cohort as defined by
+        :data:`sgkit.variables.sample_cohort_spec`.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -300,7 +304,7 @@ def count_cohort_alleles(
     n_variants = ds.dims["variants"]
     n_alleles = ds.dims["alleles"]
 
-    AC, SC = da.asarray(ds.call_allele_count), da.asarray(ds.sample_cohort)
+    AC, SC = da.asarray(ds[call_allele_count]), da.asarray(ds[sample_cohort])
     n_cohorts = SC.max().compute() + 1  # 0-based indexing
     C = da.empty(n_cohorts, dtype=np.uint8)
 
