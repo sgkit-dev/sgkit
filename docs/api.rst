@@ -109,6 +109,8 @@ Utilities
    simulate_genotype_call_dataset
    window
 
+.. _api_variables:
+
 Variables
 =========
 

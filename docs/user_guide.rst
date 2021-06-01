@@ -89,6 +89,60 @@ TODO: Show how to read/write Zarr (and VCF?) data in cloud storage
 Datasets
 ========
 
+.. _genetic_variables:
+
+Genetic variables
+-----------------
+
+Most :ref:`genetic_methods` in sgkit operate on a few variables in an Xarray dataset. Variables have
+default names, so you can usually just pass in the dataset, but it's also possible to use different
+variable names.
+
+.. ipython:: python
+    :okwarning:
+
+    import sgkit as sg
+    ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
+    ds = ds[['variant_allele', 'call_genotype']]
+    ds
+
+    # Use the default variable (call_genotype)
+    sg.count_call_alleles(ds).call_allele_count
+
+    # Create a copy of the call_genotype variable, and use that to compute counts
+    # (More realistically, this variable would be created from another computation or input.)
+    ds["my_call_genotype"] = ds["call_genotype"]
+    sg.count_call_alleles(ds, call_genotype="my_call_genotype").call_allele_count
+
+For a full list of variables and their default names, see :ref:`api_variables`.
+
+Methods declare the variables that they use directly. If the variable exists in the dataset, then
+it will be used for the computation.
+
+If the variable doesn't exist in the dataset, then it will be computed if the variable name is
+the default one. For example, :func:`sgkit.count_variant_alleles` declares
+``call_allele_count`` as a variable it needs to perform its computation.
+If the dataset doesn't contain ``call_allele_count``, then the method will
+call :func:`sgkit.count_call_alleles` to populate it, before running its own computation.
+
+.. ipython:: python
+    :okwarning:
+
+    # The following will create call_allele_count and variant_allele_count
+    sg.count_variant_alleles(ds)
+
+If however a non-default variable name is used and it doesn't exist in the dataset, then the
+intermediate variable is *not* populated, and an error is raised, since sgkit expects the user
+to have created the variable in that case.
+
+.. ipython:: python
+    :okexcept:
+
+    sg.count_variant_alleles(ds, call_allele_count="my_call_allele_count")
+
+There are also some variables that cannot be automatically defined, such as ``call_genotype``,
+since it can't be computed from other data.
+
 .. _dataset_merge:
 
 Dataset merge behavior
@@ -130,6 +184,20 @@ Examples:
 
     # This can be useful for merging multiple datasets manually
     ds.merge(sg.count_variant_alleles(ds, merge=False))
+
+Merge can be used to rename output variables too.
+
+.. ipython:: python
+    :okwarning:
+
+    import sgkit as sg
+    ds = sg.simulate_genotype_call_dataset(n_variant=100, n_sample=50, missing_pct=.1)
+    ds = ds[['variant_allele', 'call_genotype']]
+    
+    ds.merge(sg.count_variant_alleles(ds, merge=False).rename(variant_allele_count="my_variant_allele_count"))
+
+Note that there is a limitation where intermediate variables (``call_allele_count`` in this case)
+are not returned if ``merge=False``. See https://github.com/pystatgen/sgkit/issues/405.
 
 Custom naming conventions
 -------------------------
