@@ -1,7 +1,7 @@
 numpy
 xarray
-dask[array]
-distributed
+dask[array] != 2021.5.1
+distributed != 2021.5.1
 dask-ml
 scipy
 typing-extensions
