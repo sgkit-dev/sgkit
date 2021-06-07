@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sgkit.read_vcfzarr</title>
+    <title>sgkit.variables.sample_cohort_spec</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet" />
   <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -35,8 +35,8 @@
     <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.load_dataset" href="sgkit.load_dataset.html" />
-    <link rel="prev" title="sgkit.io.vcf.zarrs_to_dataset" href="sgkit.io.vcf.zarrs_to_dataset.html" />
+    <link rel="next" title="sgkit.variables.sample_id_spec" href="sgkit.variables.sample_id_spec.html" />
+    <link rel="prev" title="sgkit.variables.sample_call_rate_spec" href="sgkit.variables.sample_call_rate_spec.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
     
@@ -135,8 +135,8 @@
      sgkit.io.vcf.zarrs_to_dataset
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.read_vcfzarr.html">
      sgkit.read_vcfzarr
     </a>
    </li>
@@ -400,8 +400,8 @@
      sgkit.variables.sample_call_rate_spec
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.sample_cohort_spec.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      sgkit.variables.sample_cohort_spec
     </a>
    </li>
@@ -678,7 +678,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../_sources/generated/sgkit.read_vcfzarr.rst.txt"><button type="button"
+        <a class="dropdown-buttons" href="../_sources/generated/sgkit.variables.sample_cohort_spec.rst.txt"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
@@ -711,54 +711,13 @@
         
               <div>
                 
-  <div class="section" id="sgkit-read-vcfzarr">
-<h1>sgkit.read_vcfzarr<a class="headerlink" href="#sgkit-read-vcfzarr" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
-<dt id="sgkit.read_vcfzarr">
-<code class="sig-prename descclassname"><span class="pre">sgkit.</span></code><code class="sig-name descname"><span class="pre">read_vcfzarr</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_defs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.read_vcfzarr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a VCF Zarr file created using scikit-allel.</p>
-<p>Loads VCF variant, sample, and genotype data as Dask arrays within a Dataset
-from a Zarr file created using scikit-allel’s <code class="docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code> function.</p>
-<p>Since <code class="docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code> does not preserve phasing information, there is no
-<a class="reference internal" href="sgkit.variables.call_genotype_phased_spec.html#sgkit.variables.call_genotype_phased_spec" title="sgkit.variables.call_genotype_phased_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_phased_spec</span></code></a> variable in the resulting dataset.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>path</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>]</span></dt><dd><p>Path to the Zarr file.</p>
-</dd>
-<dt><strong>field_defs</strong> : <span class="annotation terse">{<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>: {<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>}} | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Per-field information that overrides the field definitions in the VCF header, or
-provides extra information needed in the dataset representation. Definitions
-are a represented as a dictionary whose keys are the field names, and values are
-dictionaries with any of the following keys: <code class="docutils literal notranslate"><span class="pre">Number</span></code>, <code class="docutils literal notranslate"><span class="pre">Type</span></code>, <code class="docutils literal notranslate"><span class="pre">Description</span></code>,
-<code class="docutils literal notranslate"><span class="pre">dimension</span></code>. The first three correspond to VCF header values, and <code class="docutils literal notranslate"><span class="pre">dimension</span></code> is
-the name of the final dimension in the array for the case where <code class="docutils literal notranslate"><span class="pre">Number</span></code> is a fixed
-integer larger than 1. For example,
-<code class="docutils literal notranslate"><span class="pre">{&quot;INFO/AC&quot;:</span> <span class="pre">{&quot;Number&quot;:</span> <span class="pre">&quot;A&quot;},</span> <span class="pre">&quot;FORMAT/HQ&quot;:</span> <span class="pre">{&quot;dimension&quot;:</span> <span class="pre">&quot;haplotypes&quot;}}</span></code>
-overrides the <code class="docutils literal notranslate"><span class="pre">INFO/AC</span></code> field to be Number <code class="docutils literal notranslate"><span class="pre">A</span></code> (useful if the VCF defines it as
-having variable length with <code class="docutils literal notranslate"><span class="pre">.</span></code>), and names the final dimension of the <code class="docutils literal notranslate"><span class="pre">HQ</span></code> array
-(which is defined as Number 2 in the VCF header) as <code class="docutils literal notranslate"><span class="pre">haplotypes</span></code>.
-(Note that Number <code class="docutils literal notranslate"><span class="pre">A</span></code> is the number of alternate alleles, see section 1.4.2 of the
-VCF spec <a class="reference external" href="https://samtools.github.io/hts-specs/VCFv4.3.pdf">https://samtools.github.io/hts-specs/VCFv4.3.pdf</a>.)</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.18.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.18.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><p>A dataset containing the following variables:</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="sgkit.variables.variant_id_spec.html#sgkit.variables.variant_id_spec" title="sgkit.variables.variant_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_id_spec</span></code></a> (variants)</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.variant_contig_spec.html#sgkit.variables.variant_contig_spec" title="sgkit.variables.variant_contig_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_contig_spec</span></code></a> (variants)</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.variant_position_spec.html#sgkit.variables.variant_position_spec" title="sgkit.variables.variant_position_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_position_spec</span></code></a> (variants)</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.variant_allele_spec.html#sgkit.variables.variant_allele_spec" title="sgkit.variables.variant_allele_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_allele_spec</span></code></a> (variants)</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.sample_id_spec.html#sgkit.variables.sample_id_spec" title="sgkit.variables.sample_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_id_spec</span></code></a> (samples)</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a> (variants, samples, ploidy)</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.call_genotype_mask_spec.html#sgkit.variables.call_genotype_mask_spec" title="sgkit.variables.call_genotype_mask_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_mask_spec</span></code></a> (variants, samples, ploidy)</p></li>
-</ul>
-</p>
-</dd>
-</dl>
+  <div class="section" id="sgkit-variables-sample-cohort-spec">
+<h1>sgkit.variables.sample_cohort_spec<a class="headerlink" href="#sgkit-variables-sample-cohort-spec" title="Permalink to this headline">¶</a></h1>
+<dl class="py data">
+<dt id="sgkit.variables.sample_cohort_spec">
+<code class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></code><code class="sig-name descname"><span class="pre">sample_cohort_spec</span></code><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='sample_cohort',</span> <span class="pre">kind='i',</span> <span class="pre">ndim=1)</span></em><a class="headerlink" href="#sgkit.variables.sample_cohort_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>The index of the cohort that each sample belongs to.
+A negative value indicates a sample is not a member of any cohort.</p>
 </dd></dl>
 
 </div>
@@ -769,8 +728,8 @@ VCF spec <a class="reference external" href="https://samtools.github.io/hts-spec
         
         <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="sgkit.io.vcf.zarrs_to_dataset.html" title="previous page">sgkit.io.vcf.zarrs_to_dataset</a>
-    <a class='right-next' id="next-link" href="sgkit.load_dataset.html" title="next page">sgkit.load_dataset</a>
+    <a class='left-prev' id="prev-link" href="sgkit.variables.sample_call_rate_spec.html" title="previous page">sgkit.variables.sample_call_rate_spec</a>
+    <a class='right-next' id="next-link" href="sgkit.variables.sample_id_spec.html" title="next page">sgkit.variables.sample_id_spec</a>
 
         </div>
         

@@ -401,6 +401,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_cohort_spec.html">
+     sgkit.variables.sample_cohort_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="sgkit.variables.sample_id_spec.html">
      sgkit.variables.sample_id_spec
     </a>
@@ -710,7 +715,7 @@
 <h1>sgkit.count_cohort_alleles<a class="headerlink" href="#sgkit-count-cohort-alleles" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="sgkit.count_cohort_alleles">
-<code class="sig-prename descclassname"><span class="pre">sgkit.</span></code><code class="sig-name descname"><span class="pre">count_cohort_alleles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_allele_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_allele_count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.count_cohort_alleles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">sgkit.</span></code><code class="sig-name descname"><span class="pre">count_cohort_alleles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_allele_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_allele_count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_cohort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sample_cohort'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.count_cohort_alleles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute per cohort allele counts from per-sample allele counts, or genotype calls.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -721,6 +726,9 @@
 <a class="reference internal" href="sgkit.variables.call_allele_count_spec.html#sgkit.variables.call_allele_count_spec" title="sgkit.variables.call_allele_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_allele_count_spec</span></code></a>.
 If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
 using <a class="reference internal" href="sgkit.count_call_alleles.html#sgkit.count_call_alleles" title="sgkit.count_call_alleles"><code class="xref py py-func docutils literal notranslate"><span class="pre">count_call_alleles()</span></code></a>.</p>
+</dd>
+<dt><strong>sample_cohort</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'sample_cohort'</span></code>)</dt><dd><p>Input variable name holding sample_cohort as defined by
+<a class="reference internal" href="sgkit.variables.sample_cohort_spec.html#sgkit.variables.sample_cohort_spec" title="sgkit.variables.sample_cohort_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_cohort_spec</span></code></a>.</p>
 </dd>
 <dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
