@@ -13,7 +13,7 @@ from .typing import ArrayLike, DType
 # Window definition (user code)
 
 
-def window_by_index(
+def window_by_variant(
     ds: Dataset,
     *,
     size: int,
@@ -60,7 +60,7 @@ def window_by_index(
     return _window_per_contig(ds, variant_contig, merge, _get_windows, size, step)
 
 
-window = window_by_index
+window = window_by_variant
 
 
 def window_by_position(
