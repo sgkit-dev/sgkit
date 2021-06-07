@@ -881,8 +881,15 @@
 <span id="id1"></span><h2><a class="toc-backref" href="#id4">Reading genetic data</a><a class="headerlink" href="#reading-genetic-data" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="installation">
 <h3><a class="toc-backref" href="#id5">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
-<p>Sgkit can read standard genetic file formats, including VCF, PLINK, and BGEN. Support for reading
-these formats is not installed by default, and requires additional dependencies, which can be installed
+<p>Sgkit can read standard genetic file formats, including VCF, PLINK, and BGEN.</p>
+<p>If sgkit has been installed using conda, support for reading BGEN and PLINK is included, but
+VCF is not because there is no Windows support for cyvcf2, the library we use for reading VCF data.
+If you are using Linux or a Mac, please install cyvcf2 using the following to enable VCF support:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -c bioconda cyvcf2
+</pre></div>
+</div>
+<p>If sgkit has been installed using pip, then support for reading these formats is
+not included, and requires additional dependencies, which can be installed
 as an “extra” feature using pip, as follows.</p>
 <p>To install sgkit with BGEN support:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install &#39;sgkit[bgen]&#39;
