@@ -4,13 +4,12 @@ import pytest
 import xarray as xr
 from hypothesis import given, settings
 from hypothesis.extra.numpy import arrays
-from sklearn.decomposition import PCA
 
+from sgkit import pc_relate, pca
 from sgkit.stats.pc_relate import (
     _collapse_ploidy,
     _impute_genotype_call_with_variant_mean,
     gramian,
-    pc_relate,
 )
 from sgkit.testing import simulate_genotype_call_dataset
 
@@ -27,7 +26,7 @@ def test_pc_relate__genotype_inputs_checks() -> None:
         pc_relate(g_non_biallelic)
 
     g_no_pcs = simulate_genotype_call_dataset(100, 10)
-    with pytest.raises(ValueError, match="sample_pc not present"):
+    with pytest.raises(ValueError, match="sample_pca_projection not present"):
         pc_relate(g_no_pcs)
 
     with pytest.raises(ValueError, match="call_genotype not present"):
@@ -101,28 +100,15 @@ def test_impute_genotype_call_with_variant_mean() -> None:
 
 def test_pc_relate__values_within_range() -> None:
     n_samples = 100
-    g = simulate_genotype_call_dataset(1000, n_samples)
-    call_g, _ = _collapse_ploidy(g)
-    pcs = PCA(n_components=2, svd_solver="full").fit_transform(call_g.T)
-    g["sample_pc"] = (("components", "samples"), pcs.T)
-    phi = pc_relate(g)
-    assert phi.pc_relate_phi.shape == (n_samples, n_samples)
-    data_np = phi.pc_relate_phi.data.compute()  # to be able to use fancy indexing below
+    ds = (
+        simulate_genotype_call_dataset(1000, n_samples)
+        .pipe(pca, n_components=2)
+        .pipe(pc_relate)
+    )
+    assert ds.pc_relate_phi.shape == (n_samples, n_samples)
+    data_np = ds.pc_relate_phi.data.compute()  # to be able to use fancy indexing below
     upper_phi = data_np[np.triu_indices_from(data_np, 1)]
     assert (upper_phi > -0.5).all() and (upper_phi < 0.5).all()
-
-
-def test_pc_relate__identical_sample_should_be_05() -> None:
-    n_samples = 100
-    g = simulate_genotype_call_dataset(1000, n_samples, missing_pct=0.1)
-    call_g, _ = _collapse_ploidy(g)
-    pcs = PCA(n_components=2, svd_solver="full").fit_transform(call_g.T)
-    g["sample_pc"] = (("components", "samples"), pcs.T)
-    # Add identical sample
-    g.call_genotype.loc[dict(samples=8)] = g.call_genotype.isel(samples=0)
-    phi = pc_relate(g)
-    assert phi.pc_relate_phi.shape == (n_samples, n_samples)
-    assert np.allclose(phi.pc_relate_phi.isel(samples_0=8, samples_1=0), 0.5, atol=0.1)
 
 
 def test_pc_relate__parent_child_relationship() -> None:
@@ -151,13 +137,9 @@ def test_pc_relate__parent_child_relationship() -> None:
         return ds
 
     # Redefine the progeny genotypes
-    ds = simulate_new_generation(ds)
 
     # Infer kinship
-    call_g, _ = _collapse_ploidy(ds)
-    pcs = PCA(n_components=2, svd_solver="full").fit_transform(call_g.T)
-    ds["sample_pc"] = (("components", "samples"), pcs.T)
-    ds["pc_relate_phi"] = pc_relate(ds)["pc_relate_phi"].compute()
+    ds = simulate_new_generation(ds).pipe(pca, n_components=2).pipe(pc_relate)
 
     # Check that all coefficients are in expected ranges
     cts = (

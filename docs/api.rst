@@ -152,7 +152,6 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.sample_pca_explained_variance_ratio_spec
     variables.sample_pca_loading_spec
     variables.sample_pca_projection_spec
-    variables.sample_pc_spec
     variables.sample_ploidy_spec
     variables.stat_divergence_spec
     variables.stat_diversity_spec
