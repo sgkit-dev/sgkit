@@ -13,8 +13,8 @@ from sgkit.window import (
     _get_windows,
     has_windows,
     moving_statistic,
-    window_by_index,
     window_by_position,
+    window_by_variant,
 )
 
 
@@ -72,23 +72,23 @@ def test_moving_statistic__min_chunksize_smaller_than_size():
         moving_statistic(values, np.sum, size=3, step=3, dtype=values.dtype)
 
 
-def test_window_by_index():
+def test_window_by_variant():
     ds = simulate_genotype_call_dataset(n_variant=10, n_sample=3, seed=0)
     assert not has_windows(ds)
-    ds = window_by_index(ds, size=2, step=2)
+    ds = window_by_variant(ds, size=2, step=2)
     assert has_windows(ds)
     np.testing.assert_equal(ds[window_contig].values, [0, 0, 0, 0, 0])
     np.testing.assert_equal(ds[window_start].values, [0, 2, 4, 6, 8])
     np.testing.assert_equal(ds[window_stop].values, [2, 4, 6, 8, 10])
 
     with pytest.raises(MergeWarning):
-        window_by_index(ds, size=2, step=2)
+        window_by_variant(ds, size=2, step=2)
 
 
-def test_window_by_index__default_step():
+def test_window_by_variant__default_step():
     ds = simulate_genotype_call_dataset(n_variant=10, n_sample=3, seed=0)
     assert not has_windows(ds)
-    ds = window_by_index(ds, size=2)
+    ds = window_by_variant(ds, size=2)
     assert has_windows(ds)
     np.testing.assert_equal(ds[window_contig].values, [0, 0, 0, 0, 0])
     np.testing.assert_equal(ds[window_start].values, [0, 2, 4, 6, 8])
@@ -121,13 +121,13 @@ def test_window_by_index__default_step():
         ),
     ],
 )
-def test_window_by_index__multiple_contigs(
+def test_window_by_variant__multiple_contigs(
     n_variant, n_contig, window_contigs_exp, window_starts_exp, window_stops_exp
 ):
     ds = simulate_genotype_call_dataset(
         n_variant=n_variant, n_sample=1, n_contig=n_contig
     )
-    ds = window_by_index(ds, size=2, step=2)
+    ds = window_by_variant(ds, size=2, step=2)
     np.testing.assert_equal(ds[window_contig].values, window_contigs_exp)
     np.testing.assert_equal(ds[window_start].values, window_starts_exp)
     np.testing.assert_equal(ds[window_stop].values, window_stops_exp)
