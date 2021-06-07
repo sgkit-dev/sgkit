@@ -451,6 +451,16 @@ sample_call_rate, sample_call_rate_spec = SgkitVariables.register_variable(
     )
 )
 
+sample_cohort, sample_cohort_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "sample_cohort",
+        ndim=1,
+        kind="i",
+        __doc__="""The index of the cohort that each sample belongs to.
+A negative value indicates a sample is not a member of any cohort.""",
+    )
+)
+
 sample_id, sample_id_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "sample_id",
@@ -503,10 +513,6 @@ sample_n_non_ref, sample_n_non_ref_spec = SgkitVariables.register_variable(
         kind="i",
         __doc__="""The number of variants that are not homozygous reference calls.""",
     )
-)
-
-sample_pc, sample_pc_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec("sample_pc", ndim=2, kind="f", __doc__="""Sample PCs (PCxS).""")
 )
 
 sample_pca_component, sample_pca_component_spec = SgkitVariables.register_variable(

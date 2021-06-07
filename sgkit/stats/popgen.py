@@ -782,6 +782,7 @@ def Garud_H(
     ds: Dataset,
     *,
     call_genotype: Hashable = variables.call_genotype,
+    sample_cohort: Hashable = variables.sample_cohort,
     cohorts: Optional[Sequence[Union[int, str]]] = None,
     merge: bool = True,
 ) -> Dataset:
@@ -800,6 +801,9 @@ def Garud_H(
         Input variable name holding call_genotype as defined by
         :data:`sgkit.variables.call_genotype_spec`.
         Must be present in ``ds``.
+    sample_cohort
+        Input variable name holding sample_cohort as defined by
+        :data:`sgkit.variables.sample_cohort_spec`.
     cohorts
         The cohorts to compute statistics for, specified as a sequence of
         cohort indexes or IDs. None (the default) means compute statistics
@@ -876,7 +880,7 @@ def Garud_H(
     gt = ds[call_genotype]
 
     # convert sample cohorts to haplotype layout
-    sc = ds.sample_cohort.values
+    sc = ds[sample_cohort].values
     hsc = np.stack((sc, sc), axis=1).ravel()  # TODO: assumes diploid
     n_cohorts = sc.max() + 1  # 0-based indexing
     cohorts = cohorts or range(n_cohorts)
@@ -967,6 +971,7 @@ def observed_heterozygosity(
     ds: Dataset,
     *,
     call_heterozygosity: Hashable = variables.call_heterozygosity,
+    sample_cohort: Hashable = variables.sample_cohort,
     merge: bool = True,
 ) -> Dataset:
     """Compute per cohort observed heterozygosity.
@@ -990,6 +995,9 @@ def observed_heterozygosity(
         :data:`sgkit.variables.call_heterozygosity_spec`.
         If the variable is not present in ``ds``, it will be computed
         using :func:`individual_heterozygosity`.
+    sample_cohort
+        Input variable name holding sample_cohort as defined by
+        :data:`sgkit.variables.sample_cohort_spec`.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -1034,7 +1042,7 @@ def observed_heterozygosity(
     )
     variables.validate(ds, {call_heterozygosity: variables.call_heterozygosity_spec})
     hi = da.asarray(ds[call_heterozygosity])
-    sc = da.asarray(ds["sample_cohort"])
+    sc = da.asarray(ds[sample_cohort])
     n_cohorts = sc.max().compute() + 1
     shape = (hi.chunks[0], n_cohorts)
     n = da.zeros(n_cohorts, dtype=np.uint8)
