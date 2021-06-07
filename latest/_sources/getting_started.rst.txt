@@ -120,6 +120,8 @@ sgkit utilities as well as the Pandas/Xarray integration:
 
 This last example alludes to representations of missing data that are explained further in :ref:`missing_data`.
 
+.. _genetic_methods:
+
 Genetic methods
 ---------------
 
@@ -374,11 +376,3 @@ See `Parallel computing with Dask in Xarray <http://xarray.pydata.org/en/stable/
 for more examples and information, as well as the Dask tutorials on
 `delayed array execution <https://tutorial.dask.org/03_array.html#dask.array-contains-these-algorithms>`_ and
 `lazy execution in Dask graphs <https://tutorial.dask.org/01x_lazy.html>`_.
-
-.. _genetic_variables:
-
-Genetic variables
------------------
-
-TODO: Link to and explain ``sgkit.variables`` in https://github.com/pystatgen/sgkit/pull/276.
-
