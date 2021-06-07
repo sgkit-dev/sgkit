@@ -10,7 +10,8 @@ RUN apt-get update \
 RUN R -e 'install.packages("https://cran.r-project.org/src/contrib/data.table_1.13.0.tar.gz", type="source", repos=NULL)'
 RUN R -e 'install.packages("tictoc", version = "1.0", repos = "http://cran.us.r-project.org")'
 RUN R -e 'install.packages("BiocManager", version = "1.30.10", repos = "http://cran.us.r-project.org")'
-RUN R -e 'BiocManager::install(version = "3.11", ask = FALSE)'
+RUN R -e 'BiocManager::install(version = "3.11", ask = FALSE)' || \
+    R -e 'BiocManager::install(version = "3.11", ask = FALSE, force = TRUE)'
 RUN R -e 'BiocManager::install("SNPRelate", version = "3.11", ask = FALSE)'
 RUN R -e 'BiocManager::install("gdsfmt", version = "3.11", ask = FALSE)'
 RUN R -e 'BiocManager::install("GWASTools", version = "3.11", ask = FALSE)'
