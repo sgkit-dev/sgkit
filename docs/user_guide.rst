@@ -19,9 +19,10 @@ Installation
 Sgkit can read standard genetic file formats, including VCF, PLINK, and BGEN.
 
 If sgkit has been installed using conda, support for reading BGEN and PLINK is included, but
-VCF is not, and should be installed using pip as follows::
+VCF is not because there is no Windows support for cyvcf2, the library we use for reading VCF data.
+If you are using Linux or a Mac, please install cyvcf2 using the following to enable VCF support::
 
-    $ pip install 'sgkit[vcf]'
+    $ conda install -c bioconda cyvcf2
 
 If sgkit has been installed using pip, then support for reading these formats is
 not included, and requires additional dependencies, which can be installed
