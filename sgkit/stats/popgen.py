@@ -526,17 +526,17 @@ def Tajimas_D(
     >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
 
     >>> sg.Tajimas_D(ds)["stat_Tajimas_D"].values # doctest: +NORMALIZE_WHITESPACE
-    array([[-3.35891429, -2.96698697],
-        [-2.96698697, -3.35891429],
-        [-2.96698697, -2.96698697],
-        [-3.35891429, -3.35891429],
-        [-3.35891429, -3.35891429]])
+    array([[0.88883234, 2.18459998],
+           [2.18459998, 0.88883234],
+           [2.18459998, 2.18459998],
+           [0.88883234, 0.88883234],
+           [0.88883234, 0.88883234]])
 
     >>> # Divide into windows of size three (variants)
     >>> ds = sg.window(ds, size=3)
     >>> sg.Tajimas_D(ds)["stat_Tajimas_D"].values # doctest: +NORMALIZE_WHITESPACE
-    array([[-0.22349574, -0.22349574],
-        [-2.18313233, -2.18313233]])
+    array([[2.40517586, 2.40517586],
+           [1.10393559, 1.10393559]])
     """
     ds = define_variable_if_absent(
         ds, variables.variant_allele_count, variant_allele_count, count_variant_alleles
@@ -553,12 +553,22 @@ def Tajimas_D(
     )
 
     ac = ds[variant_allele_count]
+    ac = da.asarray(ac)
 
     # count segregating. Note that this uses the definition in tskit,
     # which is the number of alleles - 1. In the biallelic case this
     # gives us the number of non-monomorphic sites.
-    # FIXME this needs to be windowed: # 563
-    S = ((ac > 0).sum(axis=1) - 1).sum()
+    S = (ac > 0).sum(axis=1) - 1
+
+    if has_windows(ds):
+        S = window_statistic(
+            S,
+            np.sum,
+            ds.window_start.values,
+            ds.window_stop.values,
+            dtype=S.dtype,
+            axis=0,
+        )
 
     # assume number of chromosomes sampled is constant for all variants
     # NOTE: even tho ac has dtype uint, we promote the sum to float
@@ -576,7 +586,7 @@ def Tajimas_D(
 
     # N.B., both theta estimates are usually divided by the number of
     # (accessible) bases but here we want the absolute difference
-    d = div - theta
+    d = div - theta[:, np.newaxis]
 
     # calculate the denominator (standard deviation)
     a2 = (1 / (da.arange(1, n) ** 2)).sum()
@@ -591,8 +601,14 @@ def Tajimas_D(
     # Let IEEE decide the semantics of division by zero here. The return value
     # will be -inf, nan or +inf, depending on the value of the numerator.
     # Currently this will raise a RuntimeWarning, if we divide by zero.
-    D = d / d_stdev
-    new_ds = create_dataset({variables.stat_Tajimas_D: D})
+    D = d / d_stdev[:, np.newaxis]
+
+    if has_windows(ds):
+        new_ds = create_dataset({variables.stat_Tajimas_D: (["windows", "cohorts"], D)})
+    else:
+        new_ds = create_dataset(
+            {variables.stat_Tajimas_D: (["variants", "cohorts"], D)}
+        )
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
