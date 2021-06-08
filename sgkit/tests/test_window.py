@@ -203,7 +203,7 @@ def test_window_by_position():
         ["variants"],
         np.array([1, 4, 6, 8, 12]),
     )
-    ds = window_by_position(ds, size=5)
+    ds = window_by_position(ds, size=5, window_start_position="variant_position")
     assert has_windows(ds)
     np.testing.assert_equal(ds[window_contig].values, [0, 0, 0, 0, 0])
     np.testing.assert_equal(ds[window_start].values, [0, 1, 2, 3, 4])
@@ -216,7 +216,7 @@ def test_window_by_position__multiple_contigs():
         ["variants"],
         np.array([1, 4, 6, 8, 12, 1, 21, 25, 40, 55]),
     )
-    ds = window_by_position(ds, size=10)
+    ds = window_by_position(ds, size=10, window_start_position="variant_position")
     assert has_windows(ds)
     np.testing.assert_equal(ds[window_contig].values, [0, 0, 0, 0, 0, 1, 1, 1, 1, 1])
     np.testing.assert_equal(ds[window_start].values, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
@@ -229,8 +229,24 @@ def test_window_by_position__offset():
         ["variants"],
         np.array([1, 4, 6, 8, 12, 1, 21, 25, 40, 55]),
     )
-    ds = window_by_position(ds, size=10, offset=-5)
+    ds = window_by_position(
+        ds, size=10, offset=-5, window_start_position="variant_position"
+    )
     assert has_windows(ds)
     np.testing.assert_equal(ds[window_contig].values, [0, 0, 0, 0, 0, 1, 1, 1, 1, 1])
     np.testing.assert_equal(ds[window_start].values, [0, 0, 0, 1, 3, 5, 6, 6, 8, 9])
     np.testing.assert_equal(ds[window_stop].values, [2, 4, 4, 5, 5, 6, 8, 8, 9, 10])
+
+
+def test_window_by_position__equal_spaced_windows():
+    ds = simulate_genotype_call_dataset(n_variant=5, n_sample=3, seed=0)
+    assert not has_windows(ds)
+    ds["variant_position"] = (
+        ["variants"],
+        np.array([1, 4, 6, 8, 12]),
+    )
+    ds = window_by_position(ds, size=5, offset=1)
+    assert has_windows(ds)
+    np.testing.assert_equal(ds[window_contig].values, [0, 0, 0])
+    np.testing.assert_equal(ds[window_start].values, [0, 2, 4])
+    np.testing.assert_equal(ds[window_stop].values, [2, 4, 5])

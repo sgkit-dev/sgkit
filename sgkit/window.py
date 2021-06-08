@@ -70,6 +70,7 @@ def window_by_position(
     offset: int = 0,
     variant_contig: Hashable = variables.variant_contig,
     variant_position: Hashable = variables.variant_position,
+    window_start_position: Optional[Hashable] = None,
     merge: bool = True,
 ) -> Dataset:
     """Add window information to a dataset, measured by distance along the genome.
@@ -95,6 +96,10 @@ def window_by_position(
         Name of variable containing variant positions.
         Must be monotonically increasing within a contig.
         Defined by :data:`sgkit.variables.variant_position_spec`.
+    window_start_position
+        Optional name of variable to use to define window starts, defined by
+        position in the genome. Defaults to None, which means start positions
+        are at multiples of ``size``, and shifted by ``offset``.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -114,8 +119,18 @@ def window_by_position(
     """
 
     positions = ds[variant_position].values
+    window_start_positions = (
+        ds[window_start_position].values if window_start_position is not None else None
+    )
     return _window_per_contig(
-        ds, variant_contig, merge, _get_windows_by_position, size, offset, positions
+        ds,
+        variant_contig,
+        merge,
+        _get_windows_by_position,
+        size,
+        offset,
+        positions,
+        window_start_positions,
     )
 
 
@@ -178,14 +193,25 @@ def _get_windows(
 
 
 def _get_windows_by_position(
-    start: int, stop: int, size: int, offset: int, positions: ArrayLike
+    start: int,
+    stop: int,
+    size: int,
+    offset: int,
+    positions: ArrayLike,
+    window_start_positions: Optional[ArrayLike],
 ) -> Tuple[ArrayLike, ArrayLike]:
     contig_pos = positions[start:stop]
-    if offset == 0:
-        window_starts = np.arange(contig_pos.shape[0]) + start
+    if window_start_positions is None:
+        # TODO: position is 1-based (or use offset?)
+        pos_starts = np.arange(offset, contig_pos[-1] + offset, step=size)
+        window_starts = np.searchsorted(contig_pos, pos_starts) + start
+        window_stops = np.searchsorted(contig_pos, pos_starts + size) + start
     else:
-        window_starts = np.searchsorted(contig_pos, contig_pos + offset) + start
-    window_stops = np.searchsorted(contig_pos, contig_pos + offset + size) + start
+        window_start_pos = window_start_positions[start:stop]
+        window_starts = np.searchsorted(contig_pos, window_start_pos + offset) + start
+        window_stops = (
+            np.searchsorted(contig_pos, window_start_pos + offset + size) + start
+        )
     return window_starts, window_stops
 
 
