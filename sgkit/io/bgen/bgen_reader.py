@@ -31,6 +31,13 @@ from sgkit import create_genotype_dosage_dataset
 from sgkit.io.utils import dataframe_to_dict, encode_contigs
 from sgkit.typing import ArrayLike, PathType
 
+try:
+    # needed to avoid Sphinx forward reference error for DTypeLike
+    # try block is needed since SupportsIndex is in Python 3.7
+    from typing import SupportsIndex  # type: ignore # noqa: F401
+except ImportError:  # pragma: no cover
+    pass
+
 logger = logging.getLogger(__name__)
 
 GT_DATA_VARS = [
