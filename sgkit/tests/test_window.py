@@ -5,7 +5,7 @@ import dask.array as da
 import numpy as np
 import pytest
 
-from sgkit import simulate_genotype_call_dataset
+from sgkit import simulate_genotype_call_dataset, window_by_position, window_by_variant
 from sgkit.utils import MergeWarning
 from sgkit.variables import window_contig, window_start, window_stop
 from sgkit.window import (
@@ -13,8 +13,6 @@ from sgkit.window import (
     _get_windows,
     has_windows,
     moving_statistic,
-    window_by_position,
-    window_by_variant,
 )
 
 

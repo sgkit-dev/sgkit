@@ -55,6 +55,37 @@ def window_by_variant(
       The index values of window start positions.
     - :data:`sgkit.variables.window_stop_spec` (windows):
       The index values of window stop positions.
+
+    Examples
+    --------
+
+    >>> import sgkit as sg
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=10, n_sample=2, n_contig=2)
+    >>> ds.variant_contig.values
+    array([0, 0, 0, 0, 0, 1, 1, 1, 1, 1])
+    >>> ds.variant_position.values
+    array([0, 1, 2, 3, 4, 0, 1, 2, 3, 4])
+
+    >>> # Contiguous windows, each with the same number of variants (3)
+    >>> # except for the last window of each contig
+    >>> sg.window_by_variant(ds, size=3, merge=False)
+    <xarray.Dataset>
+    Dimensions:        (windows: 4)
+    Dimensions without coordinates: windows
+    Data variables:
+        window_contig  (windows) int64 0 0 1 1
+        window_start   (windows) int64 0 3 5 8
+        window_stop    (windows) int64 3 5 8 10
+
+    >>> # Overlapping windows
+    >>> sg.window_by_variant(ds, size=3, step=2, merge=False)
+    <xarray.Dataset>
+    Dimensions:        (windows: 6)
+    Dimensions without coordinates: windows
+    Data variables:
+        window_contig  (windows) int64 0 0 0 1 1 1
+        window_start   (windows) int64 0 2 4 5 7 9
+        window_stop    (windows) int64 3 5 5 8 10 10
     """
     step = step or size
     return _window_per_contig(ds, variant_contig, merge, _get_windows, size, step)
@@ -116,6 +147,59 @@ def window_by_position(
       The index values of window start positions.
     - :data:`sgkit.variables.window_stop_spec` (windows):
       The index values of window stop positions.
+
+    Examples
+    --------
+
+    >>> import sgkit as sg
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=10, n_sample=2, n_contig=2)
+    >>> ds["variant_position"] = (["variants"], np.array([1, 4, 6, 8, 12, 1, 21, 25, 40, 55]))
+    >>> ds.variant_contig.values
+    array([0, 0, 0, 0, 0, 1, 1, 1, 1, 1])
+    >>> ds.variant_position.values
+    array([ 1,  4,  6,  8, 12,  1, 21, 25, 40, 55])
+
+    >>> # Contiguous equally-spaced windows, each 10 base pairs in size
+    >>> # and using offset to start windows at 1
+    >>> ds_w1 = sg.window_by_position(ds, size=10, offset=1, merge=False)
+    >>> ds_w1
+    <xarray.Dataset>
+    Dimensions:        (windows: 8)
+    Dimensions without coordinates: windows
+    Data variables:
+        window_contig  (windows) int64 0 0 1 1 1 1 1 1
+        window_start   (windows) int64 0 4 5 6 6 8 9 9
+        window_stop    (windows) int64 4 5 6 6 8 9 9 10
+    >>> [ds.variant_position.values[i:j] for i, j in zip(ds_w1.window_start.values, ds_w1.window_stop.values) if i != j] # doctest: +NORMALIZE_WHITESPACE
+    [array([1, 4, 6, 8]),
+     array([12]),
+     array([1]),
+     array([21, 25]),
+     array([40]),
+     array([55])]
+
+    >>> # Windows centered around positions defined by a variable (variant_position),
+    >>> # each 10 base pairs in size. Also known as "locus windows".
+    >>> ds_w2 = sg.window_by_position(ds, size=10, offset=-5, window_start_position="variant_position", merge=False)
+    >>> ds_w2
+    <xarray.Dataset>
+    Dimensions:        (windows: 10)
+    Dimensions without coordinates: windows
+    Data variables:
+        window_contig  (windows) int64 0 0 0 0 0 1 1 1 1 1
+        window_start   (windows) int64 0 0 0 1 3 5 6 6 8 9
+        window_stop    (windows) int64 2 4 4 5 5 6 8 8 9 10
+    >>> [ds.variant_position.values[i:j] for i, j in zip(ds_w2.window_start.values, ds_w2.window_stop.values)] # doctest: +NORMALIZE_WHITESPACE
+    [array([1, 4]),
+     array([1, 4, 6, 8]),
+     array([1, 4, 6, 8]),
+     array([ 4,  6,  8, 12]),
+     array([ 8, 12]),
+     array([1]),
+     array([21, 25]),
+     array([21, 25]),
+     array([40]),
+     array([55])]
     """
 
     positions = ds[variant_position].values
