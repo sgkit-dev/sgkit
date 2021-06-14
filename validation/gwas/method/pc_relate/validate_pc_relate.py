@@ -7,6 +7,7 @@ import xarray as xr
 
 from sgkit import pc_relate
 from sgkit.io.plink import read_plink
+from sgkit.variables import sample_pca_projection
 
 
 def test_same_as_the_reference_implementation() -> None:
@@ -20,8 +21,8 @@ def test_same_as_the_reference_implementation() -> None:
 
     pcs = da.from_array(
         pd.read_csv(d.joinpath("pcs.csv").as_posix(), usecols=[1, 2]).to_numpy()
-    ).T
-    ds["sample_pc"] = (("components", "samples"), pcs)
+    )
+    ds[sample_pca_projection] = (("samples", "components"), pcs)
     phi = pc_relate(ds).pc_relate_phi.compute()
 
     n_samples = 90
