@@ -10,7 +10,7 @@ from hypothesis import Phase, example, given, settings
 from hypothesis import strategies as st
 from hypothesis.extra.numpy import arrays
 
-from sgkit import variables, window
+from sgkit import variables, window_by_variant
 from sgkit.stats.ld import (
     ld_matrix,
     ld_prune,
@@ -66,7 +66,7 @@ def ldm_df(
 ) -> DataFrame:
     ds = simulate_genotype_call_dataset(n_variant=x.shape[0], n_sample=x.shape[1])
     ds["dosage"] = (["variants", "samples"], x)
-    ds = window(ds, size=size, step=step)
+    ds = window_by_variant(ds, size=size, step=step)
     df = ld_matrix(ds, threshold=threshold).compute()
     if not diag:
         df = df.pipe(lambda df: df[df["i"] != df["j"]])
@@ -156,7 +156,7 @@ def test_vs_skallel(args):
 
     ds = simulate_genotype_call_dataset(n_variant=x.shape[0], n_sample=x.shape[1])
     ds["dosage"] = (["variants", "samples"], da.asarray(x).rechunk({0: chunks}))
-    ds = window(ds, size=size, step=step)
+    ds = window_by_variant(ds, size=size, step=step)
 
     ldm = ld_matrix(ds, threshold=threshold)
     has_duplicates = ldm.compute().duplicated(subset=["i", "j"]).any()
@@ -183,7 +183,7 @@ def test_scores():
 
     ds = simulate_genotype_call_dataset(n_variant=x.shape[0], n_sample=x.shape[1])
     ds["dosage"] = (["variants", "samples"], x)
-    ds = window(ds, size=10)
+    ds = window_by_variant(ds, size=10)
 
     ldm = ld_matrix(ds, threshold=0.2)
     idx_drop_ds = maximal_independent_set(ldm)

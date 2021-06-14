@@ -279,7 +279,7 @@ example shows how to give cohorts names.
 .. ipython:: python
     :okwarning:
 
-    ds = sg.window(ds, size=20)
+    ds = sg.window_by_variant(ds, size=20)
     ds = sg.Fst(ds)
 
     cohort_names = ["Africa", "Asia", "Europe"]
@@ -320,7 +320,7 @@ Xarray and Pandas operations in a single pipeline:
         # Apply filter to include variants present across > 80% of samples
         .pipe(lambda ds: ds.sel(variants=ds.variant_call_rate > .8))
         # Create windows of size 20 variants
-        .pipe(lambda ds: sg.window(ds, size=20))
+        .pipe(lambda ds: sg.window_by_variant(ds, size=20))
         # Assign a "cohort" variable that splits samples into two groups
         .assign(sample_cohort=np.repeat([0, 1], ds.dims['samples'] // 2))
         # Compute Fst between the groups

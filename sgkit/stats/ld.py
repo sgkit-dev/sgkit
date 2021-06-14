@@ -88,7 +88,7 @@ def ld_matrix(
     Parameters
     ----------
     ds
-        Dataset containing genotype dosages. Must already be windowed with :func:`window`.
+        Dataset containing genotype dosages. Must already be windowed with :func:`window_by_position` or :func:`window_by_variant`.
     dosage
         Name of genetic dosage variable.
         Defined by :data:`sgkit.variables.dosage_spec`.
@@ -410,7 +410,7 @@ def ld_prune(
     Parameters
     ----------
     ds
-        Dataset containing genotype dosages. Must already be windowed with :func:`window`.
+        Dataset containing genotype dosages. Must already be windowed with :func:`window_by_position` or :func:`window_by_variant`.
     dosage
         Name of genetic dosage variable.
         Defined by :data:`sgkit.variables.dosage_spec`.
@@ -445,7 +445,7 @@ def ld_prune(
     >>> ds["dosage"] = ds["call_genotype"].sum(dim="ploidy")
 
     >>> # Divide into windows of size five (variants)
-    >>> ds = sg.window(ds, size=5)
+    >>> ds = sg.window_by_variant(ds, size=5)
 
     >>> pruned_ds = sg.ld_prune(ds)
     >>> pruned_ds.dims["variants"]
