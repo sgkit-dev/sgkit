@@ -31,6 +31,7 @@ jobs:
     - name: Run pre-commit
       uses: pre-commit/action@v2.0.0
     - name: Check for Sphinx doc warnings
+      if: contains(matrix.python-version, '3.8')
       run: |
         cd docs
         make html SPHINXOPTS="-W --keep-going -n"
