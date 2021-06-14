@@ -94,7 +94,11 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 autosummary_generate = True
 
-nitpick_ignore = [("py:class", "sgkit.display.GenotypeDisplay")]
+nitpick_ignore = [
+    ("py:class", "sgkit.display.GenotypeDisplay"),
+    ("py:class", "numpy.typing._dtype_like._DTypeDict"),
+    ("py:class", "numpy.typing._dtype_like._SupportsDType"),
+]
 
 
 # FIXME: Workaround for linking xarray module
