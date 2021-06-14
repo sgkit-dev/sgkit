@@ -108,6 +108,8 @@ Utilities
    infer_variant_ploidy
    simulate_genotype_call_dataset
    window
+   window_by_position
+   window_by_variant
 
 .. _api_variables:
 
