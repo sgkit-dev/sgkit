@@ -35,7 +35,7 @@ def diversity(
     """Compute diversity from cohort allele counts.
 
     By default, values of this statistic are calculated per variant.
-    To compute values in windows, call :func:`window` before calling
+    To compute values in windows, call :func:`window_by_position` or :func:`window_by_variant` before calling
     this function.
 
     Parameters
@@ -83,7 +83,7 @@ def diversity(
         [0.5       , 0.5       ]])
 
     >>> # Divide into windows of size three (variants)
-    >>> ds = sg.window(ds, size=3)
+    >>> ds = sg.window_by_variant(ds, size=3)
     >>> sg.diversity(ds)["stat_diversity"].values # doctest: +NORMALIZE_WHITESPACE
     array([[1.83333333, 1.83333333],
         [1.        , 1.        ]])
@@ -188,7 +188,7 @@ def divergence(
     is the diversity for cohort i.
 
     By default, values of this statistic are calculated per variant.
-    To compute values in windows, call :func:`window` before calling
+    To compute values in windows, call :func:`window_by_position` or :func:`window_by_variant` before calling
     this function.
 
     Parameters
@@ -247,7 +247,7 @@ def divergence(
             [0.625     , 0.5       ]]])
 
     >>> # Divide into windows of size three (variants)
-    >>> ds = sg.window(ds, size=3)
+    >>> ds = sg.window_by_variant(ds, size=3)
     >>> sg.divergence(ds)["stat_divergence"].values # doctest: +NORMALIZE_WHITESPACE
     array([[[1.83333333, 1.5       ],
             [1.5       , 1.83333333]],
@@ -373,7 +373,7 @@ def Fst(
     """Compute Fst between pairs of cohorts.
 
     By default, values of this statistic are calculated per variant.
-    To compute values in windows, call :func:`window` before calling
+    To compute values in windows, call :func:`window_by_position` or :func:`window_by_variant` before calling
     this function.
 
     Parameters
@@ -439,7 +439,7 @@ def Fst(
             [ 0.2       ,         nan]]])
 
     >>> # Divide into windows of size three (variants)
-    >>> ds = sg.window(ds, size=3)
+    >>> ds = sg.window_by_variant(ds, size=3)
     >>> sg.Fst(ds)["stat_Fst"].values # doctest: +NORMALIZE_WHITESPACE
     array([[[        nan, -0.22222222],
             [-0.22222222,         nan]],
@@ -480,7 +480,7 @@ def Tajimas_D(
     """Compute Tajimas' D for a genotype call dataset.
 
     By default, values of this statistic are calculated per variant.
-    To compute values in windows, call :func:`window` before calling
+    To compute values in windows, call :func:`window_by_position` or :func:`window_by_variant` before calling
     this function.
 
     Parameters
@@ -533,7 +533,7 @@ def Tajimas_D(
            [0.88883234, 0.88883234]])
 
     >>> # Divide into windows of size three (variants)
-    >>> ds = sg.window(ds, size=3)
+    >>> ds = sg.window_by_variant(ds, size=3)
     >>> sg.Tajimas_D(ds)["stat_Tajimas_D"].values # doctest: +NORMALIZE_WHITESPACE
     array([[2.40517586, 2.40517586],
            [1.10393559, 1.10393559]])
@@ -671,7 +671,7 @@ def pbs(
     """Compute the population branching statistic (PBS) between cohort triples.
 
     By default, values of this statistic are calculated per variant.
-    To compute values in windows, call :func:`window` before calling
+    To compute values in windows, call :func:`window_by_position` or :func:`window_by_variant` before calling
     this function.
 
     Parameters
@@ -721,7 +721,7 @@ def pbs(
     >>> ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names, "cohorts_2": cohort_names})
 
     >>> # Divide into two windows of size three (variants)
-    >>> ds = sg.window(ds, size=3)
+    >>> ds = sg.window_by_variant(ds, size=3)
     >>> sg.pbs(ds)["stat_pbs"].sel(cohorts_0="co_0", cohorts_1="co_1", cohorts_2="co_2").values # doctest: +NORMALIZE_WHITESPACE
     array([ 0.      , -0.160898])
     """
@@ -806,7 +806,7 @@ def Garud_H(
     of soft sweeps, as defined in Garud et al. (2015).
 
     By default, values of this statistic are calculated across all variants.
-    To compute values in windows, call :func:`window` before calling
+    To compute values in windows, call :func:`window_by_position` or :func:`window_by_variant` before calling
     this function.
 
     Parameters
@@ -868,7 +868,7 @@ def Garud_H(
     >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
 
     >>> # Divide into windows of size three (variants)
-    >>> ds = sg.window(ds, size=3, step=3)
+    >>> ds = sg.window_by_variant(ds, size=3, step=3)
 
     >>> gh = sg.Garud_H(ds)
     >>> gh["stat_Garud_h1"].values # doctest: +NORMALIZE_WHITESPACE
@@ -999,7 +999,7 @@ def observed_heterozygosity(
     mean.
 
     By default, values of this statistic are calculated per variant.
-    To compute values in windows, call :func:`window` before calling
+    To compute values in windows, call :func:`window_by_position` or :func:`window_by_variant` before calling
     this function.
 
     Parameters
@@ -1045,7 +1045,7 @@ def observed_heterozygosity(
         [0.5, 0.5]])
 
     >>> # Divide into windows of size three (variants)
-    >>> ds = sg.window(ds, size=3)
+    >>> ds = sg.window_by_variant(ds, size=3)
     >>> sg.observed_heterozygosity(ds)["stat_observed_heterozygosity"].values # doctest: +NORMALIZE_WHITESPACE
     array([[1.5, 2.5],
         [1. , 1. ]])

@@ -91,9 +91,6 @@ def window_by_variant(
     return _window_per_contig(ds, variant_contig, merge, _get_windows, size, step)
 
 
-window = window_by_variant
-
-
 def window_by_position(
     ds: Dataset,
     *,

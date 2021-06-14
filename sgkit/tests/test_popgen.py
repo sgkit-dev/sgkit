@@ -23,7 +23,7 @@ from sgkit import (
     simulate_genotype_call_dataset,
     variables,
 )
-from sgkit.window import window
+from sgkit.window import window_by_variant
 
 from .test_aggregation import get_dataset
 
@@ -135,7 +135,7 @@ def test_diversity__windowed(sample_size):
     ts = simulate_ts(sample_size, length=200)
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
     ds, subsets = add_cohorts(ds, ts, cohort_key_names=["cohorts"])  # type: ignore[no-untyped-call]
-    ds = window(ds, size=25)
+    ds = window_by_variant(ds, size=25)
     ds = diversity(ds)
     div = ds["stat_diversity"].sel(cohorts="co_0").compute()
 
@@ -195,7 +195,7 @@ def test_divergence__windowed(sample_size, n_cohorts, chunks):
     ts = simulate_ts(sample_size, length=200)
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
-    ds = window(ds, size=25)
+    ds = window_by_variant(ds, size=25)
     ds = divergence(ds)
     div = ds["stat_divergence"].values
     # test off-diagonal entries, by replacing diagonal with NaNs
@@ -222,7 +222,7 @@ def test_divergence__windowed_scikit_allel_comparison(sample_size, n_cohorts, ch
     ts = simulate_ts(sample_size, length=200)
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
-    ds = window(ds, size=25)
+    ds = window_by_variant(ds, size=25)
     ds = divergence(ds)
     div = ds["stat_divergence"].values
     # test off-diagonal entries, by replacing diagonal with NaNs
@@ -261,7 +261,7 @@ def test_Fst__Hudson(sample_size):
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
     ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
     n_variants = ds.dims["variants"]
-    ds = window(ds, size=n_variants)  # single window
+    ds = window_by_variant(ds, size=n_variants)  # single window
     ds = Fst(ds, estimator="Hudson")
     fst = ds.stat_Fst.sel(cohorts_0="co_0", cohorts_1="co_1").values
 
@@ -283,7 +283,7 @@ def test_Fst__Nei(sample_size, n_cohorts):
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
     ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
     n_variants = ds.dims["variants"]
-    ds = window(ds, size=n_variants)  # single window
+    ds = window_by_variant(ds, size=n_variants)  # single window
     ds = Fst(ds, estimator="Nei")
     fst = ds.stat_Fst.values
 
@@ -312,7 +312,7 @@ def test_Fst__windowed(sample_size, n_cohorts, chunks):
     ts = simulate_ts(sample_size, length=200)
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
-    ds = window(ds, size=25)
+    ds = window_by_variant(ds, size=25)
     fst_ds = Fst(ds, estimator="Nei")
     fst = fst_ds["stat_Fst"].values
 
@@ -354,7 +354,7 @@ def test_Tajimas_D(sample_size):
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
     ds, subsets = add_cohorts(ds, ts, cohort_key_names=None)  # type: ignore[no-untyped-call]
     n_variants = ds.dims["variants"]
-    ds = window(ds, size=n_variants)  # single window
+    ds = window_by_variant(ds, size=n_variants)  # single window
     ds = Tajimas_D(ds)
     d = ds.stat_Tajimas_D.compute()
     ts_d = ts.Tajimas_D()
@@ -382,7 +382,7 @@ def test_pbs(sample_size, n_cohorts):
     ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
     ds, subsets = add_cohorts(ds, ts, n_cohorts, cohort_key_names=["cohorts_0", "cohorts_1", "cohorts_2"])  # type: ignore[no-untyped-call]
     n_variants = ds.dims["variants"]
-    ds = window(ds, size=n_variants)  # single window
+    ds = window_by_variant(ds, size=n_variants)  # single window
 
     ds = pbs(ds)
 
@@ -416,7 +416,7 @@ def test_pbs__windowed(sample_size, n_cohorts, cohorts, cohort_indexes, chunks):
     ts = simulate_ts(sample_size, length=200)
     ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
     ds, subsets = add_cohorts(ds, ts, n_cohorts, cohort_key_names=["cohorts_0", "cohorts_1", "cohorts_2"])  # type: ignore[no-untyped-call]
-    ds = window(ds, size=25)
+    ds = window_by_variant(ds, size=25)
 
     ds = pbs(ds, cohorts=cohorts)
 
@@ -466,7 +466,7 @@ def test_Garud_h(
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     coords = {k: cohort_names for k in ["cohorts"]}
     ds = ds.assign_coords(coords)  # type: ignore[no-untyped-call]
-    ds = window(ds, size=3)
+    ds = window_by_variant(ds, size=3)
 
     gh = Garud_H(ds, cohorts=cohorts)
     h1 = gh.stat_Garud_h1.values
@@ -635,7 +635,7 @@ def test_observed_heterozygosity__windowed(chunks, cohorts, expectation):
         ["samples"],
         da.asarray(cohorts).rechunk(chunks[1]),
     )
-    ds = window(ds, size=2)
+    ds = window_by_variant(ds, size=2)
     ho = observed_heterozygosity(ds)["stat_observed_heterozygosity"]
     np.testing.assert_almost_equal(
         ho,
@@ -662,7 +662,7 @@ def test_observed_heterozygosity__scikit_allel_comparison(
         ["samples"],
         np.zeros(n_sample, int),
     )
-    ds = window(ds, size=window_size)
+    ds = window_by_variant(ds, size=window_size)
     ho_sg = observed_heterozygosity(ds)["stat_observed_heterozygosity"].values
     if n_sample % window_size:
         # scikit-allel will drop the ragged end
