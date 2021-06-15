@@ -2,6 +2,8 @@ name: Upstream
 
 on:
   push:
+    branches:
+      - main
   schedule:
     - cron: "0 1 * * *"
   # manual trigger
