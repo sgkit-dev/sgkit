@@ -47,6 +47,9 @@ jobs:
         python-version: [3.7]
         # python-version: [3.7, 3.8, 3.9]
     steps:
+      # checkout repo to subdirectory to get access to scripts
+      - uses: actions/checkout@v2
+        path: sgkit-copy
       - name: Download artifacts
         uses: actions/download-artifact@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -58,5 +61,5 @@ jobs:
           python -VV
           # Install the local wheel
           pip install sgkit sgkit[bgen] --only-binary sgkit -f .
-          python .github/scripts/test_sgkit.py
-          python .github/scripts/test_sgkit_bgen.py
+          python sgkit-copy/.github/scripts/test_sgkit.py
+          python sgkit-copy/.github/scripts/test_sgkit_bgen.py
