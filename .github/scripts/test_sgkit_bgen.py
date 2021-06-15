@@ -7,4 +7,5 @@ if __name__ == "__main__":
         "https://github.com/pystatgen/sgkit/raw/main/sgkit/tests/io/bgen/data/example.bgen",
         "example.bgen",
     )
-    read_bgen("example.bgen")
+    ds = read_bgen("example.bgen")
+    print(ds)

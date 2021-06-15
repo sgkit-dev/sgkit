@@ -64,3 +64,4 @@ jobs:
           pip install sgkit sgkit[bgen] --only-binary sgkit -f .
           python sgkit-copy/.github/scripts/test_sgkit.py
           python sgkit-copy/.github/scripts/test_sgkit_bgen.py
+          python sgkit-copy/.github/scripts/test_sgkit_plink.py
