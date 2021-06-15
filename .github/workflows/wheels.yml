@@ -1,4 +1,4 @@
-name: Release
+name: Wheels
 
 on:
   push:
@@ -97,3 +97,28 @@ jobs:
           python sgkit-copy/.github/scripts/test_sgkit.py
           python sgkit-copy/.github/scripts/test_sgkit_bgen.py
           python sgkit-copy/.github/scripts/test_sgkit_plink.py
+
+  pypi-upload:
+    if: github.repository_owner == 'pystatgen'
+    runs-on: ubuntu-latest
+    needs: ['unix-test', 'windows-test']
+    steps:
+      - name: Download all
+        uses: actions/download-artifact@v2
+      - name: Move to dist
+        run: |
+          mkdir dist
+          cp */*.{whl,gz} dist/.
+      - name: Publish package to TestPyPI
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@v1
+        with:
+          user: __token__
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+      - name: Publish package to PyPI
+        if: github.event_name == 'release'
+        uses: pypa/gh-action-pypi-publish@v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
