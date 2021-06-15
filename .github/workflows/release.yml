@@ -36,3 +36,26 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         path: dist
+
+  linux-test:
+    # This workflow only runs on the origin org
+    if: github.repository_owner == 'pystatgen'
+    runs-on: ubuntu-latest
+    needs: ['manylinux']
+    strategy:
+      matrix:
+        python-version: [3.7]
+        # python-version: [3.7, 3.8, 3.9]
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install wheel and test
+        run: |
+          python -VV
+          # Install the local wheel
+          pip install sgkit --only-binary sgkit -f .
+          python -c "import sgkit"
