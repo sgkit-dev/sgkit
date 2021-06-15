@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+      - test
+    # tags:
+    #   - '*'
+  # release:
+  #   types: [published]
+
+jobs:
+  build:
+    # This workflow only runs on the origin org
+    if: github.repository_owner == 'pystatgen'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Build a source distribution and a wheel
+      run: |
+        python setup.py sdist bdist_wheel
