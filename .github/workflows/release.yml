@@ -37,36 +37,36 @@ jobs:
       with:
         path: dist
 
-  # unix-test:
-  #   # This workflow only runs on the origin org
-  #   if: github.repository_owner == 'pystatgen'
-  #   needs: ['build']
-  #   strategy:
-  #     matrix:
-  #       os: [ubuntu-latest, macos-latest]
-  #       python-version: [3.7, 3.8, 3.9]
-  #   runs-on: ${{ matrix.os }}
-  #   steps:
-  #     # checkout repo to subdirectory to get access to scripts
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         path: sgkit-copy
-  #     - name: Download artifacts
-  #       uses: actions/download-artifact@v2
-  #     - name: Set up Python ${{ matrix.python-version }}
-  #       uses: actions/setup-python@v2
-  #       with:
-  #         python-version: ${{ matrix.python-version }}
-  #     - name: Install wheel and test
-  #       run: |
-  #         python -VV
-  #         # Install the local wheel
-  #         wheel=$(ls artifact/sgkit-*.whl)
-  #         pip install ${wheel} ${wheel}[bgen] ${wheel}[plink] ${wheel}[vcf]
-  #         python sgkit-copy/.github/scripts/test_sgkit.py
-  #         python sgkit-copy/.github/scripts/test_sgkit_bgen.py
-  #         python sgkit-copy/.github/scripts/test_sgkit_plink.py
-  #         python sgkit-copy/.github/scripts/test_sgkit_vcf.py
+  unix-test:
+    # This workflow only runs on the origin org
+    if: github.repository_owner == 'pystatgen'
+    needs: ['build']
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: [3.7, 3.8, 3.9]
+    runs-on: ${{ matrix.os }}
+    steps:
+      # checkout repo to subdirectory to get access to scripts
+      - uses: actions/checkout@v2
+        with:
+          path: sgkit-copy
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install wheel and test
+        run: |
+          python -VV
+          # Install the local wheel
+          wheel=$(ls artifact/sgkit-*.whl)
+          pip install ${wheel} ${wheel}[bgen] ${wheel}[plink] ${wheel}[vcf]
+          python sgkit-copy/.github/scripts/test_sgkit.py
+          python sgkit-copy/.github/scripts/test_sgkit_bgen.py
+          python sgkit-copy/.github/scripts/test_sgkit_plink.py
+          python sgkit-copy/.github/scripts/test_sgkit_vcf.py
 
   # Windows doesn't support vcf
   windows-test:
