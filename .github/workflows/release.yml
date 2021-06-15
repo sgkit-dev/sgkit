@@ -93,9 +93,9 @@ jobs:
         run: |
           python -VV
           # Install the local wheel
-          wheel=$(ls artifact/sgkit-*.whl)
-          echo ${wheel}
-          pip install ${wheel} "${wheel}[bgen]" "${wheel}[plink]"
+          $env:wheel = $(ls artifact/sgkit-*.whl)
+          echo $env:wheel
+          pip install $env:wheel "$env:wheel[bgen]" "$env:wheel[plink]"
           python sgkit-copy/.github/scripts/test_sgkit.py
           python sgkit-copy/.github/scripts/test_sgkit_bgen.py
           python sgkit-copy/.github/scripts/test_sgkit_plink.py
