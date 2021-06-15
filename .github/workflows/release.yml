@@ -53,10 +53,8 @@ jobs:
           path: sgkit-copy
       - name: Download artifacts
         uses: actions/download-artifact@v2
-        with:
-          path: dist
       - name: Display structure of downloaded files
-        run: ls -R dist
+        run: ls -R
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -65,7 +63,7 @@ jobs:
         run: |
           python -VV
           # Install the local wheel
-          wheel=$(ls dist/sgkit-*.whl)
+          wheel=$(ls artifact/sgkit-*.whl)
           pip install ${wheel} ${wheel}[bgen] ${wheel}[plink]
           python sgkit-copy/.github/scripts/test_sgkit.py
           python sgkit-copy/.github/scripts/test_sgkit_bgen.py
