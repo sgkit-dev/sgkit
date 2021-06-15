@@ -5,10 +5,10 @@ on:
     branches:
       - main
       - test
-    # tags:
-    #   - '*'
-  # release:
-  #   types: [published]
+    tags:
+      - '*'
+  release:
+    types: [published]
 
 jobs:
   build:
