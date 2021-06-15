@@ -76,8 +76,7 @@ jobs:
     needs: ['build']
     strategy:
       matrix:
-        # python-version: [3.7, 3.8, 3.9]
-        python-version: [3.7]
+        python-version: [3.7, 3.8, 3.9]
     steps:
       # checkout repo to subdirectory to get access to scripts
       - uses: actions/checkout@v2
@@ -94,7 +93,6 @@ jobs:
           python -VV
           # Install the local wheel
           $env:wheel = $(ls artifact/sgkit-*.whl)
-          echo $env:wheel
           pip install $env:wheel "$env:wheel[bgen]" "$env:wheel[plink]"
           python sgkit-copy/.github/scripts/test_sgkit.py
           python sgkit-copy/.github/scripts/test_sgkit_bgen.py
