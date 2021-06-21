@@ -258,11 +258,14 @@ def run(
     y_hat_df.reset_index().to_csv(path, index=False)
     logger.info(f"Stage 2: Predictions written to {path}")
 
-    # y_hat_df_loco = estimator.transform_loco(reduced_block_df, label_df, sample_blocks, model_df, cv_df, cov_df)
+    # UNCOMMENTED THIS BLOCK
+    y_hat_df_loco = estimator.transform_loco(
+        reduced_block_df, label_df, sample_blocks, model_df, cv_df, cov_df
+    )
 
-    # path = output_path / 'predictions_loco.csv'
-    # y_hat_df_loco.reset_index().to_csv(path, index=False)
-    # logger.info(f'Stage 2: LOCO Predictions written to {path}')
+    path = output_path / "predictions_loco.csv"
+    y_hat_df_loco.reset_index().to_csv(path, index=False)
+    logger.info(f"Stage 2: LOCO Predictions written to {path}")
 
     ###########
     # Stage 3 #
@@ -316,40 +319,38 @@ def run(
     # See: https://github.com/projectglow/glow/issues/256)
 
     # Run GWAS w/ LOCO
-    # adjusted_phenotypes = reshape_for_gwas(spark, label_df - y_hat_df_loco)
-    # wgr_gwas = (
-    #     variant_df
-    #     .withColumnRenamed('values', 'callValues')
-    #     .join(
-    #         adjusted_phenotypes
-    #         .withColumnRenamed('values', 'phenotypeValues'),
-    #         ['contigName']
-    #     )
-    #     .select(
-    #         'contigName',
-    #         'start',
-    #         'names',
-    #         'label',
-    #         expand_struct(linear_regression_gwas(
-    #             F.col('callValues'),
-    #             F.col('phenotypeValues'),
-    #             F.lit(cov_arr)
-    #         ))
-    #     )
-    # )
+    adjusted_phenotypes = reshape_for_gwas(spark, label_df - y_hat_df_loco)
+    wgr_gwas = (
+        variant_df.withColumnRenamed("values", "callValues")
+        .join(
+            adjusted_phenotypes.withColumnRenamed("values", "phenotypeValues"),
+            ["contigName"],
+        )
+        .select(
+            "contigName",
+            "start",
+            "names",
+            "label",
+            expand_struct(
+                linear_regression_gwas(
+                    F.col("callValues"), F.col("phenotypeValues"), F.lit(cov_arr)
+                )
+            ),
+        )
+    )
 
-    # # Convert to pandas
-    # wgr_gwas = wgr_gwas.toPandas()
-    # logger.info(HR)
-    # logger.info('Stage 3: GWAS (with LOCO) info:')
-    # logger.info(_info(wgr_gwas))
-    # logger.info(wgr_gwas.head(5))
+    # Convert to pandas
+    wgr_gwas = wgr_gwas.toPandas()
+    logger.info(HR)
+    logger.info("Stage 3: GWAS (with LOCO) info:")
+    logger.info(_info(wgr_gwas))
+    logger.info(wgr_gwas.head(5))
 
-    # path = output_path / 'gwas_loco.csv'
-    # wgr_gwas.to_csv(path, index=False)
-    # logger.info(f'Stage 3: GWAS (with LOCO) results written to {path}')
-    # logger.info(HR)
-    # logger.info('Done')
+    path = output_path / "gwas_loco.csv"
+    wgr_gwas.to_csv(path, index=False)
+    logger.info(f"Stage 3: GWAS (with LOCO) results written to {path}")
+    logger.info(HR)
+    logger.info("Done")
 
 
 def run_from_config(
