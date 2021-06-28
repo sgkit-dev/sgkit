@@ -243,7 +243,7 @@ def check_simulation_result(
 
     # Load simulated data
     with zarr.ZipStore(str(dataset_dir / "genotypes.zarr.zip"), mode="r") as store:
-        ds = xr.open_zarr(store)  # type: ignore[no-untyped-call]
+        ds = xr.open_zarr(store, consolidated=False)  # type: ignore[no-untyped-call]
         df_covariate = load_covariates(dataset_dir)
         df_trait = load_traits(dataset_dir)
         contigs = ds["variant_contig"].values

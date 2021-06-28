@@ -340,6 +340,9 @@ def _concat_zarrs_optimized(
         # copy top-level attributes
         output_zarr.attrs.update(first_zarr_group.attrs)
 
+    # consolidate metadata
+    zarr.consolidate_metadata(str(output))
+
 
 def _to_zarr(  # type: ignore[no-untyped-def]
     arr,
