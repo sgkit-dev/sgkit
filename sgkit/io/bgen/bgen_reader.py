@@ -518,6 +518,8 @@ def rechunk_bgen(
         )
         rechunked.execute()
 
+    zarr.consolidate_metadata(output)
+
     ds: Dataset = xr.open_zarr(output, concat_characters=False)  # type: ignore[no-untyped-call]
     if pack:
         ds = unpack_variables(ds)
