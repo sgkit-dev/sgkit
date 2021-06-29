@@ -6,7 +6,7 @@ import fsspec
 import pytest
 from callee.strings import StartsWith
 
-from sgkit.io.vcf.utils import build_url, temporary_directory
+from sgkit.io.vcf.utils import build_url, chunks, temporary_directory
 
 
 def directory_with_file_scheme() -> str:
@@ -89,3 +89,19 @@ def test_build_url():
         build_url("http://host/a%20path", "subpath") == "http://host/a%20path/subpath"
     )
     assert build_url("http://host/a path", "subpath") == "http://host/a%20path/subpath"
+
+
+@pytest.mark.parametrize(
+    "x,n,expected_values",
+    [
+        (0, 1, [[]]),
+        (1, 1, [[0]]),
+        (4, 1, [[0], [1], [2], [3]]),
+        (4, 2, [[0, 1], [2, 3]]),
+        (5, 2, [[0, 1], [2, 3], [4]]),
+        (5, 5, [[0, 1, 2, 3, 4]]),
+        (5, 6, [[0, 1, 2, 3, 4]]),
+    ],
+)
+def test_chunks(x, n, expected_values):
+    assert [list(i) for i in chunks(iter(range(x)), n)] == expected_values
