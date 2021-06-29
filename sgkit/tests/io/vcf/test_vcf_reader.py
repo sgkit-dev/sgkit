@@ -206,6 +206,29 @@ def test_vcf_to_zarr__parallel(shared_datadir, is_path, tmp_path):
 
 @pytest.mark.parametrize(
     "is_path",
+    [True, False],
+)
+def test_vcf_to_zarr__empty_region(shared_datadir, is_path, tmp_path):
+    path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", is_path)
+    output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
+    regions = "23"
+
+    vcf_to_zarr(path, output, regions=regions)
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    assert ds["sample_id"].shape == (1,)
+    assert ds["call_genotype"].shape == (0, 1, 2)
+    assert ds["call_genotype_mask"].shape == (0, 1, 2)
+    assert ds["call_genotype_phased"].shape == (0, 1)
+    assert ds["variant_allele"].shape == (0, 4)
+    assert ds["variant_contig"].shape == (0,)
+    assert ds["variant_id"].shape == (0,)
+    assert ds["variant_id_mask"].shape == (0,)
+    assert ds["variant_position"].shape == (0,)
+
+
+@pytest.mark.parametrize(
+    "is_path",
     [False],
 )
 def test_vcf_to_zarr__parallel_temp_chunk_length(shared_datadir, is_path, tmp_path):

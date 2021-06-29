@@ -19,16 +19,23 @@ def ceildiv(a: int, b: int) -> int:
     return -(-a // b)
 
 
-# https://dev.to/orenovadia/solution-chunked-iterator-python-riddle-3ple
+# Based on https://dev.to/orenovadia/solution-chunked-iterator-python-riddle-3ple
 def chunks(iterator: Iterator[T], n: int) -> Iterator[Iterator[T]]:
     """
     Convert an iterator into an iterator of iterators, where the inner iterators
     each return `n` items, except the last, which may return fewer.
+
+    For the special case of an empty iterator, an iterator of an empty iterator is
+    returned.
     """
 
+    empty_iterator = True
     for first in iterator:  # take one item out (exits loop if `iterator` is empty)
+        empty_iterator = False
         rest_of_chunk = itertools.islice(iterator, 0, n - 1)
         yield itertools.chain([first], rest_of_chunk)  # concatenate the first item back
+    if empty_iterator:
+        yield iter([])
 
 
 def get_file_length(

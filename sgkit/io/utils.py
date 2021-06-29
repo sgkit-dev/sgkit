@@ -74,14 +74,10 @@ def zarrs_to_dataset(
 
     datasets = []
     for path in urls:
-        try:
-            dataset = xr.open_zarr(  # type: ignore[no-untyped-call]
-                fsspec.get_mapper(path, **storage_options), concat_characters=False
-            )
-            datasets.append(dataset)
-        except zarr.errors.GroupNotFoundError:
-            # ignore empty directory, occurs if no variants in region
-            pass
+        dataset = xr.open_zarr(  # type: ignore[no-untyped-call]
+            fsspec.get_mapper(path, **storage_options), concat_characters=False
+        )
+        datasets.append(dataset)
 
     # Combine the datasets into one
     ds = xr.concat(datasets, dim="variants", data_vars="minimal")

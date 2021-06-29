@@ -385,8 +385,9 @@ def vcf_to_zarr_sequential(
         for variants_chunk in chunks(region_filter(variants, region), chunk_length):
 
             variant_ids = []
-            variant_allele = []
+            variant_alleles = []
 
+            i = -1  # initialize in case of empty variants_chunk
             for i, variant in enumerate(variants_chunk):
                 variant_id = variant.ID if variant.ID is not None else "."
                 variant_ids.append(variant_id)
@@ -404,7 +405,7 @@ def vcf_to_zarr_sequential(
                     alleles = alleles[:n_allele]
                 elif len(alleles) < n_allele:
                     alleles = alleles + ([""] * (n_allele - len(alleles)))
-                variant_allele.append(alleles)
+                variant_alleles.append(alleles)
                 max_variant_allele_length = max(
                     max_variant_allele_length, max(len(x) for x in alleles)
                 )
@@ -422,7 +423,10 @@ def vcf_to_zarr_sequential(
 
             variant_id = np.array(variant_ids, dtype="O")
             variant_id_mask = variant_id == "."
-            variant_allele = np.array(variant_allele, dtype="O")
+            if len(variant_alleles) == 0:
+                variant_allele = np.empty((0, n_allele), dtype="O")
+            else:
+                variant_allele = np.array(variant_alleles, dtype="O")
 
             ds: xr.Dataset = create_genotype_call_dataset(
                 variant_contig_names=variant_contig_names,
