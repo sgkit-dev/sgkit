@@ -100,6 +100,11 @@ def zarrs_to_dataset(
             ds[variable_name] = ds[variable_name].astype(f"S{max_length}")
             del ds.attrs[attr]
 
+    if "max_alt_alleles_seen" in datasets[0].attrs:
+        ds.attrs["max_alt_alleles_seen"] = max(
+            ds.attrs["max_alt_alleles_seen"] for ds in datasets
+        )
+
     return ds
 
 

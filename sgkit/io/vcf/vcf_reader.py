@@ -24,6 +24,7 @@ from cyvcf2 import VCF, Variant
 from numcodecs import PackBits
 
 from sgkit import variables
+from sgkit.io.dataset import load_dataset
 from sgkit.io.utils import zarrs_to_dataset
 from sgkit.io.vcf import partition_into_regions
 from sgkit.io.vcf.utils import build_url, chunks, temporary_directory, url_filename
@@ -48,6 +49,12 @@ try:
 except ImportError:  # pragma: no cover
     warnings.warn("Cannot import Blosc, falling back to no compression", RuntimeWarning)
     DEFAULT_COMPRESSOR = None
+
+
+class MaxAltAllelesExceededWarning(UserWarning):
+    """Warning when the number of alt alleles exceeds the maximum specified."""
+
+    pass
 
 
 @contextmanager
@@ -362,6 +369,7 @@ def vcf_to_zarr_sequential(
         # Remember max lengths of variable-length strings
         max_variant_id_length = 0
         max_variant_allele_length = 0
+        max_alt_alleles_seen = 0
 
         # Iterate through variants in batches of chunk_length
 
@@ -413,6 +421,7 @@ def vcf_to_zarr_sequential(
                 variant_position[i] = variant.POS
 
                 alleles = [variant.REF] + variant.ALT
+                max_alt_alleles_seen = max(max_alt_alleles_seen, len(variant.ALT))
                 if len(alleles) > n_allele:
                     alleles = alleles[:n_allele]
                 elif len(alleles) < n_allele:
@@ -457,6 +466,7 @@ def vcf_to_zarr_sequential(
             if add_str_max_length_attrs:
                 ds.attrs["max_length_variant_id"] = max_variant_id_length
                 ds.attrs["max_length_variant_allele"] = max_variant_allele_length
+            ds.attrs["max_alt_alleles_seen"] = max_alt_alleles_seen
 
             if first_variants_chunk:
                 # Enforce uniform chunks in the variants dimension
@@ -838,6 +848,15 @@ def vcf_to_zarr(
         exclude_fields=exclude_fields,
         field_defs=field_defs,
     )
+
+    # Issue a warning if max_alt_alleles caused data to be dropped
+    ds = load_dataset(output)
+    max_alt_alleles_seen = ds.attrs["max_alt_alleles_seen"]
+    if max_alt_alleles_seen > max_alt_alleles:
+        warnings.warn(
+            f"Some alternate alleles were dropped, since actual max value {max_alt_alleles_seen} exceeded max_alt_alleles setting of {max_alt_alleles}.",
+            MaxAltAllelesExceededWarning,
+        )
 
 
 def count_variants(path: PathType, region: Optional[str] = None) -> int:

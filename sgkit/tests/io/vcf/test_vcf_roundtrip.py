@@ -79,6 +79,7 @@ def test_default_fields(shared_datadir, tmpdir):
     sg_vcfzarr_path = create_sg_vcfzarr(shared_datadir, tmpdir)
     sg_ds = sg.load_dataset(str(sg_vcfzarr_path))
     sg_ds = sg_ds.drop_vars("call_genotype_phased")  # not included in scikit-allel
+    del sg_ds.attrs["max_alt_alleles_seen"]  # not saved by scikit-allel
 
     assert_identical(allel_ds, sg_ds)
 
@@ -107,6 +108,7 @@ def test_DP_field(shared_datadir, tmpdir):
     )
     sg_ds = sg.load_dataset(str(sg_vcfzarr_path))
     sg_ds = sg_ds.drop_vars("call_genotype_phased")  # not included in scikit-allel
+    del sg_ds.attrs["max_alt_alleles_seen"]  # not saved by scikit-allel
 
     assert_identical(allel_ds, sg_ds)
 
@@ -120,6 +122,7 @@ def test_DP_field(shared_datadir, tmpdir):
         ("CEUTrio.20.21.gatk3.4.g.vcf.bgz", ["calldata/PL"], ["FORMAT/PL"]),
     ],
 )
+@pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
 def test_all_fields(
     shared_datadir, tmpdir, vcf_file, allel_exclude_fields, sgkit_exclude_fields
 ):
@@ -159,6 +162,7 @@ def test_all_fields(
     )
     sg_ds = sg.load_dataset(str(sg_vcfzarr_path))
     sg_ds = sg_ds.drop_vars("call_genotype_phased")  # not included in scikit-allel
+    del sg_ds.attrs["max_alt_alleles_seen"]  # not saved by scikit-allel
 
     # scikit-allel only records contigs for which there are actual variants,
     # whereas sgkit records contigs from the header
