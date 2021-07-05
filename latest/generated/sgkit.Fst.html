@@ -281,8 +281,13 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.window.html">
-     sgkit.window
+    <a class="reference internal" href="sgkit.window_by_position.html">
+     sgkit.window_by_position
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.window_by_variant.html">
+     sgkit.window_by_variant
     </a>
    </li>
    <li class="toctree-l2">
@@ -718,7 +723,7 @@
 <code class="sig-prename descclassname"><span class="pre">sgkit.</span></code><code class="sig-name descname"><span class="pre">Fst</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_divergence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stat_divergence'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.Fst" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute Fst between pairs of cohorts.</p>
 <p>By default, values of this statistic are calculated per variant.
-To compute values in windows, call <a class="reference internal" href="sgkit.window.html#sgkit.window" title="sgkit.window"><code class="xref py py-func docutils literal notranslate"><span class="pre">window()</span></code></a> before calling
+To compute values in windows, call <a class="reference internal" href="sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_position()</span></code></a> or <a class="reference internal" href="sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_variant()</span></code></a> before calling
 this function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -789,7 +794,7 @@ samples dimension.</p>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Divide into windows of size three (variants)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window_by_variant</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">Fst</span><span class="p">(</span><span class="n">ds</span><span class="p">)[</span><span class="s2">&quot;stat_Fst&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
 <span class="go">array([[[        nan, -0.22222222],</span>
 <span class="go">        [-0.22222222,         nan]],</span>

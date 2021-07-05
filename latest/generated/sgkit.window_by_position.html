@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sgkit.io.vcf.partition_into_regions</title>
+    <title>sgkit.window_by_position</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet" />
   <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -35,8 +35,8 @@
     <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.io.vcf.vcf_to_zarrs" href="sgkit.io.vcf.vcf_to_zarrs.html" />
-    <link rel="prev" title="sgkit.io.vcf.vcf_to_zarr" href="sgkit.io.vcf.vcf_to_zarr.html" />
+    <link rel="next" title="sgkit.window_by_variant" href="sgkit.window_by_variant.html" />
+    <link rel="prev" title="sgkit.simulate_genotype_call_dataset" href="sgkit.simulate_genotype_call_dataset.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
     
@@ -120,8 +120,8 @@
      sgkit.io.vcf.vcf_to_zarr
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.io.vcf.partition_into_regions.html">
      sgkit.io.vcf.partition_into_regions
     </a>
    </li>
@@ -280,8 +280,8 @@
      sgkit.simulate_genotype_call_dataset
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.window_by_position.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      sgkit.window_by_position
     </a>
    </li>
@@ -683,7 +683,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../_sources/generated/sgkit.io.vcf.partition_into_regions.rst.txt"><button type="button"
+        <a class="dropdown-buttons" href="../_sources/generated/sgkit.window_by_position.rst.txt"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
@@ -716,52 +716,114 @@
         
               <div>
                 
-  <div class="section" id="sgkit-io-vcf-partition-into-regions">
-<h1>sgkit.io.vcf.partition_into_regions<a class="headerlink" href="#sgkit-io-vcf-partition-into-regions" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="sgkit-window-by-position">
+<h1>sgkit.window_by_position<a class="headerlink" href="#sgkit-window-by-position" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="sgkit.io.vcf.partition_into_regions">
-<code class="sig-prename descclassname"><span class="pre">sgkit.io.vcf.</span></code><code class="sig-name descname"><span class="pre">partition_into_regions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vcf_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_parts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_part_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.io.vcf.partition_into_regions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate genomic region strings to partition a compressed VCF or BCF file into roughly equal parts.</p>
-<p>A <code class="docutils literal notranslate"><span class="pre">.tbi</span></code> or <code class="docutils literal notranslate"><span class="pre">.csi</span></code> file is used to find BGZF boundaries in the compressed VCF file, which are then
-used to divide the file into parts.</p>
-<p>The number of parts can specified directly by providing <code class="docutils literal notranslate"><span class="pre">num_parts</span></code>, or by specifying the
-desired size (in bytes) of each (compressed) part by providing <code class="docutils literal notranslate"><span class="pre">target_part_size</span></code>.
-Exactly one of <code class="docutils literal notranslate"><span class="pre">num_parts</span></code> or <code class="docutils literal notranslate"><span class="pre">target_part_size</span></code> must be provided.</p>
-<p>Both <code class="docutils literal notranslate"><span class="pre">num_parts</span></code> and <code class="docutils literal notranslate"><span class="pre">target_part_size</span></code> serve as hints: the number of parts and their sizes
-may be more or less than these parameters.</p>
+<dt id="sgkit.window_by_position">
+<code class="sig-prename descclassname"><span class="pre">sgkit.</span></code><code class="sig-name descname"><span class="pre">window_by_position</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant_contig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'variant_contig'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'variant_position'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_start_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.window_by_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add window information to a dataset, measured by distance along the genome.</p>
+<p>Windows are defined over the <code class="docutils literal notranslate"><span class="pre">variants</span></code> dimension, and are
+used by some downstream functions to calculate statistics for
+each window. Windows never span contigs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>vcf_path</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>]</span></dt><dd><p>The path to the VCF file.</p>
+<dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.18.3.dev1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.18.3.dev1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Genotype call dataset.</p>
 </dd>
-<dt><strong>index_path</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>The path to the VCF index (<code class="docutils literal notranslate"><span class="pre">.tbi</span></code> or <code class="docutils literal notranslate"><span class="pre">.csi</span></code>), by default None. If not specified, the
-index path is constructed by appending the index suffix (<code class="docutils literal notranslate"><span class="pre">.tbi</span></code> or <code class="docutils literal notranslate"><span class="pre">.csi</span></code>) to the VCF path.</p>
+<dt><strong>size</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The window size, measured by number of base pairs.</p>
 </dd>
-<dt><strong>num_parts</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>The desired number of parts to partition the VCF file into, by default None</p>
+<dt><strong>offset</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>The window offset, measured by number of base pairs. Defaults
+to no offset. For centered windows, use a negative offset that
+is half the window size.</p>
 </dd>
-<dt><strong>target_part_size</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>The desired size, in bytes, of each (compressed) part of the partitioned VCF, by default None.
-If the value is a string, it may be specified using standard abbreviations, e.g. <code class="docutils literal notranslate"><span class="pre">100MB</span></code> is
-equivalent to <code class="docutils literal notranslate"><span class="pre">100_000_000</span></code>.</p>
+<dt><strong>variant_contig</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'variant_contig'</span></code>)</dt><dd><p>Name of variable containing variant contig indexes.
+Defined by <a class="reference internal" href="sgkit.variables.variant_contig_spec.html#sgkit.variables.variant_contig_spec" title="sgkit.variables.variant_contig_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_contig_spec</span></code></a>.</p>
 </dd>
-<dt><strong>storage_options</strong> : <span class="annotation terse">{<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>} | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Any additional parameters for the storage backend (see <code class="docutils literal notranslate"><span class="pre">fsspec.open</span></code>).</p>
+<dt><strong>variant_position</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'variant_position'</span></code>)</dt><dd><p>Name of variable containing variant positions.
+Must be monotonically increasing within a contig.
+Defined by <a class="reference internal" href="sgkit.variables.variant_position_spec.html#sgkit.variables.variant_position_spec" title="sgkit.variables.variant_position_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_position_spec</span></code></a>.</p>
+</dd>
+<dt><strong>window_start_position</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Optional name of variable to use to define window starts, defined by
+position in the genome. Defaults to None, which means start positions
+are at multiples of <code class="docutils literal notranslate"><span class="pre">size</span></code>, and shifted by <code class="docutils literal notranslate"><span class="pre">offset</span></code>.</p>
+</dd>
+<dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
+output variables into a single dataset, otherwise return only
+the computed output variables.
+See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]</span></p>
+<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.18.3.dev1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.18.3.dev1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The region strings that partition the VCF file, or None if the VCF file should not be partitioned
-(so there is only a single partition).</p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If neither of <code class="docutils literal notranslate"><span class="pre">num_parts</span></code> or <code class="docutils literal notranslate"><span class="pre">target_part_size</span></code> has been specified.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If both of <code class="docutils literal notranslate"><span class="pre">num_parts</span></code> and <code class="docutils literal notranslate"><span class="pre">target_part_size</span></code> have been specified.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If either of <code class="docutils literal notranslate"><span class="pre">num_parts</span></code> or <code class="docutils literal notranslate"><span class="pre">target_part_size</span></code> is not a positive integer.</p></li>
+<dd class="field-odd"><p><p>A dataset containing the following variables:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="sgkit.variables.window_contig_spec.html#sgkit.variables.window_contig_spec" title="sgkit.variables.window_contig_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.window_contig_spec</span></code></a> (windows):
+The index values of window contigs.</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.window_start_spec.html#sgkit.variables.window_start_spec" title="sgkit.variables.window_start_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.window_start_spec</span></code></a> (windows):
+The index values of window start positions.</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.window_stop_spec.html#sgkit.variables.window_stop_spec" title="sgkit.variables.window_stop_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.window_stop_spec</span></code></a> (windows):
+The index values of window stop positions.</p></li>
 </ul>
+</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_contig</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;variant_position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">([</span><span class="s2">&quot;variants&quot;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">55</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_contig</span><span class="o">.</span><span class="n">values</span>
+<span class="go">array([0, 0, 0, 0, 0, 1, 1, 1, 1, 1])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">values</span>
+<span class="go">array([ 1,  4,  6,  8, 12,  1, 21, 25, 40, 55])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Contiguous equally-spaced windows, each 10 base pairs in size</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># and using offset to start windows at 1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds_w1</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window_by_position</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds_w1</span>
+<span class="go">&lt;xarray.Dataset&gt;</span>
+<span class="go">Dimensions:        (windows: 8)</span>
+<span class="go">Dimensions without coordinates: windows</span>
+<span class="go">Data variables:</span>
+<span class="go">    window_contig  (windows) int64 0 0 1 1 1 1 1 1</span>
+<span class="go">    window_start   (windows) int64 0 4 5 6 6 8 9 9</span>
+<span class="go">    window_stop    (windows) int64 4 5 6 6 8 9 9 10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ds_w1</span><span class="o">.</span><span class="n">window_start</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">ds_w1</span><span class="o">.</span><span class="n">window_stop</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">]</span> 
+<span class="go">[array([1, 4, 6, 8]),</span>
+<span class="go"> array([12]),</span>
+<span class="go"> array([1]),</span>
+<span class="go"> array([21, 25]),</span>
+<span class="go"> array([40]),</span>
+<span class="go"> array([55])]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Windows centered around positions defined by a variable (variant_position),</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># each 10 base pairs in size. Also known as &quot;locus windows&quot;.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds_w2</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window_by_position</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">offset</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">window_start_position</span><span class="o">=</span><span class="s2">&quot;variant_position&quot;</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds_w2</span>
+<span class="go">&lt;xarray.Dataset&gt;</span>
+<span class="go">Dimensions:        (windows: 10)</span>
+<span class="go">Dimensions without coordinates: windows</span>
+<span class="go">Data variables:</span>
+<span class="go">    window_contig  (windows) int64 0 0 0 0 0 1 1 1 1 1</span>
+<span class="go">    window_start   (windows) int64 0 0 0 1 3 5 6 6 8 9</span>
+<span class="go">    window_stop    (windows) int64 2 4 4 5 5 6 8 8 9 10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ds_w2</span><span class="o">.</span><span class="n">window_start</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">ds_w2</span><span class="o">.</span><span class="n">window_stop</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span> 
+<span class="go">[array([1, 4]),</span>
+<span class="go"> array([1, 4, 6, 8]),</span>
+<span class="go"> array([1, 4, 6, 8]),</span>
+<span class="go"> array([ 4,  6,  8, 12]),</span>
+<span class="go"> array([ 8, 12]),</span>
+<span class="go"> array([1]),</span>
+<span class="go"> array([21, 25]),</span>
+<span class="go"> array([21, 25]),</span>
+<span class="go"> array([40]),</span>
+<span class="go"> array([55])]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
@@ -772,8 +834,8 @@ equivalent to <code class="docutils literal notranslate"><span class="pre">100_0
         
         <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="sgkit.io.vcf.vcf_to_zarr.html" title="previous page">sgkit.io.vcf.vcf_to_zarr</a>
-    <a class='right-next' id="next-link" href="sgkit.io.vcf.vcf_to_zarrs.html" title="next page">sgkit.io.vcf.vcf_to_zarrs</a>
+    <a class='left-prev' id="prev-link" href="sgkit.simulate_genotype_call_dataset.html" title="previous page">sgkit.simulate_genotype_call_dataset</a>
+    <a class='right-next' id="next-link" href="sgkit.window_by_variant.html" title="next page">sgkit.window_by_variant</a>
 
         </div>
         

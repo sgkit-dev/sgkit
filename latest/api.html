@@ -281,8 +281,13 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/sgkit.window.html">
-     sgkit.window
+    <a class="reference internal" href="generated/sgkit.window_by_position.html">
+     sgkit.window_by_position
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.window_by_variant.html">
+     sgkit.window_by_variant
     </a>
    </li>
    <li class="toctree-l2">
@@ -962,8 +967,11 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset" title="sgkit.simulate_genotype_call_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_genotype_call_dataset</span></code></a>(n_variant, …)</p></td>
 <td><p>Simulate genotype calls and variant/sample data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.window.html#sgkit.window" title="sgkit.window"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window</span></code></a>(ds, size[, step, merge])</p></td>
-<td><p>Add fixed-size windowing information to a dataset.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_position</span></code></a>(ds, *, size[, offset, …])</p></td>
+<td><p>Add window information to a dataset, measured by distance along the genome.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_variant</span></code></a>(ds, *, size[, step, …])</p></td>
+<td><p>Add window information to a dataset, measured by number of variants.</p></td>
 </tr>
 </tbody>
 </table>

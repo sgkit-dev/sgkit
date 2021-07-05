@@ -281,8 +281,13 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.window.html">
-     sgkit.window
+    <a class="reference internal" href="sgkit.window_by_position.html">
+     sgkit.window_by_position
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.window_by_variant.html">
+     sgkit.window_by_variant
     </a>
    </li>
    <li class="toctree-l2">
@@ -723,7 +728,7 @@ in <a class="reference internal" href="sgkit.individual_heterozygosity.html#sgki
 individual heterozygosity are ignored when calculating the cohort
 mean.</p>
 <p>By default, values of this statistic are calculated per variant.
-To compute values in windows, call <a class="reference internal" href="sgkit.window.html#sgkit.window" title="sgkit.window"><code class="xref py py-func docutils literal notranslate"><span class="pre">window()</span></code></a> before calling
+To compute values in windows, call <a class="reference internal" href="sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_position()</span></code></a> or <a class="reference internal" href="sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_variant()</span></code></a> before calling
 this function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -775,7 +780,7 @@ containing values within the inteval [0, 1] or nan.</p>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Divide into windows of size three (variants)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window_by_variant</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">observed_heterozygosity</span><span class="p">(</span><span class="n">ds</span><span class="p">)[</span><span class="s2">&quot;stat_observed_heterozygosity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
 <span class="go">array([[1.5, 2.5],</span>
 <span class="go">    [1. , 1. ]])</span>
