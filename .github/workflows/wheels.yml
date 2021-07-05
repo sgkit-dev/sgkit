@@ -1,0 +1,125 @@
+name: Wheels
+
+on:
+  push:
+    branches:
+      - main
+      - test
+    tags:
+      - '*'
+  release:
+    types: [published]
+
+jobs:
+  build:
+    # This workflow only runs on the origin org
+    if: github.repository_owner == 'pystatgen'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools twine wheel
+    - name: Build a source distribution and a wheel
+      run: |
+        python setup.py sdist bdist_wheel
+        python -m twine check --strict dist/*
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        path: dist
+
+  unix-test:
+    # This workflow only runs on the origin org
+    if: github.repository_owner == 'pystatgen'
+    needs: ['build']
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: [3.7, 3.8, 3.9]
+    runs-on: ${{ matrix.os }}
+    steps:
+      # checkout repo to subdirectory to get access to scripts
+      - uses: actions/checkout@v2
+        with:
+          path: sgkit-copy
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install wheel and test
+        run: |
+          python -VV
+          # Install the local wheel
+          wheel=$(ls artifact/sgkit-*.whl)
+          pip install ${wheel} ${wheel}[bgen] ${wheel}[plink] ${wheel}[vcf]
+          python sgkit-copy/.github/scripts/test_sgkit.py
+          python sgkit-copy/.github/scripts/test_sgkit_bgen.py
+          python sgkit-copy/.github/scripts/test_sgkit_plink.py
+          python sgkit-copy/.github/scripts/test_sgkit_vcf.py
+
+  # Windows doesn't support vcf
+  windows-test:
+    # This workflow only runs on the origin org
+    if: github.repository_owner == 'pystatgen'
+    runs-on: windows-latest
+    needs: ['build']
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+    steps:
+      # checkout repo to subdirectory to get access to scripts
+      - uses: actions/checkout@v2
+        with:
+          path: sgkit-copy
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install wheel and test
+        run: |
+          python -VV
+          # Install the local wheel
+          $env:wheel = $(ls artifact/sgkit-*.whl)
+          pip install $env:wheel "$env:wheel[bgen]" "$env:wheel[plink]"
+          python sgkit-copy/.github/scripts/test_sgkit.py
+          python sgkit-copy/.github/scripts/test_sgkit_bgen.py
+          python sgkit-copy/.github/scripts/test_sgkit_plink.py
+
+  pypi-upload:
+    if: github.repository_owner == 'pystatgen'
+    runs-on: ubuntu-latest
+    needs: ['unix-test', 'windows-test']
+    steps:
+      - name: Download all
+        uses: actions/download-artifact@v2
+      - name: Move to dist
+        run: |
+          mkdir dist
+          cp */*.{whl,gz} dist/.
+      - name: Publish package to TestPyPI
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+      - name: Publish package to PyPI
+        if: github.event_name == 'release'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
