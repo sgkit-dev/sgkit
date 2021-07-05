@@ -710,6 +710,33 @@ def test_vcf_to_zarr__field_number_R(shared_datadir, tmp_path):
     )
 
 
+def test_vcf_to_zarr__field_number_G(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "CEUTrio.21.gatk3.4.g.vcf.bgz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(path, output, fields=["FORMAT/PL"])
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    # select a small region to check
+    ds = ds.set_index(variants="variant_position").sel(
+        variants=slice(10002764, 10002793)
+    )
+
+    pl = np.array(
+        [
+            [[319, 0, 1316, 440, 1358, 1798, -1, -1, -1, -1]],
+            [[0, 120, 1800, -1, -1, -1, -1, -1, -1, -1]],
+            [[8, 0, 1655, 103, 1743, 2955, 184, 1653, 1928, 1829]],
+            [[0, 0, 2225, -1, -1, -1, -1, -1, -1, -1]],
+        ],
+    )
+    assert_array_equal(ds["call_PL"], pl)
+    assert (
+        ds["call_PL"].attrs["comment"]
+        == "Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification"
+    )
+
+
 def test_vcf_to_zarr__field_number_fixed(shared_datadir, tmp_path):
     path = path_for_test(shared_datadir, "sample.vcf.gz")
     output = tmp_path.joinpath("vcf.zarr").as_posix()

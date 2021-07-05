@@ -151,7 +151,7 @@ class VcfFieldHandler:
         key = field[len(f"{category}/") :]
         vcf_number = field_def.get("Number", vcf_field_defs[key]["Number"])
         dimension, size = vcf_number_to_dimension_and_size(
-            vcf_number, category, key, field_def, max_alt_alleles
+            vcf_number, category, key, field_def, ploidy, max_alt_alleles
         )
         vcf_type = field_def.get("Type", vcf_field_defs[key]["Type"])
         description = field_def.get(

@@ -7,6 +7,7 @@ import dask.array as da
 import xarray as xr
 import zarr
 from fsspec import get_mapper
+from scipy.special import comb
 from typing_extensions import Literal
 
 from sgkit.io.utils import concatenate_and_rechunk, str_is_int, zarrs_to_dataset
@@ -266,11 +267,12 @@ def _add_field_to_dataset(
         return
     vcf_number = field_def.get("Number", vcfzarr[vcfzarr_key].attrs["Number"])
     dimension, _ = vcf_number_to_dimension_and_size(
-        # max_alt_alleles is not relevant since size is not used here
+        # ploidy and max_alt_alleles are not relevant since size is not used here
         vcf_number,
         category,
         key,
         field_def,
+        ploidy=2,
         max_alt_alleles=0,
     )
     if dimension is not None:
@@ -405,7 +407,12 @@ def _zarr_create_with_attrs(  # type: ignore[no-untyped-def]
 
 
 def vcf_number_to_dimension_and_size(
-    vcf_number: str, category: str, key: str, field_def: Any, max_alt_alleles: int
+    vcf_number: str,
+    category: str,
+    key: str,
+    field_def: Any,
+    ploidy: int,
+    max_alt_alleles: int,
 ) -> Tuple[Optional[str], int]:
     if vcf_number in ("0", "1"):
         return (None, 1)
@@ -413,6 +420,11 @@ def vcf_number_to_dimension_and_size(
         return ("alt_alleles", max_alt_alleles)
     elif vcf_number == "R":
         return ("alleles", max_alt_alleles + 1)
+    elif vcf_number == "G":
+        n_alleles = max_alt_alleles + 1
+        # TODO: use Python 3.8's math.comb when we drop 3.7
+        n_genotypes = comb(n_alleles + ploidy - 1, ploidy, exact=True)
+        return ("genotypes", n_genotypes)
     elif str_is_int(vcf_number):
         if "dimension" in field_def:
             dimension = field_def["dimension"]
