@@ -32,7 +32,7 @@ def test_variables__no_spec(dummy_ds: xr.Dataset) -> None:
 
 
 def test_variables__validate_by_name(dummy_ds: xr.Dataset) -> None:
-    spec = ArrayLikeSpec("foo", kind="i", ndim=1)
+    spec = ArrayLikeSpec("foo", "foo doc", kind="i", ndim=1)
     try:
         assert "foo" not in SgkitVariables.registered_variables
         name, spec_b = SgkitVariables.register_variable(spec)
@@ -46,30 +46,30 @@ def test_variables__validate_by_name(dummy_ds: xr.Dataset) -> None:
 
 
 def test_variables__validate_by_dummy_spec(dummy_ds: xr.Dataset) -> None:
-    spec = ArrayLikeSpec("foo", kind="i", ndim=1)
+    spec = ArrayLikeSpec("foo", "foo doc", kind="i", ndim=1)
     variables.validate(dummy_ds, spec)
 
 
 def test_variables__invalid_spec_fails(dummy_ds: xr.Dataset) -> None:
-    invalid_spec = ArrayLikeSpec("foo", kind="i", ndim=2)
+    invalid_spec = ArrayLikeSpec("foo", "foo doc", kind="i", ndim=2)
     with pytest.raises(ValueError, match="foo does not match the spec"):
         variables.validate(dummy_ds, invalid_spec)
 
 
 def test_variables__alternative_names(dummy_ds: xr.Dataset) -> None:
-    spec = ArrayLikeSpec("baz", kind="i", ndim=1)
+    spec = ArrayLikeSpec("baz", "baz doc", kind="i", ndim=1)
     variables.validate(dummy_ds, {"foo": spec, "bar": spec})
 
 
 def test_variables__no_present_in_ds(dummy_ds: xr.Dataset) -> None:
-    spec = ArrayLikeSpec("baz", kind="i", ndim=1)
+    spec = ArrayLikeSpec("baz", "baz doc", kind="i", ndim=1)
     with pytest.raises(ValueError, match="foobarbaz not present in"):
         variables.validate(dummy_ds, {"foobarbaz": spec})
 
 
 def test_variables__multiple_specs(dummy_ds: xr.Dataset) -> None:
-    spec = ArrayLikeSpec("baz", kind="i", ndim=1)
-    invalid_spec = ArrayLikeSpec("baz", kind="i", ndim=2)
+    spec = ArrayLikeSpec("baz", "baz doc", kind="i", ndim=1)
+    invalid_spec = ArrayLikeSpec("baz", "baz doc", kind="i", ndim=2)
     variables.validate(dummy_ds, {"foo": spec, "bar": spec})
     variables.validate(dummy_ds, {"foo": spec})
     variables.validate(dummy_ds, {"bar": spec})
@@ -80,8 +80,8 @@ def test_variables__multiple_specs(dummy_ds: xr.Dataset) -> None:
 
 
 def test_variables__whole_ds(dummy_ds: xr.Dataset) -> None:
-    spec_foo = ArrayLikeSpec("foo", kind="i", ndim=1)
-    spec_bar = ArrayLikeSpec("bar", kind="i", ndim=1)
+    spec_foo = ArrayLikeSpec("foo", "foo doc", kind="i", ndim=1)
+    spec_bar = ArrayLikeSpec("bar", "bar doc", kind="i", ndim=1)
     try:
         SgkitVariables.register_variable(spec_foo)
         with pytest.raises(ValueError, match="`foo` already registered"):
@@ -97,5 +97,5 @@ def test_variables_in_multi_index(dummy_ds: xr.Dataset) -> None:
     # create a multi index
     ds = dummy_ds.set_index({"ind": ("foo", "bar")})
 
-    spec = ArrayLikeSpec("foo", kind="i", ndim=1)
+    spec = ArrayLikeSpec("foo", "foo doc", kind="i", ndim=1)
     variables.validate(ds, spec)
