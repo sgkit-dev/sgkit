@@ -103,7 +103,7 @@ def test_DP_field(shared_datadir, tmpdir):
     allel_ds = sg.read_vcfzarr(allel_vcfzarr_path)
 
     sg_vcfzarr_path = create_sg_vcfzarr(
-        shared_datadir, tmpdir, fields=["INFO/DP", "FORMAT/DP"]
+        shared_datadir, tmpdir, fields=["INFO/DP", "FORMAT/DP", "FORMAT/GT"]
     )
     sg_ds = sg.load_dataset(str(sg_vcfzarr_path))
     sg_ds = sg_ds.drop_vars("call_genotype_phased")  # not included in scikit-allel

@@ -499,11 +499,40 @@ def test_vcf_to_zarr__no_genotypes(shared_datadir, tmp_path):
     path = path_for_test(shared_datadir, "no_genotypes.vcf")
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
-    with pytest.raises(
-        ValueError,
-        match=r"Genotype information missing from VCF.",
-    ):
-        vcf_to_zarr(path, output)
+    vcf_to_zarr(path, output)
+
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    assert "call_genotype" not in ds
+    assert "call_genotype_mask" not in ds
+    assert "call_genotype_phased" not in ds
+
+    assert ds["sample_id"].shape == (0,)
+    assert ds["variant_allele"].shape == (26, 4)
+    assert ds["variant_contig"].shape == (26,)
+    assert ds["variant_id"].shape == (26,)
+    assert ds["variant_id_mask"].shape == (26,)
+    assert ds["variant_position"].shape == (26,)
+
+
+def test_vcf_to_zarr__no_genotypes_with_gt_header(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "no_genotypes_with_gt_header.vcf")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(path, output)
+
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    assert_array_equal(ds["call_genotype"], -1)
+    assert_array_equal(ds["call_genotype_mask"], 1)
+    assert_array_equal(ds["call_genotype_phased"], 0)
+
+    assert ds["sample_id"].shape == (0,)
+    assert ds["variant_allele"].shape == (26, 4)
+    assert ds["variant_contig"].shape == (26,)
+    assert ds["variant_id"].shape == (26,)
+    assert ds["variant_id_mask"].shape == (26,)
+    assert ds["variant_position"].shape == (26,)
 
 
 def test_vcf_to_zarr__contig_not_defined_in_header(shared_datadir, tmp_path):

@@ -21,11 +21,17 @@ import numpy as np
 import xarray as xr
 from cyvcf2 import VCF, Variant
 
+from sgkit import variables
 from sgkit.io.utils import zarrs_to_dataset
 from sgkit.io.vcf import partition_into_regions
 from sgkit.io.vcf.utils import build_url, chunks, temporary_directory, url_filename
 from sgkit.io.vcfzarr_reader import vcf_number_to_dimension_and_size
-from sgkit.model import DIM_SAMPLE, DIM_VARIANT, create_genotype_call_dataset
+from sgkit.model import (
+    DIM_PLOIDY,
+    DIM_SAMPLE,
+    DIM_VARIANT,
+    create_genotype_call_dataset,
+)
 from sgkit.typing import ArrayLike, DType, PathType
 from sgkit.utils import max_str_len
 
@@ -80,11 +86,12 @@ def _normalize_fields(vcf: VCF, fields: Sequence[str]) -> Sequence[str]:
     format_fields = set(
         [f"FORMAT/{key}" for key in _get_vcf_field_defs(vcf, "FORMAT").keys()]
     )
-    # genotype is handled specially
-    format_fields = format_fields - set(("FORMAT/GT",))
 
     new_fields = []
     for field in fields:
+        # genotype is handled specially
+        if field == "FORMAT/GT" and field not in format_fields:
+            continue
         if not any(field.startswith(prefix) for prefix in ["INFO/", "FORMAT/"]):
             raise ValueError("VCF field must be prefixed with 'INFO/' or 'FORMAT/'")
         category = field.split("/")[0]
@@ -120,17 +127,8 @@ def _vcf_type_to_numpy_type_and_fill_value(
     )
 
 
-@dataclass
 class VcfFieldHandler:
-    """Converts a VCF INFO or FORMAT fields to a dataset variable."""
-
-    category: str
-    key: str
-    variable_name: str
-    description: str
-    dims: Sequence[str]
-    fill_value: Any
-    array: ArrayLike
+    """Converts a VCF field to a dataset variable."""
 
     @classmethod
     def for_field(
@@ -138,9 +136,16 @@ class VcfFieldHandler:
         vcf: VCF,
         field: str,
         chunk_length: int,
+        ploidy: int,
+        mixed_ploidy: bool,
+        truncate_calls: bool,
         max_alt_alleles: int,
         field_def: Dict[str, Any],
     ) -> "VcfFieldHandler":
+        if field == "FORMAT/GT":
+            return GenotypeFieldHandler(
+                vcf, chunk_length, ploidy, mixed_ploidy, truncate_calls
+            )
         category = field.split("/")[0]
         vcf_field_defs = _get_vcf_field_defs(vcf, category)
         key = field[len(f"{category}/") :]
@@ -171,7 +176,7 @@ class VcfFieldHandler:
 
         array = np.full(chunksize, fill_value, dtype=dtype)
 
-        return cls(
+        return InfoAndFormatFieldHandler(
             category,
             key,
             variable_name,
@@ -180,6 +185,30 @@ class VcfFieldHandler:
             fill_value,
             array,
         )
+
+    def add_variant(self, i: int, variant: Any) -> None:
+        pass  # pragma: no cover
+
+    def truncate_array(self, length: int) -> None:
+        pass  # pragma: no cover
+
+    def update_dataset(
+        self, ds: xr.Dataset, add_str_max_length_attrs: bool = False
+    ) -> None:
+        pass  # pragma: no cover
+
+
+@dataclass
+class InfoAndFormatFieldHandler(VcfFieldHandler):
+    """Converts a VCF INFO or FORMAT field to a dataset variable."""
+
+    category: str
+    key: str
+    variable_name: str
+    description: str
+    dims: Sequence[str]
+    fill_value: Any
+    array: ArrayLike
 
     def add_variant(self, i: int, variant: Any) -> None:
         if self.category == "INFO":
@@ -230,6 +259,72 @@ class VcfFieldHandler:
             ds.attrs[f"max_length_{self.variable_name}"] = max_length
 
 
+class GenotypeFieldHandler(VcfFieldHandler):
+    """Converts a FORMAT/GT field to a dataset variable."""
+
+    def __init__(
+        self,
+        vcf: VCF,
+        chunk_length: int,
+        ploidy: int,
+        mixed_ploidy: bool,
+        truncate_calls: bool,
+    ) -> None:
+        n_sample = len(vcf.samples)
+        self.call_genotype = np.empty((chunk_length, n_sample, ploidy), dtype="i1")
+        self.call_genotype_phased = np.empty((chunk_length, n_sample), dtype=bool)
+        self.ploidy = ploidy
+        self.mixed_ploidy = mixed_ploidy
+        self.truncate_calls = truncate_calls
+
+    def add_variant(self, i: int, variant: Any) -> None:
+        fill = -2 if self.mixed_ploidy else -1
+        if variant.genotype is not None:
+            gt = variant.genotype.array(fill=fill)
+            gt_length = gt.shape[-1] - 1  # final element indicates phasing
+            if (gt_length > self.ploidy) and not self.truncate_calls:
+                raise ValueError("Genotype call longer than ploidy.")
+            n = min(self.call_genotype.shape[-1], gt_length)
+            self.call_genotype[i, ..., 0:n] = gt[..., 0:n]
+            self.call_genotype[i, ..., n:] = fill
+            self.call_genotype_phased[i] = gt[..., -1]
+        else:
+            self.call_genotype[i] = fill
+            self.call_genotype_phased[i] = 0
+
+    def truncate_array(self, length: int) -> None:
+        self.call_genotype = self.call_genotype[:length]
+        self.call_genotype_phased = self.call_genotype_phased[:length]
+
+    def update_dataset(
+        self, ds: xr.Dataset, add_str_max_length_attrs: bool = False
+    ) -> None:
+        ds["call_genotype"] = (
+            [DIM_VARIANT, DIM_SAMPLE, DIM_PLOIDY],
+            self.call_genotype,
+            {
+                "comment": variables.call_genotype_spec.__doc__.strip(),
+                "mixed_ploidy": self.mixed_ploidy,
+            },
+        )
+        ds["call_genotype_mask"] = (
+            [DIM_VARIANT, DIM_SAMPLE, DIM_PLOIDY],
+            self.call_genotype < 0,
+            {"comment": variables.call_genotype_mask_spec.__doc__.strip()},
+        )
+        if self.mixed_ploidy is True:
+            ds["call_genotype_non_allele"] = (
+                [DIM_VARIANT, DIM_SAMPLE, DIM_PLOIDY],
+                self.call_genotype < -1,
+                {"comment": variables.call_genotype_non_allele_spec.__doc__.strip()},
+            )
+        ds["call_genotype_phased"] = (
+            [DIM_VARIANT, DIM_SAMPLE],
+            self.call_genotype_phased,
+            {"comment": variables.call_genotype_phased_spec.__doc__.strip()},
+        )
+
+
 def vcf_to_zarr_sequential(
     input: PathType,
     output: Union[PathType, MutableMapping[str, bytes]],
@@ -248,7 +343,6 @@ def vcf_to_zarr_sequential(
 
     with open_vcf(input) as vcf:
         sample_id = np.array(vcf.samples, dtype=str)
-        n_sample = len(sample_id)
         n_allele = max_alt_alleles + 1
 
         variant_contig_names = vcf.seqnames
@@ -266,10 +360,8 @@ def vcf_to_zarr_sequential(
 
         variant_contig = np.empty(chunk_length, dtype="i1")
         variant_position = np.empty(chunk_length, dtype="i4")
-        call_genotype = np.empty((chunk_length, n_sample, ploidy), dtype="i1")
-        call_genotype_phased = np.empty((chunk_length, n_sample), dtype=bool)
 
-        fields = fields or []
+        fields = fields or ["FORMAT/GT"]  # default to GT as the only extra field
         fields = _normalize_fields(vcf, fields)
         exclude_fields = exclude_fields or []
         exclude_fields = _normalize_fields(vcf, exclude_fields)
@@ -277,7 +369,14 @@ def vcf_to_zarr_sequential(
         field_defs = field_defs or {}
         field_handlers = [
             VcfFieldHandler.for_field(
-                vcf, field, chunk_length, max_alt_alleles, field_defs.get(field, {})
+                vcf,
+                field,
+                chunk_length,
+                ploidy,
+                mixed_ploidy,
+                truncate_calls,
+                max_alt_alleles,
+                field_defs.get(field, {}),
             )
             for field in fields
         ]
@@ -289,8 +388,6 @@ def vcf_to_zarr_sequential(
             variant_allele = []
 
             for i, variant in enumerate(variants_chunk):
-                if variant.genotype is None:
-                    raise ValueError("Genotype information missing from VCF.")
                 variant_id = variant.ID if variant.ID is not None else "."
                 variant_ids.append(variant_id)
                 max_variant_id_length = max(max_variant_id_length, len(variant_id))
@@ -312,16 +409,6 @@ def vcf_to_zarr_sequential(
                     max_variant_allele_length, max(len(x) for x in alleles)
                 )
 
-                fill = -2 if mixed_ploidy else -1
-                gt = variant.genotype.array(fill=fill)
-                gt_length = gt.shape[-1] - 1  # final element indicates phasing
-                if (gt_length > ploidy) and not truncate_calls:
-                    raise ValueError("Genotype call longer than ploidy.")
-                n = min(call_genotype.shape[-1], gt_length)
-                call_genotype[i, ..., 0:n] = gt[..., 0:n]
-                call_genotype[i, ..., n:] = fill
-                call_genotype_phased[i] = gt[..., -1]
-
                 for field_handler in field_handlers:
                     field_handler.add_variant(i, variant)
 
@@ -329,8 +416,6 @@ def vcf_to_zarr_sequential(
             if i + 1 < chunk_length:
                 variant_contig = variant_contig[: i + 1]
                 variant_position = variant_position[: i + 1]
-                call_genotype = call_genotype[: i + 1]
-                call_genotype_phased = call_genotype_phased[: i + 1]
 
                 for field_handler in field_handlers:
                     field_handler.truncate_array(i + 1)
@@ -345,10 +430,7 @@ def vcf_to_zarr_sequential(
                 variant_position=variant_position,
                 variant_allele=variant_allele,
                 sample_id=sample_id,
-                call_genotype=call_genotype,
-                call_genotype_phased=call_genotype_phased,
                 variant_id=variant_id,
-                mixed_ploidy=mixed_ploidy,
             )
             ds["variant_id_mask"] = (
                 [DIM_VARIANT],
