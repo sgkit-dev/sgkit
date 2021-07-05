@@ -4,12 +4,7 @@ import dask.array as da
 import numpy as np
 import pytest
 from numba import cuda
-from scipy.spatial.distance import (  # type: ignore
-    correlation,
-    euclidean,
-    pdist,
-    squareform,
-)
+from scipy.spatial.distance import correlation, euclidean, pdist, squareform
 
 from sgkit.distance.api import DeviceTypes, MetricTypes, pairwise_distance
 from sgkit.typing import ArrayLike
