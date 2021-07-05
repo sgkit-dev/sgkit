@@ -8,7 +8,11 @@ from numcodecs import Blosc, PackBits
 from numpy.testing import assert_allclose, assert_array_equal
 
 from sgkit import load_dataset
-from sgkit.io.vcf import partition_into_regions, vcf_to_zarr
+from sgkit.io.vcf import (
+    MaxAltAllelesExceededWarning,
+    partition_into_regions,
+    vcf_to_zarr,
+)
 
 from .utils import path_for_test
 
@@ -98,30 +102,35 @@ def test_vcf_to_zarr__max_alt_alleles(shared_datadir, is_path, tmp_path):
     path = path_for_test(shared_datadir, "sample.vcf.gz", is_path)
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
-    vcf_to_zarr(path, output, chunk_length=5, chunk_width=2, max_alt_alleles=1)
-    ds = xr.open_zarr(output)
+    with pytest.warns(MaxAltAllelesExceededWarning):
+        vcf_to_zarr(path, output, chunk_length=5, chunk_width=2, max_alt_alleles=1)
+        ds = xr.open_zarr(output)
 
-    # extra alt alleles are silently dropped
-    assert_array_equal(
-        ds["variant_allele"],
-        [
-            ["A", "C"],
-            ["A", "G"],
-            ["G", "A"],
-            ["T", "A"],
-            ["A", "G"],
-            ["T", ""],
-            ["G", "GA"],
-            ["T", ""],
-            ["AC", "A"],
-        ],
-    )
+        # extra alt alleles are dropped
+        assert_array_equal(
+            ds["variant_allele"],
+            [
+                ["A", "C"],
+                ["A", "G"],
+                ["G", "A"],
+                ["T", "A"],
+                ["A", "G"],
+                ["T", ""],
+                ["G", "GA"],
+                ["T", ""],
+                ["AC", "A"],
+            ],
+        )
+
+        # the maximum number of alt alleles actually seen is stored as an attribute
+        assert ds.attrs["max_alt_alleles_seen"] == 3
 
 
 @pytest.mark.parametrize(
     "is_path",
     [True, False],
 )
+@pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
 def test_vcf_to_zarr__large_vcf(shared_datadir, is_path, tmp_path):
     path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", is_path)
     output = tmp_path.joinpath("vcf.zarr").as_posix()
@@ -159,6 +168,7 @@ def test_vcf_to_zarr__plain_vcf_with_no_index(shared_datadir, tmp_path):
     "is_path",
     [True, False],
 )
+@pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
 def test_vcf_to_zarr__mutable_mapping(shared_datadir, is_path):
     path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", is_path)
     output: MutableMapping[str, bytes] = {}
@@ -217,6 +227,7 @@ def test_vcf_to_zarr__compressor_and_filters(shared_datadir, is_path, tmp_path):
     "is_path",
     [True, False],
 )
+@pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
 def test_vcf_to_zarr__parallel(shared_datadir, is_path, tmp_path):
     path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", is_path)
     output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
@@ -266,6 +277,7 @@ def test_vcf_to_zarr__empty_region(shared_datadir, is_path, tmp_path):
     "is_path",
     [False],
 )
+@pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
 def test_vcf_to_zarr__parallel_temp_chunk_length(shared_datadir, is_path, tmp_path):
     path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", is_path)
     output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
@@ -354,6 +366,7 @@ def test_vcf_to_zarr__parallel_partitioned_by_size(shared_datadir, is_path, tmp_
     "is_path",
     [True, False],
 )
+@pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
 def test_vcf_to_zarr__multiple(shared_datadir, is_path, tmp_path):
     paths = [
         path_for_test(shared_datadir, "CEUTrio.20.gatk3.4.g.vcf.bgz", is_path),
@@ -381,6 +394,7 @@ def test_vcf_to_zarr__multiple(shared_datadir, is_path, tmp_path):
     "is_path",
     [True, False],
 )
+@pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
 def test_vcf_to_zarr__multiple_partitioned(shared_datadir, is_path, tmp_path):
     paths = [
         path_for_test(shared_datadir, "CEUTrio.20.gatk3.4.g.vcf.bgz", is_path),
@@ -410,6 +424,7 @@ def test_vcf_to_zarr__multiple_partitioned(shared_datadir, is_path, tmp_path):
     "is_path",
     [True, False],
 )
+@pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
 def test_vcf_to_zarr__multiple_partitioned_by_size(shared_datadir, is_path, tmp_path):
     paths = [
         path_for_test(shared_datadir, "CEUTrio.20.gatk3.4.g.vcf.bgz", is_path),
@@ -454,6 +469,31 @@ def test_vcf_to_zarr__mutiple_partitioned_invalid_regions(
         match=r"multiple input regions must be a sequence of sequence of strings",
     ):
         vcf_to_zarr(paths, output, regions=regions, chunk_length=5_000)
+
+
+@pytest.mark.parametrize(
+    "is_path",
+    [True, False],
+)
+def test_vcf_to_zarr__multiple_max_alt_alleles(shared_datadir, is_path, tmp_path):
+    paths = [
+        path_for_test(shared_datadir, "CEUTrio.20.gatk3.4.g.vcf.bgz", is_path),
+        path_for_test(shared_datadir, "CEUTrio.21.gatk3.4.g.vcf.bgz", is_path),
+    ]
+    output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
+
+    with pytest.warns(MaxAltAllelesExceededWarning):
+        vcf_to_zarr(
+            paths,
+            output,
+            target_part_size="40KB",
+            chunk_length=5_000,
+            max_alt_alleles=1,
+        )
+        ds = xr.open_zarr(output)
+
+        # the maximum number of alt alleles actually seen is stored as an attribute
+        assert ds.attrs["max_alt_alleles_seen"] == 7
 
 
 @pytest.mark.parametrize(
@@ -647,6 +687,7 @@ def test_vcf_to_zarr__fields(shared_datadir, tmp_path):
     assert ds["call_DP"].attrs["comment"] == "Read Depth"
 
 
+@pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
 def test_vcf_to_zarr__parallel_with_fields(shared_datadir, tmp_path):
     path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz")
     output = tmp_path.joinpath("vcf.zarr").as_posix()
@@ -703,6 +744,7 @@ def test_vcf_to_zarr__field_defs(shared_datadir, tmp_path):
     assert "comment" not in ds["variant_DP"].attrs
 
 
+@pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
 def test_vcf_to_zarr__field_number_A(shared_datadir, tmp_path):
     path = path_for_test(shared_datadir, "sample.vcf.gz")
     output = tmp_path.joinpath("vcf.zarr").as_posix()
@@ -736,6 +778,7 @@ def test_vcf_to_zarr__field_number_A(shared_datadir, tmp_path):
     )
 
 
+@pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
 def test_vcf_to_zarr__field_number_R(shared_datadir, tmp_path):
     path = path_for_test(shared_datadir, "CEUTrio.21.gatk3.4.g.vcf.bgz")
     output = tmp_path.joinpath("vcf.zarr").as_posix()
@@ -768,6 +811,7 @@ def test_vcf_to_zarr__field_number_R(shared_datadir, tmp_path):
     )
 
 
+@pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
 def test_vcf_to_zarr__field_number_G(shared_datadir, tmp_path):
     path = path_for_test(shared_datadir, "CEUTrio.21.gatk3.4.g.vcf.bgz")
     output = tmp_path.joinpath("vcf.zarr").as_posix()

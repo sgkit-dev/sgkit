@@ -3,9 +3,10 @@ import platform
 try:
     from ..utils import zarrs_to_dataset
     from .vcf_partition import partition_into_regions
-    from .vcf_reader import vcf_to_zarr, vcf_to_zarrs
+    from .vcf_reader import MaxAltAllelesExceededWarning, vcf_to_zarr, vcf_to_zarrs
 
     __all__ = [
+        "MaxAltAllelesExceededWarning",
         "partition_into_regions",
         "vcf_to_zarr",
         "vcf_to_zarrs",
