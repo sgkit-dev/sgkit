@@ -615,7 +615,8 @@ def vcf_to_zarrs(
         specified ploidy will raise an exception.
     max_alt_alleles
         The (maximum) number of alternate alleles in the VCF file. Any records with more than
-        this number of alternate alleles will have the extra alleles dropped.
+        this number of alternate alleles will have the extra alleles dropped (the `variant_allele`
+        variable will be truncated). Call genotype fields will however be unaffected.
     fields
         Extra fields to extract data for. A list of strings, with ``INFO`` or ``FORMAT`` prefixes.
         Wildcards are permitted too, for example: ``["INFO/*", "FORMAT/DP"]``.
@@ -782,7 +783,8 @@ def vcf_to_zarr(
         specified ploidy will raise an exception.
     max_alt_alleles
         The (maximum) number of alternate alleles in the VCF file. Any records with more than
-        this number of alternate alleles will have the extra alleles dropped.
+        this number of alternate alleles will have the extra alleles dropped (the `variant_allele`
+        variable will be truncated). Call genotype fields will however be unaffected.
     fields
         Extra fields to extract data for. A list of strings, with ``INFO`` or ``FORMAT`` prefixes.
         Wildcards are permitted too, for example: ``["INFO/*", "FORMAT/DP"]``.
