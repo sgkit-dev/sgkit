@@ -737,6 +737,18 @@ def test_vcf_to_zarr__field_number_G(shared_datadir, tmp_path):
     )
 
 
+def test_vcf_to_zarr__field_number_G_non_diploid(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "simple.output.mixed_depth.likelihoods.vcf")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(path, output, ploidy=4, max_alt_alleles=3, fields=["FORMAT/GL"])
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    # comb(n_alleles + ploidy - 1, ploidy) = comb(4 + 4 - 1, 4) = comb(7, 4) = 35
+    assert_array_equal(ds["call_GL"].shape, (4, 3, 35))
+    assert ds["call_GL"].attrs["comment"] == "Genotype likelihoods"
+
+
 def test_vcf_to_zarr__field_number_fixed(shared_datadir, tmp_path):
     path = path_for_test(shared_datadir, "sample.vcf.gz")
     output = tmp_path.joinpath("vcf.zarr").as_posix()
