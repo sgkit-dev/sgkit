@@ -7,4 +7,4 @@ scipy
 typing-extensions
 numba
 zarr
-fsspec
+fsspec != 2021.6.*
