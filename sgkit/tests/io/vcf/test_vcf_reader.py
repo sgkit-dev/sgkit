@@ -499,11 +499,40 @@ def test_vcf_to_zarr__no_genotypes(shared_datadir, tmp_path):
     path = path_for_test(shared_datadir, "no_genotypes.vcf")
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
-    with pytest.raises(
-        ValueError,
-        match=r"Genotype information missing from VCF.",
-    ):
-        vcf_to_zarr(path, output)
+    vcf_to_zarr(path, output)
+
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    assert "call_genotype" not in ds
+    assert "call_genotype_mask" not in ds
+    assert "call_genotype_phased" not in ds
+
+    assert ds["sample_id"].shape == (0,)
+    assert ds["variant_allele"].shape == (26, 4)
+    assert ds["variant_contig"].shape == (26,)
+    assert ds["variant_id"].shape == (26,)
+    assert ds["variant_id_mask"].shape == (26,)
+    assert ds["variant_position"].shape == (26,)
+
+
+def test_vcf_to_zarr__no_genotypes_with_gt_header(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "no_genotypes_with_gt_header.vcf")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(path, output)
+
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    assert_array_equal(ds["call_genotype"], -1)
+    assert_array_equal(ds["call_genotype_mask"], 1)
+    assert_array_equal(ds["call_genotype_phased"], 0)
+
+    assert ds["sample_id"].shape == (0,)
+    assert ds["variant_allele"].shape == (26, 4)
+    assert ds["variant_contig"].shape == (26,)
+    assert ds["variant_id"].shape == (26,)
+    assert ds["variant_id_mask"].shape == (26,)
+    assert ds["variant_position"].shape == (26,)
 
 
 def test_vcf_to_zarr__contig_not_defined_in_header(shared_datadir, tmp_path):
@@ -679,6 +708,45 @@ def test_vcf_to_zarr__field_number_R(shared_datadir, tmp_path):
         ds["call_AD"].attrs["comment"]
         == "Allelic depths for the ref and alt alleles in the order listed"
     )
+
+
+def test_vcf_to_zarr__field_number_G(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "CEUTrio.21.gatk3.4.g.vcf.bgz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(path, output, fields=["FORMAT/PL"])
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    # select a small region to check
+    ds = ds.set_index(variants="variant_position").sel(
+        variants=slice(10002764, 10002793)
+    )
+
+    pl = np.array(
+        [
+            [[319, 0, 1316, 440, 1358, 1798, -1, -1, -1, -1]],
+            [[0, 120, 1800, -1, -1, -1, -1, -1, -1, -1]],
+            [[8, 0, 1655, 103, 1743, 2955, 184, 1653, 1928, 1829]],
+            [[0, 0, 2225, -1, -1, -1, -1, -1, -1, -1]],
+        ],
+    )
+    assert_array_equal(ds["call_PL"], pl)
+    assert (
+        ds["call_PL"].attrs["comment"]
+        == "Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification"
+    )
+
+
+def test_vcf_to_zarr__field_number_G_non_diploid(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "simple.output.mixed_depth.likelihoods.vcf")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(path, output, ploidy=4, max_alt_alleles=3, fields=["FORMAT/GL"])
+    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+
+    # comb(n_alleles + ploidy - 1, ploidy) = comb(4 + 4 - 1, 4) = comb(7, 4) = 35
+    assert_array_equal(ds["call_GL"].shape, (4, 3, 35))
+    assert ds["call_GL"].attrs["comment"] == "Genotype likelihoods"
 
 
 def test_vcf_to_zarr__field_number_fixed(shared_datadir, tmp_path):

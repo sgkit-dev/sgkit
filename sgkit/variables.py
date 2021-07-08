@@ -1,7 +1,6 @@
-import dataclasses
 import logging
 from dataclasses import dataclass
-from typing import Dict, Hashable, Mapping, Optional, Set, Tuple, Union, overload
+from typing import Dict, Hashable, Mapping, Set, Tuple, Union, overload
 
 import xarray as xr
 
@@ -13,7 +12,7 @@ class Spec:
     """Root type Spec"""
 
     default_name: str
-    __doc__: Optional[str] = dataclasses.field(default=None, repr=False)
+    __doc__: str
 
     # Note: we want to prevent dev/users from mistakenly
     #       using Spec as a hashable obj in dict, xr.Dataset
