@@ -63,6 +63,9 @@ Similarly, the function :func:`sgkit.save_dataset` can be used to save the datas
 This can be used to save a newly-loaded dataset, or a dataset with new variables that are the
 result of running genetic methods on the data, so it can be loaded again later.
 
+By default, Zarr datasets created by sgkit (and Xarray) have `consolidated metadata <http://xarray.pydata.org/en/stable/user-guide/io.html#consolidated-metadata>`_,
+which makes opening the dataset faster.
+
 BGEN
 ----
 
