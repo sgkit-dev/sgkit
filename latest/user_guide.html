@@ -927,6 +927,8 @@ This is like Xarray’s <a class="reference external" href="https://xarray.pydat
 <p>Similarly, the function <a class="reference internal" href="generated/sgkit.save_dataset.html#sgkit.save_dataset" title="sgkit.save_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.save_dataset()</span></code></a> can be used to save the dataset in Zarr format.
 This can be used to save a newly-loaded dataset, or a dataset with new variables that are the
 result of running genetic methods on the data, so it can be loaded again later.</p>
+<p>By default, Zarr datasets created by sgkit (and Xarray) have <a class="reference external" href="http://xarray.pydata.org/en/stable/user-guide/io.html#consolidated-metadata">consolidated metadata</a>,
+which makes opening the dataset faster.</p>
 </div>
 <div class="section" id="bgen">
 <h3><a class="toc-backref" href="#id7">BGEN</a><a class="headerlink" href="#bgen" title="Permalink to this headline">¶</a></h3>
