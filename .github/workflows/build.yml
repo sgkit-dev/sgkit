@@ -34,6 +34,11 @@ jobs:
       run: |
         cd docs
         make html SPHINXOPTS="-W --keep-going -n"
+    - uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: gwas_tutorial
+        path: /home/runner/work/sgkit/sgkit/docs/_build/html/reports/gwas_tutorial.log
     - name: Test with pytest and coverage
       run: |
         pytest -v --cov=sgkit --cov-report=term-missing
