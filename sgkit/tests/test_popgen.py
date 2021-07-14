@@ -113,8 +113,8 @@ def add_cohorts(ds, ts, n_cohorts=1, cohort_key_names=["cohorts_0", "cohorts_1"]
 )
 def test_diversity(sample_size, chunks, cohort_allele_count):
     ts = simulate_ts(sample_size)
-    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
-    ds, subsets = add_cohorts(ds, ts, cohort_key_names=["cohorts"])  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts, chunks)
+    ds, subsets = add_cohorts(ds, ts, cohort_key_names=["cohorts"])
     if cohort_allele_count is not None:
         ds = count_cohort_alleles(ds, merge=False).rename(
             {variables.cohort_allele_count: cohort_allele_count}
@@ -133,8 +133,8 @@ def test_diversity(sample_size, chunks, cohort_allele_count):
 @pytest.mark.parametrize("sample_size", [10])
 def test_diversity__windowed(sample_size):
     ts = simulate_ts(sample_size, length=200)
-    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
-    ds, subsets = add_cohorts(ds, ts, cohort_key_names=["cohorts"])  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts)
+    ds, subsets = add_cohorts(ds, ts, cohort_key_names=["cohorts"])
     ds = window_by_variant(ds, size=25)
     ds = diversity(ds)
     div = ds["stat_diversity"].sel(cohorts="co_0").compute()
@@ -148,7 +148,7 @@ def test_diversity__windowed(sample_size):
 
     # Calculate diversity using scikit-allel moving_statistic
     # (Don't use windowed_diversity, since it treats the last window differently)
-    ds = count_variant_alleles(ts_to_dataset(ts))  # type: ignore[no-untyped-call]
+    ds = count_variant_alleles(ts_to_dataset(ts))
     ac = ds["variant_allele_count"].values
     mpd = allel.mean_pairwise_difference(ac, fill=0)
     ska_div = allel.moving_statistic(mpd, np.sum, size=25)
@@ -170,8 +170,8 @@ def test_diversity__missing_call_genotype():
 @pytest.mark.parametrize("chunks", [(-1, -1), (10, -1)])
 def test_divergence(sample_size, n_cohorts, chunks):
     ts = simulate_ts(sample_size)
-    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
-    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts, chunks)
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)
     ds = divergence(ds)
     div = ds.stat_divergence.sum(axis=0, skipna=False).values
 
@@ -193,8 +193,8 @@ def test_divergence(sample_size, n_cohorts, chunks):
 @pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
 def test_divergence__windowed(sample_size, n_cohorts, chunks):
     ts = simulate_ts(sample_size, length=200)
-    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
-    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts, chunks)
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)
     ds = window_by_variant(ds, size=25)
     ds = divergence(ds)
     div = ds["stat_divergence"].values
@@ -220,8 +220,8 @@ def test_divergence__windowed(sample_size, n_cohorts, chunks):
 @pytest.mark.xfail()  # combine with test_divergence__windowed when this is passing
 def test_divergence__windowed_scikit_allel_comparison(sample_size, n_cohorts, chunks):
     ts = simulate_ts(sample_size, length=200)
-    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
-    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts, chunks)
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)
     ds = window_by_variant(ds, size=25)
     ds = divergence(ds)
     div = ds["stat_divergence"].values
@@ -230,8 +230,8 @@ def test_divergence__windowed_scikit_allel_comparison(sample_size, n_cohorts, ch
 
     # Calculate divergence using scikit-allel moving_statistic
     # (Don't use windowed_divergence, since it treats the last window differently)
-    ds1 = count_variant_alleles(ts_to_dataset(ts, samples=ts.samples()[:1]))  # type: ignore[no-untyped-call]
-    ds2 = count_variant_alleles(ts_to_dataset(ts, samples=ts.samples()[1:]))  # type: ignore[no-untyped-call]
+    ds1 = count_variant_alleles(ts_to_dataset(ts, samples=ts.samples()[:1]))
+    ds2 = count_variant_alleles(ts_to_dataset(ts, samples=ts.samples()[1:]))
     ac1 = ds1["variant_allele_count"].values
     ac2 = ds2["variant_allele_count"].values
     mpd = allel.mean_pairwise_difference_between(ac1, ac2, fill=0)
@@ -258,8 +258,8 @@ def test_Fst__Hudson(sample_size):
     # scikit-allel can only calculate Fst for pairs of cohorts (populations)
     n_cohorts = 2
     ts = simulate_ts(sample_size)
-    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
-    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts)
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)
     n_variants = ds.dims["variants"]
     ds = window_by_variant(ds, size=n_variants)  # single window
     ds = Fst(ds, estimator="Hudson")
@@ -280,8 +280,8 @@ def test_Fst__Hudson(sample_size):
 )
 def test_Fst__Nei(sample_size, n_cohorts):
     ts = simulate_ts(sample_size)
-    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
-    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts)
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)
     n_variants = ds.dims["variants"]
     ds = window_by_variant(ds, size=n_variants)  # single window
     ds = Fst(ds, estimator="Nei")
@@ -296,7 +296,7 @@ def test_Fst__Nei(sample_size, n_cohorts):
 
 def test_Fst__unknown_estimator():
     ts = simulate_ts(2)
-    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts)
     with pytest.raises(
         ValueError, match="Estimator 'Unknown' is not a known estimator"
     ):
@@ -310,8 +310,8 @@ def test_Fst__unknown_estimator():
 @pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
 def test_Fst__windowed(sample_size, n_cohorts, chunks):
     ts = simulate_ts(sample_size, length=200)
-    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
-    ds, subsets = add_cohorts(ds, ts, n_cohorts)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts, chunks)
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)
     ds = window_by_variant(ds, size=25)
     fst_ds = Fst(ds, estimator="Nei")
     fst = fst_ds["stat_Fst"].values
@@ -351,8 +351,8 @@ def test_Fst__windowed(sample_size, n_cohorts, chunks):
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_Tajimas_D(sample_size):
     ts = simulate_ts(sample_size)
-    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
-    ds, subsets = add_cohorts(ds, ts, cohort_key_names=None)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts)
+    ds, subsets = add_cohorts(ds, ts, cohort_key_names=None)
     n_variants = ds.dims["variants"]
     ds = window_by_variant(ds, size=n_variants)  # single window
     ds = Tajimas_D(ds)
@@ -365,8 +365,8 @@ def test_Tajimas_D(sample_size):
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_Tajimas_D_per_site(sample_size):
     ts = simulate_ts(sample_size, random_seed=1234)
-    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
-    ds, subsets = add_cohorts(ds, ts, cohort_key_names=None)  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts)
+    ds, subsets = add_cohorts(ds, ts, cohort_key_names=None)
     ds = Tajimas_D(ds)
     d = ds.stat_Tajimas_D.compute().squeeze()
     ts_d = ts.Tajimas_D(windows="sites")
@@ -379,8 +379,10 @@ def test_Tajimas_D_per_site(sample_size):
 )
 def test_pbs(sample_size, n_cohorts):
     ts = simulate_ts(sample_size)
-    ds = ts_to_dataset(ts)  # type: ignore[no-untyped-call]
-    ds, subsets = add_cohorts(ds, ts, n_cohorts, cohort_key_names=["cohorts_0", "cohorts_1", "cohorts_2"])  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts)
+    ds, subsets = add_cohorts(
+        ds, ts, n_cohorts, cohort_key_names=["cohorts_0", "cohorts_1", "cohorts_2"]
+    )
     n_variants = ds.dims["variants"]
     ds = window_by_variant(ds, size=n_variants)  # single window
 
@@ -414,8 +416,10 @@ def test_pbs(sample_size, n_cohorts):
 @pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
 def test_pbs__windowed(sample_size, n_cohorts, cohorts, cohort_indexes, chunks):
     ts = simulate_ts(sample_size, length=200)
-    ds = ts_to_dataset(ts, chunks)  # type: ignore[no-untyped-call]
-    ds, subsets = add_cohorts(ds, ts, n_cohorts, cohort_key_names=["cohorts_0", "cohorts_1", "cohorts_2"])  # type: ignore[no-untyped-call]
+    ds = ts_to_dataset(ts, chunks)
+    ds, subsets = add_cohorts(
+        ds, ts, n_cohorts, cohort_key_names=["cohorts_0", "cohorts_1", "cohorts_2"]
+    )
     ds = window_by_variant(ds, size=25)
 
     ds = pbs(ds, cohorts=cohorts)
@@ -465,7 +469,7 @@ def test_Garud_h(
     ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
     cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     coords = {k: cohort_names for k in ["cohorts"]}
-    ds = ds.assign_coords(coords)  # type: ignore[no-untyped-call]
+    ds = ds.assign_coords(coords)
     ds = window_by_variant(ds, size=3)
 
     gh = Garud_H(ds, cohorts=cohorts)

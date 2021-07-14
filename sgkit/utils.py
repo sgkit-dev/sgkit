@@ -98,7 +98,7 @@ def encode_array(x: ArrayLike) -> Tuple[ArrayLike, List[Any]]:
         Unique values in original array in order of appearance.
     """
     # argsort not implemented in dask: https://github.com/dask/dask/issues/4368
-    names, index, inverse = np.unique(x, return_index=True, return_inverse=True)
+    names, index, inverse = np.unique(x, return_index=True, return_inverse=True)  # type: ignore[no-untyped-call]
     index = np.argsort(index)
     rank = np.empty_like(index)
     rank[index] = np.arange(len(index))
@@ -299,7 +299,7 @@ def max_str_len(a: ArrayLike) -> ArrayLike:
     if a.dtype.kind not in {"U", "S"}:
         raise ValueError(f"Array must have string dtype (got dtype {a.dtype})")
 
-    lens = np.frompyfunc(len, 1, 1)(a)
+    lens = np.frompyfunc(len, 1, 1)(a)  # type: ignore[no-untyped-call]
     if isinstance(a, np.ndarray):
         lens = np.asarray(lens)
     return lens.max()

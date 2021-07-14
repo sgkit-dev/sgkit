@@ -22,7 +22,7 @@ def test_r2_score__batch_dims():
     np.random.seed(0)
     X = np.random.normal(size=(n, p))
     B = np.random.normal(size=(p, y))
-    Y = (X @ B).T
+    Y = (X @ B).T  # type: ignore[attr-defined]
     YP = Y + np.random.normal(size=(6, 8, y, n), scale=0.1)
 
     # Test case with perfect predictions

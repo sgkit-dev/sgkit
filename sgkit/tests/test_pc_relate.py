@@ -1,9 +1,12 @@
+from typing import Any
+
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
 from hypothesis import given, settings
 from hypothesis.extra.numpy import arrays
+from numpy.typing import NDArray
 
 from sgkit import pc_relate, pca
 from sgkit.stats.pc_relate import (
@@ -48,7 +51,7 @@ def test_pc_relate__maf_inputs_checks() -> None:
 
 @given(arrays(np.int8, (3, 5)))
 @settings(max_examples=10)
-def test_gramian_is_symmetric(a: np.ndarray) -> None:
+def test_gramian_is_symmetric(a: NDArray[Any]) -> None:
     b = gramian(a)
     assert np.allclose(b, b.T)
 

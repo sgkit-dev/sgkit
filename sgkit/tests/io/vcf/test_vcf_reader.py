@@ -20,7 +20,7 @@ def test_vcf_to_zarr__small_vcf(shared_datadir, is_path, tmp_path):
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
     vcf_to_zarr(path, output, chunk_length=5, chunk_width=2)
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert ds.attrs["contigs"] == ["19", "20", "X"]
     assert_array_equal(ds["variant_contig"], [0, 0, 1, 1, 1, 1, 1, 1, 2])
@@ -97,7 +97,7 @@ def test_vcf_to_zarr__max_alt_alleles(shared_datadir, is_path, tmp_path):
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
     vcf_to_zarr(path, output, chunk_length=5, chunk_width=2, max_alt_alleles=1)
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     # extra alt alleles are silently dropped
     assert_array_equal(
@@ -125,7 +125,7 @@ def test_vcf_to_zarr__large_vcf(shared_datadir, is_path, tmp_path):
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
     vcf_to_zarr(path, output, chunk_length=5_000)
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert ds["sample_id"].shape == (1,)
     assert ds["call_genotype"].shape == (19910, 1, 2)
@@ -149,7 +149,7 @@ def test_vcf_to_zarr__plain_vcf_with_no_index(shared_datadir, tmp_path):
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
     vcf_to_zarr(path, output, truncate_calls=True)
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
     assert ds["sample_id"].shape == (3,)
 
 
@@ -162,7 +162,7 @@ def test_vcf_to_zarr__mutable_mapping(shared_datadir, is_path):
     output: MutableMapping[str, bytes] = {}
 
     vcf_to_zarr(path, output, chunk_length=5_000)
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert ds["sample_id"].shape == (1,)
     assert ds["call_genotype"].shape == (19910, 1, 2)
@@ -188,7 +188,7 @@ def test_vcf_to_zarr__parallel(shared_datadir, is_path, tmp_path):
     regions = ["20", "21"]
 
     vcf_to_zarr(path, output, regions=regions, chunk_length=5_000)
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert ds["sample_id"].shape == (1,)
     assert ds["call_genotype"].shape == (19910, 1, 2)
@@ -214,7 +214,7 @@ def test_vcf_to_zarr__empty_region(shared_datadir, is_path, tmp_path):
     regions = "23"
 
     vcf_to_zarr(path, output, regions=regions)
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert ds["sample_id"].shape == (1,)
     assert ds["call_genotype"].shape == (0, 1, 2)
@@ -240,7 +240,7 @@ def test_vcf_to_zarr__parallel_temp_chunk_length(shared_datadir, is_path, tmp_pa
     vcf_to_zarr(
         path, output, regions=regions, chunk_length=5_000, temp_chunk_length=2_500
     )
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert ds["sample_id"].shape == (1,)
     assert ds["call_genotype"].shape == (19910, 1, 2)
@@ -288,7 +288,7 @@ def test_vcf_to_zarr__parallel_partitioned(shared_datadir, is_path, tmp_path):
     regions = partition_into_regions(path, num_parts=4)
 
     vcf_to_zarr(path, output, regions=regions, chunk_length=1_000, chunk_width=1_000)
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert ds["sample_id"].shape == (2535,)
     assert ds["variant_id"].shape == (1406,)
@@ -309,7 +309,7 @@ def test_vcf_to_zarr__parallel_partitioned_by_size(shared_datadir, is_path, tmp_
     vcf_to_zarr(
         path, output, target_part_size="4MB", chunk_length=1_000, chunk_width=1_000
     )
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert ds["sample_id"].shape == (2535,)
     assert ds["variant_id"].shape == (1406,)
@@ -327,7 +327,7 @@ def test_vcf_to_zarr__multiple(shared_datadir, is_path, tmp_path):
     output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
 
     vcf_to_zarr(paths, output, target_part_size=None, chunk_length=5_000)
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert ds["sample_id"].shape == (1,)
     assert ds["call_genotype"].shape == (19910, 1, 2)
@@ -356,7 +356,7 @@ def test_vcf_to_zarr__multiple_partitioned(shared_datadir, is_path, tmp_path):
     regions = [partition_into_regions(path, num_parts=2) for path in paths]
 
     vcf_to_zarr(paths, output, regions=regions, chunk_length=5_000)
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert ds["sample_id"].shape == (1,)
     assert ds["call_genotype"].shape == (19910, 1, 2)
@@ -383,7 +383,7 @@ def test_vcf_to_zarr__multiple_partitioned_by_size(shared_datadir, is_path, tmp_
     output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
 
     vcf_to_zarr(paths, output, target_part_size="40KB", chunk_length=5_000)
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert ds["sample_id"].shape == (1,)
     assert ds["call_genotype"].shape == (19910, 1, 2)
@@ -464,12 +464,12 @@ def test_vcf_to_zarr__mixed_ploidy_vcf(
             dtype=variant_dtype,
         ),
     )
-    assert ds["variant_allele"].dtype == variant_dtype
+    assert ds["variant_allele"].dtype == variant_dtype  # type: ignore[comparison-overlap]
     assert_array_equal(
         ds["variant_id"],
         np.array([".", "."], dtype=variant_dtype),
     )
-    assert ds["variant_id"].dtype == variant_dtype
+    assert ds["variant_id"].dtype == variant_dtype  # type: ignore[comparison-overlap]
     assert_array_equal(
         ds["variant_id_mask"],
         [True, True],
@@ -524,7 +524,7 @@ def test_vcf_to_zarr__no_genotypes(shared_datadir, tmp_path):
 
     vcf_to_zarr(path, output)
 
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert "call_genotype" not in ds
     assert "call_genotype_mask" not in ds
@@ -544,7 +544,7 @@ def test_vcf_to_zarr__no_genotypes_with_gt_header(shared_datadir, tmp_path):
 
     vcf_to_zarr(path, output)
 
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert_array_equal(ds["call_genotype"], -1)
     assert_array_equal(ds["call_genotype_mask"], 1)
@@ -581,7 +581,7 @@ def test_vcf_to_zarr__fields(shared_datadir, tmp_path):
         chunk_width=2,
         fields=["INFO/DP", "INFO/AA", "INFO/DB", "FORMAT/DP"],
     )
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert_array_equal(ds["variant_DP"], [-1, -1, 14, 11, 10, 13, 9, -1, -1])
     assert ds["variant_DP"].attrs["comment"] == "Total Depth"
@@ -625,7 +625,7 @@ def test_vcf_to_zarr__parallel_with_fields(shared_datadir, tmp_path):
         temp_chunk_length=2_500,
         fields=["INFO/MQ", "FORMAT/PGT"],
     )
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     # select a small region to check
     ds = ds.set_index(variants=("variant_contig", "variant_position")).sel(
@@ -651,7 +651,7 @@ def test_vcf_to_zarr__field_defs(shared_datadir, tmp_path):
         fields=["INFO/DP"],
         field_defs={"INFO/DP": {"Description": "Combined depth across samples"}},
     )
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert_array_equal(ds["variant_DP"], [-1, -1, 14, 11, 10, 13, 9, -1, -1])
     assert ds["variant_DP"].attrs["comment"] == "Combined depth across samples"
@@ -662,7 +662,7 @@ def test_vcf_to_zarr__field_defs(shared_datadir, tmp_path):
         fields=["INFO/DP"],
         field_defs={"INFO/DP": {"Description": ""}},  # blank description
     )
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert_array_equal(ds["variant_DP"], [-1, -1, 14, 11, 10, 13, 9, -1, -1])
     assert "comment" not in ds["variant_DP"].attrs
@@ -679,7 +679,7 @@ def test_vcf_to_zarr__field_number_A(shared_datadir, tmp_path):
         fields=["INFO/AC"],
         field_defs={"INFO/AC": {"Number": "A"}},
     )
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert_array_equal(
         ds["variant_AC"],
@@ -711,7 +711,7 @@ def test_vcf_to_zarr__field_number_R(shared_datadir, tmp_path):
         fields=["FORMAT/AD"],
         field_defs={"FORMAT/AD": {"Number": "R"}},
     )
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     # select a small region to check
     ds = ds.set_index(variants="variant_position").sel(
@@ -738,7 +738,7 @@ def test_vcf_to_zarr__field_number_G(shared_datadir, tmp_path):
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
     vcf_to_zarr(path, output, fields=["FORMAT/PL"])
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     # select a small region to check
     ds = ds.set_index(variants="variant_position").sel(
@@ -765,7 +765,7 @@ def test_vcf_to_zarr__field_number_G_non_diploid(shared_datadir, tmp_path):
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
     vcf_to_zarr(path, output, ploidy=4, max_alt_alleles=3, fields=["FORMAT/GL"])
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     # comb(n_alleles + ploidy - 1, ploidy) = comb(4 + 4 - 1, 4) = comb(7, 4) = 35
     assert_array_equal(ds["call_GL"].shape, (4, 3, 35))
@@ -783,7 +783,7 @@ def test_vcf_to_zarr__field_number_fixed(shared_datadir, tmp_path):
         fields=["FORMAT/HQ"],
         field_defs={"FORMAT/HQ": {"dimension": "haplotypes"}},
     )
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     assert_array_equal(
         ds["call_HQ"],

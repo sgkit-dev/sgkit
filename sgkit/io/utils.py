@@ -30,12 +30,12 @@ def dataframe_to_dict(
     return arrs
 
 
-def encode_contigs(contig: ArrayLike) -> Tuple[np.ndarray, np.ndarray]:
+def encode_contigs(contig: ArrayLike) -> Tuple[ArrayLike, ArrayLike]:
     # TODO: test preservation of int16
     # If contigs are already integers, use them as-is
     if np.issubdtype(contig.dtype, np.integer):
         ids = contig
-        names = np.unique(np.asarray(ids)).astype(str)
+        names = np.unique(np.asarray(ids)).astype(str)  # type: ignore[no-untyped-call]
     # Otherwise create index for contig names based
     # on order of appearance in underlying file
     else:
@@ -149,7 +149,7 @@ def concatenate_and_rechunk(
         )
 
     lengths = np.array([z.shape[0] for z in zarrs])
-    lengths0 = np.insert(lengths, 0, 0, axis=0)
+    lengths0 = np.insert(lengths, 0, 0, axis=0)  # type: ignore[no-untyped-call]
     offsets = np.cumsum(lengths0)
     total_length = offsets[-1]
 
@@ -197,7 +197,7 @@ def _slice_zarrs(
         if stop > offsets[i1]:
             slices.append((i1, slice(0, stop - offsets[i1])))
         parts = [zarrs[i][(sel, *locs[1:])] for (i, sel) in slices]
-        return np.concatenate(parts)
+        return np.concatenate(parts)  # type: ignore[no-untyped-call]
 
 
 def str_is_int(x: str) -> bool:

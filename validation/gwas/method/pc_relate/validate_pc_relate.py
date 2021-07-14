@@ -33,6 +33,6 @@ def test_same_as_the_reference_implementation() -> None:
     genesis_phi = pd.read_csv(d.joinpath("kinbtwe.csv"))
     genesis_phi = genesis_phi[["kin"]].to_numpy()
 
-    phi_s = phi.data[np.triu_indices_from(phi.data, 1)]
+    phi_s = phi.data[np.triu_indices_from(phi.data, 1)]  # type: ignore[no-untyped-call]
     assert phi_s.size == genesis_phi.size
     assert np.allclose(phi_s, genesis_phi.T)

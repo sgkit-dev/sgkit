@@ -5,17 +5,19 @@ import networkx as nx
 import numpy as np
 import pytest
 import toolz
-from numpy import ndarray
+from numpy.typing import NDArray
 
 from sgkit.stats.ld import _maximal_independent_set as numba_mis
 
 
-def to_vertex_ids(g: nx.Graph) -> Tuple[ndarray, ndarray]:
+def to_vertex_ids(g: nx.Graph) -> Tuple[NDArray[np.int_], NDArray[np.int_]]:
     g = np.array(sorted(g.edges))
     return g[:, 0], g[:, 1]
 
 
-def plink_mis(idi: ndarray, idj: ndarray, cmp: Optional[ndarray] = None) -> List[int]:
+def plink_mis(
+    idi: NDArray[np.int_], idj: NDArray[np.int_], cmp: Optional[NDArray[np.int_]] = None
+) -> List[int]:
     # Direct port of https://groups.google.com/forum/#!msg/plink2-users/w5TuZo2fgsQ/WbNnE16_xDIJ
     if cmp is None:
         cmp = np.zeros(len(idi))

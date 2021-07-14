@@ -37,7 +37,7 @@ def test_ensure_2d():
 
 
 def test_read_vcfzarr(shared_datadir, tmpdir):
-    vcfzarr_path = create_vcfzarr(shared_datadir, tmpdir)  # type: ignore[no-untyped-call]
+    vcfzarr_path = create_vcfzarr(shared_datadir, tmpdir)
     ds = read_vcfzarr(vcfzarr_path)
 
     assert ds.attrs["contigs"] == ["19", "20", "X"]
@@ -123,7 +123,7 @@ def test_vcfzarr_to_zarr(
             "samples",
         ]
 
-    vcfzarr_path = create_vcfzarr(  # type: ignore[no-untyped-call]
+    vcfzarr_path = create_vcfzarr(
         shared_datadir,
         tmpdir,
         fields=fields,
@@ -140,7 +140,7 @@ def test_vcfzarr_to_zarr(
         consolidated=consolidated,
     )
 
-    ds = xr.open_zarr(output)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output)
 
     # Note that variant_allele values are byte strings, not unicode strings (unlike for read_vcfzarr)
     # We should make the two consistent.
