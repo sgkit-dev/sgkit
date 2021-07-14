@@ -3,7 +3,7 @@ from typing import Hashable, Optional
 import dask.array as da
 import numpy as np
 from numba import njit
-from numpy import ndarray
+from numpy.typing import NDArray
 from xarray import Dataset
 
 from sgkit import variables
@@ -104,8 +104,8 @@ hardy_weinberg_p_value_jit = njit(hardy_weinberg_p_value, fastmath=True, nogil=T
 
 
 def hardy_weinberg_p_value_vec(
-    obs_hets: ndarray, obs_hom1: ndarray, obs_hom2: ndarray
-) -> ndarray:
+    obs_hets: NDArray[np.int_], obs_hom1: NDArray[np.int_], obs_hom2: NDArray[np.int_]
+) -> NDArray[np.float64]:
     arrs = [obs_hets, obs_hom1, obs_hom2]
     if len(set(map(len, arrs))) != 1:
         raise ValueError("All arrays must have same length")

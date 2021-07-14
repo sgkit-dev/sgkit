@@ -68,7 +68,7 @@ def r2_score(YP: ArrayLike, YT: ArrayLike) -> ArrayLike:
         R2 scores array with shape equal to all leading
         (i.e. batch) dimensions of the provided arrays.
     """
-    YP, YT = np.broadcast_arrays(YP, YT)
+    YP, YT = np.broadcast_arrays(YP, YT)  # type: ignore[no-untyped-call]
     tot = np.power(YT - YT.mean(axis=-1, keepdims=True), 2)
     tot = tot.sum(axis=-1, keepdims=True)
     res = np.power(YT - YP, 2)

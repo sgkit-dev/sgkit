@@ -131,7 +131,7 @@ def test_read_bgen__contig_dtype(shared_datadir, dtype):
     ds = read_bgen(path, contig_dtype=dtype)
     dtype = np.dtype(dtype)
     if dtype.kind in {"U", "S"}:
-        assert ds["variant_contig"].dtype == np.int64
+        assert ds["variant_contig"].dtype == np.int64  # type: ignore[comparison-overlap]
     else:
         assert ds["variant_contig"].dtype == dtype
 

@@ -4,7 +4,7 @@ import dask.array as da
 import numpy as np
 import xarray as xr
 from dask.array import Array
-from numpy import ndarray
+from numpy.typing import NDArray
 from xarray import Dataset
 
 from .. import variables
@@ -21,7 +21,7 @@ from .utils import (
 
 def index_array_blocks(
     x: Union[ArrayLike, Sequence[int]], size: int
-) -> Tuple[ndarray, ndarray]:
+) -> Tuple[NDArray[np.int_], NDArray[np.int_]]:
     """Generate indexes for blocks that partition an array within groups.
 
     Given an array with monotonic increasing group assignments (as integers),
@@ -48,9 +48,9 @@ def index_array_blocks(
 
     Returns
     -------
-    index : ndarray
+    index
         Array of indexes for each block start
-    sizes : ndarray
+    sizes
         Size of block such that `x[index[0]:(index[0] + sizes[0])]` contains
         every element in block 0
 
@@ -74,21 +74,21 @@ def index_array_blocks(
         raise ValueError(f"Block size {size} must be > 0")
     if not np.issubdtype(x.dtype, np.integer):
         raise ValueError("Array to partition must contain integers")
-    if np.any(np.diff(x) < 0):
+    if np.any(np.diff(x) < 0):  # type: ignore[no-untyped-call]
         raise ValueError("Array to partition must be monotonic increasing")
-    breaks = np.argwhere(np.diff(x, prepend=x[0]))[:, 0]
-    breaks = np.concatenate(([0], breaks, [x.size]))
-    index = np.concatenate(
+    breaks = np.argwhere(np.diff(x, prepend=x[0]))[:, 0]  # type: ignore[no-untyped-call]
+    breaks = np.concatenate(([0], breaks, [x.size]))  # type: ignore[no-untyped-call]
+    index = np.concatenate(  # type: ignore[no-untyped-call]
         [np.arange(breaks[i], breaks[i + 1], size) for i in range(breaks.size - 1)]
     )
-    sizes = np.diff(index, append=x.size)
+    sizes = np.diff(index, append=x.size)  # type: ignore[no-untyped-call]
     assert index.size == sizes.size
     return index, sizes
 
 
 def index_block_sizes(
     sizes: Union[ArrayLike, Sequence[int]]
-) -> Tuple[ndarray, ndarray]:
+) -> Tuple[NDArray[np.int_], NDArray[np.int_]]:
     """Generate indexes for blocks of specific sizes.
 
     Parameters
@@ -104,9 +104,9 @@ def index_block_sizes(
 
     Returns
     -------
-    index : ndarray
+    index
         Array of indexes for each block start.
-    sizes : ndarray
+    sizes
         Size of block such that `x[index[0]:(index[0] + sizes[0])]` contains
         every element in block 0.
 
@@ -122,7 +122,7 @@ def index_block_sizes(
         raise ValueError("All block sizes must be >= 0")
     if not np.issubdtype(sizes.dtype, np.integer):
         raise ValueError("Block sizes must be integers")
-    chunks = np.concatenate([np.array([0]), sizes])
+    chunks = np.concatenate([np.array([0]), sizes])  # type: ignore[no-untyped-call]
     index = np.cumsum(chunks)[:-1]
     assert index.size == sizes.size
     return index, sizes
@@ -143,16 +143,16 @@ def ridge_regression(
     diags = []
     n_alpha, n_obs, n_outcome = len(alphas), XtX.shape[0], XtY.shape[1]
     for i in range(n_alpha):
-        diag = np.ones(XtX.shape[1]) * alphas[i]
+        diag: ArrayLike = np.ones(XtX.shape[1]) * alphas[i]
         if n_zero_reg:
             # Optionally fix regularization for leading covariates
             # TODO: This should probably be zero for consistency
             # with orthogonalization, see:
             # https://github.com/projectglow/glow/issues/266
             diag[:n_zero_reg] = 1
-        diags.append(np.diag(diag))
+        diags.append(np.diag(diag))  # type: ignore[no-untyped-call]
     diags = np.stack(diags)
-    B = np.linalg.inv(XtX + diags) @ XtY
+    B = np.linalg.inv(XtX + diags) @ XtY  # type: ignore[no-untyped-call]
     B = B.astype(dtype or XtX.dtype)
     assert_array_shape(B, n_alpha, n_obs, n_outcome)
     return B
@@ -160,7 +160,7 @@ def ridge_regression(
 
 def get_alphas(
     n_cols: int, heritability: Sequence[float] = [0.99, 0.75, 0.50, 0.25, 0.01]
-) -> ndarray:
+) -> NDArray[np.float_]:
     # https://github.com/projectglow/glow/blob/f3edf5bb8fe9c2d2e1a374d4402032ba5ce08e29/python/glow/wgr/linear_model/ridge_model.py#L80
     return np.array([n_cols / h for h in heritability])
 
@@ -176,7 +176,7 @@ def unstack(x: Array) -> Array:
 
 
 def _ridge_regression_cv(
-    X: Array, Y: Array, alphas: ndarray, n_zero_reg: Optional[int] = None
+    X: Array, Y: Array, alphas: NDArray[np.float_], n_zero_reg: Optional[int] = None
 ) -> Tuple[Array, Array, Array, Array]:
     assert alphas.ndim == 1
     assert X.ndim == 2
@@ -239,7 +239,9 @@ def _ridge_regression_cv(
     return XtX, XtY, B, YP
 
 
-def _stage_1(G: Array, X: Array, Y: Array, alphas: Optional[ndarray] = None) -> Array:
+def _stage_1(
+    G: Array, X: Array, Y: Array, alphas: Optional[NDArray[np.float_]] = None
+) -> Array:
     """Stage 1 - WGR Base Regression
 
     This stage will predict outcomes separately for each alpha parameter and variant
@@ -299,7 +301,7 @@ def _stage_2(
     YP: Array,
     X: Array,
     Y: Array,
-    alphas: Optional[ndarray] = None,
+    alphas: Optional[NDArray[np.float_]] = None,
     normalize: bool = True,
     _glow_adj_alpha: bool = False,
     _glow_adj_scaling: bool = False,
@@ -436,7 +438,7 @@ def _stage_3(
     X: Array,
     Y: Array,
     contigs: Array,
-    variant_chunk_start: ndarray,
+    variant_chunk_start: NDArray[np.int_],
 ) -> Optional[Array]:
     """Stage 3 - Leave-one-chromosome-out (LOCO) Estimation
 
@@ -466,7 +468,7 @@ def _stage_3(
 
     # Determine unique contigs to create LOCO estimates for
     contigs = np.asarray(contigs)
-    unique_contigs = np.unique(contigs)
+    unique_contigs = np.unique(contigs)  # type: ignore[no-untyped-call]
     n_contig = len(unique_contigs)
     if n_contig <= 1:
         # Return nothing w/o at least 2 contigs
@@ -571,7 +573,7 @@ def _stage_3(
 
 def _variant_block_indexes(
     variant_block_size: Union[int, Tuple[int, ...]], contigs: ArrayLike
-) -> Tuple[ndarray, ndarray]:
+) -> Tuple[NDArray[np.int_], NDArray[np.int_]]:
     if isinstance(variant_block_size, tuple):
         return index_block_sizes(variant_block_size)
     elif isinstance(variant_block_size, int):

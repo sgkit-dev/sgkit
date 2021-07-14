@@ -14,7 +14,7 @@ from hypothesis import given, settings
 from hypothesis import strategies as st
 from hypothesis.extra.numpy import arrays as st_arrays
 from hypothesis.strategies import data as st_data
-from numpy import ndarray
+from numpy.typing import NDArray
 from pandas import DataFrame
 from xarray import Dataset
 
@@ -27,6 +27,7 @@ from sgkit.stats.regenie import (
     ridge_regression,
 )
 from sgkit.testing import simulate_genotype_call_dataset
+from sgkit.typing import ArrayLike
 
 regenie_sim = functools.partial(
     regenie, dosage="call_dosage", covariates="sample_covariate", traits="sample_trait"
@@ -243,7 +244,7 @@ def check_simulation_result(
 
     # Load simulated data
     with zarr.ZipStore(str(dataset_dir / "genotypes.zarr.zip"), mode="r") as store:
-        ds = xr.open_zarr(store, consolidated=False)  # type: ignore[no-untyped-call]
+        ds = xr.open_zarr(store, consolidated=False)
         df_covariate = load_covariates(dataset_dir)
         df_trait = load_traits(dataset_dir)
         contigs = ds["variant_contig"].values
@@ -314,7 +315,7 @@ def test_regenie__32bit_float(ds):
     # results in arrays with the same type
     res = regenie_sim(ds=ds, merge=False)
     for v in res:
-        assert res[v].dtype == np.float32
+        assert res[v].dtype == np.float32  # type: ignore[comparison-overlap]
 
 
 def test_regenie__custom_variant_block_size(ds):
@@ -360,8 +361,10 @@ def test_ridge_regression():
     alphas = np.array([0.0, 1.0, 10.0])
     n_obs, n_covariate, n_trait = 25, 5, 3
     X = rs.normal(size=(n_obs, n_covariate))
-    Y = X @ rs.normal(size=(n_covariate, n_trait)) + rs.normal(size=(n_obs, 1))
-    XtX, XtY = X.T @ X, X.T @ Y
+    Y: ArrayLike = X @ rs.normal(size=(n_covariate, n_trait)) + rs.normal(
+        size=(n_obs, 1)
+    )
+    XtX, XtY = X.T @ X, X.T @ Y  # type: ignore[var-annotated]
 
     # Check that results are equal for multiple alphas
     res1 = ridge_regression(XtX, XtY, alphas)
@@ -427,7 +430,7 @@ def test_index_array_blocks__raise_on_not_monotonic_increasing():
 
 
 @st.composite
-def monotonic_increasing_ints(draw: Any) -> ndarray:
+def monotonic_increasing_ints(draw: Any) -> NDArray[np.int_]:
     # Draw increasing ints with repeats, e.g. [0, 0, 5, 7, 7, 7]
     n = draw(st.integers(min_value=0, max_value=5))
     repeats = draw(
@@ -442,7 +445,7 @@ def monotonic_increasing_ints(draw: Any) -> ndarray:
 
 @given(st_data(), monotonic_increasing_ints())
 @settings(max_examples=50)
-def test_index_array_blocks__coverage(data: Any, x: ndarray) -> None:
+def test_index_array_blocks__coverage(data: Any, x: NDArray[np.int_]) -> None:
     # Draw block size that is no less than 1 but possibly
     # greater than or equal to the size of the array
     size = data.draw(st.integers(min_value=1, max_value=len(x) + 1))

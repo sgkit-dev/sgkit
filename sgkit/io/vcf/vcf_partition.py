@@ -158,10 +158,10 @@ def partition_into_regions(
     ind = np.searchsorted(file_offsets, part_lengths)
 
     # Drop any parts that are greater than the file offsets (these will be covered by a region with no end)
-    ind = np.delete(ind, ind >= len(file_offsets))
+    ind = np.delete(ind, ind >= len(file_offsets))  # type: ignore[no-untyped-call]
 
     # Drop any duplicates
-    ind = np.unique(ind)
+    ind = np.unique(ind)  # type: ignore[no-untyped-call]
 
     # Calculate region contig and start for each index
     region_contigs = region_contig_indexes[ind]

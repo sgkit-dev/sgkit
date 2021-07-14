@@ -7,6 +7,7 @@ import dask.dataframe as dd
 import numpy as np
 from bed_reader import open_bed
 from dask.dataframe import DataFrame
+from numpy.typing import NDArray
 from xarray import Dataset
 
 from sgkit import create_genotype_call_dataset
@@ -62,7 +63,7 @@ class BedReader(object):
         self.dtype = dtype
         self.ndim = 3
 
-    def __getitem__(self, idx: Tuple[Any, ...]) -> np.ndarray:
+    def __getitem__(self, idx: Tuple[Any, ...]) -> NDArray[Any]:
         if not isinstance(idx, tuple):
             raise IndexError(  # pragma: no cover
                 f"Indexer must be tuple (received {type(idx)})"

@@ -5,6 +5,7 @@ import dask.array as da
 import numpy as np
 import pytest
 import xarray as xr
+from numpy.typing import NDArray
 from xarray import Dataset
 
 from sgkit.stats import pca
@@ -15,7 +16,7 @@ from sgkit.typing import ArrayLike
 
 def simulate_cohort_genotypes(
     n_variant: int, n_sample: int, n_cohort: int, seed: int = 0
-) -> np.ndarray:
+) -> NDArray[np.int8]:
     """ Sample genotypes from distinct ancestral populations """
     rs = np.random.RandomState(seed)
     # Determine size of each cohort (which will be roughly equal)

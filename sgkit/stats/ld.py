@@ -1,5 +1,5 @@
 import math
-from typing import Any, Hashable, List, Optional
+from typing import Any, Hashable, List, Optional, Tuple
 
 import dask
 import dask.array as da
@@ -155,7 +155,7 @@ def ld_matrix(
         chunk_window_stops = rel_window_stops[
             chunk_offset_index_start:chunk_offset_index_stop
         ]
-        max_stop = np.max(chunk_window_stops) if len(chunk_window_stops) > 0 else 0
+        max_stop = np.max(chunk_window_stops) if len(chunk_window_stops) > 0 else 0  # type: ignore[no-untyped-call]
         abs_chunk_start = chunk_starts[chunk_index]
         abs_chunk_end = abs_chunk_start + max_stop  # this may extend into later chunks
         block_x = x[abs_chunk_start:abs_chunk_end]
@@ -188,7 +188,11 @@ def ld_matrix(
             threshold=threshold,
             scores=block_scores,
         )
-        meta = [("i", index_dtype), ("j", index_dtype), ("value", value_dtype)]
+        meta: List[Tuple[str, DType]] = [
+            ("i", index_dtype),
+            ("j", index_dtype),
+            ("value", value_dtype),
+        ]
         if scores is not None:
             meta.append(("cmp", np.int8))
         return dd.from_delayed([f], meta=meta)

@@ -23,6 +23,7 @@ import pandas as pd
 import xarray as xr
 import zarr
 from cbgen import bgen_file, bgen_metafile
+from numpy.typing import NDArray
 from rechunker import api as rechunker_api
 from xarray import Dataset
 
@@ -92,7 +93,7 @@ class BgenReader:
         self.precision = 64 if self.dtype.itemsize >= 8 else 32
         self.ndim = 3
 
-    def __getitem__(self, idx: Any) -> np.ndarray:
+    def __getitem__(self, idx: Any) -> NDArray[Any]:
         if not isinstance(idx, tuple):
             raise IndexError(f"Indexer must be tuple (received {type(idx)})")
         if len(idx) != self.ndim:
@@ -326,7 +327,7 @@ def _default_sample_ids(path: PathType) -> ArrayLike:
         if bgen.contain_samples:
             return bgen.read_samples()
         else:
-            return np.char.add(b"sample_", np.arange(bgen.nsamples).astype("S"))
+            return np.char.add(b"sample_", np.arange(bgen.nsamples).astype("S"))  # type: ignore[no-untyped-call]
 
 
 def _to_dosage(probs: ArrayLike) -> ArrayLike:

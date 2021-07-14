@@ -228,7 +228,7 @@ def _window_per_contig(
     contig_ids = np.arange(n_contigs)
     variant_contig = ds["variant_contig"]
     contig_starts = np.searchsorted(variant_contig.values, contig_ids)
-    contig_bounds = np.append(contig_starts, [n_variants], axis=0)
+    contig_bounds = np.append(contig_starts, [n_variants], axis=0)  # type: ignore[no-untyped-call]
 
     contig_window_contigs = []
     contig_window_starts = []
@@ -241,9 +241,9 @@ def _window_per_contig(
         contig_window_stops.append(stops)
         contig_window_contigs.append(np.full_like(starts, i))
 
-    window_contigs = np.concatenate(contig_window_contigs)
-    window_starts = np.concatenate(contig_window_starts)
-    window_stops = np.concatenate(contig_window_stops)
+    window_contigs = np.concatenate(contig_window_contigs)  # type: ignore[no-untyped-call]
+    window_starts = np.concatenate(contig_window_starts)  # type: ignore[no-untyped-call]
+    window_stops = np.concatenate(contig_window_stops)  # type: ignore[no-untyped-call]
 
     new_ds = create_dataset(
         {
@@ -316,9 +316,10 @@ def moving_statistic(
     length = values.shape[0]
     chunks = values.chunks[0]
     if len(chunks) > 1:
-        min_chunksize = np.min(chunks[:-1])  # ignore last chunk
+        # ignore last chunk
+        min_chunksize = np.min(chunks[:-1])  # type: ignore[no-untyped-call]
     else:
-        min_chunksize = np.min(chunks)
+        min_chunksize = np.min(chunks)  # type: ignore[no-untyped-call]
     if min_chunksize < size:
         raise ValueError(
             f"Minimum chunk size ({min_chunksize}) must not be smaller than size ({size})."
@@ -344,7 +345,7 @@ def window_statistic(
     desired_chunks = chunks or values.chunks
 
     window_lengths = window_stops - window_starts
-    depth = np.max(window_lengths)
+    depth = np.max(window_lengths)  # type: ignore[no-untyped-call]
 
     # Dask will raise an error if the last chunk size is smaller than the depth
     # Workaround by rechunking to combine the last two chunks in first axis
@@ -402,7 +403,7 @@ def window_statistic(
 
 def _sizes_to_start_offsets(sizes: ArrayLike) -> ArrayLike:
     """Convert an array of sizes, to cumulative offsets, starting with 0"""
-    return np.cumsum(np.insert(sizes, 0, 0, axis=0))
+    return np.cumsum(np.insert(sizes, 0, 0, axis=0))  # type: ignore[no-untyped-call]
 
 
 def _get_chunked_windows(
@@ -417,13 +418,15 @@ def _get_chunked_windows(
     chunk_starts = _sizes_to_start_offsets(chunks)
 
     # Find which chunk each window falls in
-    chunk_numbers = np.searchsorted(chunk_starts, window_starts, side="right") - 1
+    chunk_numbers: ArrayLike = (
+        np.searchsorted(chunk_starts, window_starts, side="right") - 1
+    )
 
     # Find the start positions for each window relative to each chunk start
     rel_window_starts = window_starts - chunk_starts[chunk_numbers]
 
     # Find the number of windows in each chunk
-    unique_chunk_numbers, unique_chunk_counts = np.unique(
+    unique_chunk_numbers, unique_chunk_counts = np.unique(  # type: ignore[no-untyped-call]
         chunk_numbers, return_counts=True
     )
     windows_per_chunk = np.zeros_like(chunks)
