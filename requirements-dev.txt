@@ -19,3 +19,5 @@ yarl
 matplotlib
 asv
 networkx
+aiohttp
+requests
