@@ -10,3 +10,4 @@ scanpydoc
 ipython
 matplotlib
 graphviz
+seaborn
