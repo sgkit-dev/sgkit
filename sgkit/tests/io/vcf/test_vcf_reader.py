@@ -3,6 +3,8 @@ from typing import MutableMapping
 import numpy as np
 import pytest
 import xarray as xr
+import zarr
+from numcodecs import Blosc, PackBits
 from numpy.testing import assert_allclose, assert_array_equal
 
 from sgkit import load_dataset
@@ -176,6 +178,39 @@ def test_vcf_to_zarr__mutable_mapping(shared_datadir, is_path):
 
     assert ds["variant_allele"].dtype == "O"
     assert ds["variant_id"].dtype == "O"
+
+
+@pytest.mark.parametrize(
+    "is_path",
+    [True, False],
+)
+def test_vcf_to_zarr__compressor_and_filters(shared_datadir, is_path, tmp_path):
+    path = path_for_test(shared_datadir, "sample.vcf.gz", is_path)
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    default_compressor = Blosc("zlib", 1, Blosc.NOSHUFFLE)
+    variant_id_compressor = Blosc("zlib", 2, Blosc.NOSHUFFLE)
+    encoding = dict(
+        variant_id=dict(compressor=variant_id_compressor),
+        variant_id_mask=dict(filters=None),
+    )
+    vcf_to_zarr(
+        path,
+        output,
+        chunk_length=5,
+        chunk_width=2,
+        compressor=default_compressor,
+        encoding=encoding,
+    )
+
+    # look at actual Zarr store to check compressor and filters
+    z = zarr.open(output)
+    assert z["call_genotype"].compressor == default_compressor
+    assert z["call_genotype"].filters is None
+    assert z["call_genotype_mask"].filters == [PackBits()]
+
+    assert z["variant_id"].compressor == variant_id_compressor
+    assert z["variant_id_mask"].filters is None
 
 
 @pytest.mark.parametrize(
