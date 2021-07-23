@@ -20,6 +20,7 @@ import fsspec
 import numpy as np
 import xarray as xr
 from cyvcf2 import VCF, Variant
+from numcodecs import Blosc, PackBits
 
 from sgkit import variables
 from sgkit.io.utils import zarrs_to_dataset
@@ -331,6 +332,10 @@ def vcf_to_zarr_sequential(
     region: Optional[str] = None,
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
+    compressor: Optional[Any] = Blosc(
+        cname="zstd", clevel=7, shuffle=Blosc.AUTOSHUFFLE
+    ),
+    encoding: Optional[Any] = None,
     ploidy: int = 2,
     mixed_ploidy: bool = False,
     truncate_calls: bool = False,
@@ -458,15 +463,24 @@ def vcf_to_zarr_sequential(
                     else:
                         return size
 
-                encoding = {}
+                default_encoding = {}
                 for var in ds.data_vars:
                     var_chunks = tuple(
                         get_chunk_size(dim, size)
                         for (dim, size) in zip(ds[var].dims, ds[var].shape)
                     )
-                    encoding[var] = dict(chunks=var_chunks)
+                    default_encoding[var] = dict(
+                        chunks=var_chunks, compressor=compressor
+                    )
+                    if ds[var].dtype.kind == "b":
+                        default_encoding[var]["filters"] = [PackBits()]
 
-                ds.to_zarr(output, mode="w", encoding=encoding)
+                # values from function args (encoding) take precedence over default_encoding
+                encoding = encoding or {}
+                merged_encoding = {**default_encoding, **encoding}
+                print(merged_encoding)
+
+                ds.to_zarr(output, mode="w", encoding=merged_encoding)
                 first_variants_chunk = False
             else:
                 # Append along the variants dimension
@@ -479,6 +493,10 @@ def vcf_to_zarr_parallel(
     regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]],
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
+    compressor: Optional[Any] = Blosc(
+        cname="zstd", clevel=7, shuffle=Blosc.AUTOSHUFFLE
+    ),
+    encoding: Optional[Any] = None,
     temp_chunk_length: Optional[int] = None,
     tempdir: Optional[PathType] = None,
     tempdir_storage_options: Optional[Dict[str, str]] = None,
@@ -506,6 +524,8 @@ def vcf_to_zarr_parallel(
             regions,
             temp_chunk_length,
             chunk_width,
+            compressor,
+            encoding,
             tempdir_storage_options,
             ploidy=ploidy,
             mixed_ploidy=mixed_ploidy,
@@ -529,6 +549,10 @@ def vcf_to_zarrs(
     regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]],
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
+    compressor: Optional[Any] = Blosc(
+        cname="zstd", clevel=7, shuffle=Blosc.AUTOSHUFFLE
+    ),
+    encoding: Optional[Any] = None,
     output_storage_options: Optional[Dict[str, str]] = None,
     ploidy: int = 2,
     mixed_ploidy: bool = False,
@@ -556,6 +580,14 @@ def vcf_to_zarrs(
         Length (number of variants) of chunks in which data are stored, by default 10,000.
     chunk_width
         Width (number of samples) to use when storing chunks in output, by default 1,000.
+    compressor
+        Zarr compressor, by default Blosc + zstd with compression level 7 and auto-shuffle.
+        No compression is used when set as None.
+    encoding
+        Variable-specific encodings for xarray, specified as a nested dictionary with
+        variable names as keys and dictionaries of variable specific encodings as values.
+        Can be used to override Zarr compressor and filters on a per-variable basis,
+        e.g., ``{"call_genotype": {"compressor": Blosc("zstd", 9)}}``.
     output_storage_options
         Any additional parameters for the storage backend, for the output (see ``fsspec.open``).
     ploidy
@@ -634,6 +666,8 @@ def vcf_to_zarrs(
                 region=region,
                 chunk_length=chunk_length,
                 chunk_width=chunk_width,
+                compressor=compressor,
+                encoding=encoding,
                 ploidy=ploidy,
                 mixed_ploidy=mixed_ploidy,
                 truncate_calls=truncate_calls,
@@ -656,6 +690,10 @@ def vcf_to_zarr(
     regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]] = None,
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
+    compressor: Optional[Any] = Blosc(
+        cname="zstd", clevel=7, shuffle=Blosc.AUTOSHUFFLE
+    ),
+    encoding: Optional[Any] = None,
     temp_chunk_length: Optional[int] = None,
     tempdir: Optional[PathType] = None,
     tempdir_storage_options: Optional[Dict[str, str]] = None,
@@ -703,6 +741,14 @@ def vcf_to_zarr(
         Length (number of variants) of chunks in which data are stored, by default 10,000.
     chunk_width
         Width (number of samples) to use when storing chunks in output, by default 1,000.
+    compressor
+        Zarr compressor, by default Blosc + zstd with compression level 7 and auto-shuffle.
+        No compression is used when set as None.
+    encoding
+        Variable-specific encodings for xarray, specified as a nested dictionary with
+        variable names as keys and dictionaries of variable specific encodings as values.
+        Can be used to override Zarr compressor and filters on a per-variable basis,
+        e.g., ``{"call_genotype": {"compressor": Blosc("zstd", 9)}}``.
     temp_chunk_length
         Length (number of variants) of chunks for temporary intermediate files. Set this
         to be smaller than ``chunk_length`` to avoid memory errors when loading files with
@@ -782,6 +828,8 @@ def vcf_to_zarr(
         regions,  # type: ignore
         chunk_length=chunk_length,
         chunk_width=chunk_width,
+        compressor=compressor,
+        encoding=encoding,
         ploidy=ploidy,
         mixed_ploidy=mixed_ploidy,
         truncate_calls=truncate_calls,
