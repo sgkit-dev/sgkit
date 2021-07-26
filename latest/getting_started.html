@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.e8e5499552300ddf5d7adccae7cc3b70.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/typehints.css" />
     
   <link rel="preload" as="script" href="_static/js/index.1c5a1a01449ed65a7b51.js">
@@ -828,8 +828,8 @@ several of the sgkit conventions in place for representing common genetic quanti
 <span class="gp">In [3]: </span><span class="n">ds</span>
 <span class="gh">Out[3]: </span><span class="go"></span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:             (alleles: 2, ploidy: 2, samples: 250, variants: 1000)</span>
-<span class="go">Dimensions without coordinates: alleles, ploidy, samples, variants</span>
+<span class="go">Dimensions:             (variants: 1000, alleles: 2, samples: 250, ploidy: 2)</span>
+<span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
 <span class="go">Data variables:</span>
 <span class="go">    variant_contig      (variants) int64 0 0 0 0 0 0 0 ... 22 22 22 22 22 22 22</span>
 <span class="go">    variant_position    (variants) int64 0 1 2 3 4 5 6 ... 36 37 38 39 40 41 42</span>
@@ -855,8 +855,8 @@ information on this specific variable and any others, see <a class="reference in
 <span class="gp">In [6]: </span><span class="n">ds</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">variants</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">samples</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
 <span class="gh">Out[6]: </span><span class="go"></span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:             (alleles: 2, ploidy: 2, samples: 10, variants: 10)</span>
-<span class="go">Dimensions without coordinates: alleles, ploidy, samples, variants</span>
+<span class="go">Dimensions:             (variants: 10, alleles: 2, samples: 10, ploidy: 2)</span>
+<span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
 <span class="go">Data variables:</span>
 <span class="go">    variant_contig      (variants) int64 0 0 0 0 0 1 1 1 1 1</span>
 <span class="go">    variant_position    (variants) int64 0 1 2 3 4 0 1 2 3 4</span>
@@ -871,8 +871,8 @@ information on this specific variable and any others, see <a class="reference in
 <span class="gp">In [7]: </span><span class="n">ds</span><span class="p">[[</span><span class="s1">&#39;variant_allele&#39;</span><span class="p">,</span> <span class="s1">&#39;call_genotype&#39;</span><span class="p">]]</span>
 <span class="gh">Out[7]: </span><span class="go"></span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:         (alleles: 2, ploidy: 2, samples: 50, variants: 100)</span>
-<span class="go">Dimensions without coordinates: alleles, ploidy, samples, variants</span>
+<span class="go">Dimensions:         (variants: 100, alleles: 2, samples: 50, ploidy: 2)</span>
+<span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
 <span class="go">Data variables:</span>
 <span class="go">    variant_allele  (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; b&#39;C&#39; ... b&#39;T&#39; b&#39;T&#39; b&#39;A&#39;</span>
 <span class="go">    call_genotype   (variants, samples, ploidy) int8 0 0 1 0 1 0 ... 0 1 0 1 0 0</span>
@@ -1031,8 +1031,8 @@ across samples for each individual variant:</p>
 <span class="gp">In [25]: </span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="gh">Out[25]: </span><span class="go"></span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:                   (alleles: 2, variants: 100)</span>
-<span class="go">Dimensions without coordinates: alleles, variants</span>
+<span class="go">Dimensions:                   (variants: 100, alleles: 2)</span>
+<span class="go">Dimensions without coordinates: variants, alleles</span>
 <span class="go">Data variables:</span>
 <span class="go">    variant_n_called          (variants) int64 40 42 43 40 41 ... 42 38 43 43 40</span>
 <span class="go">    variant_call_rate         (variants) float64 0.8 0.84 0.86 ... 0.86 0.86 0.8</span>
@@ -1178,10 +1178,10 @@ then with windows.</p>
 <span class="gp">In [44]: </span><span class="n">sg</span><span class="o">.</span><span class="n">diversity</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="gh">Out[44]: </span><span class="go"></span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:         (cohorts: 1, variants: 100)</span>
-<span class="go">Dimensions without coordinates: cohorts, variants</span>
+<span class="go">Dimensions:         (variants: 100, cohorts: 1)</span>
+<span class="go">Dimensions without coordinates: variants, cohorts</span>
 <span class="go">Data variables:</span>
-<span class="go">    stat_diversity  (variants, cohorts) float64 0.4978 0.4978 ... 0.4921 0.4978</span>
+<span class="go">    stat_diversity  (variants, cohorts) float64 dask.array&lt;chunksize=(100, 1), meta=np.ndarray&gt;</span>
 
 <span class="go"># Define windows of size 20 variants. This creates a new dimension called `windows`, and</span>
 <span class="go"># some new variables for internal use.</span>
@@ -1191,8 +1191,8 @@ then with windows.</p>
 <span class="gp">In [46]: </span><span class="n">sg</span><span class="o">.</span><span class="n">diversity</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="gh">Out[46]: </span><span class="go"></span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:         (cohorts: 1, windows: 5)</span>
-<span class="go">Dimensions without coordinates: cohorts, windows</span>
+<span class="go">Dimensions:         (windows: 5, cohorts: 1)</span>
+<span class="go">Dimensions without coordinates: windows, cohorts</span>
 <span class="go">Data variables:</span>
 <span class="go">    stat_diversity  (windows, cohorts) float64 dask.array&lt;chunksize=(5, 1), meta=np.ndarray&gt;</span>
 </pre></div>
@@ -1255,8 +1255,8 @@ Xarray and Pandas operations in a single pipeline:</p>
 <span class="gp">In [59]: </span><span class="n">ds_qc</span>
 <span class="gh">Out[59]: </span><span class="go"></span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:                   (alleles: 2, variants: 100)</span>
-<span class="go">Dimensions without coordinates: alleles, variants</span>
+<span class="go">Dimensions:                   (variants: 100, alleles: 2)</span>
+<span class="go">Dimensions without coordinates: variants, alleles</span>
 <span class="go">Data variables:</span>
 <span class="go">    variant_n_called          (variants) int64 40 42 43 40 41 ... 42 38 43 43 40</span>
 <span class="go">    variant_call_rate         (variants) float64 0.8 0.84 0.86 ... 0.86 0.86 0.8</span>
@@ -1339,8 +1339,8 @@ until one of the following occurs:</p>
 <span class="gp">In [65]: </span><span class="n">ds</span>
 <span class="gh">Out[65]: </span><span class="go"></span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:             (alleles: 2, ploidy: 2, samples: 50, variants: 100)</span>
-<span class="go">Dimensions without coordinates: alleles, ploidy, samples, variants</span>
+<span class="go">Dimensions:             (variants: 100, alleles: 2, samples: 50, ploidy: 2)</span>
+<span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
 <span class="go">Data variables:</span>
 <span class="go">    variant_contig      (variants) int64 dask.array&lt;chunksize=(50,), meta=np.ndarray&gt;</span>
 <span class="go">    variant_position    (variants) int64 dask.array&lt;chunksize=(50,), meta=np.ndarray&gt;</span>
