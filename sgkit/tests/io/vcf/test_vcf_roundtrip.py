@@ -114,17 +114,23 @@ def test_DP_field(shared_datadir, tmpdir):
 
 
 @pytest.mark.parametrize(
-    "vcf_file,allel_exclude_fields,sgkit_exclude_fields",
+    "vcf_file,allel_exclude_fields,sgkit_exclude_fields,max_alt_alleles",
     [
-        ("sample.vcf.gz", None, None),
-        ("mixed.vcf.gz", None, None),
+        ("sample.vcf.gz", None, None, 3),
+        ("mixed.vcf.gz", None, None, 3),
         # exclude PL since it has Number=G, which is not yet supported
-        ("CEUTrio.20.21.gatk3.4.g.vcf.bgz", ["calldata/PL"], ["FORMAT/PL"]),
+        # increase max_alt_alleles since scikit-allel does not truncate genotype calls
+        ("CEUTrio.20.21.gatk3.4.g.vcf.bgz", ["calldata/PL"], ["FORMAT/PL"], 7),
     ],
 )
 @pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
 def test_all_fields(
-    shared_datadir, tmpdir, vcf_file, allel_exclude_fields, sgkit_exclude_fields
+    shared_datadir,
+    tmpdir,
+    vcf_file,
+    allel_exclude_fields,
+    sgkit_exclude_fields,
+    max_alt_alleles,
 ):
     # change scikit-allel type defaults back to the VCF default
     types = {
@@ -140,6 +146,7 @@ def test_all_fields(
         fields=["*"],
         exclude_fields=allel_exclude_fields,
         types=types,
+        alt_number=max_alt_alleles,
     )
 
     field_defs = {
@@ -159,6 +166,7 @@ def test_all_fields(
         exclude_fields=sgkit_exclude_fields,
         field_defs=field_defs,
         truncate_calls=True,
+        max_alt_alleles=max_alt_alleles,
     )
     sg_ds = sg.load_dataset(str(sg_vcfzarr_path))
     sg_ds = sg_ds.drop_vars("call_genotype_phased")  # not included in scikit-allel

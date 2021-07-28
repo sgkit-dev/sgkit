@@ -103,7 +103,10 @@ def test_vcf_to_zarr__max_alt_alleles(shared_datadir, is_path, tmp_path):
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
     with pytest.warns(MaxAltAllelesExceededWarning):
-        vcf_to_zarr(path, output, chunk_length=5, chunk_width=2, max_alt_alleles=1)
+        max_alt_alleles = 1
+        vcf_to_zarr(
+            path, output, chunk_length=5, chunk_width=2, max_alt_alleles=max_alt_alleles
+        )
         ds = xr.open_zarr(output)
 
         # extra alt alleles are dropped
@@ -121,6 +124,9 @@ def test_vcf_to_zarr__max_alt_alleles(shared_datadir, is_path, tmp_path):
                 ["AC", "A"],
             ],
         )
+
+        # genotype calls are truncated
+        assert np.all(ds["call_genotype"].values <= max_alt_alleles)
 
         # the maximum number of alt alleles actually seen is stored as an attribute
         assert ds.attrs["max_alt_alleles_seen"] == 3

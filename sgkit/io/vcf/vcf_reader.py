@@ -161,7 +161,7 @@ class VcfFieldHandler:
     ) -> "VcfFieldHandler":
         if field == "FORMAT/GT":
             return GenotypeFieldHandler(
-                vcf, chunk_length, ploidy, mixed_ploidy, truncate_calls
+                vcf, chunk_length, ploidy, mixed_ploidy, truncate_calls, max_alt_alleles
             )
         category = field.split("/")[0]
         vcf_field_defs = _get_vcf_field_defs(vcf, category)
@@ -286,6 +286,7 @@ class GenotypeFieldHandler(VcfFieldHandler):
         ploidy: int,
         mixed_ploidy: bool,
         truncate_calls: bool,
+        max_alt_alleles: int,
     ) -> None:
         n_sample = len(vcf.samples)
         self.call_genotype = np.empty((chunk_length, n_sample, ploidy), dtype="i1")
@@ -293,6 +294,7 @@ class GenotypeFieldHandler(VcfFieldHandler):
         self.ploidy = ploidy
         self.mixed_ploidy = mixed_ploidy
         self.truncate_calls = truncate_calls
+        self.max_alt_alleles = max_alt_alleles
 
     def add_variant(self, i: int, variant: Any) -> None:
         fill = -2 if self.mixed_ploidy else -1
@@ -305,6 +307,10 @@ class GenotypeFieldHandler(VcfFieldHandler):
             self.call_genotype[i, ..., 0:n] = gt[..., 0:n]
             self.call_genotype[i, ..., n:] = fill
             self.call_genotype_phased[i] = gt[..., -1]
+
+            # set any calls that exceed maximum number of alt alleles as missing
+            self.call_genotype[i][self.call_genotype[i] > self.max_alt_alleles] = -1
+
         else:
             self.call_genotype[i] = fill
             self.call_genotype_phased[i] = 0
@@ -616,7 +622,8 @@ def vcf_to_zarrs(
     max_alt_alleles
         The (maximum) number of alternate alleles in the VCF file. Any records with more than
         this number of alternate alleles will have the extra alleles dropped (the `variant_allele`
-        variable will be truncated). Call genotype fields will however be unaffected.
+        variable will be truncated). Any call genotype fields with the extra alleles will
+        be changed to the missing-allele sentinel value of -1.
     fields
         Extra fields to extract data for. A list of strings, with ``INFO`` or ``FORMAT`` prefixes.
         Wildcards are permitted too, for example: ``["INFO/*", "FORMAT/DP"]``.
@@ -784,7 +791,8 @@ def vcf_to_zarr(
     max_alt_alleles
         The (maximum) number of alternate alleles in the VCF file. Any records with more than
         this number of alternate alleles will have the extra alleles dropped (the `variant_allele`
-        variable will be truncated). Call genotype fields will however be unaffected.
+        variable will be truncated). Any call genotype fields with the extra alleles will
+        be changed to the missing-allele sentinel value of -1.
     fields
         Extra fields to extract data for. A list of strings, with ``INFO`` or ``FORMAT`` prefixes.
         Wildcards are permitted too, for example: ``["INFO/*", "FORMAT/DP"]``.
