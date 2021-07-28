@@ -222,17 +222,17 @@ def _inner_loco_regression(
             assert hasattr(cp, "asnumpy")
 
             assert isinstance(B, da.Array)
-            if isinstance(B._meta, cp.ndarray):
-                B = B.map_blocks(cp.asnumpy, dtype=B.dtype)
+            if isinstance(B._meta, cp.ndarray):  # type: ignore[attr-defined]
+                B = B.map_blocks(cp.asnumpy, dtype=B.dtype)  # type: ignore[attr-defined]
 
             assert isinstance(T, da.Array)
-            if isinstance(T._meta, cp.ndarray):
-                T = T.map_blocks(cp.asnumpy, dtype=T.dtype)
+            if isinstance(T._meta, cp.ndarray):  # type: ignore[attr-defined]
+                T = T.map_blocks(cp.asnumpy, dtype=T.dtype)  # type: ignore[attr-defined]
 
             assert isinstance(effect_size, da.Array)
-            if isinstance(effect_size._meta, cp.ndarray):
+            if isinstance(effect_size._meta, cp.ndarray):  # type: ignore[attr-defined]
                 effect_size = effect_size.map_blocks(
-                    cp.asnumpy, dtype=effect_size.dtype
+                    cp.asnumpy, dtype=effect_size.dtype  # type: ignore[attr-defined]
                 )
         except Exception:
             pass
@@ -482,29 +482,29 @@ def regenie_gwas_linear_regression(
 
     G = _get_loop_covariates(ds, call_genotype, dosage)
     if gpu_avail:
-        G = G.map_blocks(cp.asarray)
+        G = G.map_blocks(cp.asarray)  # type: ignore[attr-defined]
 
     contigs = da.asarray(ds[variant_contigs].data)
     if gpu_avail:
-        contigs = contigs.map_blocks(cp.asarray)
+        contigs = contigs.map_blocks(cp.asarray)  # type: ignore[attr-defined]
     # Pre-compute contigs to have concrete indices to slice the genotype array
     contigs = contigs.compute()
 
     if gpu_avail:
-        assert isinstance(contigs, cp.ndarray)
+        assert isinstance(contigs, cp.ndarray)  # type: ignore[attr-defined]
     else:
         assert isinstance(contigs, np.ndarray)
 
     # Load covariates and add intercept if necessary
     covariates = da.asarray(ds[covariates].data)
     if gpu_avail:
-        covariates = covariates.map_blocks(cp.asarray)
+        covariates = covariates.map_blocks(cp.asarray)  # type: ignore[attr-defined]
 
     if len(covariates) == 0:
         if add_intercept:
             X = da.ones((ds[traits].shape[0], 1), dtype=np.float32)
             if gpu_avail:
-                X = X.map_blocks(cp.asarray)
+                X = X.map_blocks(cp.asarray)  # type: ignore[attr-defined]
         else:
             raise ValueError("add_intercept must be True if no covariates specified")
     else:
@@ -513,7 +513,7 @@ def regenie_gwas_linear_regression(
         if add_intercept:
             intercept_arr = da.ones((X.shape[0], 1), dtype=X.dtype)
             if gpu_avail:
-                intercept_arr = intercept_arr.map_blocks(cp.asarray)
+                intercept_arr = intercept_arr.map_blocks(cp.asarray)  # type: ignore[attr-defined]
             X = da.concatenate([intercept_arr, X], axis=1)
 
     assert isinstance(X, da.Array)
@@ -533,7 +533,7 @@ def regenie_gwas_linear_regression(
 
     Y = da.asarray(ds[traits].data)
     if gpu_avail:
-        Y = Y.map_blocks(cp.asarray)
+        Y = Y.map_blocks(cp.asarray)  # type: ignore[attr-defined]
     Y_mask = (~da.isnan(Y)).astype("float64")
     Y = da.nan_to_num(Y)
     # Mean-center
@@ -548,7 +548,7 @@ def regenie_gwas_linear_regression(
 
     offsets = da.asarray(ds[loco_predicts].data)
     if gpu_avail:
-        offsets = offsets.map_blocks(cp.asarray)
+        offsets = offsets.map_blocks(cp.asarray)  # type: ignore[attr-defined]
     # Match chunksize of Y
     offsets = offsets.rechunk((None, Y.chunksize[0], Y.chunksize[1]))
 
