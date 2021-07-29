@@ -1,5 +1,6 @@
 import functools
 import itertools
+import warnings
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,7 +21,7 @@ import fsspec
 import numpy as np
 import xarray as xr
 from cyvcf2 import VCF, Variant
-from numcodecs import Blosc, PackBits
+from numcodecs import PackBits
 
 from sgkit import variables
 from sgkit.io.utils import zarrs_to_dataset
@@ -39,6 +40,14 @@ from sgkit.utils import max_str_len
 DEFAULT_MAX_ALT_ALLELES = (
     3  # equivalent to DEFAULT_ALT_NUMBER in vcf_read.py in scikit_allel
 )
+
+try:
+    from numcodecs import Blosc
+
+    DEFAULT_COMPRESSOR = Blosc(cname="zstd", clevel=7, shuffle=Blosc.AUTOSHUFFLE)
+except ImportError:  # pragma: no cover
+    warnings.warn("Cannot import Blosc, falling back to no compression", RuntimeWarning)
+    DEFAULT_COMPRESSOR = None
 
 
 @contextmanager
@@ -332,9 +341,7 @@ def vcf_to_zarr_sequential(
     region: Optional[str] = None,
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
-    compressor: Optional[Any] = Blosc(
-        cname="zstd", clevel=7, shuffle=Blosc.AUTOSHUFFLE
-    ),
+    compressor: Optional[Any] = DEFAULT_COMPRESSOR,
     encoding: Optional[Any] = None,
     ploidy: int = 2,
     mixed_ploidy: bool = False,
@@ -478,7 +485,6 @@ def vcf_to_zarr_sequential(
                 # values from function args (encoding) take precedence over default_encoding
                 encoding = encoding or {}
                 merged_encoding = {**default_encoding, **encoding}
-                print(merged_encoding)
 
                 ds.to_zarr(output, mode="w", encoding=merged_encoding)
                 first_variants_chunk = False
@@ -493,9 +499,7 @@ def vcf_to_zarr_parallel(
     regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]],
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
-    compressor: Optional[Any] = Blosc(
-        cname="zstd", clevel=7, shuffle=Blosc.AUTOSHUFFLE
-    ),
+    compressor: Optional[Any] = DEFAULT_COMPRESSOR,
     encoding: Optional[Any] = None,
     temp_chunk_length: Optional[int] = None,
     tempdir: Optional[PathType] = None,
@@ -549,9 +553,7 @@ def vcf_to_zarrs(
     regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]],
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
-    compressor: Optional[Any] = Blosc(
-        cname="zstd", clevel=7, shuffle=Blosc.AUTOSHUFFLE
-    ),
+    compressor: Optional[Any] = DEFAULT_COMPRESSOR,
     encoding: Optional[Any] = None,
     output_storage_options: Optional[Dict[str, str]] = None,
     ploidy: int = 2,
@@ -690,9 +692,7 @@ def vcf_to_zarr(
     regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]] = None,
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
-    compressor: Optional[Any] = Blosc(
-        cname="zstd", clevel=7, shuffle=Blosc.AUTOSHUFFLE
-    ),
+    compressor: Optional[Any] = DEFAULT_COMPRESSOR,
     encoding: Optional[Any] = None,
     temp_chunk_length: Optional[int] = None,
     tempdir: Optional[PathType] = None,
