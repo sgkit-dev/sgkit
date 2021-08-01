@@ -11,6 +11,7 @@ from .model import (
     DIM_VARIANT,
     create_genotype_call_dataset,
     create_genotype_dosage_dataset,
+    select,
 )
 from .stats.aggregation import (
     call_allele_frequencies,
@@ -92,4 +93,5 @@ __all__ = [
     "load_dataset",
     "save_dataset",
     "pairwise_distance",
+    "select",
 ]

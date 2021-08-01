@@ -1,4 +1,4 @@
-from typing import Any, Dict, Hashable, List, Optional
+from typing import Any, Dict, Hashable, List, Optional, Tuple
 
 import numpy as np
 import xarray as xr
@@ -150,3 +150,79 @@ def create_genotype_dosage_dataset(
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
     attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
     return create_dataset(data_vars=data_vars, attrs=attrs)
+
+
+def select(
+    ds: xr.Dataset,
+    *,
+    region: Optional[str] = None,
+    sample_ids: Optional[List[str]] = None,
+) -> xr.Dataset:
+    """Select a particular region of variants, a subset of samples, or both, from a dataset.
+
+    Parameters
+    ----------
+    ds
+        Genotype call dataset.
+    region
+        A bcftools style region string of the form ``contig``, ``contig:start-``, or ``contig:start-end``,
+        where ``start`` and ``end`` are inclusive.
+    sample_ids
+        A list of sample IDs that should be included.
+
+    Returns
+    -------
+    A dataset that contains only variants in the given region and samples in the given subset.
+    """
+    if region is None and sample_ids is None:
+        return ds
+    kwargs = {}
+    if region is not None:
+        kwargs["variants"] = _region_to_index(ds, region)
+    if sample_ids is not None:
+        kwargs["samples"] = _sample_ids_to_index(ds, sample_ids)
+    return ds.isel(**kwargs)  # type: ignore[arg-type]
+
+
+def _region_to_index(ds: xr.Dataset, region: str) -> slice:
+    contig, start, end = _parse_region(region)
+
+    contig_index = ds.attrs["contigs"].index(contig)
+    contig_range = np.searchsorted(
+        ds.variant_contig.values, [contig_index, contig_index + 1]
+    )
+
+    if start is None and end is None:
+        start_index, end_index = contig_range
+    else:
+        contig_pos = ds.variant_position.values[slice(contig_range[0], contig_range[1])]
+        if end is None:
+            start_index = contig_range[0] + np.searchsorted(contig_pos, [start])[0]  # type: ignore[arg-type]
+            end_index = contig_range[1]
+        else:
+            start_index, end_index = contig_range[0] + np.searchsorted(
+                contig_pos, [start, end + 1]  # type: ignore[arg-type]
+            )
+
+    return slice(start_index, end_index)
+
+
+def _parse_region(region: str) -> Tuple[str, Optional[int], Optional[int]]:
+    if ":" not in region:
+        return region, None, None
+    contig, start_end = region.split(":")
+    start, end = start_end.split("-")
+    start = int(start)
+    end = int(end) if end != "" else None
+    return contig, start, end
+
+
+def _sample_ids_to_index(ds: xr.Dataset, sample_ids: List[str]) -> Any:
+    all_sample_ids = ds.sample_id.values
+    all_sample_ids_index = np.argsort(all_sample_ids)
+    all_sample_ids_sorted = all_sample_ids[all_sample_ids_index]
+    sample_ids_sorted_index = np.searchsorted(all_sample_ids_sorted, sample_ids)
+    sample_ids_index = np.take(
+        all_sample_ids_index, sample_ids_sorted_index, mode="clip"
+    )
+    return sample_ids_index

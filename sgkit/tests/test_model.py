@@ -1,4 +1,5 @@
 import numpy as np
+import xarray as xr
 from numpy.testing import assert_array_equal
 
 from sgkit import (
@@ -9,6 +10,8 @@ from sgkit import (
     create_genotype_call_dataset,
     create_genotype_dosage_dataset,
     display_genotypes,
+    select,
+    simulate_genotype_call_dataset,
 )
 
 
@@ -104,3 +107,52 @@ def test_create_genotype_dosage_dataset():
     assert_array_equal(
         ds["call_genotype_probability_mask"], np.isnan(call_genotype_probability)
     )
+
+
+def test_select():
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=6, n_contig=2)
+
+    # identity
+    ds2 = select(ds)
+    xr.testing.assert_equal(ds, ds2)
+
+    # region: whole contig
+    ds2 = select(ds, region="1")
+    assert ds2.dims["variants"] == 5
+    assert ds2.dims["samples"] == ds.dims["samples"]
+    assert_array_equal(ds2["variant_contig"], [1, 1, 1, 1, 1])
+    assert_array_equal(ds2["variant_position"], [0, 1, 2, 3, 4])
+
+    # region: start position only
+    ds2 = select(ds, region="1:2-")
+    assert ds2.dims["variants"] == 3
+    assert ds2.dims["samples"] == ds.dims["samples"]
+    assert_array_equal(ds2["variant_contig"], [1, 1, 1])
+    assert_array_equal(ds2["variant_position"], [2, 3, 4])
+
+    # region: contig, start and end position
+    ds2 = select(ds, region="1:2-3")
+    assert ds2.dims["variants"] == 2
+    assert ds2.dims["samples"] == ds.dims["samples"]
+    assert_array_equal(ds2["variant_contig"], [1, 1])
+    assert_array_equal(ds2["variant_position"], [2, 3])
+
+    # sample ids
+    ds2 = select(ds, sample_ids=["S1", "S3"])
+    assert ds2.dims["variants"] == ds.dims["variants"]
+    assert ds2.dims["samples"] == 2
+    assert_array_equal(ds2["sample_id"], ["S1", "S3"])
+
+    # sample ids: different order to dataset
+    ds2 = select(ds, sample_ids=["S3", "S1"])
+    assert ds2.dims["variants"] == ds.dims["variants"]
+    assert ds2.dims["samples"] == 2
+    assert_array_equal(ds2["sample_id"], ["S3", "S1"])
+
+    # region and sample ids
+    ds2 = select(ds, region="1:2-", sample_ids=["S1", "S3"])
+    assert ds2.dims["variants"] == 3
+    assert ds2.dims["samples"] == 2
+    assert_array_equal(ds2["variant_contig"], [1, 1, 1])
+    assert_array_equal(ds2["variant_position"], [2, 3, 4])
+    assert_array_equal(ds2["sample_id"], ["S1", "S3"])

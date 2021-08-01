@@ -107,6 +107,7 @@ Utilities
    infer_call_ploidy
    infer_sample_ploidy
    infer_variant_ploidy
+   select
    simulate_genotype_call_dataset
    window_by_position
    window_by_variant
