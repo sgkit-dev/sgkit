@@ -1,0 +1,6 @@
+﻿sgkit.infer\_variant\_ploidy
+============================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: infer_variant_ploidy

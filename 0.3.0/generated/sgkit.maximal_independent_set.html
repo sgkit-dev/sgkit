@@ -1,0 +1,809 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sgkit.maximal_independent_set</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-book-theme.c441f2ba0852f4cabcb80105e3a46ae6.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/typehints.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="sgkit.observed_heterozygosity" href="sgkit.observed_heterozygosity.html" />
+    <link rel="prev" title="sgkit.ld_prune" href="sgkit.ld_prune.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/sgkit_trnsprnt.png" class="logo" alt="logo">
+  
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <p class="caption collapsible-parent" role="heading">
+ <span class="caption-text">
+  Contents:
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../getting_started.html">
+   Getting Started
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../user_guide.html">
+   User Guide
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../vcf.html">
+   Reading VCF
+  </a>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="../examples/index.html">
+   Examples
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="../examples/gwas_tutorial.html">
+     GWAS Tutorial
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1 current active collapsible-parent">
+  <a class="reference internal" href="../api.html">
+   API reference
+  </a>
+  <ul class="current collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.io.bgen.bgen_to_zarr.html">
+     sgkit.io.bgen.bgen_to_zarr
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.io.bgen.read_bgen.html">
+     sgkit.io.bgen.read_bgen
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.io.bgen.rechunk_bgen.html">
+     sgkit.io.bgen.rechunk_bgen
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.io.plink.read_plink.html">
+     sgkit.io.plink.read_plink
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.io.vcf.vcf_to_zarr.html">
+     sgkit.io.vcf.vcf_to_zarr
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.io.vcf.partition_into_regions.html">
+     sgkit.io.vcf.partition_into_regions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.io.vcf.vcf_to_zarrs.html">
+     sgkit.io.vcf.vcf_to_zarrs
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.io.vcf.zarrs_to_dataset.html">
+     sgkit.io.vcf.zarrs_to_dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.read_vcfzarr.html">
+     sgkit.read_vcfzarr
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.load_dataset.html">
+     sgkit.load_dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.save_dataset.html">
+     sgkit.save_dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.count_call_alleles.html">
+     sgkit.count_call_alleles
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.count_cohort_alleles.html">
+     sgkit.count_cohort_alleles
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.count_variant_alleles.html">
+     sgkit.count_variant_alleles
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.divergence.html">
+     sgkit.divergence
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.diversity.html">
+     sgkit.diversity
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.Fst.html">
+     sgkit.Fst
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.Garud_H.html">
+     sgkit.Garud_H
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.gwas_linear_regression.html">
+     sgkit.gwas_linear_regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.hardy_weinberg_test.html">
+     sgkit.hardy_weinberg_test
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.individual_heterozygosity.html">
+     sgkit.individual_heterozygosity
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.ld_matrix.html">
+     sgkit.ld_matrix
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.ld_prune.html">
+     sgkit.ld_prune
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     sgkit.maximal_independent_set
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.observed_heterozygosity.html">
+     sgkit.observed_heterozygosity
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.pc_relate.html">
+     sgkit.pc_relate
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.regenie.html">
+     sgkit.regenie
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.sample_stats.html">
+     sgkit.sample_stats
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.Tajimas_D.html">
+     sgkit.Tajimas_D
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variant_stats.html">
+     sgkit.variant_stats
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.convert_probability_to_call.html">
+     sgkit.convert_probability_to_call
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.display_genotypes.html">
+     sgkit.display_genotypes
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.filter_partial_calls.html">
+     sgkit.filter_partial_calls
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.infer_call_ploidy.html">
+     sgkit.infer_call_ploidy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.infer_sample_ploidy.html">
+     sgkit.infer_sample_ploidy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.infer_variant_ploidy.html">
+     sgkit.infer_variant_ploidy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.simulate_genotype_call_dataset.html">
+     sgkit.simulate_genotype_call_dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.window_by_position.html">
+     sgkit.window_by_position
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.window_by_variant.html">
+     sgkit.window_by_variant
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.regenie_base_prediction_spec.html">
+     sgkit.variables.regenie_base_prediction_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_allele_count_spec.html">
+     sgkit.variables.call_allele_count_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_dosage_spec.html">
+     sgkit.variables.call_dosage_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_dosage_mask_spec.html">
+     sgkit.variables.call_dosage_mask_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_genotype_complete_spec.html">
+     sgkit.variables.call_genotype_complete_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_genotype_complete_mask_spec.html">
+     sgkit.variables.call_genotype_complete_mask_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_genotype_spec.html">
+     sgkit.variables.call_genotype_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_genotype_mask_spec.html">
+     sgkit.variables.call_genotype_mask_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_genotype_non_allele_spec.html">
+     sgkit.variables.call_genotype_non_allele_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_genotype_phased_spec.html">
+     sgkit.variables.call_genotype_phased_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_genotype_probability_spec.html">
+     sgkit.variables.call_genotype_probability_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_genotype_probability_mask_spec.html">
+     sgkit.variables.call_genotype_probability_mask_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_heterozygosity_spec.html">
+     sgkit.variables.call_heterozygosity_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_ploidy_spec.html">
+     sgkit.variables.call_ploidy_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.cohort_allele_count_spec.html">
+     sgkit.variables.cohort_allele_count_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.covariates_spec.html">
+     sgkit.variables.covariates_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.dosage_spec.html">
+     sgkit.variables.dosage_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.genotype_count_spec.html">
+     sgkit.variables.genotype_count_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.ld_prune_index_to_drop_spec.html">
+     sgkit.variables.ld_prune_index_to_drop_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.regenie_loco_prediction_spec.html">
+     sgkit.variables.regenie_loco_prediction_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.regenie_meta_prediction_spec.html">
+     sgkit.variables.regenie_meta_prediction_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.pc_relate_phi_spec.html">
+     sgkit.variables.pc_relate_phi_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_call_rate_spec.html">
+     sgkit.variables.sample_call_rate_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_cohort_spec.html">
+     sgkit.variables.sample_cohort_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_id_spec.html">
+     sgkit.variables.sample_id_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_n_called_spec.html">
+     sgkit.variables.sample_n_called_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_n_het_spec.html">
+     sgkit.variables.sample_n_het_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_n_hom_alt_spec.html">
+     sgkit.variables.sample_n_hom_alt_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_n_hom_ref_spec.html">
+     sgkit.variables.sample_n_hom_ref_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_n_non_ref_spec.html">
+     sgkit.variables.sample_n_non_ref_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_component_spec.html">
+     sgkit.variables.sample_pca_component_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_explained_variance_spec.html">
+     sgkit.variables.sample_pca_explained_variance_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_explained_variance_ratio_spec.html">
+     sgkit.variables.sample_pca_explained_variance_ratio_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_loading_spec.html">
+     sgkit.variables.sample_pca_loading_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_pca_projection_spec.html">
+     sgkit.variables.sample_pca_projection_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.sample_ploidy_spec.html">
+     sgkit.variables.sample_ploidy_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.stat_divergence_spec.html">
+     sgkit.variables.stat_divergence_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.stat_diversity_spec.html">
+     sgkit.variables.stat_diversity_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.stat_Fst_spec.html">
+     sgkit.variables.stat_Fst_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.stat_Garud_h1_spec.html">
+     sgkit.variables.stat_Garud_h1_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.stat_Garud_h12_spec.html">
+     sgkit.variables.stat_Garud_h12_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.stat_Garud_h123_spec.html">
+     sgkit.variables.stat_Garud_h123_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.stat_Garud_h2_h1_spec.html">
+     sgkit.variables.stat_Garud_h2_h1_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.stat_observed_heterozygosity_spec.html">
+     sgkit.variables.stat_observed_heterozygosity_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.stat_pbs_spec.html">
+     sgkit.variables.stat_pbs_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.stat_Tajimas_D_spec.html">
+     sgkit.variables.stat_Tajimas_D_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.traits_spec.html">
+     sgkit.variables.traits_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_allele_spec.html">
+     sgkit.variables.variant_allele_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_allele_count_spec.html">
+     sgkit.variables.variant_allele_count_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_allele_frequency_spec.html">
+     sgkit.variables.variant_allele_frequency_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_allele_total_spec.html">
+     sgkit.variables.variant_allele_total_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_linreg_beta_spec.html">
+     sgkit.variables.variant_linreg_beta_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_call_rate_spec.html">
+     sgkit.variables.variant_call_rate_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_contig_spec.html">
+     sgkit.variables.variant_contig_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_hwe_p_value_spec.html">
+     sgkit.variables.variant_hwe_p_value_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_id_spec.html">
+     sgkit.variables.variant_id_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_n_called_spec.html">
+     sgkit.variables.variant_n_called_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_n_het_spec.html">
+     sgkit.variables.variant_n_het_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_n_hom_alt_spec.html">
+     sgkit.variables.variant_n_hom_alt_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_n_hom_ref_spec.html">
+     sgkit.variables.variant_n_hom_ref_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_n_non_ref_spec.html">
+     sgkit.variables.variant_n_non_ref_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_linreg_p_value_spec.html">
+     sgkit.variables.variant_linreg_p_value_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_ploidy_spec.html">
+     sgkit.variables.variant_ploidy_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_position_spec.html">
+     sgkit.variables.variant_position_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_score_spec.html">
+     sgkit.variables.variant_score_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_linreg_t_value_spec.html">
+     sgkit.variables.variant_linreg_t_value_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.window_contig_spec.html">
+     sgkit.variables.window_contig_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.window_start_spec.html">
+     sgkit.variables.window_start_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.window_stop_spec.html">
+     sgkit.variables.window_stop_spec
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../contributing.html">
+   Contributing to sgkit
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/generated/sgkit.maximal_independent_set.rst.txt"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="sgkit-maximal-independent-set">
+<h1>sgkit.maximal_independent_set<a class="headerlink" href="#sgkit-maximal-independent-set" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="sgkit.maximal_independent_set">
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">maximal_independent_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.maximal_independent_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a maximal independent set of variants.</p>
+<p>This method is based on the PLINK algorithm that selects independent
+vertices from a graph implied by excessive LD between variants.</p>
+<p>For an outline of this process, see
+<a class="reference external" href="https://groups.google.com/forum/#!msg/plink2-users/w5TuZo2fgsQ/WbNnE16_xDIJ">this discussion</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>df</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.dataframe.DataFrame.html#dask.dataframe.DataFrame" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.dataframe.DataFrame.html#dask.dataframe.DataFrame" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></span></dt><dd><p>Dataframe containing a sparse matrix of R2 values, typically from <a class="reference internal" href="sgkit.ld_matrix.html#sgkit.ld_matrix" title="sgkit.ld_matrix"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.ld_matrix()</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This algorithm will materialize the whole input dataframe (the LD matrix) in memory.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">i</span></code> and <code class="docutils literal notranslate"><span class="pre">j</span></code> are not sorted ascending (and in that order)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.19.1.dev6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.19.1.dev6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dataset containing the indexes of variants to drop, as defined by
+<a class="reference internal" href="sgkit.variables.ld_prune_index_to_drop_spec.html#sgkit.variables.ld_prune_index_to_drop_spec" title="sgkit.variables.ld_prune_index_to_drop_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.ld_prune_index_to_drop_spec</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="sgkit.ld_prune.html" title="previous page">sgkit.ld_prune</a>
+    <a class='right-next' id="next-link" href="sgkit.observed_heterozygosity.html" title="next page">sgkit.observed_heterozygosity</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By sgkit developers<br/>
+        
+            &copy; Copyright 2020, sgkit developers.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

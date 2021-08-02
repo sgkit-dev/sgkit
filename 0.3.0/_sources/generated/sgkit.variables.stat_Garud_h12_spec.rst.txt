@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_Garud\_h12\_spec
+======================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_Garud_h12_spec

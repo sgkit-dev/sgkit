@@ -1,0 +1,6 @@
+﻿sgkit.infer\_call\_ploidy
+=========================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: infer_call_ploidy

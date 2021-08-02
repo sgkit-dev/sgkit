@@ -1,0 +1,6 @@
+﻿sgkit.variables.variant\_linreg\_t\_value\_spec
+===============================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: variant_linreg_t_value_spec
