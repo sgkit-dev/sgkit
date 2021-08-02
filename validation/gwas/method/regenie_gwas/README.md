@@ -9,7 +9,7 @@ conda activate glow
 ```
 2. Install the `glow.py` package and its dependencies.
 ```
-pip3 install glow.py
+pip install glow.py
 ```
 3. Find the location of the corresponding pyspark binary, by typing the following commands in a python console
 ```
@@ -18,7 +18,7 @@ pip3 install glow.py
 ```
 4. Start the Jupyter notebook (1/ example below is through ssh, 2/ pyspark path should be adapted)
 ```
-PYSPARK_DRIVER_PYTHON=jupyter PYSPARK_DRIVER_PYTHON_OPTS="notebook --port 9999 --no-browser" /path/to/pyspark/bin/pyspark --packages io.projectglow:glow-spark3_2.12:1.0.0 --conf spark.hadoop.io.compression.codecs=io.projectglow.sql.util.BGZFCodec
+PYSPARK_DRIVER_PYTHON=jupyter-lab PYSPARK_DRIVER_PYTHON_OPTS="--port 9999 --no-browser" /path/to/pyspark/bin/pyspark --packages io.projectglow:glow-spark3_2.12:1.0.0 --conf spark.hadoop.io.compression.codecs=io.projectglow.sql.util.BGZFCodec
 ```
 On your local station, run `ssh -N -L localhost:9999:localhost:9999 <user>@<server>` 
 
