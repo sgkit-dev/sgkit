@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import numpy as np
-import cupy as cp
 import pandas as pd
 import pytest
 import xarray as xr
@@ -33,6 +32,20 @@ from sgkit.typing import ArrayLike
 regenie_sim = functools.partial(
     regenie, dosage="call_dosage", covariates="sample_covariate", traits="sample_trait"
 )
+
+
+def _dask_cupy_to_numpy(x):
+    from dask.utils import is_cupy_type
+
+    if is_cupy_type(x):
+        import cupy as cp
+
+        x = x.get()
+    elif hasattr(x, "_meta") and is_cupy_type(x._meta):
+        import cupy as cp
+
+        x = x.map_blocks(cp.asnumpy).persist()
+    return x
 
 
 def simulate_regression_dataset(
@@ -97,6 +110,8 @@ def validate_indexes(df_sg: DataFrame, df_gl: DataFrame, cols: List[str]) -> Non
 
 
 def prepare_stage_1_sgkit_results(x: Array) -> DataFrame:
+    x = _dask_cupy_to_numpy(x)
+
     df = (
         xr.DataArray(
             x,
@@ -162,6 +177,8 @@ def check_stage_1_results(
 
 
 def check_stage_2_results(X: Array, df_trait: DataFrame, result_dir: Path) -> None:
+    X = _dask_cupy_to_numpy(X)
+
     df_gl = pd.read_csv(result_dir / "predictions.csv", index_col="sample_id")
     df_sg = pd.DataFrame(np.asarray(X), columns=df_trait.columns, index=df_trait.index)
     assert df_gl.shape == df_sg.shape
@@ -234,7 +251,10 @@ def check_stage_3_results(
 
 
 def check_simulation_result(
-    datadir: Path, config: Dict[str, Any], run: Dict[str, Any]
+    datadir: Path,
+    config: Dict[str, Any],
+    run: Dict[str, Any],
+    ndarray_type: str,
 ) -> None:
     # Extract properties for simulation
     dataset, paramset = run["dataset"], run["paramset"]
@@ -249,16 +269,16 @@ def check_simulation_result(
         df_covariate = load_covariates(dataset_dir)
         df_trait = load_traits(dataset_dir)
         contigs = ds["variant_contig"].values
-        # G = ds["call_genotype"].sum(dim="ploidy").values
-        # X = df_covariate.values
-        # Y = df_trait.values
-        # alphas = ps_config["alphas"]
-        G = cp.asarray(ds["call_genotype"].sum(dim="ploidy").values)
-        X = cp.asarray(df_covariate.values)
-        Y = cp.asarray(df_trait.values)
+        G = ds["call_genotype"].sum(dim="ploidy").values
+        X = df_covariate.values
+        Y = df_trait.values
         alphas = ps_config["alphas"]
-        if alphas is not None:
-            alphas = cp.asarray(alphas)
+        if ndarray_type == "cupy":
+            G = cp.asarray(G)
+            X = cp.asarray(X)
+            Y = cp.asarray(Y)
+            if alphas is not None:
+                alphas = cp.asarray(alphas)
 
         # Define transformed traits
         res = regenie_transform(
@@ -281,28 +301,30 @@ def check_simulation_result(
         YBP = res["regenie_base_prediction"].data
         YMP = res["regenie_meta_prediction"].data
 
-        print(f"G: [{type(G)}] {G}\nX: [{type(X)}] {X}\nY: [{type(Y)}] {Y}")
-        print(f"res: {res}")
-        print(f"YBP: {YBP}\nYMP: {YMP}")
+        # Check equality of stage 1 and 2 transformations
+        check_stage_1_results(YBP, ds_config, ps_config, result_dir)
+        check_stage_2_results(YMP, df_trait, result_dir)
 
-        # # Check equality of stage 1 and 2 transformations
-        # check_stage_1_results(YBP, ds_config, ps_config, result_dir)
-        # check_stage_2_results(YMP, df_trait, result_dir)
-
-        # # Check equality of GWAS results
-        # YR = Y - YMP
-        # stats = linear_regression(G.T, X, YR)
-        # check_stage_3_results(ds, stats, df_trait, result_dir)
+        # Check equality of GWAS results
+        YR = Y - YMP
+        stats = linear_regression(
+            _dask_cupy_to_numpy(G.T), _dask_cupy_to_numpy(X), _dask_cupy_to_numpy(YR)
+        )
+        check_stage_3_results(ds, stats, df_trait, result_dir)
 
         # TODO: Add LOCO validation after Glow WGR release
         # See: https://github.com/projectglow/glow/issues/256
 
 
-def test_regenie__glow_comparison(datadir: Path) -> None:
+@pytest.mark.parametrize(
+    "ndarray_type",
+    ["numpy", "cupy"],
+)
+def test_regenie__glow_comparison(ndarray_type: str, datadir: Path) -> None:
     with open(datadir / "config.yml") as fd:
         config = yaml.load(fd, Loader=yaml.FullLoader)
     for run in config["runs"]:
-        check_simulation_result(datadir, config, run)
+        check_simulation_result(datadir, config, run, ndarray_type)
 
 
 @pytest.mark.xfail(reason="See https://github.com/pystatgen/sgkit/issues/456")
