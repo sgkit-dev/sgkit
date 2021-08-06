@@ -163,12 +163,17 @@ def ridge_regression(
 
 
 def get_alphas(
-    n_cols: int, heritability: Sequence[float] = [0.99, 0.75, 0.50, 0.25, 0.01], like: Optional[ArrayLike] = None,
+    n_cols: int,
+    heritability: Sequence[float] = [0.99, 0.75, 0.50, 0.25, 0.01],
+    like: Optional[ArrayLike] = None,
 ) -> NDArray[np.float_]:
     # https://github.com/projectglow/glow/blob/f3edf5bb8fe9c2d2e1a374d4402032ba5ce08e29/python/glow/wgr/linear_model/ridge_model.py#L80
     if like is not None:
         from dask.array.utils import meta_from_array
-        return np.asarray([n_cols / h for h in heritability], like=meta_from_array(like))
+
+        return np.asarray(
+            [n_cols / h for h in heritability], like=meta_from_array(like)
+        )
     else:
         return np.asarray([n_cols / h for h in heritability])
 
@@ -223,6 +228,7 @@ def _ridge_regression_cv(
 
     # Regress for all outcomes/alphas and add new axis for ridge parameters
     from dask.array.utils import meta_from_array
+
     B = da.map_blocks(
         ridge_regression,
         XtX,
@@ -574,12 +580,10 @@ def _stage_3(
         # Define a variant block mask of size `n_variant_block`
         # determining which blocks correspond to this contig
         variant_block_mask = variant_block_contigs == contig
+        if hasattr(variant_block_mask, "compute"):
+            variant_block_mask = variant_block_mask.compute()
         BYPC = BYP[:, :, ~variant_block_mask, :]
         YPC = YP[:, :, ~variant_block_mask, :]
-        if hasattr(YPC, "compute_chunk_sizes"):
-            YPC.compute_chunk_sizes()
-        if hasattr(BYPC, "compute_chunk_sizes"):
-            BYPC.compute_chunk_sizes()
         YGC = apply(X, YPC, BX, BYPC)
         YC.append(YGC)
     YC = da.stack(YC, axis=0)
@@ -696,7 +700,9 @@ def regenie_transform(
         X = (X - X.mean(axis=0)) / X.std(axis=0)
 
     if add_intercept:
-        X = da.concatenate([da.ones_like(X, shape=(X.shape[0], 1), dtype=X.dtype), X], axis=1)
+        X = da.concatenate(
+            [da.ones_like(X, shape=(X.shape[0], 1), dtype=X.dtype), X], axis=1
+        )
 
     # TODO: Test this after finding out whether or not there was a good reason
     # it was precluded in glow by unit covariate regularization:
