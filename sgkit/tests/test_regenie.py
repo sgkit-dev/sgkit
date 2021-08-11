@@ -3,6 +3,7 @@ import functools
 from pathlib import Path
 from typing import Any, Dict, List
 
+import dask.array as da
 import numpy as np
 import pandas as pd
 import pytest
@@ -35,16 +36,10 @@ regenie_sim = functools.partial(
 
 
 def _dask_cupy_to_numpy(x):
-    from dask.utils import is_cupy_type
-
-    if is_cupy_type(x):
-        import cupy as cp
-
+    if da.utils.is_cupy_type(x):
         x = x.get()
-    elif hasattr(x, "_meta") and is_cupy_type(x._meta):
-        import cupy as cp
-
-        x = x.map_blocks(cp.asnumpy).persist()
+    elif hasattr(x, "_meta") and da.utils.is_cupy_type(x._meta):
+        x = x.map_blocks(lambda x: x.get()).persist()
     return x
 
 
@@ -254,7 +249,7 @@ def check_simulation_result(
     datadir: Path,
     config: Dict[str, Any],
     run: Dict[str, Any],
-    ndarray_type: str,
+    xp: Any,
 ) -> None:
     # Extract properties for simulation
     dataset, paramset = run["dataset"], run["paramset"]
@@ -269,16 +264,12 @@ def check_simulation_result(
         df_covariate = load_covariates(dataset_dir)
         df_trait = load_traits(dataset_dir)
         contigs = ds["variant_contig"].values
-        G = ds["call_genotype"].sum(dim="ploidy").values
-        X = df_covariate.values
-        Y = df_trait.values
+        G = xp.asarray(ds["call_genotype"].sum(dim="ploidy").values)
+        X = xp.asarray(df_covariate.values)
+        Y = xp.asarray(df_trait.values)
         alphas = ps_config["alphas"]
-        if ndarray_type == "cupy":
-            G = cp.asarray(G)
-            X = cp.asarray(X)
-            Y = cp.asarray(Y)
-            if alphas is not None:
-                alphas = cp.asarray(alphas)
+        if alphas is not None:
+            alphas = xp.asarray(alphas)
 
         # Define transformed traits
         res = regenie_transform(
@@ -321,10 +312,12 @@ def check_simulation_result(
     ["numpy", "cupy"],
 )
 def test_regenie__glow_comparison(ndarray_type: str, datadir: Path) -> None:
+    xp = pytest.importorskip(ndarray_type)
+
     with open(datadir / "config.yml") as fd:
         config = yaml.load(fd, Loader=yaml.FullLoader)
     for run in config["runs"]:
-        check_simulation_result(datadir, config, run, ndarray_type)
+        check_simulation_result(datadir, config, run, xp)
 
 
 @pytest.mark.xfail(reason="See https://github.com/pystatgen/sgkit/issues/456")
