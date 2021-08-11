@@ -15,6 +15,7 @@ from .utils import (
     assert_block_shape,
     assert_chunk_shape,
     concat_2d,
+    map_blocks_asnumpy,
     r2_score,
 )
 
@@ -65,10 +66,6 @@ def index_array_blocks(
     ValueError
         If `x` is not monotonic increasing.
     """
-    if hasattr(x, "compute"):
-        x = x.compute()
-    if hasattr(x, "get"):
-        x = x.get()
     x = np.asarray(x)
     if x.size == 0:
         return np.empty(0, dtype=int), np.empty(0, dtype=int)
@@ -714,8 +711,12 @@ def regenie_transform(
         Y = Y / Y.std(axis=0)
         X = da.zeros(shape=(n_sample, 0), dtype=G.dtype)
 
+    # The output of _variant_block_indexes is better suited as a NumPy array,
+    # since it will be downcast to tuple. Additionally, since it's not
+    # computationally intensive and cumbersome to implement it to be
+    # CuPy-compatible, we map a CuPy-backed Dask array contigs to NumPy backend.
     variant_chunk_start, variant_chunk_size = _variant_block_indexes(
-        variant_block_size, contigs
+        variant_block_size, map_blocks_asnumpy(contigs)
     )
     G = G.rechunk(chunks=(sample_block_size, tuple(variant_chunk_size)))
     X = X.rechunk(chunks=(sample_block_size, -1))
