@@ -1,3 +1,7 @@
+# Apache License
+#
+# Copyright (c) 2021, NVIDIA CORPORATION.
+
 from typing import Hashable, Tuple
 
 import dask.array as da
