@@ -193,6 +193,18 @@ corresponding to the number of non-missing occurrences of each allele.
     )
 )
 
+call_allele_frequency, call_allele_frequency_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "call_allele_frequency",
+        ndim=3,
+        kind="f",
+        __doc__="""
+Allele frequencies. With shape (variants, samples, alleles) and values
+corresponding to the frequencies of non-missing occurrences of each allele.
+""",
+    )
+)
+
 call_dosage, call_dosage_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "call_dosage",

@@ -372,6 +372,71 @@ def count_genotypes(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
+def call_allele_frequencies(
+    ds: Dataset,
+    *,
+    call_allele_count: Hashable = variables.call_allele_count,
+    merge: bool = True,
+) -> Dataset:
+    """Compute per sample allele frequencies from genotype calls.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing genotype calls.
+    call_allele_count
+        Input variable name holding call_allele_count as defined by
+        :data:`sgkit.variables.call_allele_count_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`count_call_alleles`.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing :data:`sgkit.variables.call_allele_frequency_spec`
+    of allele frequencies with shape (variants, samples, alleles) and values
+    corresponding to the frequency of non-missing occurrences of each allele.
+
+    Examples
+    --------
+    >>> import sgkit as sg
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=4, n_sample=2, seed=1)
+    >>> sg.display_genotypes(ds) # doctest: +NORMALIZE_WHITESPACE
+    samples    S0   S1
+    variants
+    0         1/0  1/0
+    1         1/0  1/1
+    2         0/1  1/0
+    3         0/0  0/0
+    >>> sg.call_allele_frequencies(ds)["call_allele_frequency"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[[0.5, 0.5],
+            [0.5, 0.5]],
+    <BLANKLINE>
+           [[0.5, 0.5],
+            [0. , 1. ]],
+    <BLANKLINE>
+           [[0.5, 0.5],
+            [0.5, 0.5]],
+    <BLANKLINE>
+           [[1. , 0. ],
+            [1. , 0. ]]])
+    """
+    ds = define_variable_if_absent(
+        ds, variables.call_allele_count, call_allele_count, count_call_alleles
+    )
+    variables.validate(ds, {call_allele_count: variables.call_allele_count_spec})
+    AC = ds[call_allele_count]
+    K = AC.sum(dim="alleles")
+    # avoid divide by zero
+    AF = AC / xr.where(K > 0, K, np.nan)  # type: ignore[no-untyped-call]
+    new_ds = create_dataset({variables.call_allele_frequency: AF})
+    return conditional_merge_datasets(ds, new_ds, merge)
+
+
 def allele_frequency(
     ds: Dataset,
     call_genotype_mask: Hashable,
