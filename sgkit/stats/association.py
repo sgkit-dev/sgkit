@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from importlib import import_module
 from typing import Hashable, Optional, Sequence, Union
 
+import dask
 import dask.array as da
 import numpy as np
 from dask.array import Array, stats
@@ -216,20 +216,19 @@ def _inner_loco_regression(
     # Transfer data back from device to host if using GPU, no Cupy implementation of t-test
     if use_gpu:
         try:
-            cp = import_module("cupy")
+            import cupy as cp
 
-            assert hasattr(cp, "ndarray")
-            assert hasattr(cp, "asnumpy")
-
-            assert isinstance(B, da.Array)
+            # assert hasattr(cp, "ndarray")
+            # assert hasattr(cp, "asnumpy")
+            # assert isinstance(B, da.Array)
             if isinstance(B._meta, cp.ndarray):  # type: ignore[attr-defined]
                 B = B.map_blocks(cp.asnumpy, dtype=B.dtype)  # type: ignore[attr-defined]
 
-            assert isinstance(T, da.Array)
+            # assert isinstance(T, da.Array)
             if isinstance(T._meta, cp.ndarray):  # type: ignore[attr-defined]
                 T = T.map_blocks(cp.asnumpy, dtype=T.dtype)  # type: ignore[attr-defined]
 
-            assert isinstance(effect_size, da.Array)
+            # assert isinstance(effect_size, da.Array)
             if isinstance(effect_size._meta, cp.ndarray):  # type: ignore[attr-defined]
                 effect_size = effect_size.map_blocks(
                     cp.asnumpy, dtype=effect_size.dtype  # type: ignore[attr-defined]
@@ -241,6 +240,8 @@ def _inner_loco_regression(
     # Note: t dist not implemented in Dask so this must be delayed,
     # see https://github.com/dask/dask/issues/6857
 
+    # https://github.com/scipy/scipy/blob/v1.7.1/scipy/stats/_continuous_distns.py#L6328
+    # cupy (almost) equivalent: https://github.com/cupy/cupy/blob/dddb367e03e413c5120521733e2694515a0d8f70/cupyx/scipy/special/_statistics.py#L4
     P = da.map_blocks(
         lambda t: 2 * stats.distributions.t.sf(np.abs(t), dof), T, dtype="float64"
     )
@@ -466,29 +467,47 @@ def regenie_gwas_linear_regression(
 
     # Use GPU if available
     gpu_avail = False
+    # Forces use_gpu to True if any of the data variables are already backed by Cupy
+    if not use_gpu:
+        for dv in ds.data_vars:
+            if hasattr(ds[dv].data, "_meta"):
+                tb = "cupy" in str(type(ds[dv].data._meta))
+            else:
+                tb = "cupy" in str(type(ds[dv].data))
+            use_gpu = use_gpu or tb
+            if use_gpu:
+                break
 
     if use_gpu:
         try:
-            cp = import_module("cupy")
+            import cupy as cp
+
             print("Cupy found, GPU will be used where possible.")
             gpu_avail = True
 
-            assert hasattr(cp, "asarray")
-            assert hasattr(cp, "ndarray")
-        except ModuleNotFoundError:
+            # assert hasattr(cp, "asarray")
+            # assert hasattr(cp, "ndarray")
+        except ImportError:
             print(
                 "Cupy not found. If you have a Cupy-compatible GPU, please follow the instructions to install Cupy."
             )
 
     G = _get_loop_covariates(ds, call_genotype, dosage)
-    if gpu_avail:
+    if gpu_avail and not isinstance(G._meta, cp.ndarray):
         G = G.map_blocks(cp.asarray)  # type: ignore[attr-defined]
+        # potential choke point: all the memory transfers
 
     contigs = da.asarray(ds[variant_contigs].data)
-    if gpu_avail:
+    if gpu_avail and not isinstance(contigs._meta, cp.ndarray):
         contigs = contigs.map_blocks(cp.asarray)  # type: ignore[attr-defined]
     # Pre-compute contigs to have concrete indices to slice the genotype array
-    contigs = contigs.compute()
+    contigs = (
+        contigs.compute()
+    )  # POTENTIAL CHOKE POINT? find another solution other than pre-computing contigs
+    # potential solution: rearrange G from shape (snips, samples) -> (contig, subset_snips, samples) using stack
+    # G = da.stack([G[contigs==contig, :] for contig in ds[variant_contigs].to_series().sort_values().drop_duplicates()], axis=0)
+    # G_loco = G[contig,:,:]
+    # or replace .compute() with .persist()
 
     if gpu_avail:
         assert isinstance(contigs, cp.ndarray)  # type: ignore[attr-defined]
@@ -497,26 +516,34 @@ def regenie_gwas_linear_regression(
 
     # Load covariates and add intercept if necessary
     covariates = da.asarray(ds[covariates].data)
-    if gpu_avail:
+    if gpu_avail and not isinstance(covariates._meta, cp.ndarray):
         covariates = covariates.map_blocks(cp.asarray)  # type: ignore[attr-defined]
 
     if len(covariates) == 0:
         if add_intercept:
-            X = da.ones((ds[traits].shape[0], 1), dtype=np.float32)
             if gpu_avail:
-                X = X.map_blocks(cp.asarray)  # type: ignore[attr-defined]
+                X = da.ones(
+                    (ds[traits].shape[0], 1), dtype=np.float32, meta=cp.array(())
+                )
+            else:
+                X = da.ones((ds[traits].shape[0], 1), dtype=np.float32)
+                # X = X.map_blocks(cp.asarray)  # type: ignore[attr-defined]
         else:
             raise ValueError("add_intercept must be True if no covariates specified")
     else:
         X = covariates
 
         if add_intercept:
-            intercept_arr = da.ones((X.shape[0], 1), dtype=X.dtype)
             if gpu_avail:
-                intercept_arr = intercept_arr.map_blocks(cp.asarray)  # type: ignore[attr-defined]
+                intercept_arr = da.ones(
+                    (X.shape[0], 1), dtype=X.dtype, meta=cp.array(())
+                )
+            else:
+                intercept_arr = da.ones((X.shape[0], 1), dtype=X.dtype)
+                # intercept_arr = intercept_arr.map_blocks(cp.asarray)  # type: ignore[attr-defined]
             X = da.concatenate([intercept_arr, X], axis=1)
 
-    assert isinstance(X, da.Array)
+    # assert isinstance(X, da.Array)
 
     assert X.ndim == 2  # 2d covariate array required
     dof = X.shape[0] - X.shape[1] - 1
@@ -532,7 +559,7 @@ def regenie_gwas_linear_regression(
     assert Q.shape == X.shape
 
     Y = da.asarray(ds[traits].data)
-    if gpu_avail:
+    if gpu_avail and not isinstance(Y._meta, cp.ndarray):
         Y = Y.map_blocks(cp.asarray)  # type: ignore[attr-defined]
     Y_mask = (~da.isnan(Y)).astype("float64")
     Y = da.nan_to_num(Y)
@@ -547,17 +574,17 @@ def regenie_gwas_linear_regression(
     Y /= Y_scale[None, :]
 
     offsets = da.asarray(ds[loco_predicts].data)
-    if gpu_avail:
+    if gpu_avail and not isinstance(offsets._meta, cp.ndarray):
         offsets = offsets.map_blocks(cp.asarray)  # type: ignore[attr-defined]
     # Match chunksize of Y
     offsets = offsets.rechunk((None, Y.chunksize[0], Y.chunksize[1]))
 
-    contig_list = ds[variant_contigs].to_series().sort_values().drop_duplicates()
     results = []
 
-    for contig in contig_list:
+    for contig in range(ds[loco_predicts].shape[0]):
         # Use variants only from this contig
-        loco_G = G[contigs == contig, :]
+        with dask.config.set(**{"array.slicing.split_large_chunks": False}):
+            loco_G = G[contigs == contig, :]
 
         offset_contig = offsets[contig, :, :]
         assert Y.shape == offset_contig.shape
