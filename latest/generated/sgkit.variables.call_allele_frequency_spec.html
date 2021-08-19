@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sgkit.variables.covariates_spec</title>
+    <title>sgkit.variables.call_allele_frequency_spec</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet" />
   <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -39,8 +39,8 @@
     <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.variables.dosage_spec" href="sgkit.variables.dosage_spec.html" />
-    <link rel="prev" title="sgkit.variables.cohort_allele_count_spec" href="sgkit.variables.cohort_allele_count_spec.html" />
+    <link rel="next" title="sgkit.variables.call_dosage_spec" href="sgkit.variables.call_dosage_spec.html" />
+    <link rel="prev" title="sgkit.variables.call_allele_count_spec" href="sgkit.variables.call_allele_count_spec.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
     
@@ -326,8 +326,8 @@
      sgkit.variables.call_allele_count_spec
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.call_allele_frequency_spec.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      sgkit.variables.call_allele_frequency_spec
     </a>
    </li>
@@ -396,8 +396,8 @@
      sgkit.variables.cohort_allele_count_spec
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.covariates_spec.html">
      sgkit.variables.covariates_spec
     </a>
    </li>
@@ -714,7 +714,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../_sources/generated/sgkit.variables.covariates_spec.rst.txt"><button type="button"
+        <a class="dropdown-buttons" href="../_sources/generated/sgkit.variables.call_allele_frequency_spec.rst.txt"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
@@ -747,14 +747,13 @@
         
               <div>
                 
-  <div class="section" id="sgkit-variables-covariates-spec">
-<h1>sgkit.variables.covariates_spec<a class="headerlink" href="#sgkit-variables-covariates-spec" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="sgkit-variables-call-allele-frequency-spec">
+<h1>sgkit.variables.call_allele_frequency_spec<a class="headerlink" href="#sgkit-variables-call-allele-frequency-spec" title="Permalink to this headline">¶</a></h1>
 <dl class="py data">
-<dt id="sgkit.variables.covariates_spec">
-<code class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></code><code class="sig-name descname"><span class="pre">covariates_spec</span></code><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='covariates',</span> <span class="pre">__doc__='\nCovariate</span> <span class="pre">variable</span> <span class="pre">names.</span> <span class="pre">Must</span> <span class="pre">correspond</span> <span class="pre">to</span> <span class="pre">1</span> <span class="pre">or</span> <span class="pre">2D</span> <span class="pre">dataset\nvariables</span> <span class="pre">of</span> <span class="pre">shape</span> <span class="pre">(samples[,</span> <span class="pre">covariates]).</span> <span class="pre">All</span> <span class="pre">covariate</span> <span class="pre">arrays\nwill</span> <span class="pre">be</span> <span class="pre">concatenated</span> <span class="pre">along</span> <span class="pre">the</span> <span class="pre">second</span> <span class="pre">axis</span> <span class="pre">(columns).\n',</span> <span class="pre">kind=None,</span> <span class="pre">ndim={1,</span> <span class="pre">2})</span></em><a class="headerlink" href="#sgkit.variables.covariates_spec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Covariate variable names. Must correspond to 1 or 2D dataset
-variables of shape (samples[, covariates]). All covariate arrays
-will be concatenated along the second axis (columns).</p>
+<dt id="sgkit.variables.call_allele_frequency_spec">
+<code class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></code><code class="sig-name descname"><span class="pre">call_allele_frequency_spec</span></code><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='call_allele_frequency',</span> <span class="pre">__doc__='\nAllele</span> <span class="pre">frequencies.</span> <span class="pre">With</span> <span class="pre">shape</span> <span class="pre">(variants,</span> <span class="pre">samples,</span> <span class="pre">alleles)</span> <span class="pre">and</span> <span class="pre">values\ncorresponding</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">frequencies</span> <span class="pre">of</span> <span class="pre">non-missing</span> <span class="pre">occurrences</span> <span class="pre">of</span> <span class="pre">each</span> <span class="pre">allele.\n',</span> <span class="pre">kind='f',</span> <span class="pre">ndim=3)</span></em><a class="headerlink" href="#sgkit.variables.call_allele_frequency_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allele frequencies. With shape (variants, samples, alleles) and values
+corresponding to the frequencies of non-missing occurrences of each allele.</p>
 </dd></dl>
 
 </div>
@@ -765,8 +764,8 @@ will be concatenated along the second axis (columns).</p>
         
         <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="sgkit.variables.cohort_allele_count_spec.html" title="previous page">sgkit.variables.cohort_allele_count_spec</a>
-    <a class='right-next' id="next-link" href="sgkit.variables.dosage_spec.html" title="next page">sgkit.variables.dosage_spec</a>
+    <a class='left-prev' id="prev-link" href="sgkit.variables.call_allele_count_spec.html" title="previous page">sgkit.variables.call_allele_count_spec</a>
+    <a class='right-next' id="next-link" href="sgkit.variables.call_dosage_spec.html" title="next page">sgkit.variables.call_dosage_spec</a>
 
         </div>
         
