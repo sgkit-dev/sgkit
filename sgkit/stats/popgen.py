@@ -124,7 +124,7 @@ def diversity(
             {
                 variables.stat_diversity: (
                     ("variants", "cohorts"),
-                    pi,
+                    pi.data,
                 )
             }
         )
@@ -604,10 +604,12 @@ def Tajimas_D(
     D = d / d_stdev[:, np.newaxis]
 
     if has_windows(ds):
-        new_ds = create_dataset({variables.stat_Tajimas_D: (["windows", "cohorts"], D)})
+        new_ds = create_dataset(
+            {variables.stat_Tajimas_D: (["windows", "cohorts"], D.data)}
+        )
     else:
         new_ds = create_dataset(
-            {variables.stat_Tajimas_D: (["variants", "cohorts"], D)}
+            {variables.stat_Tajimas_D: (["variants", "cohorts"], D.data)}
         )
     return conditional_merge_datasets(ds, new_ds, merge)
 

@@ -7,6 +7,7 @@ import xarray as xr
 from xarray import Dataset
 
 from sgkit.stats.aggregation import (
+    call_allele_frequencies,
     count_call_alleles,
     count_cohort_alleles,
     count_variant_alleles,
@@ -253,6 +254,82 @@ def test_count_cohort_alleles__chunked():
     ac2 = count_cohort_alleles(ds)
     assert isinstance(ac2["cohort_allele_count"].data, da.Array)
     xr.testing.assert_equal(ac1, ac2)
+
+
+@pytest.mark.parametrize(
+    "chunks",
+    [
+        None,
+        ((4,), (3,), (2,)),
+        ((2, 2), (2, 1), (2,)),
+    ],
+)
+def test_call_allele_frequencies__diploid(chunks):
+    ds = call_allele_frequencies(
+        get_dataset(
+            [
+                [[0, 0], [0, 0], [0, 0]],
+                [[0, 0], [0, 0], [0, 1]],
+                [[1, 1], [0, 1], [1, 0]],
+                [[1, -1], [1, 1], [-1, -1]],
+            ]
+        )
+    )
+    if chunks is not None:
+        ds["call_genotype"] = (
+            ds["call_genotype"].dims,
+            da.array(ds["call_genotype"]).rechunk(chunks),
+        )
+    af = ds["call_allele_frequency"]
+    np.testing.assert_equal(
+        af,
+        np.array(
+            [
+                [[1.0, 0.0], [1.0, 0.0], [1.0, 0.0]],
+                [[1.0, 0.0], [1.0, 0.0], [0.5, 0.5]],
+                [[0.0, 1.0], [0.5, 0.5], [0.5, 0.5]],
+                [[0.0, 1.0], [0.0, 1.0], [np.nan, np.nan]],
+            ]
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "chunks",
+    [
+        None,
+        ((3,), (3,), (4,)),
+        ((1, 2), (2, 1), (2, 2)),
+    ],
+)
+def test_call_allele_frequencies__tetraploid(chunks):
+    ds = call_allele_frequencies(
+        get_dataset(
+            [
+                [[0, 1, 2, 2], [0, 0, 0, 0], [0, 0, 1, 2]],
+                [[0, 0, 1, 0], [0, 2, 2, 2], [2, 1, 2, 1]],
+                [[1, 1, -1, 2], [1, 1, 1, 1], [-1, -1, -1, -1]],
+            ],
+            n_ploidy=4,
+            n_allele=3,
+        )
+    )
+    if chunks is not None:
+        ds["call_genotype"] = (
+            ds["call_genotype"].dims,
+            da.array(ds["call_genotype"]).rechunk(chunks),
+        )
+    af = ds["call_allele_frequency"]
+    np.testing.assert_equal(
+        af,
+        np.array(
+            [
+                [[0.25, 0.25, 0.5], [1.0, 0.0, 0.0], [0.5, 0.25, 0.25]],
+                [[0.75, 0.25, 0.0], [0.25, 0.0, 0.75], [0.0, 0.5, 0.5]],
+                [[0.0, 2 / 3, 1 / 3], [0.0, 1.0, 0.0], [np.nan, np.nan, np.nan]],
+            ]
+        ),
+    )
 
 
 @pytest.mark.parametrize("precompute_variant_allele_count", [False, True])

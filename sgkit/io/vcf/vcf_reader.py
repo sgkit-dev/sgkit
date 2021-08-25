@@ -1,5 +1,6 @@
 import functools
 import itertools
+import warnings
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,8 +21,10 @@ import fsspec
 import numpy as np
 import xarray as xr
 from cyvcf2 import VCF, Variant
+from numcodecs import PackBits
 
 from sgkit import variables
+from sgkit.io.dataset import load_dataset
 from sgkit.io.utils import zarrs_to_dataset
 from sgkit.io.vcf import partition_into_regions
 from sgkit.io.vcf.utils import build_url, chunks, temporary_directory, url_filename
@@ -38,6 +41,20 @@ from sgkit.utils import max_str_len
 DEFAULT_MAX_ALT_ALLELES = (
     3  # equivalent to DEFAULT_ALT_NUMBER in vcf_read.py in scikit_allel
 )
+
+try:
+    from numcodecs import Blosc
+
+    DEFAULT_COMPRESSOR = Blosc(cname="zstd", clevel=7, shuffle=Blosc.AUTOSHUFFLE)
+except ImportError:  # pragma: no cover
+    warnings.warn("Cannot import Blosc, falling back to no compression", RuntimeWarning)
+    DEFAULT_COMPRESSOR = None
+
+
+class MaxAltAllelesExceededWarning(UserWarning):
+    """Warning when the number of alt alleles exceeds the maximum specified."""
+
+    pass
 
 
 @contextmanager
@@ -144,7 +161,7 @@ class VcfFieldHandler:
     ) -> "VcfFieldHandler":
         if field == "FORMAT/GT":
             return GenotypeFieldHandler(
-                vcf, chunk_length, ploidy, mixed_ploidy, truncate_calls
+                vcf, chunk_length, ploidy, mixed_ploidy, truncate_calls, max_alt_alleles
             )
         category = field.split("/")[0]
         vcf_field_defs = _get_vcf_field_defs(vcf, category)
@@ -269,6 +286,7 @@ class GenotypeFieldHandler(VcfFieldHandler):
         ploidy: int,
         mixed_ploidy: bool,
         truncate_calls: bool,
+        max_alt_alleles: int,
     ) -> None:
         n_sample = len(vcf.samples)
         self.call_genotype = np.empty((chunk_length, n_sample, ploidy), dtype="i1")
@@ -276,6 +294,7 @@ class GenotypeFieldHandler(VcfFieldHandler):
         self.ploidy = ploidy
         self.mixed_ploidy = mixed_ploidy
         self.truncate_calls = truncate_calls
+        self.max_alt_alleles = max_alt_alleles
 
     def add_variant(self, i: int, variant: Any) -> None:
         fill = -2 if self.mixed_ploidy else -1
@@ -288,6 +307,10 @@ class GenotypeFieldHandler(VcfFieldHandler):
             self.call_genotype[i, ..., 0:n] = gt[..., 0:n]
             self.call_genotype[i, ..., n:] = fill
             self.call_genotype_phased[i] = gt[..., -1]
+
+            # set any calls that exceed maximum number of alt alleles as missing
+            self.call_genotype[i][self.call_genotype[i] > self.max_alt_alleles] = -1
+
         else:
             self.call_genotype[i] = fill
             self.call_genotype_phased[i] = 0
@@ -331,6 +354,8 @@ def vcf_to_zarr_sequential(
     region: Optional[str] = None,
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
+    compressor: Optional[Any] = DEFAULT_COMPRESSOR,
+    encoding: Optional[Any] = None,
     ploidy: int = 2,
     mixed_ploidy: bool = False,
     truncate_calls: bool = False,
@@ -350,6 +375,7 @@ def vcf_to_zarr_sequential(
         # Remember max lengths of variable-length strings
         max_variant_id_length = 0
         max_variant_allele_length = 0
+        max_alt_alleles_seen = 0
 
         # Iterate through variants in batches of chunk_length
 
@@ -401,6 +427,7 @@ def vcf_to_zarr_sequential(
                 variant_position[i] = variant.POS
 
                 alleles = [variant.REF] + variant.ALT
+                max_alt_alleles_seen = max(max_alt_alleles_seen, len(variant.ALT))
                 if len(alleles) > n_allele:
                     alleles = alleles[:n_allele]
                 elif len(alleles) < n_allele:
@@ -445,6 +472,7 @@ def vcf_to_zarr_sequential(
             if add_str_max_length_attrs:
                 ds.attrs["max_length_variant_id"] = max_variant_id_length
                 ds.attrs["max_length_variant_allele"] = max_variant_allele_length
+            ds.attrs["max_alt_alleles_seen"] = max_alt_alleles_seen
 
             if first_variants_chunk:
                 # Enforce uniform chunks in the variants dimension
@@ -458,15 +486,23 @@ def vcf_to_zarr_sequential(
                     else:
                         return size
 
-                encoding = {}
+                default_encoding = {}
                 for var in ds.data_vars:
                     var_chunks = tuple(
                         get_chunk_size(dim, size)
                         for (dim, size) in zip(ds[var].dims, ds[var].shape)
                     )
-                    encoding[var] = dict(chunks=var_chunks)
+                    default_encoding[var] = dict(
+                        chunks=var_chunks, compressor=compressor
+                    )
+                    if ds[var].dtype.kind == "b":
+                        default_encoding[var]["filters"] = [PackBits()]
 
-                ds.to_zarr(output, mode="w", encoding=encoding)
+                # values from function args (encoding) take precedence over default_encoding
+                encoding = encoding or {}
+                merged_encoding = {**default_encoding, **encoding}
+
+                ds.to_zarr(output, mode="w", encoding=merged_encoding)
                 first_variants_chunk = False
             else:
                 # Append along the variants dimension
@@ -479,6 +515,8 @@ def vcf_to_zarr_parallel(
     regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]],
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
+    compressor: Optional[Any] = DEFAULT_COMPRESSOR,
+    encoding: Optional[Any] = None,
     temp_chunk_length: Optional[int] = None,
     tempdir: Optional[PathType] = None,
     tempdir_storage_options: Optional[Dict[str, str]] = None,
@@ -506,6 +544,8 @@ def vcf_to_zarr_parallel(
             regions,
             temp_chunk_length,
             chunk_width,
+            compressor,
+            encoding,
             tempdir_storage_options,
             ploidy=ploidy,
             mixed_ploidy=mixed_ploidy,
@@ -529,6 +569,8 @@ def vcf_to_zarrs(
     regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]],
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
+    compressor: Optional[Any] = DEFAULT_COMPRESSOR,
+    encoding: Optional[Any] = None,
     output_storage_options: Optional[Dict[str, str]] = None,
     ploidy: int = 2,
     mixed_ploidy: bool = False,
@@ -556,6 +598,14 @@ def vcf_to_zarrs(
         Length (number of variants) of chunks in which data are stored, by default 10,000.
     chunk_width
         Width (number of samples) to use when storing chunks in output, by default 1,000.
+    compressor
+        Zarr compressor, by default Blosc + zstd with compression level 7 and auto-shuffle.
+        No compression is used when set as None.
+    encoding
+        Variable-specific encodings for xarray, specified as a nested dictionary with
+        variable names as keys and dictionaries of variable specific encodings as values.
+        Can be used to override Zarr compressor and filters on a per-variable basis,
+        e.g., ``{"call_genotype": {"compressor": Blosc("zstd", 9)}}``.
     output_storage_options
         Any additional parameters for the storage backend, for the output (see ``fsspec.open``).
     ploidy
@@ -571,7 +621,9 @@ def vcf_to_zarrs(
         specified ploidy will raise an exception.
     max_alt_alleles
         The (maximum) number of alternate alleles in the VCF file. Any records with more than
-        this number of alternate alleles will have the extra alleles dropped.
+        this number of alternate alleles will have the extra alleles dropped (the `variant_allele`
+        variable will be truncated). Any call genotype fields with the extra alleles will
+        be changed to the missing-allele sentinel value of -1.
     fields
         Extra fields to extract data for. A list of strings, with ``INFO`` or ``FORMAT`` prefixes.
         Wildcards are permitted too, for example: ``["INFO/*", "FORMAT/DP"]``.
@@ -634,6 +686,8 @@ def vcf_to_zarrs(
                 region=region,
                 chunk_length=chunk_length,
                 chunk_width=chunk_width,
+                compressor=compressor,
+                encoding=encoding,
                 ploidy=ploidy,
                 mixed_ploidy=mixed_ploidy,
                 truncate_calls=truncate_calls,
@@ -656,6 +710,8 @@ def vcf_to_zarr(
     regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]] = None,
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
+    compressor: Optional[Any] = DEFAULT_COMPRESSOR,
+    encoding: Optional[Any] = None,
     temp_chunk_length: Optional[int] = None,
     tempdir: Optional[PathType] = None,
     tempdir_storage_options: Optional[Dict[str, str]] = None,
@@ -703,6 +759,14 @@ def vcf_to_zarr(
         Length (number of variants) of chunks in which data are stored, by default 10,000.
     chunk_width
         Width (number of samples) to use when storing chunks in output, by default 1,000.
+    compressor
+        Zarr compressor, by default Blosc + zstd with compression level 7 and auto-shuffle.
+        No compression is used when set as None.
+    encoding
+        Variable-specific encodings for xarray, specified as a nested dictionary with
+        variable names as keys and dictionaries of variable specific encodings as values.
+        Can be used to override Zarr compressor and filters on a per-variable basis,
+        e.g., ``{"call_genotype": {"compressor": Blosc("zstd", 9)}}``.
     temp_chunk_length
         Length (number of variants) of chunks for temporary intermediate files. Set this
         to be smaller than ``chunk_length`` to avoid memory errors when loading files with
@@ -726,7 +790,9 @@ def vcf_to_zarr(
         specified ploidy will raise an exception.
     max_alt_alleles
         The (maximum) number of alternate alleles in the VCF file. Any records with more than
-        this number of alternate alleles will have the extra alleles dropped.
+        this number of alternate alleles will have the extra alleles dropped (the `variant_allele`
+        variable will be truncated). Any call genotype fields with the extra alleles will
+        be changed to the missing-allele sentinel value of -1.
     fields
         Extra fields to extract data for. A list of strings, with ``INFO`` or ``FORMAT`` prefixes.
         Wildcards are permitted too, for example: ``["INFO/*", "FORMAT/DP"]``.
@@ -782,6 +848,8 @@ def vcf_to_zarr(
         regions,  # type: ignore
         chunk_length=chunk_length,
         chunk_width=chunk_width,
+        compressor=compressor,
+        encoding=encoding,
         ploidy=ploidy,
         mixed_ploidy=mixed_ploidy,
         truncate_calls=truncate_calls,
@@ -790,6 +858,15 @@ def vcf_to_zarr(
         exclude_fields=exclude_fields,
         field_defs=field_defs,
     )
+
+    # Issue a warning if max_alt_alleles caused data to be dropped
+    ds = load_dataset(output)
+    max_alt_alleles_seen = ds.attrs["max_alt_alleles_seen"]
+    if max_alt_alleles_seen > max_alt_alleles:
+        warnings.warn(
+            f"Some alternate alleles were dropped, since actual max value {max_alt_alleles_seen} exceeded max_alt_alleles setting of {max_alt_alleles}.",
+            MaxAltAllelesExceededWarning,
+        )
 
 
 def count_variants(path: PathType, region: Optional[str] = None) -> int:

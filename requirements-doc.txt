@@ -1,3 +1,4 @@
+myst_nb
 pydata-sphinx-theme
 sphinx >= 3.3
 sphinx_autodoc_typehints 
@@ -9,3 +10,4 @@ scanpydoc
 ipython
 matplotlib
 graphviz
+seaborn
