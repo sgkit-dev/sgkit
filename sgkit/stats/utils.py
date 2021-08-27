@@ -1,10 +1,5 @@
-# Apache License
-#
-# Copyright (c) 2021, NVIDIA CORPORATION.
-
 from typing import Hashable, Tuple
 
-import dask.array as da
 import numpy as np
 import xarray as xr
 from dask.array import Array
@@ -105,11 +100,3 @@ def assert_array_shape(x: ArrayLike, *args: int) -> None:
     """Validate array shape (i.e. x.shape)"""
     shape = tuple(args)
     assert x.shape == shape, f"Expecting array shape {shape}, found {x.shape}"
-
-
-def map_blocks_asnumpy(x: Array) -> Array:
-    if da.utils.is_cupy_type(x._meta):
-        import cupy as cp  # type: ignore[import]
-
-        x = x.map_blocks(cp.asnumpy)
-    return x
