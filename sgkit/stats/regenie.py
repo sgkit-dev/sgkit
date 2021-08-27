@@ -483,8 +483,8 @@ def _stage_3(
     if not hasattr(contigs, "__array_function__"):
         contigs = np.asarray(contigs)
     unique_contigs = np.unique(contigs)  # type: ignore[no-untyped-call]
-    if hasattr(unique_contigs, "compute_chunk_sizes"):
-        unique_contigs.compute_chunk_sizes()
+    if hasattr(unique_contigs, "compute"):
+        unique_contigs = unique_contigs.compute()
     n_contig = len(unique_contigs)
     if n_contig <= 1:
         # Return nothing w/o at least 2 contigs
