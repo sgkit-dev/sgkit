@@ -480,8 +480,7 @@ def _stage_3(
     n_sample, n_outcome = Y.shape
 
     # Determine unique contigs to create LOCO estimates for
-    if not hasattr(contigs, "__array_function__"):
-        contigs = np.asarray(contigs)
+    contigs = np.asarray(contigs, like=contigs)
     unique_contigs = np.unique(contigs)  # type: ignore[no-untyped-call]
     if hasattr(unique_contigs, "compute"):
         unique_contigs = unique_contigs.compute()
