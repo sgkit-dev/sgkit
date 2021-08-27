@@ -170,10 +170,8 @@ def get_alphas(
 ) -> NDArray[np.float_]:
     # https://github.com/projectglow/glow/blob/f3edf5bb8fe9c2d2e1a374d4402032ba5ce08e29/python/glow/wgr/linear_model/ridge_model.py#L80
     if like is not None:
-        from dask.array.utils import meta_from_array
-
         return np.asarray(
-            [n_cols / h for h in heritability], like=meta_from_array(like)
+            [n_cols / h for h in heritability], like=da.utils.meta_from_array(like)
         )
     else:
         return np.asarray([n_cols / h for h in heritability])
@@ -228,8 +226,6 @@ def _ridge_regression_cv(
     assert XtX.numblocks == XtY.numblocks
 
     # Regress for all outcomes/alphas and add new axis for ridge parameters
-    from dask.array.utils import meta_from_array
-
     B = da.map_blocks(
         ridge_regression,
         XtX,
@@ -238,7 +234,7 @@ def _ridge_regression_cv(
         new_axis=[0],
         alphas=alphas,
         n_zero_reg=n_zero_reg,
-        meta=meta_from_array(XtX),
+        meta=da.utils.meta_from_array(XtX),
     )
     assert_block_shape(B, 1, n_block, 1)
     assert_chunk_shape(B, n_alpha, n_covar, n_outcome)
