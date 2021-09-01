@@ -1,4 +1,4 @@
-from typing import Any, Dict, Hashable, List, Optional, Tuple
+from typing import Any, Dict, Hashable, List, Optional, Tuple, Union
 
 import numpy as np
 import xarray as xr
@@ -155,47 +155,47 @@ def create_genotype_dosage_dataset(
 def select(
     ds: xr.Dataset,
     *,
-    region: Optional[str] = None,
+    regions: Union[None, str, List[str]] = None,
     sample_ids: Optional[List[str]] = None,
 ) -> xr.Dataset:
-    """Select a particular region of variants, a subset of samples, or both, from a dataset.
+    """Select a subset of variants, samples, or both, from a dataset.
 
     Parameters
     ----------
     ds
         Genotype call dataset.
-    region
-        A bcftools style region string of the form ``contig``, ``contig:start-``, or ``contig:start-end``,
-        where ``start`` and ``end`` are inclusive.
+    regions
+        One or more bcftools style region strings of the form ``contig``, ``contig:start-``, or ``contig:start-end``,
+        where ``start`` and ``end`` are inclusive. Specify as None (the default) to include all variants.
     sample_ids
-        A list of sample IDs that should be included.
+        A list of sample IDs that should be included. Specify as None (the default) to include all samples.
 
     Returns
     -------
-    A dataset that contains only variants in the given region and samples in the given subset.
+    A dataset that contains only variants in the given regions and samples in the given subset.
     """
-    if region is None and sample_ids is None:
+    if regions is None and sample_ids is None:
         return ds
     kwargs = {}
-    if region is not None:
-        kwargs["variants"] = _region_to_index(ds, region)
+    if regions is not None:
+        kwargs["variants"] = _regions_to_index(ds, regions)
     if sample_ids is not None:
         kwargs["samples"] = _sample_ids_to_index(ds, sample_ids)
-    return ds.isel(**kwargs)  # type: ignore[arg-type]
+    return ds.isel(**kwargs)
 
 
-def _region_to_index(ds: xr.Dataset, region: str) -> slice:
+def _region_to_slice(
+    contigs: List[str], variant_contig: Any, variant_position: Any, region: str
+) -> slice:
     contig, start, end = _parse_region(region)
 
-    contig_index = ds.attrs["contigs"].index(contig)
-    contig_range = np.searchsorted(
-        ds.variant_contig.values, [contig_index, contig_index + 1]
-    )
+    contig_index = contigs.index(contig)
+    contig_range = np.searchsorted(variant_contig, [contig_index, contig_index + 1])
 
     if start is None and end is None:
         start_index, end_index = contig_range
     else:
-        contig_pos = ds.variant_position.values[slice(contig_range[0], contig_range[1])]
+        contig_pos = variant_position[slice(contig_range[0], contig_range[1])]
         if end is None:
             start_index = contig_range[0] + np.searchsorted(contig_pos, [start])[0]  # type: ignore[arg-type]
             end_index = contig_range[1]
@@ -205,6 +205,21 @@ def _region_to_index(ds: xr.Dataset, region: str) -> slice:
             )
 
     return slice(start_index, end_index)
+
+
+def _regions_to_index(ds: xr.Dataset, regions: Union[str, List[str]]) -> Any:
+    if isinstance(regions, str):
+        regions = [regions]
+    size = ds.dims["variants"]
+    contigs = ds.attrs["contigs"]
+    variant_contig = ds.variant_contig.values
+    variant_position = ds.variant_position.values
+
+    slices = [
+        _region_to_slice(contigs, variant_contig, variant_position, region)
+        for region in regions
+    ]
+    return np.concatenate([np.arange(*sl.indices(size)) for sl in slices])  # type: ignore[no-untyped-call]
 
 
 def _parse_region(region: str) -> Tuple[str, Optional[int], Optional[int]]:
