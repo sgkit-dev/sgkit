@@ -1,7 +1,3 @@
-# Apache License
-#
-# Copyright (c) 2021, NVIDIA CORPORATION.
-
 import dataclasses
 import functools
 from pathlib import Path
