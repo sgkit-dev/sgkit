@@ -2,6 +2,7 @@ from pkg_resources import DistributionNotFound, get_distribution
 
 from .display import display_genotypes
 from .distance.api import pairwise_distance
+from .indexing import regions_to_indexer
 from .io.dataset import load_dataset, save_dataset
 from .io.vcfzarr_reader import read_vcfzarr
 from .model import (
@@ -11,7 +12,6 @@ from .model import (
     DIM_VARIANT,
     create_genotype_call_dataset,
     create_genotype_dosage_dataset,
-    select,
 )
 from .stats.aggregation import (
     call_allele_frequencies,
@@ -93,5 +93,5 @@ __all__ = [
     "load_dataset",
     "save_dataset",
     "pairwise_distance",
-    "select",
+    "regions_to_indexer",
 ]
