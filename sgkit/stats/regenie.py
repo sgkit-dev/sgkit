@@ -20,7 +20,7 @@ from .utils import (
 
 
 def _map_blocks_asnumpy(x: Array) -> Array:
-    if da.utils.is_cupy_type(x._meta):
+    if da.utils.is_cupy_type(x._meta):  # pragma: no cover
         import cupy as cp  # type: ignore[import]
 
         x = x.map_blocks(cp.asnumpy)
