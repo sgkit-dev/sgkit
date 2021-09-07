@@ -1,19 +1,23 @@
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Tuple, Union
 
 import numpy as np
 import xarray as xr
 
+RegionTuple = Union[Tuple[str], Tuple[str, int], Tuple[str, int, int]]
 
-def regions_to_indexer(ds: xr.Dataset, regions: Union[str, List[str]]) -> Any:
-    """Converts bcftools-style region strings to an Xarray indexer for selecting variants.
+
+def regions_to_indexer(ds: xr.Dataset, *regions: RegionTuple) -> Any:
+    """Convert genomic regions to an Xarray indexer for selecting variants.
 
     Parameters
     ----------
     ds
         Genotype call dataset.
     regions
-        One or more bcftools-style region strings of the form ``contig``, ``contig:start-``, or ``contig:start-end``,
-        where ``start`` and ``end`` are inclusive.
+        One or more tuples specifying the contig name, the start position, and the end position for each region.
+        Positions follow Python semantics: start is inclusive, and end is exclusive. Both start and end
+        may be omitted (so the region covers the entire contig), or end may be omitted (the region covers covers
+        from the start position to the end of the contig).
 
     Returns
     -------
@@ -30,7 +34,7 @@ def regions_to_indexer(ds: xr.Dataset, regions: Union[str, List[str]]) -> Any:
     --------
     >>> import sgkit as sg
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=10, n_sample=2, n_contig=2)
-    >>> ds.isel(dict(variants=sg.regions_to_indexer(ds, "0"))) # doctest: +SKIP
+    >>> ds.isel(dict(variants=sg.regions_to_indexer(ds, ("0",)))) # doctest: +SKIP
     <xarray.Dataset>
     Dimensions:             (variants: 5, alleles: 2, samples: 2, ploidy: 2)
     Dimensions without coordinates: variants, alleles, samples, ploidy
@@ -41,7 +45,7 @@ def regions_to_indexer(ds: xr.Dataset, regions: Union[str, List[str]]) -> Any:
         sample_id           (samples) <U2 'S0' 'S1'
         call_genotype       (variants, samples, ploidy) int8 0 0 1 0 1 ... 0 1 1 0 0
         call_genotype_mask  (variants, samples, ploidy) bool False False ... False
-    >>> ds.isel(dict(variants=sg.regions_to_indexer(ds, ["0:2-3", "1:3-"]))) # doctest: +SKIP
+    >>> ds.isel(dict(variants=sg.regions_to_indexer(ds, ("0", 2, 4), ("1", 3)))) # doctest: +SKIP
     <xarray.Dataset>
     Dimensions:             (variants: 4, alleles: 2, samples: 2, ploidy: 2)
     Dimensions without coordinates: variants, alleles, samples, ploidy
@@ -53,8 +57,6 @@ def regions_to_indexer(ds: xr.Dataset, regions: Union[str, List[str]]) -> Any:
         call_genotype       (variants, samples, ploidy) int8 1 0 0 1 0 ... 0 1 0 1 1
         call_genotype_mask  (variants, samples, ploidy) bool False False ... False
     """
-    if isinstance(regions, str):
-        regions = [regions]
     size = ds.dims["variants"]
     contigs = ds.attrs["contigs"]
     variant_contig = ds.variant_contig.values
@@ -68,33 +70,25 @@ def regions_to_indexer(ds: xr.Dataset, regions: Union[str, List[str]]) -> Any:
 
 
 def _region_to_slice(
-    contigs: List[str], variant_contig: Any, variant_position: Any, region: str
+    contigs: List[str], variant_contig: Any, variant_position: Any, region: RegionTuple
 ) -> slice:
-    contig, start, end = _parse_region(region)
+    contig = region[0]
 
     contig_index = contigs.index(contig)
     contig_range = np.searchsorted(variant_contig, [contig_index, contig_index + 1])
 
-    if start is None and end is None:
+    if len(region) == 1:
         start_index, end_index = contig_range
     else:
+        start = region[1]  # type: ignore[misc]
         contig_pos = variant_position[slice(contig_range[0], contig_range[1])]
-        if end is None:
-            start_index = contig_range[0] + np.searchsorted(contig_pos, [start])[0]  # type: ignore[arg-type]
+        if len(region) == 2:
+            start_index = contig_range[0] + np.searchsorted(contig_pos, [start])[0]
             end_index = contig_range[1]
         else:
+            end = region[2]  # type: ignore[misc]
             start_index, end_index = contig_range[0] + np.searchsorted(
-                contig_pos, [start, end + 1]  # type: ignore[arg-type]
+                contig_pos, [start, end]
             )
 
     return slice(start_index, end_index)
-
-
-def _parse_region(region: str) -> Tuple[str, Optional[int], Optional[int]]:
-    if ":" not in region:
-        return region, None, None
-    contig, start_end = region.split(":")
-    start, end = start_end.split("-")
-    start = int(start)
-    end = int(end) if end != "" else None
-    return contig, start, end
