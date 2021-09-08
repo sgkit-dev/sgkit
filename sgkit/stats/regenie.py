@@ -15,16 +15,9 @@ from .utils import (
     assert_block_shape,
     assert_chunk_shape,
     concat_2d,
+    map_blocks_asnumpy,
     r2_score,
 )
-
-
-def _map_blocks_asnumpy(x: Array) -> Array:
-    if da.utils.is_cupy_type(x._meta):  # pragma: no cover
-        import cupy as cp  # type: ignore[import]
-
-        x = x.map_blocks(cp.asnumpy)
-    return x
 
 
 def index_array_blocks(
@@ -718,7 +711,7 @@ def regenie_transform(
     # computationally intensive and cumbersome to implement it to be
     # CuPy-compatible, we map a CuPy-backed Dask array contigs to NumPy backend.
     variant_chunk_start, variant_chunk_size = _variant_block_indexes(
-        variant_block_size, _map_blocks_asnumpy(contigs)
+        variant_block_size, map_blocks_asnumpy(contigs)
     )
     G = G.rechunk(chunks=(sample_block_size, tuple(variant_chunk_size)))
     X = X.rechunk(chunks=(sample_block_size, -1))
