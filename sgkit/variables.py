@@ -386,6 +386,17 @@ across all samples for a variant.
     )
 )
 
+stat_identity_by_state, stat_identity_by_state_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_identity_by_state",
+        ndim=2,
+        kind="f",
+        __doc__="""
+Pairwise IBS probabilities among all samples.
+""",
+    )
+)
+
 ld_prune_index_to_drop, ld_prune_index_to_drop_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "ld_prune_index_to_drop",
@@ -684,6 +695,15 @@ stat_pbs, stat_pbs_spec = SgkitVariables.register_variable(
 stat_Tajimas_D, stat_Tajimas_D_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "stat_Tajimas_D", ndim=2, kind="f", __doc__="""Tajima’s D for cohorts."""
+    )
+)
+
+stat_Weir_Goudet_beta, stat_Weir_Goudet_beta_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_Weir_Goudet_beta",
+        ndim=2,
+        kind="f",
+        __doc__="""Pairwise Weir Goudet beta statistic among all samples.""",
     )
 )
 

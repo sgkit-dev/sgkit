@@ -27,6 +27,7 @@ from .stats.aggregation import (
 from .stats.association import gwas_linear_regression
 from .stats.conversion import convert_probability_to_call
 from .stats.hwe import hardy_weinberg_test
+from .stats.ibs import Weir_Goudet_beta, identity_by_state
 from .stats.ld import ld_matrix, ld_prune, maximal_independent_set
 from .stats.pc_relate import pc_relate
 from .stats.pca import pca
@@ -67,6 +68,7 @@ __all__ = [
     "read_vcfzarr",
     "regenie",
     "hardy_weinberg_test",
+    "identity_by_state",
     "individual_heterozygosity",
     "infer_call_ploidy",
     "infer_sample_ploidy",
@@ -87,6 +89,7 @@ __all__ = [
     "variables",
     "observed_heterozygosity",
     "pca",
+    "Weir_Goudet_beta",
     "window_by_position",
     "window_by_variant",
     "load_dataset",
