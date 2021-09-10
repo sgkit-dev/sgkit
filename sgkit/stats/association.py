@@ -10,7 +10,7 @@ from xarray import Dataset, concat
 from .. import variables
 from ..typing import ArrayLike
 from ..utils import conditional_merge_datasets, create_dataset
-from .utils import concat_2d
+from .utils import concat_2d, map_blocks_asnumpy
 
 
 @dataclass
@@ -125,7 +125,6 @@ def _inner_loco_regression(
     Y_scale: ArrayLike,
     Q: ArrayLike,
     dof: int,
-    use_gpu: bool,
 ) -> LinearRegressionResultLoco:
     """Linear regression estimation for multiple covariate sets. Uses pre-computed orthonormal matrix Q to apply orthogonal projection to genotype matrix.
 
@@ -148,9 +147,6 @@ def _inner_loco_regression(
         Orthonormal matrix computed by applying QR factorization to covariate matrix
     dof
         Number of samples - Number of covariates - 1
-    use_gpu
-        bool
-        Whether the dask arrays above are backed by Cupy arrays or not
 
     Returns
     -------
@@ -213,39 +209,21 @@ def _inner_loco_regression(
     assert B.shape[1] == Y_scale.shape[0]
     effect_size = B * Y_scale[None, :]
 
-    # Transfer data back from device to host if using GPU, no Cupy implementation of t-test
-    if use_gpu:
-        try:
-            import cupy as cp
-
-            # assert hasattr(cp, "ndarray")
-            # assert hasattr(cp, "asnumpy")
-            # assert isinstance(B, da.Array)
-            if isinstance(B._meta, cp.ndarray):  # type: ignore[attr-defined]
-                B = B.map_blocks(cp.asnumpy, dtype=B.dtype)  # type: ignore[attr-defined]
-
-            # assert isinstance(T, da.Array)
-            if isinstance(T._meta, cp.ndarray):  # type: ignore[attr-defined]
-                T = T.map_blocks(cp.asnumpy, dtype=T.dtype)  # type: ignore[attr-defined]
-
-            # assert isinstance(effect_size, da.Array)
-            if isinstance(effect_size._meta, cp.ndarray):  # type: ignore[attr-defined]
-                effect_size = effect_size.map_blocks(
-                    cp.asnumpy, dtype=effect_size.dtype  # type: ignore[attr-defined]
-                )
-        except Exception:
-            pass
-
     # Match to p-values
     # Note: t dist not implemented in Dask so this must be delayed,
     # see https://github.com/dask/dask/issues/6857
-
+    #
+    # Map T to NumPy blocks if using CuPy, no scipy.stats.distributions.t.sf
+    # equivalent available in CuPy.
     # https://github.com/scipy/scipy/blob/v1.7.1/scipy/stats/_continuous_distns.py#L6328
     # cupy (almost) equivalent: https://github.com/cupy/cupy/blob/dddb367e03e413c5120521733e2694515a0d8f70/cupyx/scipy/special/_statistics.py#L4
     P = da.map_blocks(
-        lambda t: 2 * stats.distributions.t.sf(np.abs(t), dof), T, dtype="float64"
+        lambda t: 2 * stats.distributions.t.sf(np.abs(t), dof),
+        map_blocks_asnumpy(T),
+        dtype="float64",
     )
     assert P.shape == (n_loop_covar, n_outcome)
+    P = np.asarray(P, like=T)
 
     return LinearRegressionResultLoco(beta=B, effect=effect_size, t_value=T, p_value=P)
 
@@ -396,7 +374,6 @@ def regenie_gwas_linear_regression(
     add_intercept: bool = True,
     call_genotype: Hashable,
     merge: bool = True,
-    use_gpu: bool = True,
 ) -> Dataset:
     """
     Runs linear regression in a Leave-One-Chromosome-Out (LOCO) scheme as described in the REGENIE paper. It identifies continuous trait associations with genetic variants.
@@ -438,8 +415,6 @@ def regenie_gwas_linear_regression(
         output variables into a single dataset, otherwise return only
         the computed output variables.
         See :ref:`dataset_merge` for more details.
-    use_gpu
-        If true, attempts to use GPU if a Cupy installation is found.
 
     Returns
     -------
@@ -465,41 +440,9 @@ def regenie_gwas_linear_regression(
         {loco_predicts: variables.regenie_loco_prediction_spec},
     )
 
-    # Use GPU if available
-    gpu_avail = False
-    # Forces use_gpu to True if any of the data variables are already backed by Cupy
-    if not use_gpu:
-        for dv in ds.data_vars:
-            if hasattr(ds[dv].data, "_meta"):
-                tb = "cupy" in str(type(ds[dv].data._meta))
-            else:
-                tb = "cupy" in str(type(ds[dv].data))
-            use_gpu = use_gpu or tb
-            if use_gpu:
-                break
-
-    if use_gpu:
-        try:
-            import cupy as cp
-
-            print("Cupy found, GPU will be used where possible.")
-            gpu_avail = True
-
-            # assert hasattr(cp, "asarray")
-            # assert hasattr(cp, "ndarray")
-        except ImportError:
-            print(
-                "Cupy not found. If you have a Cupy-compatible GPU, please follow the instructions to install Cupy."
-            )
-
     G = _get_loop_covariates(ds, call_genotype, dosage)
-    if gpu_avail and not isinstance(G._meta, cp.ndarray):
-        G = G.map_blocks(cp.asarray)  # type: ignore[attr-defined]
-        # potential choke point: all the memory transfers
 
-    contigs = da.asarray(ds[variant_contigs].data)
-    if gpu_avail and not isinstance(contigs._meta, cp.ndarray):
-        contigs = contigs.map_blocks(cp.asarray)  # type: ignore[attr-defined]
+    contigs = np.asarray(ds[variant_contigs].data, like=G)
     # Pre-compute contigs to have concrete indices to slice the genotype array
     contigs = (
         contigs.compute()
@@ -509,38 +452,23 @@ def regenie_gwas_linear_regression(
     # G_loco = G[contig,:,:]
     # or replace .compute() with .persist()
 
-    if gpu_avail:
-        assert isinstance(contigs, cp.ndarray)  # type: ignore[attr-defined]
-    else:
-        assert isinstance(contigs, np.ndarray)
-
     # Load covariates and add intercept if necessary
-    covariates = da.asarray(ds[covariates].data)
-    if gpu_avail and not isinstance(covariates._meta, cp.ndarray):
-        covariates = covariates.map_blocks(cp.asarray)  # type: ignore[attr-defined]
+    covariates = np.asarray(ds[covariates].data, like=G)
 
     if len(covariates) == 0:
         if add_intercept:
-            if gpu_avail:
-                X = da.ones(
-                    (ds[traits].shape[0], 1), dtype=np.float32, meta=cp.array(())
-                )
-            else:
-                X = da.ones((ds[traits].shape[0], 1), dtype=np.float32)
-                # X = X.map_blocks(cp.asarray)  # type: ignore[attr-defined]
+            X = np.ones_like(
+                G,
+                shape=(ds[traits].shape[0], 1),
+                dtype=np.float32,
+            )
         else:
             raise ValueError("add_intercept must be True if no covariates specified")
     else:
         X = covariates
 
         if add_intercept:
-            if gpu_avail:
-                intercept_arr = da.ones(
-                    (X.shape[0], 1), dtype=X.dtype, meta=cp.array(())
-                )
-            else:
-                intercept_arr = da.ones((X.shape[0], 1), dtype=X.dtype)
-                # intercept_arr = intercept_arr.map_blocks(cp.asarray)  # type: ignore[attr-defined]
+            intercept_arr = np.ones_like(G, shape=(X.shape[0], 1), dtype=X.dtype)
             X = da.concatenate([intercept_arr, X], axis=1)
 
     # assert isinstance(X, da.Array)
@@ -558,9 +486,7 @@ def regenie_gwas_linear_regression(
     Q = da.linalg.qr(X)[0]
     assert Q.shape == X.shape
 
-    Y = da.asarray(ds[traits].data)
-    if gpu_avail and not isinstance(Y._meta, cp.ndarray):
-        Y = Y.map_blocks(cp.asarray)  # type: ignore[attr-defined]
+    Y = np.asarray(ds[traits].data, like=G)
     Y_mask = (~da.isnan(Y)).astype("float64")
     Y = da.nan_to_num(Y)
     # Mean-center
@@ -573,9 +499,7 @@ def regenie_gwas_linear_regression(
     # Scale
     Y /= Y_scale[None, :]
 
-    offsets = da.asarray(ds[loco_predicts].data)
-    if gpu_avail and not isinstance(offsets._meta, cp.ndarray):
-        offsets = offsets.map_blocks(cp.asarray)  # type: ignore[attr-defined]
+    offsets = np.asarray(ds[loco_predicts].data, like=G)
     # Match chunksize of Y
     offsets = offsets.rechunk((None, Y.chunksize[0], Y.chunksize[1]))
 
@@ -602,7 +526,12 @@ def regenie_gwas_linear_regression(
         Y_loco = Y_loco.rechunk((None, -1))
 
         res = _inner_loco_regression(
-            loco_G.T, X, Y_loco, Y_scale, Q, dof, use_gpu=use_gpu
+            loco_G.T,
+            X,
+            Y_loco,
+            Y_scale,
+            Q,
+            dof,
         )
 
         new_ds = create_dataset(
