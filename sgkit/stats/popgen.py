@@ -791,7 +791,7 @@ def _Garud_h_cohorts(
     # transpose to hash columns (haplotypes)
     haplotypes = hash_array(gt.transpose()).transpose().flatten()
     arr = np.full((n_cohorts, N_GARUD_H_STATS), np.nan)
-    for c in np.nditer(ct):  # type: ignore[attr-defined]
+    for c in np.nditer(ct):
         arr[c, :] = _Garud_h(haplotypes[sample_cohort == c])
     return arr
 
