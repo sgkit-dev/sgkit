@@ -233,13 +233,23 @@ def test_vcf_to_zarr__compressor_and_filters(shared_datadir, is_path, tmp_path):
     "is_path",
     [True, False],
 )
+@pytest.mark.parametrize(
+    "concat_algorithm",
+    [None, "xarray_internal"],
+)
 @pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
-def test_vcf_to_zarr__parallel(shared_datadir, is_path, tmp_path):
+def test_vcf_to_zarr__parallel(shared_datadir, is_path, concat_algorithm, tmp_path):
     path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", is_path)
     output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
     regions = ["20", "21"]
 
-    vcf_to_zarr(path, output, regions=regions, chunk_length=5_000)
+    vcf_to_zarr(
+        path,
+        output,
+        regions=regions,
+        chunk_length=5_000,
+        concat_algorithm=concat_algorithm,
+    )
     ds = xr.open_zarr(output)
 
     assert ds["sample_id"].shape == (1,)
@@ -252,8 +262,12 @@ def test_vcf_to_zarr__parallel(shared_datadir, is_path, tmp_path):
     assert ds["variant_id_mask"].shape == (19910,)
     assert ds["variant_position"].shape == (19910,)
 
-    assert ds["variant_allele"].dtype == "S48"
-    assert ds["variant_id"].dtype == "S1"
+    if concat_algorithm is None:
+        assert ds["variant_allele"].dtype == "O"
+        assert ds["variant_id"].dtype == "O"
+    else:
+        assert ds["variant_allele"].dtype == "S48"
+        assert ds["variant_id"].dtype == "S1"
 
 
 @pytest.mark.parametrize(
@@ -305,8 +319,8 @@ def test_vcf_to_zarr__parallel_temp_chunk_length(shared_datadir, is_path, tmp_pa
     assert ds["variant_id_mask"].shape == (19910,)
     assert ds["variant_position"].shape == (19910,)
 
-    assert ds["variant_allele"].dtype == "S48"
-    assert ds["variant_id"].dtype == "S1"
+    assert ds["variant_allele"].dtype == "O"
+    assert ds["variant_id"].dtype == "O"
 
 
 def test_vcf_to_zarr__parallel_temp_chunk_length_not_divisible(
@@ -531,7 +545,7 @@ def test_vcf_to_zarr__mixed_ploidy_vcf(
     )
     ds = load_dataset(output)
 
-    variant_dtype = "|S1" if regions else "O"
+    variant_dtype = "O"
     assert ds.attrs["contigs"] == ["CHR1", "CHR2", "CHR3"]
     assert_array_equal(ds["variant_contig"], [0, 0])
     assert_array_equal(ds["variant_position"], [2, 7])
@@ -728,7 +742,7 @@ def test_vcf_to_zarr__parallel_with_fields(shared_datadir, tmp_path):
     assert_allclose(ds["variant_MQ"], [58.33, np.nan, 57.45])
     assert ds["variant_MQ"].attrs["comment"] == "RMS Mapping Quality"
 
-    assert_array_equal(ds["call_PGT"], [[b"0|1"], [b""], [b"0|1"]])
+    assert_array_equal(ds["call_PGT"], [["0|1"], [""], ["0|1"]])
     assert (
         ds["call_PGT"].attrs["comment"]
         == "Physical phasing haplotype information, describing how the alternate alleles are phased in relation to one another"
