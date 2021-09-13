@@ -442,22 +442,22 @@ def regenie_gwas_linear_regression(
 
     G = _get_loop_covariates(ds, call_genotype, dosage)
 
-    contigs = np.asarray(ds[variant_contigs].data, like=G)
+    contigs: Array = np.asarray(ds[variant_contigs].data, like=G)
+
     # Pre-compute contigs to have concrete indices to slice the genotype array
-    contigs = (
-        contigs.compute()
-    )  # POTENTIAL CHOKE POINT? find another solution other than pre-computing contigs
-    # potential solution: rearrange G from shape (snips, samples) -> (contig, subset_snips, samples) using stack
+    #
+    # Potential alternative to pre-computing contigs: rearrange G from shape (snips, samples) -> (contig, subset_snips, samples) using stack
     # G = da.stack([G[contigs==contig, :] for contig in ds[variant_contigs].to_series().sort_values().drop_duplicates()], axis=0)
     # G_loco = G[contig,:,:]
     # or replace .compute() with .persist()
+    contigs = contigs.compute()
 
     # Load covariates and add intercept if necessary
     covariates = np.asarray(ds[covariates].data, like=G)
 
     if len(covariates) == 0:
         if add_intercept:
-            X = np.ones_like(
+            X: Array = np.ones_like(
                 G,
                 shape=(ds[traits].shape[0], 1),
                 dtype=np.float32,
@@ -499,7 +499,7 @@ def regenie_gwas_linear_regression(
     # Scale
     Y /= Y_scale[None, :]
 
-    offsets = np.asarray(ds[loco_predicts].data, like=G)
+    offsets: Array = np.asarray(ds[loco_predicts].data, like=G)
     # Match chunksize of Y
     offsets = offsets.rechunk((None, Y.chunksize[0], Y.chunksize[1]))
 
