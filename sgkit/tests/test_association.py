@@ -11,7 +11,6 @@ import zarr
 from pandas import DataFrame
 from xarray import Dataset
 
-import sgkit
 from sgkit.stats.association import (
     gwas_linear_regression,
     linear_regression,
@@ -20,6 +19,15 @@ from sgkit.stats.association import (
 from sgkit.typing import ArrayLike
 
 from .test_regenie import load_covariates, load_traits
+
+
+def _dask_cupy_to_numpy(x):
+    if da.utils.is_cupy_type(x):
+        x = x.get()
+    elif hasattr(x, "_meta") and da.utils.is_cupy_type(x._meta):
+        x = x.map_blocks(lambda x: x.get()).persist()
+    return x
+
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore", DeprecationWarning)
@@ -260,7 +268,10 @@ def test_linear_regression__raise_on_dof_lte_0():
         linear_regression(XL, XC, Y)
 
 
-def test_regenie_gwas_linear_regression() -> None:
+@pytest.mark.parametrize("ndarray_type", ["numpy", "cupy"])
+def test_regenie_gwas_linear_regression(ndarray_type: str) -> None:
+    xp = pytest.importorskip(ndarray_type)
+
     datasets = ["sim_sm_02"]  # Only dataset 2 has more than 1 contig
     ds_dir = Path("sgkit/tests/test_regenie/dataset")
 
@@ -303,6 +314,16 @@ def test_regenie_gwas_linear_regression() -> None:
             )
         )
 
+        # Map arrays to CuPy, if it's being tested
+        if xp is not np:
+            for k, v in ds.items():
+                # Bytes and strings are not supported in CuPy, but they're not used for
+                # compute in this test anyway
+                if not any([v.dtype.type is t for t in [np.bytes_, np.str_]]):
+                    ds[k] = xr.DataArray(
+                        da.asarray(v).map_blocks(xp.asarray, dtype=v.dtype), dims=v.dims
+                    )
+
         res = regenie_gwas_linear_regression(
             ds,
             dosage="call_alternate_allele_count",
@@ -311,8 +332,15 @@ def test_regenie_gwas_linear_regression() -> None:
             variant_contigs="variant_contig",
             loco_predicts="regenie_loco_prediction",
             call_genotype="call_genotype",
-            use_gpu=True,
         )
+
+        # Map resulting arrays back to NumPy, when CuPy test is running. Since xarray
+        # does not natively support CuPy, we need to convert arrays back to CPU to
+        # run final checks.
+        if xp is not np:
+            for k, v in res.items():
+                arr = _dask_cupy_to_numpy(da.asarray(v))
+                res[k] = xr.DataArray(arr, dims=v.dims)
 
         # PREPARE GLOW RESULTS
         results_dir = Path("sgkit/tests/test_regenie/result/sim_sm_02-wgr_02")
