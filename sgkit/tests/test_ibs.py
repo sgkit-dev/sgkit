@@ -122,6 +122,19 @@ def test_identity_by_state__reference_implementation(ploidy, chunks, seed):
     np.testing.assert_array_almost_equal(expect, actual)
 
 
+def test_identity_by_state__chunked_sample_dimension():
+    ds = simulate_genotype_call_dataset(n_variant=20, n_sample=10, n_ploidy=2)
+    ds["call_genotype"] = ds.call_genotype.dims, da.asarray(
+        ds.call_genotype.data,
+        chunks=((20,), (5, 5), (2,)),
+    )
+    with pytest.raises(
+        NotImplementedError,
+        match="identity_by_state does not support chunking in the samples dimension",
+    ):
+        identity_by_state(ds)
+
+
 @pytest.mark.parametrize(
     "sim,chunks",
     [

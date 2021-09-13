@@ -48,6 +48,17 @@ def identity_by_state(
     which is a matrix of pairwise IBS probabilities among all samples.
     The dimensions are named ``samples_0`` and ``samples_1``.
 
+    Raises
+    ------
+    NotImplementedError
+        If the variable holding call_allele_frequency is chunked along the
+        samples dimension.
+
+    Warnings
+    --------
+    This method does not currently support datasets that are chunked along the
+    samples dimension.
+
     Examples
     --------
 
@@ -73,6 +84,10 @@ def identity_by_state(
         ds, {call_allele_frequency: variables.call_allele_frequency_spec}
     )
     af = da.asarray(ds[call_allele_frequency])
+    if len(af.chunks[1]) > 1:
+        raise NotImplementedError(
+            "identity_by_state does not support chunking in the samples dimension"
+        )
     af0 = da.where(da.isnan(af), 0.0, af)
     num = da.einsum("ixj,iyj->xy", af0, af0)
     called = da.nansum(af, axis=-1)
