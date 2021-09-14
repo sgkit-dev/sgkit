@@ -651,6 +651,18 @@ def test_vcf_to_zarr__contig_not_defined_in_header(shared_datadir, tmp_path):
         vcf_to_zarr(path, output)
 
 
+def test_vcf_to_zarr__large_number_of_contigs(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "Homo_sapiens_assembly38.headerOnly.vcf.gz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(path, output)
+
+    ds = xr.open_zarr(output)
+
+    assert len(ds.attrs["contigs"]) == 3366
+    assert ds["variant_contig"].dtype == np.int16  # needs larger dtype than np.int8
+
+
 def test_vcf_to_zarr__fields(shared_datadir, tmp_path):
     path = path_for_test(shared_datadir, "sample.vcf.gz")
     output = tmp_path.joinpath("vcf.zarr").as_posix()
