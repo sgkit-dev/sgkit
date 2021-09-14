@@ -385,10 +385,6 @@ def vcf_to_zarr_sequential(
             variants = vcf(region)
 
         variant_contig_dtype = smallest_numpy_int_dtype(len(variant_contig_names))
-        if variant_contig_dtype is None:
-            raise ValueError(
-                f"Number of contigs ({len(variant_contig_names)}) exceeds maxmimum NumPy signed int dtype"
-            )  # pragma: no cover
         variant_contig = np.empty(chunk_length, dtype=variant_contig_dtype)
         variant_position = np.empty(chunk_length, dtype="i4")
 
