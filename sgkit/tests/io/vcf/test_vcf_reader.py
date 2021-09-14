@@ -233,6 +233,43 @@ def test_vcf_to_zarr__compressor_and_filters(shared_datadir, is_path, tmp_path):
     "is_path",
     [True, False],
 )
+@pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
+def test_vcf_to_zarr__parallel_compressor_and_filters(
+    shared_datadir, is_path, tmp_path
+):
+    path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", is_path)
+    output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
+    regions = ["20", "21"]
+
+    default_compressor = Blosc("zlib", 1, Blosc.NOSHUFFLE)
+    variant_id_compressor = Blosc("zlib", 2, Blosc.NOSHUFFLE)
+    encoding = dict(
+        variant_id=dict(compressor=variant_id_compressor),
+        variant_id_mask=dict(filters=None),
+    )
+    vcf_to_zarr(
+        path,
+        output,
+        regions=regions,
+        chunk_length=5_000,
+        compressor=default_compressor,
+        encoding=encoding,
+    )
+
+    # look at actual Zarr store to check compressor and filters
+    z = zarr.open(output)
+    assert z["call_genotype"].compressor == default_compressor
+    assert z["call_genotype"].filters is None
+    assert z["call_genotype_mask"].filters == [PackBits()]
+
+    assert z["variant_id"].compressor == variant_id_compressor
+    assert z["variant_id_mask"].filters is None
+
+
+@pytest.mark.parametrize(
+    "is_path",
+    [True, False],
+)
 @pytest.mark.parametrize(
     "output_is_path",
     [True, False],
