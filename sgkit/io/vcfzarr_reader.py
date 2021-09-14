@@ -14,7 +14,7 @@ from sgkit.io.utils import concatenate_and_rechunk, str_is_int, zarrs_to_dataset
 
 from ..model import DIM_SAMPLE, DIM_VARIANT, create_genotype_call_dataset
 from ..typing import ArrayLike, PathType
-from ..utils import encode_array, max_str_len
+from ..utils import encode_array, max_str_len, smallest_numpy_int_dtype
 
 
 def _ensure_2d(arr: ArrayLike) -> ArrayLike:
@@ -170,7 +170,12 @@ def _vcfzarr_to_dataset(
         # Get the contigs from variants/CHROM
         variants_chrom = da.from_zarr(vcfzarr["variants/CHROM"]).astype(str)
         variant_contig, variant_contig_names = encode_array(variants_chrom.compute())
-        variant_contig = variant_contig.astype("i1")
+        variant_contig_dtype = smallest_numpy_int_dtype(len(variant_contig_names))
+        if variant_contig_dtype is None:
+            raise ValueError(
+                f"Number of contigs ({len(variant_contig_names)}) exceeds maxmimum NumPy signed int dtype"
+            )  # pragma: no cover
+        variant_contig = variant_contig.astype(variant_contig_dtype)
         variant_contig_names = list(variant_contig_names)
     else:
         # Single contig: contig names were passed in
