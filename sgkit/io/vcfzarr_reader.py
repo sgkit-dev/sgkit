@@ -171,10 +171,6 @@ def _vcfzarr_to_dataset(
         variants_chrom = da.from_zarr(vcfzarr["variants/CHROM"]).astype(str)
         variant_contig, variant_contig_names = encode_array(variants_chrom.compute())
         variant_contig_dtype = smallest_numpy_int_dtype(len(variant_contig_names))
-        if variant_contig_dtype is None:
-            raise ValueError(
-                f"Number of contigs ({len(variant_contig_names)}) exceeds maxmimum NumPy signed int dtype"
-            )  # pragma: no cover
         variant_contig = variant_contig.astype(variant_contig_dtype)
         variant_contig_names = list(variant_contig_names)
     else:

@@ -348,10 +348,14 @@ def smallest_numpy_int_dtype(value: int) -> Optional[DType]:
 
     Returns
     -------
-    A NumPy signed integer dtype suitable for storing the given value, or None if the value exceeds
-    the bounds of the largest dtype (``np.int64``).
+    A NumPy signed integer dtype suitable for storing the given value.
+
+    Raises
+    ------
+    OverflowError
+        If the value cannot be stored in a signed 64-bit integer dtype (``np.int64``).
     """
     for dtype in (np.int8, np.int16, np.int32, np.int64):
         if np.iinfo(dtype).min <= value <= np.iinfo(dtype).max:
             return dtype
-    return None
+    raise OverflowError(f"Value {value} cannot be stored in np.int64")

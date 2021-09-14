@@ -254,9 +254,15 @@ def test_hash_array(n_rows, n_cols):
         (np.iinfo(np.int32).max + 1, np.int64),
         (np.iinfo(np.int64).min, np.int64),
         (np.iinfo(np.int64).max, np.int64),
-        (np.iinfo(np.int64).min - 1, None),
-        (np.iinfo(np.int64).max + 1, None),
     ],
 )
 def test_smallest_numpy_int_dtype(value, expected_dtype):
     assert smallest_numpy_int_dtype(value) == expected_dtype
+
+
+def test_smallest_numpy_int_dtype__overflow():
+    with pytest.raises(OverflowError):
+        smallest_numpy_int_dtype(np.iinfo(np.int64).min - 1)
+
+    with pytest.raises(OverflowError):
+        smallest_numpy_int_dtype(np.iinfo(np.int64).max + 1)
