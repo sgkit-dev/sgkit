@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sgkit.variables.variant_allele_total_spec</title>
+    <title>sgkit.Weir_Goudet_beta</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet" />
   <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -37,10 +37,12 @@
     <script src="../_static/togglebutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.variables.variant_linreg_beta_spec" href="sgkit.variables.variant_linreg_beta_spec.html" />
-    <link rel="prev" title="sgkit.variables.variant_allele_frequency_spec" href="sgkit.variables.variant_allele_frequency_spec.html" />
+    <link rel="next" title="sgkit.convert_probability_to_call" href="sgkit.convert_probability_to_call.html" />
+    <link rel="prev" title="sgkit.variant_stats" href="sgkit.variant_stats.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
     
@@ -276,8 +278,8 @@
      sgkit.variant_stats
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.Weir_Goudet_beta.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      sgkit.Weir_Goudet_beta
     </a>
    </li>
@@ -591,8 +593,8 @@
      sgkit.variables.variant_allele_frequency_spec
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.variant_allele_total_spec.html">
      sgkit.variables.variant_allele_total_spec
     </a>
    </li>
@@ -734,7 +736,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../_sources/generated/sgkit.variables.variant_allele_total_spec.rst.txt"><button type="button"
+        <a class="dropdown-buttons" href="../_sources/generated/sgkit.Weir_Goudet_beta.rst.txt"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
@@ -767,12 +769,80 @@
         
               <div>
                 
-  <div class="section" id="sgkit-variables-variant-allele-total-spec">
-<h1>sgkit.variables.variant_allele_total_spec<a class="headerlink" href="#sgkit-variables-variant-allele-total-spec" title="Permalink to this headline">¶</a></h1>
-<dl class="py data">
-<dt id="sgkit.variables.variant_allele_total_spec">
-<code class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></code><code class="sig-name descname"><span class="pre">variant_allele_total_spec</span></code><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='variant_allele_total',</span> <span class="pre">__doc__='The</span> <span class="pre">number</span> <span class="pre">of</span> <span class="pre">occurrences</span> <span class="pre">of</span> <span class="pre">all</span> <span class="pre">alleles.',</span> <span class="pre">kind='i',</span> <span class="pre">ndim=1)</span></em><a class="headerlink" href="#sgkit.variables.variant_allele_total_spec" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of occurrences of all alleles.</p>
+  <div class="section" id="sgkit-weir-goudet-beta">
+<h1>sgkit.Weir_Goudet_beta<a class="headerlink" href="#sgkit-weir-goudet-beta" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="sgkit.Weir_Goudet_beta">
+<code class="sig-prename descclassname"><span class="pre">sgkit.</span></code><code class="sig-name descname"><span class="pre">Weir_Goudet_beta</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_identity_by_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stat_identity_by_state'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.Weir_Goudet_beta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate pairwise beta between all pairs of samples as described
+in Weir and Goudet 2017 [1].</p>
+<p>Beta is the kinship scaled by the average kinship of all pairs of
+individuals in the dataset such that the non-diagonal (non-self) values
+sum to zero.</p>
+<p>Beta may be corrected to more accurately reflect pedigree based kinship
+estimates using the formula
+<span class="math notranslate nohighlight">\(\hat{\beta}^c=\frac{\hat{\beta}-\hat{\beta}_0}{1-\hat{\beta}_0}\)</span>
+where <span class="math notranslate nohighlight">\(\hat{\beta}_0\)</span> is the estimated beta between samples which are
+known to be unrelated [1].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.19.1.dev6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.19.1.dev6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Genotype call dataset.</p>
+</dd>
+<dt><strong>stat_identity_by_state</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'stat_identity_by_state'</span></code>)</dt><dd><p>Input variable name holding stat_identity_by_state as defined
+by <a class="reference internal" href="sgkit.variables.stat_identity_by_state_spec.html#sgkit.variables.stat_identity_by_state_spec" title="sgkit.variables.stat_identity_by_state_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_identity_by_state_spec</span></code></a>.
+If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
+using <a class="reference internal" href="sgkit.identity_by_state.html#sgkit.identity_by_state" title="sgkit.identity_by_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">identity_by_state()</span></code></a>.</p>
+</dd>
+<dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
+output variables into a single dataset, otherwise return only
+the computed output variables.
+See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.19.1.dev6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.19.1.dev6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.stat_Weir_Goudet_beta_spec.html#sgkit.variables.stat_Weir_Goudet_beta_spec" title="sgkit.variables.stat_Weir_Goudet_beta_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Weir_Goudet_beta_spec</span></code></a>
+which is a matrix of estimated pairwise kinship relative to the average
+kinship of all pairs of individuals in the dataset.
+The dimensions are named <code class="docutils literal notranslate"><span class="pre">samples_0</span></code> and <code class="docutils literal notranslate"><span class="pre">samples_1</span></code>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">n_allele</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># sample 2 &quot;inherits&quot; alleles from samples 0 and 1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">display_genotypes</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span> 
+<span class="go">samples    S0   S1   S2</span>
+<span class="go">variants</span>
+<span class="go">0         7/1  8/6  7/8</span>
+<span class="go">1         9/5  3/6  9/3</span>
+<span class="go">2         8/8  8/3  8/8</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># estimate beta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">Weir_Goudet_beta</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">stat_Weir_Goudet_beta</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([[ 0.5 , -0.25,  0.25],</span>
+<span class="go">       [-0.25,  0.25,  0.  ],</span>
+<span class="go">       [ 0.25,  0.  ,  0.5 ]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># correct beta assuming least related samples are unrelated</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beta</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">stat_Weir_Goudet_beta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beta0</span> <span class="o">=</span> <span class="n">beta</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beta_corrected</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span> <span class="o">-</span> <span class="n">beta0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">beta0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beta_corrected</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([[0.6, 0. , 0.4],</span>
+<span class="go">       [0. , 0.4, 0.2],</span>
+<span class="go">       [0.4, 0.2, 0.6]])</span>
+</pre></div>
+</div>
+<p class="rubric">References</p>
+<p>[1] - Bruce, S. Weir, and Jérôme Goudet 2017.
+“A Unified Characterization of Population Structure and Relatedness.”
+Genetics 206 (4): 2085-2103.</p>
 </dd></dl>
 
 </div>
@@ -788,19 +858,19 @@
 <div class='prev-next-bottom'>
     
     <div id="prev">
-        <a class="left-prev" href="sgkit.variables.variant_allele_frequency_spec.html" title="previous page">
+        <a class="left-prev" href="sgkit.variant_stats.html" title="previous page">
             <i class="prevnext-label fas fa-angle-left"></i>
             <div class="prevnext-info">
                 <p class="prevnext-label">previous</p>
-                <p class="prevnext-title">sgkit.variables.variant_allele_frequency_spec</p>
+                <p class="prevnext-title">sgkit.variant_stats</p>
             </div>
         </a>
     </div>
      <div id="next">
-        <a class="right-next" href="sgkit.variables.variant_linreg_beta_spec.html" title="next page">
+        <a class="right-next" href="sgkit.convert_probability_to_call.html" title="next page">
             <div class="prevnext-info">
                 <p class="prevnext-label">next</p>
-                <p class="prevnext-title">sgkit.variables.variant_linreg_beta_spec</p>
+                <p class="prevnext-title">sgkit.convert_probability_to_call</p>
             </div>
             <i class="prevnext-label fas fa-angle-right"></i>
         </a>
