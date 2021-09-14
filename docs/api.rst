@@ -46,7 +46,7 @@ For more low-level control:
 
    partition_into_regions
    vcf_to_zarrs
-   zarrs_to_dataset
+   concat_zarrs
 
 For converting from `scikit-allel's VCF Zarr representation <https://scikit-allel.readthedocs.io/en/stable/io.html#allel.vcf_to_zarr>`_ to sgkit's Zarr representation:
 

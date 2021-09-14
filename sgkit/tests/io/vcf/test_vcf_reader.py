@@ -234,13 +234,22 @@ def test_vcf_to_zarr__compressor_and_filters(shared_datadir, is_path, tmp_path):
     [True, False],
 )
 @pytest.mark.parametrize(
+    "output_is_path",
+    [True, False],
+)
+@pytest.mark.parametrize(
     "concat_algorithm",
     [None, "xarray_internal"],
 )
 @pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
-def test_vcf_to_zarr__parallel(shared_datadir, is_path, concat_algorithm, tmp_path):
+def test_vcf_to_zarr__parallel(
+    shared_datadir, is_path, output_is_path, concat_algorithm, tmp_path
+):
     path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", is_path)
-    output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
+    output = tmp_path.joinpath("vcf_concat.zarr")
+    if not output_is_path:
+        output = output.as_posix()
+
     regions = ["20", "21"]
 
     vcf_to_zarr(
