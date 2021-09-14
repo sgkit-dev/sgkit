@@ -1,16 +1,20 @@
 import platform
 
 try:
-    from ..utils import zarrs_to_dataset
     from .vcf_partition import partition_into_regions
-    from .vcf_reader import MaxAltAllelesExceededWarning, vcf_to_zarr, vcf_to_zarrs
+    from .vcf_reader import (
+        MaxAltAllelesExceededWarning,
+        concat_zarrs,
+        vcf_to_zarr,
+        vcf_to_zarrs,
+    )
 
     __all__ = [
         "MaxAltAllelesExceededWarning",
+        "concat_zarrs",
         "partition_into_regions",
         "vcf_to_zarr",
         "vcf_to_zarrs",
-        "zarrs_to_dataset",
     ]
 except ImportError as e:  # pragma: no cover
     if platform.system() == "Windows":
