@@ -4,8 +4,10 @@ channels:
   - conda-forge
 dependencies:
   - python=3.7
-  - jupyterlab
+  - glow=1.0.1=pyh44b312d_0
+  - jupyterlab=3
+  - numpy=1.18.1
   - pandas=1.0.1
-  - pyspark=3.0.0
+  - pyspark=3.1.2
   - xarray
   - zarr
