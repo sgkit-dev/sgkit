@@ -19,6 +19,14 @@ from .utils import (
 )
 
 
+def _map_blocks_asnumpy(x: Array) -> Array:
+    if da.utils.is_cupy_type(x._meta):  # pragma: no cover
+        import cupy as cp  # type: ignore[import]
+
+        x = x.map_blocks(cp.asnumpy)
+    return x
+
+
 def index_array_blocks(
     x: Union[ArrayLike, Sequence[int]], size: int
 ) -> Tuple[NDArray[np.int_], NDArray[np.int_]]:
@@ -143,7 +151,7 @@ def ridge_regression(
     diags = []
     n_alpha, n_obs, n_outcome = len(alphas), XtX.shape[0], XtY.shape[1]
     for i in range(n_alpha):
-        diag: ArrayLike = np.ones(XtX.shape[1]) * alphas[i]
+        diag: ArrayLike = np.ones_like(XtX, shape=XtX.shape[1]) * alphas[i]
         if n_zero_reg:
             # Optionally fix regularization for leading covariates
             # TODO: This should probably be zero for consistency
@@ -159,10 +167,17 @@ def ridge_regression(
 
 
 def get_alphas(
-    n_cols: int, heritability: Sequence[float] = [0.99, 0.75, 0.50, 0.25, 0.01]
+    n_cols: int,
+    heritability: Sequence[float] = [0.99, 0.75, 0.50, 0.25, 0.01],
+    like: Optional[ArrayLike] = None,
 ) -> NDArray[np.float_]:
     # https://github.com/projectglow/glow/blob/f3edf5bb8fe9c2d2e1a374d4402032ba5ce08e29/python/glow/wgr/linear_model/ridge_model.py#L80
-    return np.array([n_cols / h for h in heritability])
+    if like is not None:
+        return np.asarray(
+            [n_cols / h for h in heritability], like=da.utils.meta_from_array(like)
+        )
+    else:
+        return np.asarray([n_cols / h for h in heritability])
 
 
 def stack(x: Array) -> Array:
@@ -222,6 +237,7 @@ def _ridge_regression_cv(
         new_axis=[0],
         alphas=alphas,
         n_zero_reg=n_zero_reg,
+        meta=da.utils.meta_from_array(XtX),
     )
     assert_block_shape(B, 1, n_block, 1)
     assert_chunk_shape(B, n_alpha, n_covar, n_outcome)
@@ -267,7 +283,7 @@ def _stage_1(
     assert G.chunks[0] == X.chunks[0] == Y.chunks[0]
     assert X.numblocks[1] == Y.numblocks[1] == 1
     if alphas is None:
-        alphas = get_alphas(G.shape[1])
+        alphas = get_alphas(G.shape[1], like=G)
     # Extract shape statistics
     n_sample = G.shape[0]
     n_outcome = Y.shape[1]
@@ -467,8 +483,10 @@ def _stage_3(
     n_sample, n_outcome = Y.shape
 
     # Determine unique contigs to create LOCO estimates for
-    contigs = np.asarray(contigs)
+    contigs = np.asarray(contigs, like=contigs)
     unique_contigs = np.unique(contigs)  # type: ignore[no-untyped-call]
+    if hasattr(unique_contigs, "compute"):
+        unique_contigs = unique_contigs.compute()
     n_contig = len(unique_contigs)
     if n_contig <= 1:
         # Return nothing w/o at least 2 contigs
@@ -561,6 +579,8 @@ def _stage_3(
         # Define a variant block mask of size `n_variant_block`
         # determining which blocks correspond to this contig
         variant_block_mask = variant_block_contigs == contig
+        if hasattr(variant_block_mask, "compute"):
+            variant_block_mask = variant_block_mask.compute()
         BYPC = BYP[:, :, ~variant_block_mask, :]
         YPC = YP[:, :, ~variant_block_mask, :]
         YGC = apply(X, YPC, BX, BYPC)
@@ -656,7 +676,7 @@ def regenie_transform(
     n_variant = G.shape[1]
 
     if alphas is not None:
-        alphas = np.asarray(alphas)
+        alphas = np.asarray(alphas, like=G)
 
     G, X, Y = da.asarray(G), da.asarray(X), da.asarray(Y)
     contigs = da.asarray(contigs)
@@ -679,7 +699,9 @@ def regenie_transform(
         X = (X - X.mean(axis=0)) / X.std(axis=0)
 
     if add_intercept:
-        X = da.concatenate([da.ones((X.shape[0], 1), dtype=X.dtype), X], axis=1)
+        X = da.concatenate(
+            [da.ones_like(X, shape=(X.shape[0], 1), dtype=X.dtype), X], axis=1
+        )
 
     # TODO: Test this after finding out whether or not there was a good reason
     # it was precluded in glow by unit covariate regularization:
@@ -691,8 +713,12 @@ def regenie_transform(
         Y = Y / Y.std(axis=0)
         X = da.zeros(shape=(n_sample, 0), dtype=G.dtype)
 
+    # The output of _variant_block_indexes is better suited as a NumPy array,
+    # since it will be downcast to tuple. Additionally, since it's not
+    # computationally intensive and cumbersome to implement it to be
+    # CuPy-compatible, we map a CuPy-backed Dask array contigs to NumPy backend.
     variant_chunk_start, variant_chunk_size = _variant_block_indexes(
-        variant_block_size, contigs
+        variant_block_size, _map_blocks_asnumpy(contigs)
     )
     G = G.rechunk(chunks=(sample_block_size, tuple(variant_chunk_size)))
     X = X.rechunk(chunks=(sample_block_size, -1))
