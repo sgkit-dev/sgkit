@@ -333,10 +333,20 @@ def concat_zarrs_optimized(
             [group[var] for group in zarr_groups], dtype=dtype
         )
 
-        _to_zarr_kwargs = dict(fill_value=None)
+        _to_zarr_kwargs = dict(
+            compressor=first_zarr_group[var].compressor,
+            filters=first_zarr_group[var].filters,
+            fill_value=None,
+        )
         if not fix_strings and arr.dtype == "O":
             # We assume that all object dtypes are variable length strings
-            _to_zarr_kwargs["object_codec"] = numcodecs.VLenUTF8()
+            var_len_str_codec = numcodecs.VLenUTF8()
+            _to_zarr_kwargs["object_codec"] = var_len_str_codec
+            # Remove from filters to avoid double encoding error
+            if var_len_str_codec in first_zarr_group[var].filters:
+                filters = list(first_zarr_group[var].filters)
+                filters.remove(var_len_str_codec)
+                _to_zarr_kwargs["filters"] = filters
 
         d = _to_zarr(  # type: ignore[no-untyped-call]
             arr,
