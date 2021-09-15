@@ -90,6 +90,7 @@ Methods
    ld_prune
    maximal_independent_set
    observed_heterozygosity
+   pbs
    pc_relate
    regenie
    sample_stats
