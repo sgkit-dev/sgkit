@@ -2,7 +2,7 @@ from pkg_resources import DistributionNotFound, get_distribution
 
 from .display import display_genotypes
 from .distance.api import pairwise_distance
-from .indexing import regions_to_indexer
+from .indexing import pslice_to_indexer
 from .io.dataset import load_dataset, save_dataset
 from .io.vcfzarr_reader import read_vcfzarr
 from .model import (
@@ -93,5 +93,5 @@ __all__ = [
     "load_dataset",
     "save_dataset",
     "pairwise_distance",
-    "regions_to_indexer",
+    "pslice_to_indexer",
 ]
