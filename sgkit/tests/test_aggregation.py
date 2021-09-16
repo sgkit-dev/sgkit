@@ -105,7 +105,7 @@ def test_count_variant_alleles__chunked():
     ds = get_dataset(calls)
     ac1 = count_variant_alleles(ds)
     # Coerce from numpy to multiple chunks in all dimensions
-    ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))  # type: ignore[arg-type]
+    ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))
     ac2 = count_variant_alleles(ds)
     assert isinstance(ac2["variant_allele_count"].data, da.Array)
     xr.testing.assert_equal(ac1, ac2)
@@ -215,7 +215,7 @@ def test_count_call_alleles__chunked():
     ds = get_dataset(calls)
     ac1 = count_call_alleles(ds)
     # Coerce from numpy to multiple chunks in all dimensions
-    ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))  # type: ignore[arg-type]
+    ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))
     ac2 = count_call_alleles(ds)
     assert isinstance(ac2["call_allele_count"].data, da.Array)
     xr.testing.assert_equal(ac1, ac2)
@@ -250,7 +250,7 @@ def test_count_cohort_alleles__chunked():
     ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
     ac1 = count_cohort_alleles(ds)
     # Coerce from numpy to multiple chunks in variants dimension only
-    ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, -1, -1))  # type: ignore[arg-type]
+    ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, -1, -1))
     ac2 = count_cohort_alleles(ds)
     assert isinstance(ac2["cohort_allele_count"].data, da.Array)
     xr.testing.assert_equal(ac1, ac2)

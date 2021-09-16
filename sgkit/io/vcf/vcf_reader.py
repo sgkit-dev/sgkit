@@ -40,7 +40,7 @@ from sgkit.model import (
     create_genotype_call_dataset,
 )
 from sgkit.typing import ArrayLike, DType, PathType
-from sgkit.utils import max_str_len
+from sgkit.utils import max_str_len, smallest_numpy_int_dtype
 
 DEFAULT_MAX_ALT_ALLELES = (
     3  # equivalent to DEFAULT_ALT_NUMBER in vcf_read.py in scikit_allel
@@ -388,7 +388,8 @@ def vcf_to_zarr_sequential(
         else:
             variants = vcf(region)
 
-        variant_contig = np.empty(chunk_length, dtype="i1")
+        variant_contig_dtype = smallest_numpy_int_dtype(len(variant_contig_names))
+        variant_contig = np.empty(chunk_length, dtype=variant_contig_dtype)
         variant_position = np.empty(chunk_length, dtype="i4")
 
         fields = fields or ["FORMAT/GT"]  # default to GT as the only extra field

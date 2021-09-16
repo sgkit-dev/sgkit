@@ -336,3 +336,26 @@ def hash_array(x: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     out[0] = 5381
     for i in range(x.shape[0]):
         out[0] = out[0] * 33 + x[i]
+
+
+def smallest_numpy_int_dtype(value: int) -> Optional[DType]:
+    """Return the smallest NumPy signed integer dtype that can be used to store the given value.
+
+    Parameters
+    ----------
+    value
+        An integer value to be stored.
+
+    Returns
+    -------
+    A NumPy signed integer dtype suitable for storing the given value.
+
+    Raises
+    ------
+    OverflowError
+        If the value cannot be stored in a signed 64-bit integer dtype (``np.int64``).
+    """
+    for dtype in (np.int8, np.int16, np.int32, np.int64):
+        if np.iinfo(dtype).min <= value <= np.iinfo(dtype).max:
+            return dtype
+    raise OverflowError(f"Value {value} cannot be stored in np.int64")
