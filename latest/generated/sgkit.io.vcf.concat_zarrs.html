@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sgkit.variables.stat_Garud_h123_spec</title>
+    <title>sgkit.io.vcf.concat_zarrs</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet" />
   <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -39,8 +39,8 @@
     <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.variables.stat_Garud_h2_h1_spec" href="sgkit.variables.stat_Garud_h2_h1_spec.html" />
-    <link rel="prev" title="sgkit.variables.stat_Garud_h12_spec" href="sgkit.variables.stat_Garud_h12_spec.html" />
+    <link rel="next" title="sgkit.read_vcfzarr" href="sgkit.read_vcfzarr.html" />
+    <link rel="prev" title="sgkit.io.vcf.vcf_to_zarrs" href="sgkit.io.vcf.vcf_to_zarrs.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
     
@@ -151,8 +151,8 @@
      sgkit.io.vcf.vcf_to_zarrs
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.io.vcf.concat_zarrs.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      sgkit.io.vcf.concat_zarrs
     </a>
    </li>
@@ -541,8 +541,8 @@
      sgkit.variables.stat_Garud_h12_spec
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.stat_Garud_h123_spec.html">
      sgkit.variables.stat_Garud_h123_spec
     </a>
    </li>
@@ -739,7 +739,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../_sources/generated/sgkit.variables.stat_Garud_h123_spec.rst.txt"><button type="button"
+        <a class="dropdown-buttons" href="../_sources/generated/sgkit.io.vcf.concat_zarrs.rst.txt"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
@@ -772,12 +772,41 @@
         
               <div>
                 
-  <div class="section" id="sgkit-variables-stat-garud-h123-spec">
-<h1>sgkit.variables.stat_Garud_h123_spec<a class="headerlink" href="#sgkit-variables-stat-garud-h123-spec" title="Permalink to this headline">¶</a></h1>
-<dl class="py data">
-<dt id="sgkit.variables.stat_Garud_h123_spec">
-<code class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></code><code class="sig-name descname"><span class="pre">stat_Garud_h123_spec</span></code><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='stat_Garud_h123',</span> <span class="pre">__doc__='Garud</span> <span class="pre">H123</span> <span class="pre">statistic</span> <span class="pre">for</span> <span class="pre">cohorts.',</span> <span class="pre">kind='f',</span> <span class="pre">ndim={1,</span> <span class="pre">2})</span></em><a class="headerlink" href="#sgkit.variables.stat_Garud_h123_spec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Garud H123 statistic for cohorts.</p>
+  <div class="section" id="sgkit-io-vcf-concat-zarrs">
+<h1>sgkit.io.vcf.concat_zarrs<a class="headerlink" href="#sgkit-io-vcf-concat-zarrs" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="sgkit.io.vcf.concat_zarrs">
+<code class="sig-prename descclassname"><span class="pre">sgkit.io.vcf.</span></code><code class="sig-name descname"><span class="pre">concat_zarrs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">urls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concat_algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dask_fuse_avg_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.io.vcf.concat_zarrs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Concatenate multiple Zarr stores into a single Zarr store.</p>
+<p>The Zarr stores are concatenated and rechunked to produce a single combined store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>urls</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></dt><dd><p>A list of URLs to the Zarr stores to combine, typically the return value of
+<a class="reference internal" href="sgkit.io.vcf.vcf_to_zarrs.html#sgkit.io.vcf.vcf_to_zarrs" title="sgkit.io.vcf.vcf_to_zarrs"><code class="xref py py-func docutils literal notranslate"><span class="pre">vcf_to_zarrs()</span></code></a>.</p>
+</dd>
+<dt><strong>output</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.MutableMapping" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MutableMapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>]</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.MutableMapping" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MutableMapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>]]</span></dt><dd><p>Zarr store or path to directory in file system.</p>
+</dd>
+<dt><strong>concat_algorithm</strong> : <span class="annotation terse">{‘xarray_internal’} | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘xarray_internal’]]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>The algorithm to use to concatenate and rechunk Zarr files. The default None means
+use the optimized version suitable for large files, whereas <code class="docutils literal notranslate"><span class="pre">xarray_internal</span></code> will
+use built-in Xarray APIs, which can exhibit high memory usage, see <a class="reference external" href="https://github.com/dask/dask/issues/6745">https://github.com/dask/dask/issues/6745</a>.</p>
+</dd>
+<dt><strong>chunk_length</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">10000</span></code>)</dt><dd><p>Length (number of variants) of chunks in which data are stored, by default 10,000.
+This is only used when <code class="docutils literal notranslate"><span class="pre">concat_algorithm</span></code> is <code class="docutils literal notranslate"><span class="pre">xarray_internal</span></code>.</p>
+</dd>
+<dt><strong>chunk_width</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">1000</span></code>)</dt><dd><p>Width (number of samples) to use when storing chunks in output, by default 1,000.
+This is only used when <code class="docutils literal notranslate"><span class="pre">concat_algorithm</span></code> is <code class="docutils literal notranslate"><span class="pre">xarray_internal</span></code>.</p>
+</dd>
+<dt><strong>storage_options</strong> : <span class="annotation terse">{<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>} | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Any additional parameters for the storage backend (see <code class="docutils literal notranslate"><span class="pre">fsspec.open</span></code>).</p>
+</dd>
+<dt><strong>dask_fuse_avg_width</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">50</span></code>)</dt><dd><p>Setting for Dask’s <code class="docutils literal notranslate"><span class="pre">optimization.fuse.ave-width</span></code>, see <a class="reference external" href="https://github.com/dask/dask/issues/5105">https://github.com/dask/dask/issues/5105</a></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -793,19 +822,19 @@
 <div class='prev-next-bottom'>
     
     <div id="prev">
-        <a class="left-prev" href="sgkit.variables.stat_Garud_h12_spec.html" title="previous page">
+        <a class="left-prev" href="sgkit.io.vcf.vcf_to_zarrs.html" title="previous page">
             <i class="prevnext-label fas fa-angle-left"></i>
             <div class="prevnext-info">
                 <p class="prevnext-label">previous</p>
-                <p class="prevnext-title">sgkit.variables.stat_Garud_h12_spec</p>
+                <p class="prevnext-title">sgkit.io.vcf.vcf_to_zarrs</p>
             </div>
         </a>
     </div>
      <div id="next">
-        <a class="right-next" href="sgkit.variables.stat_Garud_h2_h1_spec.html" title="next page">
+        <a class="right-next" href="sgkit.read_vcfzarr.html" title="next page">
             <div class="prevnext-info">
                 <p class="prevnext-label">next</p>
-                <p class="prevnext-title">sgkit.variables.stat_Garud_h2_h1_spec</p>
+                <p class="prevnext-title">sgkit.read_vcfzarr</p>
             </div>
             <i class="prevnext-label fas fa-angle-right"></i>
         </a>

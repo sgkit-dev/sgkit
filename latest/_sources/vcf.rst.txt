@@ -197,8 +197,7 @@ would set the temporary Zarr store to be a cloud storage URL (by setting ``tempd
 that all workers can access the store (both for reading and writing).
 
 For debugging, or for more control over the steps, consider using
-:func:`sgkit.io.vcf.vcf_to_zarrs` followed by :func:`sgkit.io.vcf.zarrs_to_dataset`,
-then saving the dataset using Xarray's :meth:`xarray.Dataset.to_zarr` method.
+:func:`sgkit.io.vcf.vcf_to_zarrs` followed by :func:`sgkit.io.vcf.concat_zarrs`.
 
 Polyploid and mixed-ploidy VCF
 ------------------------------
