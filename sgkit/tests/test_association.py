@@ -475,3 +475,45 @@ def test_regenie_gwas_linear_regression__raise_on_no_intercept_and_empty_covaria
             merge=False,
             add_intercept=False,
         )
+
+
+def test_regenie_gwas_linear_regression__raise_on_non_2D():
+    # Sample count too low relative to core covariate will cause
+    # degrees of freedom to be zero
+    ds = _generate_regenie_test_dataset()
+
+    # Add third dimension to `dosage`
+    ds = ds.assign(
+        dosage=(
+            ("variants", "samples", "third"),
+            da.asarray([ds["dosage"].data]).reshape((len(ds["variants"]), len(ds["samples"]), 1)),
+        )
+    )
+
+    # Match expected `loco_predicts` shape validation
+    ds = ds.assign(
+        loco_predicts=(
+            ("contigs", "samples", "outcomes"),
+            da.zeros((1, len(ds["samples"]), 10), dtype=np.float32),
+        )
+    )
+
+    # Generate dummy `variant_contigs` and `loco_predicts`, required
+    # to pass input data validation
+    ds = ds.assign(
+        variant_contig=(
+            ("variants", ), da.zeros(len(ds["variants"]), dtype=np.int16),
+        )
+    )
+
+    with pytest.raises(ValueError, match="All arguments must be 2D"):
+        regenie_gwas_linear_regression(
+            ds,
+            dosage="dosage",
+            covariates="sample_covariates",
+            traits="sample_traits",
+            variant_contigs="variant_contig",
+            loco_predicts="loco_predicts",
+            call_genotype=None,
+            merge=False,
+        )
