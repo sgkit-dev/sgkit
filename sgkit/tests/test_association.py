@@ -114,6 +114,16 @@ def _generate_test_dataset(**kwargs: Any) -> Dataset:
     return xr.Dataset(data_vars, attrs=attrs)  # type: ignore[arg-type]
 
 
+def _generate_regenie_test_dataset(**kwargs: Any) -> Dataset:
+    g, x, bg, ys = _generate_test_data(**kwargs)
+    data_vars = {}
+    data_vars["dosage"] = (["variants", "samples"], g.T)
+    data_vars["sample_covariates"] = (["samples", "covariates"], x)
+    data_vars["sample_traits"] = (["samples", "traits"], ys.T)
+    attrs = dict(beta=bg, n_trait=ys.shape[0], n_covar=x.shape[1])
+    return xr.Dataset(data_vars, attrs=attrs)  # type: ignore[arg-type]
+
+
 @pytest.fixture(scope="module")
 def ds() -> Dataset:
     return _generate_test_dataset()
@@ -398,3 +408,35 @@ def test_regenie_gwas_linear_regression(ndarray_type: str) -> None:
         np.testing.assert_allclose(df["effect_sgkit"], df["effect_glow"], atol=1e-14)
         np.testing.assert_allclose(df["p_value_sgkit"], df["p_value_glow"], atol=1e-14)
         np.testing.assert_allclose(df["t_value_sgkit"], df["t_value_glow"], atol=1e-14)
+
+
+def test_regenie_gwas_linear_regression__raise_on_dof_lte_0():
+    # Sample count too low relative to core covariate will cause
+    # degrees of freedom to be zero
+    ds = _generate_regenie_test_dataset(n=100, p=100)
+
+    # Generate dummy `variant_contigs` and `loco_predicts`, required
+    # to pass input data validation
+    ds = ds.assign(
+        variant_contig=(
+            ("variants", ), da.zeros(len(ds["variants"]), dtype=np.int16),
+        )
+    )
+    ds = ds.assign(
+        loco_predicts=(
+            ("contigs", "samples", "outcomes"),
+            da.zeros((0, len(ds["samples"]), 0), dtype=np.float32),
+        )
+    )
+
+    with pytest.raises(ValueError, match=r"Number of observations \(N\) too small"):
+        regenie_gwas_linear_regression(
+            ds,
+            dosage="dosage",
+            covariates="sample_covariates",
+            traits="sample_traits",
+            variant_contigs="variant_contig",
+            loco_predicts="loco_predicts",
+            call_genotype=None,
+            merge=False,
+        )
