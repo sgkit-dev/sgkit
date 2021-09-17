@@ -120,6 +120,20 @@ def _generate_regenie_test_dataset(**kwargs: Any) -> Dataset:
     data_vars["dosage"] = (["variants", "samples"], g.T)
     data_vars["sample_covariates"] = (["samples", "covariates"], x)
     data_vars["sample_traits"] = (["samples", "traits"], ys.T)
+
+    # Generate dummy `variant_contigs` and `loco_predicts`, required
+    # to pass input data validation
+    data_vars["variant_contig"] = (
+        [
+            "variants",
+        ],
+        da.zeros(g.shape[1], dtype=np.int16),
+    )
+    data_vars["loco_predicts"] = (
+        ["contigs", "samples", "outcomes"],
+        da.zeros((0, g.shape[0], 0), dtype=np.float32),
+    )
+
     attrs = dict(beta=bg, n_trait=ys.shape[0], n_covar=x.shape[1])
     return xr.Dataset(data_vars, attrs=attrs)  # type: ignore[arg-type]
 
@@ -415,20 +429,6 @@ def test_regenie_gwas_linear_regression__raise_on_dof_lte_0():
     # degrees of freedom to be zero
     ds = _generate_regenie_test_dataset(n=100, p=100)
 
-    # Generate dummy `variant_contigs` and `loco_predicts`, required
-    # to pass input data validation
-    ds = ds.assign(
-        variant_contig=(
-            ("variants", ), da.zeros(len(ds["variants"]), dtype=np.int16),
-        )
-    )
-    ds = ds.assign(
-        loco_predicts=(
-            ("contigs", "samples", "outcomes"),
-            da.zeros((0, len(ds["samples"]), 0), dtype=np.float32),
-        )
-    )
-
     with pytest.raises(ValueError, match=r"Number of observations \(N\) too small"):
         regenie_gwas_linear_regression(
             ds,
@@ -437,7 +437,7 @@ def test_regenie_gwas_linear_regression__raise_on_dof_lte_0():
             traits="sample_traits",
             variant_contigs="variant_contig",
             loco_predicts="loco_predicts",
-            call_genotype=None,
+            call_genotype="call_genotype",
             merge=False,
         )
 
@@ -446,20 +446,6 @@ def test_regenie_gwas_linear_regression__raise_on_no_intercept_and_empty_covaria
     # Sample count too low relative to core covariate will cause
     # degrees of freedom to be zero
     ds = _generate_regenie_test_dataset(n=0)
-
-    # Generate dummy `variant_contigs` and `loco_predicts`, required
-    # to pass input data validation
-    ds = ds.assign(
-        variant_contig=(
-            ("variants", ), da.zeros(len(ds["variants"]), dtype=np.int16),
-        )
-    )
-    ds = ds.assign(
-        loco_predicts=(
-            ("contigs", "samples", "outcomes"),
-            da.zeros((0, len(ds["samples"]), 0), dtype=np.float32),
-        )
-    )
 
     with pytest.raises(
         ValueError, match="add_intercept must be True if no covariates specified"
@@ -471,7 +457,7 @@ def test_regenie_gwas_linear_regression__raise_on_no_intercept_and_empty_covaria
             traits="sample_traits",
             variant_contigs="variant_contig",
             loco_predicts="loco_predicts",
-            call_genotype=None,
+            call_genotype="call_genotype",
             merge=False,
             add_intercept=False,
         )
@@ -486,7 +472,9 @@ def test_regenie_gwas_linear_regression__raise_on_non_2D():
     ds = ds.assign(
         dosage=(
             ("variants", "samples", "third"),
-            da.asarray([ds["dosage"].data]).reshape((len(ds["variants"]), len(ds["samples"]), 1)),
+            da.asarray([ds["dosage"].data]).reshape(
+                (len(ds["variants"]), len(ds["samples"]), 1)
+            ),
         )
     )
 
@@ -498,14 +486,6 @@ def test_regenie_gwas_linear_regression__raise_on_non_2D():
         )
     )
 
-    # Generate dummy `variant_contigs` and `loco_predicts`, required
-    # to pass input data validation
-    ds = ds.assign(
-        variant_contig=(
-            ("variants", ), da.zeros(len(ds["variants"]), dtype=np.int16),
-        )
-    )
-
     with pytest.raises(ValueError, match="All arguments must be 2D"):
         regenie_gwas_linear_regression(
             ds,
@@ -514,6 +494,6 @@ def test_regenie_gwas_linear_regression__raise_on_non_2D():
             traits="sample_traits",
             variant_contigs="variant_contig",
             loco_predicts="loco_predicts",
-            call_genotype=None,
+            call_genotype="call_genotype",
             merge=False,
         )
