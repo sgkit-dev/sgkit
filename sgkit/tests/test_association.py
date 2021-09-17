@@ -293,8 +293,20 @@ def test_linear_regression__raise_on_dof_lte_0():
 
 
 @pytest.mark.parametrize("ndarray_type", ["numpy", "cupy"])
-def test_regenie_gwas_linear_regression(ndarray_type: str) -> None:
+@pytest.mark.parametrize("covariate", [True, False])
+def test_regenie_gwas_linear_regression(ndarray_type: str, covariate: bool) -> None:
     xp = pytest.importorskip(ndarray_type)
+
+    atol = 1e-14
+
+    if covariate is True:
+        glow_offsets_filename = "glow_offsets.zarr.zip"
+        gwas_loco_filename = "gwas_loco.csv"
+    else:
+        glow_offsets_filename = "glow_offsets_nocovariate.zarr.zip"
+        gwas_loco_filename = "gwas_loco_nocovariate.csv"
+        if xp is not np:
+            atol = 1e-7
 
     datasets = ["sim_sm_02"]  # Only dataset 2 has more than 1 contig
     ds_dir = Path("sgkit/tests/test_regenie/dataset")
@@ -305,12 +317,11 @@ def test_regenie_gwas_linear_regression(ndarray_type: str) -> None:
             str(ds_dir / ds_name / "genotypes.zarr.zip"), mode="r"
         )
         glow_store = zarr.ZipStore(
-            str(ds_dir / ds_name / "glow_offsets.zarr.zip"), mode="r"
+            str(ds_dir / ds_name / glow_offsets_filename), mode="r"
         )
 
         ds = xr.open_zarr(genotypes_store, consolidated=False)
         glow_loco_predictions = xr.open_zarr(glow_store, consolidated=False)
-        df_covariate = load_covariates(ds_dir / ds_name)
         df_trait = load_traits(ds_dir / ds_name)
 
         ds = ds.assign(
@@ -320,12 +331,16 @@ def test_regenie_gwas_linear_regression(ndarray_type: str) -> None:
             )
         )
 
-        ds = ds.assign(
-            sample_covariates=(
-                ("samples", "covariates"),
-                da.from_array(df_covariate.to_numpy()),
+        if covariate is True:
+            df_covariate = load_covariates(ds_dir / ds_name)
+            ds = ds.assign(
+                sample_covariates=(
+                    ("samples", "covariates"),
+                    da.from_array(df_covariate.to_numpy()),
+                )
             )
-        )
+        else:
+            ds = ds.assign(sample_covariates=(("empty", "empty"), da.zeros((0, 0))))
 
         ds = ds.assign(
             sample_traits=(("samples", "traits"), da.from_array(df_trait.to_numpy()))
@@ -368,7 +383,7 @@ def test_regenie_gwas_linear_regression(ndarray_type: str) -> None:
 
         # PREPARE GLOW RESULTS
         results_dir = Path("sgkit/tests/test_regenie/result/sim_sm_02-wgr_02")
-        glowres = pd.read_csv(results_dir / "gwas_loco.csv")
+        glowres = pd.read_csv(results_dir / gwas_loco_filename)
         glowres = glowres.rename(
             columns={
                 "pvalue": "p_value",
@@ -419,9 +434,9 @@ def test_regenie_gwas_linear_regression(ndarray_type: str) -> None:
             join="outer",
         )
 
-        np.testing.assert_allclose(df["effect_sgkit"], df["effect_glow"], atol=1e-14)
-        np.testing.assert_allclose(df["p_value_sgkit"], df["p_value_glow"], atol=1e-14)
-        np.testing.assert_allclose(df["t_value_sgkit"], df["t_value_glow"], atol=1e-14)
+        np.testing.assert_allclose(df["effect_sgkit"], df["effect_glow"], atol=atol)
+        np.testing.assert_allclose(df["p_value_sgkit"], df["p_value_glow"], atol=atol)
+        np.testing.assert_allclose(df["t_value_sgkit"], df["t_value_glow"], atol=atol)
 
 
 def test_regenie_gwas_linear_regression__raise_on_dof_lte_0():
