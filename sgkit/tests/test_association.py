@@ -468,11 +468,12 @@ def test_regenie_gwas_linear_regression__raise_on_non_2D():
     # degrees of freedom to be zero
     ds = _generate_regenie_test_dataset()
 
-    # Add third dimension to `dosage`
+    # Add third dimension to `dosage`. By changing number of chunks,
+    # we also cover `Q.rechunk(X.chunksize)` in this test.
     ds = ds.assign(
         dosage=(
             ("variants", "samples", "third"),
-            da.asarray([ds["dosage"].data]).reshape(
+            da.asarray([ds["dosage"].data], chunks=10).reshape(
                 (len(ds["variants"]), len(ds["samples"]), 1)
             ),
         )
