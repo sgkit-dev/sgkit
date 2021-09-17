@@ -234,7 +234,6 @@ def _get_loop_covariates(
     if dosage is None:
         # TODO: This should be (probably gwas-specific) allele
         # count with sex chromosome considerations
-        assert call_genotype is not None
         G = ds[call_genotype].sum(dim="ploidy")  # pragma: no cover
     else:
         G = ds[dosage]
@@ -470,8 +469,6 @@ def regenie_gwas_linear_regression(
         if add_intercept:
             intercept_arr = np.ones_like(G, shape=(X.shape[0], 1), dtype=X.dtype)
             X = da.concatenate([intercept_arr, X], axis=1)
-
-    # assert isinstance(X, da.Array)
 
     assert X.ndim == 2  # 2d covariate array required
     dof = X.shape[0] - X.shape[1] - 1
