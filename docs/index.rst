@@ -23,9 +23,3 @@ both popular Python genetics toolkits with a respective focus on population and 
     examples/index
     api
     contributing
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`search`

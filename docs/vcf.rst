@@ -3,9 +3,6 @@
 Reading VCF
 ===========
 
-.. contents:: Table of contents:
-   :local:
-
 The :func:`sgkit.io.vcf.vcf_to_zarr` function converts one or more VCF files to Zarr files stored in
 sgkit's Xarray data representation.
 

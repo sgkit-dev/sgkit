@@ -4,9 +4,6 @@
 Getting Started
 **********************
 
-.. contents:: Table of contents:
-   :local:
-
 Installation
 ------------
 

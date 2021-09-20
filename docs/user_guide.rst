@@ -4,10 +4,6 @@
 User Guide
 **********
 
-.. contents:: Table of contents:
-   :local:
-
-
 .. _reading_genetic_data:
 
 Reading genetic data

@@ -4,9 +4,6 @@
 Contributing to sgkit
 **********************
 
-.. contents:: Table of contents:
-   :local:
-
 All contributions, bug reports, bug fixes, documentation improvements,
 enhancements, and ideas are welcome.
 This page provides resources on how best to contribute.

@@ -124,6 +124,11 @@ html_theme = "sphinx_book_theme"
 html_title = ""
 html_logo = "_static/sgkit_trnsprnt.png"
 
+html_theme_options = {
+    "use_download_button": False,
+    "use_fullscreen_button": False,
+}
+
 html_css_files = [
     "docsearch.sbt.css",
     "https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css",
