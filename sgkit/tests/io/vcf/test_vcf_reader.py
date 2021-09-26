@@ -563,6 +563,31 @@ def test_vcf_to_zarr__multiple_max_alt_alleles(shared_datadir, is_path, tmp_path
 
 
 @pytest.mark.parametrize(
+    "max_alt_alleles,dtype,warning",
+    [
+        (2, np.int8, True),
+        (127, np.int8, True),
+        (128, np.int16, True),
+        (145, np.int16, True),
+        (164, np.int16, False),
+    ],
+)
+def test_vcf_to_zarr__call_genotype_dtype(
+    shared_datadir, tmp_path, max_alt_alleles, dtype, warning
+):
+    path = path_for_test(shared_datadir, "allele_overflow.vcf.gz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+    if warning:
+        with pytest.warns(MaxAltAllelesExceededWarning):
+            vcf_to_zarr(path, output, max_alt_alleles=max_alt_alleles)
+    else:
+        vcf_to_zarr(path, output, max_alt_alleles=max_alt_alleles)
+    ds = load_dataset(output)
+    assert ds.call_genotype.dtype == dtype
+    assert ds.call_genotype.values.max() <= max_alt_alleles
+
+
+@pytest.mark.parametrize(
     "ploidy,mixed_ploidy,truncate_calls,regions",
     [
         (2, False, True, None),
