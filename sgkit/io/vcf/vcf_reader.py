@@ -293,7 +293,10 @@ class GenotypeFieldHandler(VcfFieldHandler):
         max_alt_alleles: int,
     ) -> None:
         n_sample = len(vcf.samples)
-        self.call_genotype = np.empty((chunk_length, n_sample, ploidy), dtype="i1")
+        self.call_genotype = np.empty(
+            (chunk_length, n_sample, ploidy),
+            dtype=smallest_numpy_int_dtype(max_alt_alleles),
+        )
         self.call_genotype_phased = np.empty((chunk_length, n_sample), dtype=bool)
         self.ploidy = ploidy
         self.mixed_ploidy = mixed_ploidy
