@@ -241,6 +241,9 @@ Documentation is maintained in the RestructuredText markup language (``.rst``
 files) in ``docs``.  The documentation consists both of prose
 and API documentation.
 
+Building the documentation requires the Graphviz ``dot`` executable, which you
+can install by following `these instructions <https://graphviz.org/download/#executable-packages>`_.
+
 You can build the documentation locally with ``make``::
 
    cd docs

@@ -16,6 +16,7 @@ from sgkit.utils import (
     hash_array,
     max_str_len,
     merge_datasets,
+    smallest_numpy_int_dtype,
     split_array_chunks,
 )
 
@@ -231,3 +232,37 @@ def test_hash_array(n_rows, n_cols):
     # counts[inverse] gives the count for each column in x
     # these should be the same for both ways of counting
     np.testing.assert_equal(counts[inverse], expected_counts[expected_inverse])
+
+
+@pytest.mark.parametrize(
+    "value,expected_dtype",
+    [
+        (0, np.int8),
+        (1, np.int8),
+        (-1, np.int8),
+        (np.iinfo(np.int8).min, np.int8),
+        (np.iinfo(np.int8).max, np.int8),
+        (np.iinfo(np.int8).min - 1, np.int16),
+        (np.iinfo(np.int8).max + 1, np.int16),
+        (np.iinfo(np.int16).min, np.int16),
+        (np.iinfo(np.int16).max, np.int16),
+        (np.iinfo(np.int16).min - 1, np.int32),
+        (np.iinfo(np.int16).max + 1, np.int32),
+        (np.iinfo(np.int32).min, np.int32),
+        (np.iinfo(np.int32).max, np.int32),
+        (np.iinfo(np.int32).min - 1, np.int64),
+        (np.iinfo(np.int32).max + 1, np.int64),
+        (np.iinfo(np.int64).min, np.int64),
+        (np.iinfo(np.int64).max, np.int64),
+    ],
+)
+def test_smallest_numpy_int_dtype(value, expected_dtype):
+    assert smallest_numpy_int_dtype(value) == expected_dtype
+
+
+def test_smallest_numpy_int_dtype__overflow():
+    with pytest.raises(OverflowError):
+        smallest_numpy_int_dtype(np.iinfo(np.int64).min - 1)
+
+    with pytest.raises(OverflowError):
+        smallest_numpy_int_dtype(np.iinfo(np.int64).max + 1)

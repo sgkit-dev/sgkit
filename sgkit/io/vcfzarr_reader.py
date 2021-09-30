@@ -1,9 +1,20 @@
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, Hashable, List, Optional, Tuple
+from typing import (
+    Any,
+    Dict,
+    Hashable,
+    List,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import dask
 import dask.array as da
+import numcodecs
 import xarray as xr
 import zarr
 from fsspec import get_mapper
@@ -14,7 +25,7 @@ from sgkit.io.utils import concatenate_and_rechunk, str_is_int, zarrs_to_dataset
 
 from ..model import DIM_SAMPLE, DIM_VARIANT, create_genotype_call_dataset
 from ..typing import ArrayLike, PathType
-from ..utils import encode_array, max_str_len
+from ..utils import encode_array, max_str_len, smallest_numpy_int_dtype
 
 
 def _ensure_2d(arr: ArrayLike) -> ArrayLike:
@@ -151,8 +162,8 @@ def vcfzarr_to_zarr(
                 ds.to_zarr(output, mode="w")
             else:
                 # Use the optimized algorithm in `concatenate_and_rechunk`
-                _concat_zarrs_optimized(
-                    zarr_files, output, vars_to_rechunk, vars_to_copy
+                concat_zarrs_optimized(
+                    zarr_files, output, vars_to_rechunk, vars_to_copy, fix_strings=True
                 )
 
 
@@ -170,7 +181,8 @@ def _vcfzarr_to_dataset(
         # Get the contigs from variants/CHROM
         variants_chrom = da.from_zarr(vcfzarr["variants/CHROM"]).astype(str)
         variant_contig, variant_contig_names = encode_array(variants_chrom.compute())
-        variant_contig = variant_contig.astype("i1")
+        variant_contig_dtype = smallest_numpy_int_dtype(len(variant_contig_names))
+        variant_contig = variant_contig.astype(variant_contig_dtype)
         variant_contig_names = list(variant_contig_names)
     else:
         # Single contig: contig names were passed in
@@ -290,18 +302,22 @@ def _get_max_len(zarr_groups: List[zarr.Group], attr_name: str) -> int:
     return max_len
 
 
-def _concat_zarrs_optimized(
-    zarr_files: List[str],
-    output: PathType,
+def concat_zarrs_optimized(
+    zarr_files: Sequence[str],
+    output: Union[PathType, MutableMapping[str, bytes]],
     vars_to_rechunk: List[Hashable],
     vars_to_copy: List[Hashable],
+    fix_strings: bool = False,
 ) -> None:
+    if isinstance(output, Path):
+        output = str(output)
+
     zarr_groups = [zarr.open_group(f) for f in zarr_files]
 
     first_zarr_group = zarr_groups[0]
 
     # create the top-level group
-    zarr.open_group(str(output), mode="w")
+    zarr.open_group(output, mode="w")
 
     # copy variables that are to be rechunked
     # NOTE: that this uses _to_zarr function defined here that is needed to avoid
@@ -310,27 +326,42 @@ def _concat_zarrs_optimized(
     delayed = []  # do all the rechunking operations in one computation
     for var in vars_to_rechunk:
         dtype = None
-        if var in {"variant_id", "variant_allele"}:
+        if fix_strings and var in {"variant_id", "variant_allele"}:
             max_len = _get_max_len(zarr_groups, f"max_length_{var}")
             dtype = f"S{max_len}"
-
         arr = concatenate_and_rechunk(
             [group[var] for group in zarr_groups], dtype=dtype
         )
+
+        _to_zarr_kwargs = dict(
+            compressor=first_zarr_group[var].compressor,
+            filters=first_zarr_group[var].filters,
+            fill_value=None,
+        )
+        if not fix_strings and arr.dtype == "O":
+            # We assume that all object dtypes are variable length strings
+            var_len_str_codec = numcodecs.VLenUTF8()
+            _to_zarr_kwargs["object_codec"] = var_len_str_codec
+            # Remove from filters to avoid double encoding error
+            if var_len_str_codec in first_zarr_group[var].filters:
+                filters = list(first_zarr_group[var].filters)
+                filters.remove(var_len_str_codec)
+                _to_zarr_kwargs["filters"] = filters
+
         d = _to_zarr(  # type: ignore[no-untyped-call]
             arr,
-            str(output),
+            output,
             component=var,
             overwrite=True,
             compute=False,
-            fill_value=None,
             attrs=first_zarr_group[var].attrs.asdict(),
+            **_to_zarr_kwargs,
         )
         delayed.append(d)
     da.compute(*delayed)
 
     # copy unchanged variables and top-level metadata
-    with zarr.open_group(str(output)) as output_zarr:
+    with zarr.open_group(output) as output_zarr:
 
         # copy variables that are not rechunked (e.g. sample_id)
         for var in vars_to_copy:
@@ -338,10 +369,14 @@ def _concat_zarrs_optimized(
             output_zarr[var].attrs.update(first_zarr_group[var].attrs)
 
         # copy top-level attributes
-        output_zarr.attrs.update(first_zarr_group.attrs)
+        group_attrs = dict(first_zarr_group.attrs)
+        if "max_alt_alleles_seen" in group_attrs:
+            max_alt_alleles_seen = _get_max_len(zarr_groups, "max_alt_alleles_seen")
+            group_attrs["max_alt_alleles_seen"] = max_alt_alleles_seen
+        output_zarr.attrs.update(group_attrs)
 
     # consolidate metadata
-    zarr.consolidate_metadata(str(output))
+    zarr.consolidate_metadata(output)
 
 
 def _to_zarr(  # type: ignore[no-untyped-def]

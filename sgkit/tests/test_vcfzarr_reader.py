@@ -140,7 +140,7 @@ def test_vcfzarr_to_zarr(
         consolidated=consolidated,
     )
 
-    ds = xr.open_zarr(output)
+    ds = xr.open_zarr(output, concat_characters=False)
 
     # Note that variant_allele values are byte strings, not unicode strings (unlike for read_vcfzarr)
     # We should make the two consistent.

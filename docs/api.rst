@@ -46,7 +46,7 @@ For more low-level control:
 
    partition_into_regions
    vcf_to_zarrs
-   zarrs_to_dataset
+   concat_zarrs
 
 For converting from `scikit-allel's VCF Zarr representation <https://scikit-allel.readthedocs.io/en/stable/io.html#allel.vcf_to_zarr>`_ to sgkit's Zarr representation:
 
@@ -84,16 +84,19 @@ Methods
    Garud_H
    gwas_linear_regression
    hardy_weinberg_test
+   identity_by_state
    individual_heterozygosity
    ld_matrix
    ld_prune
    maximal_independent_set
    observed_heterozygosity
+   pbs
    pc_relate
    regenie
    sample_stats
    Tajimas_D
    variant_stats
+   Weir_Goudet_beta
 
 Utilities
 =========
@@ -165,9 +168,11 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.stat_Garud_h12_spec
     variables.stat_Garud_h123_spec
     variables.stat_Garud_h2_h1_spec
+    variables.stat_identity_by_state_spec
     variables.stat_observed_heterozygosity_spec
     variables.stat_pbs_spec
     variables.stat_Tajimas_D_spec
+    variables.stat_Weir_Goudet_beta_spec
     variables.traits_spec
     variables.variant_allele_spec
     variables.variant_allele_count_spec
