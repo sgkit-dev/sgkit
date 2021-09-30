@@ -22,21 +22,25 @@
       
 
     
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e8f53015daec13862f6db5e763c41738.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" />
     <link rel="stylesheet" type="text/css" href="_static/typehints.css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/docsearch.sbt.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
     
   <link rel="preload" as="script" href="_static/js/index.1c5a1a01449ed65a7b51.js">
 
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/togglebutton.js"></script>
-    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script defer="defer" src="_static/docsearch.sbt.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="sgkit.io.bgen.bgen_to_zarr" href="generated/sgkit.io.bgen.bgen_to_zarr.html" />
@@ -59,6 +63,10 @@
         <div class="navbar-brand-box">
     <a class="navbar-brand text-wrap" href="index.html">
       
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
       <img src="_static/sgkit_trnsprnt.png" class="logo" alt="logo">
       
       
@@ -68,7 +76,7 @@
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item active">
-        <p class="caption">
+        <p class="caption" role="heading">
  <span class="caption-text">
   Contents:
  </span>
@@ -838,13 +846,13 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.bgen.bgen_to_zarr.html#sgkit.io.bgen.bgen_to_zarr" title="sgkit.io.bgen.bgen_to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bgen_to_zarr</span></code></a>(input, output[, region, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.bgen.bgen_to_zarr.html#sgkit.io.bgen.bgen_to_zarr" title="sgkit.io.bgen.bgen_to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bgen_to_zarr</span></code></a>(input, output[, region, ...])</p></td>
 <td><p>Convert a BGEN file to a Zarr on-disk store.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.io.bgen.read_bgen.html#sgkit.io.bgen.read_bgen" title="sgkit.io.bgen.read_bgen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_bgen</span></code></a>(path[, metafile_path, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.io.bgen.read_bgen.html#sgkit.io.bgen.read_bgen" title="sgkit.io.bgen.read_bgen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_bgen</span></code></a>(path[, metafile_path, ...])</p></td>
 <td><p>Read BGEN dataset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.bgen.rechunk_bgen.html#sgkit.io.bgen.rechunk_bgen" title="sgkit.io.bgen.rechunk_bgen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rechunk_bgen</span></code></a>(ds, output, *[, chunk_length, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.bgen.rechunk_bgen.html#sgkit.io.bgen.rechunk_bgen" title="sgkit.io.bgen.rechunk_bgen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rechunk_bgen</span></code></a>(ds, output, *[, chunk_length, ...])</p></td>
 <td><p>Rechunk BGEN dataset as Zarr.</p></td>
 </tr>
 </tbody>
@@ -858,7 +866,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.plink.read_plink.html#sgkit.io.plink.read_plink" title="sgkit.io.plink.read_plink"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_plink</span></code></a>(*[, path, bed_path, bim_path, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.plink.read_plink.html#sgkit.io.plink.read_plink" title="sgkit.io.plink.read_plink"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_plink</span></code></a>(*[, path, bed_path, bim_path, ...])</p></td>
 <td><p>Read PLINK dataset.</p></td>
 </tr>
 </tbody>
@@ -872,7 +880,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code></a>(input, output, *[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code></a>(input, output, *[, ...])</p></td>
 <td><p>Convert VCF files to a single Zarr on-disk store.</p></td>
 </tr>
 </tbody>
@@ -884,13 +892,13 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.vcf.partition_into_regions.html#sgkit.io.vcf.partition_into_regions" title="sgkit.io.vcf.partition_into_regions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">partition_into_regions</span></code></a>(vcf_path, *[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.vcf.partition_into_regions.html#sgkit.io.vcf.partition_into_regions" title="sgkit.io.vcf.partition_into_regions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">partition_into_regions</span></code></a>(vcf_path, *[, ...])</p></td>
 <td><p>Calculate genomic region strings to partition a compressed VCF or BCF file into roughly equal parts.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarrs.html#sgkit.io.vcf.vcf_to_zarrs" title="sgkit.io.vcf.vcf_to_zarrs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vcf_to_zarrs</span></code></a>(input, output, regions[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarrs.html#sgkit.io.vcf.vcf_to_zarrs" title="sgkit.io.vcf.vcf_to_zarrs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vcf_to_zarrs</span></code></a>(input, output, regions[, ...])</p></td>
 <td><p>Convert VCF files to multiple Zarr on-disk stores, one per region.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.vcf.concat_zarrs.html#sgkit.io.vcf.concat_zarrs" title="sgkit.io.vcf.concat_zarrs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">concat_zarrs</span></code></a>(urls, output, *[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.vcf.concat_zarrs.html#sgkit.io.vcf.concat_zarrs" title="sgkit.io.vcf.concat_zarrs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">concat_zarrs</span></code></a>(urls, output, *[, ...])</p></td>
 <td><p>Concatenate multiple Zarr stores into a single Zarr store.</p></td>
 </tr>
 </tbody>
@@ -934,16 +942,16 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.call_allele_frequencies.html#sgkit.call_allele_frequencies" title="sgkit.call_allele_frequencies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call_allele_frequencies</span></code></a>(ds, *[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.call_allele_frequencies.html#sgkit.call_allele_frequencies" title="sgkit.call_allele_frequencies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call_allele_frequencies</span></code></a>(ds, *[, ...])</p></td>
 <td><p>Compute per sample allele frequencies from genotype calls.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.count_call_alleles.html#sgkit.count_call_alleles" title="sgkit.count_call_alleles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_call_alleles</span></code></a>(ds, *[, call_genotype, merge])</p></td>
 <td><p>Compute per sample allele counts from genotype calls.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.count_cohort_alleles.html#sgkit.count_cohort_alleles" title="sgkit.count_cohort_alleles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_cohort_alleles</span></code></a>(ds, *[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.count_cohort_alleles.html#sgkit.count_cohort_alleles" title="sgkit.count_cohort_alleles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_cohort_alleles</span></code></a>(ds, *[, ...])</p></td>
 <td><p>Compute per cohort allele counts from per-sample allele counts, or genotype calls.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.count_variant_alleles.html#sgkit.count_variant_alleles" title="sgkit.count_variant_alleles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_variant_alleles</span></code></a>(ds, *[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.count_variant_alleles.html#sgkit.count_variant_alleles" title="sgkit.count_variant_alleles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_variant_alleles</span></code></a>(ds, *[, ...])</p></td>
 <td><p>Compute allele count from per-sample allele counts, or genotype calls.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.divergence.html#sgkit.divergence" title="sgkit.divergence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">divergence</span></code></a>(ds, *[, cohort_allele_count, merge])</p></td>
@@ -955,52 +963,52 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.Fst.html#sgkit.Fst" title="sgkit.Fst"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Fst</span></code></a>(ds, *[, estimator, stat_divergence, merge])</p></td>
 <td><p>Compute Fst between pairs of cohorts.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.Garud_H.html#sgkit.Garud_H" title="sgkit.Garud_H"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Garud_H</span></code></a>(ds, *[, call_genotype, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.Garud_H.html#sgkit.Garud_H" title="sgkit.Garud_H"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Garud_H</span></code></a>(ds, *[, call_genotype, ...])</p></td>
 <td><p>Compute the H1, H12, H123 and H2/H1 statistics for detecting signatures of soft sweeps, as defined in Garud et al. (2015).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.gwas_linear_regression.html#sgkit.gwas_linear_regression" title="sgkit.gwas_linear_regression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gwas_linear_regression</span></code></a>(ds, *, dosage, …[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.gwas_linear_regression.html#sgkit.gwas_linear_regression" title="sgkit.gwas_linear_regression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gwas_linear_regression</span></code></a>(ds, *, dosage, ...[, ...])</p></td>
 <td><p>Run linear regression to identify continuous trait associations with genetic variants.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.hardy_weinberg_test.html#sgkit.hardy_weinberg_test" title="sgkit.hardy_weinberg_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hardy_weinberg_test</span></code></a>(ds, *[, genotype_count, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.hardy_weinberg_test.html#sgkit.hardy_weinberg_test" title="sgkit.hardy_weinberg_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hardy_weinberg_test</span></code></a>(ds, *[, genotype_count, ...])</p></td>
 <td><p>Exact test for HWE as described in Wigginton et al. 2005 [1].</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.identity_by_state.html#sgkit.identity_by_state" title="sgkit.identity_by_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">identity_by_state</span></code></a>(ds, *[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.identity_by_state.html#sgkit.identity_by_state" title="sgkit.identity_by_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">identity_by_state</span></code></a>(ds, *[, ...])</p></td>
 <td><p>Compute identity by state (IBS) probabilities between all pairs of samples.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.individual_heterozygosity.html#sgkit.individual_heterozygosity" title="sgkit.individual_heterozygosity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">individual_heterozygosity</span></code></a>(ds, *[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.individual_heterozygosity.html#sgkit.individual_heterozygosity" title="sgkit.individual_heterozygosity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">individual_heterozygosity</span></code></a>(ds, *[, ...])</p></td>
 <td><p>Compute per call individual heterozygosity.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.ld_matrix.html#sgkit.ld_matrix" title="sgkit.ld_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ld_matrix</span></code></a>(ds, *[, dosage, threshold, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.ld_matrix.html#sgkit.ld_matrix" title="sgkit.ld_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ld_matrix</span></code></a>(ds, *[, dosage, threshold, ...])</p></td>
 <td><p>Compute a sparse linkage disequilibrium (LD) matrix.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.ld_prune.html#sgkit.ld_prune" title="sgkit.ld_prune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ld_prune</span></code></a>(ds, *[, dosage, threshold, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.ld_prune.html#sgkit.ld_prune" title="sgkit.ld_prune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ld_prune</span></code></a>(ds, *[, dosage, threshold, ...])</p></td>
 <td><p>Prune variants in linkage disequilibrium (LD).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.maximal_independent_set.html#sgkit.maximal_independent_set" title="sgkit.maximal_independent_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximal_independent_set</span></code></a>(df)</p></td>
 <td><p>Compute a maximal independent set of variants.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.observed_heterozygosity.html#sgkit.observed_heterozygosity" title="sgkit.observed_heterozygosity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">observed_heterozygosity</span></code></a>(ds, *[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.observed_heterozygosity.html#sgkit.observed_heterozygosity" title="sgkit.observed_heterozygosity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">observed_heterozygosity</span></code></a>(ds, *[, ...])</p></td>
 <td><p>Compute per cohort observed heterozygosity.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pbs.html#sgkit.pbs" title="sgkit.pbs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pbs</span></code></a>(ds, *[, stat_Fst, cohorts, merge])</p></td>
 <td><p>Compute the population branching statistic (PBS) between cohort triples.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.pc_relate.html#sgkit.pc_relate" title="sgkit.pc_relate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pc_relate</span></code></a>(ds, *[, maf, call_genotype, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.pc_relate.html#sgkit.pc_relate" title="sgkit.pc_relate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pc_relate</span></code></a>(ds, *[, maf, call_genotype, ...])</p></td>
 <td><p>Compute PC-Relate as described in Conomos, et al. 2016 [1].</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.regenie.html#sgkit.regenie" title="sgkit.regenie"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regenie</span></code></a>(ds, *, dosage, covariates, traits[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.regenie.html#sgkit.regenie" title="sgkit.regenie"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regenie</span></code></a>(ds, *, dosage, covariates, traits[, ...])</p></td>
 <td><p>Regenie trait transformation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.sample_stats.html#sgkit.sample_stats" title="sgkit.sample_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_stats</span></code></a>(ds, *[, call_genotype_mask, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.sample_stats.html#sgkit.sample_stats" title="sgkit.sample_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_stats</span></code></a>(ds, *[, call_genotype_mask, ...])</p></td>
 <td><p>Compute quality control sample statistics from genotype calls.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.Tajimas_D.html#sgkit.Tajimas_D" title="sgkit.Tajimas_D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tajimas_D</span></code></a>(ds, *[, variant_allele_count, …])</p></td>
-<td><p>Compute Tajimas’ D for a genotype call dataset.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.Tajimas_D.html#sgkit.Tajimas_D" title="sgkit.Tajimas_D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tajimas_D</span></code></a>(ds, *[, variant_allele_count, ...])</p></td>
+<td><p>Compute Tajimas' D for a genotype call dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variant_stats.html#sgkit.variant_stats" title="sgkit.variant_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variant_stats</span></code></a>(ds, *[, call_genotype_mask, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variant_stats.html#sgkit.variant_stats" title="sgkit.variant_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variant_stats</span></code></a>(ds, *[, call_genotype_mask, ...])</p></td>
 <td><p>Compute quality control variant statistics from genotype calls.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.Weir_Goudet_beta.html#sgkit.Weir_Goudet_beta" title="sgkit.Weir_Goudet_beta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Weir_Goudet_beta</span></code></a>(ds, *[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.Weir_Goudet_beta.html#sgkit.Weir_Goudet_beta" title="sgkit.Weir_Goudet_beta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Weir_Goudet_beta</span></code></a>(ds, *[, ...])</p></td>
 <td><p>Estimate pairwise beta between all pairs of samples as described in Weir and Goudet 2017 [1].</p></td>
 </tr>
 </tbody>
@@ -1014,31 +1022,31 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.convert_probability_to_call.html#sgkit.convert_probability_to_call" title="sgkit.convert_probability_to_call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_probability_to_call</span></code></a>(ds[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.convert_probability_to_call.html#sgkit.convert_probability_to_call" title="sgkit.convert_probability_to_call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_probability_to_call</span></code></a>(ds[, ...])</p></td>
 <td><p>Convert genotype probabilities to hard calls.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.display_genotypes.html#sgkit.display_genotypes" title="sgkit.display_genotypes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_genotypes</span></code></a>(ds[, max_variants, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.display_genotypes.html#sgkit.display_genotypes" title="sgkit.display_genotypes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_genotypes</span></code></a>(ds[, max_variants, ...])</p></td>
 <td><p>Display genotype calls.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.filter_partial_calls.html#sgkit.filter_partial_calls" title="sgkit.filter_partial_calls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_partial_calls</span></code></a>(ds, *[, call_genotype, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.filter_partial_calls.html#sgkit.filter_partial_calls" title="sgkit.filter_partial_calls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_partial_calls</span></code></a>(ds, *[, call_genotype, ...])</p></td>
 <td><p>Replace partial genotype calls with missing values.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.infer_call_ploidy.html#sgkit.infer_call_ploidy" title="sgkit.infer_call_ploidy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_call_ploidy</span></code></a>(ds, *[, call_genotype, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.infer_call_ploidy.html#sgkit.infer_call_ploidy" title="sgkit.infer_call_ploidy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_call_ploidy</span></code></a>(ds, *[, call_genotype, ...])</p></td>
 <td><p>Infer the ploidy of each call genotype based on the number of non-allele values in each call genotype.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.infer_sample_ploidy.html#sgkit.infer_sample_ploidy" title="sgkit.infer_sample_ploidy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_sample_ploidy</span></code></a>(ds, *[, call_genotype, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.infer_sample_ploidy.html#sgkit.infer_sample_ploidy" title="sgkit.infer_sample_ploidy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_sample_ploidy</span></code></a>(ds, *[, call_genotype, ...])</p></td>
 <td><p>Infer the ploidy of each sample across all variants based on the number of non-allele values in call genotypes.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.infer_variant_ploidy.html#sgkit.infer_variant_ploidy" title="sgkit.infer_variant_ploidy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_variant_ploidy</span></code></a>(ds, *[, call_genotype, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.infer_variant_ploidy.html#sgkit.infer_variant_ploidy" title="sgkit.infer_variant_ploidy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_variant_ploidy</span></code></a>(ds, *[, call_genotype, ...])</p></td>
 <td><p>Infer the ploidy at each variant across all samples based on the number of non-allele values in call genotypes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset" title="sgkit.simulate_genotype_call_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_genotype_call_dataset</span></code></a>(n_variant, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset" title="sgkit.simulate_genotype_call_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_genotype_call_dataset</span></code></a>(n_variant, ...)</p></td>
 <td><p>Simulate genotype calls and variant/sample data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_position</span></code></a>(ds, *, size[, offset, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_position</span></code></a>(ds, *, size[, offset, ...])</p></td>
 <td><p>Add window information to a dataset, measured by distance along the genome.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_variant</span></code></a>(ds, *, size[, step, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_variant</span></code></a>(ds, *, size[, step, ...])</p></td>
 <td><p>Add window information to a dataset, measured by number of variants.</p></td>
 </tr>
 </tbody>
@@ -1054,7 +1062,7 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.regenie_base_prediction_spec.html#sgkit.variables.regenie_base_prediction_spec" title="sgkit.variables.regenie_base_prediction_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.regenie_base_prediction_spec</span></code></a></p></td>
-<td><p>REGENIE’s base prediction (blocks, alphas, samples, outcomes).</p></td>
+<td><p>REGENIE's base prediction (blocks, alphas, samples, outcomes).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.call_allele_count_spec.html#sgkit.variables.call_allele_count_spec" title="sgkit.variables.call_allele_count_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.call_allele_count_spec</span></code></a></p></td>
 <td><p>Allele counts.</p></td>
@@ -1114,10 +1122,10 @@
 <td><p>Variant indexes to drop for LD prune.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.regenie_loco_prediction_spec.html#sgkit.variables.regenie_loco_prediction_spec" title="sgkit.variables.regenie_loco_prediction_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.regenie_loco_prediction_spec</span></code></a></p></td>
-<td><p>REGENIE’s regenie_loco_prediction (contigs, samples, outcomes).</p></td>
+<td><p>REGENIE's regenie_loco_prediction (contigs, samples, outcomes).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.regenie_meta_prediction_spec.html#sgkit.variables.regenie_meta_prediction_spec" title="sgkit.variables.regenie_meta_prediction_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.regenie_meta_prediction_spec</span></code></a></p></td>
-<td><p>REGENIE’s regenie_meta_prediction (samples, outcomes).</p></td>
+<td><p>REGENIE's regenie_meta_prediction (samples, outcomes).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.pc_relate_phi_spec.html#sgkit.variables.pc_relate_phi_spec" title="sgkit.variables.pc_relate_phi_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.pc_relate_phi_spec</span></code></a></p></td>
 <td><p>PC Relate kinship coefficient matrix.</p></td>
@@ -1168,7 +1176,7 @@
 <td><p>Genetic divergence between pairs of cohorts.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.stat_diversity_spec.html#sgkit.variables.stat_diversity_spec" title="sgkit.variables.stat_diversity_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.stat_diversity_spec</span></code></a></p></td>
-<td><p>Genetic diversity (also known as “Tajima’s pi”) for cohorts.</p></td>
+<td><p>Genetic diversity (also known as &quot;Tajima’s pi&quot;) for cohorts.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.stat_Fst_spec.html#sgkit.variables.stat_Fst_spec" title="sgkit.variables.stat_Fst_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.stat_Fst_spec</span></code></a></p></td>
 <td><p>Fixation index (Fst) between pairs of cohorts.</p></td>
@@ -1307,7 +1315,7 @@
         
         </div>
     </div>
-    <footer class="footer mt-5 mt-md-0">
+    <footer class="footer">
     <div class="container">
       <p>
         
