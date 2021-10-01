@@ -21,9 +21,8 @@ from dask.delayed import Delayed
 from dask.optimization import fuse
 from fsspec import get_mapper
 from scipy.special import comb
-from typing_extensions import Literal
 
-from sgkit.io.utils import concatenate_and_rechunk, str_is_int, zarrs_to_dataset
+from sgkit.io.utils import concatenate_and_rechunk, str_is_int
 
 from ..model import DIM_SAMPLE, DIM_VARIANT, create_genotype_call_dataset
 from ..typing import ArrayLike, PathType
@@ -94,7 +93,6 @@ def vcfzarr_to_zarr(
     grouped_by_contig: bool = False,
     consolidated: bool = False,
     tempdir: Optional[PathType] = None,
-    concat_algorithm: Optional[Literal["xarray_internal"]] = None,
 ) -> None:
     """Convert VCF Zarr files created using scikit-allel to a single Zarr on-disk store in sgkit Xarray format.
 
@@ -113,10 +111,6 @@ def vcfzarr_to_zarr(
     tempdir
         Temporary directory where intermediate files are stored. The default None means
         use the system default temporary directory.
-    concat_algorithm
-        The algorithm to use to concatenate and rechunk Zarr files. The default None means
-        use the optimized version suitable for large files, whereas ``xarray_internal`` will
-        use built-in Xarray APIs, which can exhibit high memory usage, see https://github.com/dask/dask/issues/6745.
     """
 
     if consolidated:
@@ -159,14 +153,9 @@ def vcfzarr_to_zarr(
 
                 zarr_files.append(str(contig_zarr_file))
 
-            if concat_algorithm == "xarray_internal":
-                ds = zarrs_to_dataset(zarr_files)
-                ds.to_zarr(output, mode="w")
-            else:
-                # Use the optimized algorithm in `concatenate_and_rechunk`
-                concat_zarrs_optimized(
-                    zarr_files, output, vars_to_rechunk, vars_to_copy, fix_strings=True
-                )
+            concat_zarrs_optimized(
+                zarr_files, output, vars_to_rechunk, vars_to_copy, fix_strings=True
+            )
 
 
 def _vcfzarr_to_dataset(

@@ -99,17 +99,12 @@ def test_read_vcfzarr(shared_datadir, tmpdir):
         (True, True, False),
     ],
 )
-@pytest.mark.parametrize(
-    "concat_algorithm",
-    [None, "xarray_internal"],
-)
 def test_vcfzarr_to_zarr(
     shared_datadir,
     tmpdir,
     grouped_by_contig,
     consolidated,
     has_variant_id,
-    concat_algorithm,
 ):
     if has_variant_id:
         fields = None
@@ -136,7 +131,6 @@ def test_vcfzarr_to_zarr(
         vcfzarr_path,
         output,
         grouped_by_contig=grouped_by_contig,
-        concat_algorithm=concat_algorithm,
         consolidated=consolidated,
     )
 

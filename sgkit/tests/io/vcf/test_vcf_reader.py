@@ -274,14 +274,8 @@ def test_vcf_to_zarr__parallel_compressor_and_filters(
     "output_is_path",
     [True, False],
 )
-@pytest.mark.parametrize(
-    "concat_algorithm",
-    [None, "xarray_internal"],
-)
 @pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
-def test_vcf_to_zarr__parallel(
-    shared_datadir, is_path, output_is_path, concat_algorithm, tmp_path
-):
+def test_vcf_to_zarr__parallel(shared_datadir, is_path, output_is_path, tmp_path):
     path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", is_path)
     output = tmp_path.joinpath("vcf_concat.zarr")
     if not output_is_path:
@@ -294,7 +288,6 @@ def test_vcf_to_zarr__parallel(
         output,
         regions=regions,
         chunk_length=5_000,
-        concat_algorithm=concat_algorithm,
     )
     ds = xr.open_zarr(output)
 
@@ -308,12 +301,8 @@ def test_vcf_to_zarr__parallel(
     assert ds["variant_id_mask"].shape == (19910,)
     assert ds["variant_position"].shape == (19910,)
 
-    if concat_algorithm is None:
-        assert ds["variant_allele"].dtype == "O"
-        assert ds["variant_id"].dtype == "O"
-    else:
-        assert ds["variant_allele"].dtype == "S48"
-        assert ds["variant_id"].dtype == "S1"
+    assert ds["variant_allele"].dtype == "O"
+    assert ds["variant_id"].dtype == "O"
 
 
 @pytest.mark.parametrize(
