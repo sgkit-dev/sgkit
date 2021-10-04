@@ -23,6 +23,7 @@ both popular Python genetics toolkits with a respective focus on population and 
     examples/index
     api
     how_do_i
+    how_do_i_min
     contributing
 
 Indices and tables
