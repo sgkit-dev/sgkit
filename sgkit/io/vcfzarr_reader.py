@@ -12,10 +12,13 @@ from typing import (
     Union,
 )
 
+import dask
 import dask.array as da
 import numcodecs
 import xarray as xr
 import zarr
+from dask.delayed import Delayed
+from dask.optimization import fuse
 from fsspec import get_mapper
 from scipy.special import comb
 from typing_extensions import Literal
@@ -356,6 +359,7 @@ def concat_zarrs_optimized(
             attrs=first_zarr_group[var].attrs.asdict(),
             **_to_zarr_kwargs,
         )
+        d = _fuse_delayed(d)  # type: ignore[no-untyped-call]
         delayed.append(d)
     da.compute(*delayed)
 
@@ -376,6 +380,13 @@ def concat_zarrs_optimized(
 
     # consolidate metadata
     zarr.consolidate_metadata(output)
+
+
+def _fuse_delayed(d):  # type: ignore[no-untyped-def]
+    """Perform task fusion within a Delayed object"""
+    # from https://github.com/dask/dask/issues/6219
+    dsk_fused, _ = fuse(dask.utils.ensure_dict(d.dask))
+    return Delayed(d._key, dsk_fused)
 
 
 def _to_zarr(  # type: ignore[no-untyped-def]
