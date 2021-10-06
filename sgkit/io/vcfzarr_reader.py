@@ -12,7 +12,6 @@ from typing import (
     Union,
 )
 
-import dask
 import dask.array as da
 import numcodecs
 import xarray as xr
@@ -413,7 +412,7 @@ def _to_zarr(  # type: ignore[no-untyped-def]
         # assume the object passed is already a mapper
         mapper = url  # pragma: no cover
     chunks = [c[0] for c in arr.chunks]
-    z = dask.delayed(_zarr_create_with_attrs)(
+    z = _zarr_create_with_attrs(  # type: ignore[no-untyped-call]
         shape=arr.shape,
         chunks=chunks,
         dtype=arr.dtype,
