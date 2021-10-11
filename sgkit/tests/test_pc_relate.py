@@ -1,12 +1,9 @@
-from typing import Any
-
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
 from hypothesis import given, settings
 from hypothesis.extra.numpy import arrays
-from numpy.typing import NDArray
 
 from sgkit import pc_relate, pca
 from sgkit.stats.pc_relate import (
@@ -15,6 +12,7 @@ from sgkit.stats.pc_relate import (
     gramian,
 )
 from sgkit.testing import simulate_genotype_call_dataset
+from sgkit.typing import NDArray
 
 
 def test_pc_relate__genotype_inputs_checks() -> None:
@@ -51,7 +49,7 @@ def test_pc_relate__maf_inputs_checks() -> None:
 
 @given(arrays(np.int8, (3, 5)))
 @settings(max_examples=10)
-def test_gramian_is_symmetric(a: NDArray[Any]) -> None:
+def test_gramian_is_symmetric(a: NDArray) -> None:
     b = gramian(a)
     assert np.allclose(b, b.T)
 

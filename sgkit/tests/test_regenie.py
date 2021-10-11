@@ -15,7 +15,6 @@ from hypothesis import given, settings
 from hypothesis import strategies as st
 from hypothesis.extra.numpy import arrays as st_arrays
 from hypothesis.strategies import data as st_data
-from numpy.typing import NDArray
 from pandas import DataFrame
 from xarray import Dataset
 
@@ -28,7 +27,7 @@ from sgkit.stats.regenie import (
     ridge_regression,
 )
 from sgkit.testing import simulate_genotype_call_dataset
-from sgkit.typing import ArrayLike
+from sgkit.typing import ArrayLike, NDArray
 
 regenie_sim = functools.partial(
     regenie, dosage="call_dosage", covariates="sample_covariate", traits="sample_trait"
@@ -457,7 +456,7 @@ def test_index_array_blocks__raise_on_not_monotonic_increasing():
 
 
 @st.composite
-def monotonic_increasing_ints(draw: Any) -> NDArray[np.int_]:
+def monotonic_increasing_ints(draw: Any) -> NDArray:
     # Draw increasing ints with repeats, e.g. [0, 0, 5, 7, 7, 7]
     n = draw(st.integers(min_value=0, max_value=5))
     repeats = draw(
@@ -472,7 +471,7 @@ def monotonic_increasing_ints(draw: Any) -> NDArray[np.int_]:
 
 @given(st_data(), monotonic_increasing_ints())
 @settings(max_examples=50)
-def test_index_array_blocks__coverage(data: Any, x: NDArray[np.int_]) -> None:
+def test_index_array_blocks__coverage(data: Any, x: NDArray) -> None:
     # Draw block size that is no less than 1 but possibly
     # greater than or equal to the size of the array
     size = data.draw(st.integers(min_value=1, max_value=len(x) + 1))

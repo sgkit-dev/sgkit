@@ -4,11 +4,10 @@ import dask.array as da
 import numpy as np
 import xarray as xr
 from dask.array import Array
-from numpy.typing import NDArray
 from xarray import Dataset
 
 from .. import variables
-from ..typing import ArrayLike
+from ..typing import ArrayLike, NDArray
 from ..utils import conditional_merge_datasets, create_dataset, split_array_chunks
 from .utils import (
     assert_array_shape,
@@ -29,7 +28,7 @@ def _map_blocks_asnumpy(x: Array) -> Array:
 
 def index_array_blocks(
     x: Union[ArrayLike, Sequence[int]], size: int
-) -> Tuple[NDArray[np.int_], NDArray[np.int_]]:
+) -> Tuple[NDArray, NDArray]:
     """Generate indexes for blocks that partition an array within groups.
 
     Given an array with monotonic increasing group assignments (as integers),
@@ -96,7 +95,7 @@ def index_array_blocks(
 
 def index_block_sizes(
     sizes: Union[ArrayLike, Sequence[int]]
-) -> Tuple[NDArray[np.int_], NDArray[np.int_]]:
+) -> Tuple[NDArray, NDArray]:
     """Generate indexes for blocks of specific sizes.
 
     Parameters
@@ -170,7 +169,7 @@ def get_alphas(
     n_cols: int,
     heritability: Sequence[float] = [0.99, 0.75, 0.50, 0.25, 0.01],
     like: Optional[ArrayLike] = None,
-) -> NDArray[np.float_]:
+) -> NDArray:
     # https://github.com/projectglow/glow/blob/f3edf5bb8fe9c2d2e1a374d4402032ba5ce08e29/python/glow/wgr/linear_model/ridge_model.py#L80
     if like is not None:
         return np.asarray(
@@ -191,7 +190,7 @@ def unstack(x: Array) -> Array:
 
 
 def _ridge_regression_cv(
-    X: Array, Y: Array, alphas: NDArray[np.float_], n_zero_reg: Optional[int] = None
+    X: Array, Y: Array, alphas: NDArray, n_zero_reg: Optional[int] = None
 ) -> Tuple[Array, Array, Array, Array]:
     assert alphas.ndim == 1
     assert X.ndim == 2
@@ -255,9 +254,7 @@ def _ridge_regression_cv(
     return XtX, XtY, B, YP
 
 
-def _stage_1(
-    G: Array, X: Array, Y: Array, alphas: Optional[NDArray[np.float_]] = None
-) -> Array:
+def _stage_1(G: Array, X: Array, Y: Array, alphas: Optional[NDArray] = None) -> Array:
     """Stage 1 - WGR Base Regression
 
     This stage will predict outcomes separately for each alpha parameter and variant
@@ -317,7 +314,7 @@ def _stage_2(
     YP: Array,
     X: Array,
     Y: Array,
-    alphas: Optional[NDArray[np.float_]] = None,
+    alphas: Optional[NDArray] = None,
     normalize: bool = True,
     _glow_adj_alpha: bool = False,
     _glow_adj_scaling: bool = False,
@@ -454,7 +451,7 @@ def _stage_3(
     X: Array,
     Y: Array,
     contigs: Array,
-    variant_chunk_start: NDArray[np.int_],
+    variant_chunk_start: NDArray,
 ) -> Optional[Array]:
     """Stage 3 - Leave-one-chromosome-out (LOCO) Estimation
 
@@ -593,7 +590,7 @@ def _stage_3(
 
 def _variant_block_indexes(
     variant_block_size: Union[int, Tuple[int, ...]], contigs: ArrayLike
-) -> Tuple[NDArray[np.int_], NDArray[np.int_]]:
+) -> Tuple[NDArray, NDArray]:
     if isinstance(variant_block_size, tuple):
         return index_block_sizes(variant_block_size)
     elif isinstance(variant_block_size, int):
