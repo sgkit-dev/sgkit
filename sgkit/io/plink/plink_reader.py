@@ -7,12 +7,12 @@ import dask.dataframe as dd
 import numpy as np
 from bed_reader import open_bed
 from dask.dataframe import DataFrame
-from numpy.typing import NDArray
 from xarray import Dataset
 
 from sgkit import create_genotype_call_dataset
 from sgkit.io.utils import dataframe_to_dict
 from sgkit.model import DIM_SAMPLE
+from sgkit.typing import NDArray
 from sgkit.utils import encode_array
 
 PathType = Union[str, Path]
@@ -63,7 +63,7 @@ class BedReader(object):
         self.dtype = dtype
         self.ndim = 3
 
-    def __getitem__(self, idx: Tuple[Any, ...]) -> NDArray[Any]:
+    def __getitem__(self, idx: Tuple[Any, ...]) -> NDArray:
         if not isinstance(idx, tuple):
             raise IndexError(  # pragma: no cover
                 f"Indexer must be tuple (received {type(idx)})"
@@ -85,7 +85,7 @@ class BedReader(object):
         call1 = np.where(arr < 0, -1, np.where(arr == 2, 1, 0))
         arr = np.stack([call0, call1], axis=-1)
         # Apply final slice to 3D result
-        return arr[:, :, idx[-1]]  # type: ignore[no-any-return]
+        return arr[:, :, idx[-1]]
 
     def close(self) -> None:
         # This is not actually crucial since a Bed instance with no
