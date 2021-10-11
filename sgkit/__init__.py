@@ -1,3 +1,5 @@
+import sgkit._windows_ssl_fix  # noqa: F401 isort:skip # must be imported first to apply fix
+
 from pkg_resources import DistributionNotFound, get_distribution
 
 from .display import display_genotypes
