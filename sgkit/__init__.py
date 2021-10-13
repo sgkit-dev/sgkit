@@ -1,4 +1,9 @@
-import sgkit._windows_ssl_fix  # noqa: F401 isort:skip # must be imported first to apply fix
+import os
+
+if (
+    os.getenv("CI") == "true" and os.getenv("RUNNER_OS") == "Windows"
+):  # pragma: no cover
+    import sgkit._windows_ssl_fix  # noqa: F401 isort:skip # must be imported first to apply fix
 
 from pkg_resources import DistributionNotFound, get_distribution
 
