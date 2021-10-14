@@ -1,4 +1,7 @@
-# Monkey patch https://github.com/pystatgen/sgkit/issues/733
+# A fix for the the problem when there are bad certificates in the Windows CA store.
+# See discussion on https://github.com/pystatgen/sgkit/issues/733 and linked issues.
+# TODO: remove this when fixed upstream https://github.com/pystatgen/sgkit/issues/737
+
 import ssl
 
 
