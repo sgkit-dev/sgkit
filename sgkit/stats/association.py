@@ -361,7 +361,7 @@ def gwas_linear_regression(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-def regenie_gwas_linear_regression(
+def regenie_loco_regression(
     ds: Dataset,
     *,
     dosage: Hashable,

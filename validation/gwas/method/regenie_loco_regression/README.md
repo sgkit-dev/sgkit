@@ -1,4 +1,4 @@
-This notebook is used to generate validation data for `sgkit.stats.association.regenie_gwas_linear_regression`. It generates offsets to pass as a parameter to the function as well as results from GLOW to check it against.
+This notebook is used to generate validation data for `sgkit.stats.association.regenie_loco_regression`. It generates offsets to pass as a parameter to the function as well as results from GLOW to check it against.
 
 Follow these steps to start the `.ipynb` notebooks
 
