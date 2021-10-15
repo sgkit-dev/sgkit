@@ -23,13 +23,12 @@ import pandas as pd
 import xarray as xr
 import zarr
 from cbgen import bgen_file, bgen_metafile
-from numpy.typing import NDArray
 from rechunker import api as rechunker_api
 from xarray import Dataset
 
 from sgkit import create_genotype_dosage_dataset
 from sgkit.io.utils import dataframe_to_dict, encode_contigs
-from sgkit.typing import ArrayLike, DType, PathType
+from sgkit.typing import ArrayLike, DType, NDArray, PathType
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +92,7 @@ class BgenReader:
         self.precision = 64 if self.dtype.itemsize >= 8 else 32
         self.ndim = 3
 
-    def __getitem__(self, idx: Any) -> NDArray[Any]:
+    def __getitem__(self, idx: Any) -> NDArray:
         if not isinstance(idx, tuple):
             raise IndexError(f"Indexer must be tuple (received {type(idx)})")
         if len(idx) != self.ndim:
@@ -146,7 +145,7 @@ class BgenReader:
                     res = np.zeros((len(all_vaddr), len(probs), 3), dtype=self.dtype)
                 res[i] = probs
             res = res[..., idx[2]]  # type: ignore[index]
-            return np.squeeze(res, axis=squeeze_dims)  # type: ignore[no-any-return]
+            return np.squeeze(res, axis=squeeze_dims)
 
 
 def _split_alleles(allele_ids: bytes) -> List[bytes]:

@@ -5,18 +5,17 @@ import dask.array as da
 import numpy as np
 import pytest
 import xarray as xr
-from numpy.typing import NDArray
 from xarray import Dataset
 
 from sgkit.stats import pca
 from sgkit.stats.pca import count_call_alternate_alleles
 from sgkit.testing import simulate_genotype_call_dataset
-from sgkit.typing import ArrayLike
+from sgkit.typing import ArrayLike, NDArray
 
 
 def simulate_cohort_genotypes(
     n_variant: int, n_sample: int, n_cohort: int, seed: int = 0
-) -> NDArray[np.int8]:
+) -> NDArray:
     """ Sample genotypes from distinct ancestral populations """
     rs = np.random.RandomState(seed)
     # Determine size of each cohort (which will be roughly equal)
@@ -30,7 +29,7 @@ def simulate_cohort_genotypes(
         ]
     )
     # Sample allele counts in [0, 1, 2]
-    return rs.binomial(2, af.T).astype("int8")  # type: ignore[no-any-return]
+    return rs.binomial(2, af.T).astype("int8")
 
 
 def simulate_dataset(

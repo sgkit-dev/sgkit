@@ -124,7 +124,20 @@ html_theme = "sphinx_book_theme"
 html_title = ""
 html_logo = "_static/sgkit_trnsprnt.png"
 
+html_css_files = [
+    "docsearch.sbt.css",
+    "https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css",
+]
+
+html_js_files = [
+    (
+        "https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js",
+        {"defer": "defer"},
+    ),
+    ("docsearch.sbt.js", {"defer": "defer"}),
+]
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ["_static"]
+html_static_path = ["_static"]
