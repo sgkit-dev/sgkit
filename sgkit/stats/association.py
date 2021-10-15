@@ -368,7 +368,7 @@ def regenie_gwas_linear_regression(
     dosage: Hashable,
     covariates: Hashable,
     traits: Hashable,
-    variant_contigs: Hashable,
+    variant_contig: Hashable,
     loco_predicts: Hashable,
     add_intercept: bool = True,
     call_genotype: Hashable,
@@ -400,8 +400,9 @@ def regenie_gwas_linear_regression(
     traits
         Name of trait variable (1D or 2D).
         Defined by :data:`sgkit.variables.traits_spec`.
-    variant_contigs
-        Grouping of variants, typically into chromosomes for Leave-One-Chromosome-Out scheme.
+    variant_contig
+        Name of the variant contig input variable used to group variants for LOCO calculations.
+        Defined by :data:`sgkit.variables.variant_contig_spec`.
     loco_predicts
         Name of LOCO prediction variable. Can be obtained from sgkit.stats.regenie.
     add_intercept
@@ -435,18 +436,18 @@ def regenie_gwas_linear_regression(
         {dosage: variables.dosage_spec},
         {covariates: variables.covariates_spec},
         {traits: variables.traits_spec},
-        {variant_contigs: variables.variant_contig_spec},
+        {variant_contig: variables.variant_contig_spec},
         {loco_predicts: variables.regenie_loco_prediction_spec},
     )
 
     G = _get_loop_covariates(ds, call_genotype, dosage)
 
-    contigs: Array = np.asarray(ds[variant_contigs].data, like=G)
+    contigs: Array = np.asarray(ds[variant_contig].data, like=G)
 
     # Pre-compute contigs to have concrete indices to slice the genotype array
     #
     # Potential alternative to pre-computing contigs: rearrange G from shape (snips, samples) -> (contig, subset_snips, samples) using stack
-    # G = da.stack([G[contigs==contig, :] for contig in ds[variant_contigs].to_series().sort_values().drop_duplicates()], axis=0)
+    # G = da.stack([G[contigs==contig, :] for contig in ds[variant_contig].to_series().sort_values().drop_duplicates()], axis=0)
     # G_loco = G[contig,:,:]
     # or replace .compute() with .persist()
     contigs = contigs.compute()
