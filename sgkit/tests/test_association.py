@@ -14,7 +14,7 @@ from xarray import Dataset
 from sgkit.stats.association import (
     gwas_linear_regression,
     linear_regression,
-    regenie_gwas_linear_regression,
+    regenie_loco_regression,
 )
 from sgkit.typing import ArrayLike
 
@@ -294,7 +294,7 @@ def test_linear_regression__raise_on_dof_lte_0():
 
 @pytest.mark.parametrize("ndarray_type", ["numpy", "cupy"])
 @pytest.mark.parametrize("covariate", [True, False])
-def test_regenie_gwas_linear_regression(ndarray_type: str, covariate: bool) -> None:
+def test_regenie_loco_regression(ndarray_type: str, covariate: bool) -> None:
     xp = pytest.importorskip(ndarray_type)
 
     atol = 1e-14
@@ -363,7 +363,7 @@ def test_regenie_gwas_linear_regression(ndarray_type: str, covariate: bool) -> N
                         da.asarray(v).map_blocks(xp.asarray, dtype=v.dtype), dims=v.dims
                     )
 
-        res = regenie_gwas_linear_regression(
+        res = regenie_loco_regression(
             ds,
             dosage="call_alternate_allele_count",
             covariates="sample_covariates",
@@ -439,13 +439,13 @@ def test_regenie_gwas_linear_regression(ndarray_type: str, covariate: bool) -> N
         np.testing.assert_allclose(df["t_value_sgkit"], df["t_value_glow"], atol=atol)
 
 
-def test_regenie_gwas_linear_regression__raise_on_dof_lte_0():
+def test_regenie_loco_regression__raise_on_dof_lte_0():
     # Sample count too low relative to core covariate will cause
     # degrees of freedom to be zero
     ds = _generate_regenie_test_dataset(n=100, p=100)
 
     with pytest.raises(ValueError, match=r"Number of observations \(N\) too small"):
-        regenie_gwas_linear_regression(
+        regenie_loco_regression(
             ds,
             dosage="dosage",
             covariates="sample_covariates",
@@ -457,7 +457,7 @@ def test_regenie_gwas_linear_regression__raise_on_dof_lte_0():
         )
 
 
-def test_regenie_gwas_linear_regression__raise_on_no_intercept_and_empty_covariates():
+def test_regenie_loco_regression__raise_on_no_intercept_and_empty_covariates():
     # Sample count too low relative to core covariate will cause
     # degrees of freedom to be zero
     ds = _generate_regenie_test_dataset(n=0)
@@ -465,7 +465,7 @@ def test_regenie_gwas_linear_regression__raise_on_no_intercept_and_empty_covaria
     with pytest.raises(
         ValueError, match="add_intercept must be True if no covariates specified"
     ):
-        regenie_gwas_linear_regression(
+        regenie_loco_regression(
             ds,
             dosage="dosage",
             covariates="sample_covariates",
@@ -478,7 +478,7 @@ def test_regenie_gwas_linear_regression__raise_on_no_intercept_and_empty_covaria
         )
 
 
-def test_regenie_gwas_linear_regression__raise_on_contig_mismatch():
+def test_regenie_loco_regression__raise_on_contig_mismatch():
     ds = _generate_regenie_test_dataset()
 
     # Generate different number of `regenie_loco_prediction` than expected
@@ -493,7 +493,7 @@ def test_regenie_gwas_linear_regression__raise_on_contig_mismatch():
     with pytest.raises(
         ValueError, match=r"The number of contigs provided \(1\) does not match"
     ):
-        regenie_gwas_linear_regression(
+        regenie_loco_regression(
             ds,
             dosage="dosage",
             covariates="sample_covariates",
@@ -505,7 +505,7 @@ def test_regenie_gwas_linear_regression__raise_on_contig_mismatch():
         )
 
 
-def test_regenie_gwas_linear_regression__raise_on_non_2D():
+def test_regenie_loco_regression__raise_on_non_2D():
     # Sample count too low relative to core covariate will cause
     # degrees of freedom to be zero
     ds = _generate_regenie_test_dataset()
@@ -530,7 +530,7 @@ def test_regenie_gwas_linear_regression__raise_on_non_2D():
     )
 
     with pytest.raises(ValueError, match="All arguments must be 2D"):
-        regenie_gwas_linear_regression(
+        regenie_loco_regression(
             ds,
             dosage="dosage",
             covariates="sample_covariates",
