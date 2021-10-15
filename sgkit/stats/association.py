@@ -451,6 +451,13 @@ def regenie_gwas_linear_regression(
     # G_loco = G[contig,:,:]
     # or replace .compute() with .persist()
     contigs = contigs.compute()
+    num_contigs = np.unique(contigs).shape[0]  # type: ignore[no-untyped-call]
+    num_contigs_loco_prediction = ds[regenie_loco_prediction].shape[0]
+    if num_contigs != num_contigs_loco_prediction:
+        raise ValueError(
+            f"The number of contigs provided ({num_contigs}) does not match number "
+            f"of contigs in LOCO predictions ({num_contigs_loco_prediction})"
+        )
 
     # Load covariates and add intercept if necessary
     covariates = np.asarray(ds[covariates].data, like=G)
