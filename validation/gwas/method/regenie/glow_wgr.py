@@ -258,7 +258,6 @@ def run(
     y_hat_df.reset_index().to_csv(path, index=False)
     logger.info(f"Stage 2: Predictions written to {path}")
 
-    # UNCOMMENTED THIS BLOCK
     y_hat_df_loco = estimator.transform_loco(
         reduced_block_df, label_df, sample_blocks, model_df, cv_df, cov_df
     )
