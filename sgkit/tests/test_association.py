@@ -478,6 +478,33 @@ def test_regenie_gwas_linear_regression__raise_on_no_intercept_and_empty_covaria
         )
 
 
+def test_regenie_gwas_linear_regression__raise_on_contig_mismatch():
+    ds = _generate_regenie_test_dataset()
+
+    # Generate different number of `regenie_loco_prediction` than expected
+    # for `variant_contig`.
+    ds = ds.assign(
+        regenie_loco_prediction=(
+            ("contigs", "samples", "outcomes"),
+            da.zeros((0, len(ds["samples"]), 10), dtype=np.float32),
+        )
+    )
+
+    with pytest.raises(
+        ValueError, match=r"The number of contigs provided \(1\) does not match"
+    ):
+        regenie_gwas_linear_regression(
+            ds,
+            dosage="dosage",
+            covariates="sample_covariates",
+            traits="sample_traits",
+            variant_contig="variant_contig",
+            regenie_loco_prediction="regenie_loco_prediction",
+            call_genotype="call_genotype",
+            merge=False,
+        )
+
+
 def test_regenie_gwas_linear_regression__raise_on_non_2D():
     # Sample count too low relative to core covariate will cause
     # degrees of freedom to be zero
