@@ -121,7 +121,7 @@ def _generate_regenie_test_dataset(**kwargs: Any) -> Dataset:
     data_vars["sample_covariates"] = (["samples", "covariates"], x)
     data_vars["sample_traits"] = (["samples", "traits"], ys.T)
 
-    # Generate dummy `variant_contigs` and `loco_predicts`, required
+    # Generate dummy `variant_contig` and `regenie_loco_prediction`, required
     # to pass input data validation
     data_vars["variant_contig"] = (
         [
@@ -129,9 +129,9 @@ def _generate_regenie_test_dataset(**kwargs: Any) -> Dataset:
         ],
         da.zeros(g.shape[1], dtype=np.int16),
     )
-    data_vars["loco_predicts"] = (
+    data_vars["regenie_loco_prediction"] = (
         ["contigs", "samples", "outcomes"],
-        da.zeros((0, g.shape[0], 0), dtype=np.float32),
+        da.zeros((1, g.shape[0], 0), dtype=np.float32),
     )
 
     attrs = dict(beta=bg, n_trait=ys.shape[0], n_covar=x.shape[1])
@@ -368,8 +368,8 @@ def test_regenie_gwas_linear_regression(ndarray_type: str, covariate: bool) -> N
             dosage="call_alternate_allele_count",
             covariates="sample_covariates",
             traits="sample_traits",
-            variant_contigs="variant_contig",
-            loco_predicts="regenie_loco_prediction",
+            variant_contig="variant_contig",
+            regenie_loco_prediction="regenie_loco_prediction",
             call_genotype="call_genotype",
         )
 
@@ -450,8 +450,8 @@ def test_regenie_gwas_linear_regression__raise_on_dof_lte_0():
             dosage="dosage",
             covariates="sample_covariates",
             traits="sample_traits",
-            variant_contigs="variant_contig",
-            loco_predicts="loco_predicts",
+            variant_contig="variant_contig",
+            regenie_loco_prediction="regenie_loco_prediction",
             call_genotype="call_genotype",
             merge=False,
         )
@@ -470,8 +470,8 @@ def test_regenie_gwas_linear_regression__raise_on_no_intercept_and_empty_covaria
             dosage="dosage",
             covariates="sample_covariates",
             traits="sample_traits",
-            variant_contigs="variant_contig",
-            loco_predicts="loco_predicts",
+            variant_contig="variant_contig",
+            regenie_loco_prediction="regenie_loco_prediction",
             call_genotype="call_genotype",
             merge=False,
             add_intercept=False,
@@ -494,9 +494,9 @@ def test_regenie_gwas_linear_regression__raise_on_non_2D():
         )
     )
 
-    # Match expected `loco_predicts` shape validation
+    # Match expected `regenie_loco_prediction` shape validation
     ds = ds.assign(
-        loco_predicts=(
+        regenie_loco_prediction=(
             ("contigs", "samples", "outcomes"),
             da.zeros((1, len(ds["samples"]), 10), dtype=np.float32),
         )
@@ -508,8 +508,8 @@ def test_regenie_gwas_linear_regression__raise_on_non_2D():
             dosage="dosage",
             covariates="sample_covariates",
             traits="sample_traits",
-            variant_contigs="variant_contig",
-            loco_predicts="loco_predicts",
+            variant_contig="variant_contig",
+            regenie_loco_prediction="regenie_loco_prediction",
             call_genotype="call_genotype",
             merge=False,
         )
