@@ -490,16 +490,12 @@ def regenie_gwas_linear_regression(
     Q = da.linalg.qr(X)[0]
     assert Q.shape == X.shape
 
-    Y = np.asarray(ds[traits].data, like=G)
-    Y_mask = (~da.isnan(Y)).astype("float64")
-    Y = da.nan_to_num(Y)
+    Y: Array = np.asarray(ds[traits].data, like=G)
     # Mean-center
     Y -= Y.mean(axis=0)
     # Orthogonally project covariates out of phenotype matrix
     Y -= Q @ (Q.T @ Y)
-    assert Y.shape == Y_mask.shape
-    Y *= Y_mask
-    Y_scale = da.sqrt(da.sum(Y ** 2, axis=0) / (Y_mask.sum(axis=0) - Q.shape[1]))
+    Y_scale = da.sqrt(da.sum(Y ** 2, axis=0) / (Y.shape[0] - Q.shape[1]))
     # Scale
     Y /= Y_scale[None, :]
 
@@ -516,7 +512,6 @@ def regenie_gwas_linear_regression(
         offset_contig = offsets[contig, :, :]
         assert Y.shape == offset_contig.shape
         Y_loco = Y - offset_contig
-        Y_loco *= Y_mask
 
         # Dim 0 should have the same chunking
         # as loco_G dim 1, so that when XLP is computed in _inner_loco_regression() the
