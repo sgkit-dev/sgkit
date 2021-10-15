@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Hashable, Optional, Sequence, Union
 
-import dask
 import dask.array as da
 import numpy as np
 from dask.array import Array, stats
@@ -512,8 +511,7 @@ def regenie_gwas_linear_regression(
 
     for contig in range(ds[regenie_loco_prediction].shape[0]):
         # Use variants only from this contig
-        with dask.config.set(**{"array.slicing.split_large_chunks": False}):
-            loco_G = G[contigs == contig, :]
+        loco_G = G[contigs == contig, :]
 
         offset_contig = offsets[contig, :, :]
         assert Y.shape == offset_contig.shape
