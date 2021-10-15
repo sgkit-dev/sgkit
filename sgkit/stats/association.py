@@ -368,10 +368,10 @@ def regenie_gwas_linear_regression(
     dosage: Hashable,
     covariates: Hashable,
     traits: Hashable,
-    variant_contig: Hashable,
-    loco_predicts: Hashable,
+    variant_contig: Hashable = variables.variant_contig,
+    regenie_loco_prediction: Hashable = variables.regenie_loco_prediction,
     add_intercept: bool = True,
-    call_genotype: Hashable,
+    call_genotype: Hashable = variables.call_genotype,
     merge: bool = True,
 ) -> Dataset:
     """
@@ -403,7 +403,7 @@ def regenie_gwas_linear_regression(
     variant_contig
         Name of the variant contig input variable used to group variants for LOCO calculations.
         Defined by :data:`sgkit.variables.variant_contig_spec`.
-    loco_predicts
+    regenie_loco_prediction
         Name of LOCO prediction variable. Can be obtained from sgkit.stats.regenie.
     add_intercept
         Add intercept term to covariate set, by default True.
@@ -437,7 +437,7 @@ def regenie_gwas_linear_regression(
         {covariates: variables.covariates_spec},
         {traits: variables.traits_spec},
         {variant_contig: variables.variant_contig_spec},
-        {loco_predicts: variables.regenie_loco_prediction_spec},
+        {regenie_loco_prediction: variables.regenie_loco_prediction_spec},
     )
 
     G = _get_loop_covariates(ds, call_genotype, dosage)
@@ -497,13 +497,13 @@ def regenie_gwas_linear_regression(
     # Scale
     Y /= Y_scale[None, :]
 
-    offsets: Array = np.asarray(ds[loco_predicts].data, like=G)
+    offsets: Array = np.asarray(ds[regenie_loco_prediction].data, like=G)
     # Match chunksize of Y
     offsets = offsets.rechunk((None, Y.chunksize[0], Y.chunksize[1]))
 
     results = []
 
-    for contig in range(ds[loco_predicts].shape[0]):
+    for contig in range(ds[regenie_loco_prediction].shape[0]):
         # Use variants only from this contig
         with dask.config.set(**{"array.slicing.split_large_chunks": False}):
             loco_G = G[contigs == contig, :]
