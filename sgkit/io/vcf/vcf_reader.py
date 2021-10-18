@@ -819,7 +819,7 @@ def vcf_to_zarr(
     target_part_size
         The desired size, in bytes, of each (compressed) part of the input to be
         processed in parallel. Defaults to ``"auto"``, which will pick a good size
-        (currently 100MB). A value of None means that the input will be processed
+        (currently 20MB). A value of None means that the input will be processed
         sequentially. The setting will be ignored if ``regions`` is also specified.
     regions
         Genomic region or regions to extract variants for. For multiple inputs, multiple
@@ -895,7 +895,7 @@ def vcf_to_zarr(
             )
     if regions is None and target_part_size is not None:
         if target_part_size == "auto":
-            target_part_size = "100MB"
+            target_part_size = "20MB"
         if isinstance(input, str) or isinstance(input, Path):
             regions = partition_into_regions(input, target_part_size=target_part_size)
         else:
