@@ -2,9 +2,7 @@ from typing import Any, Dict, Mapping, Optional, Sequence, Tuple
 
 import dask.array as da
 import dask.dataframe as dd
-import fsspec
 import numpy as np
-import xarray as xr
 import zarr
 
 from ..typing import ArrayLike, DType
@@ -41,71 +39,6 @@ def encode_contigs(contig: ArrayLike) -> Tuple[ArrayLike, ArrayLike]:
     else:
         ids, names = encode_array(np.asarray(contig, dtype=str))
     return ids, names
-
-
-def zarrs_to_dataset(
-    urls: Sequence[str],
-    chunk_length: int = 10_000,
-    chunk_width: int = 1_000,
-    storage_options: Optional[Dict[str, str]] = None,
-) -> xr.Dataset:
-    """Combine multiple Zarr stores into a single Xarray dataset.
-
-    The Zarr stores are concatenated and rechunked to produce a single combined dataset.
-
-    Parameters
-    ----------
-    urls
-        A list of URLs to the Zarr stores to combine, typically the return value of
-        :func:`vcf_to_zarrs`.
-    chunk_length
-        Length (number of variants) of chunks in which data are stored, by default 10,000.
-    chunk_width
-        Width (number of samples) to use when storing chunks in output, by default 1,000.
-    storage_options
-        Any additional parameters for the storage backend (see ``fsspec.open``).
-
-    Returns
-    -------
-    A dataset representing the combined dataset.
-    """
-
-    storage_options = storage_options or {}
-
-    datasets = []
-    for path in urls:
-        dataset = xr.open_zarr(  # type: ignore[no-untyped-call]
-            fsspec.get_mapper(path, **storage_options), concat_characters=False
-        )
-        datasets.append(dataset)
-
-    # Combine the datasets into one
-    ds = xr.concat(datasets, dim="variants", data_vars="minimal")
-
-    # This is a workaround to make rechunking work when the temp_chunk_length is different to chunk_length
-    # See https://github.com/pydata/xarray/issues/4380
-    for data_var in ds.data_vars:
-        if "variants" in ds[data_var].dims:
-            del ds[data_var].encoding["chunks"]
-
-    # Rechunk to uniform chunk size
-    ds: xr.Dataset = ds.chunk({"variants": chunk_length, "samples": chunk_width})
-
-    # Set variable length strings to fixed length ones to avoid xarray/conventions.py:188 warning
-    # (Also avoids this issue: https://github.com/pydata/xarray/issues/3476)
-    for attr in datasets[0].attrs:
-        if attr.startswith("max_length_"):
-            variable_name = attr[len("max_length_") :]
-            max_length = max(ds.attrs[attr] for ds in datasets)
-            ds[variable_name] = ds[variable_name].astype(f"S{max_length}")
-            del ds.attrs[attr]
-
-    if "max_alt_alleles_seen" in datasets[0].attrs:
-        ds.attrs["max_alt_alleles_seen"] = max(
-            ds.attrs["max_alt_alleles_seen"] for ds in datasets
-        )
-
-    return ds
 
 
 def concatenate_and_rechunk(
