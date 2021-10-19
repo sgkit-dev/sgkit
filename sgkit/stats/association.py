@@ -19,16 +19,8 @@ class LinearRegressionResult:
     p_value: ArrayLike
 
 
-@dataclass
-class LinearRegressionResultLoco:
-    beta: ArrayLike
-    effect: ArrayLike
-    t_value: ArrayLike
-    p_value: ArrayLike
-
-
 def linear_regression(
-    XL: ArrayLike, XC: ArrayLike, Y: ArrayLike
+    XL: ArrayLike, YP: ArrayLike, Q: ArrayLike
 ) -> LinearRegressionResult:
     """Efficient linear regression estimation for multiple covariate sets
 
@@ -37,14 +29,12 @@ def linear_regression(
     XL
         [array-like, shape: (M, N)]
         "Loop" covariates for which N separate regressions will be run
-    XC
-        [array-like, shape: (M, P)]
-        "Core" covariates included in the regressions for each loop
-        covariate. All P core covariates are used in each of the N
-        loop covariate regressions.
-    Y
+    YP
         [array-like, shape: (M, O)]
-        Continuous outcomes
+        Continuous traits that have had core covariates eliminated through orthogonal projection.
+    Q
+        [array-like, shape: (M, P)]
+        Orthonormal matrix computed by applying QR factorization to covariate matrix
 
     Returns
     -------
@@ -57,14 +47,13 @@ def linear_regression(
     p_value : [array-like, shape: (N, O)]
         P values as float in [0, 1]
     """
-    XL, XC = da.asarray(XL), da.asarray(XC)  # Coerce for `lstsq`
-    if set([x.ndim for x in [XL, XC, Y]]) != {2}:
+    if set([x.ndim for x in [XL, YP, Q]]) != {2}:
         raise ValueError("All arguments must be 2D")
     n_core_covar, n_loop_covar, n_obs, n_outcome = (
-        XC.shape[1],
+        Q.shape[1],
         XL.shape[1],
-        Y.shape[0],
-        Y.shape[1],
+        YP.shape[0],
+        YP.shape[1],
     )
     dof = n_obs - n_core_covar - 1
     if dof < 1:
@@ -79,12 +68,10 @@ def linear_regression(
     # what are effectively OLS residuals rather than matrix inverse
     # to avoid need for MxM array; additionally, dask.lstsq fails
     # with numpy arrays
-    LS = XC @ da.linalg.lstsq(XC, XL)[0]
-    assert XL.chunksize == LS.chunksize
+    LS = Q @ (Q.T @ XL)
+    assert XL.shape == LS.shape
     XLP = XL - LS
     assert XLP.shape == (n_obs, n_loop_covar)
-    YP = Y - XC @ da.linalg.lstsq(XC, Y)[0]
-    assert YP.shape == (n_obs, n_outcome)
 
     # Estimate coefficients for each loop covariate
     # Note: A key assumption here is that 0-mean residuals
@@ -110,121 +97,13 @@ def linear_regression(
     # see https://github.com/dask/dask/issues/6857
 
     P = da.map_blocks(
-        lambda t: 2 * stats.distributions.t.sf(np.abs(t), dof), T, dtype="float64"
-    )
-    assert P.shape == (n_loop_covar, n_outcome)
-
-    return LinearRegressionResult(beta=B, t_value=T, p_value=P)
-
-
-def _inner_loco_regression(
-    G: ArrayLike,
-    XC: ArrayLike,
-    YP: ArrayLike,
-    Y_scale: ArrayLike,
-    Q: ArrayLike,
-    dof: int,
-) -> LinearRegressionResultLoco:
-    """Linear regression estimation for multiple covariate sets. Uses pre-computed orthonormal matrix Q to apply orthogonal projection to genotype matrix.
-
-    Parameters
-    ----------
-    G
-        [array-like, shape: (M, N)]
-        Genotype matrix for single block of SNPs (one contig/chromosome)
-    XC
-        [array-like, shape: (M, P)]
-        Covariate matrix
-    YP
-        [array-like, shape: (M, O)]
-        Continuous traits that has had core covariates eliminated through orthogonal projection.
-    Y_scale
-        [array-like, shape: (O,)]
-        Scaling factor to compute effect sizes. See https://glow.readthedocs.io/en/latest/_modules/glow/gwas/lin_reg.html
-    Q
-        [array-like, shape: (M, P)]
-        Orthonormal matrix computed by applying QR factorization to covariate matrix
-    dof
-        Number of samples - Number of covariates - 1
-
-    Returns
-    -------
-    Dataclass containing:
-
-    beta : [array-like, shape: (N, O)]
-        Beta values associated with each loop covariate and outcome
-    effect : [array-like, shape: (N, O)]
-        Effect sizes, equivalent to beta multiplied by scaling factor Y_scale
-    t_value : [array-like, shape: (N, O)]
-        T statistics for each beta
-    p_value : [array-like, shape: (N, O)]
-        P values as float in [0, 1]
-    """
-    assert isinstance(G, Array)
-    assert isinstance(XC, Array)
-    assert isinstance(YP, Array)
-    assert isinstance(Y_scale, Array)
-    assert isinstance(Q, Array)
-
-    if set([x.ndim for x in [G, XC, YP]]) != {2}:
-        raise ValueError("All arguments must be 2D")
-    n_loop_covar, n_obs, n_outcome = (
-        G.shape[1],
-        YP.shape[0],
-        YP.shape[1],
-    )
-
-    # Apply orthogonal projection to eliminate core covariates from genotype matrix
-    # Note: QR factorization or SVD should be used here to find
-    # what are effectively OLS residuals rather than matrix inverse
-    # to avoid need for MxM array; additionally, dask.lstsq fails
-    # with numpy arrays
-    LS = Q @ (Q.T @ G)
-    assert G.chunksize == LS.chunksize
-    XLP = G - LS  # residualized genotype matrix using orthonormal basis
-    assert XLP.shape == (n_obs, n_loop_covar)
-    assert YP.shape == (n_obs, n_outcome)
-
-    # Estimate coefficients for each loop covariate
-    # Note: A key assumption here is that 0-mean residuals
-    # from projection require no extra terms in variance
-    # estimate for loop covariates (columns of G), which is
-    # only true when an intercept is present.
-    XLPS = (XLP ** 2).sum(axis=0, keepdims=True).T
-    assert XLPS.shape == (n_loop_covar, 1)
-    B = (XLP.T @ YP) / XLPS
-    assert B.shape == (n_loop_covar, n_outcome)
-
-    # Compute residuals for each loop covariate and outcome separately
-    YR = YP[:, np.newaxis, :] - XLP[..., np.newaxis] * B[np.newaxis, ...]
-    assert YR.shape == (n_obs, n_loop_covar, n_outcome)
-    RSS = (YR ** 2).sum(axis=0)
-    assert RSS.shape == (n_loop_covar, n_outcome)
-    # Get t-statistics for coefficient estimates
-    T = B / da.sqrt(RSS / dof / XLPS)
-    assert T.shape == (n_loop_covar, n_outcome)
-
-    # Compute effect sizes to match glow results
-    assert B.shape[1] == Y_scale.shape[0]
-    effect_size = B * Y_scale[None, :]
-
-    # Match to p-values
-    # Note: t dist not implemented in Dask so this must be delayed,
-    # see https://github.com/dask/dask/issues/6857
-    #
-    # Map T to NumPy blocks if using CuPy, no scipy.stats.distributions.t.sf
-    # equivalent available in CuPy.
-    # https://github.com/scipy/scipy/blob/v1.7.1/scipy/stats/_continuous_distns.py#L6328
-    # cupy (almost) equivalent: https://github.com/cupy/cupy/blob/dddb367e03e413c5120521733e2694515a0d8f70/cupyx/scipy/special/_statistics.py#L4
-    P = da.map_blocks(
         lambda t: 2 * stats.distributions.t.sf(np.abs(t), dof),
         map_blocks_asnumpy(T),
         dtype="float64",
     )
     assert P.shape == (n_loop_covar, n_outcome)
     P = np.asarray(P, like=T)
-
-    return LinearRegressionResultLoco(beta=B, effect=effect_size, t_value=T, p_value=P)
+    return LinearRegressionResult(beta=B, t_value=T, p_value=P)
 
 
 def _get_loop_covariates(
@@ -345,12 +224,16 @@ def gwas_linear_regression(
     # as G dim 1, so that when XLP is computed in linear_regression() the
     # two arrays have the same chunking.
     X = X.rechunk((G.chunksize[1], -1))
+    Q = da.linalg.qr(X)[0]
+    assert Q.shape == X.shape
 
     Y = da.asarray(concat_2d(ds[list(traits)], dims=("samples", "traits")))
     # Like covariates, traits must also be tall-skinny arrays
     Y = Y.rechunk((None, -1))
+    YP = Y - Q @ (Q.T @ Y)
+    assert YP.shape == Y.shape
 
-    res = linear_regression(G.T, X, Y)
+    res = linear_regression(G.T, YP, Q)
     new_ds = create_dataset(
         {
             variables.variant_linreg_beta: (("variants", "traits"), res.beta),
@@ -394,10 +277,7 @@ def regenie_loco_regression(
         Name of genetic dosage variable.
         Defined by :data:`sgkit.variables.dosage_spec`.
     covariates
-        Name of covariate variable (1D or 2D).
-        Defined by :data:`sgkit.variables.covariates_spec`.
-    traits
-        Name of trait variable (1D or 2D).
+        Name of covariate variable (1D or 2D), map_blocks_asnumpy
         Defined by :data:`sgkit.variables.traits_spec`.
     variant_contig
         Name of the variant contig input variable used to group variants for LOCO calculations.
@@ -421,8 +301,6 @@ def regenie_loco_regression(
 
     variant_linreg_beta : [array-like, shape: (N, O)]
         Beta values associated with each variant and trait
-    variant_linreg_effect: [array-like, shape: (N, O)]
-        Effect sizes associated with each variant and trait
     variant_linreg_t_value : [array-like, shape: (N, O)]
         T statistics for each beta
     variant_linreg_p_value : [array-like, shape: (N, O)]
@@ -523,19 +401,11 @@ def regenie_loco_regression(
         # Like covariates, traits must also be tall-skinny arrays
         Y_loco = Y_loco.rechunk((None, -1))
 
-        res = _inner_loco_regression(
-            loco_G.T,
-            X,
-            Y_loco,
-            Y_scale,
-            Q,
-            dof,
-        )
+        res = linear_regression(loco_G.T, Y_loco, Q)
 
         new_ds = create_dataset(
             {
                 variables.variant_linreg_beta: (("variants", "traits"), res.beta),
-                variables.variant_linreg_effect: (("variants", "traits"), res.effect),
                 variables.variant_linreg_t_value: (("variants", "traits"), res.t_value),
                 variables.variant_linreg_p_value: (("variants", "traits"), res.p_value),
             }

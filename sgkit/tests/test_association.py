@@ -401,7 +401,6 @@ def test_regenie_loco_regression(ndarray_type: str, covariate: bool) -> None:
         # PREPARE SGKIT RESULTS
         dsr = res[
             [
-                "variant_linreg_effect",
                 "variant_linreg_t_value",
                 "variant_linreg_p_value",
                 "variant_id",
@@ -412,7 +411,6 @@ def test_regenie_loco_regression(ndarray_type: str, covariate: bool) -> None:
                 "traits": "outcomes",  # dimension name
                 "variant_linreg_p_value": "p_value",
                 "variant_linreg_t_value": "t_value",
-                "variant_linreg_effect": "effect",
             }
         )
         dsr = dsr.assign(outcome=xr.DataArray(df_trait.columns, dims=("outcomes")))
@@ -424,17 +422,16 @@ def test_regenie_loco_regression(ndarray_type: str, covariate: bool) -> None:
         df = pd.concat(
             [
                 sgkitres.set_index(["outcome", "variant_id"])[
-                    ["effect", "p_value", "t_value"]
+                    ["p_value", "t_value"]
                 ].add_suffix("_sgkit"),
                 glowres.set_index(["outcome", "variant_id"])[
-                    ["effect", "p_value", "t_value"]
+                    ["p_value", "t_value"]
                 ].add_suffix("_glow"),
             ],
             axis=1,
             join="outer",
         )
 
-        np.testing.assert_allclose(df["effect_sgkit"], df["effect_glow"], atol=atol)
         np.testing.assert_allclose(df["p_value_sgkit"], df["p_value_glow"], atol=atol)
         np.testing.assert_allclose(df["t_value_sgkit"], df["t_value_glow"], atol=atol)
 
