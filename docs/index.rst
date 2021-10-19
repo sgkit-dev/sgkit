@@ -25,6 +25,7 @@ both popular Python genetics toolkits with a respective focus on population and 
     how_do_i
     contributing
     about
+    news
 
 Indices and tables
 ==================
