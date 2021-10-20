@@ -25,6 +25,7 @@ from numcodecs import PackBits
 
 from sgkit import variables
 from sgkit.io.dataset import load_dataset
+from sgkit.io.utils import FLOAT32_FILL, INT32_FILL, STR_FILL
 from sgkit.io.vcf import partition_into_regions
 from sgkit.io.vcf.utils import build_url, chunks, temporary_directory, url_filename
 from sgkit.io.vcfzarr_reader import (
@@ -135,12 +136,12 @@ def _vcf_type_to_numpy_type_and_fill_value(
     if vcf_type == "Flag":
         return "bool", False
     elif vcf_type == "Integer":
-        return "i4", -1
+        return "i4", INT32_FILL
     # the VCF spec defines Float as 32 bit, and in BCF is stored as 32 bit
     elif vcf_type == "Float":
-        return "f4", np.nan
+        return "f4", FLOAT32_FILL
     elif vcf_type == "String":
-        return "O", ""
+        return "O", STR_FILL
     raise ValueError(
         f"{category} field '{key}' is defined as Type '{vcf_type}', which is not supported."
     )
@@ -261,11 +262,6 @@ class InfoAndFormatFieldHandler(VcfFieldHandler):
         self.array = self.array[:length]
 
     def update_dataset(self, ds: xr.Dataset) -> None:
-        # cyvcf2 represents missing Integer values as the minimum int32 value
-        # so change these to be the fill value
-        if self.array.dtype == np.int32:
-            self.array[self.array == np.iinfo(np.int32).min] = self.fill_value
-
         ds[self.variable_name] = (self.dims, self.array)
         if len(self.description) > 0:
             ds[self.variable_name].attrs["comment"] = self.description
@@ -427,7 +423,7 @@ def vcf_to_zarr_sequential(
                 if len(alleles) > n_allele:
                     alleles = alleles[:n_allele]
                 elif len(alleles) < n_allele:
-                    alleles = alleles + ([""] * (n_allele - len(alleles)))
+                    alleles = alleles + ([STR_FILL] * (n_allele - len(alleles)))
                 variant_alleles.append(alleles)
                 max_variant_allele_length = max(
                     max_variant_allele_length, max(len(x) for x in alleles)
