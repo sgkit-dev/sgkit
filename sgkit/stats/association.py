@@ -284,6 +284,7 @@ def regenie_loco_regression(
         Defined by :data:`sgkit.variables.variant_contig_spec`.
     regenie_loco_prediction
         Name of LOCO prediction variable. Can be obtained from sgkit.stats.regenie.
+        Defined by :data:`sgkit.variables.regenie_loco_prediction`.
     add_intercept
         Add intercept term to covariate set, by default True.
     call_genotype
