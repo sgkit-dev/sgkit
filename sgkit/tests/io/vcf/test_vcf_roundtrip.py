@@ -23,11 +23,13 @@ from pathlib import Path
 from typing import Any
 
 import allel
+import numpy as np
 import pytest
 import xarray as xr
 from xarray import Dataset
 
 import sgkit as sg
+from sgkit.io.utils import INT32_FILL, INT32_MISSING
 from sgkit.io.vcf import vcf_to_zarr
 
 
@@ -72,6 +74,14 @@ def create_sg_vcfzarr(
     return output_path
 
 
+def fix_missing_fields(ds: Dataset) -> Dataset:
+    # scikit-allel doesn't distinguish between missing and fill fields, so set all to fill
+    for var in ds.data_vars:
+        if ds[var].dtype == np.int32:  # type: ignore[comparison-overlap]
+            ds[var] = ds[var].where(ds[var] != INT32_MISSING, INT32_FILL)
+    return ds
+
+
 def test_default_fields(shared_datadir, tmpdir):
     allel_vcfzarr_path = create_allel_vcfzarr(shared_datadir, tmpdir)
     allel_ds = sg.read_vcfzarr(allel_vcfzarr_path)
@@ -80,6 +90,7 @@ def test_default_fields(shared_datadir, tmpdir):
     sg_ds = sg.load_dataset(str(sg_vcfzarr_path))
     sg_ds = sg_ds.drop_vars("call_genotype_phased")  # not included in scikit-allel
     del sg_ds.attrs["max_alt_alleles_seen"]  # not saved by scikit-allel
+    sg_ds = fix_missing_fields(sg_ds)
 
     assert_identical(allel_ds, sg_ds)
 
@@ -109,6 +120,7 @@ def test_DP_field(shared_datadir, tmpdir):
     sg_ds = sg.load_dataset(str(sg_vcfzarr_path))
     sg_ds = sg_ds.drop_vars("call_genotype_phased")  # not included in scikit-allel
     del sg_ds.attrs["max_alt_alleles_seen"]  # not saved by scikit-allel
+    sg_ds = fix_missing_fields(sg_ds)
 
     assert_identical(allel_ds, sg_ds)
 
@@ -174,6 +186,7 @@ def test_all_fields(
     sg_ds = sg.load_dataset(str(sg_vcfzarr_path))
     sg_ds = sg_ds.drop_vars("call_genotype_phased")  # not included in scikit-allel
     del sg_ds.attrs["max_alt_alleles_seen"]  # not saved by scikit-allel
+    sg_ds = fix_missing_fields(sg_ds)
 
     # scikit-allel only records contigs for which there are actual variants,
     # whereas sgkit records contigs from the header

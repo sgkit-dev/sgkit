@@ -16,6 +16,7 @@ from typing import (
 import dask
 import dask.array as da
 import numcodecs
+import numpy as np
 import xarray as xr
 import zarr
 from dask.delayed import Delayed
@@ -23,7 +24,7 @@ from dask.optimization import fuse
 from fsspec import get_mapper
 from scipy.special import comb
 
-from sgkit.io.utils import concatenate_and_rechunk, str_is_int
+from sgkit.io.utils import INT32_FILL, concatenate_and_rechunk, str_is_int
 
 from ..model import DIM_SAMPLE, DIM_VARIANT, create_genotype_call_dataset
 from ..typing import ArrayLike, PathType
@@ -288,11 +289,18 @@ def _add_field_to_dataset(
     if dimension is not None:
         dims.append(dimension)
     array = da.from_zarr(vcfzarr[vcfzarr_key])
+    array = _replace_fill_values(array)
     ds[variable_name] = (dims, array)
     if "Description" in vcfzarr[vcfzarr_key].attrs:
         description = vcfzarr[vcfzarr_key].attrs["Description"]
         if len(description) > 0:
             ds[variable_name].attrs["comment"] = description
+
+
+def _replace_fill_values(arr: ArrayLike) -> ArrayLike:
+    if arr.dtype == np.int32:
+        arr[arr == -1] = INT32_FILL
+    return arr
 
 
 def _get_max_len(zarr_groups: List[zarr.Group], attr_name: str) -> int:
