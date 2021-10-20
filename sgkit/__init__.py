@@ -31,7 +31,7 @@ from .stats.aggregation import (
     sample_stats,
     variant_stats,
 )
-from .stats.association import gwas_linear_regression
+from .stats.association import gwas_linear_regression, regenie_loco_regression
 from .stats.conversion import convert_probability_to_call
 from .stats.hwe import hardy_weinberg_test
 from .stats.ibs import Weir_Goudet_beta, identity_by_state
@@ -74,6 +74,7 @@ __all__ = [
     "gwas_linear_regression",
     "read_vcfzarr",
     "regenie",
+    "regenie_loco_regression",
     "hardy_weinberg_test",
     "identity_by_state",
     "individual_heterozygosity",
