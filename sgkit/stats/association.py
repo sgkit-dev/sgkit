@@ -257,17 +257,13 @@ def regenie_loco_regression(
     merge: bool = True,
 ) -> Dataset:
     """
-    Runs linear regression in a Leave-One-Chromosome-Out (LOCO) scheme as described in the REGENIE paper. It identifies continuous trait associations with genetic variants.
-    https://www.nature.com/articles/s41588-021-00870-7
+    Runs quantitative trait LOCO regression as described in REGENIE [1].
 
-
-    Run linear regression to identify continuous trait associations with genetic variants.
-
-    This method solves OLS regressions for each variant in a block-wise LOCO scheme. This is facilitated by the removal of
-    sample (i.e. person/individual) covariates through orthogonal projection
-    of both the genetic variant and phenotype data [2]. A consequence of this
-    rotation is that effect sizes and significances cannot be reported for
-    covariates, only variants.
+    This method solves OLS regressions for each variant in a block-wise LOCO scheme as
+    defined in [1]. This is facilitated by the removal of sample (i.e. person/individual)
+    covariates through orthogonal projection of both the genetic variant and phenotype
+    data [2]. A consequence of this rotation is that effect sizes and significances cannot
+    be reported for covariates, only variants.
 
     Parameters
     ----------
@@ -306,6 +302,18 @@ def regenie_loco_regression(
         T statistics for each beta
     variant_linreg_p_value : [array-like, shape: (N, O)]
         P values as float in [0, 1]
+
+    References
+    ----------
+    - [1] Mbatchou J, Barnard L, Backman J, Marcketta A, Kosmicki JA, Ziyatdinov A, Benner C,
+        O'Dushlaine C, Barber M, Boutkov B, Habegger L, Ferreira M, Baras A, Reid J, Abecasis G,
+        Maxwell E, Marchini J. "Computationally efficient whole-genome regression for quantitative
+        and binary traits." Nat Genet. 2021 Jul;53(7):1097-1103. doi: 10.1038/s41588-021-00870-7.
+        Epub 2021 May 20. PMID: 34017140.
+    - [2] Loh, Po-Ru, George Tucker, Brendan K. Bulik-Sullivan, Bjarni J. Vilhjálmsson,
+        Hilary K. Finucane, Rany M. Salem, Daniel I. Chasman, et al. 2015. “Efficient
+        Bayesian Mixed-Model Analysis Increases Association Power in Large Cohorts.”
+        Nature Genetics 47 (3): 284–90.
 
     """
 
