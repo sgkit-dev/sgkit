@@ -13,6 +13,8 @@ User Guide
 Reading genetic data
 ====================
 
+.. _installation:
+
 Installation
 ------------
 

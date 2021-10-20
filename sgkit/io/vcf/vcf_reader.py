@@ -22,11 +22,9 @@ import numpy as np
 import xarray as xr
 from cyvcf2 import VCF, Variant
 from numcodecs import PackBits
-from typing_extensions import Literal
 
 from sgkit import variables
 from sgkit.io.dataset import load_dataset
-from sgkit.io.utils import zarrs_to_dataset
 from sgkit.io.vcf import partition_into_regions
 from sgkit.io.vcf.utils import build_url, chunks, temporary_directory, url_filename
 from sgkit.io.vcfzarr_reader import (
@@ -40,7 +38,7 @@ from sgkit.model import (
     create_genotype_call_dataset,
 )
 from sgkit.typing import ArrayLike, DType, PathType
-from sgkit.utils import max_str_len, smallest_numpy_int_dtype
+from sgkit.utils import smallest_numpy_int_dtype
 
 DEFAULT_MAX_ALT_ALLELES = (
     3  # equivalent to DEFAULT_ALT_NUMBER in vcf_read.py in scikit_allel
@@ -213,9 +211,7 @@ class VcfFieldHandler:
     def truncate_array(self, length: int) -> None:
         pass  # pragma: no cover
 
-    def update_dataset(
-        self, ds: xr.Dataset, add_str_max_length_attrs: bool = False
-    ) -> None:
+    def update_dataset(self, ds: xr.Dataset) -> None:
         pass  # pragma: no cover
 
 
@@ -264,9 +260,7 @@ class InfoAndFormatFieldHandler(VcfFieldHandler):
     def truncate_array(self, length: int) -> None:
         self.array = self.array[:length]
 
-    def update_dataset(
-        self, ds: xr.Dataset, add_str_max_length_attrs: bool = False
-    ) -> None:
+    def update_dataset(self, ds: xr.Dataset) -> None:
         # cyvcf2 represents missing Integer values as the minimum int32 value
         # so change these to be the fill value
         if self.array.dtype == np.int32:
@@ -275,9 +269,6 @@ class InfoAndFormatFieldHandler(VcfFieldHandler):
         ds[self.variable_name] = (self.dims, self.array)
         if len(self.description) > 0:
             ds[self.variable_name].attrs["comment"] = self.description
-        if add_str_max_length_attrs and self.array.dtype.kind == "O":
-            max_length = max_str_len(self.array)
-            ds.attrs[f"max_length_{self.variable_name}"] = max_length
 
 
 class GenotypeFieldHandler(VcfFieldHandler):
@@ -326,9 +317,7 @@ class GenotypeFieldHandler(VcfFieldHandler):
         self.call_genotype = self.call_genotype[:length]
         self.call_genotype_phased = self.call_genotype_phased[:length]
 
-    def update_dataset(
-        self, ds: xr.Dataset, add_str_max_length_attrs: bool = False
-    ) -> None:
+    def update_dataset(self, ds: xr.Dataset) -> None:
         ds["call_genotype"] = (
             [DIM_VARIANT, DIM_SAMPLE, DIM_PLOIDY],
             self.call_genotype,
@@ -370,7 +359,6 @@ def vcf_to_zarr_sequential(
     fields: Optional[Sequence[str]] = None,
     exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
-    add_str_max_length_attrs: bool = False,
 ) -> None:
 
     with open_vcf(input) as vcf:
@@ -476,10 +464,7 @@ def vcf_to_zarr_sequential(
                 variant_id_mask,
             )
             for field_handler in field_handlers:
-                field_handler.update_dataset(ds, add_str_max_length_attrs)
-            if add_str_max_length_attrs:
-                ds.attrs["max_length_variant_id"] = max_variant_id_length
-                ds.attrs["max_length_variant_allele"] = max_variant_allele_length
+                field_handler.update_dataset(ds)
             ds.attrs["max_alt_alleles_seen"] = max_alt_alleles_seen
 
             if first_variants_chunk:
@@ -528,7 +513,6 @@ def vcf_to_zarr_parallel(
     temp_chunk_length: Optional[int] = None,
     tempdir: Optional[PathType] = None,
     tempdir_storage_options: Optional[Dict[str, str]] = None,
-    dask_fuse_avg_width: int = 50,
     ploidy: int = 2,
     mixed_ploidy: bool = False,
     truncate_calls: bool = False,
@@ -536,7 +520,6 @@ def vcf_to_zarr_parallel(
     fields: Optional[Sequence[str]] = None,
     exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
-    concat_algorithm: Optional[Literal["xarray_internal"]] = None,
 ) -> None:
     """Convert specified regions of one or more VCF files to zarr files, then concat, rechunk, write to zarr"""
 
@@ -568,11 +551,7 @@ def vcf_to_zarr_parallel(
         concat_zarrs(
             paths,
             output,
-            concat_algorithm=concat_algorithm,
-            chunk_length=chunk_length,
-            chunk_width=chunk_width,
             storage_options=tempdir_storage_options,
-            dask_fuse_avg_width=dask_fuse_avg_width,
         )
 
 
@@ -708,7 +687,6 @@ def vcf_to_zarrs(
                 fields=fields,
                 exclude_fields=exclude_fields,
                 field_defs=field_defs,
-                add_str_max_length_attrs=True,
             )
             tasks.append(task)
     dask.compute(*tasks)
@@ -719,11 +697,7 @@ def concat_zarrs(
     urls: Sequence[str],
     output: Union[PathType, MutableMapping[str, bytes]],
     *,
-    concat_algorithm: Optional[Literal["xarray_internal"]] = None,
-    chunk_length: int = 10_000,
-    chunk_width: int = 1_000,
     storage_options: Optional[Dict[str, str]] = None,
-    dask_fuse_avg_width: int = 50,
 ) -> None:
     """Concatenate multiple Zarr stores into a single Zarr store.
 
@@ -736,41 +710,23 @@ def concat_zarrs(
         :func:`vcf_to_zarrs`.
     output
         Zarr store or path to directory in file system.
-    concat_algorithm
-        The algorithm to use to concatenate and rechunk Zarr files. The default None means
-        use the optimized version suitable for large files, whereas ``xarray_internal`` will
-        use built-in Xarray APIs, which can exhibit high memory usage, see https://github.com/dask/dask/issues/6745.
-    chunk_length
-        Length (number of variants) of chunks in which data are stored, by default 10,000.
-        This is only used when ``concat_algorithm`` is ``xarray_internal``.
-    chunk_width
-        Width (number of samples) to use when storing chunks in output, by default 1,000.
-        This is only used when ``concat_algorithm`` is ``xarray_internal``.
     storage_options
         Any additional parameters for the storage backend (see ``fsspec.open``).
-    dask_fuse_avg_width
-        Setting for Dask's ``optimization.fuse.ave-width``, see https://github.com/dask/dask/issues/5105
     """
-    if concat_algorithm == "xarray_internal":
-        ds = zarrs_to_dataset(urls, chunk_length, chunk_width, storage_options)
 
-        with dask.config.set({"optimization.fuse.ave-width": dask_fuse_avg_width}):
-            ds.to_zarr(output, mode="w")
-    else:
+    vars_to_rechunk = []
+    vars_to_copy = []
+    storage_options = storage_options or {}
+    ds = xr.open_zarr(  # type: ignore[no-untyped-call]
+        fsspec.get_mapper(urls[0], **storage_options), concat_characters=False
+    )
+    for (var, arr) in ds.data_vars.items():
+        if arr.dims[0] == "variants":
+            vars_to_rechunk.append(var)
+        else:
+            vars_to_copy.append(var)
 
-        vars_to_rechunk = []
-        vars_to_copy = []
-        storage_options = storage_options or {}
-        ds = xr.open_zarr(  # type: ignore[no-untyped-call]
-            fsspec.get_mapper(urls[0], **storage_options), concat_characters=False
-        )
-        for (var, arr) in ds.data_vars.items():
-            if arr.dims[0] == "variants":
-                vars_to_rechunk.append(var)
-            else:
-                vars_to_copy.append(var)
-
-        concat_zarrs_optimized(urls, output, vars_to_rechunk, vars_to_copy)
+    concat_zarrs_optimized(urls, output, vars_to_rechunk, vars_to_copy)
 
 
 def vcf_to_zarr(
@@ -793,7 +749,6 @@ def vcf_to_zarr(
     fields: Optional[Sequence[str]] = None,
     exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
-    concat_algorithm: Optional[Literal["xarray_internal"]] = None,
 ) -> None:
     """Convert VCF files to a single Zarr on-disk store.
 
@@ -819,7 +774,7 @@ def vcf_to_zarr(
     target_part_size
         The desired size, in bytes, of each (compressed) part of the input to be
         processed in parallel. Defaults to ``"auto"``, which will pick a good size
-        (currently 100MB). A value of None means that the input will be processed
+        (currently 20MB). A value of None means that the input will be processed
         sequentially. The setting will be ignored if ``regions`` is also specified.
     regions
         Genomic region or regions to extract variants for. For multiple inputs, multiple
@@ -881,10 +836,6 @@ def vcf_to_zarr(
         (which is defined as Number 2 in the VCF header) as ``haplotypes``.
         (Note that Number ``A`` is the number of alternate alleles, see section 1.4.2 of the
         VCF spec https://samtools.github.io/hts-specs/VCFv4.3.pdf.)
-    concat_algorithm
-        The algorithm to use to concatenate and rechunk Zarr files. The default None means
-        use the optimized version suitable for large files, whereas ``xarray_internal`` will
-        use built-in Xarray APIs, which can exhibit high memory usage, see https://github.com/dask/dask/issues/6745.
     """
 
     if temp_chunk_length is not None:
@@ -895,7 +846,7 @@ def vcf_to_zarr(
             )
     if regions is None and target_part_size is not None:
         if target_part_size == "auto":
-            target_part_size = "100MB"
+            target_part_size = "20MB"
         if isinstance(input, str) or isinstance(input, Path):
             regions = partition_into_regions(input, target_part_size=target_part_size)
         else:
@@ -916,7 +867,6 @@ def vcf_to_zarr(
             temp_chunk_length=temp_chunk_length,
             tempdir=tempdir,
             tempdir_storage_options=tempdir_storage_options,
-            concat_algorithm=concat_algorithm,
         )
     convert_func(
         input,  # type: ignore
