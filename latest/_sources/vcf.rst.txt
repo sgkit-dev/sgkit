@@ -181,6 +181,8 @@ cloud storage. You can access files stored on Amazon S3 or Google Cloud Storage
 using ``s3://`` or ``gs://`` URLs. Setting credentials or other options is
 typically achieved using environment variables for the underlying cloud store.
 
+.. _vcf_low_level_operation:
+
 Low-level operation
 -------------------
 
@@ -235,3 +237,83 @@ datasets.
 Methods that are generalized to polyploid and mixed-ploidy data may make assumptions
 such as polysomic inheritance and hence it is necessary to understand the type of polyploidy
 present within any given dataset.
+
+Example: converting 1000 genomes VCF to Zarr
+--------------------------------------------
+
+This section shows how to convert the `1000 genomes <https://www.internationalgenome.org/>`_ dataset into Zarr format for analysis in sgkit.
+
+For reference, the conversion (not including downloading the data) took about an hour on a machine with 32 vCPUs and 128GB of memory (GCP e2-standard-32).
+
+Install sgkit
+~~~~~~~~~~~~~
+
+Install the main package using conda or pip, and the VCF extra package using pip, as described in :ref:`installation`.
+
+Download the data
+~~~~~~~~~~~~~~~~~
+
+Run the following to download the 1000 genomes VCF files over FTP::
+
+    mkdir -p data/1kg
+    for contig in {1..22}; do
+      wget -P data/1kg ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chr${contig}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz
+      wget -P data/1kg ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chr${contig}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz.tbi
+    done
+
+Run the conversion
+~~~~~~~~~~~~~~~~~~
+
+Run the following Python code::
+
+    from sgkit.io.vcf import vcf_to_zarr
+    from dask.distributed import Client
+
+    if __name__ == "__main__":
+        client = Client(n_workers=16, threads_per_worker=1)
+
+        vcfs = [f"data/1kg/ALL.chr{contig}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz" for contig in range(1, 23)]
+        target = "1kg.zarr"
+        vcf_to_zarr(vcfs, target, tempdir="1kg-tmp")
+
+A few notes about the code:
+
+1. Using a Dask distributed cluster, even on a single machine, performs better than the default scheduler (which uses threads), or
+the multiprocessing scheduler. Creating a ``Client`` object will start a local cluster.
+
+2. Making the number of workers less than the number of cores (16 rather than 32 in this case) will improve performance.
+It's  also important to set ``threads_per_worker`` to 1 to avoid overcommitting threads, as recommended in `the Dask documentation <https://distributed.dask.org/en/latest/worker.html#thread-pool>`_.
+
+3. It is useful to track the progress of the computation using `the Dask dashboard <https://docs.dask.org/en/latest/diagnostics-distributed.html#dashboard>`_.
+There are two steps in the conversion operation, described in :ref:`vcf_low_level_operation`, the first of which has coarse-grained, long-running tasks,
+and the second which has much shorter-running tasks. There is a considerable delay (around 10 minutes) between the two steps,
+so don't worry if it doesn't look like it's progressing.
+
+4. Only the core VCF fields and genotypes are converted. To import more VCF fields see the documentation
+for the ``fields`` and ``field_defs`` parameters for :func:`sgkit.io.vcf.vcf_to_zarr`.
+
+Inspect the dataset
+~~~~~~~~~~~~~~~~~~~
+
+When the conversion is complete, have a look at the dataset as follows::
+
+    >>> import sgkit as sg
+    >>> ds = sg.load_dataset("1kg.zarr")
+    >>> ds
+    <xarray.Dataset>
+    Dimensions:               (variants: 81271745, samples: 2504, ploidy: 2, alleles: 4)
+    Dimensions without coordinates: variants, samples, ploidy, alleles
+    Data variables:
+        call_genotype         (variants, samples, ploidy) int8 dask.array<chunksize=(10000, 1000, 2), meta=np.ndarray>
+        call_genotype_mask    (variants, samples, ploidy) bool dask.array<chunksize=(10000, 1000, 2), meta=np.ndarray>
+        call_genotype_phased  (variants, samples) bool dask.array<chunksize=(10000, 1000), meta=np.ndarray>
+        sample_id             (samples) object dask.array<chunksize=(1000,), meta=np.ndarray>
+        variant_allele        (variants, alleles) object dask.array<chunksize=(10000, 4), meta=np.ndarray>
+        variant_contig        (variants) int8 dask.array<chunksize=(10000,), meta=np.ndarray>
+        variant_id            (variants) object dask.array<chunksize=(10000,), meta=np.ndarray>
+        variant_id_mask       (variants) bool dask.array<chunksize=(10000,), meta=np.ndarray>
+        variant_position      (variants) int32 dask.array<chunksize=(10000,), meta=np.ndarray>
+    Attributes:
+        contigs:               ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'...
+        max_alt_alleles_seen:  12
+
