@@ -38,6 +38,10 @@ Call :attr:`xarray.Variable.values`:
     ds.variant_contig.values
     ds["variant_contig"].values # equivalent alternative
 
+.. warning::
+
+   Calling ``values`` materializes a variable's data in memory, so is only suitable for small datasets.
+
 Find the definition for a variable in a dataset?
 ------------------------------------------------
 
@@ -133,6 +137,10 @@ Call :meth:`xarray.Dataset.sel` on the ``variants`` dimension:
     ds2 = sg.hardy_weinberg_test(ds)
     ds2.sel(variants=(ds2.variant_hwe_p_value > 1e-2))
 
+.. note::
+
+   Filtering causes an eager Xarray computation.
+
 Find which new variables were added by a method?
 ------------------------------------------------
 
@@ -151,6 +159,11 @@ Call :py:func:`save_dataset`:
 .. ipython:: python
 
     sg.save_dataset(ds, "ds.zarr")
+
+.. note::
+
+   Zarr datasets must have equal-sized chunks (except for the final chunk, which may be smaller),
+   so you may have to `rechunk the dataset <http://xarray.pydata.org/en/stable/generated/xarray.DataArray.chunk.html>`_ first.
 
 Load a dataset from Zarr?
 -------------------------
