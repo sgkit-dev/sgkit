@@ -1,4 +1,5 @@
 import warnings
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import dask.array as da
@@ -6,11 +7,27 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+import zarr
 from pandas import DataFrame
 from xarray import Dataset
 
-from sgkit.stats.association import gwas_linear_regression, linear_regression
+from sgkit.stats.association import (
+    gwas_linear_regression,
+    linear_regression,
+    regenie_loco_regression,
+)
 from sgkit.typing import ArrayLike
+
+from .test_regenie import load_covariates, load_traits
+
+
+def _dask_cupy_to_numpy(x):
+    if da.utils.is_cupy_type(x):
+        x = x.get()
+    elif hasattr(x, "_meta") and da.utils.is_cupy_type(x._meta):
+        x = x.map_blocks(lambda x: x.get()).persist()
+    return x
+
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore", DeprecationWarning)
@@ -93,6 +110,30 @@ def _generate_test_dataset(**kwargs: Any) -> Dataset:
         # 1:1 with variants such that variant i has no causal
         # relationship with trait j where i != j
         data_vars[f"trait_{i}"] = (["samples"], ys[i])
+    attrs = dict(beta=bg, n_trait=ys.shape[0], n_covar=x.shape[1])
+    return xr.Dataset(data_vars, attrs=attrs)  # type: ignore[arg-type]
+
+
+def _generate_regenie_test_dataset(**kwargs: Any) -> Dataset:
+    g, x, bg, ys = _generate_test_data(**kwargs)
+    data_vars = {}
+    data_vars["dosage"] = (["variants", "samples"], g.T)
+    data_vars["sample_covariates"] = (["samples", "covariates"], x)
+    data_vars["sample_traits"] = (["samples", "traits"], ys.T)
+
+    # Generate dummy `variant_contig` and `regenie_loco_prediction`, required
+    # to pass input data validation
+    data_vars["variant_contig"] = (
+        [
+            "variants",
+        ],
+        da.zeros(g.shape[1], dtype=np.int16),
+    )
+    data_vars["regenie_loco_prediction"] = (
+        ["contigs", "samples", "outcomes"],
+        da.zeros((1, g.shape[0], 0), dtype=np.float32),
+    )
+
     attrs = dict(beta=bg, n_trait=ys.shape[0], n_covar=x.shape[1])
     return xr.Dataset(data_vars, attrs=attrs)  # type: ignore[arg-type]
 
@@ -249,3 +290,250 @@ def test_linear_regression__raise_on_dof_lte_0():
     Y = np.ones((2, 3))
     with pytest.raises(ValueError, match=r"Number of observations \(N\) too small"):
         linear_regression(XL, XC, Y)
+
+
+@pytest.mark.parametrize("ndarray_type", ["numpy", "cupy"])
+@pytest.mark.parametrize("covariate", [True, False])
+def test_regenie_loco_regression(ndarray_type: str, covariate: bool) -> None:
+    xp = pytest.importorskip(ndarray_type)
+
+    atol = 1e-14
+
+    if covariate is True:
+        glow_offsets_filename = "glow_offsets.zarr.zip"
+        gwas_loco_filename = "gwas_loco.csv"
+    else:
+        glow_offsets_filename = "glow_offsets_nocovariate.zarr.zip"
+        gwas_loco_filename = "gwas_loco_nocovariate.csv"
+        if xp is not np:
+            atol = 1e-7
+
+    datasets = ["sim_sm_02"]  # Only dataset 2 has more than 1 contig
+    ds_dir = Path("sgkit/tests/test_regenie/dataset")
+
+    for ds_name in datasets:
+        # Load simulated data
+        genotypes_store = zarr.ZipStore(
+            str(ds_dir / ds_name / "genotypes.zarr.zip"), mode="r"
+        )
+        glow_store = zarr.ZipStore(
+            str(ds_dir / ds_name / glow_offsets_filename), mode="r"
+        )
+
+        ds = xr.open_zarr(genotypes_store, consolidated=False)
+        glow_loco_predictions = xr.open_zarr(glow_store, consolidated=False)
+        df_trait = load_traits(ds_dir / ds_name)
+
+        ds = ds.assign(
+            call_alternate_allele_count=(
+                ("variants", "samples"),
+                da.asarray(ds["call_genotype"].sum(dim="ploidy").data),
+            )
+        )
+
+        if covariate is True:
+            df_covariate = load_covariates(ds_dir / ds_name)
+            ds = ds.assign(
+                sample_covariates=(
+                    ("samples", "covariates"),
+                    da.from_array(df_covariate.to_numpy()),
+                )
+            )
+        else:
+            ds = ds.assign(sample_covariates=(("empty", "empty"), da.zeros((0, 0))))
+
+        ds = ds.assign(
+            sample_traits=(("samples", "traits"), da.from_array(df_trait.to_numpy()))
+        )
+
+        ds = ds.assign(
+            regenie_loco_prediction=(
+                ("contigs", "samples", "outcomes"),
+                da.asarray(glow_loco_predictions["regenie_loco_prediction"].data),
+            )
+        )
+
+        # Map arrays to CuPy, if it's being tested
+        if xp is not np:
+            for k, v in ds.items():
+                # Bytes and strings are not supported in CuPy, but they're not used for
+                # compute in this test anyway
+                if not any([v.dtype.type is t for t in [np.bytes_, np.str_]]):
+                    ds[k] = xr.DataArray(
+                        da.asarray(v).map_blocks(xp.asarray, dtype=v.dtype), dims=v.dims
+                    )
+
+        res = regenie_loco_regression(
+            ds,
+            dosage="call_alternate_allele_count",
+            covariates="sample_covariates",
+            traits="sample_traits",
+            variant_contig="variant_contig",
+            regenie_loco_prediction="regenie_loco_prediction",
+            call_genotype="call_genotype",
+        )
+
+        # Map resulting arrays back to NumPy, when CuPy test is running. Since xarray
+        # does not natively support CuPy, we need to convert arrays back to CPU to
+        # run final checks.
+        if xp is not np:
+            for k, v in res.items():
+                arr = _dask_cupy_to_numpy(da.asarray(v))
+                res[k] = xr.DataArray(arr, dims=v.dims)
+
+        # PREPARE GLOW RESULTS
+        results_dir = Path("sgkit/tests/test_regenie/result/sim_sm_02-wgr_02")
+        glowres = pd.read_csv(results_dir / gwas_loco_filename)
+        glowres = glowres.rename(
+            columns={
+                "pvalue": "p_value",
+                "tvalue": "t_value",
+                "phenotype": "outcome",
+                "stderror": "standard_error",
+            }
+        )
+
+        glowres["names"] = glowres["names"].apply(eval)
+        assert np.all(glowres["names"].apply(len) == 1)
+        glowres["variant_id"] = glowres["names"].apply(lambda v: v[0])
+        glowres = glowres.drop(["names"], axis=1)
+
+        # PREPARE SGKIT RESULTS
+        dsr = res[
+            [
+                "variant_linreg_t_value",
+                "variant_linreg_p_value",
+                "variant_id",
+            ]
+        ]
+        dsr = dsr.rename(
+            {
+                "traits": "outcomes",  # dimension name
+                "variant_linreg_p_value": "p_value",
+                "variant_linreg_t_value": "t_value",
+            }
+        )
+        dsr = dsr.assign(outcome=xr.DataArray(df_trait.columns, dims=("outcomes")))
+        sgkitres = dsr.to_dataframe().reset_index(drop=True)
+
+        assert glowres.notnull().all().all()
+        assert sgkitres.notnull().all().all()
+
+        df = pd.concat(
+            [
+                sgkitres.set_index(["outcome", "variant_id"])[
+                    ["p_value", "t_value"]
+                ].add_suffix("_sgkit"),
+                glowres.set_index(["outcome", "variant_id"])[
+                    ["p_value", "t_value"]
+                ].add_suffix("_glow"),
+            ],
+            axis=1,
+            join="outer",
+        )
+
+        np.testing.assert_allclose(df["p_value_sgkit"], df["p_value_glow"], atol=atol)
+        np.testing.assert_allclose(df["t_value_sgkit"], df["t_value_glow"], atol=atol)
+
+
+def test_regenie_loco_regression__raise_on_dof_lte_0():
+    # Sample count too low relative to core covariate will cause
+    # degrees of freedom to be zero
+    ds = _generate_regenie_test_dataset(n=100, p=100)
+
+    with pytest.raises(ValueError, match=r"Number of observations \(N\) too small"):
+        regenie_loco_regression(
+            ds,
+            dosage="dosage",
+            covariates="sample_covariates",
+            traits="sample_traits",
+            variant_contig="variant_contig",
+            regenie_loco_prediction="regenie_loco_prediction",
+            call_genotype="call_genotype",
+            merge=False,
+        )
+
+
+def test_regenie_loco_regression__raise_on_no_intercept_and_empty_covariates():
+    # Sample count too low relative to core covariate will cause
+    # degrees of freedom to be zero
+    ds = _generate_regenie_test_dataset(n=0)
+
+    with pytest.raises(
+        ValueError, match="add_intercept must be True if no covariates specified"
+    ):
+        regenie_loco_regression(
+            ds,
+            dosage="dosage",
+            covariates="sample_covariates",
+            traits="sample_traits",
+            variant_contig="variant_contig",
+            regenie_loco_prediction="regenie_loco_prediction",
+            call_genotype="call_genotype",
+            merge=False,
+            add_intercept=False,
+        )
+
+
+def test_regenie_loco_regression__raise_on_contig_mismatch():
+    ds = _generate_regenie_test_dataset()
+
+    # Generate different number of `regenie_loco_prediction` than expected
+    # for `variant_contig`.
+    ds = ds.assign(
+        regenie_loco_prediction=(
+            ("contigs", "samples", "outcomes"),
+            da.zeros((0, len(ds["samples"]), 10), dtype=np.float32),
+        )
+    )
+
+    with pytest.raises(
+        ValueError, match=r"The number of contigs provided \(1\) does not match"
+    ):
+        regenie_loco_regression(
+            ds,
+            dosage="dosage",
+            covariates="sample_covariates",
+            traits="sample_traits",
+            variant_contig="variant_contig",
+            regenie_loco_prediction="regenie_loco_prediction",
+            call_genotype="call_genotype",
+            merge=False,
+        )
+
+
+def test_regenie_loco_regression__raise_on_non_2D():
+    # Sample count too low relative to core covariate will cause
+    # degrees of freedom to be zero
+    ds = _generate_regenie_test_dataset()
+
+    # Add third dimension to `dosage`. By changing number of chunks,
+    # we also cover `Q.rechunk(X.chunksize)` in this test.
+    ds = ds.assign(
+        dosage=(
+            ("variants", "samples", "third"),
+            da.asarray([ds["dosage"].data], chunks=10).reshape(
+                (len(ds["variants"]), len(ds["samples"]), 1)
+            ),
+        )
+    )
+
+    # Match expected `regenie_loco_prediction` shape validation
+    ds = ds.assign(
+        regenie_loco_prediction=(
+            ("contigs", "samples", "outcomes"),
+            da.zeros((1, len(ds["samples"]), 10), dtype=np.float32),
+        )
+    )
+
+    with pytest.raises(ValueError, match="All arguments must be 2D"):
+        regenie_loco_regression(
+            ds,
+            dosage="dosage",
+            covariates="sample_covariates",
+            traits="sample_traits",
+            variant_contig="variant_contig",
+            regenie_loco_prediction="regenie_loco_prediction",
+            call_genotype="call_genotype",
+            merge=False,
+        )

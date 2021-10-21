@@ -296,9 +296,12 @@ def check_simulation_result(
         check_stage_2_results(YMP, df_trait, result_dir)
 
         # Check equality of GWAS results
+        X = da.from_array(X)
+        Q = da.linalg.qr(X)[0]
         YR = Y - YMP
+        YP = YR - Q @ (Q.T @ YR)
         stats = linear_regression(
-            _dask_cupy_to_numpy(G.T), _dask_cupy_to_numpy(X), _dask_cupy_to_numpy(YR)
+            _dask_cupy_to_numpy(G.T), _dask_cupy_to_numpy(YP), _dask_cupy_to_numpy(Q)
         )
         check_stage_3_results(ds, stats, df_trait, result_dir)
 
