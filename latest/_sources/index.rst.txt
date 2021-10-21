@@ -22,6 +22,7 @@ both popular Python genetics toolkits with a respective focus on population and 
     vcf
     examples/index
     api
+    how_do_i
     contributing
 
 Indices and tables
