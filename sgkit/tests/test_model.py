@@ -6,6 +6,7 @@ from sgkit import (
     DIM_PLOIDY,
     DIM_SAMPLE,
     DIM_VARIANT,
+    __version__,
     create_genotype_call_dataset,
     create_genotype_dosage_dataset,
     display_genotypes,
@@ -41,6 +42,7 @@ def test_create_genotype_call_dataset():
     assert DIM_PLOIDY in ds.dims
     assert DIM_ALLELE in ds.dims
 
+    assert ds.attrs["source"] == f"sgkit-{__version__}"
     assert ds.attrs["contigs"] == variant_contig_names
     assert_array_equal(ds["variant_contig"], variant_contig)
     assert_array_equal(ds["variant_position"], variant_position)

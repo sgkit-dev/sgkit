@@ -3,6 +3,8 @@ from typing import Any, Dict, Hashable, List, Optional
 import numpy as np
 import xarray as xr
 
+import sgkit as sg
+
 from .typing import ArrayLike
 from .utils import create_dataset
 
@@ -80,7 +82,12 @@ def create_genotype_call_dataset(
         )
     if variant_id is not None:
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
-    attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
+    attrs: Dict[Hashable, Any] = {
+        "contigs": variant_contig_names,
+        # "source" attribute records which version of sgkit the dataset was created with
+        # following CF Conventions https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#description-of-file-contents
+        "source": f"sgkit-{sg.__version__}",
+    }
     return create_dataset(data_vars=data_vars, attrs=attrs)
 
 
