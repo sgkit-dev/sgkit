@@ -8,8 +8,10 @@ runners:
     gpu: nvidia-tesla-t4
     # Cheapest VM on GCP, with GPU attachable
     instance_type: n1-standard-1
-    # Ubuntu-20.4, can be seen from "gcloud compute images list"
-    machine_image: ubuntu-minimal-2004-lts
+    # Custom image with NVIDIA drivers installed on Ubuntu-20.4
+    # to reduce provision time
+    # Format => project_name:image_name
+    machine_image: sgkit-dev:cirun-nvidia
     # preemptible instances seems quite less reliable.
     preemptible: false
     # Path of the relevant workflow file
