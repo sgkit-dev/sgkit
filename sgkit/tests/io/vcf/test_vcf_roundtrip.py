@@ -123,7 +123,10 @@ def test_DP_field(shared_datadir, tmpdir):
         ("CEUTrio.20.21.gatk3.4.g.vcf.bgz", ["calldata/PL"], ["FORMAT/PL"], 7),
     ],
 )
-@pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
+@pytest.mark.filterwarnings(
+    "ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning",
+    "ignore::sgkit.io.vcfzarr_reader.DimensionNameForFixedFormatFieldWarning",
+)
 def test_all_fields(
     shared_datadir,
     tmpdir,
@@ -153,7 +156,7 @@ def test_all_fields(
         "INFO/AF": {"Number": "A"},
         "INFO/AC": {"Number": "A"},
         "FORMAT/AD": {"Number": "R"},
-        "FORMAT/HQ": {"dimension": "haplotypes"},
+        # override automatically assigned dim name
         "FORMAT/SB": {"dimension": "strand_biases"},
     }
     allel_ds = sg.read_vcfzarr(allel_vcfzarr_path, field_defs=field_defs)
