@@ -943,16 +943,18 @@ def test_vcf_to_zarr__field_number_G_non_diploid(shared_datadir, tmp_path):
     assert ds["call_GL"].attrs["comment"] == "Genotype likelihoods"
 
 
+@pytest.mark.filterwarnings(
+    "ignore::sgkit.io.vcfzarr_reader.DimensionNameForFixedFormatFieldWarning"
+)
 def test_vcf_to_zarr__field_number_fixed(shared_datadir, tmp_path):
     path = path_for_test(shared_datadir, "sample.vcf.gz")
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
-    # HQ Number is 2
+    # HQ Number is 2, and a dimension is automatically assigned (FORMAT_HQ_dim)
     vcf_to_zarr(
         path,
         output,
         fields=["FORMAT/HQ"],
-        field_defs={"FORMAT/HQ": {"dimension": "haplotypes"}},
     )
     ds = xr.open_zarr(output)
 
@@ -970,6 +972,7 @@ def test_vcf_to_zarr__field_number_fixed(shared_datadir, tmp_path):
             [[-1, -1], [-1, -1], [-1, -1]],
         ],
     )
+    assert ds["call_HQ"].dims == ("variants", "samples", "FORMAT_HQ_dim")
     assert ds["call_HQ"].attrs["comment"] == "Haplotype Quality"
 
 
@@ -1006,12 +1009,6 @@ def test_vcf_to_zarr__fields_errors(shared_datadir, tmp_path):
         match=r"INFO field 'AC' is defined as Number '.', which is not supported.",
     ):
         vcf_to_zarr(path, output, fields=["INFO/AC"])
-
-    with pytest.raises(
-        ValueError,
-        match=r"FORMAT field 'HQ' is defined as Number '2', but no dimension name is defined in field_defs.",
-    ):
-        vcf_to_zarr(path, output, fields=["FORMAT/HQ"])
 
     with pytest.raises(
         ValueError,

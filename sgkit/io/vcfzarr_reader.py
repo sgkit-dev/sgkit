@@ -1,4 +1,5 @@
 import tempfile
+import warnings
 from pathlib import Path
 from typing import (
     Any,
@@ -27,6 +28,12 @@ from sgkit.io.utils import concatenate_and_rechunk, str_is_int
 from ..model import DIM_SAMPLE, DIM_VARIANT, create_genotype_call_dataset
 from ..typing import ArrayLike, PathType
 from ..utils import encode_array, max_str_len, smallest_numpy_int_dtype
+
+
+class DimensionNameForFixedFormatFieldWarning(UserWarning):
+    """Warning when a dimension name for a FORMAT field with Number > 1 was created automatically."""
+
+    pass
 
 
 def _ensure_2d(arr: ArrayLike) -> ArrayLike:
@@ -466,9 +473,13 @@ def vcf_number_to_dimension_and_size(
         if "dimension" in field_def:
             dimension = field_def["dimension"]
             return (dimension, int(vcf_number))
-        raise ValueError(
-            f"{category} field '{key}' is defined as Number '{vcf_number}', but no dimension name is defined in field_defs."
-        )
+        else:
+            dim_name = f"{category}_{key}_dim"
+            warnings.warn(
+                f"A new dimension named {dim_name} was created. To change this name re-run specifying `field_defs`.",
+                DimensionNameForFixedFormatFieldWarning,
+            )
+            return (dim_name, int(vcf_number))
     raise ValueError(
         f"{category} field '{key}' is defined as Number '{vcf_number}', which is not supported."
     )
