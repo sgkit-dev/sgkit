@@ -204,6 +204,11 @@ def _vcfzarr_to_dataset(
     else:
         variants_id = None
 
+    if "variants/QUAL" in vcfzarr:
+        variant_quality = da.from_zarr(vcfzarr["variants/QUAL"])
+    else:
+        variant_quality = None
+
     ds = create_genotype_call_dataset(
         variant_contig_names=variant_contig_names,
         variant_contig=variant_contig,
@@ -220,6 +225,9 @@ def _vcfzarr_to_dataset(
             [DIM_VARIANT],
             variants_id == ".",
         )
+
+    if variant_quality is not None:
+        ds["variant_quality"] = ([DIM_VARIANT], variant_quality)
 
     # Add any other fields
     field_defs = field_defs or {}
@@ -366,15 +374,41 @@ def concat_zarrs_optimized(
         )
         d = _fuse_delayed(d)  # type: ignore[no-untyped-call]
         delayed.append(d)
+
+    # copy variables that are not rechunked (e.g. sample_id)
+    for var in vars_to_copy:
+        arr = da.from_zarr(zarr_files[0], component=var)
+        _to_zarr_kwargs = dict(
+            compressor=first_zarr_group[var].compressor,
+            filters=first_zarr_group[var].filters,
+            fill_value=None,
+        )
+        if not fix_strings and arr.dtype == "O":
+            # We assume that all object dtypes are variable length strings
+            var_len_str_codec = numcodecs.VLenUTF8()
+            _to_zarr_kwargs["object_codec"] = var_len_str_codec
+            # Remove from filters to avoid double encoding error
+            if var_len_str_codec in first_zarr_group[var].filters:
+                filters = list(first_zarr_group[var].filters)
+                filters.remove(var_len_str_codec)
+                _to_zarr_kwargs["filters"] = filters
+
+        d = _to_zarr(  # type: ignore[no-untyped-call]
+            arr,
+            output,
+            component=var,
+            overwrite=True,
+            compute=False,
+            attrs=first_zarr_group[var].attrs.asdict(),
+            **_to_zarr_kwargs,
+        )
+        d = _fuse_delayed(d)  # type: ignore[no-untyped-call]
+        delayed.append(d)
+
     da.compute(*delayed)
 
     # copy unchanged variables and top-level metadata
     with zarr.open_group(output) as output_zarr:
-
-        # copy variables that are not rechunked (e.g. sample_id)
-        for var in vars_to_copy:
-            output_zarr[var] = first_zarr_group[var]
-            output_zarr[var].attrs.update(first_zarr_group[var].attrs)
 
         # copy top-level attributes
         group_attrs = dict(first_zarr_group.attrs)
