@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import xarray as xr
 import zarr
-from numcodecs import Blosc, PackBits
+from numcodecs import Blosc, PackBits, VLenUTF8
 from numpy.testing import assert_allclose, assert_array_equal
 
 from sgkit import load_dataset
@@ -14,6 +14,7 @@ from sgkit.io.vcf import (
     partition_into_regions,
     vcf_to_zarr,
 )
+from sgkit.io.vcf.vcf_reader import zarr_array_sizes
 
 from .utils import path_for_test
 
@@ -1036,3 +1037,356 @@ def test_vcf_to_zarr__fields_errors(shared_datadir, tmp_path):
             fields=["INFO/AN"],
             field_defs={"INFO/AN": {"Type": "Blah"}},
         )
+
+
+@pytest.mark.parametrize(
+    "vcf_file, expected_sizes",
+    [
+        (
+            "sample.vcf.gz",
+            {
+                "max_alt_alleles": 3,
+                "field_defs": {"INFO/AC": {"Number": 2}, "INFO/AF": {"Number": 2}},
+                "ploidy": 2,
+            },
+        ),
+        ("mixed.vcf.gz", {"max_alt_alleles": 1, "ploidy": 4}),
+        ("no_genotypes.vcf", {"max_alt_alleles": 1}),
+        (
+            "CEUTrio.20.21.gatk3.4.g.vcf.bgz",
+            {
+                "max_alt_alleles": 7,
+                "field_defs": {"FORMAT/AD": {"Number": 8}},
+                "ploidy": 2,
+            },
+        ),
+    ],
+)
+def test_zarr_array_sizes(shared_datadir, vcf_file, expected_sizes):
+    path = path_for_test(shared_datadir, vcf_file)
+    sizes = zarr_array_sizes(path)
+    assert sizes == expected_sizes
+
+
+def check_field(group, name, ndim, shape, dimension_names, dtype):
+    assert group[name].ndim == ndim
+    assert group[name].shape == shape
+    assert group[name].attrs["_ARRAY_DIMENSIONS"] == dimension_names
+    if dtype == str:
+        assert group[name].dtype == np.object_
+        assert VLenUTF8() in group[name].filters
+    else:
+        assert group[name].dtype == dtype
+
+
+@pytest.mark.filterwarnings(
+    "ignore::sgkit.io.vcfzarr_reader.DimensionNameForFixedFormatFieldWarning"
+)
+def test_spec(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "sample.vcf.gz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    kwargs = zarr_array_sizes(path)
+    vcf_to_zarr(
+        path,
+        output,
+        chunk_length=5,
+        fields=["INFO/*", "FORMAT/*"],
+        mixed_ploidy=True,
+        **kwargs,
+    )
+
+    variants = 9
+    alt_alleles = 3
+    samples = 3
+    ploidy = 2
+
+    group = zarr.open_group(output)
+
+    # VCF Zarr group attributes
+    assert group.attrs["vcf_zarr_version"] == "0.1"
+    assert group.attrs["vcf_header"].startswith("##fileformat=VCFv4.0")
+    assert group.attrs["contigs"] == ["19", "20", "X"]
+
+    # VCF Zarr arrays
+    assert set(list(group.array_keys())) == set(
+        [
+            "variant_contig",
+            "variant_position",
+            "variant_id",
+            "variant_id_mask",
+            "variant_allele",
+            "variant_quality",
+            "variant_filter",
+            "variant_AA",
+            "variant_AC",
+            "variant_AF",
+            "variant_AN",
+            "variant_DB",
+            "variant_DP",
+            "variant_H2",
+            "variant_NS",
+            "call_DP",
+            "call_GQ",
+            "call_genotype",
+            "call_genotype_mask",
+            "call_genotype_non_allele",
+            "call_genotype_phased",
+            "call_HQ",
+            "sample_id",
+        ]
+    )
+
+    # Fixed fields
+    check_field(
+        group,
+        "variant_contig",
+        ndim=1,
+        shape=(variants,),
+        dimension_names=["variants"],
+        dtype=np.int8,
+    )
+    check_field(
+        group,
+        "variant_position",
+        ndim=1,
+        shape=(variants,),
+        dimension_names=["variants"],
+        dtype=np.int32,
+    )
+    check_field(
+        group,
+        "variant_id",
+        ndim=1,
+        shape=(variants,),
+        dimension_names=["variants"],
+        dtype=str,
+    )
+    check_field(
+        group,
+        "variant_allele",
+        ndim=2,
+        shape=(variants, alt_alleles + 1),
+        dimension_names=["variants", "alleles"],
+        dtype=str,
+    )
+    check_field(
+        group,
+        "variant_quality",
+        ndim=1,
+        shape=(variants,),
+        dimension_names=["variants"],
+        dtype=np.float32,
+    )
+    check_field(
+        group,
+        "variant_filter",
+        ndim=1,
+        shape=(variants,),
+        dimension_names=["variants"],
+        dtype=str,
+    )
+
+    # INFO fields
+    check_field(
+        group,
+        "variant_AA",
+        ndim=1,
+        shape=(variants,),
+        dimension_names=["variants"],
+        dtype=str,
+    )
+    check_field(
+        group,
+        "variant_AC",
+        ndim=2,
+        shape=(variants, 2),
+        dimension_names=["variants", "INFO_AC_dim"],
+        dtype=np.int32,
+    )
+    check_field(
+        group,
+        "variant_AF",
+        ndim=2,
+        shape=(variants, 2),
+        dimension_names=["variants", "INFO_AF_dim"],
+        dtype=np.float32,
+    )
+    check_field(
+        group,
+        "variant_AN",
+        ndim=1,
+        shape=(variants,),
+        dimension_names=["variants"],
+        dtype=np.int32,
+    )
+    check_field(
+        group,
+        "variant_DB",
+        ndim=1,
+        shape=(variants,),
+        dimension_names=["variants"],
+        dtype=np.bool_,
+    )
+    check_field(
+        group,
+        "variant_DP",
+        ndim=1,
+        shape=(variants,),
+        dimension_names=["variants"],
+        dtype=np.int32,
+    )
+    check_field(
+        group,
+        "variant_H2",
+        ndim=1,
+        shape=(variants,),
+        dimension_names=["variants"],
+        dtype=np.bool_,
+    )
+    check_field(
+        group,
+        "variant_NS",
+        ndim=1,
+        shape=(variants,),
+        dimension_names=["variants"],
+        dtype=np.int32,
+    )
+
+    # FORMAT fields
+    check_field(
+        group,
+        "call_DP",
+        ndim=2,
+        shape=(variants, samples),
+        dimension_names=["variants", "samples"],
+        dtype=np.int32,
+    )
+    check_field(
+        group,
+        "call_GQ",
+        ndim=2,
+        shape=(variants, samples),
+        dimension_names=["variants", "samples"],
+        dtype=np.int32,
+    )
+    check_field(
+        group,
+        "call_HQ",
+        ndim=3,
+        shape=(variants, samples, 2),
+        dimension_names=["variants", "samples", "FORMAT_HQ_dim"],
+        dtype=np.int32,
+    )
+    check_field(
+        group,
+        "call_genotype",
+        ndim=3,
+        shape=(variants, samples, ploidy),
+        dimension_names=["variants", "samples", "ploidy"],
+        dtype=np.int8,
+    )
+    check_field(
+        group,
+        "call_genotype_phased",
+        ndim=2,
+        shape=(variants, samples),
+        dimension_names=["variants", "samples"],
+        dtype=np.bool_,
+    )
+
+    # Sample information
+    check_field(
+        group,
+        "sample_id",
+        ndim=1,
+        shape=(samples,),
+        dimension_names=["samples"],
+        dtype=str,
+    )
+
+    # Array values
+    assert_array_equal(group["variant_contig"], [0, 0, 1, 1, 1, 1, 1, 1, 2])
+    assert_array_equal(
+        group["variant_position"],
+        [111, 112, 14370, 17330, 1110696, 1230237, 1234567, 1235237, 10],
+    )
+    assert_array_equal(
+        group["variant_id"],
+        [".", ".", "rs6054257", ".", "rs6040355", ".", "microsat1", ".", "rsTest"],
+    )
+    assert_array_equal(
+        group["variant_allele"],
+        [
+            ["A", "C", "", ""],
+            ["A", "G", "", ""],
+            ["G", "A", "", ""],
+            ["T", "A", "", ""],
+            ["A", "G", "T", ""],
+            ["T", "", "", ""],
+            ["G", "GA", "GAC", ""],
+            ["T", "", "", ""],
+            ["AC", "A", "ATG", "C"],
+        ],
+    )
+    assert_allclose(
+        group["variant_quality"], [9.6, 10.0, 29.0, 3.0, 67.0, 47.0, 50.0, np.nan, 10.0]
+    )
+    assert (
+        group["variant_quality"][:].view(np.int32)[7]
+        == np.array([0x7F800001], dtype=np.int32).item()
+    )  # missing nan
+    assert_array_equal(
+        group["variant_filter"],
+        [".", ".", "PASS", "q10", "PASS", "PASS", "PASS", ".", "PASS"],
+    )
+
+    assert_array_equal(
+        group["variant_NS"],
+        [INT_FILL, INT_FILL, 3, 3, 2, 3, 3, INT_FILL, INT_FILL],
+    )
+
+    assert_array_equal(
+        group["call_DP"],
+        [
+            [INT_FILL, INT_FILL, INT_FILL],
+            [INT_FILL, INT_FILL, INT_FILL],
+            [1, 8, 5],
+            [3, 5, 3],
+            [6, 0, 4],
+            [INT_MISSING, 4, 2],
+            [4, 2, 3],
+            [INT_FILL, INT_FILL, INT_FILL],
+            [INT_FILL, INT_FILL, INT_FILL],
+        ],
+    )
+    assert_array_equal(
+        group["call_genotype"],
+        [
+            [[0, 0], [0, 0], [0, 1]],
+            [[0, 0], [0, 0], [0, 1]],
+            [[0, 0], [1, 0], [1, 1]],
+            [[0, 0], [0, 1], [0, 0]],
+            [[1, 2], [2, 1], [2, 2]],
+            [[0, 0], [0, 0], [0, 0]],
+            [[0, 1], [0, 2], [-1, -1]],
+            [[0, 0], [0, 0], [-1, -1]],
+            [[0, -2], [0, 1], [0, 2]],
+        ],
+    )
+    assert_array_equal(
+        group["call_genotype_phased"],
+        [
+            [True, True, False],
+            [True, True, False],
+            [True, True, False],
+            [True, True, False],
+            [True, True, False],
+            [True, True, False],
+            [False, False, False],
+            [False, True, False],
+            [True, False, True],
+        ],
+    )
+
+    assert_array_equal(group["sample_id"], ["NA00001", "NA00002", "NA00003"])

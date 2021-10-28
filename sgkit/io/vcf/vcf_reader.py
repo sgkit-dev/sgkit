@@ -25,7 +25,14 @@ from numcodecs import PackBits
 
 from sgkit import variables
 from sgkit.io.dataset import load_dataset
-from sgkit.io.utils import FLOAT32_FILL, INT_FILL, INT_MISSING, STR_FILL
+from sgkit.io.utils import (
+    FLOAT32_FILL,
+    FLOAT32_MISSING,
+    INT_FILL,
+    INT_MISSING,
+    STR_FILL,
+    STR_MISSING,
+)
 from sgkit.io.vcf import partition_into_regions
 from sgkit.io.vcf.utils import build_url, chunks, temporary_directory, url_filename
 from sgkit.io.vcfzarr_reader import (
@@ -363,7 +370,7 @@ def vcf_to_zarr_sequential(
 ) -> None:
 
     with open_vcf(input) as vcf:
-        sample_id = np.array(vcf.samples, dtype=str)
+        sample_id = np.array(vcf.samples, dtype="O")
         n_allele = max_alt_alleles + 1
 
         variant_contig_names = vcf.seqnames
@@ -409,6 +416,8 @@ def vcf_to_zarr_sequential(
 
             variant_ids = []
             variant_alleles = []
+            variant_quality = np.empty(chunk_length, dtype="f4")
+            variant_filter = np.empty(chunk_length, dtype="O")
 
             i = -1  # initialize in case of empty variants_chunk
             for i, variant in enumerate(variants_chunk):
@@ -434,6 +443,14 @@ def vcf_to_zarr_sequential(
                     max_variant_allele_length, max(len(x) for x in alleles)
                 )
 
+                variant_quality[i] = (
+                    variant.QUAL if variant.QUAL is not None else FLOAT32_MISSING
+                )
+                variant_filter[i] = (
+                    ";".join(variant.FILTERS)
+                    if len(variant.FILTERS) > 0
+                    else STR_MISSING
+                )
                 for field_handler in field_handlers:
                     field_handler.add_variant(i, variant)
 
@@ -441,6 +458,8 @@ def vcf_to_zarr_sequential(
             if i + 1 < chunk_length:
                 variant_contig = variant_contig[: i + 1]
                 variant_position = variant_position[: i + 1]
+                variant_quality = variant_quality[: i + 1]
+                variant_filter = variant_filter[: i + 1]
 
                 for field_handler in field_handlers:
                     field_handler.truncate_array(i + 1)
@@ -464,6 +483,11 @@ def vcf_to_zarr_sequential(
                 [DIM_VARIANT],
                 variant_id_mask,
             )
+            ds["variant_quality"] = ([DIM_VARIANT], variant_quality)
+            ds["variant_filter"] = ([DIM_VARIANT], variant_filter)
+            ds.attrs["vcf_zarr_version"] = "0.1"
+            ds.attrs["vcf_header"] = vcf.raw_header
+
             for field_handler in field_handlers:
                 field_handler.update_dataset(ds)
             ds.attrs["max_alt_alleles_seen"] = max_alt_alleles_seen
@@ -490,6 +514,8 @@ def vcf_to_zarr_sequential(
                         chunks=var_chunks, compressor=compressor
                     )
                     if ds[var].dtype.kind == "b":
+                        # ensure that booleans are not stored as int8 by xarray https://github.com/pydata/xarray/issues/4386
+                        ds[var].attrs["dtype"] = "bool"
                         default_encoding[var]["filters"] = [PackBits()]
 
                 # values from function args (encoding) take precedence over default_encoding
@@ -902,3 +928,55 @@ def count_variants(path: PathType, region: Optional[str] = None) -> int:
         if region is not None:
             vcf = vcf(region)
         return sum(1 for _ in region_filter(vcf, region))
+
+
+def zarr_array_sizes(input: PathType) -> Dict[str, Any]:
+    """Make a pass through a VCF/BCF file to determine sizes for storage in Zarr."""
+
+    with open_vcf(input) as vcf:
+
+        ploidy = -1
+        alt_alleles = 0
+
+        info = _get_vcf_field_defs(vcf, "INFO")
+        info_field_defs = {
+            key: {"Number": 1} for key in info.keys() if info[key]["Number"] == "."
+        }
+
+        format = _get_vcf_field_defs(vcf, "FORMAT")
+        format_field_defs = {
+            key: {"Number": 1} for key in format.keys() if format[key]["Number"] == "."
+        }
+
+        for variant in vcf:
+            for key, val in info_field_defs.items():
+                field_val = variant.INFO.get(key)
+                if field_val is not None:
+                    try:
+                        val["Number"] = max(val["Number"], len(field_val))
+                    except TypeError:
+                        pass  # single value
+
+            for key, val in format_field_defs.items():
+                field_val = variant.format(key)
+                if field_val is not None:
+                    val["Number"] = max(val["Number"], field_val.shape[-1])
+
+            try:
+                ploidy = max(ploidy, variant.genotype.ploidy)
+            except Exception:
+                pass  # no genotype information
+            alt_alleles = max(alt_alleles, len(variant.ALT))
+
+        field_defs = {}
+        for key, val in info_field_defs.items():
+            field_defs[f"INFO/{key}"] = val
+        for key, val in format_field_defs.items():
+            field_defs[f"FORMAT/{key}"] = val
+
+        kwargs: Dict[str, Any] = {"max_alt_alleles": alt_alleles}
+        if len(field_defs) > 0:
+            kwargs["field_defs"] = field_defs
+        if ploidy > -1:
+            kwargs["ploidy"] = ploidy
+        return kwargs

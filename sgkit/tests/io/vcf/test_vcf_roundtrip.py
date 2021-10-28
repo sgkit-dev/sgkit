@@ -75,6 +75,14 @@ def create_sg_vcfzarr(
 
 
 def fix_missing_fields(ds: Dataset) -> Dataset:
+
+    # drop variables and attributes that are not included in scikit-allel
+    ds = ds.drop_vars("call_genotype_phased")
+    ds = ds.drop_vars("variant_filter")
+    del ds.attrs["max_alt_alleles_seen"]
+    del ds.attrs["vcf_zarr_version"]
+    del ds.attrs["vcf_header"]
+
     # scikit-allel doesn't distinguish between missing and fill fields, so set all to fill
     for var in ds.data_vars:
         if ds[var].dtype == np.int32:  # type: ignore[comparison-overlap]
@@ -88,8 +96,6 @@ def test_default_fields(shared_datadir, tmpdir):
 
     sg_vcfzarr_path = create_sg_vcfzarr(shared_datadir, tmpdir)
     sg_ds = sg.load_dataset(str(sg_vcfzarr_path))
-    sg_ds = sg_ds.drop_vars("call_genotype_phased")  # not included in scikit-allel
-    del sg_ds.attrs["max_alt_alleles_seen"]  # not saved by scikit-allel
     sg_ds = fix_missing_fields(sg_ds)
 
     assert_identical(allel_ds, sg_ds)
@@ -102,6 +108,7 @@ def test_DP_field(shared_datadir, tmpdir):
         "variants/ID",
         "variants/REF",
         "variants/ALT",
+        "variants/QUAL",
         "calldata/GT",
         "samples",
         # extra
@@ -118,8 +125,6 @@ def test_DP_field(shared_datadir, tmpdir):
         shared_datadir, tmpdir, fields=["INFO/DP", "FORMAT/DP", "FORMAT/GT"]
     )
     sg_ds = sg.load_dataset(str(sg_vcfzarr_path))
-    sg_ds = sg_ds.drop_vars("call_genotype_phased")  # not included in scikit-allel
-    del sg_ds.attrs["max_alt_alleles_seen"]  # not saved by scikit-allel
     sg_ds = fix_missing_fields(sg_ds)
 
     assert_identical(allel_ds, sg_ds)
@@ -184,8 +189,6 @@ def test_all_fields(
         max_alt_alleles=max_alt_alleles,
     )
     sg_ds = sg.load_dataset(str(sg_vcfzarr_path))
-    sg_ds = sg_ds.drop_vars("call_genotype_phased")  # not included in scikit-allel
-    del sg_ds.attrs["max_alt_alleles_seen"]  # not saved by scikit-allel
     sg_ds = fix_missing_fields(sg_ds)
 
     # scikit-allel only records contigs for which there are actual variants,
