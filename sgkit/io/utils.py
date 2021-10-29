@@ -9,13 +9,19 @@ from ..typing import ArrayLike, DType
 from ..utils import encode_array, max_str_len
 
 # These values are based on BCF conventions
-INT32_MISSING, INT32_FILL = np.array([0x80000000, 0x80000001], dtype=np.int32)
+INT32_MISSING, INT32_FILL = np.array(
+    # Equivalent to 0x80000000, 0x80000001
+    [np.iinfo(np.int32).min, np.iinfo(np.int32).min + 1],
+    dtype=np.int32,
+)
+
 FLOAT32_MISSING, FLOAT32_FILL = np.array([0x7F800001, 0x7F800002], dtype=np.int32).view(
     np.float32
 )
 FLOAT32_MISSING_AS_INT32, FLOAT32_FILL_AS_INT32 = np.array(
     [0x7F800001, 0x7F800002], dtype=np.int32
 )
+
 STR_MISSING, STR_FILL = ".", ""
 
 
