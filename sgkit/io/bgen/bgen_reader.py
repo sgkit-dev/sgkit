@@ -290,7 +290,7 @@ def read_bgen(
     arrs = dataframe_to_dict(df, METAFILE_DTYPE)
 
     variant_id = arrs["id"]
-    variant_contig = arrs["chrom"].astype(contig_dtype)
+    variant_contig: ArrayLike = arrs["chrom"].astype(contig_dtype)
     variant_contig, variant_contig_names = encode_contigs(variant_contig)
     variant_contig_names = list(variant_contig_names)
     variant_position = arrs["pos"]

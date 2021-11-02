@@ -23,6 +23,7 @@ from sgkit import (
     simulate_genotype_call_dataset,
     variables,
 )
+from sgkit.typing import ArrayLike
 from sgkit.window import window_by_variant
 
 from .test_aggregation import get_dataset
@@ -76,7 +77,7 @@ def ts_to_dataset(ts, chunks=None, samples=None):
         list(site_alleles) + [""] * (max_alleles - len(site_alleles))
         for site_alleles in alleles
     ]
-    alleles = np.array(padded_alleles).astype("S")
+    alleles: ArrayLike = np.array(padded_alleles).astype("S")
     genotypes = np.expand_dims(genotypes, axis=2)
 
     ds = create_genotype_call_dataset(

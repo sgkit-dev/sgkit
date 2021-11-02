@@ -7,6 +7,7 @@ import pytest
 from sgkit import count_call_alleles, create_genotype_call_dataset
 from sgkit.stats.ibs import Weir_Goudet_beta, identity_by_state
 from sgkit.testing import simulate_genotype_call_dataset
+from sgkit.typing import ArrayLike
 
 
 @pytest.mark.parametrize(
@@ -164,7 +165,7 @@ def test_Weir_Goudet_beta__hierfstat(sim, chunks):
     # convert hierfstat dose (samples, variants) to call_allele_counts
     alts = np.nan_to_num(dose.T).astype(np.uint8)
     refs = np.nan_to_num(2 - dose.T).astype(np.uint8)
-    ac = np.stack([refs, alts], axis=-1).astype("u8")
+    ac: ArrayLike = np.stack([refs, alts], axis=-1).astype("u8")
     # create dummy dataset and add allele counts
     n_variants, n_samples, _ = ac.shape
     ploidy = 2

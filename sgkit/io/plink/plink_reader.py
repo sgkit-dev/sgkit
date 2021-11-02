@@ -12,7 +12,7 @@ from xarray import Dataset
 from sgkit import create_genotype_call_dataset
 from sgkit.io.utils import dataframe_to_dict
 from sgkit.model import DIM_SAMPLE
-from sgkit.typing import NDArray
+from sgkit.typing import ArrayLike, NDArray
 from sgkit.utils import encode_array
 
 PathType = Union[str, Path]
@@ -259,6 +259,7 @@ def read_plink(
     )
 
     # If contigs are already integers, use them as-is
+    variant_contig: ArrayLike = None
     if bim_int_contig:
         variant_contig = arr_bim["contig"].astype("int16")
         variant_contig_names = da.unique(variant_contig).astype(str)
@@ -271,8 +272,8 @@ def read_plink(
         variant_contig_names = list(variant_contig_names)
 
     variant_position = arr_bim["pos"]
-    a1 = arr_bim["a1"].astype("str")
-    a2 = arr_bim["a2"].astype("str")
+    a1: ArrayLike = arr_bim["a1"].astype("str")
+    a2: ArrayLike = arr_bim["a2"].astype("str")
 
     # Note: column_stack not implemented in Dask, must use [v|h]stack
     variant_allele = da.hstack((a1[:, np.newaxis], a2[:, np.newaxis]))

@@ -3,6 +3,8 @@ from typing import Optional
 import numpy as np
 from xarray import Dataset
 
+from sgkit.typing import ArrayLike
+
 from .model import create_genotype_call_dataset
 from .utils import split_array_chunks
 
@@ -73,7 +75,9 @@ def simulate_genotype_call_dataset(
     contig_names = np.unique(contig).tolist()  # type: ignore[no-untyped-call]
     position = np.concatenate([np.arange(contig_size[i]) for i in range(n_contig)])  # type: ignore[no-untyped-call]
     assert position.size == contig.size
-    alleles = rs.choice(["A", "C", "G", "T"], size=(n_variant, n_allele)).astype("S")
+    alleles: ArrayLike = rs.choice(
+        ["A", "C", "G", "T"], size=(n_variant, n_allele)
+    ).astype("S")
     sample_id = np.array([f"S{i}" for i in range(n_sample)])
     return create_genotype_call_dataset(
         variant_contig_names=contig_names,
