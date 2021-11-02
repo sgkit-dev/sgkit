@@ -174,6 +174,7 @@ def _vcfzarr_to_dataset(
 ) -> xr.Dataset:
 
     variant_position = da.from_zarr(vcfzarr["variants/POS"])
+    variant_contig: ArrayLike = None
 
     if contig is None:
         # Get the contigs from variants/CHROM
