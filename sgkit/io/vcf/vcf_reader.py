@@ -25,7 +25,7 @@ from numcodecs import PackBits
 
 from sgkit import variables
 from sgkit.io.dataset import load_dataset
-from sgkit.io.utils import FLOAT32_FILL, INT32_FILL, INT32_MISSING, STR_FILL
+from sgkit.io.utils import FLOAT32_FILL, INT_FILL, INT_MISSING, STR_FILL
 from sgkit.io.vcf import partition_into_regions
 from sgkit.io.vcf.utils import build_url, chunks, temporary_directory, url_filename
 from sgkit.io.vcfzarr_reader import (
@@ -136,7 +136,7 @@ def _vcf_type_to_numpy_type_and_fill_value(
     if vcf_type == "Flag":
         return "bool", False
     elif vcf_type == "Integer":
-        return "i4", INT32_FILL
+        return "i4", INT_FILL
     # the VCF spec defines Float as 32 bit, and in BCF is stored as 32 bit
     elif vcf_type == "Float":
         return "f4", FLOAT32_FILL
@@ -265,7 +265,7 @@ class InfoAndFormatFieldHandler(VcfFieldHandler):
         # cyvcf2 represents missing Integer values as the minimum int32 value
         # so change these to be the missing value
         if self.array.dtype == np.int32:
-            self.array[self.array == np.iinfo(np.int32).min] = INT32_MISSING
+            self.array[self.array == np.iinfo(np.int32).min] = INT_MISSING
 
         ds[self.variable_name] = (self.dims, self.array)
         if len(self.description) > 0:

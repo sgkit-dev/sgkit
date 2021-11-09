@@ -8,7 +8,7 @@ from numcodecs import Blosc, PackBits
 from numpy.testing import assert_allclose, assert_array_equal
 
 from sgkit import load_dataset
-from sgkit.io.utils import FLOAT32_FILL, INT32_FILL, INT32_MISSING
+from sgkit.io.utils import FLOAT32_FILL, INT_FILL, INT_MISSING
 from sgkit.io.vcf import (
     MaxAltAllelesExceededWarning,
     partition_into_regions,
@@ -751,7 +751,7 @@ def test_vcf_to_zarr__fields(shared_datadir, tmp_path):
     )
     ds = xr.open_zarr(output)
 
-    missing, fill = INT32_MISSING, INT32_FILL
+    missing, fill = INT_MISSING, INT_FILL
     assert_array_equal(ds["variant_DP"], [fill, fill, 14, 11, 10, 13, 9, fill, fill])
     assert ds["variant_DP"].attrs["comment"] == "Total Depth"
 
@@ -832,7 +832,7 @@ def test_vcf_to_zarr__field_defs(shared_datadir, tmp_path):
     )
     ds = xr.open_zarr(output)
 
-    fill = INT32_FILL
+    fill = INT_FILL
     assert_array_equal(ds["variant_DP"], [fill, fill, 14, 11, 10, 13, 9, fill, fill])
     assert ds["variant_DP"].attrs["comment"] == "Combined depth across samples"
 
@@ -862,7 +862,7 @@ def test_vcf_to_zarr__field_number_A(shared_datadir, tmp_path):
     )
     ds = xr.open_zarr(output)
 
-    fill = INT32_FILL
+    fill = INT_FILL
     assert_array_equal(
         ds["variant_AC"],
         [
@@ -901,7 +901,7 @@ def test_vcf_to_zarr__field_number_R(shared_datadir, tmp_path):
         variants=slice(10002764, 10002793)
     )
 
-    fill = INT32_FILL
+    fill = INT_FILL
     ad = np.array(
         [
             [[40, 14, 0, fill]],
@@ -930,7 +930,7 @@ def test_vcf_to_zarr__field_number_G(shared_datadir, tmp_path):
         variants=slice(10002764, 10002793)
     )
 
-    fill = INT32_FILL
+    fill = INT_FILL
     pl = np.array(
         [
             [[319, 0, 1316, 440, 1358, 1798, fill, fill, fill, fill]],
@@ -973,7 +973,7 @@ def test_vcf_to_zarr__field_number_fixed(shared_datadir, tmp_path):
     )
     ds = xr.open_zarr(output)
 
-    missing, fill = INT32_MISSING, INT32_FILL
+    missing, fill = INT_MISSING, INT_FILL
     assert_array_equal(
         ds["call_HQ"],
         [
