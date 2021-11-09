@@ -111,7 +111,7 @@ def _generate_test_dataset(**kwargs: Any) -> Dataset:
         # relationship with trait j where i != j
         data_vars[f"trait_{i}"] = (["samples"], ys[i])
     attrs = dict(beta=bg, n_trait=ys.shape[0], n_covar=x.shape[1])
-    return xr.Dataset(data_vars, attrs=attrs)  # type: ignore[arg-type]
+    return xr.Dataset(data_vars, attrs=attrs)
 
 
 def _generate_regenie_test_dataset(**kwargs: Any) -> Dataset:
@@ -135,7 +135,7 @@ def _generate_regenie_test_dataset(**kwargs: Any) -> Dataset:
     )
 
     attrs = dict(beta=bg, n_trait=ys.shape[0], n_covar=x.shape[1])
-    return xr.Dataset(data_vars, attrs=attrs)  # type: ignore[arg-type]
+    return xr.Dataset(data_vars, attrs=attrs)
 
 
 @pytest.fixture(scope="module")
