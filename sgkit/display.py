@@ -108,17 +108,19 @@ def truncate(ds: xr.Dataset, max_sizes: Mapping[Hashable, int]) -> xr.Dataset:
 
     limits = {dims[0]: m_dim[0], dims[1]: m_dim[1]}
     slices = {k: slice(v) for k, v in limits.items()}
-    ds_abbr: xr.Dataset = xr.combine_nested(  # type: ignore[no-untyped-call]
+    ds_abbr: xr.Dataset = xr.combine_nested(
         [
             [
                 # Roll all of these simultaneously along with any indexes/coords
                 # and then clip them using the same slice for each corner
-                ds.roll(dict(zip(limits, roll)), roll_coords=True).isel(**slices)
+                ds.roll(dict(zip(limits, roll)), roll_coords=True).isel(  # type: ignore[misc]
+                    **slices  # type: ignore[arg-type]
+                )
                 for roll in row
             ]
             for row in rows
         ],
-        concat_dim=limits.keys(),
+        concat_dim=limits.keys(),  # type: ignore[arg-type]
     )
 
     assert ds_abbr.sizes[dims[0]] <= max_dim[0] + 2
