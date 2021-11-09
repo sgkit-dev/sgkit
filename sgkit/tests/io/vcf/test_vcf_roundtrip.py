@@ -29,7 +29,7 @@ import xarray as xr
 from xarray import Dataset
 
 import sgkit as sg
-from sgkit.io.utils import INT32_FILL, INT32_MISSING
+from sgkit.io.utils import INT_FILL, INT_MISSING
 from sgkit.io.vcf import vcf_to_zarr
 
 
@@ -78,7 +78,7 @@ def fix_missing_fields(ds: Dataset) -> Dataset:
     # scikit-allel doesn't distinguish between missing and fill fields, so set all to fill
     for var in ds.data_vars:
         if ds[var].dtype == np.int32:  # type: ignore[comparison-overlap]
-            ds[var] = ds[var].where(ds[var] != INT32_MISSING, INT32_FILL)
+            ds[var] = ds[var].where(ds[var] != INT_MISSING, INT_FILL)
     return ds
 
 

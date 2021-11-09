@@ -8,7 +8,7 @@ import zarr
 from ..typing import ArrayLike, DType
 from ..utils import encode_array, max_str_len
 
-INT32_MISSING, INT32_FILL = -1, -2
+INT_MISSING, INT_FILL = -1, -2
 
 FLOAT32_MISSING, FLOAT32_FILL = np.array([0x7F800001, 0x7F800002], dtype=np.int32).view(
     np.float32
