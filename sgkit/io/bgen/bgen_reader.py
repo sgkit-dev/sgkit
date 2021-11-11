@@ -175,7 +175,7 @@ def _read_metafile_partition(path: Path, partition: int) -> pd.DataFrame:
 
 
 def read_metafile(path: PathType) -> dd.DataFrame:
-    """ Read cbgen metafile containing partitioned variant info """
+    """Read cbgen metafile containing partitioned variant info"""
     with bgen_metafile(path) as mf:
         divisions = [mf.partition_size * i for i in range(mf.npartitions)] + [
             mf.nvariants - 1
@@ -189,7 +189,7 @@ def read_metafile(path: PathType) -> dd.DataFrame:
 
 
 def read_samples(path: PathType) -> pd.DataFrame:
-    """ Read BGEN .sample file """
+    """Read BGEN .sample file"""
     df = pd.read_csv(path, sep=" ", skiprows=[1], usecols=[0])
     df.columns = ["sample_id"]
     return df
