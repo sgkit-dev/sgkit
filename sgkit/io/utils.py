@@ -23,7 +23,7 @@ STR_MISSING, STR_FILL = ".", ""
 def dataframe_to_dict(
     df: dd.DataFrame, dtype: Optional[Mapping[str, DType]] = None
 ) -> Mapping[str, ArrayLike]:
-    """ Convert dask dataframe to dictionary of arrays """
+    """Convert dask dataframe to dictionary of arrays"""
     arrs = {}
     for c in df:
         a = df[c].to_dask_array(lengths=True)

@@ -28,7 +28,7 @@ def pca_est(
     random_state: RandomStateType = 0,
     variable: str = "call_alternate_allele_count",
 ) -> BaseEstimator:
-    """ Create PCA estimator """
+    """Create PCA estimator"""
     if ploidy is None:
         if "ploidy" not in ds.dims:
             raise ValueError(
@@ -79,7 +79,7 @@ def pca_fit(
     variable: str = "call_alternate_allele_count",
     check_missing: bool = True,
 ) -> BaseEstimator:
-    """ Fit PCA estimator """
+    """Fit PCA estimator"""
     AC = _allele_counts(ds, variable, check_missing=check_missing)
     return est.fit(da.asarray(AC).T)
 
@@ -92,7 +92,7 @@ def pca_transform(
     check_missing: bool = True,
     merge: bool = True,
 ) -> Dataset:
-    """ Apply PCA estimator to new data """
+    """Apply PCA estimator to new data"""
     AC = _allele_counts(ds, variable, check_missing=check_missing)
     projection = est.transform(da.asarray(AC).T)
     new_ds = Dataset(
@@ -111,7 +111,7 @@ def _get(est: BaseEstimator, attr: str, fn: Any = lambda v: v) -> Optional[Array
 
 
 def pca_stats(ds: Dataset, est: BaseEstimator, *, merge: bool = True) -> Dataset:
-    """ Extract attributes from PCA estimator """
+    """Extract attributes from PCA estimator"""
     new_ds = {
         variables.sample_pca_component: (
             ("variants", "components"),

@@ -16,7 +16,7 @@ from sgkit.typing import ArrayLike, NDArray
 def simulate_cohort_genotypes(
     n_variant: int, n_sample: int, n_cohort: int, seed: int = 0
 ) -> NDArray:
-    """ Sample genotypes from distinct ancestral populations """
+    """Sample genotypes from distinct ancestral populations"""
     rs = np.random.RandomState(seed)
     # Determine size of each cohort (which will be roughly equal)
     cohort_sizes = list(map(len, np.array_split(np.arange(n_sample), n_cohort)))
@@ -38,7 +38,7 @@ def simulate_dataset(
     n_cohort: Optional[int] = None,
     chunks: Any = (None, None),
 ) -> Dataset:
-    """ Simulate dataset with optional population structure """
+    """Simulate dataset with optional population structure"""
     ds = simulate_genotype_call_dataset(n_variant, n_sample, seed=0)
     if n_cohort:
         ac = simulate_cohort_genotypes(
@@ -284,7 +284,7 @@ def validate_allel_comparison(ds_sg: Dataset, ds_sk: Dataset) -> None:
 
 
 def _align_vectors(x: ArrayLike, axis: int) -> ArrayLike:
-    """ Align vectors to common, arbitrary half-space """
+    """Align vectors to common, arbitrary half-space"""
     assert x.ndim == 2
     v = np.random.RandomState(1).rand(x.shape[axis])
     signs = np.dot(x, v)[:, np.newaxis] if axis == 1 else np.dot(v[np.newaxis], x)
