@@ -1,6 +1,6 @@
 myst_nb
 pydata-sphinx-theme
-sphinx >= 3.3
+sphinx>4,<=4.2.0
 sphinx_autodoc_typehints 
 # Work around problem with autodoc_typehints
 # https://github.com/theislab/scanpydoc/pull/32
