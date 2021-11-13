@@ -7,9 +7,11 @@
 [![asv](https://img.shields.io/badge/Benchmarked%20by-asv-green.svg?style=flat)](https://pystatgen.github.io/sgkit-benchmarks-asv/)
 [![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A)](http://numfocus.org)
 
-Statistical genetics toolkit
+Sgkit is a Python package that provides a variety of analytical genetics methods through the use of
+general-purpose frameworks such as [Xarray](http://xarray.pydata.org/en/stable/), [Pandas](https://pandas.pydata.org/docs/),
+[Dask](https://docs.dask.org/en/latest/) and [Zarr](https://zarr.readthedocs.io/en/stable/).
 
-[Documentation](https://pystatgen.github.io/sgkit/)
+For more information on using sgkit, see the [documentation](https://pystatgen.github.io/sgkit/).
 
 [//]: # (numfocus-fiscal-sponsor-attribution)
 
