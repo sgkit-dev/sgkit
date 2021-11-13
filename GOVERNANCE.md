@@ -1,0 +1,1 @@
+Please see our [code of conduct](https://github.com/pystatgen/.github/blob/master/CODE_OF_CONDUCT.md) for more information.
