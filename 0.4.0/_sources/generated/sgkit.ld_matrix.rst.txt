@@ -1,0 +1,6 @@
+﻿sgkit.ld\_matrix
+================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: ld_matrix

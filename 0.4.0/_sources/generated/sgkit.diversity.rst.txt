@@ -1,0 +1,6 @@
+﻿sgkit.diversity
+===============
+
+.. currentmodule:: sgkit
+
+.. autofunction:: diversity

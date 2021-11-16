@@ -1,0 +1,6 @@
+﻿sgkit.count\_call\_alleles
+==========================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: count_call_alleles

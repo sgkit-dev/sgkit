@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_pbs\_spec
+===============================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_pbs_spec

@@ -1,0 +1,6 @@
+﻿sgkit.variables.regenie\_loco\_prediction\_spec
+===============================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: regenie_loco_prediction_spec
