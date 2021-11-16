@@ -328,6 +328,98 @@ We use `mergify <https://mergify.io/>`_ to automate PR flow. A project
 to automatically merge a PR by labeling it with ``auto-merge``, and then when the PR gets
 at least one approval from a committer and a clean build it will get merged automatically.
 
+Release process
+---------------
+
+Releases are made by a project maintainer by following these steps.
+
+With the latest main branch checked out locally, tag the release::
+
+   VERSION=x.y.z
+   git tag -a $VERSION -m "Release $VERSION"
+   git push origin $VERSION
+
+This will run some actions, including one that builds wheels and uploads artifacts to TestPyPI_.
+Once the artifacts have been uploaded, install with the following, and run some manual tests on them (see examples below)::
+
+   pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple sgkit
+   pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple 'sgkit[bgen]'
+   pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple 'sgkit[plink]'
+   pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple 'sgkit[vcf]'
+
+Once you are happy with the artifacts, create a release on GitHub based on the tag_ you pushed.
+Publishing the release will cause the the GitHub action to deploy to the production PyPi_.
+
+.. _TestPyPI: https://test.pypi.org/project/sgkit/
+.. _PyPi: https://pypi.org/project/sgkit/
+.. _tag: https://github.com/pystatgen/sgkit/tags
+
+Install these artifacts in a fresh virtualenv and run some more tests::
+
+   pip install sgkit
+   pip install 'sgkit[bgen]'
+   pip install 'sgkit[plink]'
+   pip install 'sgkit[vcf]'
+
+Update the documentation as follows::
+
+   # based on docs.yml
+   (cd docs; make clean html SPHINXOPTS="-W --keep-going -n")
+   git clone https://github.com/pystatgen/sgkit.git --branch gh-pages --single-branch gh-pages
+   mkdir gh-pages/$VERSION
+   cp -r docs/_build/html/* gh-pages/$VERSION
+   cd gh-pages
+   git add $VERSION
+   git commit -am "Add documentation for $VERSION"
+   git push origin gh-pages
+   # check https://pystatgen.github.io/sgkit/$VERSION/
+   cd ..
+   rm -rf gh-pages
+
+BGEN test
+~~~~~~~~~
+
+Download data::
+
+   wget https://github.com/pystatgen/sgkit/raw/main/sgkit/tests/io/bgen/data/example.bgen
+
+Python test::
+
+   from sgkit.io.bgen import read_bgen
+   ds = read_bgen("example.bgen")
+   print(ds)
+
+PLINK test
+~~~~~~~~~~
+
+Download data::
+
+   wget https://github.com/pystatgen/sgkit/raw/main/sgkit/tests/io/plink/data/plink_sim_10s_100v_10pmiss.bed
+   wget https://github.com/pystatgen/sgkit/raw/main/sgkit/tests/io/plink/data/plink_sim_10s_100v_10pmiss.bim
+   wget https://github.com/pystatgen/sgkit/raw/main/sgkit/tests/io/plink/data/plink_sim_10s_100v_10pmiss.fam
+
+Python test::
+
+   from sgkit.io.plink import read_plink
+   ds = read_plink(path="plink_sim_10s_100v_10pmiss")
+   print(ds)
+
+VCF test
+~~~~~~~~
+
+Download data::
+
+   wget https://github.com/pystatgen/sgkit/raw/main/sgkit/tests/io/vcf/data/sample.vcf.gz
+   wget https://github.com/pystatgen/sgkit/raw/main/sgkit/tests/io/vcf/data/sample.vcf.gz.tbi
+
+Python test::
+
+   from sgkit.io.vcf import vcf_to_zarr
+   import xarray as xr
+   vcf_to_zarr("sample.vcf.gz", "out")
+   ds = xr.open_zarr("out")
+   print(ds)
+
 Design discussions
 ------------------
 
