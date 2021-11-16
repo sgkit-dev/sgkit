@@ -15,7 +15,7 @@ both popular Python genetics toolkits with a respective focus on population and 
 
 .. toctree::
     :maxdepth: 2
-    :caption: Contents:
+    :caption: Contents
 
     getting_started
     user_guide
@@ -24,6 +24,7 @@ both popular Python genetics toolkits with a respective focus on population and 
     api
     how_do_i
     contributing
+    about
 
 Indices and tables
 ==================
