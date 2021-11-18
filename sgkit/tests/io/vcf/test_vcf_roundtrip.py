@@ -79,6 +79,7 @@ def fix_missing_fields(ds: Dataset) -> Dataset:
     # drop variables and attributes that are not included in scikit-allel
     ds = ds.drop_vars("call_genotype_phased")
     ds = ds.drop_vars("variant_filter")
+    del ds.attrs["filters"]
     del ds.attrs["max_alt_alleles_seen"]
     del ds.attrs["vcf_zarr_version"]
     del ds.attrs["vcf_header"]

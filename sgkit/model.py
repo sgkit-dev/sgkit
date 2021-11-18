@@ -13,6 +13,7 @@ DIM_SAMPLE = "samples"
 DIM_PLOIDY = "ploidy"
 DIM_ALLELE = "alleles"
 DIM_GENOTYPE = "genotypes"
+DIM_FILTER = "filters"
 
 
 def create_genotype_call_dataset(
