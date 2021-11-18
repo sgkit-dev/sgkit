@@ -1083,7 +1083,7 @@ def check_field(group, name, ndim, shape, dimension_names, dtype):
     "ignore::sgkit.io.vcfzarr_reader.DimensionNameForFixedFormatFieldWarning"
 )
 def test_spec(shared_datadir, tmp_path):
-    path = path_for_test(shared_datadir, "sample.vcf.gz")
+    path = path_for_test(shared_datadir, "sample_multiple_filters.vcf.gz")
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
     kwargs = zarr_array_sizes(path)
@@ -1338,7 +1338,7 @@ def test_spec(shared_datadir, tmp_path):
     )  # missing nan
     assert_array_equal(
         group["variant_filter"],
-        [".", ".", "PASS", "q10", "PASS", "PASS", "PASS", ".", "PASS"],
+        [".", ".", "PASS", "q10;s50", "PASS", "PASS", "PASS", ".", "PASS"],
     )
 
     assert_array_equal(

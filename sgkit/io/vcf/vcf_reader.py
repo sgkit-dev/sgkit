@@ -446,6 +446,9 @@ def vcf_to_zarr_sequential(
                 variant_quality[i] = (
                     variant.QUAL if variant.QUAL is not None else FLOAT32_MISSING
                 )
+                # filters are stored as a semicolon-delimited string (like VCF) since Zarr can't store
+                # variable-length arrays of variable-length strings
+                # (related to https://github.com/pystatgen/sgkit/issues/634)
                 variant_filter[i] = (
                     ";".join(variant.FILTERS)
                     if len(variant.FILTERS) > 0
