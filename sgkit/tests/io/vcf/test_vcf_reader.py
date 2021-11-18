@@ -1181,10 +1181,10 @@ def test_spec(shared_datadir, tmp_path):
     check_field(
         group,
         "variant_filter",
-        ndim=1,
-        shape=(variants,),
-        dimension_names=["variants"],
-        dtype=str,
+        ndim=2,
+        shape=(variants, 3),
+        dimension_names=["variants", "filters"],
+        dtype=bool,
     )
 
     # INFO fields
@@ -1338,7 +1338,17 @@ def test_spec(shared_datadir, tmp_path):
     )  # missing nan
     assert_array_equal(
         group["variant_filter"],
-        [".", ".", "PASS", "q10;s50", "PASS", "PASS", "PASS", ".", "PASS"],
+        [
+            [False, False, False],
+            [False, False, False],
+            [True, False, False],
+            [False, True, True],
+            [True, False, False],
+            [True, False, False],
+            [True, False, False],
+            [False, False, False],
+            [True, False, False],
+        ],
     )
 
     assert_array_equal(

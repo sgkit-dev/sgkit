@@ -31,7 +31,6 @@ from sgkit.io.utils import (
     INT_FILL,
     INT_MISSING,
     STR_FILL,
-    STR_MISSING,
 )
 from sgkit.io.vcf import partition_into_regions
 from sgkit.io.vcf.utils import build_url, chunks, temporary_directory, url_filename
@@ -40,6 +39,7 @@ from sgkit.io.vcfzarr_reader import (
     vcf_number_to_dimension_and_size,
 )
 from sgkit.model import (
+    DIM_FILTER,
     DIM_PLOIDY,
     DIM_SAMPLE,
     DIM_VARIANT,
@@ -375,6 +375,16 @@ def vcf_to_zarr_sequential(
 
         variant_contig_names = vcf.seqnames
 
+        filters = [
+            h["ID"]
+            for h in vcf.header_iter()
+            if h["HeaderType"] == "FILTER" and isinstance(h["ID"], str)
+        ]
+        # Ensure PASS is the first filter if present
+        if "PASS" in filters:
+            filters.remove("PASS")
+            filters.insert(0, "PASS")
+
         # Remember max lengths of variable-length strings
         max_variant_id_length = 0
         max_variant_allele_length = 0
@@ -417,7 +427,7 @@ def vcf_to_zarr_sequential(
             variant_ids = []
             variant_alleles = []
             variant_quality = np.empty(chunk_length, dtype="f4")
-            variant_filter = np.empty(chunk_length, dtype="O")
+            variant_filter = np.full((chunk_length, len(filters)), False, dtype="bool")
 
             i = -1  # initialize in case of empty variants_chunk
             for i, variant in enumerate(variants_chunk):
@@ -446,14 +456,9 @@ def vcf_to_zarr_sequential(
                 variant_quality[i] = (
                     variant.QUAL if variant.QUAL is not None else FLOAT32_MISSING
                 )
-                # filters are stored as a semicolon-delimited string (like VCF) since Zarr can't store
-                # variable-length arrays of variable-length strings
-                # (related to https://github.com/pystatgen/sgkit/issues/634)
-                variant_filter[i] = (
-                    ";".join(variant.FILTERS)
-                    if len(variant.FILTERS) > 0
-                    else STR_MISSING
-                )
+                for f in variant.FILTERS:
+                    variant_filter[i][filters.index(f)] = True
+
                 for field_handler in field_handlers:
                     field_handler.add_variant(i, variant)
 
@@ -487,7 +492,8 @@ def vcf_to_zarr_sequential(
                 variant_id_mask,
             )
             ds["variant_quality"] = ([DIM_VARIANT], variant_quality)
-            ds["variant_filter"] = ([DIM_VARIANT], variant_filter)
+            ds["variant_filter"] = ([DIM_VARIANT, DIM_FILTER], variant_filter)
+            ds.attrs["filters"] = filters
             ds.attrs["vcf_zarr_version"] = "0.1"
             ds.attrs["vcf_header"] = vcf.raw_header
 
