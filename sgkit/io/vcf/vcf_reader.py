@@ -964,7 +964,7 @@ def zarr_array_sizes(input: PathType) -> Dict[str, Any]:
 
             try:
                 ploidy = max(ploidy, variant.genotype.ploidy)
-            except Exception:
+            except AttributeError:
                 pass  # no genotype information
             alt_alleles = max(alt_alleles, len(variant.ALT))
 
