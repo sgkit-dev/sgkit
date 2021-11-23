@@ -456,9 +456,11 @@ def vcf_to_zarr_sequential(
                 variant_quality[i] = (
                     variant.QUAL if variant.QUAL is not None else FLOAT32_MISSING
                 )
-                for f in variant.FILTERS:
-                    variant_filter[i][filters.index(f)] = True
-
+                try:
+                    for f in variant.FILTERS:
+                        variant_filter[i][filters.index(f)] = True
+                except ValueError:
+                    raise ValueError(f"Filter '{f}' is not defined in the header.")
                 for field_handler in field_handlers:
                     field_handler.add_variant(i, variant)
 
