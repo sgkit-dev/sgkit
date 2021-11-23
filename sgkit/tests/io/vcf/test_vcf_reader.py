@@ -727,6 +727,17 @@ def test_vcf_to_zarr__contig_not_defined_in_header(shared_datadir, tmp_path):
         vcf_to_zarr(path, output)
 
 
+def test_vcf_to_zarr__filter_not_defined_in_header(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "no_filter_defined.vcf")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    with pytest.raises(
+        ValueError,
+        match=r"Filter 'FAIL' is not defined in the header.",
+    ):
+        vcf_to_zarr(path, output)
+
+
 def test_vcf_to_zarr__large_number_of_contigs(shared_datadir, tmp_path):
     path = path_for_test(shared_datadir, "Homo_sapiens_assembly38.headerOnly.vcf.gz")
     output = tmp_path.joinpath("vcf.zarr").as_posix()
