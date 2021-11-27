@@ -634,7 +634,7 @@ def test_vcf_to_zarr__mixed_ploidy_vcf(
     assert_array_equal(ds["sample_id"], ["SAMPLE1", "SAMPLE2", "SAMPLE3"])
 
     assert ds["call_genotype"].attrs["mixed_ploidy"] == mixed_ploidy
-    pad = -2 if mixed_ploidy else -1  # -2 indicates a non-allele
+    pad = -2 if mixed_ploidy else -1  # -2 indicates a fill (non-allele) value
     call_genotype = np.array(
         [
             [[0, 0, 1, 1, pad], [0, 0, pad, pad, pad], [0, 0, 0, 1, pad]],
@@ -648,7 +648,7 @@ def test_vcf_to_zarr__mixed_ploidy_vcf(
     assert_array_equal(ds["call_genotype"], call_genotype)
     assert_array_equal(ds["call_genotype_mask"], call_genotype < 0)
     if mixed_ploidy:
-        assert_array_equal(ds["call_genotype_non_allele"], call_genotype < -1)
+        assert_array_equal(ds["call_genotype_fill"], call_genotype < -1)
 
 
 @pytest.mark.parametrize(
@@ -1141,7 +1141,7 @@ def test_spec(shared_datadir, tmp_path):
             "call_GQ",
             "call_genotype",
             "call_genotype_mask",
-            "call_genotype_non_allele",
+            "call_genotype_fill",
             "call_genotype_phased",
             "call_HQ",
             "sample_id",
