@@ -245,17 +245,14 @@ call_genotype_mask, call_genotype_mask_spec = SgkitVariables.register_variable(
     )
 )
 
-(
-    call_genotype_non_allele,
-    call_genotype_non_allele_spec,
-) = SgkitVariables.register_variable(
+(call_genotype_fill, call_genotype_fill_spec,) = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "call_genotype_non_allele",
+        "call_genotype_fill",
         kind="b",
         ndim=3,
         __doc__="""
 A flag for each allele position within mixed ploidy call genotypes
-indicating non-allele values of lower ploidy calls.
+indicating fill (non-allele) values of lower ploidy calls.
 """,
     )
 )

@@ -617,7 +617,7 @@ def sample_stats(
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
 
 
-def infer_non_alleles(
+def infer_call_genotype_fill(
     ds: Dataset,
     *,
     call_genotype: Hashable = variables.call_genotype,
@@ -626,12 +626,10 @@ def infer_non_alleles(
     variables.validate(ds, {call_genotype: variables.call_genotype_spec})
     mixed_ploidy = ds[variables.call_genotype].attrs.get("mixed_ploidy", False)
     if mixed_ploidy:
-        call_genotype_non_allele = ds[call_genotype] < -1
+        call_genotype_fill = ds[call_genotype] < -1
     else:
-        call_genotype_non_allele = xr.full_like(ds[call_genotype], False, "b1")
-    new_ds = create_dataset(
-        {variables.call_genotype_non_allele: call_genotype_non_allele}
-    )
+        call_genotype_fill = xr.full_like(ds[call_genotype], False, "b1")
+    new_ds = create_dataset({variables.call_genotype_fill: call_genotype_fill})
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
 
 
@@ -639,11 +637,11 @@ def infer_call_ploidy(
     ds: Dataset,
     *,
     call_genotype: Hashable = variables.call_genotype,
-    call_genotype_non_allele: Hashable = variables.call_genotype_non_allele,
+    call_genotype_fill: Hashable = variables.call_genotype_fill,
     merge: bool = True,
 ) -> Dataset:
     """Infer the ploidy of each call genotype based on the number of
-    non-allele values in each call genotype.
+    fill (non-allele) values in each call genotype.
 
     Parameters
     ----------
@@ -653,12 +651,12 @@ def infer_call_ploidy(
         Input variable name holding call_genotype as defined by
         :data:`sgkit.variables.call_genotype_spec`.
         Must be present in ``ds``.
-    call_genotype_non_allele
-        Input variable name holding call_genotype_non_allele as defined by
-        :data:`sgkit.variables.call_genotype_non_allele_spec`.
+    call_genotype_fill
+        Input variable name holding call_genotype_fill as defined by
+        :data:`sgkit.variables.call_genotype_fill_spec`.
         If the variable is not present in ``ds``, it will be computed
-        assuming that allele values less than -1 are non-alleles in mixed ploidy
-        datasets, or that no non-alleles are present in fixed ploidy datasets.
+        assuming that allele values less than -1 are fill (non-allele) values in mixed ploidy
+        datasets, or that no fill values are present in fixed ploidy datasets.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -671,13 +669,13 @@ def infer_call_ploidy(
     """
     ds = define_variable_if_absent(
         ds,
-        variables.call_genotype_non_allele,
-        call_genotype_non_allele,
-        infer_non_alleles,
+        variables.call_genotype_fill,
+        call_genotype_fill,
+        infer_call_genotype_fill,
     )
     mixed_ploidy = ds[variables.call_genotype].attrs.get("mixed_ploidy", False)
     if mixed_ploidy:
-        call_ploidy = (~ds[call_genotype_non_allele]).sum(axis=-1)
+        call_ploidy = (~ds[call_genotype_fill]).sum(axis=-1)
     else:
         ploidy = ds[variables.call_genotype].shape[-1]
         call_ploidy = xr.full_like(ds[variables.call_genotype][..., 0], ploidy)
@@ -694,7 +692,7 @@ def infer_variant_ploidy(
     merge: bool = True,
 ) -> Dataset:
     """Infer the ploidy at each variant across all samples based on
-    the number of non-allele values in call genotypes.
+    the number of fill (non-allele) values in call genotypes.
 
     Parameters
     ----------
@@ -743,7 +741,7 @@ def infer_sample_ploidy(
     merge: bool = True,
 ) -> Dataset:
     """Infer the ploidy of each sample across all variants based on
-    the number of non-allele values in call genotypes.
+    the number of fill (non-allele) values in call genotypes.
 
     Parameters
     ----------
