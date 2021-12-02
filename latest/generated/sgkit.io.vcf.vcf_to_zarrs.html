@@ -389,8 +389,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.call_genotype_non_allele_spec.html">
-     sgkit.variables.call_genotype_non_allele_spec
+    <a class="reference internal" href="sgkit.variables.call_genotype_fill_spec.html">
+     sgkit.variables.call_genotype_fill_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -830,7 +830,7 @@ e.g., <code class="docutils literal notranslate"><span class="pre">{&quot;call_g
 <dt><strong>ploidy</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">2</span></code>)</dt><dd><p>The (maximum) ploidy of genotypes in the VCF file.</p>
 </dd>
 <dt><strong>mixed_ploidy</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</dt><dd><p>If True, genotype calls with fewer alleles than the specified ploidy will be padded
-with the non-allele sentinel value of -2. If false, calls with fewer alleles than
+with the fill (non-allele) sentinel value of -2. If false, calls with fewer alleles than
 the specified ploidy will be treated as incomplete and will be padded with the
 missing-allele sentinel value of -1.</p>
 </dd>

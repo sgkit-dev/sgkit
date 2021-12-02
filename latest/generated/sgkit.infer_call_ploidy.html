@@ -389,8 +389,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.call_genotype_non_allele_spec.html">
-     sgkit.variables.call_genotype_non_allele_spec
+    <a class="reference internal" href="sgkit.variables.call_genotype_fill_spec.html">
+     sgkit.variables.call_genotype_fill_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -798,9 +798,9 @@
 <h1>sgkit.infer_call_ploidy<a class="headerlink" href="#sgkit-infer-call-ploidy" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgkit.infer_call_ploidy">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">infer_call_ploidy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype_non_allele</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype_non_allele'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.infer_call_ploidy" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">infer_call_ploidy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype_fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype_fill'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.infer_call_ploidy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Infer the ploidy of each call genotype based on the number of
-non-allele values in each call genotype.</p>
+fill (non-allele) values in each call genotype.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -810,11 +810,11 @@ non-allele values in each call genotype.</p>
 <a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a>.
 Must be present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>.</p>
 </dd>
-<dt><strong>call_genotype_non_allele</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype_non_allele'</span></code>)</dt><dd><p>Input variable name holding call_genotype_non_allele as defined by
-<a class="reference internal" href="sgkit.variables.call_genotype_non_allele_spec.html#sgkit.variables.call_genotype_non_allele_spec" title="sgkit.variables.call_genotype_non_allele_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_non_allele_spec</span></code></a>.
+<dt><strong>call_genotype_fill</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype_fill'</span></code>)</dt><dd><p>Input variable name holding call_genotype_fill as defined by
+<a class="reference internal" href="sgkit.variables.call_genotype_fill_spec.html#sgkit.variables.call_genotype_fill_spec" title="sgkit.variables.call_genotype_fill_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_fill_spec</span></code></a>.
 If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
-assuming that allele values less than -1 are non-alleles in mixed ploidy
-datasets, or that no non-alleles are present in fixed ploidy datasets.</p>
+assuming that allele values less than -1 are fill (non-allele) values in mixed ploidy
+datasets, or that no fill values are present in fixed ploidy datasets.</p>
 </dd>
 <dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
