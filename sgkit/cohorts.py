@@ -1,5 +1,6 @@
-from typing import Optional, Sequence, Tuple, Union
+from typing import Any, Callable, Optional, Sequence, Tuple, Union
 
+import dask.array as da
 import numpy as np
 import pandas as pd
 
@@ -70,3 +71,40 @@ def _cohorts_to_array(
     for n, t in enumerate(cohorts):
         ct[n, :] = t
     return ct
+
+
+def cohort_statistic(
+    values: ArrayLike,
+    statistic: Callable[..., ArrayLike],
+    cohorts: ArrayLike,
+    sample_axis: int = 1,
+    **kwargs: Any,
+) -> da.Array:
+    """Calculate a statistic for each cohort of samples.
+
+    Parameters
+    ----------
+    values
+        An n-dimensional array of sample values.
+    statistic
+        A callable to apply to the samples of each cohort. The callable is
+        expected to consume the samples axis.
+    cohorts
+        An array of integers indicating which cohort each sample is assigned to.
+        Negative integers indicate that a sample is not assigned to any cohort.
+    sample_axis
+        Integer indicating the samples axis of the values array.
+    kwargs
+        Key word arguments to pass to the callable statistic.
+
+    Returns
+    -------
+    Array of results for each cohort.
+    """
+    values = da.asarray(values)
+    cohorts = np.array(cohorts)
+    n_cohorts = cohorts.max() + 1
+    idx = [cohorts == c for c in range(n_cohorts)]
+    seq = [da.take(values, i, axis=sample_axis) for i in idx]
+    out = da.stack([statistic(c, **kwargs) for c in seq], axis=sample_axis)
+    return out
