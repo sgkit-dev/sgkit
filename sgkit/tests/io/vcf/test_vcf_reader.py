@@ -311,6 +311,7 @@ def test_vcf_to_zarr__parallel(shared_datadir, is_path, output_is_path, tmp_path
     "is_path",
     [True, False],
 )
+@pytest.mark.filterwarnings("ignore::UserWarning")
 def test_vcf_to_zarr__empty_region(shared_datadir, is_path, tmp_path):
     path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", is_path)
     output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
