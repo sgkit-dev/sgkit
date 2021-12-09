@@ -14,6 +14,7 @@ from .model import (
 )
 from .stats.aggregation import (
     call_allele_frequencies,
+    cohort_allele_frequencies,
     count_call_alleles,
     count_cohort_alleles,
     count_variant_alleles,
@@ -57,6 +58,7 @@ __all__ = [
     "DIM_VARIANT",
     "call_allele_frequencies",
     "create_genotype_call_dataset",
+    "cohort_allele_frequencies",
     "convert_probability_to_call",
     "count_variant_alleles",
     "count_call_alleles",

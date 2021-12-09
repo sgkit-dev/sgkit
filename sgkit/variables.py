@@ -343,6 +343,21 @@ cohort_allele_count, cohort_allele_count_spec = SgkitVariables.register_variable
     )
 )
 
+(
+    cohort_allele_frequency,
+    cohort_allele_frequency_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "cohort_allele_frequency",
+        ndim=3,
+        kind="f",
+        __doc__="""
+Cohort Allele frequencies. With shape (variants, cohorts, alleles) and values
+corresponding to the frequencies of non-missing occurrences of each allele.
+""",
+    )
+)
+
 covariates, covariates_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "covariates",

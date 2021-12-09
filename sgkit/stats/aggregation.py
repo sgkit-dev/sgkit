@@ -437,6 +437,81 @@ def call_allele_frequencies(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
+def cohort_allele_frequencies(
+    ds: Dataset,
+    *,
+    cohort_allele_count: Hashable = variables.cohort_allele_count,
+    merge: bool = True,
+) -> Dataset:
+    """Compute allele frequencies for each cohort.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing genotype calls.
+    cohort_allele_count
+        Input variable name holding cohort_allele_count as defined by
+        :data:`sgkit.variables.cohort_allele_count_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`count_cohort_alleles`.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing :data:`sgkit.variables.cohort_allele_frequency_spec`
+    of allele frequencies with shape (variants, cohorts, alleles) and values
+    corresponding to the frequency of non-missing occurrences of each allele.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import sgkit as sg
+    >>> import xarray as xr
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
+
+    >>> # Divide samples into two cohorts
+    >>> ds["sample_cohort"] = xr.DataArray(np.repeat([0, 1], ds.dims["samples"] // 2), dims="samples")
+    >>> sg.display_genotypes(ds) # doctest: +NORMALIZE_WHITESPACE
+    samples    S0   S1   S2   S3
+    variants
+    0         0/0  1/0  1/0  0/1
+    1         1/0  0/1  0/0  1/0
+    2         1/1  0/0  1/0  0/1
+    3         1/0  1/1  1/1  1/0
+    4         1/0  0/0  1/0  1/1
+
+    >>> sg.cohort_allele_frequencies(ds)["cohort_allele_frequency"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[[0.75, 0.25],
+            [0.5 , 0.5 ]],
+    <BLANKLINE>
+            [[0.5 , 0.5 ],
+            [0.75, 0.25]],
+    <BLANKLINE>
+            [[0.5 , 0.5 ],
+            [0.5 , 0.5 ]],
+    <BLANKLINE>
+            [[0.25, 0.75],
+            [0.25, 0.75]],
+    <BLANKLINE>
+            [[0.75, 0.25],
+            [0.25, 0.75]]])
+    """
+    ds = define_variable_if_absent(
+        ds, variables.cohort_allele_count, cohort_allele_count, count_cohort_alleles
+    )
+    variables.validate(ds, {cohort_allele_count: variables.cohort_allele_count_spec})
+    AC = ds[cohort_allele_count]
+    K = AC.sum(dim="alleles")
+    # avoid divide by zero
+    AF = AC / xr.where(K > 0, K, np.nan)  # type: ignore[no-untyped-call]
+    new_ds = create_dataset({variables.cohort_allele_frequency: AF})
+    return conditional_merge_datasets(ds, new_ds, merge)
+
+
 def allele_frequency(
     ds: Dataset,
     call_genotype_mask: Hashable,
