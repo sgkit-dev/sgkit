@@ -327,6 +327,7 @@ def test_cohort_allele_frequencies__polyploid(chunks):
     )
 
 
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 @pytest.mark.parametrize(
     "chunks",
     [
@@ -365,6 +366,7 @@ def test_call_allele_frequencies__diploid(chunks):
     )
 
 
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 @pytest.mark.parametrize(
     "chunks",
     [

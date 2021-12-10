@@ -430,9 +430,7 @@ def call_allele_frequencies(
     )
     variables.validate(ds, {call_allele_count: variables.call_allele_count_spec})
     AC = ds[call_allele_count]
-    K = AC.sum(dim="alleles")
-    # avoid divide by zero
-    AF = AC / xr.where(K > 0, K, np.nan)  # type: ignore[no-untyped-call]
+    AF = AC / AC.sum(dim="alleles")
     new_ds = create_dataset({variables.call_allele_frequency: AF})
     return conditional_merge_datasets(ds, new_ds, merge)
 
@@ -505,9 +503,7 @@ def cohort_allele_frequencies(
     )
     variables.validate(ds, {cohort_allele_count: variables.cohort_allele_count_spec})
     AC = ds[cohort_allele_count]
-    K = AC.sum(dim="alleles")
-    # avoid divide by zero
-    AF = AC / xr.where(K > 0, K, np.nan)  # type: ignore[no-untyped-call]
+    AF = AC / AC.sum(dim="alleles")
     new_ds = create_dataset({variables.cohort_allele_frequency: AF})
     return conditional_merge_datasets(ds, new_ds, merge)
 
