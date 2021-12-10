@@ -47,6 +47,7 @@ def test_identity_by_state__diploid_biallelic(chunks):
     np.testing.assert_array_equal(expect, actual)
 
 
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 @pytest.mark.parametrize(
     "chunks",
     [
@@ -89,6 +90,7 @@ def test_identity_by_state__tetraploid_multiallelic(chunks):
     np.testing.assert_array_equal(expect, actual)
 
 
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 @pytest.mark.parametrize(
     "chunks",
     [
@@ -136,6 +138,7 @@ def test_identity_by_state__chunked_sample_dimension():
         identity_by_state(ds)
 
 
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 @pytest.mark.parametrize(
     "sim,chunks",
     [
