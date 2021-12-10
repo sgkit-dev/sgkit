@@ -1015,6 +1015,11 @@ def observed_heterozygosity(
     variables.validate(ds, {call_heterozygosity: variables.call_heterozygosity_spec})
     hi = da.asarray(ds[call_heterozygosity])
     sc = da.asarray(ds[sample_cohort])
+    # NOTE: Performance of cohort_statistic is substantially slower than a numba
+    # JIT function which handles cohorts directly (i.e. avoids slicing the
+    # `hi` array by cohort).
+    # See commit 89da16e495315ed318a2d4dec92f70154cd2013d for an older implementation
+    # using numba.
     ho = cohort_statistic(
         values=hi,
         statistic=np.nanmean,
