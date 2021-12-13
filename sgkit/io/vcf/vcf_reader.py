@@ -373,10 +373,10 @@ class GenotypeFieldHandler(VcfFieldHandler):
             {"comment": variables.call_genotype_mask_spec.__doc__.strip()},
         )
         if self.mixed_ploidy is True:
-            ds["call_genotype_non_allele"] = (
+            ds["call_genotype_fill"] = (
                 [DIM_VARIANT, DIM_SAMPLE, DIM_PLOIDY],
                 self.call_genotype < -1,
-                {"comment": variables.call_genotype_non_allele_spec.__doc__.strip()},
+                {"comment": variables.call_genotype_fill_spec.__doc__.strip()},
             )
         ds["call_genotype_phased"] = (
             [DIM_VARIANT, DIM_SAMPLE],
@@ -675,7 +675,7 @@ def vcf_to_zarrs(
         The (maximum) ploidy of genotypes in the VCF file.
     mixed_ploidy
         If True, genotype calls with fewer alleles than the specified ploidy will be padded
-        with the non-allele sentinel value of -2. If false, calls with fewer alleles than
+        with the fill (non-allele) sentinel value of -2. If false, calls with fewer alleles than
         the specified ploidy will be treated as incomplete and will be padded with the
         missing-allele sentinel value of -1.
     truncate_calls
@@ -878,7 +878,7 @@ def vcf_to_zarr(
         The (maximum) ploidy of genotypes in the VCF file.
     mixed_ploidy
         If True, genotype calls with fewer alleles than the specified ploidy will be padded
-        with the non-allele sentinel value of -2. If false, calls with fewer alleles than
+        with the fill (non-allele) sentinel value of -2. If false, calls with fewer alleles than
         the specified ploidy will be treated as incomplete and will be padded with the
         missing-allele sentinel value of -1.
     truncate_calls

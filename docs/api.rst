@@ -133,7 +133,7 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.call_genotype_complete_mask_spec
     variables.call_genotype_spec
     variables.call_genotype_mask_spec
-    variables.call_genotype_non_allele_spec
+    variables.call_genotype_fill_spec
     variables.call_genotype_phased_spec
     variables.call_genotype_probability_spec
     variables.call_genotype_probability_mask_spec
