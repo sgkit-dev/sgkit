@@ -41,7 +41,7 @@ which may be helpful if you encounter errors during installation.
    Reading VCFs is not supported on Windows, since ``cyvcf2`` and ``htslib`` do
    not `currently work on Windows <https://github.com/brentp/cyvcf2/issues/90>`_.
    As a workaround, consider using scikit-allel's ``vcf_to_zarr`` function
-   to write a VCF in Zarr format, followed by :func:`sgkit.read_vcfzarr` to
+   to write a VCF in Zarr format, followed by :func:`sgkit.read_scikit_allel_vcfzarr` to
    read the VCF as a :class:`xarray.Dataset`.
 
 Usage

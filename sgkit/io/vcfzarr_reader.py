@@ -43,7 +43,7 @@ def _ensure_2d(arr: ArrayLike) -> ArrayLike:
     return arr
 
 
-def read_vcfzarr(
+def read_scikit_allel_vcfzarr(
     path: PathType,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> xr.Dataset:

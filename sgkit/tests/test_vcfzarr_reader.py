@@ -5,7 +5,7 @@ import xarray as xr
 import zarr
 from numpy.testing import assert_array_equal
 
-from sgkit import read_vcfzarr
+from sgkit import read_scikit_allel_vcfzarr
 from sgkit.io.vcfzarr_reader import _ensure_2d, vcfzarr_to_zarr
 
 
@@ -36,9 +36,9 @@ def test_ensure_2d():
     assert_array_equal(_ensure_2d(np.array([[0], [2], [1]])), np.array([[0], [2], [1]]))
 
 
-def test_read_vcfzarr(shared_datadir, tmpdir):
+def test_read_scikit_allel_vcfzarr(shared_datadir, tmpdir):
     vcfzarr_path = create_vcfzarr(shared_datadir, tmpdir)
-    ds = read_vcfzarr(vcfzarr_path)
+    ds = read_scikit_allel_vcfzarr(vcfzarr_path)
 
     assert ds.attrs["contigs"] == ["19", "20", "X"]
     assert_array_equal(ds["variant_contig"], [0, 0, 1, 1, 1, 1, 1, 1, 2])
@@ -136,7 +136,7 @@ def test_vcfzarr_to_zarr(
 
     ds = xr.open_zarr(output, concat_characters=False)
 
-    # Note that variant_allele values are byte strings, not unicode strings (unlike for read_vcfzarr)
+    # Note that variant_allele values are byte strings, not unicode strings (unlike for read_scikit_allel_vcfzarr)
     # We should make the two consistent.
 
     assert ds.attrs["contigs"] == ["19", "20", "X"]

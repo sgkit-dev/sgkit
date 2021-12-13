@@ -9,7 +9,7 @@
 #                   |                            |
 #                   |                            |
 #                   |                            |
-# sg.vcf_to_zarr    |                            |   sg.read_vcfzarr
+# sg.vcf_to_zarr    |                            |   sg.read_scikit_allel_vcfzarr
 #                   |                            |
 #                   |                            |
 #                   |                            |
@@ -93,7 +93,7 @@ def fix_missing_fields(ds: Dataset) -> Dataset:
 
 def test_default_fields(shared_datadir, tmpdir):
     allel_vcfzarr_path = create_allel_vcfzarr(shared_datadir, tmpdir)
-    allel_ds = sg.read_vcfzarr(allel_vcfzarr_path)
+    allel_ds = sg.read_scikit_allel_vcfzarr(allel_vcfzarr_path)
 
     sg_vcfzarr_path = create_sg_vcfzarr(shared_datadir, tmpdir)
     sg_ds = sg.load_dataset(str(sg_vcfzarr_path))
@@ -120,7 +120,7 @@ def test_DP_field(shared_datadir, tmpdir):
     allel_vcfzarr_path = create_allel_vcfzarr(
         shared_datadir, tmpdir, fields=fields, types=types
     )
-    allel_ds = sg.read_vcfzarr(allel_vcfzarr_path)
+    allel_ds = sg.read_scikit_allel_vcfzarr(allel_vcfzarr_path)
 
     sg_vcfzarr_path = create_sg_vcfzarr(
         shared_datadir, tmpdir, fields=["INFO/DP", "FORMAT/DP", "FORMAT/GT"]
@@ -177,7 +177,7 @@ def test_all_fields(
         # override automatically assigned dim name
         "FORMAT/SB": {"dimension": "strand_biases"},
     }
-    allel_ds = sg.read_vcfzarr(allel_vcfzarr_path, field_defs=field_defs)
+    allel_ds = sg.read_scikit_allel_vcfzarr(allel_vcfzarr_path, field_defs=field_defs)
 
     sg_vcfzarr_path = create_sg_vcfzarr(
         shared_datadir,

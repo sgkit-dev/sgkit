@@ -54,7 +54,7 @@ For converting from `scikit-allel's VCF Zarr representation <https://scikit-alle
 .. autosummary::
    :toctree: generated/
 
-   read_vcfzarr
+   read_scikit_allel_vcfzarr
 
 Dataset
 -------
