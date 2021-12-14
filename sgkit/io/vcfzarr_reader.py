@@ -52,6 +52,9 @@ def read_scikit_allel_vcfzarr(
     Loads VCF variant, sample, and genotype data as Dask arrays within a Dataset
     from a Zarr file created using scikit-allel's ``vcf_to_zarr`` function.
 
+    This allows conversion from scikit-allel's Zarr format to sgkit's
+    `VCF Zarr <https://github.com/pystatgen/vcf-zarr-spec>`_ format.
+
     Since ``vcf_to_zarr`` does not preserve phasing information, there is no
     :data:`sgkit.variables.call_genotype_phased_spec` variable in the resulting dataset.
 
