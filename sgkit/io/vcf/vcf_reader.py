@@ -26,11 +26,14 @@ from numcodecs import PackBits
 from sgkit import variables
 from sgkit.io.dataset import load_dataset
 from sgkit.io.utils import (
+    CHAR_FILL,
+    CHAR_MISSING,
     FLOAT32_FILL,
     FLOAT32_MISSING,
     INT_FILL,
     INT_MISSING,
     STR_FILL,
+    STR_MISSING,
 )
 from sgkit.io.vcf import partition_into_regions
 from sgkit.io.vcf.utils import build_url, chunks, temporary_directory, url_filename
@@ -136,22 +139,29 @@ def _normalize_fields(vcf: VCF, fields: Sequence[str]) -> Sequence[str]:
     return new_fields
 
 
-def _vcf_type_to_numpy_type_and_fill_value(
+def _vcf_type_to_numpy(
     vcf_type: str, category: str, key: str
-) -> Tuple[DType, Any]:
-    """Convert the VCF Type to a NumPy dtype and fill value."""
+) -> Tuple[DType, Any, Any]:
+    """Convert the VCF Type to a NumPy dtype, missing value, and fill value."""
     if vcf_type == "Flag":
-        return "bool", False
+        return "bool", False, False
     elif vcf_type == "Integer":
-        return "i4", INT_FILL
+        return "i4", INT_MISSING, INT_FILL
     # the VCF spec defines Float as 32 bit, and in BCF is stored as 32 bit
     elif vcf_type == "Float":
-        return "f4", FLOAT32_FILL
+        return "f4", FLOAT32_MISSING, FLOAT32_FILL
+    elif vcf_type == "Character":
+        return "S1", CHAR_MISSING, CHAR_FILL
     elif vcf_type == "String":
-        return "O", STR_FILL
+        return "O", STR_MISSING, STR_FILL
     raise ValueError(
         f"{category} field '{key}' is defined as Type '{vcf_type}', which is not supported."
     )
+
+
+def _is_str_or_char(array: ArrayLike) -> bool:
+    """Return True if the array is of string or character type"""
+    return array.dtype.kind in ("O", "S", "U")
 
 
 class VcfFieldHandler:
@@ -184,9 +194,7 @@ class VcfFieldHandler:
         description = field_def.get(
             "Description", vcf_field_defs[key]["Description"].strip('"')
         )
-        dtype, fill_value = _vcf_type_to_numpy_type_and_fill_value(
-            vcf_type, category, key
-        )
+        dtype, missing_value, fill_value = _vcf_type_to_numpy(vcf_type, category, key)
         chunksize: Tuple[int, ...]
         if category == "INFO":
             variable_name = f"variant_{key}"
@@ -209,6 +217,7 @@ class VcfFieldHandler:
             variable_name,
             description,
             dims,
+            missing_value,
             fill_value,
             array,
         )
@@ -232,23 +241,37 @@ class InfoAndFormatFieldHandler(VcfFieldHandler):
     variable_name: str
     description: str
     dims: Sequence[str]
+    missing_value: Any
     fill_value: Any
     array: ArrayLike
 
     def add_variant(self, i: int, variant: Any) -> None:
         if self.category == "INFO":
-            val = variant.INFO.get(self.key)
-            if val is not None:
+            try:
+                val = variant.INFO[self.key]
+                present = True
+            except KeyError:
+                present, val = False, None
+
+            if present:
                 assert self.array.ndim in (1, 2)
                 if self.array.ndim == 1:
+                    if val is None:
+                        val = self.missing_value
                     self.array[i] = val
                 elif self.array.ndim == 2:
                     self.array[i] = self.fill_value
-                    a = np.array(val, dtype=self.array.dtype)
-                    if a.ndim == 0:
-                        a = a.reshape(1)  # ensure 1D
-                    a = a[: self.array.shape[-1]]  # trim to fit
-                    self.array[i, : a.shape[-1]] = a
+                    if _is_str_or_char(self.array):  # need to split strings
+                        val = np.array(val.split(","), dtype=self.array.dtype)
+                    try:
+                        for j, v in enumerate(val):
+                            self.array[i, j] = (
+                                v if v is not None else self.missing_value
+                            )
+                    except TypeError:  # val is a scalar
+                        self.array[i, 0] = (
+                            val if val is not None else self.missing_value
+                        )
             else:
                 self.array[i] = self.fill_value
         elif self.category == "FORMAT":
@@ -256,12 +279,22 @@ class InfoAndFormatFieldHandler(VcfFieldHandler):
             if val is not None:
                 assert self.array.ndim in (2, 3)
                 if self.array.ndim == 2:
-                    self.array[i] = val[..., 0]
+                    if _is_str_or_char(self.array):
+                        self.array[i] = val
+                    else:
+                        self.array[i] = val[..., 0]
                 elif self.array.ndim == 3:
                     self.array[i] = self.fill_value
-                    a = val
-                    a = a[..., : self.array.shape[-1]]  # trim to fit
-                    self.array[i, ..., : a.shape[-1]] = a
+                    if _is_str_or_char(self.array):  # need to split strings
+                        for j, v in enumerate(val):
+                            v = v.split(",")
+                            if len(v) > self.array.shape[-1]:  # pragma: no cover
+                                v = v[: self.array.shape[-1]]
+                            self.array[i, j, : len(v)] = v
+                    else:
+                        a = val
+                        a = a[..., : self.array.shape[-1]]  # trim to fit
+                        self.array[i, ..., : a.shape[-1]] = a
             else:
                 self.array[i] = self.fill_value
 
@@ -971,11 +1004,16 @@ def zarr_array_sizes(input: PathType) -> Dict[str, Any]:
             for key, val in format_field_defs.items():
                 field_val = variant.format(key)
                 if field_val is not None:
-                    val["Number"] = max(val["Number"], field_val.shape[-1])
+                    if _is_str_or_char(field_val):  # need to split strings
+                        m = max([len(v.split(",")) for v in field_val])
+                        val["Number"] = max(val["Number"], m)
+                    else:
+                        val["Number"] = max(val["Number"], field_val.shape[-1])
 
             try:
-                ploidy = max(ploidy, variant.genotype.ploidy)
-            except AttributeError:
+                if variant.genotype is not None:
+                    ploidy = max(ploidy, variant.genotype.ploidy)
+            except Exception:  # cyvcf2 raises an Exception "couldn't get genotypes for variant"
                 pass  # no genotype information
             alt_alleles = max(alt_alleles, len(variant.ALT))
 
