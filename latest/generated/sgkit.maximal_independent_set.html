@@ -38,7 +38,7 @@
     <script src="../_static/doctools.js"></script>
     <script src="../_static/togglebutton.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
     <script defer="defer" src="../_static/docsearch.sbt.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
@@ -766,7 +766,7 @@
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -784,12 +784,68 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>sgkit.maximal_independent_set</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+            </div>
+            
+              <div>
+                
+  <div class="section" id="sgkit-maximal-independent-set">
+<h1>sgkit.maximal_independent_set<a class="headerlink" href="#sgkit-maximal-independent-set" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="sgkit.maximal_independent_set">
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">maximal_independent_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.maximal_independent_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a maximal independent set of variants.</p>
+<p>This method is based on the PLINK algorithm that selects independent
+vertices from a graph implied by excessive LD between variants.</p>
+<p>For an outline of this process, see
+<a class="reference external" href="https://groups.google.com/forum/#!msg/plink2-users/w5TuZo2fgsQ/WbNnE16_xDIJ">this discussion</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>df</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.dataframe.DataFrame.html#dask.dataframe.DataFrame" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.dataframe.DataFrame.html#dask.dataframe.DataFrame" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></span></dt><dd><p>Dataframe containing a sparse matrix of R2 values, typically from <a class="reference internal" href="sgkit.ld_matrix.html#sgkit.ld_matrix" title="sgkit.ld_matrix"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.ld_matrix()</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This algorithm will materialize the whole input dataframe (the LD matrix) in memory.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">i</span></code> and <code class="docutils literal notranslate"><span class="pre">j</span></code> are not sorted ascending (and in that order)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dataset containing the indexes of variants to drop, as defined by
+<a class="reference internal" href="sgkit.variables.ld_prune_index_to_drop_spec.html#sgkit.variables.ld_prune_index_to_drop_spec" title="sgkit.variables.ld_prune_index_to_drop_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.ld_prune_index_to_drop_spec</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -857,15 +913,13 @@ vertices from a graph implied by excessive LD between variants.</p>
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By sgkit developers<br/>
-        
-            &copy; Copyright 2020, sgkit developers.<br/>
-      </p>
-    </div>
-  </footer>
+  <p>
+    
+      By sgkit developers<br/>
+    
+        &copy; Copyright 2020, sgkit developers.<br/>
+  </p>
+</footer>
 </main>
 
 

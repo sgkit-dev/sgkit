@@ -38,7 +38,7 @@
     <script src="../_static/doctools.js"></script>
     <script src="../_static/togglebutton.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
     <script defer="defer" src="../_static/docsearch.sbt.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
@@ -766,7 +766,7 @@
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -784,12 +784,41 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>sgkit.variables.call_allele_count_spec</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+            </div>
+            
+              <div>
+                
+  <div class="section" id="sgkit-variables-call-allele-count-spec">
+<h1>sgkit.variables.call_allele_count_spec<a class="headerlink" href="#sgkit-variables-call-allele-count-spec" title="Permalink to this headline">¶</a></h1>
+<dl class="py data">
+<dt class="sig sig-object py" id="sgkit.variables.call_allele_count_spec">
+<span class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></span><span class="sig-name descname"><span class="pre">call_allele_count_spec</span></span><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='call_allele_count',</span> <span class="pre">__doc__='\nAllele</span> <span class="pre">counts.</span> <span class="pre">With</span> <span class="pre">shape</span> <span class="pre">(variants,</span> <span class="pre">samples,</span> <span class="pre">alleles)</span> <span class="pre">and</span> <span class="pre">values\ncorresponding</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">number</span> <span class="pre">of</span> <span class="pre">non-missing</span> <span class="pre">occurrences</span> <span class="pre">of</span> <span class="pre">each</span> <span class="pre">allele.\n',</span> <span class="pre">kind='u',</span> <span class="pre">ndim=3)</span></em><a class="headerlink" href="#sgkit.variables.call_allele_count_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allele counts. With shape (variants, samples, alleles) and values
+corresponding to the number of non-missing occurrences of each allele.</p>
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -830,15 +859,13 @@ corresponding to the number of non-missing occurrences of each allele.</p>
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By sgkit developers<br/>
-        
-            &copy; Copyright 2020, sgkit developers.<br/>
-      </p>
-    </div>
-  </footer>
+  <p>
+    
+      By sgkit developers<br/>
+    
+        &copy; Copyright 2020, sgkit developers.<br/>
+  </p>
+</footer>
 </main>
 
 

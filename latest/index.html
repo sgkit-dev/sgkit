@@ -38,7 +38,7 @@
     <script src="_static/doctools.js"></script>
     <script src="_static/togglebutton.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
     <script defer="defer" src="_static/docsearch.sbt.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
@@ -765,7 +765,7 @@
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -783,7 +783,7 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
@@ -806,7 +806,141 @@
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>sgkit: Statistical genetics toolkit in Python</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+                <div>
+                    <h2> Contents </h2>
+                </div>
+                <nav aria-label="Page">
+                    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   sgkit: Statistical genetics toolkit in Python
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#indices-and-tables">
+   Indices and tables
+  </a>
+ </li>
+</ul>
+
+                </nav>
+            </div>
+            
+              <div>
+                
+  <div class="section" id="sgkit-statistical-genetics-toolkit-in-python">
+<h1>sgkit: Statistical genetics toolkit in Python<a class="headerlink" href="#sgkit-statistical-genetics-toolkit-in-python" title="Permalink to this headline">¶</a></h1>
+<p>Sgkit is a Python package that provides a variety of analytical genetics methods through the use of
+general-purpose frameworks such as <a class="reference external" href="http://xarray.pydata.org/en/stable/">Xarray</a>, <a class="reference external" href="https://pandas.pydata.org/docs/">Pandas</a>,
+<a class="reference external" href="https://docs.dask.org/en/latest/">Dask</a> and <a class="reference external" href="https://zarr.readthedocs.io/en/stable/">Zarr</a>. The sgkit API makes as
+few assumptions as possible about the origin, structure, and intended use of genetic data by adopting a set of
+domain-specific conventions that allow such data to be used within this broader ecosystem of tools. The package is
+designed for complex workflows over large distributed datasets but attempts to make it as easy as possible to scale
+down to smaller datasets and access simpler functionality for those that may be new to Python (though there is still
+a good bit of work to done on this front). See <a class="reference internal" href="getting_started.html#getting-started"><span class="std std-ref">Getting Started</span></a> for more details.</p>
+<p>Sgkit is inspired heavily by <a class="reference external" href="https://scikit-allel.readthedocs.io/en/stable/">scikit-allel</a> and <a class="reference external" href="https://hail.is/docs/0.2/index.html">Hail</a>,
+both popular Python genetics toolkits with a respective focus on population and quantitative genetics.</p>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#data-structures">Data structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#genetic-methods">Genetic methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#missing-data">Missing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#windowing">Windowing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#cohorts">Cohorts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#chaining-operations">Chaining operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#chunked-arrays">Chunked arrays</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#reading-genetic-data">Reading genetic data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#methods">Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#deployment">Deployment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="vcf.html">Reading VCF</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vcf.html#highlights">Highlights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcf.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcf.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcf.html#multiple-files">Multiple files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcf.html#partitioning">Partitioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcf.html#chunk-sizes">Chunk sizes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcf.html#cloud-storage">Cloud storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcf.html#low-level-operation">Low-level operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcf.html#polyploid-and-mixed-ploidy-vcf">Polyploid and mixed-ploidy VCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcf.html#example-converting-1000-genomes-vcf-to-zarr">Example: converting 1000 genomes VCF to Zarr</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#io-imports">IO/imports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#methods">Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#utilities">Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#variables">Variables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="how_do_i.html">How do I …</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#create-a-test-dataset">Create a test dataset?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#look-at-the-dataset-summary">Look at the dataset summary?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#get-the-values-for-a-variable-in-a-dataset">Get the values for a variable in a dataset?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#find-the-definition-for-a-variable-in-a-dataset">Find the definition for a variable in a dataset?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#look-at-the-genotypes">Look at the genotypes?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#subset-the-variables">Subset the variables?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#subset-to-a-genomic-range">Subset to a genomic range?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#get-the-list-of-samples">Get the list of samples?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#subset-the-samples">Subset the samples?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#define-a-new-variable-based-on-others">Define a new variable based on others?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#get-summary-stats">Get summary stats?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#filter-variants">Filter variants?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#find-which-new-variables-were-added-by-a-method">Find which new variables were added by a method?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#save-results-to-a-zarr-file">Save results to a Zarr file?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_do_i.html#load-a-dataset-from-zarr">Load a dataset from Zarr?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to sgkit</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#discussion-forums">Discussion forums</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#code-repositories">Code repositories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#issues">Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#development-environment">Development environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#contributing-to-code">Contributing to code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#contributing-to-documentation">Contributing to documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#benchmarks">Benchmarks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#review-process">Review process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#design-discussions">Design discussions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -927,15 +1061,13 @@ both popular Python genetics toolkits with a respective focus on population and 
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By sgkit developers<br/>
-        
-            &copy; Copyright 2020, sgkit developers.<br/>
-      </p>
-    </div>
-  </footer>
+  <p>
+    
+      By sgkit developers<br/>
+    
+        &copy; Copyright 2020, sgkit developers.<br/>
+  </p>
+</footer>
 </main>
 
 

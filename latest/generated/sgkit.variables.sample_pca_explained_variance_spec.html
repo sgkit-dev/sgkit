@@ -38,7 +38,7 @@
     <script src="../_static/doctools.js"></script>
     <script src="../_static/togglebutton.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
     <script defer="defer" src="../_static/docsearch.sbt.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
@@ -766,7 +766,7 @@
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -784,12 +784,42 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>sgkit.variables.sample_pca_explained_variance_spec</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+            </div>
+            
+              <div>
+                
+  <div class="section" id="sgkit-variables-sample-pca-explained-variance-spec">
+<h1>sgkit.variables.sample_pca_explained_variance_spec<a class="headerlink" href="#sgkit-variables-sample-pca-explained-variance-spec" title="Permalink to this headline">¶</a></h1>
+<dl class="py data">
+<dt class="sig sig-object py" id="sgkit.variables.sample_pca_explained_variance_spec">
+<span class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></span><span class="sig-name descname"><span class="pre">sample_pca_explained_variance_spec</span></span><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='sample_pca_explained_variance',</span> <span class="pre">__doc__='Variance</span> <span class="pre">explained</span> <span class="pre">by</span> <span class="pre">each</span> <span class="pre">principal</span> <span class="pre">component.</span> <span class="pre">These</span> <span class="pre">values</span> <span class="pre">are</span> <span class="pre">equivalent\nto</span> <span class="pre">eigenvalues</span> <span class="pre">that</span> <span class="pre">result</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">eigendecomposition</span> <span class="pre">of</span> <span class="pre">a</span> <span class="pre">(N,</span> <span class="pre">M)</span> <span class="pre">matrix,\ni.e.</span> <span class="pre">``dask_ml.decomposition.TruncatedSVD.explained_variance_``.',</span> <span class="pre">kind='f',</span> <span class="pre">ndim=1)</span></em><a class="headerlink" href="#sgkit.variables.sample_pca_explained_variance_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Variance explained by each principal component. These values are equivalent
+to eigenvalues that result from the eigendecomposition of a (N, M) matrix,
+i.e. <code class="docutils literal notranslate"><span class="pre">dask_ml.decomposition.TruncatedSVD.explained_variance_</span></code>.</p>
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -831,15 +861,13 @@ i.e. <code class="docutils literal notranslate"><span class="pre">dask_ml.decomp
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By sgkit developers<br/>
-        
-            &copy; Copyright 2020, sgkit developers.<br/>
-      </p>
-    </div>
-  </footer>
+  <p>
+    
+      By sgkit developers<br/>
+    
+        &copy; Copyright 2020, sgkit developers.<br/>
+  </p>
+</footer>
 </main>
 
 

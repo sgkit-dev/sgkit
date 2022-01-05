@@ -38,7 +38,7 @@
     <script src="../_static/doctools.js"></script>
     <script src="../_static/togglebutton.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
     <script defer="defer" src="../_static/docsearch.sbt.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
@@ -766,7 +766,7 @@
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -784,12 +784,43 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>sgkit.variables.regenie_loco_prediction_spec</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+            </div>
+            
+              <div>
+                
+  <div class="section" id="sgkit-variables-regenie-loco-prediction-spec">
+<h1>sgkit.variables.regenie_loco_prediction_spec<a class="headerlink" href="#sgkit-variables-regenie-loco-prediction-spec" title="Permalink to this headline">¶</a></h1>
+<dl class="py data">
+<dt class="sig sig-object py" id="sgkit.variables.regenie_loco_prediction_spec">
+<span class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></span><span class="sig-name descname"><span class="pre">regenie_loco_prediction_spec</span></span><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='regenie_loco_prediction',</span> <span class="pre">__doc__=&quot;\nREGENIE's</span> <span class="pre">regenie_loco_prediction</span> <span class="pre">(contigs,</span> <span class="pre">samples,</span> <span class="pre">outcomes).</span> <span class="pre">LOCO</span> <span class="pre">predictions\nresulting</span> <span class="pre">from</span> <span class="pre">Stage</span> <span class="pre">2</span> <span class="pre">predictions</span> <span class="pre">ignoring</span> <span class="pre">effects</span> <span class="pre">for</span> <span class="pre">variant</span> <span class="pre">blocks</span> <span class="pre">on\nheld</span> <span class="pre">out</span> <span class="pre">contigs.</span> <span class="pre">This</span> <span class="pre">will</span> <span class="pre">be</span> <span class="pre">absent</span> <span class="pre">if</span> <span class="pre">the</span> <span class="pre">data</span> <span class="pre">provided</span> <span class="pre">does</span> <span class="pre">not</span> <span class="pre">contain\nat</span> <span class="pre">least</span> <span class="pre">2</span> <span class="pre">contigs.\n&quot;,</span> <span class="pre">kind='f',</span> <span class="pre">ndim=3)</span></em><a class="headerlink" href="#sgkit.variables.regenie_loco_prediction_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>REGENIE’s regenie_loco_prediction (contigs, samples, outcomes). LOCO predictions
+resulting from Stage 2 predictions ignoring effects for variant blocks on
+held out contigs. This will be absent if the data provided does not contain
+at least 2 contigs.</p>
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -832,15 +863,13 @@ at least 2 contigs.</p>
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By sgkit developers<br/>
-        
-            &copy; Copyright 2020, sgkit developers.<br/>
-      </p>
-    </div>
-  </footer>
+  <p>
+    
+      By sgkit developers<br/>
+    
+        &copy; Copyright 2020, sgkit developers.<br/>
+  </p>
+</footer>
 </main>
 
 

@@ -38,7 +38,7 @@
     <script src="../_static/doctools.js"></script>
     <script src="../_static/togglebutton.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
     <script defer="defer" src="../_static/docsearch.sbt.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
@@ -766,7 +766,7 @@
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -784,12 +784,142 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>sgkit.window_by_position</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+            </div>
+            
+              <div>
+                
+  <div class="section" id="sgkit-window-by-position">
+<h1>sgkit.window_by_position<a class="headerlink" href="#sgkit-window-by-position" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="sgkit.window_by_position">
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">window_by_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant_contig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'variant_contig'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'variant_position'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_start_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.window_by_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add window information to a dataset, measured by distance along the genome.</p>
+<p>Windows are defined over the <code class="docutils literal notranslate"><span class="pre">variants</span></code> dimension, and are
+used by some downstream functions to calculate statistics for
+each window. Windows never span contigs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Genotype call dataset.</p>
+</dd>
+<dt><strong>size</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The window size, measured by number of base pairs.</p>
+</dd>
+<dt><strong>offset</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>The window offset, measured by number of base pairs. Defaults
+to no offset. For centered windows, use a negative offset that
+is half the window size.</p>
+</dd>
+<dt><strong>variant_contig</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'variant_contig'</span></code>)</dt><dd><p>Name of variable containing variant contig indexes.
+Defined by <a class="reference internal" href="sgkit.variables.variant_contig_spec.html#sgkit.variables.variant_contig_spec" title="sgkit.variables.variant_contig_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_contig_spec</span></code></a>.</p>
+</dd>
+<dt><strong>variant_position</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'variant_position'</span></code>)</dt><dd><p>Name of variable containing variant positions.
+Must be monotonically increasing within a contig.
+Defined by <a class="reference internal" href="sgkit.variables.variant_position_spec.html#sgkit.variables.variant_position_spec" title="sgkit.variables.variant_position_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_position_spec</span></code></a>.</p>
+</dd>
+<dt><strong>window_start_position</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Optional name of variable to use to define window starts, defined by
+position in the genome. Defaults to None, which means start positions
+are at multiples of <code class="docutils literal notranslate"><span class="pre">size</span></code>, and shifted by <code class="docutils literal notranslate"><span class="pre">offset</span></code>.</p>
+</dd>
+<dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
+output variables into a single dataset, otherwise return only
+the computed output variables.
+See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>A dataset containing the following variables:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="sgkit.variables.window_contig_spec.html#sgkit.variables.window_contig_spec" title="sgkit.variables.window_contig_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.window_contig_spec</span></code></a> (windows):
+The index values of window contigs.</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.window_start_spec.html#sgkit.variables.window_start_spec" title="sgkit.variables.window_start_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.window_start_spec</span></code></a> (windows):
+The index values of window start positions.</p></li>
+<li><p><a class="reference internal" href="sgkit.variables.window_stop_spec.html#sgkit.variables.window_stop_spec" title="sgkit.variables.window_stop_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.window_stop_spec</span></code></a> (windows):
+The index values of window stop positions.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_contig</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;variant_position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">([</span><span class="s2">&quot;variants&quot;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">55</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_contig</span><span class="o">.</span><span class="n">values</span>
+<span class="go">array([0, 0, 0, 0, 0, 1, 1, 1, 1, 1])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">values</span>
+<span class="go">array([ 1,  4,  6,  8, 12,  1, 21, 25, 40, 55])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Contiguous equally-spaced windows, each 10 base pairs in size</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># and using offset to start windows at 1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds_w1</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window_by_position</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds_w1</span>
+<span class="go">&lt;xarray.Dataset&gt;</span>
+<span class="go">Dimensions:        (windows: 8)</span>
+<span class="go">Dimensions without coordinates: windows</span>
+<span class="go">Data variables:</span>
+<span class="go">    window_contig  (windows) int64 0 0 1 1 1 1 1 1</span>
+<span class="go">    window_start   (windows) int64 0 4 5 6 6 8 9 9</span>
+<span class="go">    window_stop    (windows) int64 4 5 6 6 8 9 9 10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ds_w1</span><span class="o">.</span><span class="n">window_start</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">ds_w1</span><span class="o">.</span><span class="n">window_stop</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">]</span> 
+<span class="go">[array([1, 4, 6, 8]),</span>
+<span class="go"> array([12]),</span>
+<span class="go"> array([1]),</span>
+<span class="go"> array([21, 25]),</span>
+<span class="go"> array([40]),</span>
+<span class="go"> array([55])]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Windows centered around positions defined by a variable (variant_position),</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># each 10 base pairs in size. Also known as &quot;locus windows&quot;.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds_w2</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window_by_position</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">offset</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">window_start_position</span><span class="o">=</span><span class="s2">&quot;variant_position&quot;</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds_w2</span>
+<span class="go">&lt;xarray.Dataset&gt;</span>
+<span class="go">Dimensions:        (windows: 10)</span>
+<span class="go">Dimensions without coordinates: windows</span>
+<span class="go">Data variables:</span>
+<span class="go">    window_contig  (windows) int64 0 0 0 0 0 1 1 1 1 1</span>
+<span class="go">    window_start   (windows) int64 0 0 0 1 3 5 6 6 8 9</span>
+<span class="go">    window_stop    (windows) int64 2 4 4 5 5 6 8 8 9 10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ds_w2</span><span class="o">.</span><span class="n">window_start</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">ds_w2</span><span class="o">.</span><span class="n">window_stop</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span> 
+<span class="go">[array([1, 4]),</span>
+<span class="go"> array([1, 4, 6, 8]),</span>
+<span class="go"> array([1, 4, 6, 8]),</span>
+<span class="go"> array([ 4,  6,  8, 12]),</span>
+<span class="go"> array([ 8, 12]),</span>
+<span class="go"> array([1]),</span>
+<span class="go"> array([21, 25]),</span>
+<span class="go"> array([21, 25]),</span>
+<span class="go"> array([40]),</span>
+<span class="go"> array([55])]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -931,15 +1061,13 @@ The index values of window stop positions.</p></li>
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By sgkit developers<br/>
-        
-            &copy; Copyright 2020, sgkit developers.<br/>
-      </p>
-    </div>
-  </footer>
+  <p>
+    
+      By sgkit developers<br/>
+    
+        &copy; Copyright 2020, sgkit developers.<br/>
+  </p>
+</footer>
 </main>
 
 

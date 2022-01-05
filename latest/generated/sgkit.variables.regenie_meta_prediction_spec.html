@@ -38,7 +38,7 @@
     <script src="../_static/doctools.js"></script>
     <script src="../_static/togglebutton.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
     <script defer="defer" src="../_static/docsearch.sbt.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
@@ -766,7 +766,7 @@
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -784,12 +784,41 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>sgkit.variables.regenie_meta_prediction_spec</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+            </div>
+            
+              <div>
+                
+  <div class="section" id="sgkit-variables-regenie-meta-prediction-spec">
+<h1>sgkit.variables.regenie_meta_prediction_spec<a class="headerlink" href="#sgkit-variables-regenie-meta-prediction-spec" title="Permalink to this headline">¶</a></h1>
+<dl class="py data">
+<dt class="sig sig-object py" id="sgkit.variables.regenie_meta_prediction_spec">
+<span class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></span><span class="sig-name descname"><span class="pre">regenie_meta_prediction_spec</span></span><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='regenie_meta_prediction',</span> <span class="pre">__doc__=&quot;\nREGENIE's</span> <span class="pre">regenie_meta_prediction</span> <span class="pre">(samples,</span> <span class="pre">outcomes).</span> <span class="pre">Stage</span> <span class="pre">2</span> <span class="pre">predictions</span> <span class="pre">from\nthe</span> <span class="pre">best</span> <span class="pre">meta</span> <span class="pre">estimator</span> <span class="pre">trained</span> <span class="pre">on</span> <span class="pre">the</span> <span class="pre">out-of-sample</span> <span class="pre">Stage</span> <span class="pre">1</span> <span class="pre">predictions.\n&quot;,</span> <span class="pre">kind='f',</span> <span class="pre">ndim=2)</span></em><a class="headerlink" href="#sgkit.variables.regenie_meta_prediction_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>REGENIE’s regenie_meta_prediction (samples, outcomes). Stage 2 predictions from
+the best meta estimator trained on the out-of-sample Stage 1 predictions.</p>
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -830,15 +859,13 @@ the best meta estimator trained on the out-of-sample Stage 1 predictions.</p>
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By sgkit developers<br/>
-        
-            &copy; Copyright 2020, sgkit developers.<br/>
-      </p>
-    </div>
-  </footer>
+  <p>
+    
+      By sgkit developers<br/>
+    
+        &copy; Copyright 2020, sgkit developers.<br/>
+  </p>
+</footer>
 </main>
 
 
