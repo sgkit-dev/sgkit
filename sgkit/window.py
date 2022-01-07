@@ -95,6 +95,7 @@ def window_by_position(
     ds: Dataset,
     *,
     size: int,
+    step: Optional[int] = None,
     offset: int = 0,
     variant_contig: Hashable = variables.variant_contig,
     variant_position: Hashable = variables.variant_position,
@@ -113,6 +114,9 @@ def window_by_position(
         Genotype call dataset.
     size
         The window size, measured by number of base pairs.
+    step
+        The distance, measured by number of base pairs, between start positions of windows.
+        Only used if ``window_start_position`` is None. Defaults to ``size``.
     offset
         The window offset, measured by number of base pairs. Defaults
         to no offset. For centered windows, use a negative offset that
@@ -127,7 +131,7 @@ def window_by_position(
     window_start_position
         Optional name of variable to use to define window starts, defined by
         position in the genome. Defaults to None, which means start positions
-        are at multiples of ``size``, and shifted by ``offset``.
+        are at multiples of ``step``, and shifted by ``offset``.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -198,7 +202,7 @@ def window_by_position(
      array([40]),
      array([55])]
     """
-
+    step = step or size
     positions = ds[variant_position].values
     window_start_positions = (
         ds[window_start_position].values if window_start_position is not None else None
@@ -209,6 +213,7 @@ def window_by_position(
         merge,
         _get_windows_by_position,
         size,
+        step,
         offset,
         positions,
         window_start_positions,
@@ -277,6 +282,7 @@ def _get_windows_by_position(
     start: int,
     stop: int,
     size: int,
+    step: int,
     offset: int,
     positions: ArrayLike,
     window_start_positions: Optional[ArrayLike],
@@ -284,7 +290,7 @@ def _get_windows_by_position(
     contig_pos = positions[start:stop]
     if window_start_positions is None:
         # TODO: position is 1-based (or use offset?)
-        pos_starts = np.arange(offset, contig_pos[-1] + offset, step=size)
+        pos_starts = np.arange(offset, contig_pos[-1] + offset, step=step)
         window_starts = np.searchsorted(contig_pos, pos_starts) + start
         window_stops = np.searchsorted(contig_pos, pos_starts + size) + start
     else:
