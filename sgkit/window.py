@@ -116,7 +116,7 @@ def window_by_position(
         The window size, measured by number of base pairs.
     step
         The distance, measured by number of base pairs, between start positions of windows.
-        Only used if ``window_start_position`` is None. Defaults to ``size``.
+        May only be set if ``window_start_position`` is None. Defaults to ``size``.
     offset
         The window offset, measured by number of base pairs. Defaults
         to no offset. For centered windows, use a negative offset that
@@ -148,6 +148,11 @@ def window_by_position(
       The index values of window start positions.
     - :data:`sgkit.variables.window_stop_spec` (windows):
       The index values of window stop positions.
+
+    Raises
+    ------
+    ValueError
+        If both of ``step`` and ``window_start_position`` have been specified.
 
     Examples
     --------
@@ -202,6 +207,8 @@ def window_by_position(
      array([40]),
      array([55])]
     """
+    if step is not None and window_start_position is not None:
+        raise ValueError("Only one of step or window_start_position may be specified")
     step = step or size
     positions = ds[variant_position].values
     window_start_positions = (

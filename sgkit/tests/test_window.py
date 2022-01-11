@@ -262,3 +262,14 @@ def test_window_by_position__equal_spaced_overlapping_windows():
     np.testing.assert_equal(ds[window_contig].values, [0, 0, 0])
     np.testing.assert_equal(ds[window_start].values, [0, 0, 2])
     np.testing.assert_equal(ds[window_stop].values, [2, 4, 5])
+
+
+def test_window_by_position__invalid_arguments():
+    ds = simulate_genotype_call_dataset(n_variant=5, n_sample=3, seed=0)
+
+    with pytest.raises(
+        ValueError, match=r"Only one of step or window_start_position may be specified"
+    ):
+        window_by_position(
+            ds, size=10, step=5, window_start_position="variant_position"
+        )
