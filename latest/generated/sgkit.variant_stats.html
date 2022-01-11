@@ -789,14 +789,17 @@
         </div>
     </div>
 </div>
-    <!-- Table of contents that is only displayed when printing the page -->
-    <div id="jb-print-docs-body" class="onlyprint">
-        <h1>sgkit.variant_stats</h1>
-        <!-- Table of contents -->
-        <div id="print-main-content" class="row">
-            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
-            <div id="jb-print-toc">
-                
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>sgkit.variant_stats</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                    </div>
+                </div>
             </div>
             
               <div>
@@ -867,82 +870,8 @@ The frequency of occurrence of each allele.</p></li>
 
               </div>
               
-            </div>
-        </div>
-    </div>
-    <div id="main-content" class="row noprint">
-        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
-        
-              <div>
-                
-  <div class="section" id="sgkit-variant-stats">
-<h1>sgkit.variant_stats<a class="headerlink" href="#sgkit-variant-stats" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="sgkit.variant_stats">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">variant_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype_mask'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant_allele_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'variant_allele_count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.variant_stats" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute quality control variant statistics from genotype calls.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Dataset containing genotype calls.</p>
-</dd>
-<dt><strong>call_genotype</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype'</span></code>)</dt><dd><p>Input variable name holding call_genotype.
-Defined by <a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a>.
-Must be present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>.</p>
-</dd>
-<dt><strong>call_genotype_mask</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype_mask'</span></code>)</dt><dd><p>Input variable name holding call_genotype_mask.
-Defined by <a class="reference internal" href="sgkit.variables.call_genotype_mask_spec.html#sgkit.variables.call_genotype_mask_spec" title="sgkit.variables.call_genotype_mask_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_mask_spec</span></code></a>
-Must be present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>.</p>
-</dd>
-<dt><strong>variant_allele_count</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'variant_allele_count'</span></code>)</dt><dd><p>Input variable name holding variant_allele_count,
-as defined by <a class="reference internal" href="sgkit.variables.variant_allele_count_spec.html#sgkit.variables.variant_allele_count_spec" title="sgkit.variables.variant_allele_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_allele_count_spec</span></code></a>.
-If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
-using <a class="reference internal" href="sgkit.count_variant_alleles.html#sgkit.count_variant_alleles" title="sgkit.count_variant_alleles"><code class="xref py py-func docutils literal notranslate"><span class="pre">count_variant_alleles()</span></code></a>.</p>
-</dd>
-<dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
-output variables into a single dataset, otherwise return only
-the computed output variables.
-See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><p>A dataset containing the following variables:</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="sgkit.variables.variant_n_called_spec.html#sgkit.variables.variant_n_called_spec" title="sgkit.variables.variant_n_called_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_n_called_spec</span></code></a> (variants):
-The number of samples with called genotypes.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.variant_call_rate_spec.html#sgkit.variables.variant_call_rate_spec" title="sgkit.variables.variant_call_rate_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_call_rate_spec</span></code></a> (variants):
-The fraction of samples with called genotypes.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.variant_n_het_spec.html#sgkit.variables.variant_n_het_spec" title="sgkit.variables.variant_n_het_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_n_het_spec</span></code></a> (variants):
-The number of samples with heterozygous calls.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.variant_n_hom_ref_spec.html#sgkit.variables.variant_n_hom_ref_spec" title="sgkit.variables.variant_n_hom_ref_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_n_hom_ref_spec</span></code></a> (variants):
-The number of samples with homozygous reference calls.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.variant_n_hom_alt_spec.html#sgkit.variables.variant_n_hom_alt_spec" title="sgkit.variables.variant_n_hom_alt_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_n_hom_alt_spec</span></code></a> (variants):
-The number of samples with homozygous alternate calls.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.variant_n_non_ref_spec.html#sgkit.variables.variant_n_non_ref_spec" title="sgkit.variables.variant_n_non_ref_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_n_non_ref_spec</span></code></a> (variants):
-The number of samples that are not homozygous reference calls.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.variant_allele_count_spec.html#sgkit.variables.variant_allele_count_spec" title="sgkit.variables.variant_allele_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_allele_count_spec</span></code></a> (variants, alleles):
-The number of occurrences of each allele.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.variant_allele_total_spec.html#sgkit.variables.variant_allele_total_spec" title="sgkit.variables.variant_allele_total_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_allele_total_spec</span></code></a> (variants):
-The number of occurrences of all alleles.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.variant_allele_frequency_spec.html#sgkit.variables.variant_allele_frequency_spec" title="sgkit.variables.variant_allele_frequency_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_allele_frequency_spec</span></code></a> (variants, alleles):
-The frequency of occurrence of each allele.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-
-
-              </div>
-              
-        
-            <!-- Previous / next buttons -->
+            
+                <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
     <a class='left-prev' id="prev-link" href="sgkit.Tajimas_D.html" title="previous page">
         <i class="fas fa-angle-left"></i>
@@ -959,7 +888,7 @@ The frequency of occurrence of each allele.</p></li>
     <i class="fas fa-angle-right"></i>
     </a>
 </div>
-        
+            
         </div>
     </div>
     <footer class="footer">

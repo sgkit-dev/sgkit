@@ -789,14 +789,17 @@
         </div>
     </div>
 </div>
-    <!-- Table of contents that is only displayed when printing the page -->
-    <div id="jb-print-docs-body" class="onlyprint">
-        <h1>sgkit.infer_sample_ploidy</h1>
-        <!-- Table of contents -->
-        <div id="print-main-content" class="row">
-            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
-            <div id="jb-print-toc">
-                
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>sgkit.infer_sample_ploidy</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                    </div>
+                </div>
             </div>
             
               <div>
@@ -843,58 +846,8 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
 
               </div>
               
-            </div>
-        </div>
-    </div>
-    <div id="main-content" class="row noprint">
-        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
-        
-              <div>
-                
-  <div class="section" id="sgkit-infer-sample-ploidy">
-<h1>sgkit.infer_sample_ploidy<a class="headerlink" href="#sgkit-infer-sample-ploidy" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="sgkit.infer_sample_ploidy">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">infer_sample_ploidy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_ploidy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_ploidy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.infer_sample_ploidy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Infer the ploidy of each sample across all variants based on
-the number of fill (non-allele) values in call genotypes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Dataset containing genotype calls.</p>
-</dd>
-<dt><strong>call_genotype</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype'</span></code>)</dt><dd><p>Input variable name holding call_genotype as defined by
-<a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a>.
-Must be present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>.</p>
-</dd>
-<dt><strong>call_ploidy</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_ploidy'</span></code>)</dt><dd><p>Input variable name holding call_ploidy as defined by
-<a class="reference internal" href="sgkit.variables.call_ploidy_spec.html#sgkit.variables.call_ploidy_spec" title="sgkit.variables.call_ploidy_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_ploidy_spec</span></code></a>.
-If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
-using <a class="reference internal" href="sgkit.infer_call_ploidy.html#sgkit.infer_call_ploidy" title="sgkit.infer_call_ploidy"><code class="xref py py-func docutils literal notranslate"><span class="pre">infer_call_ploidy()</span></code></a>.</p>
-</dd>
-<dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
-output variables into a single dataset, otherwise return only
-the computed output variables.
-See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.sample_ploidy_spec.html#sgkit.variables.sample_ploidy_spec" title="sgkit.variables.sample_ploidy_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_ploidy_spec</span></code></a>.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-
-
-              </div>
-              
-        
-            <!-- Previous / next buttons -->
+            
+                <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
     <a class='left-prev' id="prev-link" href="sgkit.infer_call_ploidy.html" title="previous page">
         <i class="fas fa-angle-left"></i>
@@ -911,7 +864,7 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
     <i class="fas fa-angle-right"></i>
     </a>
 </div>
-        
+            
         </div>
     </div>
     <footer class="footer">

@@ -789,14 +789,17 @@
         </div>
     </div>
 </div>
-    <!-- Table of contents that is only displayed when printing the page -->
-    <div id="jb-print-docs-body" class="onlyprint">
-        <h1>sgkit.window_by_variant</h1>
-        <!-- Table of contents -->
-        <div id="print-main-content" class="row">
-            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
-            <div id="jb-print-toc">
-                
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>sgkit.window_by_variant</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                    </div>
+                </div>
             </div>
             
               <div>
@@ -885,100 +888,8 @@ The index values of window stop positions.</p></li>
 
               </div>
               
-            </div>
-        </div>
-    </div>
-    <div id="main-content" class="row noprint">
-        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
-        
-              <div>
-                
-  <div class="section" id="sgkit-window-by-variant">
-<h1>sgkit.window_by_variant<a class="headerlink" href="#sgkit-window-by-variant" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="sgkit.window_by_variant">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">window_by_variant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant_contig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'variant_contig'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.window_by_variant" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add window information to a dataset, measured by number of variants.</p>
-<p>Windows are defined over the <code class="docutils literal notranslate"><span class="pre">variants</span></code> dimension, and are
-used by some downstream functions to calculate statistics for
-each window. Windows never span contigs.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Genotype call dataset.</p>
-</dd>
-<dt><strong>size</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The window size, measured by number of variants.</p>
-</dd>
-<dt><strong>step</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>The distance (number of variants) between start positions of windows.
-Defaults to <code class="docutils literal notranslate"><span class="pre">size</span></code>.</p>
-</dd>
-<dt><strong>variant_contig</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'variant_contig'</span></code>)</dt><dd><p>Name of variable containing variant contig indexes.
-Defined by <a class="reference internal" href="sgkit.variables.variant_contig_spec.html#sgkit.variables.variant_contig_spec" title="sgkit.variables.variant_contig_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_contig_spec</span></code></a>.</p>
-</dd>
-<dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
-output variables into a single dataset, otherwise return only
-the computed output variables.
-See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><p>A dataset containing the following variables:</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="sgkit.variables.window_contig_spec.html#sgkit.variables.window_contig_spec" title="sgkit.variables.window_contig_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.window_contig_spec</span></code></a> (windows):
-The index values of window contigs.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.window_start_spec.html#sgkit.variables.window_start_spec" title="sgkit.variables.window_start_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.window_start_spec</span></code></a> (windows):
-The index values of window start positions.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.window_stop_spec.html#sgkit.variables.window_stop_spec" title="sgkit.variables.window_stop_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.window_stop_spec</span></code></a> (windows):
-The index values of window stop positions.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_contig</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_contig</span><span class="o">.</span><span class="n">values</span>
-<span class="go">array([0, 0, 0, 0, 0, 1, 1, 1, 1, 1])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">values</span>
-<span class="go">array([0, 1, 2, 3, 4, 0, 1, 2, 3, 4])</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Contiguous windows, each with the same number of variants (3)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># except for the last window of each contig</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">window_by_variant</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:        (windows: 4)</span>
-<span class="go">Dimensions without coordinates: windows</span>
-<span class="go">Data variables:</span>
-<span class="go">    window_contig  (windows) int64 0 0 1 1</span>
-<span class="go">    window_start   (windows) int64 0 3 5 8</span>
-<span class="go">    window_stop    (windows) int64 3 5 8 10</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Overlapping windows</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">window_by_variant</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:        (windows: 6)</span>
-<span class="go">Dimensions without coordinates: windows</span>
-<span class="go">Data variables:</span>
-<span class="go">    window_contig  (windows) int64 0 0 0 1 1 1</span>
-<span class="go">    window_start   (windows) int64 0 2 4 5 7 9</span>
-<span class="go">    window_stop    (windows) int64 3 5 5 8 10 10</span>
-</pre></div>
-</div>
-</dd></dl>
-
-</div>
-
-
-              </div>
-              
-        
-            <!-- Previous / next buttons -->
+            
+                <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
     <a class='left-prev' id="prev-link" href="sgkit.window_by_position.html" title="previous page">
         <i class="fas fa-angle-left"></i>
@@ -995,7 +906,7 @@ The index values of window stop positions.</p></li>
     <i class="fas fa-angle-right"></i>
     </a>
 </div>
-        
+            
         </div>
     </div>
     <footer class="footer">

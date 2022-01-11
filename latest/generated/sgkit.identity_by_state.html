@@ -789,14 +789,17 @@
         </div>
     </div>
 </div>
-    <!-- Table of contents that is only displayed when printing the page -->
-    <div id="jb-print-docs-body" class="onlyprint">
-        <h1>sgkit.identity_by_state</h1>
-        <!-- Table of contents -->
-        <div id="print-main-content" class="row">
-            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
-            <div id="jb-print-toc">
-                
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>sgkit.identity_by_state</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                    </div>
+                </div>
             </div>
             
               <div>
@@ -868,83 +871,8 @@ samples dimension.</p>
 
               </div>
               
-            </div>
-        </div>
-    </div>
-    <div id="main-content" class="row noprint">
-        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
-        
-              <div>
-                
-  <div class="section" id="sgkit-identity-by-state">
-<h1>sgkit.identity_by_state<a class="headerlink" href="#sgkit-identity-by-state" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="sgkit.identity_by_state">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">identity_by_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_allele_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_allele_frequency'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.identity_by_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute identity by state (IBS) probabilities between
-all pairs of samples.</p>
-<p>The IBS probability between a pair of individuals is the
-probability that a randomly drawn allele from the first individual
-is identical in state with a randomly drawn allele from the second
-individual at a single random locus.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> : <span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Dataset containing call genotype alleles.</p>
-</dd>
-<dt><strong>call_allele_frequency</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">'call_allele_frequency'</span></code>)</dt><dd><p>Input variable name holding call_allele_frequency as defined by
-<a class="reference internal" href="sgkit.variables.call_allele_frequency_spec.html#sgkit.variables.call_allele_frequency_spec" title="sgkit.variables.call_allele_frequency_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_allele_frequency_spec</span></code></a>.
-If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
-using <a class="reference internal" href="sgkit.call_allele_frequencies.html#sgkit.call_allele_frequencies" title="sgkit.call_allele_frequencies"><code class="xref py py-func docutils literal notranslate"><span class="pre">call_allele_frequencies()</span></code></a>.</p>
-</dd>
-<dt><strong>merge</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
-output variables into a single dataset, otherwise return only
-the computed output variables.
-See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.stat_identity_by_state_spec.html#sgkit.variables.stat_identity_by_state_spec" title="sgkit.variables.stat_identity_by_state_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_identity_by_state_spec</span></code></a>
-which is a matrix of pairwise IBS probabilities among all samples.
-The dimensions are named <code class="docutils literal notranslate"><span class="pre">samples_0</span></code> and <code class="docutils literal notranslate"><span class="pre">samples_1</span></code>.</p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.10)"><strong>NotImplementedError</strong></a> – If the variable holding call_allele_frequency is chunked along the
-    samples dimension.</p>
-</dd>
-</dl>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This method does not currently support datasets that are chunked along the
-samples dimension.</p>
-</div>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">display_genotypes</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span> 
-<span class="go">samples    S0   S1   S2</span>
-<span class="go">variants</span>
-<span class="go">0         0/0  1/1  1/0</span>
-<span class="go">1         1/1  1/1  1/0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">identity_by_state</span><span class="p">(</span><span class="n">ds</span><span class="p">)[</span><span class="s2">&quot;stat_identity_by_state&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
-<span class="go">array([[1. , 0.5, 0.5],</span>
-<span class="go">       [0.5, 1. , 0.5],</span>
-<span class="go">       [0.5, 0.5, 0.5]])</span>
-</pre></div>
-</div>
-</dd></dl>
-
-</div>
-
-
-              </div>
-              
-        
-            <!-- Previous / next buttons -->
+            
+                <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
     <a class='left-prev' id="prev-link" href="sgkit.hardy_weinberg_test.html" title="previous page">
         <i class="fas fa-angle-left"></i>
@@ -961,7 +889,7 @@ samples dimension.</p>
     <i class="fas fa-angle-right"></i>
     </a>
 </div>
-        
+            
         </div>
     </div>
     <footer class="footer">

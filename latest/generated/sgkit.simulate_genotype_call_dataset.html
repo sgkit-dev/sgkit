@@ -789,14 +789,17 @@
         </div>
     </div>
 </div>
-    <!-- Table of contents that is only displayed when printing the page -->
-    <div id="jb-print-docs-body" class="onlyprint">
-        <h1>sgkit.simulate_genotype_call_dataset</h1>
-        <!-- Table of contents -->
-        <div id="print-main-content" class="row">
-            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
-            <div id="jb-print-toc">
-                
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>sgkit.simulate_genotype_call_dataset</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                    </div>
+                </div>
             </div>
             
               <div>
@@ -859,74 +862,8 @@ will all be 0 by default when <code class="docutils literal notranslate"><span c
 
               </div>
               
-            </div>
-        </div>
-    </div>
-    <div id="main-content" class="row noprint">
-        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
-        
-              <div>
-                
-  <div class="section" id="sgkit-simulate-genotype-call-dataset">
-<h1>sgkit.simulate_genotype_call_dataset<a class="headerlink" href="#sgkit-simulate-genotype-call-dataset" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="sgkit.simulate_genotype_call_dataset">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">simulate_genotype_call_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_variant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_ploidy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_allele</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_contig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing_pct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.simulate_genotype_call_dataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simulate genotype calls and variant/sample data.</p>
-<p>Note that the data simulated by this function has no
-biological interpretation and that summary statistics
-or other methods applied to it will produce meaningless
-results.  This function is primarily a convenience on
-generating <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a> containers so quantities of interest
-should be overwritten, where appropriate, within the
-context of a more specific application.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>n_variant</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Number of variants to simulate</p>
-</dd>
-<dt><strong>n_sample</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Number of samples to simulate</p>
-</dd>
-<dt><strong>n_ploidy</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">2</span></code>)</dt><dd><p>Number of chromosome copies in each sample</p>
-</dd>
-<dt><strong>n_allele</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">2</span></code>)</dt><dd><p>Number of alleles to simulate</p>
-</dd>
-<dt><strong>n_contig</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span> (default: <code class="docutils literal notranslate"><span class="pre">1</span></code>)</dt><dd><p>optional
-Number of contigs to partition variants with,
-controlling values in <code class="docutils literal notranslate"><span class="pre">variant_contig</span></code>. Values
-will all be 0 by default when <code class="docutils literal notranslate"><span class="pre">n_contig</span></code> is 1.</p>
-</dd>
-<dt><strong>seed</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Seed for random number generation, optional</p>
-</dd>
-<dt><strong>missing_pct</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Donate the percent of missing calls, must be within [0.0, 1.0], optional</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><span class="annotation terse"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span><span class="annotation full"><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.20.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><p>A dataset containing the following variables:</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="sgkit.variables.variant_contig_spec.html#sgkit.variables.variant_contig_spec" title="sgkit.variables.variant_contig_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_contig_spec</span></code></a> (variants)</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.variant_position_spec.html#sgkit.variables.variant_position_spec" title="sgkit.variables.variant_position_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_position_spec</span></code></a> (variants)</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.variant_allele_spec.html#sgkit.variables.variant_allele_spec" title="sgkit.variables.variant_allele_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_allele_spec</span></code></a> (variants)</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.sample_id_spec.html#sgkit.variables.sample_id_spec" title="sgkit.variables.sample_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_id_spec</span></code></a> (samples)</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a> (variants, samples, ploidy)</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.call_genotype_mask_spec.html#sgkit.variables.call_genotype_mask_spec" title="sgkit.variables.call_genotype_mask_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_mask_spec</span></code></a> (variants, samples, ploidy)</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-
-
-              </div>
-              
-        
-            <!-- Previous / next buttons -->
+            
+                <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
     <a class='left-prev' id="prev-link" href="sgkit.infer_variant_ploidy.html" title="previous page">
         <i class="fas fa-angle-left"></i>
@@ -943,7 +880,7 @@ will all be 0 by default when <code class="docutils literal notranslate"><span c
     <i class="fas fa-angle-right"></i>
     </a>
 </div>
-        
+            
         </div>
     </div>
     <footer class="footer">
