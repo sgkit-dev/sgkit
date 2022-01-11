@@ -1,3 +1,15 @@
+queue_rules:
+  - name: default
+    conditions:
+      - base=main
+      - status-success=build (3.7)
+      - status-success=build (3.8)
+      - status-success=win_build (3.7)
+      - status-success=win_build (3.8)
+      - approved-reviews-by=@pystatgen/committers
+      - "#approved-reviews-by>=1"
+      - label=auto-merge
+
 pull_request_rules:
   - name: automatic merge
     conditions:
@@ -10,8 +22,8 @@ pull_request_rules:
       - "#approved-reviews-by>=1"
       - label=auto-merge
     actions:
-      merge:
-        strict: smart+fasttrack
+      queue:
+        name: default
         method: rebase
   - name: deleting merged branch
     conditions:
