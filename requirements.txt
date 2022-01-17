@@ -8,3 +8,4 @@ typing-extensions
 numba
 zarr
 fsspec != 2021.6.*
+scikit-learn
