@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-book-theme.css?digest=84ace793992934648b4de8eed757e5a2" />
     <link rel="stylesheet" type="text/css" href="_static/typehints.css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
@@ -38,7 +38,7 @@
     <script src="_static/doctools.js"></script>
     <script src="_static/togglebutton.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
+    <script src="_static/sphinx-book-theme.9d8b4a8b9bb19db25eeaddc40d639ba2.js"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
     <script defer="defer" src="_static/docsearch.sbt.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
@@ -62,7 +62,12 @@
     <div class="container-xl">
       <div class="row">
           
-<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<div class="col-12 col-md-3 bd-sidebar site-navigation " id="site-navigation">
     
         <div class="navbar-brand-box">
     <a class="navbar-brand text-wrap" href="index.html">
@@ -736,22 +741,22 @@
 
 
           
+<!-- This is an invisible pixel that we watch to see if we've scrolled. -->
+<div class="sbt-scroll-pixel-helper"></div>
 <main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
     
     <div class="topbar container-xl fixed-top">
     <div class="topbar-contents row">
         <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
         <div class="col pl-md-4 topbar-main">
-            
-            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
-                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
-                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
-                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
-                <i class="fas fa-bars"></i>
-                <i class="fas fa-arrow-left"></i>
-                <i class="fas fa-arrow-up"></i>
-            </button>
-            
+            <div class="topbar-left">
+                
+                <label class="nav-toggle-button" for="__navigation">
+                    <div class="visually-hidden">Toggle navigation</div>
+                    <i class="fas fa-bars"></i>
+                </label>
+                
+            </div>
             
 <div class="dropdown-buttons-trigger">
     <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
@@ -1244,22 +1249,37 @@ to have created the variable in that case.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [9]: </span><span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">call_allele_count</span><span class="o">=</span><span class="s2">&quot;my_call_allele_count&quot;</span><span class="p">)</span>
 <span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">9</span><span class="o">-</span><span class="n">a02760c2a541</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="n">Input</span> <span class="n">In</span> <span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">call_allele_count</span><span class="o">=</span><span class="s2">&quot;my_call_allele_count&quot;</span><span class="p">)</span>
 
-<span class="nn">~/work/sgkit/sgkit/sgkit/stats/aggregation.py</span> in <span class="ni">count_variant_alleles</span><span class="nt">(ds, call_allele_count, merge)</span>
-<span class="g g-Whitespace">    </span><span class="mi">218</span>            <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">uint64</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">219</span>     <span class="s2">&quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">220</span><span class="s2">     ds = define_variable_if_absent(</span>
-<span class="g g-Whitespace">    </span><span class="mi">221</span><span class="s2">         ds, variables.call_allele_count, call_allele_count, count_call_alleles</span>
-<span class="g g-Whitespace">    </span><span class="mi">222</span><span class="s2">     )</span>
+<span class="nn">File ~/work/sgkit/sgkit/sgkit/stats/aggregation.py:220,</span> in <span class="ni">count_variant_alleles</span><span class="nt">(ds, call_allele_count, merge)</span>
+<span class="g g-Whitespace">    </span><span class="mi">172</span> <span class="k">def</span> <span class="nf">count_variant_alleles</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">173</span>     <span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">174</span>     <span class="o">*</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">175</span>     <span class="n">call_allele_count</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">=</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">176</span>     <span class="n">merge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">177</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">178</span>     <span class="sd">&quot;&quot;&quot;Compute allele count from per-sample allele counts, or genotype calls.</span>
+<span class="g g-Whitespace">    </span><span class="mi">179</span><span class="sd"> </span>
+<span class="g g-Whitespace">    </span><span class="mi">180</span><span class="sd">     Parameters</span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">    </span><span class="mi">218</span><span class="sd">            [4, 0]], dtype=uint64)</span>
+<span class="g g-Whitespace">    </span><span class="mi">219</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">220</span>     <span class="n">ds</span> <span class="o">=</span> <span class="n">define_variable_if_absent</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">221</span>         <span class="n">ds</span><span class="p">,</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count</span><span class="p">,</span> <span class="n">call_allele_count</span><span class="p">,</span> <span class="n">count_call_alleles</span>
+<span class="g g-Whitespace">    </span><span class="mi">222</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">223</span>     <span class="n">variables</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">{</span><span class="n">call_allele_count</span><span class="p">:</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count_spec</span><span class="p">})</span>
+<span class="g g-Whitespace">    </span><span class="mi">225</span>     <span class="n">new_ds</span> <span class="o">=</span> <span class="n">create_dataset</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">226</span>         <span class="p">{</span><span class="n">variables</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="p">:</span> <span class="n">ds</span><span class="p">[</span><span class="n">call_allele_count</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)}</span>
+<span class="g g-Whitespace">    </span><span class="mi">227</span>     <span class="p">)</span>
 
-<span class="nn">~/work/sgkit/sgkit/sgkit/utils.py</span> in <span class="ni">define_variable_if_absent</span><span class="nt">(ds, default_variable_name, variable_name, func)</span>
-<span class="g g-Whitespace">    </span><span class="mi">190</span><span class="s2">         return ds</span>
-<span class="g g-Whitespace">    </span><span class="mi">191</span><span class="s2">     if variable_name != default_variable_name:</span>
-<span class="ne">--&gt; </span><span class="mi">192</span><span class="s2">         raise ValueError(</span>
-<span class="g g-Whitespace">    </span><span class="mi">193</span><span class="s2">             f&quot;Variable &#39;</span><span class="si">{variable_name}</span><span class="s2">&#39; with non-default name is missing and will not be automatically defined.&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">194</span><span class="s2">         )</span>
+<span class="nn">File ~/work/sgkit/sgkit/sgkit/utils.py:192,</span> in <span class="ni">define_variable_if_absent</span><span class="nt">(ds, default_variable_name, variable_name, func)</span>
+<span class="g g-Whitespace">    </span><span class="mi">190</span>     <span class="k">return</span> <span class="n">ds</span>
+<span class="g g-Whitespace">    </span><span class="mi">191</span> <span class="k">if</span> <span class="n">variable_name</span> <span class="o">!=</span> <span class="n">default_variable_name</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">192</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">193</span>         <span class="sa">f</span><span class="s2">&quot;Variable &#39;</span><span class="si">{</span><span class="n">variable_name</span><span class="si">}</span><span class="s2">&#39; with non-default name is missing and will not be automatically defined.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">194</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">195</span> <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 
 <span class="ne">ValueError</span>: Variable &#39;my_call_allele_count&#39; with non-default name is missing and will not be automatically defined.
 </pre></div>
