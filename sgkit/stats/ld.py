@@ -15,7 +15,7 @@ from sgkit.typing import ArrayLike, DType
 from sgkit.window import _get_chunked_windows, _sizes_to_start_offsets, has_windows
 
 
-@njit(nogil=True, fastmath=True, cache=True)  # type: ignore
+@njit(nogil=True, fastmath=False, cache=True)  # type: ignore
 def rogers_huff_r_between(gn0: ArrayLike, gn1: ArrayLike) -> float:  # pragma: no cover
     """Rogers Huff *r*.
 
