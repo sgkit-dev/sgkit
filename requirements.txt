@@ -5,6 +5,6 @@ distributed >= 2021.10.0
 dask-ml
 scipy
 typing-extensions
-numba != 0.54.*
+numba
 zarr
 fsspec != 2021.6.*
