@@ -75,6 +75,7 @@ Methods
    :toctree: generated/
 
    call_allele_frequencies
+   cohort_allele_frequencies
    count_call_alleles
    count_cohort_alleles
    count_variant_alleles
@@ -140,6 +141,7 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.call_heterozygosity_spec
     variables.call_ploidy_spec
     variables.cohort_allele_count_spec
+    variables.cohort_allele_frequency_spec
     variables.covariates_spec
     variables.dosage_spec
     variables.genotype_count_spec
