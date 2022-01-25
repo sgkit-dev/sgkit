@@ -1,11 +1,10 @@
 # Introducing sgkit
 
-```{post} 2021-10-19
+```{post} 2022-02-01
 ---
-tags: genetics
 category: releases
 author: hammer
 ---
 ```
 
-There should be some text here.
+The sgkit team is pleased to announce the release of [sgkit 0.4.0](https://github.com/pystatgen/sgkit/releases/tag/0.4.0)!
