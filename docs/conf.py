@@ -124,6 +124,15 @@ html_theme = "sphinx_book_theme"
 html_title = ""
 html_logo = "_static/sgkit_trnsprnt.png"
 
+html_theme_options = {
+    "repository_url": "https://github.com/pystatgen/sgkit",
+    "use_repository_button": True,
+    "use_issues_button": True,
+    "use_edit_page_button": True,
+    "use_download_button": False,
+    "use_fullscreen_button": False,
+}
+
 html_css_files = [
     "docsearch.sbt.css",
     "https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css",
