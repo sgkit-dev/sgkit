@@ -1,4 +1,4 @@
-from pkg_resources import DistributionNotFound, get_distribution
+from pkg_resources import DistributionNotFound, get_distribution  # type: ignore[import]
 
 from .display import display_genotypes
 from .distance.api import pairwise_distance

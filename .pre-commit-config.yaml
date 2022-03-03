@@ -22,8 +22,8 @@ repos:
       - id: flake8
         language_version: python3
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.782
+    rev: v0.931
     hooks:
       - id: mypy
-        args: ["--strict", "--show-error-codes"]
-        additional_dependencies: ["numpy>=1.21.2", "xarray", "dask[array]", "scipy", "typing-extensions", "zarr", "numba", "dask-ml", "networkx"]
+        args: ["--show-error-codes", "--ignore-missing-imports"]
+        additional_dependencies: ["numpy>=1.21.2", "xarray", "dask[array]", "scipy", "typing-extensions", "zarr", "numba", "dask-ml", "networkx", "types-PyYAML"]

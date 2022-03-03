@@ -80,7 +80,7 @@ def create_distance_matrix(
             chunks,
             device,
             metric,
-            marks=pytest.mark.gpu if device == "gpu" else "",
+            marks=pytest.mark.gpu if device == "gpu" else "",  # type: ignore[arg-type]
         )
         for shape in [(30, 30), (15, 30), (30, 15)]
         for chunks in [(10, 10), (5, 10), (10, 5)]

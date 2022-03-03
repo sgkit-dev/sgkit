@@ -126,12 +126,14 @@ def pca_stats(ds: Dataset, est: BaseEstimator, *, merge: bool = True) -> Dataset
             _get(est, "explained_variance_ratio_"),
         ),
     }
-    new_ds = Dataset({k: v for k, v in new_ds.items() if v[1] is not None})
+    new_ds = Dataset({k: v for k, v in new_ds.items() if v[1] is not None})  # type: ignore[assignment]
     if "sample_pca_component" in new_ds and "sample_pca_explained_variance" in new_ds:
         new_ds[variables.sample_pca_loading] = new_ds[
             variables.sample_pca_component
-        ] * np.sqrt(new_ds[variables.sample_pca_explained_variance].data)
-    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
+        ] * np.sqrt(
+            new_ds[variables.sample_pca_explained_variance].data  # type: ignore[attr-defined]
+        )
+    return conditional_merge_datasets(ds, variables.validate(new_ds), merge)  # type: ignore[call-overload]
 
 
 def pca(
