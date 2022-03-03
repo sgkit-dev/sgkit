@@ -132,9 +132,9 @@ def _slice_zarrs(
 ) -> ArrayLike:
     """Slice concatenated zarrs by locs"""
     # convert array locations to slices
-    locs = [slice(*loc) for loc in locs]
+    locs = [slice(*loc) for loc in locs]  # type: ignore[misc]
     # determine which zarr files are needed
-    start, stop = locs[0].start, locs[0].stop  # stack on first axis
+    start, stop = locs[0].start, locs[0].stop  # type: ignore[attr-defined] # stack on first axis
     i0 = _zarr_index(offsets, start)
     i1 = _zarr_index(offsets, stop)
     if i0 == i1:  # within a single zarr file

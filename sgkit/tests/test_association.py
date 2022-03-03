@@ -146,14 +146,14 @@ def ds() -> Dataset:
 def _sm_statistics(
     ds: Dataset, i: int, add_intercept: bool
 ) -> RegressionResultsWrapper:
-    X = []
+    X_list = []
     # Make sure first independent variable is variant
-    X.append(ds["dosage"].values[i])
+    X_list.append(ds["dosage"].values[i])
     for v in [c for c in list(ds.keys()) if c.startswith("covar_")]:
-        X.append(ds[v].values)
+        X_list.append(ds[v].values)
     if add_intercept:
-        X.append(np.ones(ds.dims["samples"]))
-    X = np.stack(X).T
+        X_list.append(np.ones(ds.dims["samples"]))
+    X = np.stack(X_list).T
     y = ds[f"trait_{i}"].values
 
     return sm.OLS(y, X, hasconst=True).fit()

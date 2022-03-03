@@ -151,7 +151,7 @@ def ridge_regression(
             # https://github.com/projectglow/glow/issues/266
             diag[:n_zero_reg] = 1
         diags.append(np.diag(diag))  # type: ignore[no-untyped-call]
-    diags = np.stack(diags)
+    diags = np.stack(diags)  # type: ignore[assignment]
     B = np.linalg.inv(XtX + diags) @ XtY  # type: ignore[no-untyped-call]
     B = B.astype(dtype or XtX.dtype)
     assert_array_shape(B, n_alpha, n_obs, n_outcome)
@@ -363,8 +363,8 @@ def _stage_2(
             alphas = get_alphas(n_variant_block * n_alpha_1)
     n_alpha_2 = alphas.size
 
-    YR = []
-    BR = []
+    YR_list = []
+    BR_list = []
     for i in range(n_outcome):
         # Slice and reshape to new 2D covariate matrix;
         # The order of raveling in trailing dimensions is important
@@ -382,11 +382,11 @@ def _stage_2(
         BB, YPB = _ridge_regression_cv(XPB, YB, alphas, n_zero_reg=n_covar)[-2:]
         assert_array_shape(BB, n_alpha_2, n_sample_block * n_indvar, 1)
         assert_array_shape(YPB, n_alpha_2, n_sample, 1)
-        BR.append(BB)
-        YR.append(YPB)
+        BR_list.append(BB)
+        YR_list.append(YPB)
 
     # Concatenate predictions along outcome dimension
-    YR = da.concatenate(YR, axis=2)
+    YR = da.concatenate(YR_list, axis=2)
     assert_block_shape(YR, 1, n_sample_block, n_outcome)
     assert_chunk_shape(YR, n_alpha_2, sample_chunks[0], 1)
     assert_array_shape(YR, n_alpha_2, n_sample, n_outcome)
@@ -399,7 +399,7 @@ def _stage_2(
     assert YR.shape[1:] == Y.T.shape
 
     # Concatenate betas along outcome dimension
-    BR = da.concatenate(BR, axis=2)
+    BR = da.concatenate(BR_list, axis=2)
     assert_block_shape(BR, 1, n_sample_block, n_outcome)
     assert_chunk_shape(BR, n_alpha_2, n_indvar, 1)
     assert_array_shape(BR, n_alpha_2, n_sample_block * n_indvar, n_outcome)

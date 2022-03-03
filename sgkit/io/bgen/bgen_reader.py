@@ -145,7 +145,7 @@ class BgenReader:
                     res = np.zeros((len(all_vaddr), len(probs), 3), dtype=self.dtype)
                 res[i] = probs
             res = res[..., idx[2]]  # type: ignore[index]
-            return np.squeeze(res, axis=squeeze_dims)
+            return np.squeeze(res, axis=squeeze_dims)  # type: ignore[arg-type]
 
 
 def _split_alleles(allele_ids: bytes) -> List[bytes]:
@@ -520,7 +520,7 @@ def rechunk_bgen(
 
     zarr.consolidate_metadata(output)
 
-    ds: Dataset = xr.open_zarr(output, concat_characters=False)  # type: ignore[no-untyped-call]
+    ds = xr.open_zarr(output, concat_characters=False)  # type: ignore[no-untyped-call]
     if pack:
         ds = unpack_variables(ds)
 

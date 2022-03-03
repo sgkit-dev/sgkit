@@ -265,7 +265,7 @@ def divergence(
     n_variants = ds.dims["variants"]
     n_cohorts = ds.dims["cohorts"]
     ac = da.asarray(ac)
-    shape = (ac.chunks[0], n_cohorts, n_cohorts)
+    shape = (ac.chunks[0], n_cohorts, n_cohorts)  # type: ignore[index]
     d = da.map_blocks(_divergence, ac, chunks=shape, dtype=np.float64)
     assert_array_shape(d, n_variants, n_cohorts, n_cohorts)
 
@@ -741,7 +741,7 @@ def pbs(
 
     # calculate PBS triples
     t = da.asarray(t)
-    shape = (t.chunks[0], n_cohorts, n_cohorts, n_cohorts)
+    shape = (t.chunks[0], n_cohorts, n_cohorts, n_cohorts)  # type: ignore[attr-defined]
 
     cohorts = cohorts or list(itertools.combinations(range(n_cohorts), 3))  # type: ignore
     ct = _cohorts_to_array(cohorts, ds.indexes.get("cohorts_0", None))
@@ -763,23 +763,23 @@ N_GARUD_H_STATS = 4  # H1, H12, H123, H2/H1
 def _Garud_h(haplotypes: ArrayLike) -> ArrayLike:
     # find haplotype counts (sorted in descending order)
     counts = sorted(collections.Counter(haplotypes.tolist()).values(), reverse=True)
-    counts = np.array(counts)
+    counts = np.array(counts)  # type: ignore[assignment]
 
     # find haplotype frequencies
     n = haplotypes.shape[0]
-    f = counts / n
+    f = counts / n  # type: ignore[operator]
 
     # compute H1
     h1 = np.sum(f ** 2)
 
     # compute H12
-    h12 = np.sum(f[:2]) ** 2 + np.sum(f[2:] ** 2)
+    h12 = np.sum(f[:2]) ** 2 + np.sum(f[2:] ** 2)  # type: ignore[index]
 
     # compute H123
-    h123 = np.sum(f[:3]) ** 2 + np.sum(f[3:] ** 2)
+    h123 = np.sum(f[:3]) ** 2 + np.sum(f[3:] ** 2)  # type: ignore[index]
 
     # compute H2/H1
-    h2 = h1 - f[0] ** 2
+    h2 = h1 - f[0] ** 2  # type: ignore[index]
     h2_h1 = h2 / h1
 
     return np.array([h1, h12, h123, h2_h1])
