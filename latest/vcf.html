@@ -36,6 +36,9 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
     <script src="_static/togglebutton.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="_static/sphinx-book-theme.9d8b4a8b9bb19db25eeaddc40d639ba2.js"></script>
@@ -1037,7 +1040,7 @@ which may be helpful if you encounter errors during installation.</p>
 not <a class="reference external" href="https://github.com/brentp/cyvcf2/issues/90">currently work on Windows</a>.
 As a workaround, consider using scikit-allel’s <code class="docutils literal notranslate"><span class="pre">vcf_to_zarr</span></code> function
 to write a VCF in Zarr format, followed by <a class="reference internal" href="generated/sgkit.read_scikit_allel_vcfzarr.html#sgkit.read_scikit_allel_vcfzarr" title="sgkit.read_scikit_allel_vcfzarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.read_scikit_allel_vcfzarr()</span></code></a> to
-read the VCF as a <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v0.21.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
+read the VCF as a <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
 </div>
 </div>
 <div class="section" id="usage">
