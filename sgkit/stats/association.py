@@ -78,7 +78,7 @@ def linear_regression(
     # from projection require no extra terms in variance
     # estimate for loop covariates (columns of G), which is
     # only true when an intercept is present.
-    XLPS = (XLP ** 2).sum(axis=0, keepdims=True).T
+    XLPS = (XLP**2).sum(axis=0, keepdims=True).T
     assert XLPS.shape == (n_loop_covar, 1)
     B = (XLP.T @ YP) / XLPS
     assert B.shape == (n_loop_covar, n_outcome)
@@ -86,7 +86,7 @@ def linear_regression(
     # Compute residuals for each loop covariate and outcome separately
     YR = YP[:, np.newaxis, :] - XLP[..., np.newaxis] * B[np.newaxis, ...]
     assert YR.shape == (n_obs, n_loop_covar, n_outcome)
-    RSS = (YR ** 2).sum(axis=0)
+    RSS = (YR**2).sum(axis=0)
     assert RSS.shape == (n_loop_covar, n_outcome)
     # Get t-statistics for coefficient estimates
     T = B / np.sqrt(RSS / dof / XLPS)
@@ -382,7 +382,7 @@ def regenie_loco_regression(
     Y -= Y.mean(axis=0)
     # Orthogonally project covariates out of phenotype matrix
     Y -= Q @ (Q.T @ Y)
-    Y_scale = da.sqrt(da.sum(Y ** 2, axis=0) / (Y.shape[0] - Q.shape[1]))
+    Y_scale = da.sqrt(da.sum(Y**2, axis=0) / (Y.shape[0] - Q.shape[1]))
     # Scale
     Y /= Y_scale[None, :]
 
