@@ -14,7 +14,7 @@ partd
 bed-reader
 rechunker == 0.3.3
 cbgen
-cyvcf2; platform_system != "Windows"
+cyvcf2 < 0.30.15; platform_system != "Windows"
 yarl
 matplotlib
 asv
