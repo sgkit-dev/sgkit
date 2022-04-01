@@ -4,11 +4,13 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>User Guide</title>
     
-  <link href="_static/css/theme.css" rel="stylesheet">
-  <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,19 +20,16 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx-book-theme.css?digest=84ace793992934648b4de8eed757e5a2" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=62ba249389abaaa9ffc34bf36a076bdc1d65ee18" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/typehints.css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="_static/docsearch.sbt.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
     
-  <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -40,10 +39,10 @@
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
     <script src="_static/togglebutton.js"></script>
-    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="_static/sphinx-book-theme.9d8b4a8b9bb19db25eeaddc40d639ba2.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
     <script defer="defer" src="_static/docsearch.sbt.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -56,7 +55,21 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
     
     <div class="container-fluid" id="banner"></div>
 
@@ -65,14 +78,10 @@
     <div class="container-xl">
       <div class="row">
           
-<!-- Checkboxes to toggle the left sidebar -->
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
-<label class="overlay" for="__navigation">
-    <div class="visually-hidden">Toggle navigation sidebar</div>
-</label>
-<div class="col-12 col-md-3 bd-sidebar site-navigation " id="site-navigation">
-    
-        <div class="navbar-brand-box">
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
     <a class="navbar-brand text-wrap" href="index.html">
       
         <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
@@ -741,74 +750,135 @@
 </ul>
 
     </div>
-</nav> <!-- To handle the deprecated key -->
-
-<div class="navbar_extra_footer">
-  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
-</div>
-
-</div>
-
-
-          
-
-
-          
-<!-- This is an invisible pixel that we watch to see if we've scrolled. -->
-<div class="sbt-scroll-pixel-helper"></div>
-<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
-    
-    <div class="topbar container-xl fixed-top">
-    <div class="topbar-contents row">
-        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
-        <div class="col pl-md-4 topbar-main">
-            <div class="topbar-left">
-                
-                <label class="nav-toggle-button" for="__navigation">
-                    <div class="visually-hidden">Toggle navigation</div>
-                    <i class="fas fa-bars"></i>
-                </label>
-                
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
             </div>
             
-<div class="dropdown-buttons-trigger">
-    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
-            class="fas fa-download"></i></button>
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
 
-    <div class="dropdown-buttons">
-        <!-- ipynb file if we had a myst markdown file -->
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
         
-        <!-- Download raw file -->
-        <a class="dropdown-buttons" href="_sources/user_guide.rst.txt"><button type="button"
-                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
-                data-placement="left">.rst</button></a>
-        <!-- Download PDF via print -->
-        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="_sources/user_guide.rst.txt"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.rst</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
     </div>
 </div>
 
-            <!-- Source interaction buttons -->
-
-            <!-- Full screen (wrap in <a> to have style consistency -->
-
-<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
-        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
-        title="Fullscreen mode"><i
-            class="fas fa-expand"></i></button></a>
-
-            <!-- Launch buttons -->
-
-        </div>
-
-        <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
-            
-            <div class="tocsection onthispage pt-5 pb-3">
-                <i class="fas fa-list"></i> Contents
-            </div>
-            <nav id="bd-toc-nav" aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#reading-genetic-data">
    Reading genetic data
@@ -926,12 +996,11 @@
  </li>
 </ul>
 
-            </nav>
-        </div>
-    </div>
+    </nav>
 </div>
-    <div id="main-content" class="row">
-        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
                 <h1>User Guide</h1>
@@ -1065,11 +1134,12 @@
                     </div>
                 </div>
             </div>
-            
+            <main id="main-content" role="main">
+                
               <div>
                 
-  <div class="section" id="user-guide">
-<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
+  <section id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">#</a></h1>
 <div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of contents:</p>
 <ul class="simple">
@@ -1111,10 +1181,10 @@
 </li>
 </ul>
 </div>
-<div class="section" id="reading-genetic-data">
-<span id="id1"></span><h2><a class="toc-backref" href="#id5">Reading genetic data</a><a class="headerlink" href="#reading-genetic-data" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="installation">
-<span id="id2"></span><h3><a class="toc-backref" href="#id6">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
+<section id="reading-genetic-data">
+<span id="id1"></span><h2><a class="toc-backref" href="#id5">Reading genetic data</a><a class="headerlink" href="#reading-genetic-data" title="Permalink to this headline">#</a></h2>
+<section id="installation">
+<span id="id2"></span><h3><a class="toc-backref" href="#id6">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">#</a></h3>
 <p>Sgkit can read standard genetic file formats, including VCF, PLINK, and BGEN.</p>
 <p>If sgkit has been installed using conda, support for reading BGEN and PLINK is included, but
 VCF is not because there is no Windows support for cyvcf2, the library we use for reading VCF data.
@@ -1137,9 +1207,9 @@ as an “extra” feature using pip, as follows.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install &#39;sgkit[vcf]&#39;
 </pre></div>
 </div>
-</div>
-<div class="section" id="converting-genetic-data-to-zarr">
-<h3><a class="toc-backref" href="#id7">Converting genetic data to Zarr</a><a class="headerlink" href="#converting-genetic-data-to-zarr" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="converting-genetic-data-to-zarr">
+<h3><a class="toc-backref" href="#id7">Converting genetic data to Zarr</a><a class="headerlink" href="#converting-genetic-data-to-zarr" title="Permalink to this headline">#</a></h3>
 <p>There are broadly two ways of loading genetic file format <code class="docutils literal notranslate"><span class="pre">X</span></code> for use in sgkit:</p>
 <ol class="arabic simple">
 <li><p>a <code class="docutils literal notranslate"><span class="pre">read_X</span></code> function to read the file directly</p></li>
@@ -1158,36 +1228,36 @@ This can be used to save a newly-loaded dataset, or a dataset with new variables
 result of running genetic methods on the data, so it can be loaded again later.</p>
 <p>By default, Zarr datasets created by sgkit (and Xarray) have <a class="reference external" href="http://xarray.pydata.org/en/stable/user-guide/io.html#consolidated-metadata">consolidated metadata</a>,
 which makes opening the dataset faster.</p>
-</div>
-<div class="section" id="bgen">
-<h3><a class="toc-backref" href="#id8">BGEN</a><a class="headerlink" href="#bgen" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bgen">
+<h3><a class="toc-backref" href="#id8">BGEN</a><a class="headerlink" href="#bgen" title="Permalink to this headline">#</a></h3>
 <p>The <a class="reference internal" href="generated/sgkit.io.bgen.read_bgen.html#sgkit.io.bgen.read_bgen" title="sgkit.io.bgen.read_bgen"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.bgen.read_bgen()</span></code></a> function loads a single BGEN dataset as Dask
 arrays within an <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a> from a <code class="docutils literal notranslate"><span class="pre">bgen</span></code> file.</p>
 <p>The <a class="reference internal" href="generated/sgkit.io.bgen.bgen_to_zarr.html#sgkit.io.bgen.bgen_to_zarr" title="sgkit.io.bgen.bgen_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.bgen.bgen_to_zarr()</span></code></a> function converts a <code class="docutils literal notranslate"><span class="pre">bgen</span></code> file to Zarr
 files stored in sgkit’s Xarray data representation, which can then be opened
 as a <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
-</div>
-<div class="section" id="plink">
-<h3><a class="toc-backref" href="#id9">PLINK</a><a class="headerlink" href="#plink" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="plink">
+<h3><a class="toc-backref" href="#id9">PLINK</a><a class="headerlink" href="#plink" title="Permalink to this headline">#</a></h3>
 <p>The <a class="reference internal" href="generated/sgkit.io.plink.read_plink.html#sgkit.io.plink.read_plink" title="sgkit.io.plink.read_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.read_plink()</span></code></a> function loads a single PLINK dataset as Dask
 arrays within an <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a> from <code class="docutils literal notranslate"><span class="pre">bed</span></code>, <code class="docutils literal notranslate"><span class="pre">bim</span></code>, and <code class="docutils literal notranslate"><span class="pre">fam</span></code> files.</p>
-</div>
-<div class="section" id="vcf">
-<h3><a class="toc-backref" href="#id10">VCF</a><a class="headerlink" href="#vcf" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="vcf">
+<h3><a class="toc-backref" href="#id10">VCF</a><a class="headerlink" href="#vcf" title="Permalink to this headline">#</a></h3>
 <p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function converts one or more VCF files to
 Zarr files stored in sgkit’s Xarray data representation, which can then be opened
 as a <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
 <p>See <a class="reference internal" href="vcf.html#vcf"><span class="std std-ref">Reading VCF</span></a> for installation instructions, and details on using VCF in sgkit.</p>
-</div>
-<div class="section" id="working-with-cloud-native-data">
-<h3><a class="toc-backref" href="#id11">Working with cloud-native data</a><a class="headerlink" href="#working-with-cloud-native-data" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="working-with-cloud-native-data">
+<h3><a class="toc-backref" href="#id11">Working with cloud-native data</a><a class="headerlink" href="#working-with-cloud-native-data" title="Permalink to this headline">#</a></h3>
 <p>TODO: Show how to read/write Zarr (and VCF?) data in cloud storage</p>
-</div>
-</div>
-<div class="section" id="datasets">
-<h2><a class="toc-backref" href="#id12">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="genetic-variables">
-<span id="id3"></span><h3><a class="toc-backref" href="#id13">Genetic variables</a><a class="headerlink" href="#genetic-variables" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="datasets">
+<h2><a class="toc-backref" href="#id12">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">#</a></h2>
+<section id="genetic-variables">
+<span id="id3"></span><h3><a class="toc-backref" href="#id13">Genetic variables</a><a class="headerlink" href="#genetic-variables" title="Permalink to this headline">#</a></h3>
 <p>Most <a class="reference internal" href="getting_started.html#genetic-methods"><span class="std std-ref">Genetic methods</span></a> in sgkit operate on a few variables in an Xarray dataset. Variables have
 default names, so you can usually just pass in the dataset, but it’s also possible to use different
 variable names.</p>
@@ -1299,9 +1369,9 @@ to have created the variable in that case.</p>
 </div>
 <p>There are also some variables that cannot be automatically defined, such as <code class="docutils literal notranslate"><span class="pre">call_genotype</span></code>,
 since it can’t be computed from other data.</p>
-</div>
-<div class="section" id="dataset-merge-behavior">
-<span id="dataset-merge"></span><h3><a class="toc-backref" href="#id14">Dataset merge behavior</a><a class="headerlink" href="#dataset-merge-behavior" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="dataset-merge-behavior">
+<span id="dataset-merge"></span><h3><a class="toc-backref" href="#id14">Dataset merge behavior</a><a class="headerlink" href="#dataset-merge-behavior" title="Permalink to this headline">#</a></h3>
 <p>Generally, method functions in sgkit compute some new variables based on the
 input dataset, then return a new output dataset that consists of the input
 dataset plus the new computed variables. The input dataset is unchanged.</p>
@@ -1405,21 +1475,21 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 </div>
 <p>Note that there is a limitation where intermediate variables (<code class="docutils literal notranslate"><span class="pre">call_allele_count</span></code> in this case)
 are not returned if <code class="docutils literal notranslate"><span class="pre">merge=False</span></code>. See <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/405">https://github.com/pystatgen/sgkit/issues/405</a>.</p>
-</div>
-<div class="section" id="custom-naming-conventions">
-<h3><a class="toc-backref" href="#id15">Custom naming conventions</a><a class="headerlink" href="#custom-naming-conventions" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="custom-naming-conventions">
+<h3><a class="toc-backref" href="#id15">Custom naming conventions</a><a class="headerlink" href="#custom-naming-conventions" title="Permalink to this headline">#</a></h3>
 <p>TODO: Show to use a custom naming convention via Xarray renaming features.</p>
-</div>
-<div class="section" id="adding-custom-data-to-a-dataset">
-<h3><a class="toc-backref" href="#id16">Adding custom data to a Dataset</a><a class="headerlink" href="#adding-custom-data-to-a-dataset" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="adding-custom-data-to-a-dataset">
+<h3><a class="toc-backref" href="#id16">Adding custom data to a Dataset</a><a class="headerlink" href="#adding-custom-data-to-a-dataset" title="Permalink to this headline">#</a></h3>
 <p>TODO:  Show how something like sample metadata can be joined to an existing Xarray dataset. Also briefly explain
 indexing and uniqueness within Xarray/Pandas, since this is critical for understanding joins.</p>
-</div>
-</div>
-<div class="section" id="methods">
-<h2><a class="toc-backref" href="#id17">Methods</a><a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="custom-computations">
-<span id="id4"></span><h3><a class="toc-backref" href="#id18">Custom Computations</a><a class="headerlink" href="#custom-computations" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="methods">
+<h2><a class="toc-backref" href="#id17">Methods</a><a class="headerlink" href="#methods" title="Permalink to this headline">#</a></h2>
+<section id="custom-computations">
+<span id="id4"></span><h3><a class="toc-backref" href="#id18">Custom Computations</a><a class="headerlink" href="#custom-computations" title="Permalink to this headline">#</a></h3>
 <p>TODO: Finish explaining how Numba works and how users might apply it</p>
 <p>Here is an example that demonstrates an alt allele count:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [25]: </span><span class="kn">import</span> <span class="nn">numba</span>
@@ -1447,27 +1517,27 @@ indexing and uniqueness within Xarray/Pandas, since this is critical for underst
 <span class="go">       [ 1,  2,  2]])</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="pca">
-<h3><a class="toc-backref" href="#id19">PCA</a><a class="headerlink" href="#pca" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="pca">
+<h3><a class="toc-backref" href="#id19">PCA</a><a class="headerlink" href="#pca" title="Permalink to this headline">#</a></h3>
 <p>TODO: Describe the upstream tools for PCA (i.e. those in dask-ml/scikit-learn)</p>
-</div>
-</div>
-<div class="section" id="deployment">
-<h2><a class="toc-backref" href="#id20">Deployment</a><a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="deploying-sgkit-on-a-cluster">
-<h3><a class="toc-backref" href="#id21">Deploying sgkit on a cluster</a><a class="headerlink" href="#deploying-sgkit-on-a-cluster" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="deployment">
+<h2><a class="toc-backref" href="#id20">Deployment</a><a class="headerlink" href="#deployment" title="Permalink to this headline">#</a></h2>
+<section id="deploying-sgkit-on-a-cluster">
+<h3><a class="toc-backref" href="#id21">Deploying sgkit on a cluster</a><a class="headerlink" href="#deploying-sgkit-on-a-cluster" title="Permalink to this headline">#</a></h3>
 <p>TODO: Create a tutorial on running sgkit at scale</p>
-</div>
-<div class="section" id="using-gpus">
-<h3><a class="toc-backref" href="#id22">Using GPUs</a><a class="headerlink" href="#using-gpus" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="using-gpus">
+<h3><a class="toc-backref" href="#id22">Using GPUs</a><a class="headerlink" href="#using-gpus" title="Permalink to this headline">#</a></h3>
 <p>TODO: Show CuPy examples</p>
-</div>
-</div>
-<div class="section" id="troubleshooting">
-<h2><a class="toc-backref" href="#id23">Troubleshooting</a><a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="monitoring-operations">
-<h3><a class="toc-backref" href="#id24">Monitoring operations</a><a class="headerlink" href="#monitoring-operations" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="troubleshooting">
+<h2><a class="toc-backref" href="#id23">Troubleshooting</a><a class="headerlink" href="#troubleshooting" title="Permalink to this headline">#</a></h2>
+<section id="monitoring-operations">
+<h3><a class="toc-backref" href="#id24">Monitoring operations</a><a class="headerlink" href="#monitoring-operations" title="Permalink to this headline">#</a></h3>
 <p>The simplest way to monitor operations when running sgkit on a single host is to use <a class="reference external" href="https://docs.dask.org/en/latest/diagnostics-local.html">Dask local diagnostics</a>.</p>
 <p>As an example, this code shows how to track the progress of a single sgkit function:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [31]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
@@ -1500,9 +1570,9 @@ indexing and uniqueness within Xarray/Pandas, since this is critical for underst
 and profiling task streams with <a class="reference external" href="https://docs.dask.org/en/latest/diagnostics-local.html#profiler">Profiler</a> are other
 commonly used local diagnostics.</p>
 <p>For similar monitoring in a distributed cluster, see <a class="reference external" href="https://docs.dask.org/en/latest/diagnostics-distributed.html">Dask distributed diagnostics</a>.</p>
-</div>
-<div class="section" id="visualizing-computations">
-<h3><a class="toc-backref" href="#id25">Visualizing computations</a><a class="headerlink" href="#visualizing-computations" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="visualizing-computations">
+<h3><a class="toc-backref" href="#id25">Visualizing computations</a><a class="headerlink" href="#visualizing-computations" title="Permalink to this headline">#</a></h3>
 <p>Dask allows you to <a class="reference external" href="https://docs.dask.org/en/latest/graphviz.html">visualize the task graph</a> of a computation
 before running it, which can be handy when trying to understand where the bottlenecks are.</p>
 <p>In most cases the number of tasks is too large to visualize, so it’s useful to restrict
@@ -1532,16 +1602,18 @@ the graph just a few chunks, as shown in this example.</p>
 </div>
 <a class="reference internal image-reference" href="_images/order.png"><img alt="_images/order.png" class="align-center" src="_images/order.png" style="width: 600px;" /></a>
 <p>Task order number is shown in circular boxes, colored from red to yellow.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
               </div>
               
-            
-                <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="getting_started.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -1557,24 +1629,28 @@ the graph just a few chunks, as shown in this example.</p>
     <i class="fas fa-angle-right"></i>
     </a>
 </div>
-            
+            </footer>
         </div>
     </div>
-    <footer class="footer">
-  <p>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By sgkit developers<br/>
+  
+      &copy; Copyright 2020, sgkit developers.<br/>
+</p>
+        </footer>
+    </div>
     
-      By sgkit developers<br/>
-    
-        &copy; Copyright 2020, sgkit developers.<br/>
-  </p>
-</footer>
-</main>
+</div>
 
 
       </div>
     </div>
   
-  <script src="_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
 
   </body>
 </html>
