@@ -916,7 +916,7 @@ def individual_heterozygosity(
     # use nan denominator to avoid divide by zero with K - 1
     K2 = da.where(K > 1, K, np.nan)
     AF = AC / K2[..., None]
-    HI = (1 - da.sum(AF ** 2, axis=-1)) * (K / (K2 - 1))
+    HI = (1 - da.sum(AF**2, axis=-1)) * (K / (K2 - 1))
     new_ds = create_dataset(
         {variables.call_heterozygosity: (("variants", "samples"), HI)}
     )

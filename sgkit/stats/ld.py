@@ -41,8 +41,8 @@ def rogers_huff_r_between(gn0: ArrayLike, gn1: ArrayLike) -> float:  # pragma: n
             n += 1
             m0 += x
             m1 += y
-            v0 += x ** 2
-            v1 += y ** 2
+            v0 += x**2
+            v1 += y**2
             cov += x * y
 
     # early out
