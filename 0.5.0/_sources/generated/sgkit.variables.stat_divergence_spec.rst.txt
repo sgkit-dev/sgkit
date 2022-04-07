@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_divergence\_spec
+======================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_divergence_spec

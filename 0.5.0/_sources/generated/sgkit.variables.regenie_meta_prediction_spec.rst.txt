@@ -1,0 +1,6 @@
+﻿sgkit.variables.regenie\_meta\_prediction\_spec
+===============================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: regenie_meta_prediction_spec

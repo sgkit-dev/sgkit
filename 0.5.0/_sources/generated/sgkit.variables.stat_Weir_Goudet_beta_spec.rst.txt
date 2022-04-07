@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_Weir\_Goudet\_beta\_spec
+==============================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_Weir_Goudet_beta_spec

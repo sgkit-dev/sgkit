@@ -1,0 +1,6 @@
+﻿sgkit.save\_dataset
+===================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: save_dataset

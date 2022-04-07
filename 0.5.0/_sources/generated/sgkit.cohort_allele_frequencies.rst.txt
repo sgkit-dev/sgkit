@@ -1,0 +1,6 @@
+﻿sgkit.cohort\_allele\_frequencies
+=================================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: cohort_allele_frequencies

@@ -1,0 +1,6 @@
+﻿sgkit.variables.window\_contig\_spec
+====================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: window_contig_spec

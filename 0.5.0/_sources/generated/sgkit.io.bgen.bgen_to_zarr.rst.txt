@@ -1,0 +1,6 @@
+﻿sgkit.io.bgen.bgen\_to\_zarr
+============================
+
+.. currentmodule:: sgkit.io.bgen
+
+.. autofunction:: bgen_to_zarr

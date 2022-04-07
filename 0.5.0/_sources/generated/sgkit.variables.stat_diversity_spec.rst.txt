@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_diversity\_spec
+=====================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_diversity_spec
