@@ -96,7 +96,8 @@ def test_identity_by_state__tetraploid_multiallelic(chunks):
     [
         ((7,), (5,), (2,)),
         ((2, 7, 3), (20,), (3,)),
-        ((20, 20, 11), (33,), (7, 7, 7)),
+        ((2, 7, 3), (5, 5, 5, 5), (3,)),
+        ((20, 20, 11), (20, 10, 3), (7, 7, 7)),
     ],
 )
 @pytest.mark.parametrize("ploidy", [2, 4])
@@ -123,19 +124,6 @@ def test_identity_by_state__reference_implementation(ploidy, chunks, seed):
         (AF[..., None, :, :] * AF[..., :, None, :]).sum(axis=-1), axis=0
     ).compute()
     np.testing.assert_array_almost_equal(expect, actual)
-
-
-def test_identity_by_state__chunked_sample_dimension():
-    ds = simulate_genotype_call_dataset(n_variant=20, n_sample=10, n_ploidy=2)
-    ds["call_genotype"] = ds.call_genotype.dims, da.asarray(
-        ds.call_genotype.data,
-        chunks=((20,), (5, 5), (2,)),
-    )
-    with pytest.raises(
-        NotImplementedError,
-        match="identity_by_state does not support chunking in the samples dimension",
-    ):
-        identity_by_state(ds)
 
 
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
