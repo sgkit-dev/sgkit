@@ -420,6 +420,29 @@ Variant indexes to drop for LD prune.
     )
 )
 
+parent, parent_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "parent",
+        ndim=2,
+        kind="i",
+        __doc__="""
+Indices of parent samples with negative values indicating unknown parents.
+""",
+    )
+)
+
+parent_id, parent_id_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "parent_id",
+        ndim=2,
+        kind={"S", "U", "O"},
+        __doc__="""
+Unique identifiers of parent samples matching those in
+:data:`sgkit.variables.sample_id_spec`.
+""",
+    )
+)
+
 (
     regenie_base_prediction,
     regenie_base_prediction_spec,

@@ -32,6 +32,7 @@ from .stats.ibs import Weir_Goudet_beta, identity_by_state
 from .stats.ld import ld_matrix, ld_prune, maximal_independent_set
 from .stats.pc_relate import pc_relate
 from .stats.pca import pca
+from .stats.pedigree import parent_indices
 from .stats.popgen import (
     Fst,
     Garud_H,
@@ -79,6 +80,7 @@ __all__ = [
     "ld_matrix",
     "ld_prune",
     "maximal_independent_set",
+    "parent_indices",
     "sample_stats",
     "variant_stats",
     "diversity",
