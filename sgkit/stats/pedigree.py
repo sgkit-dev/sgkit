@@ -13,6 +13,7 @@ def parent_indices(
     *,
     sample_id: Hashable = variables.sample_id,
     parent_id: Hashable = variables.parent_id,
+    missing: Hashable = ".",
     merge: bool = True,
 ) -> Dataset:
     """Calculate the integer indices for the parents of each sample
@@ -29,6 +30,9 @@ def parent_indices(
     parent_id
         Input variable name holding parent_id as defined by
         :data:`sgkit.variables.parent_id_spec`.
+    missing
+        A value indicating unknown parents within the
+        :data:`sgkit.variables.parent_id_spec` array.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -38,6 +42,13 @@ def parent_indices(
     Returns
     -------
     A dataset containing :data:`sgkit.variables.parent_spec`.
+
+    Raises
+    ------
+    ValueError
+        If the 'missing' value is a known sample identifier.
+    KeyError
+        If a parent identifier is not a known sample identifier.
 
     Warnings
     --------
@@ -66,10 +77,22 @@ def parent_indices(
     parent_id = ds[parent_id].values
     out = np.empty(parent_id.shape, int)
     indices = {s: i for i, s in enumerate(sample_id)}
+    if missing in indices:
+        raise ValueError(
+            "Missing value '{}' is a known sample identifier".format(missing)
+        )
+    indices[missing] = -1
     n_samples, n_parents = parent_id.shape
     for i in range(n_samples):
         for j in range(n_parents):
-            out[i, j] = indices.get(parent_id[i, j], -1)
+            try:
+                out[i, j] = indices[parent_id[i, j]]
+            except KeyError as e:
+                raise KeyError(
+                    "Parent identifier '{}' is not a known sample identifier".format(
+                        parent_id[i, j]
+                    )
+                ) from e
     new_ds = create_dataset(
         {
             variables.parent: xr.DataArray(out, dims=["samples", "parents"]),
