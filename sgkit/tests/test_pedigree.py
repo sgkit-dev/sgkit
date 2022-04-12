@@ -51,12 +51,45 @@ def test_parent_indices__selection(selection):
     ]
     # reorder and/or subset samples
     ds = ds.sel(dict(samples=selection))
+    if len(selection) < 6:
+        # null out identifiers of removed parents
+        sample_id = ds.sample_id.values
+        parent_id = ds.parent_id.values
+        ds["parent_id"] = (
+            ["samples", "parents"],
+            [[s if s in sample_id else "." for s in p] for p in parent_id],
+        )
+    # calculate indices
     ds = parent_indices(ds)
+    # join samples to parent sample_ids via parent index
     parent = ds.parent.values
     sample_id = ds.sample_id.values
-    parent_id = ds.parent_id.values
-    # expect parent_id value except where that value is not in sample_id
-    expect = [[s if s in sample_id else None for s in p] for p in parent_id]
-    # join samples to parent sample_ids via parent index
-    actual = [[sample_id[i] if i >= 0 else None for i in p] for p in parent]
+    actual = [[sample_id[i] if i >= 0 else "." for i in p] for p in parent]
+    expect = ds.parent_id.values
     np.testing.assert_array_equal(actual, expect)
+
+
+def test_parent_indices__raise_on_missing_is_sample_id():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+    ]
+    with pytest.raises(
+        ValueError, match="Missing value 'S0' is a known sample identifier"
+    ):
+        parent_indices(ds, missing="S0")
+
+
+def test_parent_indices__raise_on_unknown_parent_id():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        ["", ""],
+        ["", ""],
+        ["S0", "S1"],
+    ]
+    with pytest.raises(
+        KeyError, match="Parent identifier '' is not a known sample identifier"
+    ):
+        parent_indices(ds, missing=".")
