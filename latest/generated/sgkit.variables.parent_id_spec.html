@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>sgkit.variables.call_genotype_probability_mask_spec</title>
+    <title>sgkit.variables.parent_id_spec</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -46,8 +46,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.variables.call_heterozygosity_spec" href="sgkit.variables.call_heterozygosity_spec.html" />
-    <link rel="prev" title="sgkit.variables.call_genotype_probability_spec" href="sgkit.variables.call_genotype_probability_spec.html" />
+    <link rel="next" title="sgkit.variables.pc_relate_phi_spec" href="sgkit.variables.pc_relate_phi_spec.html" />
+    <link rel="prev" title="sgkit.variables.parent_spec" href="sgkit.variables.parent_spec.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -430,8 +430,8 @@
      sgkit.variables.call_genotype_probability_spec
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_genotype_probability_mask_spec.html">
      sgkit.variables.call_genotype_probability_mask_spec
     </a>
    </li>
@@ -490,8 +490,8 @@
      sgkit.variables.parent_spec
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.variables.parent_id_spec.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      sgkit.variables.parent_id_spec
     </a>
    </li>
@@ -835,7 +835,7 @@ title="Fullscreen mode"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="../_sources/generated/sgkit.variables.call_genotype_probability_mask_spec.rst.txt"
+        <a href="../_sources/generated/sgkit.variables.parent_id_spec.rst.txt"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -884,7 +884,7 @@ title="Print to PDF"
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>sgkit.variables.call_genotype_probability_mask_spec</h1>
+                <h1>sgkit.variables.parent_id_spec</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -896,12 +896,13 @@ title="Print to PDF"
                 
               <div>
                 
-  <section id="sgkit-variables-call-genotype-probability-mask-spec">
-<h1>sgkit.variables.call_genotype_probability_mask_spec<a class="headerlink" href="#sgkit-variables-call-genotype-probability-mask-spec" title="Permalink to this headline">#</a></h1>
+  <section id="sgkit-variables-parent-id-spec">
+<h1>sgkit.variables.parent_id_spec<a class="headerlink" href="#sgkit-variables-parent-id-spec" title="Permalink to this headline">#</a></h1>
 <dl class="py data">
-<dt class="sig sig-object py" id="sgkit.variables.call_genotype_probability_mask_spec">
-<span class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></span><span class="sig-name descname"><span class="pre">call_genotype_probability_mask_spec</span></span><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='call_genotype_probability_mask',</span> <span class="pre">__doc__='A</span> <span class="pre">flag</span> <span class="pre">for</span> <span class="pre">each</span> <span class="pre">call</span> <span class="pre">indicating</span> <span class="pre">which</span> <span class="pre">values</span> <span class="pre">are</span> <span class="pre">missing.',</span> <span class="pre">kind='b',</span> <span class="pre">ndim=3)</span></em><a class="headerlink" href="#sgkit.variables.call_genotype_probability_mask_spec" title="Permalink to this definition">#</a></dt>
-<dd><p>A flag for each call indicating which values are missing.</p>
+<dt class="sig sig-object py" id="sgkit.variables.parent_id_spec">
+<span class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></span><span class="sig-name descname"><span class="pre">parent_id_spec</span></span><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='parent_id',</span> <span class="pre">__doc__='\nUnique</span> <span class="pre">identifiers</span> <span class="pre">of</span> <span class="pre">parent</span> <span class="pre">samples</span> <span class="pre">matching</span> <span class="pre">those</span> <span class="pre">in\n:data:`sgkit.variables.sample_id_spec`.\n',</span> <span class="pre">kind={'O',</span> <span class="pre">'S',</span> <span class="pre">'U'},</span> <span class="pre">ndim=2)</span></em><a class="headerlink" href="#sgkit.variables.parent_id_spec" title="Permalink to this definition">#</a></dt>
+<dd><p>Unique identifiers of parent samples matching those in
+<a class="reference internal" href="sgkit.variables.sample_id_spec.html#sgkit.variables.sample_id_spec" title="sgkit.variables.sample_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_id_spec</span></code></a>.</p>
 </dd></dl>
 
 </section>
@@ -914,17 +915,17 @@ title="Print to PDF"
                 
     <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="sgkit.variables.call_genotype_probability_spec.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="sgkit.variables.parent_spec.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">sgkit.variables.call_genotype_probability_spec</p>
+            <p class="prev-next-title">sgkit.variables.parent_spec</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="sgkit.variables.call_heterozygosity_spec.html" title="next page">
+    <a class='right-next' id="next-link" href="sgkit.variables.pc_relate_phi_spec.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">sgkit.variables.call_heterozygosity_spec</p>
+        <p class="prev-next-title">sgkit.variables.pc_relate_phi_spec</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

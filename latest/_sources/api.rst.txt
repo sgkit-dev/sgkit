@@ -111,6 +111,7 @@ Utilities
    infer_call_ploidy
    infer_sample_ploidy
    infer_variant_ploidy
+   parent_indices
    simulate_genotype_call_dataset
    window_by_position
    window_by_variant
@@ -148,6 +149,8 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.ld_prune_index_to_drop_spec
     variables.regenie_loco_prediction_spec
     variables.regenie_meta_prediction_spec
+    variables.parent_spec
+    variables.parent_id_spec
     variables.pc_relate_phi_spec
     variables.sample_call_rate_spec
     variables.sample_cohort_spec

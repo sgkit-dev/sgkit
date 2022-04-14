@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>sgkit.variables.call_genotype_probability_mask_spec</title>
+    <title>sgkit.parent_indices</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -46,8 +46,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.variables.call_heterozygosity_spec" href="sgkit.variables.call_heterozygosity_spec.html" />
-    <link rel="prev" title="sgkit.variables.call_genotype_probability_spec" href="sgkit.variables.call_genotype_probability_spec.html" />
+    <link rel="next" title="sgkit.simulate_genotype_call_dataset" href="sgkit.simulate_genotype_call_dataset.html" />
+    <link rel="prev" title="sgkit.infer_variant_ploidy" href="sgkit.infer_variant_ploidy.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -350,8 +350,8 @@
      sgkit.infer_variant_ploidy
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.parent_indices.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      sgkit.parent_indices
     </a>
    </li>
@@ -430,8 +430,8 @@
      sgkit.variables.call_genotype_probability_spec
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.variables.call_genotype_probability_mask_spec.html">
      sgkit.variables.call_genotype_probability_mask_spec
     </a>
    </li>
@@ -835,7 +835,7 @@ title="Fullscreen mode"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="../_sources/generated/sgkit.variables.call_genotype_probability_mask_spec.rst.txt"
+        <a href="../_sources/generated/sgkit.parent_indices.rst.txt"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -884,7 +884,7 @@ title="Print to PDF"
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>sgkit.variables.call_genotype_probability_mask_spec</h1>
+                <h1>sgkit.parent_indices</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -896,12 +896,69 @@ title="Print to PDF"
                 
               <div>
                 
-  <section id="sgkit-variables-call-genotype-probability-mask-spec">
-<h1>sgkit.variables.call_genotype_probability_mask_spec<a class="headerlink" href="#sgkit-variables-call-genotype-probability-mask-spec" title="Permalink to this headline">#</a></h1>
-<dl class="py data">
-<dt class="sig sig-object py" id="sgkit.variables.call_genotype_probability_mask_spec">
-<span class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></span><span class="sig-name descname"><span class="pre">call_genotype_probability_mask_spec</span></span><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='call_genotype_probability_mask',</span> <span class="pre">__doc__='A</span> <span class="pre">flag</span> <span class="pre">for</span> <span class="pre">each</span> <span class="pre">call</span> <span class="pre">indicating</span> <span class="pre">which</span> <span class="pre">values</span> <span class="pre">are</span> <span class="pre">missing.',</span> <span class="pre">kind='b',</span> <span class="pre">ndim=3)</span></em><a class="headerlink" href="#sgkit.variables.call_genotype_probability_mask_spec" title="Permalink to this definition">#</a></dt>
-<dd><p>A flag for each call indicating which values are missing.</p>
+  <section id="sgkit-parent-indices">
+<h1>sgkit.parent_indices<a class="headerlink" href="#sgkit-parent-indices" title="Permalink to this headline">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="sgkit.parent_indices">
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">parent_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sample_id'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'parent_id'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.parent_indices" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate the integer indices for the parents of each sample
+within the samples dimension.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ds</strong> : <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing pedigree structure.</p>
+</dd>
+<dt><strong>sample_id</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'sample_id'</span></code>)</dt><dd><p>Input variable name holding sample_id as defined by
+<a class="reference internal" href="sgkit.variables.sample_id_spec.html#sgkit.variables.sample_id_spec" title="sgkit.variables.sample_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_id_spec</span></code></a>.</p>
+</dd>
+<dt><strong>parent_id</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'parent_id'</span></code>)</dt><dd><p>Input variable name holding parent_id as defined by
+<a class="reference internal" href="sgkit.variables.parent_id_spec.html#sgkit.variables.parent_id_spec" title="sgkit.variables.parent_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.parent_id_spec</span></code></a>.</p>
+</dd>
+<dt><strong>missing</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'.'</span></code>)</dt><dd><p>A value indicating unknown parents within the
+<a class="reference internal" href="sgkit.variables.parent_id_spec.html#sgkit.variables.parent_id_spec" title="sgkit.variables.parent_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.parent_id_spec</span></code></a> array.</p>
+</dd>
+<dt><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
+output variables into a single dataset, otherwise return only
+the computed output variables.
+See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.parent_spec.html#sgkit.variables.parent_spec" title="sgkit.variables.parent_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.parent_spec</span></code></a>.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the ‘missing’ value is a known sample identifier.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.10)"><strong>KeyError</strong></a> – If a parent identifier is not a known sample identifier.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The resulting indices within <a class="reference internal" href="sgkit.variables.parent_spec.html#sgkit.variables.parent_spec" title="sgkit.variables.parent_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.parent_spec</span></code></a>
+may be invalidated by any alterations to sample ordering including
+sorting and the addition or removal of samples.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([&#39;S0&#39;, &#39;S1&#39;, &#39;S2&#39;], dtype=&#39;&lt;U2&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;parent_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;parents&quot;</span><span class="p">],</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;S0&quot;</span><span class="p">,</span> <span class="s2">&quot;S1&quot;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">parent_indices</span><span class="p">(</span><span class="n">ds</span><span class="p">)[</span><span class="s2">&quot;parent&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([[-1, -1],</span>
+<span class="go">       [-1, -1],</span>
+<span class="go">       [ 0,  1]])</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -914,17 +971,17 @@ title="Print to PDF"
                 
     <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="sgkit.variables.call_genotype_probability_spec.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="sgkit.infer_variant_ploidy.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">sgkit.variables.call_genotype_probability_spec</p>
+            <p class="prev-next-title">sgkit.infer_variant_ploidy</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="sgkit.variables.call_heterozygosity_spec.html" title="next page">
+    <a class='right-next' id="next-link" href="sgkit.simulate_genotype_call_dataset.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">sgkit.variables.call_heterozygosity_spec</p>
+        <p class="prev-next-title">sgkit.simulate_genotype_call_dataset</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
