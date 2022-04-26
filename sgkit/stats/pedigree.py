@@ -2,9 +2,11 @@ from typing import Hashable
 
 import numpy as np
 import xarray as xr
+from numba import njit
 from xarray import Dataset
 
 from sgkit import variables
+from sgkit.typing import ArrayLike
 from sgkit.utils import conditional_merge_datasets, create_dataset
 
 
@@ -99,3 +101,41 @@ def parent_indices(
         }
     )
     return conditional_merge_datasets(ds, new_ds, merge)
+
+
+@njit(cache=True)
+def topological_argsort(parent: ArrayLike) -> ArrayLike:  # pragma: no cover
+    n_samples, n_parents = parent.shape
+    # count children of each node
+    node_children = np.zeros(n_samples, dtype=np.uint64)
+    for i in range(n_samples):
+        for j in range(n_parents):
+            p = parent[i, j]
+            if p >= 0:
+                node_children[p] += 1
+    # initialise processing order
+    todo = np.empty(n_samples, dtype=np.uint64)
+    todo_insert = 0
+    # reverse order improves sort stability when reversing result
+    for i in range(n_samples - 1, -1, -1):
+        if node_children[i] == 0:
+            todo[todo_insert] = i
+            todo_insert += 1
+    # topological order
+    order = np.empty(n_samples, dtype=np.uint64)
+    i = 0
+    while i < todo_insert:
+        c = todo[i]
+        order[i] = c
+        i += 1
+        for j in range(n_parents):
+            p = parent[c, j]
+            if p >= 0:
+                node_children[p] -= 1
+                if node_children[p] == 0:
+                    todo[todo_insert] = p
+                    todo_insert += 1
+    if i < n_samples:
+        raise ValueError("Pedigree contains a directed loop")
+    # reverse result to return parents before children
+    return order[::-1]
