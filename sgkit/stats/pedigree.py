@@ -105,6 +105,31 @@ def parent_indices(
 
 @njit(cache=True)
 def topological_argsort(parent: ArrayLike) -> ArrayLike:  # pragma: no cover
+    """Find a topological ordering of samples within a pedigree such
+    that no individual occurs before its parents.
+
+    Parameters
+    ----------
+    parent
+        A matrix of shape (samples, parents) containing the indices of each
+        sample's parents with negative values indicating unknown parents as
+        defined in :data:`sgkit.variables.parent_spec`.
+
+    Returns
+    -------
+    order
+        An array of unsigned integers indicating the sorted sample order.
+
+    Raises
+    ------
+    ValueError
+        If the pedigree contains a directed loop.
+
+    Notes
+    -----
+    Sort order stability may be improved by sorting the parent indices of
+    each sample into decending order before calling this function.
+    """
     n_samples, n_parents = parent.shape
     # count children of each node
     node_children = np.zeros(n_samples, dtype=np.uint64)
@@ -113,28 +138,26 @@ def topological_argsort(parent: ArrayLike) -> ArrayLike:  # pragma: no cover
             p = parent[i, j]
             if p >= 0:
                 node_children[p] += 1
-    # initialise processing order
-    todo = np.empty(n_samples, dtype=np.uint64)
-    todo_insert = 0
+    # initialise order with leaf nodes
+    order = np.empty(n_samples, dtype=np.uint64)
+    insert = 0
     # reverse order improves sort stability when reversing result
     for i in range(n_samples - 1, -1, -1):
         if node_children[i] == 0:
-            todo[todo_insert] = i
-            todo_insert += 1
-    # topological order
-    order = np.empty(n_samples, dtype=np.uint64)
+            order[insert] = i
+            insert += 1
+    # topological order remaining nodes
     i = 0
-    while i < todo_insert:
-        c = todo[i]
-        order[i] = c
+    while i < insert:
+        c = order[i]
         i += 1
         for j in range(n_parents):
             p = parent[c, j]
             if p >= 0:
                 node_children[p] -= 1
                 if node_children[p] == 0:
-                    todo[todo_insert] = p
-                    todo_insert += 1
+                    order[insert] = p
+                    insert += 1
     if i < n_samples:
         raise ValueError("Pedigree contains a directed loop")
     # reverse result to return parents before children
