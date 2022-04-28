@@ -240,6 +240,9 @@ Python runtime dependencies are listed in ``requirements.txt`` and ``setup.cfg``
 dependency, or add a new one, then don't forget to change both files. We try to keep the use of pinning
 (to exclude particular version numbers) to a minimum, but sometimes this is unavoidable due to bugs or conflicts.
 
+After a release, the release manager will update the corresponding dependencies in the
+`conda-forge feedstock <https://github.com/conda-forge/sgkit-feedstock>`_.
+
 There is a `GitHub Action <https://github.com/pystatgen/sgkit/actions/workflows/upstream.yml>`_ that runs every night
 against the main branches of our key upstream dependencies. This is useful for finding any breaking changes that would
 affect *sgkit*, so we can report or try to fix the problem before the upstream library is released.
