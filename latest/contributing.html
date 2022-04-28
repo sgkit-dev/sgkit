@@ -961,6 +961,11 @@ title="Print to PDF"
      PR/Git ops
     </a>
    </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#python-dependencies">
+     Python dependencies
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -1106,6 +1111,11 @@ title="Print to PDF"
      PR/Git ops
     </a>
    </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#python-dependencies">
+     Python dependencies
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -1197,20 +1207,21 @@ title="Print to PDF"
 <li><p><a class="reference internal" href="#docstrings" id="id11">Docstrings</a></p></li>
 <li><p><a class="reference internal" href="#coding-standards" id="id12">Coding standards</a></p></li>
 <li><p><a class="reference internal" href="#pr-git-ops" id="id13">PR/Git ops</a></p></li>
+<li><p><a class="reference internal" href="#python-dependencies" id="id14">Python dependencies</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#contributing-to-documentation" id="id14">Contributing to documentation</a></p></li>
-<li><p><a class="reference internal" href="#benchmarks" id="id15">Benchmarks</a></p></li>
-<li><p><a class="reference internal" href="#review-process" id="id16">Review process</a></p></li>
-<li><p><a class="reference internal" href="#design-discussions" id="id17">Design discussions</a></p>
+<li><p><a class="reference internal" href="#contributing-to-documentation" id="id15">Contributing to documentation</a></p></li>
+<li><p><a class="reference internal" href="#benchmarks" id="id16">Benchmarks</a></p></li>
+<li><p><a class="reference internal" href="#review-process" id="id17">Review process</a></p></li>
+<li><p><a class="reference internal" href="#design-discussions" id="id18">Design discussions</a></p>
 <ul>
-<li><p><a class="reference internal" href="#dataset-subclassing" id="id18">Dataset subclassing</a></p></li>
-<li><p><a class="reference internal" href="#dataset-api-typing" id="id19">Dataset API typing</a></p></li>
-<li><p><a class="reference internal" href="#dataset-variables" id="id20">Dataset variables</a></p></li>
-<li><p><a class="reference internal" href="#delayed-invariant-checks" id="id21">Delayed invariant checks</a></p></li>
-<li><p><a class="reference internal" href="#mixed-ploidy" id="id22">Mixed ploidy</a></p></li>
-<li><p><a class="reference internal" href="#numba-guvectorize-usage" id="id23">Numba guvectorize usage</a></p></li>
-<li><p><a class="reference internal" href="#api-namespace" id="id24">API namespace</a></p></li>
+<li><p><a class="reference internal" href="#dataset-subclassing" id="id19">Dataset subclassing</a></p></li>
+<li><p><a class="reference internal" href="#dataset-api-typing" id="id20">Dataset API typing</a></p></li>
+<li><p><a class="reference internal" href="#dataset-variables" id="id21">Dataset variables</a></p></li>
+<li><p><a class="reference internal" href="#delayed-invariant-checks" id="id22">Delayed invariant checks</a></p></li>
+<li><p><a class="reference internal" href="#mixed-ploidy" id="id23">Mixed ploidy</a></p></li>
+<li><p><a class="reference internal" href="#numba-guvectorize-usage" id="id24">Numba guvectorize usage</a></p></li>
+<li><p><a class="reference internal" href="#api-namespace" id="id25">API namespace</a></p></li>
 </ul>
 </li>
 </ul>
@@ -1388,9 +1399,21 @@ bugs easier to isolate specific buggy commits.</p>
 <p>Please read <a class="reference external" href="https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project#_public_project">git best practices</a>
 and specifically a very handy <a class="reference external" href="https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History#_rewriting_history">interactive rebase doc</a>.</p>
 </section>
+<section id="python-dependencies">
+<h3><a class="toc-backref" href="#id14">Python dependencies</a><a class="headerlink" href="#python-dependencies" title="Permalink to this headline">#</a></h3>
+<p>Python runtime dependencies are listed in <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> and <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code>, so if you update a
+dependency, or add a new one, then don’t forget to change both files. We try to keep the use of pinning
+(to exclude particular version numbers) to a minimum, but sometimes this is unavoidable due to bugs or conflicts.</p>
+<p>After a release, the release manager will update the corresponding dependencies in the
+<a class="reference external" href="https://github.com/conda-forge/sgkit-feedstock">conda-forge feedstock</a>.</p>
+<p>There is a <a class="reference external" href="https://github.com/pystatgen/sgkit/actions/workflows/upstream.yml">GitHub Action</a> that runs every night
+against the main branches of our key upstream dependencies. This is useful for finding any breaking changes that would
+affect <em>sgkit</em>, so we can report or try to fix the problem before the upstream library is released.</p>
+<p>Build dependencies are listed in <code class="docutils literal notranslate"><span class="pre">requirements-dev.txt</span></code> and <code class="docutils literal notranslate"><span class="pre">requirements-doc.txt</span></code>.</p>
+</section>
 </section>
 <section id="contributing-to-documentation">
-<h2><a class="toc-backref" href="#id14">Contributing to documentation</a><a class="headerlink" href="#contributing-to-documentation" title="Permalink to this headline">#</a></h2>
+<h2><a class="toc-backref" href="#id15">Contributing to documentation</a><a class="headerlink" href="#contributing-to-documentation" title="Permalink to this headline">#</a></h2>
 <p><em>sgkit</em> uses <a class="reference external" href="https://www.sphinx-doc.org/">Sphinx</a> for documentation, hosted at <a class="reference external" href="https://pystatgen.github.io/sgkit/">https://pystatgen.github.io/sgkit/</a>.
 Documentation is maintained in the RestructuredText markup language (<code class="docutils literal notranslate"><span class="pre">.rst</span></code>
 files) in <code class="docutils literal notranslate"><span class="pre">docs</span></code>.  The documentation consists both of prose
@@ -1412,7 +1435,7 @@ without warnings. You can do that locally with:</p>
 </div>
 </section>
 <section id="benchmarks">
-<h2><a class="toc-backref" href="#id15">Benchmarks</a><a class="headerlink" href="#benchmarks" title="Permalink to this headline">#</a></h2>
+<h2><a class="toc-backref" href="#id16">Benchmarks</a><a class="headerlink" href="#benchmarks" title="Permalink to this headline">#</a></h2>
 <p><em>sgkit</em> uses <a class="reference external" href="https://www.sphinx-doc.org/">asv</a> (Airspeed Velocity) for micro benchmarking.
 Airspeed Velocity manages building the environment via conda itself. The
 recipe for the same is defined in the <code class="docutils literal notranslate"><span class="pre">benchmarks/asv.conf.json</span></code>
@@ -1462,7 +1485,7 @@ hence minor deviation in benchmarks performance should be consumed with a pinch
 of salt.</p>
 </section>
 <section id="review-process">
-<h2><a class="toc-backref" href="#id16">Review process</a><a class="headerlink" href="#review-process" title="Permalink to this headline">#</a></h2>
+<h2><a class="toc-backref" href="#id17">Review process</a><a class="headerlink" href="#review-process" title="Permalink to this headline">#</a></h2>
 <p>Pull requests will be reviewed by a project maintainer. All changes to <em>sgkit</em> require
 approval by at least one maintainer.</p>
 <p>We use <a class="reference external" href="https://mergify.io/">mergify</a> to automate PR flow. A project
@@ -1471,11 +1494,11 @@ to automatically merge a PR by labeling it with <code class="docutils literal no
 at least one approval from a committer and a clean build it will get merged automatically.</p>
 </section>
 <section id="design-discussions">
-<h2><a class="toc-backref" href="#id17">Design discussions</a><a class="headerlink" href="#design-discussions" title="Permalink to this headline">#</a></h2>
+<h2><a class="toc-backref" href="#id18">Design discussions</a><a class="headerlink" href="#design-discussions" title="Permalink to this headline">#</a></h2>
 <p>The information on these topics may be useful for developers in understanding the
 history behind the design choices that have been made within the project so far.</p>
 <section id="dataset-subclassing">
-<h3><a class="toc-backref" href="#id18">Dataset subclassing</a><a class="headerlink" href="#dataset-subclassing" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id19">Dataset subclassing</a><a class="headerlink" href="#dataset-subclassing" title="Permalink to this headline">#</a></h3>
 <p>Debates on whether or not we should use Xarray objects directly or
 put them behind a layer of encapsulation:</p>
 <ul class="simple">
@@ -1484,7 +1507,7 @@ put them behind a layer of encapsulation:</p>
 </ul>
 </section>
 <section id="dataset-api-typing">
-<h3><a class="toc-backref" href="#id19">Dataset API typing</a><a class="headerlink" href="#dataset-api-typing" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id20">Dataset API typing</a><a class="headerlink" href="#dataset-api-typing" title="Permalink to this headline">#</a></h3>
 <p>Discussions around bringing stricter array type enforcement into the API:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/issues/43">https://github.com/pystatgen/sgkit/issues/43</a></p></li>
@@ -1493,11 +1516,11 @@ put them behind a layer of encapsulation:</p>
 </ul>
 </section>
 <section id="dataset-variables">
-<h3><a class="toc-backref" href="#id20">Dataset variables</a><a class="headerlink" href="#dataset-variables" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id21">Dataset variables</a><a class="headerlink" href="#dataset-variables" title="Permalink to this headline">#</a></h3>
 <p>Naming conventions for variables: <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/295">https://github.com/pystatgen/sgkit/issues/295</a></p>
 </section>
 <section id="delayed-invariant-checks">
-<h3><a class="toc-backref" href="#id21">Delayed invariant checks</a><a class="headerlink" href="#delayed-invariant-checks" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id22">Delayed invariant checks</a><a class="headerlink" href="#delayed-invariant-checks" title="Permalink to this headline">#</a></h3>
 <p>Discussions on how to run sanity checks on arrays efficiently and why those checks would be
 useful if they were possible (they are not possible currently w/ Dask):</p>
 <ul class="simple">
@@ -1506,11 +1529,11 @@ useful if they were possible (they are not possible currently w/ Dask):</p>
 </ul>
 </section>
 <section id="mixed-ploidy">
-<h3><a class="toc-backref" href="#id22">Mixed ploidy</a><a class="headerlink" href="#mixed-ploidy" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id23">Mixed ploidy</a><a class="headerlink" href="#mixed-ploidy" title="Permalink to this headline">#</a></h3>
 <p>Proposal for handling mixed ploidy: <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/243">https://github.com/pystatgen/sgkit/issues/243</a></p>
 </section>
 <section id="numba-guvectorize-usage">
-<h3><a class="toc-backref" href="#id23">Numba guvectorize usage</a><a class="headerlink" href="#numba-guvectorize-usage" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id24">Numba guvectorize usage</a><a class="headerlink" href="#numba-guvectorize-usage" title="Permalink to this headline">#</a></h3>
 <p>Learning how to use <code class="docutils literal notranslate"><span class="pre">guvectorize</span></code> effectively:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/pull/114">https://github.com/pystatgen/sgkit/pull/114</a></p></li>
@@ -1518,7 +1541,7 @@ useful if they were possible (they are not possible currently w/ Dask):</p>
 </ul>
 </section>
 <section id="api-namespace">
-<h3><a class="toc-backref" href="#id24">API namespace</a><a class="headerlink" href="#api-namespace" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id25">API namespace</a><a class="headerlink" href="#api-namespace" title="Permalink to this headline">#</a></h3>
 <p>Sgkit controls API namespace via init files. To accommodate for mypy and docstrings
 we include both imports and <code class="docutils literal notranslate"><span class="pre">__all__</span></code> declaration. More on this decision in the issue:
 <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/251">https://github.com/pystatgen/sgkit/issues/251</a></p>
