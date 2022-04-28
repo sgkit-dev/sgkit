@@ -185,7 +185,7 @@ def read_metafile(path: PathType) -> dd.DataFrame:
             for i in range(mf.npartitions)
         ]
         meta = dd.utils.make_meta(METAFILE_DTYPE)
-        return dd.from_delayed(dfs, meta=meta, divisions=divisions)
+        return dd.from_delayed(dfs, meta=meta, divisions=divisions, verify_meta=False)
 
 
 def read_samples(path: PathType) -> pd.DataFrame:
