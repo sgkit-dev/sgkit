@@ -233,6 +233,20 @@ Please read `git best practices <https://git-scm.com/book/en/v2/Distributed-Git-
 and specifically a very handy `interactive rebase doc <https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History#_rewriting_history>`_.
 
 
+Python dependencies
+~~~~~~~~~~~~~~~~~~~
+
+Python runtime dependencies are listed in ``requirements.txt`` and ``setup.cfg``, so if you update a
+dependency, or add a new one, then don't forget to change both files. We try to keep the use of pinning
+(to exclude particular version numbers) to a minimum, but sometimes this is unavoidable due to bugs or conflicts.
+
+There is a `GitHub Action <https://github.com/pystatgen/sgkit/actions/workflows/upstream.yml>`_ that runs every night
+against the main branches of our key upstream dependencies. This is useful for finding any breaking changes that would
+affect *sgkit*, so we can report or try to fix the problem before the upstream library is released.
+
+Build dependencies are listed in ``requirements-dev.txt`` and ``requirements-doc.txt``.
+
+
 Contributing to documentation
 -----------------------------
 
