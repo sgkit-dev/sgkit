@@ -130,6 +130,9 @@ def topological_argsort(parent: ArrayLike) -> ArrayLike:  # pragma: no cover
     Sort order stability may be improved by sorting the parent indices of
     each sample into decending order before calling this function.
     """
+    # Note: this function is based on the implimentation of
+    # tsk_individual_table_topological_sort in Tskit 0.4.1
+    # https://github.com/tskit-dev/tskit/
     n_samples, n_parents = parent.shape
     # count children of each node
     node_children = np.zeros(n_samples, dtype=np.uint64)
@@ -146,7 +149,7 @@ def topological_argsort(parent: ArrayLike) -> ArrayLike:  # pragma: no cover
         if node_children[i] == 0:
             order[insert] = i
             insert += 1
-    # topological order remaining nodes
+    # topological order of remaining nodes
     i = 0
     while i < insert:
         c = order[i]
