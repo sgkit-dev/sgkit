@@ -704,6 +704,32 @@ stat_Garud_h2_h1, stat_Garud_h2_h1_spec = SgkitVariables.register_variable(
     )
 )
 
+stat_Hamilton_Kerr_tau, stat_Hamilton_Kerr_tau_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_Hamilton_Kerr_tau",
+        ndim=2,
+        kind="u",
+        __doc__="""
+Ploidy of the gametes derived from each parent, for each individual, which
+must sum to the ploidy of the individual.
+""",
+    )
+)
+
+(
+    stat_Hamilton_Kerr_lambda,
+    stat_Hamilton_Kerr_lambda_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_Hamilton_Kerr_lambda",
+        ndim=2,
+        kind="f",
+        __doc__="""
+Probability of IBD among gamete alleles resulting from meiotic processes.
+""",
+    )
+)
+
 (
     stat_observed_heterozygosity,
     stat_observed_heterozygosity_spec,
@@ -724,6 +750,18 @@ stat_pbs, stat_pbs_spec = SgkitVariables.register_variable(
         ndim=4,
         kind="f",
         __doc__="""Population branching statistic for cohort triples.""",
+    )
+)
+
+stat_pedigree_kinship, stat_pedigree_kinship_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_pedigree_kinship",
+        ndim=2,
+        kind="f",
+        __doc__="""
+Pairwise estimates of expected kinship among samples based on pedigree structure
+with self-kinship values on the diagonal.
+""",
     )
 )
 
