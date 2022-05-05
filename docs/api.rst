@@ -92,6 +92,7 @@ Methods
    maximal_independent_set
    observed_heterozygosity
    pbs
+   pedigree_kinship
    pc_relate
    regenie
    sample_stats
@@ -173,9 +174,12 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.stat_Garud_h12_spec
     variables.stat_Garud_h123_spec
     variables.stat_Garud_h2_h1_spec
+    variables.stat_Hamilton_Kerr_lambda_spec
+    variables.stat_Hamilton_Kerr_tau_spec
     variables.stat_identity_by_state_spec
     variables.stat_observed_heterozygosity_spec
     variables.stat_pbs_spec
+    variables.stat_pedigree_kinship_spec
     variables.stat_Tajimas_D_spec
     variables.stat_Weir_Goudet_beta_spec
     variables.traits_spec
