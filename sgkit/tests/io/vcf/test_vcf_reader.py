@@ -7,7 +7,7 @@ import zarr
 from numcodecs import Blosc, PackBits, VLenUTF8
 from numpy.testing import assert_allclose, assert_array_equal
 
-from sgkit import load_dataset
+from sgkit import load_dataset, save_dataset
 from sgkit.io.utils import FLOAT32_FILL, INT_FILL, INT_MISSING
 from sgkit.io.vcf import (
     MaxAltAllelesExceededWarning,
@@ -15,6 +15,7 @@ from sgkit.io.vcf import (
     vcf_to_zarr,
 )
 from sgkit.io.vcf.vcf_reader import zarr_array_sizes
+from sgkit.tests.io.test_dataset import assert_identical
 
 from .utils import path_for_test
 
@@ -94,6 +95,14 @@ def test_vcf_to_zarr__small_vcf(shared_datadir, is_path, tmp_path):
     assert_array_equal(ds["call_genotype"], call_genotype)
     assert_array_equal(ds["call_genotype_mask"], call_genotype < 0)
     assert_array_equal(ds["call_genotype_phased"], call_genotype_phased)
+
+    # save and load again to test https://github.com/pydata/xarray/issues/3476
+    with pytest.warns(xr.coding.variables.SerializationWarning):
+        path2 = tmp_path / "ds2.zarr"
+        if not is_path:
+            path2 = str(path2)
+        save_dataset(ds, path2)
+        assert_identical(ds, load_dataset(path2))
 
 
 @pytest.mark.parametrize(

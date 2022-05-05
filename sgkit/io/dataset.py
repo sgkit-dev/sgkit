@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Any, Dict, MutableMapping, Optional, Union
 
 import fsspec
+import numcodecs
 import xarray as xr
 from xarray import Dataset
 
@@ -38,6 +39,15 @@ def save_dataset(
     for v in ds:
         # Workaround for https://github.com/pydata/xarray/issues/4380
         ds[v].encoding.pop("chunks", None)
+
+        # Remove VLenUTF8 from filters to avoid double encoding error https://github.com/pydata/xarray/issues/3476
+        filters = ds[v].encoding.get("filters", None)
+        var_len_str_codec = numcodecs.VLenUTF8()
+        if filters is not None and var_len_str_codec in filters:
+            filters = list(filters)
+            filters.remove(var_len_str_codec)
+            ds[v].encoding["filters"] = filters
+
     ds.to_zarr(store, **kwargs)
 
 
