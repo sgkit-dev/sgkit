@@ -16,11 +16,12 @@ def test_variables__variables_registered():
 
 @pytest.fixture()
 def dummy_ds():
-    # foo is a data variable, bar is a coordinate
+    # foo ans baz are data variables, bar is a coordinate
     return xr.Dataset(
         {
             "foo": ("d1", np.asarray([1, 2, 3])),
             "bar": np.asarray([1, 2, 3]),
+            "baz": ("d1", np.asarray([4, 5, 6])),
         }
     )
 
@@ -82,20 +83,24 @@ def test_variables__multiple_specs(dummy_ds: xr.Dataset) -> None:
 def test_variables__whole_ds(dummy_ds: xr.Dataset) -> None:
     spec_foo = ArrayLikeSpec("foo", "foo doc", kind="i", ndim=1)
     spec_bar = ArrayLikeSpec("bar", "bar doc", kind="i", ndim=1)
+    spec_baz = ArrayLikeSpec("baz", "baz doc", kind="i", ndim=1)
     try:
         SgkitVariables.register_variable(spec_foo)
         with pytest.raises(ValueError, match="`foo` already registered"):
             SgkitVariables.register_variable(spec_foo)
         SgkitVariables.register_variable(spec_bar)
+        SgkitVariables.register_variable(spec_baz)
         variables.validate(dummy_ds)
     finally:
         SgkitVariables.registered_variables.pop("foo", None)
         SgkitVariables.registered_variables.pop("bar", None)
+        SgkitVariables.registered_variables.pop("baz", None)
 
 
 def test_variables_in_multi_index(dummy_ds: xr.Dataset) -> None:
     # create a multi index
-    ds = dummy_ds.set_index({"ind": ("foo", "bar")})
+    # variables must share a dimension since https://github.com/pydata/xarray/pull/5692
+    ds = dummy_ds.set_index({"ind": ("foo", "baz")})
 
     spec = ArrayLikeSpec("foo", "foo doc", kind="i", ndim=1)
     variables.validate(ds, spec)
