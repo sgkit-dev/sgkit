@@ -32,8 +32,8 @@ def get_vectors(
         rs = da.random.RandomState(0)
         x = rs.randint(0, 3, size=size).astype(dtype).rechunk(chunk)
     else:
-        rs = np.random.RandomState(0)
-        x = rs.rand(size[0], size[1]).astype(dtype)
+        rs = np.random.RandomState(0)  # type: ignore
+        x = rs.rand(size[0], size[1]).astype(dtype)  # type: ignore
     return x
 
 

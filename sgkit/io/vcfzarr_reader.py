@@ -178,7 +178,6 @@ def _vcfzarr_to_dataset(
 ) -> xr.Dataset:
 
     variant_position = da.from_zarr(vcfzarr["variants/POS"])
-    variant_contig: ArrayLike = None
 
     if contig is None:
         # Get the contigs from variants/CHROM
@@ -265,7 +264,7 @@ def _vcfzarr_to_dataset(
                 # Compute fixed-length string dtype for array
                 if kind == "O" or var in ("variant_id", "variant_allele"):
                     kind = "S"
-                max_len = max_str_len(arr).values  # type: ignore[union-attr]
+                max_len = max_str_len(arr).values  # type: ignore
                 dt = f"{kind}{max_len}"
                 ds[var] = arr.astype(dt)
 

@@ -71,7 +71,7 @@ def check_array_like(
             raise ValueError(f"Number of dimensions ({a.ndim}) does not match {ndim}")
 
 
-def encode_array(x: ArrayLike) -> Tuple[ArrayLike, List[Any]]:
+def encode_array(x: Union[ArrayLike, List[Any]]) -> Tuple[ArrayLike, List[Any]]:
     """Encode array values as integers indexing unique values.
 
     The codes created for each unique element in the array correspond

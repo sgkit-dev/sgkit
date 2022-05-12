@@ -3,8 +3,6 @@ from typing import Optional, Sequence, Tuple, Union
 import numpy as np
 import pandas as pd
 
-from sgkit.typing import ArrayLike
-
 
 def _tuple_len(t: Union[int, Tuple[int, ...], str, Tuple[str, ...]]) -> int:
     """Return the length of a tuple, or 1 for an int or string value."""
@@ -16,7 +14,7 @@ def _tuple_len(t: Union[int, Tuple[int, ...], str, Tuple[str, ...]]) -> int:
 def _cohorts_to_array(
     cohorts: Sequence[Union[int, Tuple[int, ...], str, Tuple[str, ...]]],
     index: Optional[pd.Index] = None,
-) -> ArrayLike:
+) -> np.ndarray:
     """Convert cohorts or cohort tuples specified as a sequence of values or
     tuples to an array of ints used to match samples in ``sample_cohorts``.
 
