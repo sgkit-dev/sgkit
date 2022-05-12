@@ -760,10 +760,10 @@ def pbs(
 N_GARUD_H_STATS = 4  # H1, H12, H123, H2/H1
 
 
-def _Garud_h(haplotypes: ArrayLike) -> ArrayLike:
+def _Garud_h(haplotypes: np.ndarray) -> np.ndarray:
     # find haplotype counts (sorted in descending order)
     counts = sorted(collections.Counter(haplotypes.tolist()).values(), reverse=True)
-    counts = np.array(counts)  # type: ignore[assignment]
+    counts = np.array(counts)  # type: ignore
 
     # find haplotype frequencies
     n = haplotypes.shape[0]
@@ -786,8 +786,8 @@ def _Garud_h(haplotypes: ArrayLike) -> ArrayLike:
 
 
 def _Garud_h_cohorts(
-    gt: ArrayLike, sample_cohort: ArrayLike, n_cohorts: int, ct: ArrayLike
-) -> ArrayLike:
+    gt: np.ndarray, sample_cohort: np.ndarray, n_cohorts: int, ct: np.ndarray
+) -> np.ndarray:
     # transpose to hash columns (haplotypes)
     haplotypes = hash_array(gt.transpose()).transpose().flatten()
     arr = np.full((n_cohorts, N_GARUD_H_STATS), np.nan)
@@ -895,7 +895,7 @@ def Garud_H(
 
     variables.validate(ds, {call_genotype: variables.call_genotype_spec})
 
-    gt = ds[call_genotype]
+    gt = da.asarray(ds[call_genotype])
 
     # convert sample cohorts to haplotype layout
     sc = ds[sample_cohort].values

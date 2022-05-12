@@ -259,7 +259,6 @@ def read_plink(
     )
 
     # If contigs are already integers, use them as-is
-    variant_contig: ArrayLike = None
     if bim_int_contig:
         variant_contig = arr_bim["contig"].astype("int16")
         variant_contig_names = da.unique(variant_contig).astype(str)

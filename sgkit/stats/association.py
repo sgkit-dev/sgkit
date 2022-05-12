@@ -328,7 +328,7 @@ def regenie_loco_regression(
 
     G = _get_loop_covariates(ds, call_genotype, dosage)
 
-    contigs: Array = np.asarray(ds[variant_contig].data, like=G)
+    contigs: Array = np.asarray(ds[variant_contig].data, like=G)  # type: ignore[assignment]
 
     # Pre-compute contigs to have concrete indices to slice the genotype array
     #
@@ -350,7 +350,7 @@ def regenie_loco_regression(
 
     if len(covariates) == 0:
         if add_intercept:
-            X: Array = np.ones_like(
+            X: Array = np.ones_like(  # type: ignore[assignment]
                 G,
                 shape=(ds[traits].shape[0], 1),
                 dtype=np.float32,
@@ -358,7 +358,7 @@ def regenie_loco_regression(
         else:
             raise ValueError("add_intercept must be True if no covariates specified")
     else:
-        X = covariates
+        X = covariates  # type: ignore[assignment]
 
         if add_intercept:
             intercept_arr = np.ones_like(G, shape=(X.shape[0], 1), dtype=X.dtype)
@@ -377,7 +377,7 @@ def regenie_loco_regression(
     Q = da.linalg.qr(X)[0]
     assert Q.shape == X.shape
 
-    Y: Array = np.asarray(ds[traits].data, like=G)
+    Y: Array = np.asarray(ds[traits].data, like=G)  # type: ignore[assignment]
     # Mean-center
     Y -= Y.mean(axis=0)
     # Orthogonally project covariates out of phenotype matrix
@@ -386,7 +386,7 @@ def regenie_loco_regression(
     # Scale
     Y /= Y_scale[None, :]
 
-    offsets: Array = np.asarray(ds[regenie_loco_prediction].data, like=G)
+    offsets: Array = np.asarray(ds[regenie_loco_prediction].data, like=G)  # type: ignore[assignment]
     # Match chunksize of Y
     offsets = offsets.rechunk((None, Y.chunksize[0], Y.chunksize[1]))
 

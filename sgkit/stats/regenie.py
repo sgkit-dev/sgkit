@@ -610,7 +610,7 @@ def regenie_transform(
     *,
     variant_block_size: Optional[Union[int, Tuple[int, ...]]] = None,
     sample_block_size: Optional[Union[int, Tuple[int, ...]]] = None,
-    alphas: Optional[ArrayLike] = None,
+    alphas: Optional[Sequence[float]] = None,
     add_intercept: bool = True,
     orthogonalize: bool = False,
     normalize: bool = False,
@@ -666,7 +666,7 @@ def regenie_transform(
     n_variant = G.shape[1]
 
     if alphas is not None:
-        alphas = np.asarray(alphas, like=G)
+        alphas = np.asarray(alphas, like=G)  # type: ignore
 
     G, X, Y = da.asarray(G), da.asarray(X), da.asarray(Y)
     contigs = da.asarray(contigs)
@@ -887,10 +887,10 @@ def regenie(
         {t: variables.traits_spec for t in traits},
     )
 
-    G = ds[dosage]
+    G = da.asarray(ds[dosage])
     X = da.asarray(concat_2d(ds[list(covariates)], dims=("samples", "covariates")))
     Y = da.asarray(concat_2d(ds[list(traits)], dims=("samples", "traits")))
-    contigs = ds[variant_contig]
+    contigs = da.asarray(ds[variant_contig])
     new_ds = regenie_transform(
         G.T,
         X,

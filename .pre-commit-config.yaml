@@ -25,5 +25,5 @@ repos:
     rev: v0.931
     hooks:
       - id: mypy
-        args: ["--show-error-codes", "--ignore-missing-imports"]
+        args: ["--allow-redefinition", "--show-error-codes", "--ignore-missing-imports"]
         additional_dependencies: ["numpy>=1.21.2", "xarray", "dask[array]", "scipy", "typing-extensions", "zarr", "numba", "dask-ml", "networkx", "types-PyYAML"]

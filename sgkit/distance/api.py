@@ -16,7 +16,7 @@ def pairwise_distance(
     metric: MetricTypes = "euclidean",
     split_every: typing.Optional[int] = None,
     device: DeviceTypes = "cpu",
-) -> da.array:
+) -> da.Array:
     """Calculates the pairwise distance between all pairs of row vectors in the
     given two dimensional array x.
 
