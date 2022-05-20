@@ -568,6 +568,8 @@ def pedigree_kinship(
     Raises
     ------
     ValueError
+        If an unknown method is specified.
+    ValueError
         If the pedigree contains a directed loop.
     ValueError
         If the parents dimension does not have a length of 2.
@@ -613,7 +615,8 @@ def pedigree_kinship(
     "Computation of the inverse additive relationship matrix for autopolyploid
     and multiple-ploidy populations." Theoretical and Applied Genetics 131: 851-860.
     """
-    assert method in {"diploid", "Hamilton-Kerr"}
+    if method not in {"diploid", "Hamilton-Kerr"}:
+        raise ValueError("Unknown method '{}'".format(method))
     ds = define_variable_if_absent(ds, variables.parent, parent, parent_indices)
     variables.validate(ds, {parent: variables.parent_spec})
     parent = da.asarray(ds[parent].data, chunks=ds[parent].shape)
