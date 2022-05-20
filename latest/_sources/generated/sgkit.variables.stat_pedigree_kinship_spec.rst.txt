@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_pedigree\_kinship\_spec
+=============================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_pedigree_kinship_spec
