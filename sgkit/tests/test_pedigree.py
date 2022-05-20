@@ -486,3 +486,16 @@ def test_pedigree_kinship__raise_on_parents_dimension(method):
         ValueError, match="Parent matrix must have shape \(samples, 2\)"  # noqa: W605
     ):
         pedigree_kinship(ds, method=method).compute()
+
+
+def test_pedigree_kinship__raise_on_invalid_method():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=5)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+        ["S1", "."],
+        ["S2", "S3"],
+    ]
+    with pytest.raises(ValueError, match="Unknown method 'unknown'"):
+        pedigree_kinship(ds, method="unknown")
