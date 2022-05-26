@@ -162,6 +162,7 @@ def define_variable_if_absent(
     default_variable_name: Hashable,
     variable_name: Optional[Hashable],
     func: Callable[[Dataset], Dataset],
+    **kwargs,
 ) -> Dataset:
     """Define a variable in a dataset using the given function if it's missing.
 
@@ -175,6 +176,8 @@ def define_variable_if_absent(
         The actual name of the variable, or None to use the default.
     func
         The function to calculate the variable.
+    kwargs
+        Additional key word arguments to pass to func.
 
     Returns
     -------
@@ -192,7 +195,7 @@ def define_variable_if_absent(
         raise ValueError(
             f"Variable '{variable_name}' with non-default name is missing and will not be automatically defined."
         )
-    return func(ds)
+    return func(ds, **kwargs)
 
 
 def create_dataset(
