@@ -1,9 +1,9 @@
-from typing import Hashable
+from typing import Hashable, Union
 
 import dask.array as da
 import numpy as np
 import xarray as xr
-from numba import njit
+from numba import njit, vectorize
 from xarray import Dataset
 
 from sgkit import variables
@@ -512,7 +512,7 @@ def kinship_Hamilton_Kerr(
 
 
 def pedigree_kinship(
-    ds,
+    ds: Dataset,
     *,
     method: str = "diploid",
     parent: Hashable = variables.parent,
@@ -520,7 +520,7 @@ def pedigree_kinship(
     stat_Hamilton_Kerr_lambda: Hashable = variables.stat_Hamilton_Kerr_lambda,
     allow_half_founders: bool = False,
     merge: bool = True,
-):
+) -> Dataset:
     """Estimate expected pairwise kinship coefficients from pedigree structure.
 
     Parameters
@@ -645,6 +645,371 @@ def pedigree_kinship(
         {
             variables.stat_pedigree_kinship: xr.DataArray(
                 kinship, dims=["samples_0", "samples_1"]
+            ),
+        }
+    )
+    return conditional_merge_datasets(ds, new_ds, merge)
+
+
+@vectorize(nopython=True, cache=True)
+def kinship_as_additive_relationship(
+    kinship: float, ploidy_x: int, ploidy_y: int
+) -> float:  # pragma: no cover
+    """Convert kinship estimates to relatedness estimates
+
+    Parameters
+    ----------
+    kinship
+        kinship between a pair of samples
+    ploidy_x
+        ploidy of first sample in pair
+    ploidy_y
+        ploidy of second sample in pair
+
+    Returns
+    relatedness between the pair of samples
+
+    Notes
+    -----
+    If both samples are of the same ploidy then their relatedness
+    is simply their kinship multiplied by their ploidy.
+    """
+    return kinship * 2 * np.sqrt(ploidy_x / 2 * ploidy_y / 2)
+
+
+def additive_relationships(
+    ds: Dataset,
+    *,
+    method: str = "diploid",
+    stat_pedigree_kinship: Hashable = variables.stat_pedigree_kinship,
+    stat_Hamilton_Kerr_tau: Hashable = variables.stat_Hamilton_Kerr_tau,
+    merge: bool = True,
+) -> Dataset:
+    """Calculate the additive relationship matrix from pedigree structure
+    (AKA the numerator relationship matrix).
+
+    Parameters
+    ----------
+    ds
+        Dataset containing pedigree structure.
+    method
+        The method used for relationship estimation which must be one of
+        {"diploid", "Hamilton-Kerr"}. Defaults to "diploid" which is
+        only suitable for pedigrees in which all samples are diploids
+        resulting from sexual reproduction.
+        The "Hamilton-Kerr" method is suitable for autopolyploid and
+        mixed-ploidy datasets following Hamilton and Kerr 2017 [1].
+    stat_pedigree_kinship
+        Input variable name holding pedigree kinship matrix as defined
+        by :data:`sgkit.variables.stat_pedigree_kinship_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`pedigree_kinship` with the method specified above.
+    stat_Hamilton_Kerr_tau
+        Input variable name holding stat_Hamilton_Kerr_tau as defined
+        by :data:`sgkit.variables.stat_Hamilton_Kerr_tau_spec`.
+        This variable is only required for the "Hamilton-Kerr" method.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+
+    Returns
+    -------
+    A dataset containing :data:`sgkit.variables.stat_additive_relationship_spec`.
+
+    Raises
+    ------
+    ValueError
+        If an unknown method is specified.
+
+    Notes
+    -----
+    Dimensions of :data:`sgkit.variables.stat_additive_relationship_spec`
+    are named ``samples_0`` and ``samples_1``.
+
+    Examples
+    --------
+
+    >>> import sgkit as sg
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, seed=1)
+    >>> ds.sample_id.values # doctest: +NORMALIZE_WHITESPACE
+    array(['S0', 'S1', 'S2', 'S3'], dtype='<U2')
+    >>> ds["parent_id"] = ["samples", "parents"], [
+    ...     [".", "."],
+    ...     [".", "."],
+    ...     ["S0", "S1"],
+    ...     ["S0", "S2"]
+    ... ]
+    >>> ds = sg.additive_relationships(ds)
+    >>> ds["stat_additive_relationship"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[1.  , 0.  , 0.5 , 0.75],
+           [0.  , 1.  , 0.5 , 0.25],
+           [0.5 , 0.5 , 1.  , 0.75],
+           [0.75, 0.25, 0.75, 1.25]])
+
+    References
+    ----------
+    [1] - Matthew G. Hamilton, and Richard J. Kerr 2017.
+    "Computation of the inverse additive relationship matrix for autopolyploid
+    and multiple-ploidy populations." Theoretical and Applied Genetics 131: 851-860.
+    """
+    if method not in {"diploid", "Hamilton-Kerr"}:
+        raise ValueError("Unknown method '{}'".format(method))
+    ds = define_variable_if_absent(
+        ds,
+        variables.stat_pedigree_kinship,
+        stat_pedigree_kinship,
+        pedigree_kinship,
+        method=method,
+        stat_Hamilton_Kerr_tau=stat_Hamilton_Kerr_tau,
+    )
+    variables.validate(
+        ds, {stat_pedigree_kinship: variables.stat_pedigree_kinship_spec}
+    )
+    kinship = ds[stat_pedigree_kinship].data
+    if method == "diploid":
+        A = kinship * 2
+    elif method == "Hamilton-Kerr":
+        ploidy = ds[stat_Hamilton_Kerr_tau].data.sum(axis=-1)
+        A = da.apply_gufunc(
+            kinship_as_additive_relationship,
+            "(),(),()->()",
+            kinship,
+            ploidy[None, :],
+            ploidy[:, None],
+        )
+    new_ds = create_dataset(
+        {
+            variables.stat_additive_relationship: xr.DataArray(
+                A, dims=["samples_0", "samples_1"]
+            ),
+        }
+    )
+    return conditional_merge_datasets(ds, new_ds, merge)
+
+
+@njit(cache=True)
+def _update_inverse_additive_relationships(
+    mtx: ArrayLike,
+    kinship: ArrayLike,
+    parent: ArrayLike,
+    i: int,
+    tau: Union[ArrayLike, None] = None,
+) -> None:  # pragma: no cover
+    p, q = parent[i]
+    if tau is None:
+        # assume diploid
+        tau_p, tau_q = 1, 1
+    else:
+        tau_p, tau_q = tau[i, 0], tau[i, 1]
+    # weighted contribution of each parent
+    ploidy_i = tau_p + tau_q
+    weight_p, weight_q = tau_p / ploidy_i, tau_q / ploidy_i
+    # sparse matrix product of weight vectors and kinship matrix
+    prod = 0.0
+    if p >= 0:
+        prod += kinship[p, p] * weight_p**2
+    if q >= 0:
+        prod += kinship[q, q] * weight_q**2
+    if (p >= 0) and (q >= 0):
+        prod += kinship[p, q] * weight_p * weight_q * 2
+    scalar = 1 / (kinship[i, i] - prod)
+    # Calculate inverse kinships and adjust to inverse relationships.
+    # using sparse matrix multiplication.
+    # The inverse kinships are then adjusted to inverse relationships by
+    # dividing by a weighting of the ploidy of each pair of individuals.
+    if p >= 0:
+        ploidy_p = 2 if tau is None else tau[p, 0] + tau[p, 1]
+        mtx[p, p] += (weight_p**2 * scalar) / ploidy_p
+        num = weight_p * scalar
+        denom = 2 * np.sqrt(ploidy_p / 2 * ploidy_i / 2)
+        frac = num / denom
+        mtx[p, i] -= frac
+        mtx[i, p] -= frac
+    if q >= 0:
+        ploidy_q = 2 if tau is None else tau[q, 0] + tau[q, 1]
+        mtx[q, q] += (weight_q**2 * scalar) / ploidy_q
+        num = weight_q * scalar
+        denom = 2 * np.sqrt(ploidy_q / 2 * ploidy_i / 2)
+        frac = num / denom
+        mtx[q, i] -= frac
+        mtx[i, q] -= frac
+    if (p >= 0) and (q >= 0):
+        num = weight_p * weight_q * scalar
+        denom = 2 * np.sqrt(ploidy_p / 2 * ploidy_q / 2)
+        frac = num / denom
+        mtx[p, q] += frac
+        mtx[q, p] += frac
+    mtx[i, i] += scalar / ploidy_i
+    return
+
+
+@njit(cache=True)
+def pedigree_kinships_as_inverse_additive_relationships(
+    kinship: ArrayLike, parent: ArrayLike, tau: Union[ArrayLike, None] = None
+) -> ArrayLike:  # pragma: no cover
+    """Compute the inverse of the additive relationship matrix from a
+    pedigree-based kinship matrix.
+
+    Parameters
+    ----------
+    kinship
+        A square matrix of pairwise kinship values among samples calculated from
+        pedigree structure.
+    parent
+        A matrix of shape (samples, parents) containing the indices of each
+        sample's parents with negative values indicating unknown parents as
+        defined in :data:`sgkit.variables.parent_spec`.
+    tau
+        An optional matrix of shape (samples, parents) containing the ploidy
+        of each gamete giving rise to each samples as defined in
+        :data:`sgkit.variables.stat_Hamilton_Kerr_tau_spec`.
+        By default it is assumed that all samples are diploid with haploid
+        gametes (i.e., tau=1).
+
+    Returns
+    -------
+    The inverse of the additive relationship matrix.
+
+    Warnings
+    --------
+    This function is only suitable for a kinship matrix calculated from
+    pedigree structure alone.
+
+    """
+    order = topological_argsort(parent)
+    n = len(parent)
+    mtx = np.zeros((n, n))
+    for i in order:
+        _update_inverse_additive_relationships(mtx, kinship, parent, i, tau=tau)
+    return mtx
+
+
+def inverse_additive_relationships(
+    ds: Dataset,
+    *,
+    method: str = "diploid",
+    parent: Hashable = variables.parent,
+    stat_pedigree_kinship: Hashable = variables.stat_pedigree_kinship,
+    stat_Hamilton_Kerr_tau: Hashable = variables.stat_Hamilton_Kerr_tau,
+    merge: bool = True,
+) -> Dataset:
+    """Calculate the inverse of the additive relationship matrix from
+    pedigree structure.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing pedigree structure.
+    method
+        The method used for relationship estimation which must be one of
+        {"diploid", "Hamilton-Kerr"}. Defaults to "diploid" which is
+        only suitable for pedigrees in which all samples are diploids
+        resulting from sexual reproduction.
+        The "Hamilton-Kerr" method is suitable for autopolyploid and
+        mixed-ploidy datasets following Hamilton and Kerr 2017 [1].
+    parent
+        Input variable name holding parents of each sample as defined by
+        :data:`sgkit.variables.parent_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`parent_indices`.
+    stat_pedigree_kinship
+        Input variable name holding pedigree kinship matrix as defined
+        by :data:`sgkit.variables.stat_pedigree_kinship_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`pedigree_kinship` with the method specified above.
+    stat_Hamilton_Kerr_tau
+        Input variable name holding stat_Hamilton_Kerr_tau as defined
+        by :data:`sgkit.variables.stat_Hamilton_Kerr_tau_spec`.
+        This variable is only required for the "Hamilton-Kerr" method.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+
+    Returns
+    -------
+    A dataset containing :data:`sgkit.variables.stat_inverse_additive_relationship_spec`.
+
+    Warnings
+    --------
+    The kinship values within :data:`sgkit.variables.stat_pedigree_kinship_spec`
+    must be calculated from only pedigree structure (i.e., not calculated
+    from variant data). This method will produce incorrect results if this
+    assumption is invalid.
+
+    Raises
+    ------
+    ValueError
+        If an unknown method is specified.
+
+    Notes
+    -----
+    Dimensions of :data:`sgkit.variables.stat_inverse_additive_relationship_spec`
+    are named ``samples_0`` and ``samples_1``.
+
+    Examples
+    --------
+
+    >>> import sgkit as sg
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, seed=1)
+    >>> ds.sample_id.values # doctest: +NORMALIZE_WHITESPACE
+    array(['S0', 'S1', 'S2', 'S3'], dtype='<U2')
+    >>> ds["parent_id"] = ["samples", "parents"], [
+    ...     [".", "."],
+    ...     [".", "."],
+    ...     ["S0", "S1"],
+    ...     ["S0", "S2"]
+    ... ]
+    >>> ds = sg.inverse_additive_relationships(ds)
+    >>> ds["stat_inverse_additive_relationship"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[ 2. ,  0.5, -0.5, -1. ],
+           [ 0.5,  1.5, -1. ,  0. ],
+           [-0.5, -1. ,  2.5, -1. ],
+           [-1. ,  0. , -1. ,  2. ]])
+
+    References
+    ----------
+    [1] - Matthew G. Hamilton, and Richard J. Kerr 2017.
+    "Computation of the inverse additive relationship matrix for autopolyploid
+    and multiple-ploidy populations." Theoretical and Applied Genetics 131: 851-860.
+    """
+    if method not in {"diploid", "Hamilton-Kerr"}:
+        raise ValueError("Unknown method '{}'".format(method))
+    ds = define_variable_if_absent(ds, variables.parent, parent, parent_indices)
+    variables.validate(ds, {parent: variables.parent_spec})
+    ds = define_variable_if_absent(
+        ds,
+        variables.stat_pedigree_kinship,
+        stat_pedigree_kinship,
+        pedigree_kinship,
+        method=method,
+        stat_Hamilton_Kerr_tau=stat_Hamilton_Kerr_tau,
+    )
+    variables.validate(
+        ds, {stat_pedigree_kinship: variables.stat_pedigree_kinship_spec}
+    )
+    parent = ds[parent].data
+    kinship = ds[stat_pedigree_kinship].data
+    if method == "diploid":
+        func = da.gufunc(
+            pedigree_kinships_as_inverse_additive_relationships,
+            signature="(n, n),(n, p) -> (n, n)",
+            output_dtypes=float,
+        )
+        A_inv = func(kinship, parent)
+    elif method == "Hamilton-Kerr":
+        tau = ds[stat_Hamilton_Kerr_tau].data
+        func = da.gufunc(
+            pedigree_kinships_as_inverse_additive_relationships,
+            signature="(n, n),(n, p),(n, p) -> (n, n)",
+            output_dtypes=float,
+        )
+        A_inv = func(kinship, parent, tau)
+    new_ds = create_dataset(
+        {
+            variables.stat_inverse_additive_relationship: xr.DataArray(
+                A_inv, dims=["samples_0", "samples_1"]
             ),
         }
     )
