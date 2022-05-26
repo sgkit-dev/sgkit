@@ -641,6 +641,18 @@ with -1 indicating variable ploidy.""",
     )
 )
 
+(
+    stat_additive_relationship,
+    stat_additive_relationship_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_additive_relationship",
+        ndim=2,
+        kind="f",
+        __doc__="""Additive relationship matrix AKA the numerator relationship matrix.""",
+    )
+)
+
 stat_Fst, stat_Fst_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "stat_Fst",
@@ -727,6 +739,18 @@ must sum to the ploidy of the individual.
         __doc__="""
 Probability of IBD among gamete alleles resulting from meiotic processes.
 """,
+    )
+)
+
+(
+    stat_inverse_additive_relationship,
+    stat_inverse_additive_relationship_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_inverse_additive_relationship",
+        ndim=2,
+        kind="f",
+        __doc__="""Inverse of the additive relationship matrix.""",
     )
 )
 

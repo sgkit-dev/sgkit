@@ -32,7 +32,12 @@ from .stats.ibs import Weir_Goudet_beta, identity_by_state
 from .stats.ld import ld_matrix, ld_prune, maximal_independent_set
 from .stats.pc_relate import pc_relate
 from .stats.pca import pca
-from .stats.pedigree import parent_indices, pedigree_kinship
+from .stats.pedigree import (
+    additive_relationships,
+    inverse_additive_relationships,
+    parent_indices,
+    pedigree_kinship,
+)
 from .stats.popgen import (
     Fst,
     Garud_H,
@@ -57,6 +62,7 @@ __all__ = [
     "DIM_PLOIDY",
     "DIM_SAMPLE",
     "DIM_VARIANT",
+    "additive_relationships",
     "call_allele_frequencies",
     "create_genotype_call_dataset",
     "cohort_allele_frequencies",
@@ -77,6 +83,7 @@ __all__ = [
     "infer_call_ploidy",
     "infer_sample_ploidy",
     "infer_variant_ploidy",
+    "inverse_additive_relationships",
     "ld_matrix",
     "ld_prune",
     "maximal_independent_set",

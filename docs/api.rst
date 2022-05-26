@@ -74,6 +74,7 @@ Methods
 .. autosummary::
    :toctree: generated/
 
+   additive_relationships
    call_allele_frequencies
    cohort_allele_frequencies
    count_call_alleles
@@ -87,6 +88,7 @@ Methods
    hardy_weinberg_test
    identity_by_state
    individual_heterozygosity
+   inverse_additive_relationships
    ld_matrix
    ld_prune
    maximal_independent_set
@@ -167,6 +169,7 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.sample_pca_loading_spec
     variables.sample_pca_projection_spec
     variables.sample_ploidy_spec
+    variables.stat_additive_relationship_spec
     variables.stat_divergence_spec
     variables.stat_diversity_spec
     variables.stat_Fst_spec
@@ -177,6 +180,7 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.stat_Hamilton_Kerr_lambda_spec
     variables.stat_Hamilton_Kerr_tau_spec
     variables.stat_identity_by_state_spec
+    variables.stat_inverse_additive_relationship_spec
     variables.stat_observed_heterozygosity_spec
     variables.stat_pbs_spec
     variables.stat_pedigree_kinship_spec

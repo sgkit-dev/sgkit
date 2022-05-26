@@ -9,6 +9,8 @@ import xarray as xr
 import sgkit as sg
 from sgkit.stats.pedigree import (
     _hamilton_kerr_self_kinship,
+    additive_relationships,
+    inverse_additive_relationships,
     parent_indices,
     pedigree_kinship,
     topological_argsort,
@@ -106,8 +108,9 @@ def test_parent_indices__raise_on_unknown_parent_id():
 
 
 def random_parent_matrix(
-    n_samples, n_founders, selfing=False, permute=False, seed=None
+    n_samples, n_founders, n_half_founders=0, selfing=False, permute=False, seed=None
 ):
+    assert n_founders + n_half_founders <= n_samples
     if seed is not None:
         np.random.seed(seed)
     sample = np.arange(0, n_samples)
@@ -118,6 +121,11 @@ def random_parent_matrix(
     for i in range(n_founders, n_samples):
         s = sample[i]
         parent[s] = np.random.choice(sample[0:i], size=2, replace=selfing)
+    if n_half_founders > 0:
+        parent[
+            np.random.choice(sample[n_founders:], size=n_half_founders, replace=False),
+            np.random.randint(0, 2, n_half_founders),
+        ] = -1
     return parent
 
 
@@ -311,6 +319,36 @@ def test_pedigree_kinship__kinship2(method):
     np.testing.assert_array_almost_equal(ds.stat_pedigree_kinship, expect_kinship)
 
 
+def load_hamilton_kerr_pedigree():
+    """Load example mixed-ploidy pedigree from Hamilton and Kerr (2017) as a dataset.
+
+    Notes
+    -----
+    This function loads data from `hamilton_kerr_pedigree.csv` which is
+    distributed with the polyAinv package as a dataframe within
+    `Tab.1.Ham.Kerr.rda`.
+
+    The sample identifiers are one-based integers with 0 indicating unknown
+    parents.
+
+    This pedigree includes half clones in which only the mother is recorded.
+    These do not count as half-founders because the paternal tau is 0 and
+    hence no alleles are inherited from the unrecorded parent.
+    """
+    path = pathlib.Path(__file__).parent.absolute()
+    ped = pd.read_csv(path / "test_pedigree/hamilton_kerr_pedigree.csv")
+    # parse dataframe into sgkit dataset
+    ds = xr.Dataset()
+    dims = ["samples", "parents"]
+    ds["sample_id"] = dims[0], ped[["INDIV.ID"]].values.astype(int).ravel()
+    ds["parent_id"] = dims, ped[["SIRE.ID", "DAM.ID"]].values.astype(int)
+    ds["stat_Hamilton_Kerr_tau"] = dims, ped[
+        ["SIRE.GAMETE.PLOIDY", "DAM.GAMETE.PLOIDY"]
+    ].values.astype(np.uint8)
+    ds["stat_Hamilton_Kerr_lambda"] = dims, ped[["SIRE.LAMBDA", "DAM.LAMBDA"]].values
+    return ds
+
+
 @pytest.mark.parametrize(
     "order",
     [
@@ -327,7 +365,6 @@ def test_pedigree_kinship__Hamilton_Kerr(order):
     #
     #    pedigree <- read.csv("hamilton_kerr_pedigree.csv")
     #    results <- polyAinv::polyAinv(ped=pedigree[,1:7])
-    #    f = results$F[,"F"]
     #    k_inv_lower <- results$K.inv
     #    k_inv <- matrix(0,nrow=8,ncol=8)
     #    for(r in 1:nrow(k_inv_lower)) {
@@ -341,26 +378,9 @@ def test_pedigree_kinship__Hamilton_Kerr(order):
     #    k <- solve(k_inv)
     #    write.table(k, file="hamilton_kerr_kinship.txt", row.names=FALSE, col.names=FALSE)
     #
-    # Note: the data in hamilton_kerr_pedigree.csv is distributed with
-    # the polyAinv package as a dataframe within `Tab.1.Ham.Kerr.rda`
-    #
-    # Note: this pedigree includes half clones in which only the
-    # mother is recorded. These do not count as half-founders
-    # because the paternal tau is 0 and hence no alleles are
-    # inherited from the unrecorded parent.
-    #
     path = pathlib.Path(__file__).parent.absolute()
-    ped = pd.read_csv(path / "test_pedigree/hamilton_kerr_pedigree.csv")
     expect_kinship = np.loadtxt(path / "test_pedigree/hamilton_kerr_kinship.txt")
-    # parse dataframe into sgkit dataset
-    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=8)
-    dims = ["samples", "parents"]
-    ds["sample_id"] = dims[0], ped[["INDIV.ID"]].values.astype(int).ravel()
-    ds["parent_id"] = dims, ped[["SIRE.ID", "DAM.ID"]].values.astype(int)
-    ds["stat_Hamilton_Kerr_tau"] = dims, ped[
-        ["SIRE.GAMETE.PLOIDY", "DAM.GAMETE.PLOIDY"]
-    ].values.astype(np.uint8)
-    ds["stat_Hamilton_Kerr_lambda"] = dims, ped[["SIRE.LAMBDA", "DAM.LAMBDA"]].values
+    ds = load_hamilton_kerr_pedigree()
     # reorder dataset samples and compute kinship
     ds = ds.sel(dict(samples=order))
     ds = parent_indices(ds, missing=0)  # ped sample names are 1 based
@@ -499,3 +519,147 @@ def test_pedigree_kinship__raise_on_invalid_method():
     ]
     with pytest.raises(ValueError, match="Unknown method 'unknown'"):
         pedigree_kinship(ds, method="unknown")
+
+
+@pytest.mark.parametrize(
+    "order",
+    [
+        [0, 1, 2, 3, 4, 5, 6, 7],
+        [7, 6, 5, 4, 3, 2, 1, 0],
+        [1, 2, 6, 5, 7, 3, 4, 0],
+    ],
+)
+def test_additive_relationships__Hamilton_Kerr(order):
+    # Example from Hamilton and Kerr 2017. The expected values were
+    # calculated with their R package "polyAinv" which only  reports
+    # the sparse inverse matrix. This was converted to dense kinship
+    # with the R code:
+    #
+    #    pedigree <- read.csv("hamilton_kerr_pedigree.csv")
+    #    results <- polyAinv::polyAinv(ped=pedigree[,1:7])
+    #    A_inv_lower <- results$A.inv
+    #    A_inv <- matrix(0,nrow=8,ncol=8)
+    #    for(r in 1:nrow(A_inv_lower)) {
+    #        row <- A_inv_lower[r,]
+    #        i = row[[1]]
+    #        j = row[[2]]
+    #        v = row[[3]]
+    #        A_inv[i, j] = v
+    #        A_inv[j, i] = v
+    #    }
+    #    A <- solve(A_inv)
+    #    write.table(A, file="hamilton_kerr_A_matrix.txt", row.names=FALSE, col.names=FALSE)
+    #
+    path = pathlib.Path(__file__).parent.absolute()
+    expect = np.loadtxt(path / "test_pedigree/hamilton_kerr_A_matrix.txt")
+    ds = load_hamilton_kerr_pedigree()
+    ds = ds.sel(dict(samples=order))
+    # compute matrix
+    ds = parent_indices(ds, missing=0)  # ped sample names are 1 based
+    ds = additive_relationships(ds, method="Hamilton-Kerr")
+    actual = ds.stat_additive_relationship.data
+    np.testing.assert_array_almost_equal(actual, expect[order, :][:, order])
+
+
+def test_additive_relationships__raise_on_unknown_method():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+    ]
+    # compute kinship first to ensure ValueError not raised from that method
+    pedigree_kinship(ds)
+    with pytest.raises(ValueError, match="Unknown method 'unknown'"):
+        additive_relationships(ds, method="unknown")
+
+
+@pytest.mark.parametrize(
+    "order",
+    [
+        [0, 1, 2, 3, 4, 5, 6, 7],
+        [7, 6, 5, 4, 3, 2, 1, 0],
+        [1, 2, 6, 5, 7, 3, 4, 0],
+    ],
+)
+def test_inverse_additive_relationships__Hamilton_Kerr(order):
+    # Example from Hamilton and Kerr 2017. The expected values were
+    # calculated with their R package "polyAinv" which only  reports
+    # the sparse inverse matrix. This was converted to dense kinship
+    # with the R code:
+    #
+    #    pedigree <- read.csv("hamilton_kerr_pedigree.csv")
+    #    results <- polyAinv::polyAinv(ped=pedigree[,1:7])
+    #    A_inv_lower <- results$A.inv
+    #    A_inv <- matrix(0,nrow=8,ncol=8)
+    #    for(r in 1:nrow(A_inv_lower)) {
+    #        row <- A_inv_lower[r,]
+    #        i = row[[1]]
+    #        j = row[[2]]
+    #        v = row[[3]]
+    #        A_inv[i, j] = v
+    #        A_inv[j, i] = v
+    #    }
+    #    write.table(A_inv, file="hamilton_kerr_A_matrix_inv.txt", row.names=FALSE, col.names=FALSE)
+    #
+    path = pathlib.Path(__file__).parent.absolute()
+    expect = np.loadtxt(path / "test_pedigree/hamilton_kerr_A_matrix_inv.txt")
+    ds = load_hamilton_kerr_pedigree()
+    ds = ds.sel(dict(samples=order))
+    # compute matrix
+    ds = parent_indices(ds, missing=0)  # ped sample names are 1 based
+    ds = inverse_additive_relationships(ds, method="Hamilton-Kerr")
+    actual = ds.stat_inverse_additive_relationship.data
+    np.testing.assert_array_almost_equal(actual, expect[order, :][:, order])
+
+
+@pytest.mark.parametrize("method", ["diploid", "Hamilton-Kerr"])
+@pytest.mark.parametrize("selfing", [False, True])
+@pytest.mark.parametrize("permute", [False, True])
+@pytest.mark.parametrize(
+    "n_sample, n_founder, n_half_founder, seed",
+    [
+        (100, 2, 0, 0),
+        (200, 10, 50, 3),  # test half-founders
+    ],
+)
+def test_inverse_additive_relationships__numpy_equivalence(
+    method, n_sample, n_founder, n_half_founder, seed, selfing, permute
+):
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=n_sample)
+    parent = random_parent_matrix(
+        n_sample, n_founder, n_half_founder, selfing=selfing, permute=permute, seed=seed
+    )
+    ds["parent"] = ["samples", "parents"], parent
+    if method == "Hamilton-Kerr":
+        # mock complex ploidy manipulations between diploid, triploid and tetraploid material
+        np.random.seed(seed)
+        ds["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], np.random.randint(
+            1, 3, size=parent.shape
+        )
+        ds["stat_Hamilton_Kerr_lambda"] = ["samples", "parents"], np.random.beta(
+            0.5, 0.5, size=parent.shape
+        )
+    if n_half_founder > 0:
+        # must allow half-founders when calculating kinship
+        ds = pedigree_kinship(ds, method=method, allow_half_founders=True)
+    expect = np.linalg.inv(
+        additive_relationships(ds, method=method).stat_additive_relationship
+    )
+    actual = inverse_additive_relationships(
+        ds, method=method
+    ).stat_inverse_additive_relationship
+    np.testing.assert_array_almost_equal(actual, expect)
+
+
+def test_inverse_additive_relationships__raise_on_unknown_method():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+    ]
+    # compute kinship first to ensure ValueError not raised from that method
+    pedigree_kinship(ds)
+    with pytest.raises(ValueError, match="Unknown method 'unknown'"):
+        inverse_additive_relationships(ds, method="unknown")
