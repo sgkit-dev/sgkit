@@ -205,3 +205,12 @@ def test_Weir_Goudet_beta__multiallelic_trio(n_allele, decimal):
         ]
     )
     np.testing.assert_array_almost_equal(actual, expect, decimal=decimal)
+
+
+def test_Weir_Goudet_beta__numpy_input():
+    # ensure ibs can be a numpy or dask array
+    ds = simulate_genotype_call_dataset(n_variant=100, n_sample=10, seed=0)
+    expect = Weir_Goudet_beta(ds).stat_Weir_Goudet_beta.compute()
+    ds = identity_by_state(ds).compute()
+    actual = Weir_Goudet_beta(ds).stat_Weir_Goudet_beta.compute()
+    np.testing.assert_array_almost_equal(expect, actual)
