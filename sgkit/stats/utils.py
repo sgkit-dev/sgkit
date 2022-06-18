@@ -1,9 +1,11 @@
-from typing import Hashable, Tuple
+from functools import wraps
+from typing import Callable, Hashable, Tuple
 
 import dask.array as da
 import numpy as np
 import xarray as xr
 from dask.array import Array
+from numba import guvectorize
 from xarray import DataArray, Dataset
 
 from ..typing import ArrayLike
@@ -109,3 +111,215 @@ def map_blocks_asnumpy(x: Array) -> Array:
 
         x = x.map_blocks(cp.asnumpy)
     return x
+
+
+def cohort_reduction(gufunc: Callable) -> Callable:
+    @wraps(gufunc)
+    def func(x: ArrayLike, cohort: ArrayLike, n: int, axis: int = -1) -> ArrayLike:
+        x = da.swapaxes(da.asarray(x), axis, -1)
+        replaced = len(x.shape) - 1
+        chunks = x.chunks[0:-1] + (n,)
+        out = da.map_blocks(
+            gufunc,
+            x,
+            cohort,
+            np.empty(n, np.int8),
+            chunks=chunks,
+            drop_axis=replaced,
+            new_axis=replaced,
+        )
+        return da.swapaxes(out, axis, -1)
+
+    return func
+
+
+@cohort_reduction
+@guvectorize(
+    [
+        "(uint8[:], int64[:], int8[:], uint64[:])",
+        "(uint64[:], int64[:], int8[:], uint64[:])",
+        "(int8[:], int64[:], int8[:], int64[:])",
+        "(int64[:], int64[:], int8[:], int64[:])",
+        "(float32[:], int64[:], int8[:], float32[:])",
+        "(float64[:], int64[:], int8[:], float64[:])",
+    ],
+    "(n),(n),(c)->(c)",
+)
+def cohort_sum(
+    x: ArrayLike, cohort: ArrayLike, _: ArrayLike, out: ArrayLike
+) -> None:  # pragma: no cover
+    """Sum of values by cohort.
+
+    Parameters
+    ----------
+    x
+        Array of values corresponding to each sample.
+    cohort
+        Array of integers indicating the cohort membership of
+        each sample with negative values indicating no cohort.
+    n
+        Number of cohorts.
+    axis
+        The axis of array x corresponding to samples (defaults
+        to final axis).
+
+    Returns
+    -------
+    An array with the same number of dimensions as x in which
+    the sample axis has been replaced with a cohort axis of
+    size n.
+    """
+    out[:] = 0
+    n = len(x)
+    for i in range(n):
+        c = cohort[i]
+        if c >= 0:
+            out[c] += x[i]
+    return
+
+
+@cohort_reduction
+@guvectorize(
+    [
+        "(uint8[:], int64[:], int8[:], uint64[:])",
+        "(uint64[:], int64[:], int8[:], uint64[:])",
+        "(int8[:], int64[:], int8[:], int64[:])",
+        "(int64[:], int64[:], int8[:], int64[:])",
+        "(float32[:], int64[:], int8[:], float32[:])",
+        "(float64[:], int64[:], int8[:], float64[:])",
+    ],
+    "(n),(n),(c)->(c)",
+)
+def cohort_nansum(
+    x: ArrayLike, cohort: ArrayLike, _: ArrayLike, out: ArrayLike
+) -> None:  # pragma: no cover
+    """Sum of values by cohort ignoring nan values.
+
+    Parameters
+    ----------
+    x
+        Array of values corresponding to each sample.
+    cohort
+        Array of integers indicating the cohort membership of
+        each sample with negative values indicating no cohort.
+    n
+        Number of cohorts.
+    axis
+        The axis of array x corresponding to samples (defaults
+        to final axis).
+
+    Returns
+    -------
+    An array with the same number of dimensions as x in which
+    the sample axis has been replaced with a cohort axis of
+    size n.
+    """
+    out[:] = 0
+    n = len(x)
+    for i in range(n):
+        c = cohort[i]
+        v = x[i]
+        if (not np.isnan(v)) and (c >= 0):
+            out[cohort[i]] += v
+    return
+
+
+@cohort_reduction
+@guvectorize(
+    [
+        "(uint8[:], int64[:], int8[:], float64[:])",
+        "(uint64[:], int64[:], int8[:], float64[:])",
+        "(int8[:], int64[:], int8[:], float64[:])",
+        "(int64[:], int64[:], int8[:], float64[:])",
+        "(float32[:], int64[:], int8[:], float32[:])",
+        "(float64[:], int64[:], int8[:], float64[:])",
+    ],
+    "(n),(n),(c)->(c)",
+)
+def cohort_mean(
+    x: ArrayLike, cohort: ArrayLike, _: ArrayLike, out: ArrayLike
+) -> None:  # pragma: no cover
+    """Mean of values by cohort.
+
+    Parameters
+    ----------
+    x
+        Array of values corresponding to each sample.
+    cohort
+        Array of integers indicating the cohort membership of
+        each sample with negative values indicating no cohort.
+    n
+        Number of cohorts.
+    axis
+        The axis of array x corresponding to samples (defaults
+        to final axis).
+
+    Returns
+    -------
+    An array with the same number of dimensions as x in which
+    the sample axis has been replaced with a cohort axis of
+    size n.
+    """
+    out[:] = 0
+    n = len(x)
+    c = len(_)
+    count = np.zeros(c)
+    for i in range(n):
+        j = cohort[i]
+        if j >= 0:
+            out[j] += x[i]
+            count[j] += 1
+    for j in range(c):
+        out[j] /= count[j]
+    return
+
+
+@cohort_reduction
+@guvectorize(
+    [
+        "(uint8[:], int64[:], int8[:], float64[:])",
+        "(uint64[:], int64[:], int8[:], float64[:])",
+        "(int8[:], int64[:], int8[:], float64[:])",
+        "(int64[:], int64[:], int8[:], float64[:])",
+        "(float32[:], int64[:], int8[:], float32[:])",
+        "(float64[:], int64[:], int8[:], float64[:])",
+    ],
+    "(n),(n),(c)->(c)",
+)
+def cohort_nanmean(
+    x: ArrayLike, cohort: ArrayLike, _: ArrayLike, out: ArrayLike
+) -> None:  # pragma: no cover
+    """Mean of values by cohort ignoring nan values.
+
+    Parameters
+    ----------
+    x
+        Array of values corresponding to each sample.
+    cohort
+        Array of integers indicating the cohort membership of
+        each sample with negative values indicating no cohort.
+    n
+        Number of cohorts.
+    axis
+        The axis of array x corresponding to samples (defaults
+        to final axis).
+
+    Returns
+    -------
+    An array with the same number of dimensions as x in which
+    the sample axis has been replaced with a cohort axis of
+    size n.
+    """
+    out[:] = 0
+    n = len(x)
+    c = len(_)
+    count = np.zeros(c)
+    for i in range(n):
+        j = cohort[i]
+        v = x[i]
+        if (not np.isnan(v)) and (j >= 0):
+            out[j] += v
+            count[j] += 1
+    for j in range(c):
+        out[j] /= count[j]
+    return
