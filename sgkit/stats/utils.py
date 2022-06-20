@@ -144,6 +144,8 @@ def cohort_reduction(gufunc: Callable) -> Callable:
         "(float64[:], int64[:], int8[:], float64[:])",
     ],
     "(n),(n),(c)->(c)",
+    nopython=True,
+    cache=True,
 )
 def cohort_sum(
     x: ArrayLike, cohort: ArrayLike, _: ArrayLike, out: ArrayLike
@@ -189,6 +191,8 @@ def cohort_sum(
         "(float64[:], int64[:], int8[:], float64[:])",
     ],
     "(n),(n),(c)->(c)",
+    nopython=True,
+    cache=True,
 )
 def cohort_nansum(
     x: ArrayLike, cohort: ArrayLike, _: ArrayLike, out: ArrayLike
@@ -235,6 +239,8 @@ def cohort_nansum(
         "(float64[:], int64[:], int8[:], float64[:])",
     ],
     "(n),(n),(c)->(c)",
+    nopython=True,
+    cache=True,
 )
 def cohort_mean(
     x: ArrayLike, cohort: ArrayLike, _: ArrayLike, out: ArrayLike
@@ -285,6 +291,8 @@ def cohort_mean(
         "(float64[:], int64[:], int8[:], float64[:])",
     ],
     "(n),(n),(c)->(c)",
+    nopython=True,
+    cache=True,
 )
 def cohort_nanmean(
     x: ArrayLike, cohort: ArrayLike, _: ArrayLike, out: ArrayLike
