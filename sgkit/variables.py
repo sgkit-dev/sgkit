@@ -339,7 +339,7 @@ call_ploidy, call_ploidy_spec = SgkitVariables.register_variable(
 
 cohort_allele_count, cohort_allele_count_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "cohort_allele_count", kind="i", ndim=3, __doc__="""Cohort allele counts."""
+        "cohort_allele_count", kind="u", ndim=3, __doc__="""Cohort allele counts."""
     )
 )
 
