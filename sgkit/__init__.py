@@ -49,7 +49,7 @@ from .window import window_by_position, window_by_variant
 
 try:
     __version__ = get_distribution(__name__).version
-except DistributionNotFound:
+except DistributionNotFound:  # pragma: no cover
     __version__ = "unknown"
 
 __all__ = [
