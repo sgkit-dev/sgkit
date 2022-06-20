@@ -134,7 +134,10 @@ def diversity(
 
 # c = cohorts, k = alleles
 @guvectorize(  # type: ignore
-    ["void(int64[:, :], float64[:,:])"], "(c, k)->(c,c)", nopython=True, cache=True
+    ["void(int64[:, :], float64[:,:])", "void(uint64[:, :], float64[:,:])"],
+    "(c, k)->(c,c)",
+    nopython=True,
+    cache=True,
 )
 def _divergence(ac: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Generalized U-function for computing divergence.
