@@ -171,7 +171,7 @@ def Weir_Goudet_beta(
     variables.validate(
         ds, {stat_identity_by_state: variables.stat_identity_by_state_spec}
     )
-    ibs = ds[stat_identity_by_state].data
+    ibs = da.asarray(ds[stat_identity_by_state].data)
     # average matching is the mean of non-diagonal elements
     num = da.nansum(da.tril(ibs, -1))
     denom = da.nansum(da.tril(~da.isnan(ibs), -1))
