@@ -114,6 +114,37 @@ def map_blocks_asnumpy(x: Array) -> Array:
 
 
 def cohort_reduction(gufunc: Callable) -> Callable:
+    """A decorator turning a numba generalized ufunc into a dask
+    function which performs a reduction over each cohort along
+    a specified axis.
+
+    The wrapped generalized u-function should have a ufunc signature
+    of ``"(n),(n),(c)->(c)"`` where n indicates the number of samples
+    and c indicates the number of cohorts. This signature corresponds
+    to the following parameters:
+
+    - An array of input values for each sample.
+    - Integers indicating the cohort membership of each sample.
+    - An array whose length indicates the number of cohorts.
+    - An array used to gather the results for each cohort.
+
+    Parameters
+    ----------
+    gufunc
+        Generalized ufunc.
+
+    Returns
+    -------
+    A cohort reduction function.
+
+    Notes
+    -----
+    The returned function will  automatically concatenate any chunks
+    along the samples axis before applying the gufunc which may result
+    in high memory usage. Avoiding chunking along the samples axis will
+    avoid this issue.
+    """
+
     @wraps(gufunc)
     def func(x: ArrayLike, cohort: ArrayLike, n: int, axis: int = -1) -> ArrayLike:
         x = da.swapaxes(da.asarray(x), axis, -1)
@@ -177,7 +208,6 @@ def cohort_sum(
         c = cohort[i]
         if c >= 0:
             out[c] += x[i]
-    return
 
 
 @cohort_reduction
@@ -225,7 +255,6 @@ def cohort_nansum(
         v = x[i]
         if (not np.isnan(v)) and (c >= 0):
             out[cohort[i]] += v
-    return
 
 
 @cohort_reduction
@@ -277,7 +306,6 @@ def cohort_mean(
             count[j] += 1
     for j in range(c):
         out[j] /= count[j]
-    return
 
 
 @cohort_reduction
@@ -330,4 +358,3 @@ def cohort_nanmean(
             count[j] += 1
     for j in range(c):
         out[j] /= count[j]
-    return
