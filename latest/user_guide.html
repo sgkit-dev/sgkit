@@ -1372,26 +1372,26 @@ to have created the variable in that case.</p>
 <span class="nn">Input In [9],</span> in <span class="ni">&lt;cell line: 1&gt;</span><span class="nt">()</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">call_allele_count</span><span class="o">=</span><span class="s2">&quot;my_call_allele_count&quot;</span><span class="p">)</span>
 
-<span class="nn">File ~/work/sgkit/sgkit/sgkit/stats/aggregation.py:220,</span> in <span class="ni">count_variant_alleles</span><span class="nt">(ds, call_allele_count, merge)</span>
-<span class="g g-Whitespace">    </span><span class="mi">172</span> <span class="k">def</span> <span class="nf">count_variant_alleles</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">173</span>     <span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">174</span>     <span class="o">*</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">175</span>     <span class="n">call_allele_count</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">=</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">176</span>     <span class="n">merge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">177</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">178</span>     <span class="sd">&quot;&quot;&quot;Compute allele count from per-sample allele counts, or genotype calls.</span>
-<span class="g g-Whitespace">    </span><span class="mi">179</span><span class="sd"> </span>
-<span class="g g-Whitespace">    </span><span class="mi">180</span><span class="sd">     Parameters</span>
+<span class="nn">File ~/work/sgkit/sgkit/sgkit/stats/aggregation.py:183,</span> in <span class="ni">count_variant_alleles</span><span class="nt">(ds, call_allele_count, merge)</span>
+<span class="g g-Whitespace">    </span><span class="mi">135</span> <span class="k">def</span> <span class="nf">count_variant_alleles</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">136</span>     <span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">137</span>     <span class="o">*</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">138</span>     <span class="n">call_allele_count</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">=</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">139</span>     <span class="n">merge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">140</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">141</span>     <span class="sd">&quot;&quot;&quot;Compute allele count from per-sample allele counts, or genotype calls.</span>
+<span class="g g-Whitespace">    </span><span class="mi">142</span><span class="sd"> </span>
+<span class="g g-Whitespace">    </span><span class="mi">143</span><span class="sd">     Parameters</span>
 <span class="sd">   (...)</span>
-<span class="g g-Whitespace">    </span><span class="mi">218</span><span class="sd">            [4, 0]], dtype=uint64)</span>
-<span class="g g-Whitespace">    </span><span class="mi">219</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">220</span>     <span class="n">ds</span> <span class="o">=</span> <span class="n">define_variable_if_absent</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">221</span>         <span class="n">ds</span><span class="p">,</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count</span><span class="p">,</span> <span class="n">call_allele_count</span><span class="p">,</span> <span class="n">count_call_alleles</span>
-<span class="g g-Whitespace">    </span><span class="mi">222</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">223</span>     <span class="n">variables</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">{</span><span class="n">call_allele_count</span><span class="p">:</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count_spec</span><span class="p">})</span>
-<span class="g g-Whitespace">    </span><span class="mi">225</span>     <span class="n">new_ds</span> <span class="o">=</span> <span class="n">create_dataset</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">226</span>         <span class="p">{</span><span class="n">variables</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="p">:</span> <span class="n">ds</span><span class="p">[</span><span class="n">call_allele_count</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)}</span>
-<span class="g g-Whitespace">    </span><span class="mi">227</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">181</span><span class="sd">            [4, 0]], dtype=uint64)</span>
+<span class="g g-Whitespace">    </span><span class="mi">182</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">183</span>     <span class="n">ds</span> <span class="o">=</span> <span class="n">define_variable_if_absent</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">184</span>         <span class="n">ds</span><span class="p">,</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count</span><span class="p">,</span> <span class="n">call_allele_count</span><span class="p">,</span> <span class="n">count_call_alleles</span>
+<span class="g g-Whitespace">    </span><span class="mi">185</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">186</span>     <span class="n">variables</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">{</span><span class="n">call_allele_count</span><span class="p">:</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count_spec</span><span class="p">})</span>
+<span class="g g-Whitespace">    </span><span class="mi">188</span>     <span class="n">new_ds</span> <span class="o">=</span> <span class="n">create_dataset</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">189</span>         <span class="p">{</span><span class="n">variables</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="p">:</span> <span class="n">ds</span><span class="p">[</span><span class="n">call_allele_count</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)}</span>
+<span class="g g-Whitespace">    </span><span class="mi">190</span>     <span class="p">)</span>
 
 <span class="nn">File ~/work/sgkit/sgkit/sgkit/utils.py:192,</span> in <span class="ni">define_variable_if_absent</span><span class="nt">(ds, default_variable_name, variable_name, func)</span>
 <span class="g g-Whitespace">    </span><span class="mi">190</span>     <span class="k">return</span> <span class="n">ds</span>
