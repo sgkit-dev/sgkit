@@ -200,7 +200,6 @@ def _raise_on_half_founder(
             raise ValueError("Pedigree contains half-founders")
         elif (q < 0 and p >= 0) and tau_q > 0:
             raise ValueError("Pedigree contains half-founders")
-    return
 
 
 @njit(cache=True)
@@ -213,7 +212,6 @@ def _diploid_self_kinship(
         kinship[i, i] = 0.5
     else:  # non-founder
         kinship[i, i] = (1 + kinship[p, q]) / 2
-    return
 
 
 @njit(cache=True)
@@ -227,7 +225,6 @@ def _diploid_pair_kinship(
     kinship_ij = (kinship_pj + kinship_qj) / 2
     kinship[i, j] = kinship_ij
     kinship[j, i] = kinship_ij
-    return
 
 
 @njit(cache=True)
@@ -422,7 +419,6 @@ def _hamilton_kerr_self_kinship(
             kinship_pq=kinship[p, q] if (p >= 0 and q >= 0) else 0,
         )
     kinship[i, i] = _inbreeding_as_self_kinship(inbreeding_i, ploidy_i)
-    return
 
 
 @njit(cache=True)
@@ -437,7 +433,6 @@ def _hamilton_kerr_pair_kinship(
     kinship_ij = (tau_p / ploidy_i) * kinship_pj + (tau_q / ploidy_i) * kinship_qj
     kinship[i, j] = kinship_ij
     kinship[j, i] = kinship_ij
-    return
 
 
 @njit(cache=True)
@@ -841,7 +836,6 @@ def _update_inverse_additive_relationships(
         mtx[p, q] += frac
         mtx[q, p] += frac
     mtx[i, i] += scalar / ploidy_i
-    return
 
 
 @njit(cache=True)
