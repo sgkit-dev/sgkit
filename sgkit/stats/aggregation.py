@@ -8,7 +8,7 @@ from typing_extensions import Literal
 from xarray import Dataset
 
 from sgkit import variables
-from sgkit.stats.utils import assert_array_shape
+from sgkit.stats.utils import cohort_sum
 from sgkit.typing import ArrayLike
 from sgkit.utils import (
     conditional_merge_datasets,
@@ -58,43 +58,6 @@ def count_alleles(
         a = g[i]
         if a >= 0:
             out[a] += 1
-
-
-# n = samples, c = cohorts, k = alleles
-@guvectorize(  # type: ignore
-    [
-        "void(uint8[:, :], int32[:], uint8[:], int32[:,:])",
-        "void(uint8[:, :], int64[:], uint8[:], int32[:,:])",
-    ],
-    "(n, k),(n),(c)->(c,k)",
-    nopython=True,
-    cache=True,
-)
-def _count_cohort_alleles(
-    ac: ArrayLike, cohorts: ArrayLike, _: ArrayLike, out: ArrayLike
-) -> None:  # pragma: no cover
-    """Generalized U-function for computing per cohort allele counts.
-
-    Parameters
-    ----------
-    ac
-        Allele counts of shape (samples, alleles) containing per-sample allele counts.
-    cohorts
-        Cohort indexes for samples of shape (samples,).
-    _
-        Dummy variable of type `uint8` and shape (cohorts,) used to
-        define the number of cohorts.
-    out
-        Allele counts with shape (cohorts, alleles) and values corresponding to
-        the number of non-missing occurrences of each allele in each cohort.
-    """
-    out[:, :] = 0  # (cohorts, alleles)
-    n_samples, n_alleles = ac.shape
-    for i in range(n_samples):
-        for j in range(n_alleles):
-            c = cohorts[i]
-            if c >= 0:
-                out[c, j] += ac[i, j]
 
 
 def count_call_alleles(
@@ -294,33 +257,15 @@ def count_cohort_alleles(
             [1, 3]],
     <BLANKLINE>
             [[3, 1],
-            [1, 3]]])
+            [1, 3]]], dtype=uint64)
     """
     ds = define_variable_if_absent(
         ds, variables.call_allele_count, call_allele_count, count_call_alleles
     )
     variables.validate(ds, {call_allele_count: variables.call_allele_count_spec})
-
-    n_variants = ds.dims["variants"]
-    n_alleles = ds.dims["alleles"]
-
     AC, SC = da.asarray(ds[call_allele_count]), da.asarray(ds[sample_cohort])
     n_cohorts = SC.max().compute() + 1  # 0-based indexing
-    C = da.empty(n_cohorts, dtype=np.uint8)
-
-    G = da.asarray(ds.call_genotype)
-    shape = (G.chunks[0], n_cohorts, n_alleles)
-
-    AC = da.map_blocks(_count_cohort_alleles, AC, SC, C, chunks=shape, dtype=np.int32)
-    assert_array_shape(
-        AC, n_variants, n_cohorts * AC.numblocks[1], n_alleles * AC.numblocks[2]
-    )
-
-    # Stack the blocks and sum across them
-    # (which will only work because each chunk is guaranteed to have same size)
-    AC = da.stack([AC.blocks[:, i] for i in range(AC.numblocks[1])]).sum(axis=0)
-    assert_array_shape(AC, n_variants, n_cohorts, n_alleles)
-
+    AC = cohort_sum(AC, SC, n_cohorts, axis=1)
     new_ds = create_dataset(
         {variables.cohort_allele_count: (("variants", "cohorts", "alleles"), AC)}
     )

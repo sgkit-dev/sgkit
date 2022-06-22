@@ -516,6 +516,7 @@ def test_Garud_h__raise_on_no_windows():
         Garud_H(ds)
 
 
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 @pytest.mark.parametrize("chunks", [((4,), (6,), (4,)), ((2, 2), (3, 3), (2, 2))])
 def test_observed_heterozygosity(chunks):
     ds = simulate_genotype_call_dataset(
@@ -581,6 +582,7 @@ def test_observed_heterozygosity(chunks):
     )
 
 
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 @pytest.mark.parametrize("chunks", [((4,), (6,), (4,)), ((2, 2), (3, 3), (2, 2))])
 @pytest.mark.parametrize(
     "cohorts,expectation",

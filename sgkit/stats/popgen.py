@@ -24,6 +24,7 @@ from .aggregation import (
     count_variant_alleles,
     individual_heterozygosity,
 )
+from .utils import cohort_nanmean
 
 
 def diversity(
@@ -133,7 +134,10 @@ def diversity(
 
 # c = cohorts, k = alleles
 @guvectorize(  # type: ignore
-    ["void(int64[:, :], float64[:,:])"], "(c, k)->(c,c)", nopython=True, cache=True
+    ["void(int64[:, :], float64[:,:])", "void(uint64[:, :], float64[:,:])"],
+    "(c, k)->(c,c)",
+    nopython=True,
+    cache=True,
 )
 def _divergence(ac: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Generalized U-function for computing divergence.
@@ -939,52 +943,6 @@ def Garud_H(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-@guvectorize(  # type: ignore
-    [
-        "void(float64[:], int32[:], uint8[:], float64[:])",
-        "void(float64[:], int64[:], uint8[:], float64[:])",
-    ],
-    "(n),(n),(c)->(c)",
-    nopython=True,
-    cache=True,
-)
-def _cohort_observed_heterozygosity(
-    hi: ArrayLike, cohorts: ArrayLike, _: ArrayLike, out: ArrayLike
-) -> None:  # pragma: no cover
-    """Generalized U-function for computing cohort observed heterozygosity.
-
-    Parameters
-    ----------
-    hi
-        Individual sample heterozygosity of shape (samples,).
-    cohorts
-        Cohort indexes for samples of shape (samples,).
-    _
-        Dummy variable of type `uint8` and shape (cohorts,) used to
-        define the number of cohorts.
-    out
-        Observed heterozygosity with shape (cohorts,) and values corresponding
-        to the mean individual heterozygosity of each cohort.
-    """
-    out[:] = 0
-    _[:] = 0
-    n_samples = len(hi)
-    n_cohorts = len(out)
-    for i in range(n_samples):
-        h = hi[i]
-        if not np.isnan(h):
-            c = cohorts[i]
-            if c >= 0:
-                out[c] += h
-                _[c] += 1
-    for j in range(n_cohorts):
-        n = _[j]
-        if n != 0:
-            out[j] /= n
-        else:
-            out[j] = np.nan
-
-
 def observed_heterozygosity(
     ds: Dataset,
     *,
@@ -1060,20 +1018,9 @@ def observed_heterozygosity(
     )
     variables.validate(ds, {call_heterozygosity: variables.call_heterozygosity_spec})
     hi = da.asarray(ds[call_heterozygosity])
-    sc = da.asarray(ds[sample_cohort])
-    n_cohorts = sc.max().compute() + 1
-    shape = (hi.chunks[0], n_cohorts)
-    n = da.zeros(n_cohorts, dtype=np.uint8)
-    ho = da.map_blocks(
-        _cohort_observed_heterozygosity,
-        hi,
-        sc,
-        n,
-        chunks=shape,
-        drop_axis=1,
-        new_axis=1,
-        dtype=np.float64,
-    )
+    cohort = da.asarray(ds[sample_cohort])
+    n_cohorts = cohort.max().compute() + 1
+    ho = cohort_nanmean(hi, cohort, n_cohorts)
     if has_windows(ds):
         ho_sum = window_statistic(
             ho,
