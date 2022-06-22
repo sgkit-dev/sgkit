@@ -1,0 +1,6 @@
+﻿sgkit.additive\_relationships
+=============================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: additive_relationships

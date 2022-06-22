@@ -201,6 +201,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.additive_relationships.html">
+     sgkit.additive_relationships
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="generated/sgkit.call_allele_frequencies.html">
      sgkit.call_allele_frequencies
     </a>
@@ -263,6 +268,11 @@
    <li class="toctree-l2">
     <a class="reference internal" href="generated/sgkit.individual_heterozygosity.html">
      sgkit.individual_heterozygosity
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.inverse_additive_relationships.html">
+     sgkit.inverse_additive_relationships
     </a>
    </li>
    <li class="toctree-l2">
@@ -576,6 +586,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.stat_additive_relationship_spec.html">
+     sgkit.variables.stat_additive_relationship_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="generated/sgkit.variables.stat_divergence_spec.html">
      sgkit.variables.stat_divergence_spec
     </a>
@@ -623,6 +638,11 @@
    <li class="toctree-l2">
     <a class="reference internal" href="generated/sgkit.variables.stat_identity_by_state_spec.html">
      sgkit.variables.stat_identity_by_state_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.stat_inverse_additive_relationship_spec.html">
+     sgkit.variables.stat_inverse_additive_relationship_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -1393,13 +1413,13 @@ to have created the variable in that case.</p>
 <span class="g g-Whitespace">    </span><span class="mi">189</span>         <span class="p">{</span><span class="n">variables</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="p">:</span> <span class="n">ds</span><span class="p">[</span><span class="n">call_allele_count</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)}</span>
 <span class="g g-Whitespace">    </span><span class="mi">190</span>     <span class="p">)</span>
 
-<span class="nn">File ~/work/sgkit/sgkit/sgkit/utils.py:192,</span> in <span class="ni">define_variable_if_absent</span><span class="nt">(ds, default_variable_name, variable_name, func)</span>
-<span class="g g-Whitespace">    </span><span class="mi">190</span>     <span class="k">return</span> <span class="n">ds</span>
-<span class="g g-Whitespace">    </span><span class="mi">191</span> <span class="k">if</span> <span class="n">variable_name</span> <span class="o">!=</span> <span class="n">default_variable_name</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">192</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">193</span>         <span class="sa">f</span><span class="s2">&quot;Variable &#39;</span><span class="si">{</span><span class="n">variable_name</span><span class="si">}</span><span class="s2">&#39; with non-default name is missing and will not be automatically defined.&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">194</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">195</span> <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="nn">File ~/work/sgkit/sgkit/sgkit/utils.py:195,</span> in <span class="ni">define_variable_if_absent</span><span class="nt">(ds, default_variable_name, variable_name, func, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">193</span>     <span class="k">return</span> <span class="n">ds</span>
+<span class="g g-Whitespace">    </span><span class="mi">194</span> <span class="k">if</span> <span class="n">variable_name</span> <span class="o">!=</span> <span class="n">default_variable_name</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">195</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">196</span>         <span class="sa">f</span><span class="s2">&quot;Variable &#39;</span><span class="si">{</span><span class="n">variable_name</span><span class="si">}</span><span class="s2">&#39; with non-default name is missing and will not be automatically defined.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">197</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">198</span> <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <span class="ne">ValueError</span>: Variable &#39;my_call_allele_count&#39; with non-default name is missing and will not be automatically defined.
 </pre></div>
