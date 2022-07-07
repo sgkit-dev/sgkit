@@ -2,10 +2,10 @@ from typing import Hashable, Optional
 
 import dask.array as da
 import numpy as np
-from numba import njit
 from xarray import Dataset
 
 from sgkit import variables
+from sgkit.accelerate import numba_jit
 from sgkit.stats.aggregation import count_genotypes
 from sgkit.typing import NDArray
 from sgkit.utils import conditional_merge_datasets, create_dataset
@@ -100,7 +100,9 @@ def hardy_weinberg_p_value(obs_hets: int, obs_hom1: int, obs_hom2: int) -> float
 
 
 # Benchmarks show ~25% improvement w/ fastmath on large (~10M) counts
-hardy_weinberg_p_value_jit = njit(hardy_weinberg_p_value, fastmath=True, nogil=True)
+hardy_weinberg_p_value_jit = numba_jit(
+    hardy_weinberg_p_value, fastmath=True, nogil=True
+)
 
 
 def hardy_weinberg_p_value_vec(
@@ -118,7 +120,7 @@ def hardy_weinberg_p_value_vec(
     return p
 
 
-hardy_weinberg_p_value_vec_jit = njit(
+hardy_weinberg_p_value_vec_jit = numba_jit(
     hardy_weinberg_p_value_vec, fastmath=True, nogil=True
 )
 

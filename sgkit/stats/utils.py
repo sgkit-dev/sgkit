@@ -5,8 +5,9 @@ import dask.array as da
 import numpy as np
 import xarray as xr
 from dask.array import Array
-from numba import guvectorize
 from xarray import DataArray, Dataset
+
+from sgkit.accelerate import numba_guvectorize
 
 from ..typing import ArrayLike
 
@@ -165,7 +166,7 @@ def cohort_reduction(gufunc: Callable) -> Callable:
 
 
 @cohort_reduction
-@guvectorize(
+@numba_guvectorize(
     [
         "(uint8[:], int64[:], int8[:], uint64[:])",
         "(uint64[:], int64[:], int8[:], uint64[:])",
@@ -175,8 +176,6 @@ def cohort_reduction(gufunc: Callable) -> Callable:
         "(float64[:], int64[:], int8[:], float64[:])",
     ],
     "(n),(n),(c)->(c)",
-    nopython=True,
-    cache=True,
 )
 def cohort_sum(
     x: ArrayLike, cohort: ArrayLike, _: ArrayLike, out: ArrayLike
@@ -211,7 +210,7 @@ def cohort_sum(
 
 
 @cohort_reduction
-@guvectorize(
+@numba_guvectorize(
     [
         "(uint8[:], int64[:], int8[:], uint64[:])",
         "(uint64[:], int64[:], int8[:], uint64[:])",
@@ -221,8 +220,6 @@ def cohort_sum(
         "(float64[:], int64[:], int8[:], float64[:])",
     ],
     "(n),(n),(c)->(c)",
-    nopython=True,
-    cache=True,
 )
 def cohort_nansum(
     x: ArrayLike, cohort: ArrayLike, _: ArrayLike, out: ArrayLike
@@ -258,7 +255,7 @@ def cohort_nansum(
 
 
 @cohort_reduction
-@guvectorize(
+@numba_guvectorize(
     [
         "(uint8[:], int64[:], int8[:], float64[:])",
         "(uint64[:], int64[:], int8[:], float64[:])",
@@ -268,8 +265,6 @@ def cohort_nansum(
         "(float64[:], int64[:], int8[:], float64[:])",
     ],
     "(n),(n),(c)->(c)",
-    nopython=True,
-    cache=True,
 )
 def cohort_mean(
     x: ArrayLike, cohort: ArrayLike, _: ArrayLike, out: ArrayLike
@@ -309,7 +304,7 @@ def cohort_mean(
 
 
 @cohort_reduction
-@guvectorize(
+@numba_guvectorize(
     [
         "(uint8[:], int64[:], int8[:], float64[:])",
         "(uint64[:], int64[:], int8[:], float64[:])",
@@ -319,8 +314,6 @@ def cohort_mean(
         "(float64[:], int64[:], int8[:], float64[:])",
     ],
     "(n),(n),(c)->(c)",
-    nopython=True,
-    cache=True,
 )
 def cohort_nanmean(
     x: ArrayLike, cohort: ArrayLike, _: ArrayLike, out: ArrayLike
