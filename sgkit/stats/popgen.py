@@ -1018,8 +1018,10 @@ def observed_heterozygosity(
     )
     variables.validate(ds, {call_heterozygosity: variables.call_heterozygosity_spec})
     hi = da.asarray(ds[call_heterozygosity])
-    cohort = da.asarray(ds[sample_cohort])
-    n_cohorts = cohort.max().compute() + 1
+    # ensure cohorts is a numpy array to minimize dask task
+    # dependencies between chunks in other dimensions
+    cohort = ds[sample_cohort].values
+    n_cohorts = cohort.max() + 1
     ho = cohort_nanmean(hi, cohort, n_cohorts)
     if has_windows(ds):
         ho_sum = window_statistic(
