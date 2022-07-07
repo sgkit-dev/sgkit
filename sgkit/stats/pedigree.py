@@ -3,10 +3,10 @@ from typing import Hashable, Union
 import dask.array as da
 import numpy as np
 import xarray as xr
-from numba import njit, vectorize
 from xarray import Dataset
 
 from sgkit import variables
+from sgkit.accelerate import numba_jit
 from sgkit.typing import ArrayLike
 from sgkit.utils import (
     conditional_merge_datasets,
@@ -108,7 +108,7 @@ def parent_indices(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-@njit(cache=True)
+@numba_jit
 def topological_argsort(parent: ArrayLike) -> ArrayLike:  # pragma: no cover
     """Find a topological ordering of samples within a pedigree such
     that no individual occurs before its parents.
@@ -172,7 +172,7 @@ def topological_argsort(parent: ArrayLike) -> ArrayLike:  # pragma: no cover
     return order[::-1]
 
 
-@njit(cache=True)
+@numba_jit
 def _is_pedigree_sorted(parent: ArrayLike) -> bool:  # pragma: no cover
     n_samples, n_parents = parent.shape
     for i in range(n_samples):
@@ -183,7 +183,7 @@ def _is_pedigree_sorted(parent: ArrayLike) -> bool:  # pragma: no cover
     return True
 
 
-@njit(cache=True)
+@numba_jit
 def _raise_on_half_founder(
     parent: ArrayLike, tau: ArrayLike = None
 ) -> None:  # pragma: no cover
@@ -202,7 +202,7 @@ def _raise_on_half_founder(
             raise ValueError("Pedigree contains half-founders")
 
 
-@njit(cache=True)
+@numba_jit
 def _diploid_self_kinship(
     kinship: ArrayLike, parent: ArrayLike, i: int
 ) -> None:  # pragma: no cover
@@ -214,7 +214,7 @@ def _diploid_self_kinship(
         kinship[i, i] = (1 + kinship[p, q]) / 2
 
 
-@njit(cache=True)
+@numba_jit
 def _diploid_pair_kinship(
     kinship: ArrayLike, parent: ArrayLike, i: int, j: int
 ) -> None:  # pragma: no cover
@@ -227,7 +227,7 @@ def _diploid_pair_kinship(
     kinship[j, i] = kinship_ij
 
 
-@njit(cache=True)
+@numba_jit
 def kinship_diploid(
     parent: ArrayLike, allow_half_founders: bool = False, dtype: type = np.float64
 ) -> ArrayLike:  # pragma: no cover
@@ -290,7 +290,7 @@ def kinship_diploid(
     return kinship
 
 
-@njit(cache=True)
+@numba_jit
 def _inbreeding_as_self_kinship(
     inbreeding: float, ploidy: int
 ) -> float:  # pragma: no cover
@@ -298,7 +298,7 @@ def _inbreeding_as_self_kinship(
     return (1 + (ploidy - 1) * inbreeding) / ploidy
 
 
-@njit(cache=True)
+@numba_jit
 def _hamilton_kerr_inbreeding_founder(
     lambda_p: float, lambda_q: float, ploidy_i: int
 ) -> float:  # pragma: no cover
@@ -310,7 +310,7 @@ def _hamilton_kerr_inbreeding_founder(
     return num / denom
 
 
-@njit(cache=True)
+@numba_jit
 def _hamilton_kerr_inbreeding_non_founder(
     tau_p: int,
     lambda_p: float,
@@ -340,7 +340,7 @@ def _hamilton_kerr_inbreeding_non_founder(
     return num / denom
 
 
-@njit(cache=True)
+@numba_jit
 def _hamilton_kerr_inbreeding_half_founder(
     tau_p: int,
     lambda_p: float,
@@ -374,7 +374,7 @@ def _hamilton_kerr_inbreeding_half_founder(
     )
 
 
-@njit(cache=True)
+@numba_jit
 def _hamilton_kerr_self_kinship(
     kinship: ArrayLike, parent: ArrayLike, tau: ArrayLike, lambda_: ArrayLike, i: int
 ) -> None:  # pragma: no cover
@@ -421,7 +421,7 @@ def _hamilton_kerr_self_kinship(
     kinship[i, i] = _inbreeding_as_self_kinship(inbreeding_i, ploidy_i)
 
 
-@njit(cache=True)
+@numba_jit
 def _hamilton_kerr_pair_kinship(
     kinship: ArrayLike, parent: ArrayLike, tau: ArrayLike, i: int, j: int
 ) -> None:  # pragma: no cover
@@ -435,7 +435,7 @@ def _hamilton_kerr_pair_kinship(
     kinship[j, i] = kinship_ij
 
 
-@njit(cache=True)
+@numba_jit
 def kinship_Hamilton_Kerr(
     parent: ArrayLike,
     tau: ArrayLike,
@@ -646,32 +646,6 @@ def pedigree_kinship(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-@vectorize(nopython=True, cache=True)
-def kinship_as_additive_relationship(
-    kinship: float, ploidy_x: int, ploidy_y: int
-) -> float:  # pragma: no cover
-    """Convert kinship estimates to relatedness estimates
-
-    Parameters
-    ----------
-    kinship
-        kinship between a pair of samples
-    ploidy_x
-        ploidy of first sample in pair
-    ploidy_y
-        ploidy of second sample in pair
-
-    Returns
-    relatedness between the pair of samples
-
-    Notes
-    -----
-    If both samples are of the same ploidy then their relatedness
-    is simply their kinship multiplied by their ploidy.
-    """
-    return kinship * 2 * np.sqrt(ploidy_x / 2 * ploidy_y / 2)
-
-
 def additive_relationships(
     ds: Dataset,
     *,
@@ -766,13 +740,7 @@ def additive_relationships(
         A = kinship * 2
     elif method == "Hamilton-Kerr":
         ploidy = ds[stat_Hamilton_Kerr_tau].data.sum(axis=-1)
-        A = da.apply_gufunc(
-            kinship_as_additive_relationship,
-            "(),(),()->()",
-            kinship,
-            ploidy[None, :],
-            ploidy[:, None],
-        )
+        A = kinship * 2 * np.sqrt(ploidy[None, :] / 2 * ploidy[:, None] / 2)
     new_ds = create_dataset(
         {
             variables.stat_additive_relationship: xr.DataArray(
@@ -783,7 +751,7 @@ def additive_relationships(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-@njit(cache=True)
+@numba_jit
 def _update_inverse_additive_relationships(
     mtx: ArrayLike,
     kinship: ArrayLike,
@@ -838,7 +806,7 @@ def _update_inverse_additive_relationships(
     mtx[i, i] += scalar / ploidy_i
 
 
-@njit(cache=True)
+@numba_jit
 def pedigree_kinships_as_inverse_additive_relationships(
     kinship: ArrayLike, parent: ArrayLike, tau: Union[ArrayLike, None] = None
 ) -> ArrayLike:  # pragma: no cover

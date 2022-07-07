@@ -3,11 +3,11 @@ from typing import Any, Dict, Hashable
 import dask.array as da
 import numpy as np
 import xarray as xr
-from numba import guvectorize
 from typing_extensions import Literal
 from xarray import Dataset
 
 from sgkit import variables
+from sgkit.accelerate import numba_guvectorize
 from sgkit.stats.utils import cohort_sum
 from sgkit.typing import ArrayLike
 from sgkit.utils import (
@@ -19,7 +19,7 @@ from sgkit.utils import (
 Dimension = Literal["samples", "variants"]
 
 
-@guvectorize(  # type: ignore
+@numba_guvectorize(  # type: ignore
     [
         "void(int8[:], uint8[:], uint8[:])",
         "void(int16[:], uint8[:], uint8[:])",
@@ -27,8 +27,6 @@ Dimension = Literal["samples", "variants"]
         "void(int64[:], uint8[:], uint8[:])",
     ],
     "(k),(n)->(n)",
-    nopython=True,
-    cache=True,
 )
 def count_alleles(
     g: ArrayLike, _: ArrayLike, out: ArrayLike

@@ -2,8 +2,9 @@ import warnings
 from typing import Any, Callable, Hashable, List, Mapping, Optional, Set, Tuple, Union
 
 import numpy as np
-from numba import guvectorize
 from xarray import Dataset
+
+from sgkit.accelerate import numba_guvectorize
 
 from . import variables
 from .typing import ArrayLike, DType
@@ -308,7 +309,7 @@ def max_str_len(a: ArrayLike) -> ArrayLike:
     return lens.max()
 
 
-@guvectorize(  # type: ignore
+@numba_guvectorize(  # type: ignore
     [
         "void(int8[:], int64[:])",
         "void(int16[:], int64[:])",
@@ -316,8 +317,6 @@ def max_str_len(a: ArrayLike) -> ArrayLike:
         "void(int64[:], int64[:])",
     ],
     "(n)->()",
-    nopython=True,
-    cache=True,
 )
 def hash_array(x: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Hash entries of ``x`` using the DJBX33A hash function.

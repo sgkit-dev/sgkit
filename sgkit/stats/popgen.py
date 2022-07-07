@@ -4,9 +4,9 @@ from typing import Hashable, Optional, Sequence, Tuple, Union
 
 import dask.array as da
 import numpy as np
-from numba import guvectorize
 from xarray import Dataset
 
+from sgkit.accelerate import numba_guvectorize
 from sgkit.cohorts import _cohorts_to_array
 from sgkit.stats.utils import assert_array_shape
 from sgkit.typing import ArrayLike
@@ -133,11 +133,9 @@ def diversity(
 
 
 # c = cohorts, k = alleles
-@guvectorize(  # type: ignore
+@numba_guvectorize(  # type: ignore
     ["void(int64[:, :], float64[:,:])", "void(uint64[:, :], float64[:,:])"],
     "(c, k)->(c,c)",
-    nopython=True,
-    cache=True,
 )
 def _divergence(ac: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Generalized U-function for computing divergence.
@@ -303,14 +301,12 @@ def divergence(
 
 
 # c = cohorts
-@guvectorize(  # type: ignore
+@numba_guvectorize(  # type: ignore
     [
         "void(float32[:,:], float32[:,:])",
         "void(float64[:,:], float64[:,:])",
     ],
     "(c,c)->(c,c)",
-    nopython=True,
-    cache=True,
 )
 def _Fst_Hudson(d: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Generalized U-function for computing Fst using Hudson's estimator.
@@ -335,14 +331,12 @@ def _Fst_Hudson(d: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
 
 
 # c = cohorts
-@guvectorize(  # type: ignore
+@numba_guvectorize(  # type: ignore
     [
         "void(float32[:,:], float32[:,:])",
         "void(float64[:,:], float64[:,:])",
     ],
     "(c,c)->(c,c)",
-    nopython=True,
-    cache=True,
 )
 def _Fst_Nei(d: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Generalized U-function for computing Fst using Nei's estimator.
@@ -619,11 +613,9 @@ def Tajimas_D(
 
 
 # c = cohorts
-@guvectorize(  # type: ignore
+@numba_guvectorize(  # type: ignore
     ["void(float32[:, :], float32[:,:,:])", "void(float64[:, :], float64[:,:,:])"],
     "(c,c)->(c,c,c)",
-    nopython=True,
-    cache=True,
 )
 def _pbs(t: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Generalized U-function for computing PBS."""
@@ -640,14 +632,12 @@ def _pbs(t: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
 
 
 # c = cohorts, ct = cohort_triples, i = index (size 3)
-@guvectorize(  # type: ignore
+@numba_guvectorize(  # type: ignore
     [
         "void(float32[:, :], int32[:, :], float32[:,:,:])",
         "void(float64[:, :], int32[:, :], float64[:,:,:])",
     ],
     "(c,c),(ct,i)->(c,c,c)",
-    nopython=True,
-    cache=True,
 )
 def _pbs_cohorts(
     t: ArrayLike, ct: ArrayLike, out: ArrayLike

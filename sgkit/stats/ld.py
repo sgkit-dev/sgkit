@@ -7,15 +7,15 @@ import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 from dask.dataframe import DataFrame
-from numba import njit
 from xarray import Dataset
 
 from sgkit import variables
+from sgkit.accelerate import numba_jit
 from sgkit.typing import ArrayLike, DType
 from sgkit.window import _get_chunked_windows, _sizes_to_start_offsets, has_windows
 
 
-@njit(nogil=True, fastmath=False, cache=True)  # type: ignore
+@numba_jit(nogil=True, fastmath=False)  # type: ignore
 def rogers_huff_r_between(gn0: ArrayLike, gn1: ArrayLike) -> float:  # pragma: no cover
     """Rogers Huff *r*.
 
@@ -67,7 +67,7 @@ def rogers_huff_r_between(gn0: ArrayLike, gn1: ArrayLike) -> float:  # pragma: n
     return r
 
 
-@njit(nogil=True, fastmath=True, cache=True)  # type: ignore
+@numba_jit(nogil=True, fastmath=True)  # type: ignore
 def rogers_huff_r2_between(gn0: ArrayLike, gn1: ArrayLike) -> float:  # pragma: no cover
     return rogers_huff_r_between(gn0, gn1) ** 2  # type: ignore
 
@@ -202,7 +202,7 @@ def ld_matrix(
     )
 
 
-@njit(nogil=True, cache=True)  # type: ignore
+@numba_jit(nogil=True)  # type: ignore
 def _ld_matrix_jit(
     x: ArrayLike,
     chunk_window_starts: ArrayLike,
@@ -302,7 +302,7 @@ def _ld_matrix(
     return df
 
 
-@njit(nogil=True, cache=True)  # type: ignore
+@numba_jit(nogil=True)  # type: ignore
 def _maximal_independent_set_jit(
     idi: ArrayLike, idj: ArrayLike, cmp: ArrayLike
 ) -> List[int]:  # pragma: no cover

@@ -9,8 +9,9 @@ import math
 from typing import Any
 
 import numpy as np
-from numba import cuda, guvectorize, types
+from numba import cuda, types
 
+from sgkit.accelerate import numba_guvectorize
 from sgkit.typing import ArrayLike
 
 # The number of parameters for the map step of the respective distance metric
@@ -20,15 +21,13 @@ N_MAP_PARAM = {
 }
 
 
-@guvectorize(  # type: ignore
+@numba_guvectorize(  # type: ignore
     [
         "void(float32[:], float32[:], float32[:], float32[:])",
         "void(float64[:], float64[:], float64[:], float64[:])",
         "void(int8[:], int8[:], int8[:], float64[:])",
     ],
     "(n),(n),(p)->(p)",
-    nopython=True,
-    cache=True,
 )
 def euclidean_map_cpu(
     x: ArrayLike, y: ArrayLike, _: ArrayLike, out: ArrayLike
@@ -78,15 +77,13 @@ def euclidean_reduce_cpu(v: ArrayLike) -> ArrayLike:  # pragma: no cover
     return out
 
 
-@guvectorize(  # type: ignore
+@numba_guvectorize(  # type: ignore
     [
         "void(float32[:], float32[:], float32[:], float32[:])",
         "void(float64[:], float64[:], float64[:], float64[:])",
         "void(int8[:], int8[:], int8[:], float64[:])",
     ],
     "(n),(n),(p)->(p)",
-    nopython=True,
-    cache=True,
 )
 def correlation_map_cpu(
     x: ArrayLike, y: ArrayLike, _: ArrayLike, out: ArrayLike
@@ -141,14 +138,12 @@ def correlation_map_cpu(
     )
 
 
-@guvectorize(  # type: ignore
+@numba_guvectorize(  # type: ignore
     [
         "void(float32[:, :], float32[:])",
         "void(float64[:, :], float64[:])",
     ],
     "(p, m)->()",
-    nopython=True,
-    cache=True,
 )
 def correlation_reduce_cpu(v: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
     """Corresponding "reduce" function for pearson correlation
