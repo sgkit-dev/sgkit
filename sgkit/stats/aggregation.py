@@ -118,7 +118,8 @@ def count_call_alleles(
     n_alleles = ds.dims["alleles"]
     G = da.asarray(ds[call_genotype])
     shape = (G.chunks[0], G.chunks[1], n_alleles)
-    N = da.empty(n_alleles, dtype=np.uint8)
+    # use numpy array to avoid dask task dependencies between chunks
+    N = np.empty(n_alleles, dtype=np.uint8)
     new_ds = create_dataset(
         {
             variables.call_allele_count: (
@@ -263,8 +264,10 @@ def count_cohort_alleles(
         ds, variables.call_allele_count, call_allele_count, count_call_alleles
     )
     variables.validate(ds, {call_allele_count: variables.call_allele_count_spec})
-    AC, SC = da.asarray(ds[call_allele_count]), da.asarray(ds[sample_cohort])
-    n_cohorts = SC.max().compute() + 1  # 0-based indexing
+    # ensure cohorts is a numpy array to minimize dask task
+    # dependencies between chunks in other dimensions
+    AC, SC = da.asarray(ds[call_allele_count]), ds[sample_cohort].values
+    n_cohorts = SC.max() + 1  # 0-based indexing
     AC = cohort_sum(AC, SC, n_cohorts, axis=1)
     new_ds = create_dataset(
         {variables.cohort_allele_count: (("variants", "cohorts", "alleles"), AC)}
