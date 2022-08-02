@@ -8,4 +8,4 @@ ipython
 matplotlib
 graphviz
 seaborn
-ablog
+ablog!=0.10.27
