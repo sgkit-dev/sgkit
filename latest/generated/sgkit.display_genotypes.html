@@ -47,13 +47,38 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sgkit.filter_partial_calls" href="sgkit.filter_partial_calls.html" />
-    <link rel="prev" title="sgkit.convert_probability_to_call" href="sgkit.convert_probability_to_call.html" />
+    <link rel="prev" title="sgkit.convert_probability_to_call" href="sgkit.convert_probability_to_call.html" /> 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
 
     <!-- Google Analytics -->
-    
+      
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
 <!-- Checkboxes to toggle the left sidebar -->
@@ -802,6 +827,11 @@
    About
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../news.html">
+   News
+  </a>
+ </li>
 </ul>
 
     </div>
@@ -937,8 +967,7 @@ title="Edit this page"
             <main id="main-content" role="main">
                 
               <div>
-                
-  <section id="sgkit-display-genotypes">
+                 <section id="sgkit-display-genotypes">
 <h1>sgkit.display_genotypes<a class="headerlink" href="#sgkit-display-genotypes" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgkit.display_genotypes">
@@ -952,7 +981,7 @@ separator. Missing values are denoted by <cite>.</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> : <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>The dataset containing genotype calls in the <cite>call/genotype</cite>
+<dt><strong>ds</strong> : <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.6.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>The dataset containing genotype calls in the <cite>call/genotype</cite>
 variable, and (optionally) phasing information in the
 <cite>call/genotype_phased</cite> variable. If no phasing information is
 present genotypes are assumed to be unphased.</p>
@@ -976,6 +1005,9 @@ more samples than this then the table is truncated.</p>
 
 </section>
 
+<div class="section">
+   
+</div>
 
               </div>
               

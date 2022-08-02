@@ -47,13 +47,38 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sgkit.hardy_weinberg_test" href="sgkit.hardy_weinberg_test.html" />
-    <link rel="prev" title="sgkit.Garud_H" href="sgkit.Garud_H.html" />
+    <link rel="prev" title="sgkit.Garud_H" href="sgkit.Garud_H.html" /> 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
 
     <!-- Google Analytics -->
-    
+      
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
 <!-- Checkboxes to toggle the left sidebar -->
@@ -802,6 +827,11 @@
    About
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../news.html">
+   News
+  </a>
+ </li>
 </ul>
 
     </div>
@@ -937,8 +967,7 @@ title="Edit this page"
             <main id="main-content" role="main">
                 
               <div>
-                
-  <section id="sgkit-gwas-linear-regression">
+                 <section id="sgkit-gwas-linear-regression">
 <h1>sgkit.gwas_linear_regression<a class="headerlink" href="#sgkit-gwas-linear-regression" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgkit.gwas_linear_regression">
@@ -953,7 +982,7 @@ covariates, only variants.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> : <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing necessary dependent and independent variables.</p>
+<dt><strong>ds</strong> : <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.6.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing necessary dependent and independent variables.</p>
 </dd>
 <dt><strong>dosage</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></dt><dd><p>Name of genetic dosage variable.
 Defined by <a class="reference internal" href="sgkit.variables.dosage_spec.html#sgkit.variables.dosage_spec" title="sgkit.variables.dosage_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.dosage_spec</span></code></a>.</p>
@@ -989,7 +1018,7 @@ they must be tall and skinny).</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.6.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><p>Dataset containing (N = num variants, O = num traits):</p>
@@ -1024,6 +1053,9 @@ Nature Genetics 47 (3): 284–90.</p>
 
 </section>
 
+<div class="section">
+   
+</div>
 
               </div>
               

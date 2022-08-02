@@ -47,13 +47,38 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sgkit.pedigree_kinship" href="sgkit.pedigree_kinship.html" />
-    <link rel="prev" title="sgkit.observed_heterozygosity" href="sgkit.observed_heterozygosity.html" />
+    <link rel="prev" title="sgkit.observed_heterozygosity" href="sgkit.observed_heterozygosity.html" /> 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
 
     <!-- Google Analytics -->
-    
+      
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
 <!-- Checkboxes to toggle the left sidebar -->
@@ -802,6 +827,11 @@
    About
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../news.html">
+   News
+  </a>
+ </li>
 </ul>
 
     </div>
@@ -937,8 +967,7 @@ title="Edit this page"
             <main id="main-content" role="main">
                 
               <div>
-                
-  <section id="sgkit-pbs">
+                 <section id="sgkit-pbs">
 <h1>sgkit.pbs<a class="headerlink" href="#sgkit-pbs" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgkit.pbs">
@@ -950,7 +979,7 @@ this function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> : <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Genotype call dataset.</p>
+<dt><strong>ds</strong> : <a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.6.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Genotype call dataset.</p>
 </dd>
 <dt><strong>stat_Fst</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'stat_Fst'</span></code>)</dt><dd><p>Fst variable to use or calculate. Defined by
 <a class="reference internal" href="sgkit.variables.stat_Fst_spec.html#sgkit.variables.stat_Fst_spec" title="sgkit.variables.stat_Fst_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Fst_spec</span></code></a>.
@@ -969,7 +998,7 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
 </dl>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://xarray.pydata.org/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.6.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A dataset containing the PBS value between cohort triples, as defined by
@@ -1008,6 +1037,9 @@ samples dimension.</p>
 
 </section>
 
+<div class="section">
+   
+</div>
 
               </div>
               
