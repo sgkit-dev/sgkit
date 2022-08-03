@@ -15,6 +15,7 @@ from typing import (
     Tuple,
     Union,
 )
+import re
 
 import dask
 import fsspec
@@ -93,9 +94,9 @@ def region_filter(
 
 def get_region_start(region: str) -> int:
     """Return the start position of the region string."""
-    if ":" not in region:
+    if not re.match("\d+-\d+$", region):
         return 1
-    contig, start_end = region.split(":")
+    contig, start_end = region.rsplit(":", 1)
     start, end = start_end.split("-")
     return int(start)
 
