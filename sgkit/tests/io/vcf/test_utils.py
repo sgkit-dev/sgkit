@@ -112,13 +112,9 @@ def test_chunks(x, n, expected_values):
     "region,expected",
     [
         ("region-with-dashes:and:colons-but:no-coordinates", 1),
-        (
-            "region-with-dashes:colons-and:coordinates:5-10", 5
-        ),
+        ("region-with-dashes:colons-and:coordinates:5-10", 5),
         ("region-with`~!@#$%^&*()-_=+various:symbols", 1),
-        (
-            "region-with`~!@#$%^&*()-_=+various:symbols-and:coordinates:6-11", 6
-        )
+        ("region-with`~!@#$%^&*()-_=+various:symbols-and:coordinates:6-11", 6),
     ],
 )
 def test_get_region_start(region: str, expected: int):
