@@ -1,5 +1,6 @@
 import functools
 import itertools
+import re
 import warnings
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -15,7 +16,6 @@ from typing import (
     Tuple,
     Union,
 )
-import re
 
 import dask
 import fsspec
