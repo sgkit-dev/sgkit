@@ -94,7 +94,7 @@ def region_filter(
 
 def get_region_start(region: str) -> int:
     """Return the start position of the region string."""
-    if not re.match("\d+-\d+$", region):
+    if not re.search(r"\d+-\d+$", region):
         return 1
     contig, start_end = region.rsplit(":", 1)
     start, end = start_end.split("-")
