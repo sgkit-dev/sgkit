@@ -765,6 +765,18 @@ stat_pbs, stat_pbs_spec = SgkitVariables.register_variable(
     )
 )
 
+(
+    stat_pedigree_inbreeding,
+    stat_pedigree_inbreeding_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_pedigree_inbreeding",
+        ndim=1,
+        kind="f",
+        __doc__="""Expected inbreeding coefficients of samples based on pedigree structure.""",
+    )
+)
+
 stat_pedigree_kinship, stat_pedigree_kinship_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "stat_pedigree_kinship",
