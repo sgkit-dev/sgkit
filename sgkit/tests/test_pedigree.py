@@ -8,9 +8,10 @@ import xarray as xr
 
 import sgkit as sg
 from sgkit.stats.pedigree import (
-    _hamilton_kerr_self_kinship,
+    _insert_hamilton_kerr_self_kinship,
     inverse_additive_relationships,
     parent_indices,
+    pedigree_inbreeding,
     pedigree_kinship,
     pedigree_relationship,
     topological_argsort,
@@ -182,7 +183,7 @@ def test_topological_argsort__raise_on_directed_loop():
         topological_argsort(parent)
 
 
-def test_hamilton_kerr_self_kinship__clone():
+def test_insert_hamilton_kerr_self_kinship__clone():
     # tests an edge case where the self kinship of the clone will
     # be nan if the "missing" parent is not handled correctly
     parent = np.array(
@@ -208,7 +209,7 @@ def test_hamilton_kerr_self_kinship__clone():
         ]
     )
     i = 1
-    _hamilton_kerr_self_kinship(kinship, parent, tau, lambda_, i)
+    _insert_hamilton_kerr_self_kinship(kinship, parent, tau, lambda_, i)
     assert kinship[i, i] == 0.5
 
 
@@ -519,6 +520,142 @@ def test_pedigree_kinship__raise_on_invalid_method():
     ]
     with pytest.raises(ValueError, match="Unknown method 'unknown'"):
         pedigree_kinship(ds, method="unknown")
+
+
+@pytest.mark.parametrize("selfing", [False, True])
+@pytest.mark.parametrize("permute", [False, True])
+@pytest.mark.parametrize(
+    "n_sample, n_founder, n_half_founder, seed",
+    [
+        (15, 3, 2, 0),
+        (1000, 10, 50, 0),
+    ],
+)
+def test_pedigree_inbreeding__diploid(
+    n_sample, n_founder, n_half_founder, seed, selfing, permute
+):
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=n_sample)
+    parent = random_parent_matrix(
+        n_sample, n_founder, n_half_founder, selfing=selfing, permute=permute, seed=seed
+    )
+    ds["parent"] = ["samples", "parents"], parent
+    ds = pedigree_kinship(ds, method="diploid", allow_half_founders=True)
+    ds = pedigree_inbreeding(ds, method="diploid", allow_half_founders=True).compute()
+    # diploid inbreeding is equal to kinship between parents
+    kinship = ds.stat_pedigree_kinship.values
+    p = parent[:, 0]
+    q = parent[:, 1]
+    expect = kinship[(p, q)]
+    # if either parent is unknown then not inbred
+    expect[np.logical_or(p < 0, q < 0)] = 0
+    actual = ds.stat_pedigree_inbreeding.values
+    np.testing.assert_array_equal(actual, expect)
+
+
+@pytest.mark.parametrize("selfing", [False, True])
+@pytest.mark.parametrize("permute", [False, True])
+@pytest.mark.parametrize(
+    "n_sample, n_founder, n_half_founder, seed",
+    [
+        (15, 3, 2, 0),
+        (1000, 10, 50, 0),
+    ],
+)
+def test_pedigree_inbreeding__tetraploid(
+    n_sample, n_founder, n_half_founder, seed, selfing, permute
+):
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=n_sample)
+    parent = random_parent_matrix(
+        n_sample, n_founder, n_half_founder, selfing=selfing, permute=permute, seed=seed
+    )
+    ds["parent"] = ["samples", "parents"], parent
+    ds["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], np.full_like(parent, 2, int)
+    ds["stat_Hamilton_Kerr_lambda"] = ["samples", "parents"], np.full_like(
+        parent, 0.01, float
+    )
+    ds = pedigree_kinship(ds, method="Hamilton-Kerr", allow_half_founders=True)
+    ds = pedigree_inbreeding(
+        ds, method="Hamilton-Kerr", allow_half_founders=True
+    ).compute()
+    # convert self-kinship to inbreeding
+    self_kinship = np.diag(ds.stat_pedigree_kinship.values)
+    expect = (self_kinship * 4 - 1) / (4 - 1)
+    actual = ds.stat_pedigree_inbreeding.values
+    np.testing.assert_array_almost_equal(actual, expect)
+
+
+@pytest.mark.parametrize(
+    "order",
+    [
+        [0, 1, 2, 3, 4, 5, 6, 7],
+        [7, 6, 5, 4, 3, 2, 1, 0],
+        [1, 2, 6, 5, 7, 3, 4, 0],
+    ],
+)
+def test_pedigree_inbreeding__Hamilton_Kerr(order):
+    # Example from Hamilton and Kerr 2017. The expected values were
+    # calculated with their R package "polyAinv".
+    #
+    #    pedigree <- read.csv("hamilton_kerr_pedigree.csv")
+    #    results <- polyAinv::polyAinv(ped=pedigree[,1:7])
+    #    f = results$F[,"F"]
+    #    write.table(f, file="hamilton_kerr_inbreeding.txt", row.names=FALSE, col.names=FALSE)
+    #
+    path = pathlib.Path(__file__).parent.absolute()
+    expect = np.loadtxt(path / "test_pedigree/hamilton_kerr_inbreeding.txt")
+    ds = load_hamilton_kerr_pedigree()
+    # reorder dataset samples and compute kinship
+    ds = ds.sel(dict(samples=order))
+    ds = parent_indices(ds, missing=0)  # ped sample names are 1 based
+    ds = pedigree_inbreeding(ds, method="Hamilton-Kerr").compute()
+    # compare to reordered polyAinv values
+    np.testing.assert_array_almost_equal(ds.stat_pedigree_inbreeding, expect[order])
+
+
+def test_pedigree_inbreeding__raise_on_unknown_method():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+    ]
+    with pytest.raises(ValueError, match="Unknown method 'unknown'"):
+        pedigree_inbreeding(ds, method="unknown")
+
+
+def test_pedigree_inbreeding__raise_on_parent_dimension():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", ".", "."],
+        [".", ".", "."],
+        ["S0", "S1", "."],
+    ]
+    with pytest.raises(
+        ValueError, match="Parent matrix must have shape \(samples, 2\)"  # noqa: W605
+    ):
+        pedigree_inbreeding(ds).compute()
+
+
+def test_pedigree_inbreeding__raise_on_not_diploid():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3, n_ploidy=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+    ]
+    with pytest.raises(ValueError, match="Dataset is not diploid"):
+        pedigree_inbreeding(ds, method="diploid")
+
+
+def test_pedigree_inbreeding__raise_on_half_founder():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        ["S0", "."],
+        ["S0", "S1"],
+    ]
+    with pytest.raises(ValueError, match="Pedigree contains half-founders"):
+        pedigree_inbreeding(ds, method="diploid").compute()
 
 
 @pytest.mark.parametrize(
