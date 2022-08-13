@@ -111,9 +111,8 @@ def test_chunks(x, n, expected_values):
 @pytest.mark.parametrize(
     "region,expected",
     [
-        ("region-with-dashes:and:colons-but:no-coordinates", 1),
-        ("region-with-dashes:colons-and:coordinates:5-10", 5),
         ("region-with`~!@#$%^&*()-_=+various:symbols", 1),
+        ("region-with`~!@#$%^&*()-_=+various:symbols-and:partial_coordinates:5-", 5),
         ("region-with`~!@#$%^&*()-_=+various:symbols-and:coordinates:6-11", 6),
     ],
 )
