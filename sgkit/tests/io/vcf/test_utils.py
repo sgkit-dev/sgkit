@@ -7,6 +7,7 @@ import pytest
 from callee.strings import StartsWith
 
 from sgkit.io.vcf.utils import build_url, chunks, temporary_directory
+from sgkit.io.vcf.vcf_reader import get_region_start
 
 
 def directory_with_file_scheme() -> str:
@@ -105,3 +106,15 @@ def test_build_url():
 )
 def test_chunks(x, n, expected_values):
     assert [list(i) for i in chunks(iter(range(x)), n)] == expected_values
+
+
+@pytest.mark.parametrize(
+    "region,expected",
+    [
+        ("region-with`~!@#$%^&*()-_=+various:symbols", 1),
+        ("region-with`~!@#$%^&*()-_=+various:symbols-and:partial_coordinates:5-", 5),
+        ("region-with`~!@#$%^&*()-_=+various:symbols-and:coordinates:6-11", 6),
+    ],
+)
+def test_get_region_start(region: str, expected: int):
+    assert get_region_start(region) == expected
