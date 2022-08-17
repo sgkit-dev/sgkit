@@ -1,4 +1,4 @@
-from typing import Hashable, Optional, Sequence
+from typing import Hashable, Optional, Sequence, Union
 
 import dask.array as da
 import numpy as np
@@ -190,7 +190,7 @@ def filter_partial_calls(
 def mean_impute(
     ds: Dataset,
     variable: str,
-    dim: Hashable | Sequence[Hashable] = "samples",
+    dim: Union[Hashable, Sequence[Hashable]] = "samples",
     merge: bool = True,
 ) -> Dataset:
     """Mean impute a masked variable
