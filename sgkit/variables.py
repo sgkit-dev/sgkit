@@ -214,6 +214,15 @@ call_dosage, call_dosage_spec = SgkitVariables.register_variable(
     )
 )
 
+call_dosage_imputed, call_dosage_imputed_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "call_dosage_imputed",
+        kind="f",
+        ndim=2,
+        __doc__="""Dosages imputed, encoded as floats, with NaN indicating a missing value.""",
+    )
+)
+
 call_dosage_mask, call_dosage_mask_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "call_dosage_mask",
@@ -293,6 +302,16 @@ completely missing genotype calls.
     )
 )
 
+call_genotype_imputed, call_genotype_imputed_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "call_genotype_imputed",
+        kind="f",
+        ndim=3,
+        __doc__="""
+Call genotype imputed """,
+    )
+)
+
 (
     call_genotype_probability,
     call_genotype_probability_spec,
@@ -304,6 +323,19 @@ completely missing genotype calls.
         __doc__="""Genotype probabilities.""",
     )
 )
+
+(
+    call_genotype_probability_imputed,
+    call_genotype_probability_imputed_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "call_genotype_probability_imputed",
+        kind="f",
+        ndim=3,
+        __doc__="""Genotype probabilities Imputed.""",
+    )
+)
+
 
 (
     call_genotype_probability_mask,
