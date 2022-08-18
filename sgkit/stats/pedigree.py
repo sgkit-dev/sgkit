@@ -646,37 +646,32 @@ def pedigree_kinship(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-def additive_relationships(
+def pedigree_relationship(
     ds: Dataset,
     *,
-    method: str = "diploid",
+    method: str = "additive",
     stat_pedigree_kinship: Hashable = variables.stat_pedigree_kinship,
-    stat_Hamilton_Kerr_tau: Hashable = variables.stat_Hamilton_Kerr_tau,
+    sample_ploidy: Hashable = None,
     merge: bool = True,
 ) -> Dataset:
-    """Calculate the additive relationship matrix from pedigree structure
-    (AKA the numerator relationship matrix).
+    """Calculate a relationship matrix from pedigree structure
 
     Parameters
     ----------
     ds
         Dataset containing pedigree structure.
     method
-        The method used for relationship estimation which must be one of
-        {"diploid", "Hamilton-Kerr"}. Defaults to "diploid" which is
-        only suitable for pedigrees in which all samples are diploids
-        resulting from sexual reproduction.
-        The "Hamilton-Kerr" method is suitable for autopolyploid and
-        mixed-ploidy datasets following Hamilton and Kerr 2017 [1].
+        The method used for relationship estimation. Currently the only
+        option is "additive".
     stat_pedigree_kinship
         Input variable name holding pedigree kinship matrix as defined
         by :data:`sgkit.variables.stat_pedigree_kinship_spec`.
-        If the variable is not present in ``ds``, it will be computed
-        using :func:`pedigree_kinship` with the method specified above.
-    stat_Hamilton_Kerr_tau
-        Input variable name holding stat_Hamilton_Kerr_tau as defined
-        by :data:`sgkit.variables.stat_Hamilton_Kerr_tau_spec`.
-        This variable is only required for the "Hamilton-Kerr" method.
+    sample_ploidy
+        Optional input variable name holding the ploidy of each sample
+        as defined by :data:`sgkit.variables.sample_ploidy_spec`.
+        By default the ploidy for all samples will be assumed to be equal
+        to the size of the ploidy dimension. If the ploidy dimension is
+        absent, then all samples will be assumed to be diploid.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -684,16 +679,16 @@ def additive_relationships(
 
     Returns
     -------
-    A dataset containing :data:`sgkit.variables.stat_additive_relationship_spec`.
+    A dataset containing :data:`sgkit.variables.stat_pedigree_relationship_spec`.
 
     Raises
     ------
     ValueError
         If an unknown method is specified.
 
-    Notes
+    Note
     -----
-    Dimensions of :data:`sgkit.variables.stat_additive_relationship_spec`
+    Dimensions of :data:`sgkit.variables.stat_pedigree_relationship_spec`
     are named ``samples_0`` and ``samples_1``.
 
     Examples
@@ -709,41 +704,33 @@ def additive_relationships(
     ...     ["S0", "S1"],
     ...     ["S0", "S2"]
     ... ]
-    >>> ds = sg.additive_relationships(ds)
-    >>> ds["stat_additive_relationship"].values # doctest: +NORMALIZE_WHITESPACE
+    >>> ds = sg.pedigree_kinship(ds)
+    >>> ds = sg.pedigree_relationship(ds)
+    >>> ds["stat_pedigree_relationship"].values # doctest: +NORMALIZE_WHITESPACE
     array([[1.  , 0.  , 0.5 , 0.75],
            [0.  , 1.  , 0.5 , 0.25],
            [0.5 , 0.5 , 1.  , 0.75],
            [0.75, 0.25, 0.75, 1.25]])
 
-    References
-    ----------
-    [1] - Matthew G. Hamilton, and Richard J. Kerr 2017.
-    "Computation of the inverse additive relationship matrix for autopolyploid
-    and multiple-ploidy populations." Theoretical and Applied Genetics 131: 851-860.
     """
-    if method not in {"diploid", "Hamilton-Kerr"}:
+    if method not in {"additive"}:
         raise ValueError("Unknown method '{}'".format(method))
-    ds = define_variable_if_absent(
-        ds,
-        variables.stat_pedigree_kinship,
-        stat_pedigree_kinship,
-        pedigree_kinship,
-        method=method,
-        stat_Hamilton_Kerr_tau=stat_Hamilton_Kerr_tau,
-    )
     variables.validate(
         ds, {stat_pedigree_kinship: variables.stat_pedigree_kinship_spec}
     )
     kinship = ds[stat_pedigree_kinship].data
-    if method == "diploid":
-        A = kinship * 2
-    elif method == "Hamilton-Kerr":
-        ploidy = ds[stat_Hamilton_Kerr_tau].data.sum(axis=-1)
-        A = kinship * 2 * np.sqrt(ploidy[None, :] / 2 * ploidy[:, None] / 2)
+    if sample_ploidy is None:
+        ploidy = ds.dims.get("ploidy", 2)
+    else:
+        ploidy = ds[sample_ploidy].data
+    if method == "additive":
+        if isinstance(ploidy, int):
+            A = kinship * ploidy
+        else:
+            A = kinship * 2 * np.sqrt(ploidy[None, :] / 2 * ploidy[:, None] / 2)
     new_ds = create_dataset(
         {
-            variables.stat_additive_relationship: xr.DataArray(
+            variables.stat_pedigree_relationship: xr.DataArray(
                 A, dims=["samples_0", "samples_1"]
             ),
         }

@@ -641,18 +641,6 @@ with -1 indicating variable ploidy.""",
     )
 )
 
-(
-    stat_additive_relationship,
-    stat_additive_relationship_spec,
-) = SgkitVariables.register_variable(
-    ArrayLikeSpec(
-        "stat_additive_relationship",
-        ndim=2,
-        kind="f",
-        __doc__="""Additive relationship matrix AKA the numerator relationship matrix.""",
-    )
-)
-
 stat_Fst, stat_Fst_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "stat_Fst",
@@ -786,6 +774,18 @@ stat_pedigree_kinship, stat_pedigree_kinship_spec = SgkitVariables.register_vari
 Pairwise estimates of expected kinship among samples based on pedigree structure
 with self-kinship values on the diagonal.
 """,
+    )
+)
+
+(
+    stat_pedigree_relationship,
+    stat_pedigree_relationship_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_pedigree_relationship",
+        ndim=2,
+        kind="f",
+        __doc__="""Relationship matrix derived from pedigree structure.""",
     )
 )
 
