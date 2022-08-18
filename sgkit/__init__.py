@@ -33,10 +33,10 @@ from .stats.ld import ld_matrix, ld_prune, maximal_independent_set
 from .stats.pc_relate import pc_relate
 from .stats.pca import pca
 from .stats.pedigree import (
-    additive_relationships,
     inverse_additive_relationships,
     parent_indices,
     pedigree_kinship,
+    pedigree_relationship,
 )
 from .stats.popgen import (
     Fst,
@@ -62,7 +62,6 @@ __all__ = [
     "DIM_PLOIDY",
     "DIM_SAMPLE",
     "DIM_VARIANT",
-    "additive_relationships",
     "call_allele_frequencies",
     "create_genotype_call_dataset",
     "cohort_allele_frequencies",
@@ -89,6 +88,7 @@ __all__ = [
     "maximal_independent_set",
     "parent_indices",
     "pedigree_kinship",
+    "pedigree_relationship",
     "sample_stats",
     "variant_stats",
     "diversity",

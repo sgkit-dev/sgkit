@@ -9,10 +9,10 @@ import xarray as xr
 import sgkit as sg
 from sgkit.stats.pedigree import (
     _hamilton_kerr_self_kinship,
-    additive_relationships,
     inverse_additive_relationships,
     parent_indices,
     pedigree_kinship,
+    pedigree_relationship,
     topological_argsort,
 )
 
@@ -529,7 +529,7 @@ def test_pedigree_kinship__raise_on_invalid_method():
         [1, 2, 6, 5, 7, 3, 4, 0],
     ],
 )
-def test_additive_relationships__Hamilton_Kerr(order):
+def test_pedigree_relationship__Hamilton_Kerr(order):
     # Example from Hamilton and Kerr 2017. The expected values were
     # calculated with their R package "polyAinv" which only  reports
     # the sparse inverse matrix. This was converted to dense kinship
@@ -556,12 +556,14 @@ def test_additive_relationships__Hamilton_Kerr(order):
     ds = ds.sel(dict(samples=order))
     # compute matrix
     ds = parent_indices(ds, missing=0)  # ped sample names are 1 based
-    ds = additive_relationships(ds, method="Hamilton-Kerr")
-    actual = ds.stat_additive_relationship.data
+    ds = pedigree_kinship(ds, method="Hamilton-Kerr")
+    ds["sample_ploidy"] = ds.stat_Hamilton_Kerr_tau.sum(dim="parents")
+    ds = pedigree_relationship(ds, sample_ploidy="sample_ploidy")
+    actual = ds.stat_pedigree_relationship.data
     np.testing.assert_array_almost_equal(actual, expect[order, :][:, order])
 
 
-def test_additive_relationships__raise_on_unknown_method():
+def test_pedigree_relationship__raise_on_unknown_method():
     ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
     ds["parent_id"] = ["samples", "parents"], [
         [".", "."],
@@ -571,7 +573,7 @@ def test_additive_relationships__raise_on_unknown_method():
     # compute kinship first to ensure ValueError not raised from that method
     pedigree_kinship(ds)
     with pytest.raises(ValueError, match="Unknown method 'unknown'"):
-        additive_relationships(ds, method="unknown")
+        pedigree_relationship(ds, method="unknown")
 
 
 @pytest.mark.parametrize(
@@ -640,11 +642,15 @@ def test_inverse_additive_relationships__numpy_equivalence(
         ds["stat_Hamilton_Kerr_lambda"] = ["samples", "parents"], np.random.beta(
             0.5, 0.5, size=parent.shape
         )
-    if n_half_founder > 0:
-        # must allow half-founders when calculating kinship
-        ds = pedigree_kinship(ds, method=method, allow_half_founders=True)
+        sample_ploidy = "sample_ploidy"
+        ds[sample_ploidy] = ds["stat_Hamilton_Kerr_tau"].sum(dim="parents")
+    else:
+        sample_ploidy = None
+    ds = pedigree_kinship(ds, method=method, allow_half_founders=n_half_founder > 0)
     expect = np.linalg.inv(
-        additive_relationships(ds, method=method).stat_additive_relationship
+        pedigree_relationship(
+            ds, sample_ploidy=sample_ploidy
+        ).stat_pedigree_relationship
     )
     actual = inverse_additive_relationships(
         ds, method=method

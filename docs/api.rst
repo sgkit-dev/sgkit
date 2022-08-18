@@ -74,7 +74,6 @@ Methods
 .. autosummary::
    :toctree: generated/
 
-   additive_relationships
    call_allele_frequencies
    cohort_allele_frequencies
    count_call_alleles
@@ -95,6 +94,7 @@ Methods
    observed_heterozygosity
    pbs
    pedigree_kinship
+   pedigree_relationship
    pc_relate
    regenie
    sample_stats
@@ -169,7 +169,6 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.sample_pca_loading_spec
     variables.sample_pca_projection_spec
     variables.sample_ploidy_spec
-    variables.stat_additive_relationship_spec
     variables.stat_divergence_spec
     variables.stat_diversity_spec
     variables.stat_Fst_spec
@@ -184,6 +183,7 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.stat_observed_heterozygosity_spec
     variables.stat_pbs_spec
     variables.stat_pedigree_kinship_spec
+    variables.stat_pedigree_relationship_spec
     variables.stat_Tajimas_D_spec
     variables.stat_Weir_Goudet_beta_spec
     variables.traits_spec
