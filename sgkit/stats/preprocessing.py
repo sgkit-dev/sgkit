@@ -200,8 +200,8 @@ def mean_impute(
     ds
         Dataset containing variable to be imputed.
     variable
-        Input variable name
-        ``f"{variable}"`` and ``f"{variable}_masked"`` must be present in ``ds``.
+        Input variable name.
+        Variables ``{variable}`` and ``{variable}_masked`` must be present in ``ds``.
     dim:
         Dimension(s) where the means are computed along.
     merge
