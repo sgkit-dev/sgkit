@@ -306,7 +306,10 @@ def max_str_len(a: ArrayLike) -> ArrayLike:
     lens = np.frompyfunc(len, 1, 1)(a)  # type: ignore[no-untyped-call]
     if isinstance(a, np.ndarray):
         lens = np.asarray(lens)
-    return lens.max()
+    if a.ndim == 0:
+        return lens
+    else:
+        return lens.max()
 
 
 @numba_guvectorize(  # type: ignore
