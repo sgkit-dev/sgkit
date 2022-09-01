@@ -93,6 +93,7 @@ Methods
    maximal_independent_set
    observed_heterozygosity
    pbs
+   pedigree_inbreeding
    pedigree_kinship
    pedigree_relationship
    pc_relate
@@ -182,6 +183,7 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.stat_inverse_additive_relationship_spec
     variables.stat_observed_heterozygosity_spec
     variables.stat_pbs_spec
+    variables.stat_pedigree_inbreeding_spec
     variables.stat_pedigree_kinship_spec
     variables.stat_pedigree_relationship_spec
     variables.stat_Tajimas_D_spec
