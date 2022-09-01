@@ -1,0 +1,6 @@
+﻿sgkit.pedigree\_relationship
+============================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: pedigree_relationship
