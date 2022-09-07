@@ -9,9 +9,9 @@ import xarray as xr
 import sgkit as sg
 from sgkit.stats.pedigree import (
     _insert_hamilton_kerr_self_kinship,
-    inverse_additive_relationships,
     parent_indices,
     pedigree_inbreeding,
+    pedigree_inverse_relationship,
     pedigree_kinship,
     pedigree_relationship,
     topological_argsort,
@@ -721,7 +721,7 @@ def test_pedigree_relationship__raise_on_unknown_method():
         [1, 2, 6, 5, 7, 3, 4, 0],
     ],
 )
-def test_inverse_additive_relationships__Hamilton_Kerr(order):
+def test_pedigree_inverse_relationship__Hamilton_Kerr(order):
     # Example from Hamilton and Kerr 2017. The expected values were
     # calculated with their R package "polyAinv" which only  reports
     # the sparse inverse matrix. This was converted to dense kinship
@@ -747,12 +747,12 @@ def test_inverse_additive_relationships__Hamilton_Kerr(order):
     ds = ds.sel(dict(samples=order))
     # compute matrix
     ds = parent_indices(ds, missing=0)  # ped sample names are 1 based
-    ds = inverse_additive_relationships(ds, method="Hamilton-Kerr")
-    actual = ds.stat_inverse_additive_relationship.data
+    ds = pedigree_inverse_relationship(ds, method="Hamilton-Kerr")
+    actual = ds.stat_pedigree_inverse_relationship.data
     np.testing.assert_array_almost_equal(actual, expect[order, :][:, order])
 
 
-@pytest.mark.parametrize("method", ["diploid", "Hamilton-Kerr"])
+@pytest.mark.parametrize("method", ["additive", "Hamilton-Kerr"])
 @pytest.mark.parametrize("selfing", [False, True])
 @pytest.mark.parametrize("permute", [False, True])
 @pytest.mark.parametrize(
@@ -762,7 +762,7 @@ def test_inverse_additive_relationships__Hamilton_Kerr(order):
         (200, 10, 50, 3),  # test half-founders
     ],
 )
-def test_inverse_additive_relationships__numpy_equivalence(
+def test_pedigree_inverse_relationship__numpy_equivalence(
     method, n_sample, n_founder, n_half_founder, seed, selfing, permute
 ):
     ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=n_sample)
@@ -781,21 +781,26 @@ def test_inverse_additive_relationships__numpy_equivalence(
         )
         sample_ploidy = "sample_ploidy"
         ds[sample_ploidy] = ds["stat_Hamilton_Kerr_tau"].sum(dim="parents")
+        ds = pedigree_kinship(
+            ds, method="Hamilton-Kerr", allow_half_founders=n_half_founder > 0
+        )
     else:
         sample_ploidy = None
-    ds = pedigree_kinship(ds, method=method, allow_half_founders=n_half_founder > 0)
+        ds = pedigree_kinship(
+            ds, method="diploid", allow_half_founders=n_half_founder > 0
+        )
     expect = np.linalg.inv(
         pedigree_relationship(
             ds, sample_ploidy=sample_ploidy
         ).stat_pedigree_relationship
     )
-    actual = inverse_additive_relationships(
-        ds, method=method
-    ).stat_inverse_additive_relationship
+    actual = pedigree_inverse_relationship(
+        ds, method=method, allow_half_founders=n_half_founder > 0
+    ).stat_pedigree_inverse_relationship
     np.testing.assert_array_almost_equal(actual, expect)
 
 
-def test_inverse_additive_relationships__raise_on_unknown_method():
+def test_pedigree_inverse_relationship__raise_on_unknown_method():
     ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
     ds["parent_id"] = ["samples", "parents"], [
         [".", "."],
@@ -805,4 +810,39 @@ def test_inverse_additive_relationships__raise_on_unknown_method():
     # compute kinship first to ensure ValueError not raised from that method
     pedigree_kinship(ds)
     with pytest.raises(ValueError, match="Unknown method 'unknown'"):
-        inverse_additive_relationships(ds, method="unknown")
+        pedigree_inverse_relationship(ds, method="unknown")
+
+
+def test_pedigree_inverse_relationship__raise_on_parent_dimension():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", ".", "."],
+        [".", ".", "."],
+        ["S0", "S1", "."],
+    ]
+    with pytest.raises(
+        ValueError, match="Parent matrix must have shape \(samples, 2\)"  # noqa: W605
+    ):
+        pedigree_inverse_relationship(ds).compute()
+
+
+def test_pedigree_inverse_relationship__raise_on_not_diploid():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3, n_ploidy=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+    ]
+    with pytest.raises(ValueError, match="Dataset is not diploid"):
+        pedigree_inverse_relationship(ds, method="additive")
+
+
+def test_pedigree_inverse_relationship__raise_on_half_founder():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        ["S0", "."],
+        ["S0", "S1"],
+    ]
+    with pytest.raises(ValueError, match="Pedigree contains half-founders"):
+        pedigree_inverse_relationship(ds).compute()

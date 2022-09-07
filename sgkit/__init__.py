@@ -33,9 +33,9 @@ from .stats.ld import ld_matrix, ld_prune, maximal_independent_set
 from .stats.pc_relate import pc_relate
 from .stats.pca import pca
 from .stats.pedigree import (
-    inverse_additive_relationships,
     parent_indices,
     pedigree_inbreeding,
+    pedigree_inverse_relationship,
     pedigree_kinship,
     pedigree_relationship,
 )
@@ -83,12 +83,12 @@ __all__ = [
     "infer_call_ploidy",
     "infer_sample_ploidy",
     "infer_variant_ploidy",
-    "inverse_additive_relationships",
     "ld_matrix",
     "ld_prune",
     "maximal_independent_set",
     "parent_indices",
     "pedigree_inbreeding",
+    "pedigree_inverse_relationship",
     "pedigree_kinship",
     "pedigree_relationship",
     "sample_stats",

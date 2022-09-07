@@ -731,14 +731,14 @@ Probability of IBD among gamete alleles resulting from meiotic processes.
 )
 
 (
-    stat_inverse_additive_relationship,
-    stat_inverse_additive_relationship_spec,
+    stat_pedigree_inverse_relationship,
+    stat_pedigree_inverse_relationship_spec,
 ) = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "stat_inverse_additive_relationship",
+        "stat_pedigree_inverse_relationship",
         ndim=2,
         kind="f",
-        __doc__="""Inverse of the additive relationship matrix.""",
+        __doc__="""Inverse of a relationship matrix calculated from pedigree structure.""",
     )
 )
 
