@@ -276,6 +276,63 @@ def _window_per_contig(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
+def window_by_genome(
+    ds: Dataset,
+    *,
+    merge: bool = True,
+) -> Dataset:
+    """Add a window spanning the whole genome to a dataset.
+
+    The window can be used by some downstream functions to calculate
+    whole-genome statistics.
+
+    Parameters
+    ----------
+    ds
+        Genotype call dataset.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing the following variables:
+
+    - :data:`sgkit.variables.window_start_spec` (windows):
+      The index values of window start positions.
+    - :data:`sgkit.variables.window_stop_spec` (windows):
+      The index values of window stop positions.
+
+    Examples
+    --------
+
+    >>> import sgkit as sg
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=10, n_sample=2, n_contig=2)
+    >>> sg.window_by_genome(ds, merge=False)
+    <xarray.Dataset>
+    Dimensions:       (windows: 1)
+    Dimensions without coordinates: windows
+    Data variables:
+        window_start  (windows) int64 0
+        window_stop   (windows) int64 10
+    """
+    new_ds = create_dataset(
+        {
+            window_start: (
+                "windows",
+                np.array([0], dtype=np.int64),
+            ),
+            window_stop: (
+                "windows",
+                np.array([ds.dims["variants"]], dtype=np.int64),
+            ),
+        }
+    )
+    return conditional_merge_datasets(ds, new_ds, merge)
+
+
 def _get_windows(
     start: int, stop: int, size: int, step: int
 ) -> Tuple[ArrayLike, ArrayLike]:
@@ -356,6 +413,16 @@ def window_statistic(
 
     values = da.asarray(values)
     desired_chunks = chunks or values.chunks
+
+    # special-case for whole-genome
+    if (
+        len(window_starts) == 1
+        and window_starts == np.array([0])
+        and len(window_stops) == 1
+        and window_stops == np.array([values.shape[0]])
+    ):
+        # call expand_dims to add back window dimension (size 1)
+        return da.expand_dims(statistic(values, **kwargs), axis=0)
 
     window_lengths = window_stops - window_starts
     depth = np.max(window_lengths)  # type: ignore[no-untyped-call]
