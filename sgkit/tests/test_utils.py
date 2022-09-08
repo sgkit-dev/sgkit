@@ -194,6 +194,16 @@ def test_max_str_len__invalid_dtype():
         max_str_len(np.array([1]))
 
 
+# track failure in https://github.com/pystatgen/sgkit/issues/890
+def test_max_str_len__dask_failure():
+    pytest.importorskip("dask", minversion="2022.8")
+    with pytest.raises(Exception):
+        x = np.array("hi")
+        d = da.array(x)
+        lens = np.frompyfunc(len, 1, 1)(d)
+        lens.max().compute()
+
+
 def test_split_array_chunks__raise_on_blocks_gt_n():
     with pytest.raises(
         ValueError,
