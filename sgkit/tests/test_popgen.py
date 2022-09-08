@@ -24,7 +24,7 @@ from sgkit import (
     variables,
 )
 from sgkit.typing import ArrayLike
-from sgkit.window import window_by_variant
+from sgkit.window import window_by_genome, window_by_variant
 
 from .test_aggregation import get_dataset
 
@@ -241,6 +241,19 @@ def test_divergence__windowed_scikit_allel_comparison(sample_size, n_cohorts, ch
     np.testing.assert_allclose(
         div[:-1], ska_div
     )  # scikit-allel has final window missing
+
+
+@pytest.mark.parametrize("sample_size, n_cohorts", [(10, 2)])
+@pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
+def test_divergence__windowed_by_genome(sample_size, n_cohorts, chunks):
+    ts = simulate_ts(sample_size, length=200)
+    ds = ts_to_dataset(ts, chunks)
+    ds, subsets = add_cohorts(ds, ts, n_cohorts)
+    div = divergence(ds).stat_divergence.sum(axis=0, skipna=False, keepdims=True).values
+
+    ds = window_by_genome(ds)
+    div_by_genome = divergence(ds).stat_divergence.values
+    np.testing.assert_allclose(div, div_by_genome)
 
 
 def test_divergence__missing_calls():

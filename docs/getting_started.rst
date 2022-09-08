@@ -214,7 +214,9 @@ are defined then the values will typically be computed for each variant. It is t
 important to define windows *before* computing statistics on a dataset.
 
 Windows are intervals that span the ``variants`` dimension in a dataset, and they are defined
-using the :func:`sgkit.window_by_variant` and :func:`sgkit.window_by_position` functions.
+using the :func:`sgkit.window_by_variant`, :func:`sgkit.window_by_position`, and 
+:func:`sgkit.window_by_genome` functions.
+
 The first function, :func:`sgkit.window_by_variant`, is the simplest and produces windows with
 a fixed number of variants in each window, determined by the ``size`` argument. An
 optional ``step`` argument may be provided to control the spacing between windows. By default,
@@ -222,6 +224,9 @@ it is the same as the ``size``, giving contiguous windows.
 
 The second function, :func:`sgkit.window_by_position`, produces windows whose size is measured
 by genomic position (base pairs). See the API documentation for usage and examples.
+
+The third function, :func:`sgkit.window_by_genome`, produces a single window spanning the whole
+genome, which can be used to compute whole-genome statistics.
 
 This example shows the effect of computing the diversity statistic: first with no windows defined,
 then with windows.

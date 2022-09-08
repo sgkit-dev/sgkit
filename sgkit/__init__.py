@@ -52,7 +52,7 @@ from .stats.popgen import (
 from .stats.preprocessing import filter_partial_calls
 from .stats.regenie import regenie
 from .testing import simulate_genotype_call_dataset
-from .window import window_by_position, window_by_variant
+from .window import window_by_genome, window_by_position, window_by_variant
 
 try:
     __version__ = get_distribution(__name__).version
@@ -107,6 +107,7 @@ __all__ = [
     "observed_heterozygosity",
     "pca",
     "Weir_Goudet_beta",
+    "window_by_genome",
     "window_by_position",
     "window_by_variant",
     "load_dataset",
