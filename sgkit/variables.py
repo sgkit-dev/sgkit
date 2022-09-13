@@ -704,6 +704,21 @@ stat_Garud_h2_h1, stat_Garud_h2_h1_spec = SgkitVariables.register_variable(
     )
 )
 
+(
+    stat_genomic_relationship,
+    stat_genomic_relationship_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_genomic_relationship",
+        ndim=2,
+        kind="f",
+        __doc__="""
+Genomic relationship matrix (GRM).
+""",
+    )
+)
+
+
 stat_Hamilton_Kerr_tau, stat_Hamilton_Kerr_tau_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "stat_Hamilton_Kerr_tau",

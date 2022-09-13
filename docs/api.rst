@@ -83,6 +83,7 @@ Methods
    diversity
    Fst
    Garud_H
+   genomic_relationship
    gwas_linear_regression
    hardy_weinberg_test
    identity_by_state
@@ -177,6 +178,7 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.stat_Garud_h12_spec
     variables.stat_Garud_h123_spec
     variables.stat_Garud_h2_h1_spec
+    variables.stat_genomic_relationship_spec
     variables.stat_Hamilton_Kerr_lambda_spec
     variables.stat_Hamilton_Kerr_tau_spec
     variables.stat_identity_by_state_spec
