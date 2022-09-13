@@ -87,13 +87,13 @@ Methods
    hardy_weinberg_test
    identity_by_state
    individual_heterozygosity
-   inverse_additive_relationships
    ld_matrix
    ld_prune
    maximal_independent_set
    observed_heterozygosity
    pbs
    pedigree_inbreeding
+   pedigree_inverse_relationship
    pedigree_kinship
    pedigree_relationship
    pc_relate
@@ -180,10 +180,10 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.stat_Hamilton_Kerr_lambda_spec
     variables.stat_Hamilton_Kerr_tau_spec
     variables.stat_identity_by_state_spec
-    variables.stat_inverse_additive_relationship_spec
     variables.stat_observed_heterozygosity_spec
     variables.stat_pbs_spec
     variables.stat_pedigree_inbreeding_spec
+    variables.stat_pedigree_inverse_relationship_spec
     variables.stat_pedigree_kinship_spec
     variables.stat_pedigree_relationship_spec
     variables.stat_Tajimas_D_spec

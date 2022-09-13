@@ -291,11 +291,6 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/sgkit.inverse_additive_relationships.html">
-     sgkit.inverse_additive_relationships
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="generated/sgkit.ld_matrix.html">
      sgkit.ld_matrix
     </a>
@@ -323,6 +318,11 @@
    <li class="toctree-l2">
     <a class="reference internal" href="generated/sgkit.pedigree_inbreeding.html">
      sgkit.pedigree_inbreeding
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.pedigree_inverse_relationship.html">
+     sgkit.pedigree_inverse_relationship
     </a>
    </li>
    <li class="toctree-l2">
@@ -666,11 +666,6 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/sgkit.variables.stat_inverse_additive_relationship_spec.html">
-     sgkit.variables.stat_inverse_additive_relationship_spec
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="generated/sgkit.variables.stat_observed_heterozygosity_spec.html">
      sgkit.variables.stat_observed_heterozygosity_spec
     </a>
@@ -683,6 +678,11 @@
    <li class="toctree-l2">
     <a class="reference internal" href="generated/sgkit.variables.stat_pedigree_inbreeding_spec.html">
      sgkit.variables.stat_pedigree_inbreeding_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.stat_pedigree_inverse_relationship_spec.html">
+     sgkit.variables.stat_pedigree_inverse_relationship_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -1241,26 +1241,26 @@ title="Edit this page"
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.individual_heterozygosity.html#sgkit.individual_heterozygosity" title="sgkit.individual_heterozygosity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">individual_heterozygosity</span></code></a>(ds, *[, ...])</p></td>
 <td><p>Compute per call individual heterozygosity.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.inverse_additive_relationships.html#sgkit.inverse_additive_relationships" title="sgkit.inverse_additive_relationships"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inverse_additive_relationships</span></code></a>(ds, *[, ...])</p></td>
-<td><p>Calculate the inverse of the additive relationship matrix from pedigree structure.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.ld_matrix.html#sgkit.ld_matrix" title="sgkit.ld_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ld_matrix</span></code></a>(ds, *[, dosage, threshold, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.ld_matrix.html#sgkit.ld_matrix" title="sgkit.ld_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ld_matrix</span></code></a>(ds, *[, dosage, threshold, ...])</p></td>
 <td><p>Compute a sparse linkage disequilibrium (LD) matrix.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.ld_prune.html#sgkit.ld_prune" title="sgkit.ld_prune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ld_prune</span></code></a>(ds, *[, dosage, threshold, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.ld_prune.html#sgkit.ld_prune" title="sgkit.ld_prune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ld_prune</span></code></a>(ds, *[, dosage, threshold, ...])</p></td>
 <td><p>Prune variants in linkage disequilibrium (LD).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.maximal_independent_set.html#sgkit.maximal_independent_set" title="sgkit.maximal_independent_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximal_independent_set</span></code></a>(df)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.maximal_independent_set.html#sgkit.maximal_independent_set" title="sgkit.maximal_independent_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximal_independent_set</span></code></a>(df)</p></td>
 <td><p>Compute a maximal independent set of variants.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.observed_heterozygosity.html#sgkit.observed_heterozygosity" title="sgkit.observed_heterozygosity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">observed_heterozygosity</span></code></a>(ds, *[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.observed_heterozygosity.html#sgkit.observed_heterozygosity" title="sgkit.observed_heterozygosity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">observed_heterozygosity</span></code></a>(ds, *[, ...])</p></td>
 <td><p>Compute per cohort observed heterozygosity.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pbs.html#sgkit.pbs" title="sgkit.pbs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pbs</span></code></a>(ds, *[, stat_Fst, cohorts, merge])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.pbs.html#sgkit.pbs" title="sgkit.pbs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pbs</span></code></a>(ds, *[, stat_Fst, cohorts, merge])</p></td>
 <td><p>Compute the population branching statistic (PBS) between cohort triples.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.pedigree_inbreeding.html#sgkit.pedigree_inbreeding" title="sgkit.pedigree_inbreeding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pedigree_inbreeding</span></code></a>(ds, *[, method, parent, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pedigree_inbreeding.html#sgkit.pedigree_inbreeding" title="sgkit.pedigree_inbreeding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pedigree_inbreeding</span></code></a>(ds, *[, method, parent, ...])</p></td>
 <td><p>Estimate expected inbreeding coefficients from pedigree structure.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.pedigree_inverse_relationship.html#sgkit.pedigree_inverse_relationship" title="sgkit.pedigree_inverse_relationship"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pedigree_inverse_relationship</span></code></a>(ds, *[, ...])</p></td>
+<td><p>Calculate an inverse relationship matrix from pedigree structure.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pedigree_kinship.html#sgkit.pedigree_kinship" title="sgkit.pedigree_kinship"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pedigree_kinship</span></code></a>(ds, *[, method, parent, ...])</p></td>
 <td><p>Estimate expected pairwise kinship coefficients from pedigree structure.</p></td>
@@ -1489,17 +1489,17 @@ title="Edit this page"
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.stat_identity_by_state_spec.html#sgkit.variables.stat_identity_by_state_spec" title="sgkit.variables.stat_identity_by_state_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.stat_identity_by_state_spec</span></code></a></p></td>
 <td><p>Pairwise IBS probabilities among all samples.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.stat_inverse_additive_relationship_spec.html#sgkit.variables.stat_inverse_additive_relationship_spec" title="sgkit.variables.stat_inverse_additive_relationship_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.stat_inverse_additive_relationship_spec</span></code></a></p></td>
-<td><p>Inverse of the additive relationship matrix.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.stat_observed_heterozygosity_spec.html#sgkit.variables.stat_observed_heterozygosity_spec" title="sgkit.variables.stat_observed_heterozygosity_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.stat_observed_heterozygosity_spec</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.stat_observed_heterozygosity_spec.html#sgkit.variables.stat_observed_heterozygosity_spec" title="sgkit.variables.stat_observed_heterozygosity_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.stat_observed_heterozygosity_spec</span></code></a></p></td>
 <td><p>Observed heterozygosity for cohorts.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.stat_pbs_spec.html#sgkit.variables.stat_pbs_spec" title="sgkit.variables.stat_pbs_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.stat_pbs_spec</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.stat_pbs_spec.html#sgkit.variables.stat_pbs_spec" title="sgkit.variables.stat_pbs_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.stat_pbs_spec</span></code></a></p></td>
 <td><p>Population branching statistic for cohort triples.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.stat_pedigree_inbreeding_spec.html#sgkit.variables.stat_pedigree_inbreeding_spec" title="sgkit.variables.stat_pedigree_inbreeding_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.stat_pedigree_inbreeding_spec</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.stat_pedigree_inbreeding_spec.html#sgkit.variables.stat_pedigree_inbreeding_spec" title="sgkit.variables.stat_pedigree_inbreeding_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.stat_pedigree_inbreeding_spec</span></code></a></p></td>
 <td><p>Expected inbreeding coefficients of samples based on pedigree structure.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.stat_pedigree_inverse_relationship_spec.html#sgkit.variables.stat_pedigree_inverse_relationship_spec" title="sgkit.variables.stat_pedigree_inverse_relationship_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.stat_pedigree_inverse_relationship_spec</span></code></a></p></td>
+<td><p>Inverse of a relationship matrix calculated from pedigree structure.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.stat_pedigree_kinship_spec.html#sgkit.variables.stat_pedigree_kinship_spec" title="sgkit.variables.stat_pedigree_kinship_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.stat_pedigree_kinship_spec</span></code></a></p></td>
 <td><p>Pairwise estimates of expected kinship among samples based on pedigree structure with self-kinship values on the diagonal.</p></td>
