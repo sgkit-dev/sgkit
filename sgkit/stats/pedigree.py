@@ -3,6 +3,7 @@ from typing import Hashable, Union
 import dask.array as da
 import numpy as np
 import xarray as xr
+from typing_extensions import Literal
 from xarray import Dataset
 
 from sgkit import variables
@@ -130,8 +131,8 @@ def topological_argsort(parent: ArrayLike) -> ArrayLike:  # pragma: no cover
     ValueError
         If the pedigree contains a directed loop.
 
-    Notes
-    -----
+    Note
+    ----
     Sort order stability may be improved by sorting the parent indices of
     each sample into decending order before calling this function.
     """
@@ -526,7 +527,7 @@ def kinship_Hamilton_Kerr(
 def pedigree_kinship(
     ds: Dataset,
     *,
-    method: str = "diploid",
+    method: Literal["diploid", "Hamilton-Kerr"] = "diploid",
     parent: Hashable = variables.parent,
     stat_Hamilton_Kerr_tau: Hashable = variables.stat_Hamilton_Kerr_tau,
     stat_Hamilton_Kerr_lambda: Hashable = variables.stat_Hamilton_Kerr_lambda,
@@ -540,10 +541,9 @@ def pedigree_kinship(
     ds
         Dataset containing pedigree structure.
     method
-        The method used for kinship estimation which must be one of
-        {"diploid", "Hamilton-Kerr"}. Defaults to "diploid" which is
-        only suitable for pedigrees in which all samples are diploids
-        resulting from sexual reproduction.
+        The method used for kinship estimation. Defaults to "diploid"
+        which is only suitable for pedigrees in which all samples are
+        diploids resulting from sexual reproduction.
         The "Hamilton-Kerr" method is suitable for autopolyploid and
         mixed-ploidy datasets following Hamilton and Kerr 2017 [1].
     parent
@@ -590,8 +590,8 @@ def pedigree_kinship(
     ValueError
         If the pedigree contains half-founders and allow_half_founders=False.
 
-    Notes
-    -----
+    Note
+    ----
     This method is faster when a pedigree is sorted in topological order
     such that parents occur before their children.
 
@@ -666,7 +666,7 @@ def pedigree_kinship(
 def pedigree_relationship(
     ds: Dataset,
     *,
-    method: str = "additive",
+    method: Literal["additive"] = "additive",
     stat_pedigree_kinship: Hashable = variables.stat_pedigree_kinship,
     sample_ploidy: Hashable = None,
     merge: bool = True,
@@ -1023,7 +1023,7 @@ def inbreeding_Hamilton_Kerr(
 def pedigree_inbreeding(
     ds: Dataset,
     *,
-    method: str = "diploid",
+    method: Literal["diploid", "Hamilton-Kerr"] = "diploid",
     parent: Hashable = variables.parent,
     stat_Hamilton_Kerr_tau: Hashable = variables.stat_Hamilton_Kerr_tau,
     stat_Hamilton_Kerr_lambda: Hashable = variables.stat_Hamilton_Kerr_lambda,
@@ -1037,10 +1037,9 @@ def pedigree_inbreeding(
     ds
         Dataset containing pedigree structure.
     method
-        The method used for inbreeding estimation which must be one of
-        {"diploid", "Hamilton-Kerr"}. Defaults to "diploid" which is
-        only suitable for pedigrees in which all samples are diploids
-        resulting from sexual reproduction.
+        The method used for inbreeding estimation. Defaults to "diploid"
+        which is only suitable for pedigrees in which all samples are
+        diploids resulting from sexual reproduction.
         The "Hamilton-Kerr" method is suitable for autopolyploid and
         mixed-ploidy datasets following Hamilton and Kerr 2017 [1].
     parent
@@ -1260,7 +1259,7 @@ def inverse_relationship_Hamilton_Kerr(
 def pedigree_inverse_relationship(
     ds: Dataset,
     *,
-    method: str = "additive",
+    method: Literal["additive", "Hamilton-Kerr"] = "additive",
     parent: Hashable = variables.parent,
     stat_Hamilton_Kerr_tau: Hashable = variables.stat_Hamilton_Kerr_tau,
     stat_Hamilton_Kerr_lambda: Hashable = variables.stat_Hamilton_Kerr_lambda,
@@ -1274,9 +1273,8 @@ def pedigree_inverse_relationship(
     ds
         Dataset containing pedigree structure.
     method
-        The method used for relationship estimation which must be one of
-        {"additive", "Hamilton-Kerr"}. Defaults to "additive" which
-        calculates the inverse of the additive relationship matrix for
+        The method used for relationship estimation. Defaults to "additive"
+        which calculates the inverse of the additive relationship matrix for
         pedigrees in which all samples are diploids resulting from sexual
         reproduction. The "Hamilton-Kerr" method is suitable for autopolyploid
         or mixed-ploidy datasets and calculates the inverse of the additive
