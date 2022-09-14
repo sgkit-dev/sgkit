@@ -59,9 +59,9 @@ def test_genomic_relationship__VanRaden_rrBLUP_diploid(chunks):
         dosage = da.asarray(dosage, chunks=chunks)
     ds = xr.Dataset()
     ds["call_dosage"] = ["variants", "samples"], dosage
-    ds["mean_dosage"] = ds["call_dosage"].mean(dim="samples")
+    ds["ancestral_frequency"] = ds["call_dosage"].mean(dim="samples") / 2
     ds = genomic_relationship(
-        ds, ancestral_dosage="mean_dosage", estimator="VanRaden", ploidy=2
+        ds, ancestral_frequency="ancestral_frequency", estimator="VanRaden", ploidy=2
     ).compute()
     actual = ds.stat_genomic_relationship.values
     np.testing.assert_array_almost_equal(actual, expect)
@@ -106,8 +106,8 @@ def test_genomic_relationship__VanRaden_AGHmatrix_tetraploid(chunks):
     ds["call_dosage"] = ds.call_allele_count[:, :, 1]
     if chunks:
         ds["call_dosage"] = ds["call_dosage"].chunk(chunks)
-    ds["mean_dosage"] = ds["call_dosage"].mean(dim="samples")
-    ds = genomic_relationship(ds, ancestral_dosage="mean_dosage")
+    ds["ancestral_frequency"] = ds["call_dosage"].mean(dim="samples") / 4
+    ds = genomic_relationship(ds, ancestral_frequency="ancestral_frequency")
     actual = ds.stat_genomic_relationship.values
     np.testing.assert_array_almost_equal(actual, expect)
 
@@ -117,15 +117,15 @@ def test_genomic_relationship__detect_ploidy(ploidy):
     ds = xr.Dataset()
     dosage = np.random.randint(0, ploidy + 1, size=(100, 30))
     ds["call_dosage"] = ["variants", "samples"], dosage
-    ds["mean_dosage"] = ds["call_dosage"].mean(dim="samples")
+    ds["ancestral_frequency"] = ds["call_dosage"].mean(dim="samples") / ploidy
     ds1 = ds
     ds2 = ds
     ds2["random_variable"] = ["ploidy"], np.zeros(ploidy)
     expect = genomic_relationship(
-        ds1, ancestral_dosage="mean_dosage", ploidy=ploidy
+        ds1, ancestral_frequency="ancestral_frequency", ploidy=ploidy
     ).stat_genomic_relationship.values
     actual = genomic_relationship(
-        ds2, ancestral_dosage="mean_dosage"
+        ds2, ancestral_frequency="ancestral_frequency"
     ).stat_genomic_relationship.values
     np.testing.assert_array_almost_equal(actual, expect)
 
@@ -134,33 +134,42 @@ def test_genomic_relationship__raise_on_unknown_ploidy():
     ds = xr.Dataset()
     dosage = np.random.randint(0, 3, size=(10, 3))
     ds["call_dosage"] = ["variants", "samples"], dosage
-    ds["mean_dosage"] = ds["call_dosage"].mean(dim="samples")
+    ds["ancestral_frequency"] = ds["call_dosage"].mean(dim="samples") / 2
     with pytest.raises(
         ValueError, match="Ploidy must be specified when the ploidy dimension is absent"
     ):
-        genomic_relationship(ds, ancestral_dosage="mean_dosage", estimator="VanRaden")
+        genomic_relationship(ds, ancestral_frequency="ancestral_frequency")
 
 
 def test_genomic_relationship__raise_on_unknown_estimator():
     ds = xr.Dataset()
     dosage = np.random.randint(0, 3, size=(10, 3))
     ds["call_dosage"] = ["variants", "samples"], dosage
-    ds["mean_dosage"] = ds["call_dosage"].mean(dim="samples")
+    ds["ancestral_frequency"] = ds["call_dosage"].mean(dim="samples") / 2
     with pytest.raises(ValueError, match="Unknown estimator 'unknown'"):
         genomic_relationship(
-            ds, ancestral_dosage="mean_dosage", estimator="unknown", ploidy=2
+            ds, ancestral_frequency="ancestral_frequency", estimator="unknown", ploidy=2
         )
 
 
-def test_genomic_relationship__raise_on_reference_dosage_shape():
+def test_genomic_relationship__raise_on_ancestral_frequency_shape():
     ds = xr.Dataset()
     dosage = np.random.randint(0, 3, size=(10, 3))
     ds["call_dosage"] = ["variants", "samples"], dosage
-    ds["mean_dosage"] = ds["call_dosage"].mean(dim="variants")
+    ds["ancestral_frequency"] = ds["call_dosage"].mean(dim="variants") / 2
     with pytest.raises(
         ValueError,
         match="The reference_dosage variable must have one value per variant",
     ):
-        genomic_relationship(
-            ds, ancestral_dosage="mean_dosage", estimator="VanRaden", ploidy=2
-        )
+        genomic_relationship(ds, ancestral_frequency="ancestral_frequency", ploidy=2)
+
+
+def test_genomic_relationship__raise_on_ancestral_frequency_missing():
+    ds = xr.Dataset()
+    dosage = np.random.randint(0, 3, size=(10, 3))
+    ds["call_dosage"] = ["variants", "samples"], dosage
+    with pytest.raises(
+        ValueError,
+        match="The 'VanRaden' estimator requires ancestral_frequency",
+    ):
+        genomic_relationship(ds, ploidy=2)

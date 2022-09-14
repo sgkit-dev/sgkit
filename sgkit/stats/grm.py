@@ -11,10 +11,10 @@ from sgkit.utils import conditional_merge_datasets, create_dataset
 def genomic_relationship(
     ds: Dataset,
     *,
-    ancestral_dosage: Hashable,
     call_dosage: Hashable = variables.call_dosage,
-    ploidy: Optional[int] = None,
     estimator: Optional[Literal["VanRaden"]] = None,
+    ancestral_frequency: Optional[Hashable] = None,
+    ploidy: Optional[int] = None,
     merge: bool = True,
 ) -> Dataset:
     """Compute a genomic relationship matrix (GRM).
@@ -23,23 +23,25 @@ def genomic_relationship(
     ----------
     ds
         Dataset containing call genotype dosages.
-    ancestral_dosage
-        Expected dosage of the ancestral/base/reference population.
-        This may be approximated by the mean dosage of the sample
-        population if the sample population is in Hardy-Weinberg
-        equilibrium.
     call_dosage
         Input variable name holding call_dosage as defined by
         :data:`sgkit.variables.call_dosage_spec`.
-    ploidy
-        Ploidy level of all samples within the dataset.
-        By default this is imputed from the size of the "ploidy" dimension
-        of the dataset.
     estimator
         Specifies a relatedness estimator to use. Currently the only option
         is ``"VanRaden"`` which uses the method described by VanRaden 2008 [1]
         and generalized to autopolyploids by Ashraf et al 2016 [2] and
         Bilton 2020 [3].
+    ancestral_frequency
+        Frequency of variant alleles corresponding to call_dosage within
+        the ancestral/base/reference population.
+        These values should range from zero to one.
+        If the sample population was derived under Hardy-Weinberg
+        equilibrium, then the ancestral frequencies may be approximated
+        as the mean dosage of the sample population divided by its ploidy.
+    ploidy
+        Ploidy level of all samples within the dataset.
+        By default this is inferred from the size of the "ploidy" dimension
+        of the dataset.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -52,10 +54,43 @@ def genomic_relationship(
     which is a matrix of pairwise relationships among all samples.
     The dimensions are named ``samples_0`` and ``samples_1``.
 
-    Note
-    ----
-    This method is suitable for diploid or autopolyploid populations
-    of a single ploidy.
+    Warnings
+    --------
+    This function is only applicable to fixed-ploidy, biallelic datasets.
+
+    Raises
+    ------
+    ValueError
+        If an unknown estimator is specified.
+    ValueError
+        If ploidy is not specified and cannot be inferred.
+    ValueError
+        If ancestral_frequency is required but not specified.
+    ValueError
+        If ancestral_frequency is the incorrect shape.
+
+    Examples
+    --------
+
+    >>> import sgkit as sg
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=6, n_sample=3, seed=0)
+    >>> ds = sg.count_call_alleles(ds)
+    >>> # use reference allele count as dosage
+    >>> ds["call_dosage"] = ds.call_allele_count[:,:,0]
+    >>> ds.call_dosage.values # doctest: +NORMALIZE_WHITESPACE
+        array([[2, 1, 1],
+            [1, 1, 1],
+            [2, 1, 0],
+            [2, 1, 1],
+            [1, 0, 0],
+            [1, 1, 2]], dtype=uint8)
+    >>> # use sample population frequency as ancestral frequency
+    >>> ds["sample_frequency"] = ds.call_dosage.mean(dim="samples") / ds.dims["ploidy"]
+    >>> ds = sg.genomic_relationship(ds, ancestral_frequency="sample_frequency")
+    >>> ds.stat_genomic_relationship.values # doctest: +NORMALIZE_WHITESPACE
+        array([[ 0.93617021, -0.21276596, -0.72340426],
+            [-0.21276596,  0.17021277,  0.04255319],
+            [-0.72340426,  0.04255319,  0.68085106]])
 
     References
     ----------
@@ -82,18 +117,20 @@ def genomic_relationship(
     if ploidy is None:
         raise ValueError("Ploidy must be specified when the ploidy dimension is absent")
 
+    # VanRaden GRM
     cd = da.array(ds[call_dosage].data)
-    ad = da.array(ds[ancestral_dosage].data)
     n_variants, _ = cd.shape
-    if ad.shape != (n_variants,):
+    if ancestral_frequency is None:
+        raise ValueError("The 'VanRaden' estimator requires ancestral_frequency")
+    af = da.array(ds[ancestral_frequency].data)
+    if af.shape != (n_variants,):
         raise ValueError(
             "The reference_dosage variable must have one value per variant"
         )
-
-    # VanRaden GRM
+    ad = af * ploidy
     M = cd - ad[:, None]
     num = M.T @ M
-    denom = (ad * (1 - ad / ploidy)).sum()
+    denom = (ad * (1 - af)).sum()
     G = num / denom
 
     new_ds = create_dataset(
