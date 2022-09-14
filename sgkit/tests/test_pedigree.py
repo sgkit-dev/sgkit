@@ -323,8 +323,8 @@ def test_pedigree_kinship__kinship2(method):
 def load_hamilton_kerr_pedigree():
     """Load example mixed-ploidy pedigree from Hamilton and Kerr (2017) as a dataset.
 
-    Notes
-    -----
+    Note
+    ----
     This function loads data from `hamilton_kerr_pedigree.csv` which is
     distributed with the polyAinv package as a dataframe within
     `Tab.1.Ham.Kerr.rda`.
