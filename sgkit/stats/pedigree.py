@@ -1,4 +1,4 @@
-from typing import Hashable, Union
+from typing import Hashable, Tuple, Union
 
 import dask.array as da
 import numpy as np
@@ -454,6 +454,62 @@ def _insert_hamilton_kerr_pair_kinship(
 
 
 @numba_jit
+def _compress_hamilton_kerr_parameters(
+    parent: ArrayLike, tau: ArrayLike, lambda_: ArrayLike
+) -> Tuple[ArrayLike, ArrayLike, ArrayLike]:  # pragma: no cover
+    """Compress arrays use in Hamilton-Kerr methods to have only two columns.
+
+    The Hamilton-Kerr methods are defined such that each individual may
+    have up to two parents. However, user defined parent arrays may have
+    more than two columns (e.g., columns for maternal, paternal and clonal
+    parents). So long as each individual has contributions from two or
+    fewer parents (as indicated by the 'tau' parameter), wider parent arrays
+    can be re-coded to have a width of two (i.e., two parent columns).
+    """
+    n_sample, n_parent = parent.shape
+    if n_parent == 2:
+        return parent, tau, lambda_
+    new_parent = parent[:, 0:2].copy()
+    new_tau = tau[:, 0:2].copy()
+    new_lambda = lambda_[:, 0:2].copy()
+
+    # markers for first two parents
+    p_empty = False
+    q_empty = False
+    for i in range(n_sample):
+        for j in range(n_parent):
+            if tau[i, j] == 0:
+                # not a parent
+                if j == 0:
+                    p_empty = True
+                elif j == 1:
+                    q_empty = True
+                else:
+                    pass
+            else:
+                # is a parent
+                if j == 0:
+                    p_empty = False
+                elif j == 1:
+                    q_empty = False
+                else:
+                    # need to find room and shuffle
+                    if p_empty:
+                        new_parent[i, 0] = parent[i, j]
+                        new_tau[i, 0] = tau[i, j]
+                        new_lambda[i, 0] = lambda_[i, j]
+                        p_empty = False
+                    elif q_empty:
+                        new_parent[i, 1] = parent[i, j]
+                        new_tau[i, 1] = tau[i, j]
+                        new_lambda[i, 1] = lambda_[i, j]
+                        q_empty = False
+                    else:
+                        raise ValueError("Sample with more than two parents.")
+    return new_parent, new_tau, new_lambda
+
+
+@numba_jit
 def kinship_Hamilton_Kerr(
     parent: ArrayLike,
     tau: ArrayLike,
@@ -496,10 +552,10 @@ def kinship_Hamilton_Kerr(
     ValueError
         If the pedigree contains half-founders and allow_half_founders=False.
     ValueError
-        If the parents dimension does not have a length of 2.
+        If a sample has more than two contributing parents.
     """
     if parent.shape[1] != 2:
-        raise ValueError("Parent matrix must have shape (samples, 2)")
+        parent, tau, lambda_ = _compress_hamilton_kerr_parameters(parent, tau, lambda_)
     if not allow_half_founders:
         _raise_on_half_founder(parent, tau)
     n = len(parent)
@@ -584,9 +640,13 @@ def pedigree_kinship(
     ValueError
         If the pedigree contains a directed loop.
     ValueError
-        If the parents dimension does not have a length of 2.
-    ValueError
         If the diploid method is used with a non-diploid dataset.
+    ValueError
+        If the diploid method is used and the parents dimension does not
+        have a length of two.
+    ValueError
+        If the Hamilton-Kerr method is used and a sample has more than
+        two contributing parents as indicated by ``stat_Hamilton_Kerr_tau``.
     ValueError
         If the pedigree contains half-founders and allow_half_founders=False.
 
@@ -636,6 +696,8 @@ def pedigree_kinship(
         # check ploidy dimension and assume diploid if it's absent
         if ds.dims.get("ploidy", 2) != 2:
             raise ValueError("Dataset is not diploid")
+        if ds.dims["parents"] != 2:
+            raise ValueError("The parents dimension must be length 2")
         func = da.gufunc(
             kinship_diploid, signature="(n, p) -> (n, n)", output_dtypes=float
         )
@@ -775,7 +837,7 @@ def inbreeding_Hamilton_Kerr(
     tau: ArrayLike,
     lambda_: ArrayLike,
     allow_half_founders: bool = False,
-) -> ArrayLike:  # pragma: no cover
+) -> Tuple[ArrayLike, ArrayLike]:  # pragma: no cover
     """Calculate expected inbreeding coefficients from a pedigree with variable ploidy.
 
     Parameters
@@ -811,10 +873,10 @@ def inbreeding_Hamilton_Kerr(
     ValueError
         If the pedigree contains half-founders and allow_half_founders=False.
     ValueError
-        If the parents dimension does not have a length of 2.
+        If a sample has more than two contributing parents.
     """
     if parent.shape[1] != 2:
-        raise ValueError("Parent matrix must have shape (samples, 2)")
+        parent, tau, lambda_ = _compress_hamilton_kerr_parameters(parent, tau, lambda_)
     if not allow_half_founders:
         _raise_on_half_founder(parent, tau)
 
@@ -1078,9 +1140,13 @@ def pedigree_inbreeding(
     ValueError
         If an unknown method is specified.
     ValueError
-        If the parents dimension does not have a length of 2.
-    ValueError
         If the diploid method is used with a non-diploid dataset.
+    ValueError
+        If the diploid method is used and the parents dimension does not
+        have a length of two.
+    ValueError
+        If the Hamilton-Kerr method is used and a sample has more than
+        two contributing parents as indicated by ``stat_Hamilton_Kerr_tau``.
     ValueError
         If the pedigree contains half-founders and allow_half_founders=False.
 
@@ -1130,6 +1196,8 @@ def pedigree_inbreeding(
         # check ploidy dimension and assume diploid if it's absent
         if ds.dims.get("ploidy", 2) != 2:
             raise ValueError("Dataset is not diploid")
+        if ds.dims["parents"] != 2:
+            raise ValueError("The parents dimension must be length 2")
         tau = da.ones_like(parent, int)
         lambda_ = da.zeros_like(parent, float)
     elif method == "Hamilton-Kerr":
@@ -1238,6 +1306,8 @@ def inverse_relationship_Hamilton_Kerr(
     The inverse of the additive relationship matrix.
 
     """
+    if parent.shape[1] != 2:
+        parent, tau, lambda_ = _compress_hamilton_kerr_parameters(parent, tau, lambda_)
     inbreeding, parent_kinship = inbreeding_Hamilton_Kerr(
         parent,
         tau,
@@ -1315,9 +1385,13 @@ def pedigree_inverse_relationship(
     ValueError
         If an unknown method is specified.
     ValueError
-        If the parents dimension does not have a length of 2.
-    ValueError
         If a diploid specific method is used with a non-diploid dataset.
+    ValueError
+        If a diploid specific method is used and the parents dimension does
+        not have a length of two.
+    ValueError
+        If the Hamilton-Kerr method is used and a sample has more than
+        two contributing parents as indicated by ``stat_Hamilton_Kerr_tau``.
     ValueError
         If the pedigree contains half-founders and allow_half_founders=False.
 
@@ -1361,6 +1435,8 @@ def pedigree_inverse_relationship(
         # check ploidy dimension and assume diploid if it's absent
         if ds.dims.get("ploidy", 2) != 2:
             raise ValueError("Dataset is not diploid")
+        if ds.dims["parents"] != 2:
+            raise ValueError("The parents dimension must be length 2")
         tau = da.ones_like(parent, int)
         lambda_ = da.zeros_like(parent, float)
     elif method == "Hamilton-Kerr":
