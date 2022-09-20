@@ -646,7 +646,7 @@ def pedigree_kinship(
         have a length of two.
     ValueError
         If the Hamilton-Kerr method is used and a sample has more than
-        two contributing parents as indicated by ``stat_Hamilton_Kerr_tau``.
+        two contributing parents.
     ValueError
         If the pedigree contains half-founders and allow_half_founders=False.
 
@@ -655,14 +655,30 @@ def pedigree_kinship(
     This method is faster when a pedigree is sorted in topological order
     such that parents occur before their children.
 
+    Note
+    ----
     The diagonal values of :data:`sgkit.variables.stat_pedigree_kinship_spec`
     are self-kinship estimates as opposed to inbreeding estimates.
 
+    Note
+    ----
     Dimensions of :data:`sgkit.variables.stat_pedigree_kinship_spec` are named
     ``samples_0`` and ``samples_1``.
 
+    Note
+    ----
+    The Hamilton-Kerr method may be applied to a dataset with more than two
+    parent columns so long as each sample has two or fewer contributing
+    parents as indicated by the ``stat_Hamilton_Kerr_tau`` variable. Within
+    this variable, a contributing parent is indicated by a value greater
+    than zero. Each sample must also have at least one (possibly unknown)
+    contributing parent. Therefore, each row of the ``stat_Hamilton_Kerr_tau``
+    variable must have either one or two non-zero values.
+
     Examples
     --------
+
+    Inbred diploid pedigree:
 
     >>> import sgkit as sg
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, seed=1)
@@ -680,6 +696,67 @@ def pedigree_kinship(
            [0.   , 0.5  , 0.25 , 0.125],
            [0.25 , 0.25 , 0.5  , 0.375],
            [0.375, 0.125, 0.375, 0.625]])
+
+    Somatic doubling and unreduced gamete:
+
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=4, seed=1)
+    >>> ds.sample_id.values # doctest: +NORMALIZE_WHITESPACE
+    array(['S0', 'S1', 'S2', 'S3'], dtype='<U2')
+    >>> ds["parent_id"] = ["samples", "parents"], [
+    ...     ['.', '.'],
+    ...     ['.', '.'],
+    ...     ['S0', 'S0'],  # somatic doubling encoded as selfing
+    ...     ['S1', 'S2'],  # diploid * tetraploid
+    ... ]
+    >>> ds["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], [
+    ...     [1, 1],
+    ...     [1, 1],
+    ...     [2, 2],  # both 'gametes' are full genomic copies
+    ...     [2, 2],  # unreduced gamete from diploid 'S1'
+    ... ]
+    >>> ds["stat_Hamilton_Kerr_lambda"] = ["samples", "parents"], [
+    ...     [0, 0],
+    ...     [0, 0],
+    ...     [0, 0],
+    ...     [0.1, 0],  # increased probability of IBD in unreduced gamete
+    ... ]
+    >>> ds = sg.pedigree_kinship(ds, method="Hamilton-Kerr")
+    >>> ds["stat_pedigree_kinship"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[0.5       , 0.        , 0.5       , 0.25      ],
+           [0.        , 0.5       , 0.        , 0.25      ],
+           [0.5       , 0.        , 0.5       , 0.25      ],
+           [0.25      , 0.25      , 0.25      , 0.30416667]])
+
+    Somatic doubling and unreduced gamete using a third parent
+    column to indicate clonal propagation:
+
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=4, seed=1)
+    >>> ds.sample_id.values # doctest: +NORMALIZE_WHITESPACE
+    array(['S0', 'S1', 'S2', 'S3'], dtype='<U2')
+    >>> ds["parent_id"] = ["samples", "parents"], [
+    ...     ['.', '.', '.'],
+    ...     ['.', '.', '.'],
+    ...     ['.', '.', 'S0'],  # somatic doubling encoded as clone
+    ...     ['S1', 'S2', '.'],  # diploid * tetraploid
+    ... ]
+    >>> ds["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], [
+    ...     [1, 1, 0],
+    ...     [1, 1, 0],
+    ...     [0, 0, 4],  # 4 homologues derived from diploid 'S0'
+    ...     [2, 2, 0],  # unreduced gamete from diploid 'S1'
+    ... ]
+    >>> ds["stat_Hamilton_Kerr_lambda"] = ["samples", "parents"], [
+    ...     [0, 0, 0],
+    ...     [0, 0, 0],
+    ...     [0, 0, 1/3],  # increased probability of IBD in somatic doubling
+    ...     [0.1, 0, 0],  # increased probability of IBD in unreduced gamete
+    ... ]
+    >>> ds = sg.pedigree_kinship(ds, method="Hamilton-Kerr")
+    >>> ds["stat_pedigree_kinship"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[0.5       , 0.        , 0.5       , 0.25      ],
+           [0.        , 0.5       , 0.        , 0.25      ],
+           [0.5       , 0.        , 0.5       , 0.25      ],
+           [0.25      , 0.25      , 0.25      , 0.30416667]])
 
     References
     ----------
@@ -1146,7 +1223,7 @@ def pedigree_inbreeding(
         have a length of two.
     ValueError
         If the Hamilton-Kerr method is used and a sample has more than
-        two contributing parents as indicated by ``stat_Hamilton_Kerr_tau``.
+        two contributing parents.
     ValueError
         If the pedigree contains half-founders and allow_half_founders=False.
 
@@ -1164,8 +1241,20 @@ def pedigree_inbreeding(
     where :math:`\\hat{\\phi}_{ii}` is a pedigree based estimate for the self kinship
     of individual :math:`i` and :math:`k_i` is that individuals ploidy.
 
+    Note
+    ----
+    The Hamilton-Kerr method may be applied to a dataset with more than two
+    parent columns so long as each sample has two or fewer contributing
+    parents as indicated by the ``stat_Hamilton_Kerr_tau`` variable. Within
+    this variable, a contributing parent is indicated by a value greater
+    than zero. Each sample must also have at least one (possibly unknown)
+    contributing parent. Therefore, each row of the ``stat_Hamilton_Kerr_tau``
+    variable must have either one or two non-zero values.
+
     Examples
     --------
+
+    Inbred diploid pedigree:
 
     >>> import sgkit as sg
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, seed=1)
@@ -1180,6 +1269,61 @@ def pedigree_inbreeding(
     >>> ds = sg.pedigree_inbreeding(ds)
     >>> ds["stat_pedigree_inbreeding"].values # doctest: +NORMALIZE_WHITESPACE
     array([0.  , 0.  , 0.  , 0.25])
+
+    Somatic doubling and unreduced gamete:
+
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=4, seed=1)
+    >>> ds.sample_id.values # doctest: +NORMALIZE_WHITESPACE
+    array(['S0', 'S1', 'S2', 'S3'], dtype='<U2')
+    >>> ds["parent_id"] = ["samples", "parents"], [
+    ...     ['.', '.'],
+    ...     ['.', '.'],
+    ...     ['S0', 'S0'],  # somatic doubling encoded as selfing
+    ...     ['S1', 'S2'],  # diploid * tetraploid
+    ... ]
+    >>> ds["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], [
+    ...     [1, 1],
+    ...     [1, 1],
+    ...     [2, 2],  # both 'gametes' are full genomic copies
+    ...     [2, 2],  # unreduced gamete from diploid 'S1'
+    ... ]
+    >>> ds["stat_Hamilton_Kerr_lambda"] = ["samples", "parents"], [
+    ...     [0, 0],
+    ...     [0, 0],
+    ...     [0, 0],
+    ...     [0.1, 0],  # increased probability of IBD in unreduced gamete
+    ... ]
+    >>> ds = sg.pedigree_inbreeding(ds, method="Hamilton-Kerr")
+    >>> ds["stat_pedigree_inbreeding"].values # doctest: +NORMALIZE_WHITESPACE
+    array([0.        , 0.        , 0.33333333, 0.07222222])
+
+    Somatic doubling and unreduced gamete using a third parent
+    column to indicate clonal propagation:
+
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=4, seed=1)
+    >>> ds.sample_id.values # doctest: +NORMALIZE_WHITESPACE
+    array(['S0', 'S1', 'S2', 'S3'], dtype='<U2')
+    >>> ds["parent_id"] = ["samples", "parents"], [
+    ...     ['.', '.', '.'],
+    ...     ['.', '.', '.'],
+    ...     ['.', '.', 'S0'],  # somatic doubling encoded as clone
+    ...     ['S1', 'S2', '.'],  # diploid * tetraploid
+    ... ]
+    >>> ds["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], [
+    ...     [1, 1, 0],
+    ...     [1, 1, 0],
+    ...     [0, 0, 4],  # 4 homologues derived from diploid 'S0'
+    ...     [2, 2, 0],  # unreduced gamete from diploid 'S1'
+    ... ]
+    >>> ds["stat_Hamilton_Kerr_lambda"] = ["samples", "parents"], [
+    ...     [0, 0, 0],
+    ...     [0, 0, 0],
+    ...     [0, 0, 1/3],  # increased probability of IBD in somatic doubling
+    ...     [0.1, 0, 0],  # increased probability of IBD in unreduced gamete
+    ... ]
+    >>> ds = sg.pedigree_inbreeding(ds, method="Hamilton-Kerr")
+    >>> ds["stat_pedigree_inbreeding"].values # doctest: +NORMALIZE_WHITESPACE
+    array([0.        , 0.        , 0.33333333, 0.07222222])
 
     References
     ----------
@@ -1391,7 +1535,7 @@ def pedigree_inverse_relationship(
         not have a length of two.
     ValueError
         If the Hamilton-Kerr method is used and a sample has more than
-        two contributing parents as indicated by ``stat_Hamilton_Kerr_tau``.
+        two contributing parents.
     ValueError
         If the pedigree contains half-founders and allow_half_founders=False.
 
@@ -1400,8 +1544,20 @@ def pedigree_inverse_relationship(
     Dimensions of :data:`sgkit.variables.stat_pedigree_inverse_relationship_spec`
     are named ``samples_0`` and ``samples_1``.
 
+    Note
+    ----
+    The Hamilton-Kerr method may be applied to a dataset with more than two
+    parent columns so long as each sample has two or fewer contributing
+    parents as indicated by the ``stat_Hamilton_Kerr_tau`` variable. Within
+    this variable, a contributing parent is indicated by a value greater
+    than zero. Each sample must also have at least one (possibly unknown)
+    contributing parent. Therefore, each row of the ``stat_Hamilton_Kerr_tau``
+    variable must have either one or two non-zero values.
+
     Examples
     --------
+
+    Inbred diploid pedigree:
 
     >>> import sgkit as sg
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, seed=1)
@@ -1419,6 +1575,67 @@ def pedigree_inverse_relationship(
            [ 0.5,  1.5, -1. ,  0. ],
            [-0.5, -1. ,  2.5, -1. ],
            [-1. ,  0. , -1. ,  2. ]])
+
+    Unreduced gamete and half-clone:
+
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=4, seed=1)
+    >>> ds.sample_id.values # doctest: +NORMALIZE_WHITESPACE
+    array(['S0', 'S1', 'S2', 'S3'], dtype='<U2')
+    >>> ds["parent_id"] = ["samples", "parents"], [
+    ...     ['.', '.'],
+    ...     ['.', '.'],
+    ...     ['S0','S1'],  # diploid * tetraploid
+    ...     ['S2', '.'],  # half-clone of 'S2'
+    ... ]
+    >>> ds["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], [
+    ...     [1, 1],
+    ...     [2, 2],
+    ...     [2, 2],  # unreduced gamete from diploid 'S0'
+    ...     [2, 0],  # contribution from 'S2' only
+    ... ]
+    >>> ds["stat_Hamilton_Kerr_lambda"] = ["samples", "parents"], [
+    ...     [0, 0],
+    ...     [0, 0],
+    ...     [0.1, 0],  # increased probability of IBD in unreduced gamete
+    ...     [0, 0],
+    ... ]
+    >>> ds = sg.pedigree_inverse_relationship(ds, method="Hamilton-Kerr")
+    >>> ds["stat_pedigree_inverse_relationship"].values  # doctest: +NORMALIZE_WHITESPACE
+    array([[ 2.66666667,  1.1785113 , -2.3570226 ,  0.        ],
+           [ 1.1785113 ,  1.83333333, -1.66666667,  0.        ],
+           [-2.3570226 , -1.66666667,  4.35028249, -1.43818328],
+           [ 0.        ,  0.        , -1.43818328,  2.03389831]])
+
+    Unreduced gamete and half-clone using a third parent
+    column to indicate clonal propagation:
+
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=4, seed=1)
+    >>> ds.sample_id.values # doctest: +NORMALIZE_WHITESPACE
+    array(['S0', 'S1', 'S2', 'S3'], dtype='<U2')
+    >>> ds["parent_id"] = ["samples", "parents"], [
+    ...     ['.', '.', '.'],
+    ...     ['.', '.', '.'],
+    ...     ['S0', 'S1', '.'],  # diploid * tetraploid
+    ...     ['.', '.', 'S2'],  # half-clone of 'S2'
+    ... ]
+    >>> ds["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], [
+    ...     [1, 1, 0],
+    ...     [2, 2, 0],
+    ...     [2, 2, 0],  # unreduced gamete from diploid 'S0'
+    ...     [0, 0, 2],  # contribution from 'S2' only
+    ... ]
+    >>> ds["stat_Hamilton_Kerr_lambda"] = ["samples", "parents"], [
+    ...     [0, 0, 0],
+    ...     [0, 0, 0],
+    ...     [0.1, 0, 0],  # increased probability of IBD in unreduced gamete
+    ...     [0, 0, 0],
+    ... ]
+    >>> ds = sg.pedigree_inverse_relationship(ds, method="Hamilton-Kerr")
+    >>> ds["stat_pedigree_inverse_relationship"].values  # doctest: +NORMALIZE_WHITESPACE
+    array([[ 2.66666667,  1.1785113 , -2.3570226 ,  0.        ],
+           [ 1.1785113 ,  1.83333333, -1.66666667,  0.        ],
+           [-2.3570226 , -1.66666667,  4.35028249, -1.43818328],
+           [ 0.        ,  0.        , -1.43818328,  2.03389831]])
 
     References
     ----------
