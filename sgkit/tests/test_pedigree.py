@@ -1021,3 +1021,28 @@ def test_pedigree_inverse_relationship__raise_on_half_founder():
     ]
     with pytest.raises(ValueError, match="Pedigree contains half-founders"):
         pedigree_inverse_relationship(ds).compute()
+
+
+def test_pedigree_inverse_relationship__raise_on_singular_kinship_matrix():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=4, seed=1)
+    ds.sample_id.values  # doctest: +NORMALIZE_WHITESPACE
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S0"],
+        ["S1", "S2"],
+    ]
+    ds["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], [
+        [1, 1],
+        [1, 1],
+        [2, 2],
+        [2, 2],
+    ]
+    ds["stat_Hamilton_Kerr_lambda"] = xr.zeros_like(ds["stat_Hamilton_Kerr_tau"], float)
+    # check kinship is singular
+    K = pedigree_kinship(ds, method="Hamilton-Kerr").stat_pedigree_kinship.values
+    with pytest.raises(np.linalg.LinAlgError, match="Singular matrix"):
+        np.linalg.inv(K)
+    # check sgkit message
+    with pytest.raises(ValueError, match="Singular kinship matrix"):
+        pedigree_inverse_relationship(ds, method="Hamilton-Kerr").compute()
