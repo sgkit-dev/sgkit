@@ -1387,7 +1387,10 @@ def _update_inverse_additive_relationships(
         prod += self_kinship[q] * weight_q**2
     if (p >= 0) and (q >= 0):
         prod += parent_kinship[i] * weight_p * weight_q * 2
-    scalar = 1 / (self_kinship[i] - prod)
+    try:
+        scalar = 1 / (self_kinship[i] - prod)
+    except:  # noqa: E722
+        raise ValueError("Singular kinship matrix")
     # Calculate inverse kinships and adjust to inverse relationships.
     # using sparse matrix multiplication.
     # The inverse kinships are then adjusted to inverse relationships by
@@ -1528,6 +1531,8 @@ def pedigree_inverse_relationship(
     ------
     ValueError
         If an unknown method is specified.
+    ValueError
+        If the (intermediate) kinship matrix is singular.
     ValueError
         If a diploid specific method is used with a non-diploid dataset.
     ValueError
