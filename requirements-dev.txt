@@ -15,7 +15,7 @@ bed-reader
 rechunker
 cbgen; python_version<="3.7" or platform_system != "Windows"
 cbgen == 1.0.1; python_version>"3.7" and platform_system == "Windows"
-cyvcf2 < 0.30.15; platform_system != "Windows"
+cyvcf2; platform_system != "Windows"
 yarl
 matplotlib
 asv
