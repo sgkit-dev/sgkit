@@ -1032,8 +1032,11 @@ the computed output variables.</p>
 <dd class="field-even"><ul class="simple">
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If an unknown method is specified.</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the pedigree contains a directed loop.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the parents dimension does not have a length of 2.</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the diploid method is used with a non-diploid dataset.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the diploid method is used and the parents dimension does not
+    have a length of two.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the Hamilton-Kerr method is used and a sample has more than
+    two contributing parents.</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the pedigree contains half-founders and allow_half_founders=False.</p></li>
 </ul>
 </dd>
@@ -1042,12 +1045,29 @@ the computed output variables.</p>
 <p class="admonition-title">Note</p>
 <p>This method is faster when a pedigree is sorted in topological order
 such that parents occur before their children.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>The diagonal values of <a class="reference internal" href="sgkit.variables.stat_pedigree_kinship_spec.html#sgkit.variables.stat_pedigree_kinship_spec" title="sgkit.variables.stat_pedigree_kinship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_kinship_spec</span></code></a>
 are self-kinship estimates as opposed to inbreeding estimates.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>Dimensions of <a class="reference internal" href="sgkit.variables.stat_pedigree_kinship_spec.html#sgkit.variables.stat_pedigree_kinship_spec" title="sgkit.variables.stat_pedigree_kinship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_kinship_spec</span></code></a> are named
 <code class="docutils literal notranslate"><span class="pre">samples_0</span></code> and <code class="docutils literal notranslate"><span class="pre">samples_1</span></code>.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Hamilton-Kerr method may be applied to a dataset with more than two
+parent columns so long as each sample has two or fewer contributing
+parents as indicated by the <code class="docutils literal notranslate"><span class="pre">stat_Hamilton_Kerr_tau</span></code> variable. Within
+this variable, a contributing parent is indicated by a value greater
+than zero. Each sample must also have at least one (possibly unknown)
+contributing parent. Therefore, each row of the <code class="docutils literal notranslate"><span class="pre">stat_Hamilton_Kerr_tau</span></code>
+variable must have either one or two non-zero values.</p>
+</div>
 <p class="rubric">Examples</p>
+<p>Inbred diploid pedigree:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">values</span> 
@@ -1064,6 +1084,67 @@ are self-kinship estimates as opposed to inbreeding estimates.</p>
 <span class="go">       [0.   , 0.5  , 0.25 , 0.125],</span>
 <span class="go">       [0.25 , 0.25 , 0.5  , 0.375],</span>
 <span class="go">       [0.375, 0.125, 0.375, 0.625]])</span>
+</pre></div>
+</div>
+<p>Somatic doubling and unreduced gamete:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_ploidy</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([&#39;S0&#39;, &#39;S1&#39;, &#39;S2&#39;, &#39;S3&#39;], dtype=&#39;&lt;U2&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;parent_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;parents&quot;</span><span class="p">],</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;S0&#39;</span><span class="p">,</span> <span class="s1">&#39;S0&#39;</span><span class="p">],</span>  <span class="c1"># somatic doubling encoded as selfing</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;S1&#39;</span><span class="p">,</span> <span class="s1">&#39;S2&#39;</span><span class="p">],</span>  <span class="c1"># diploid * tetraploid</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;stat_Hamilton_Kerr_tau&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;parents&quot;</span><span class="p">],</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>  <span class="c1"># both &#39;gametes&#39; are full genomic copies</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>  <span class="c1"># unreduced gamete from diploid &#39;S1&#39;</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;stat_Hamilton_Kerr_lambda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;parents&quot;</span><span class="p">],</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>  <span class="c1"># increased probability of IBD in unreduced gamete</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">pedigree_kinship</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;Hamilton-Kerr&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;stat_pedigree_kinship&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([[0.5       , 0.        , 0.5       , 0.25      ],</span>
+<span class="go">       [0.        , 0.5       , 0.        , 0.25      ],</span>
+<span class="go">       [0.5       , 0.        , 0.5       , 0.25      ],</span>
+<span class="go">       [0.25      , 0.25      , 0.25      , 0.30416667]])</span>
+</pre></div>
+</div>
+<p>Somatic doubling and unreduced gamete using a third parent
+column to indicate clonal propagation:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_ploidy</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([&#39;S0&#39;, &#39;S1&#39;, &#39;S2&#39;, &#39;S3&#39;], dtype=&#39;&lt;U2&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;parent_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;parents&quot;</span><span class="p">],</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;S0&#39;</span><span class="p">],</span>  <span class="c1"># somatic doubling encoded as clone</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;S1&#39;</span><span class="p">,</span> <span class="s1">&#39;S2&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">],</span>  <span class="c1"># diploid * tetraploid</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;stat_Hamilton_Kerr_tau&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;parents&quot;</span><span class="p">],</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>  <span class="c1"># 4 homologues derived from diploid &#39;S0&#39;</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>  <span class="c1"># unreduced gamete from diploid &#39;S1&#39;</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;stat_Hamilton_Kerr_lambda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;parents&quot;</span><span class="p">],</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">],</span>  <span class="c1"># increased probability of IBD in somatic doubling</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>  <span class="c1"># increased probability of IBD in unreduced gamete</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">pedigree_kinship</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;Hamilton-Kerr&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;stat_pedigree_kinship&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([[0.5       , 0.        , 0.5       , 0.25      ],</span>
+<span class="go">       [0.        , 0.5       , 0.        , 0.25      ],</span>
+<span class="go">       [0.5       , 0.        , 0.5       , 0.25      ],</span>
+<span class="go">       [0.25      , 0.25      , 0.25      , 0.30416667]])</span>
 </pre></div>
 </div>
 <p class="rubric">References</p>
