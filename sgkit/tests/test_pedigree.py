@@ -130,6 +130,27 @@ def random_parent_matrix(
     return parent
 
 
+def widen_parent_arrays(parent, tau, lambda_, n_parent=2, seed=None):
+    if seed is not None:
+        np.random.seed(seed)
+    n_sample = len(parent)
+    assert parent.shape == (n_sample, 2)
+    idx = np.array(
+        [
+            np.random.choice(np.arange(n_parent), replace=False, size=2)
+            for _ in range(n_sample)
+        ]
+    ).ravel()
+    idx = (np.repeat(np.arange(n_sample), 2), idx)
+    parent_wide = np.full((n_sample, n_parent), -1, int)
+    tau_wide = np.zeros((n_sample, n_parent), int)
+    lambda_wide = np.zeros((n_sample, n_parent), float)
+    parent_wide[idx] = parent.ravel()
+    tau_wide[idx] = tau.ravel()
+    lambda_wide[idx] = lambda_.ravel()
+    return parent_wide, tau_wide, lambda_wide
+
+
 @pytest.mark.parametrize("selfing", [False, True])
 @pytest.mark.parametrize("permute", [False, True])
 @pytest.mark.parametrize(
@@ -323,8 +344,8 @@ def test_pedigree_kinship__kinship2(method):
 def load_hamilton_kerr_pedigree():
     """Load example mixed-ploidy pedigree from Hamilton and Kerr (2017) as a dataset.
 
-    Notes
-    -----
+    Note
+    ----
     This function loads data from `hamilton_kerr_pedigree.csv` which is
     distributed with the polyAinv package as a dataframe within
     `Tab.1.Ham.Kerr.rda`.
@@ -414,7 +435,48 @@ def test_pedigree_kinship__diploid_Hamilton_Kerr(
     ds["stat_Hamilton_Kerr_tau"] = xr.ones_like(ds["parent"], dtype=np.uint8)
     ds["stat_Hamilton_Kerr_lambda"] = xr.zeros_like(ds["parent"], dtype=float)
     actual = pedigree_kinship(ds, method="Hamilton-Kerr").stat_pedigree_kinship
-    np.testing.assert_array_equal(actual, expect)
+    np.testing.assert_array_almost_equal(actual, expect)
+
+
+@pytest.mark.parametrize("permute", [False, True])
+@pytest.mark.parametrize(
+    "n_sample, n_founder, n_half_founder, n_parent, seed",
+    [
+        (100, 2, 0, 3, 0),
+        (200, 10, 50, 5, 3),  # test half-founders
+    ],
+)
+def test_pedigree_kinship__Hamilton_Kerr_compress_parent_dimension(
+    n_sample, n_founder, n_half_founder, n_parent, seed, permute
+):
+    parent = random_parent_matrix(
+        n_sample, n_founder, n_half_founder, selfing=True, permute=permute, seed=seed
+    )
+    # mock complex ploidy manipulations between diploid, triploid and tetraploid material
+    tau = np.random.randint(1, 3, size=parent.shape)
+    lambda_ = np.random.beta(0.5, 0.5, size=parent.shape)
+    # reference case with parents dim length = 2
+    dims = ["samples", "parents"]
+    ds1 = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=n_sample)
+    ds1["parent"] = dims, parent
+    ds1["stat_Hamilton_Kerr_tau"] = dims, tau
+    ds1["stat_Hamilton_Kerr_lambda"] = dims, lambda_
+    # test case with parents dim length > 2
+    parent, tau, lambda_ = widen_parent_arrays(
+        parent, tau, lambda_, n_parent=n_parent, seed=seed
+    )
+    ds2 = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=n_sample)
+    ds2["parent"] = dims, parent
+    ds2["stat_Hamilton_Kerr_tau"] = dims, tau
+    ds2["stat_Hamilton_Kerr_lambda"] = dims, lambda_
+    assert (ds1.dims["parents"], ds2.dims["parents"]) == (2, n_parent)
+    expect = pedigree_kinship(
+        ds1, method="Hamilton-Kerr", allow_half_founders=n_half_founder > 0
+    ).stat_pedigree_kinship
+    actual = pedigree_kinship(
+        ds2, method="Hamilton-Kerr", allow_half_founders=n_half_founder > 0
+    ).stat_pedigree_kinship
+    np.testing.assert_array_almost_equal(actual, expect)
 
 
 @pytest.mark.parametrize("method", ["diploid", "Hamilton-Kerr"])
@@ -490,8 +552,7 @@ def test_pedigree_kinship__raise_on_half_founder(method):
         pedigree_kinship(ds, method=method).compute()
 
 
-@pytest.mark.parametrize("method", ["diploid", "Hamilton-Kerr"])
-def test_pedigree_kinship__raise_on_parents_dimension(method):
+def test_pedigree_kinship__diploid_raise_on_parent_dimension():
     ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=5)
     ds["parent_id"] = ["samples", "parents"], [
         [".", ".", "."],
@@ -500,13 +561,23 @@ def test_pedigree_kinship__raise_on_parents_dimension(method):
         ["S1", ".", "."],
         ["S2", "S3", "."],
     ]
-    if method == "Hamilton-Kerr":
-        ds["stat_Hamilton_Kerr_tau"] = xr.ones_like(ds["parent_id"], dtype=np.uint8)
-        ds["stat_Hamilton_Kerr_lambda"] = xr.zeros_like(ds["parent_id"], dtype=float)
-    with pytest.raises(
-        ValueError, match="Parent matrix must have shape \(samples, 2\)"  # noqa: W605
-    ):
-        pedigree_kinship(ds, method=method).compute()
+    with pytest.raises(ValueError, match="The parents dimension must be length 2"):
+        pedigree_kinship(ds, method="diploid").compute()
+
+
+def test_pedigree_kinship__Hamilton_Kerr_raise_on_too_many_parents():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=5)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", ".", "."],
+        [".", ".", "."],
+        ["S0", "S1", "."],
+        ["S1", ".", "."],
+        ["S2", "S3", "."],
+    ]
+    ds["stat_Hamilton_Kerr_tau"] = xr.ones_like(ds["parent_id"], dtype=np.uint8)
+    ds["stat_Hamilton_Kerr_lambda"] = xr.zeros_like(ds["parent_id"], dtype=float)
+    with pytest.raises(ValueError, match="Sample with more than two parents"):
+        pedigree_kinship(ds, method="Hamilton-Kerr").compute()
 
 
 def test_pedigree_kinship__raise_on_invalid_method():
@@ -612,6 +683,47 @@ def test_pedigree_inbreeding__Hamilton_Kerr(order):
     np.testing.assert_array_almost_equal(ds.stat_pedigree_inbreeding, expect[order])
 
 
+@pytest.mark.parametrize("permute", [False, True])
+@pytest.mark.parametrize(
+    "n_sample, n_founder, n_half_founder, n_parent, seed",
+    [
+        (100, 2, 0, 3, 0),
+        (200, 10, 50, 5, 3),  # test half-founders
+    ],
+)
+def test_pedigree_inbreeding__Hamilton_Kerr_compress_parent_dimension(
+    n_sample, n_founder, n_half_founder, n_parent, seed, permute
+):
+    parent = random_parent_matrix(
+        n_sample, n_founder, n_half_founder, selfing=True, permute=permute, seed=seed
+    )
+    # mock complex ploidy manipulations between diploid, triploid and tetraploid material
+    tau = np.random.randint(1, 3, size=parent.shape)
+    lambda_ = np.random.beta(0.5, 0.5, size=parent.shape)
+    # reference case with parents dim length = 2
+    dims = ["samples", "parents"]
+    ds1 = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=n_sample)
+    ds1["parent"] = dims, parent
+    ds1["stat_Hamilton_Kerr_tau"] = dims, tau
+    ds1["stat_Hamilton_Kerr_lambda"] = dims, lambda_
+    # test case with parents dim length > 2
+    parent, tau, lambda_ = widen_parent_arrays(
+        parent, tau, lambda_, n_parent=n_parent, seed=seed
+    )
+    ds2 = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=n_sample)
+    ds2["parent"] = dims, parent
+    ds2["stat_Hamilton_Kerr_tau"] = dims, tau
+    ds2["stat_Hamilton_Kerr_lambda"] = dims, lambda_
+    assert (ds1.dims["parents"], ds2.dims["parents"]) == (2, n_parent)
+    expect = pedigree_inbreeding(
+        ds1, method="Hamilton-Kerr", allow_half_founders=n_half_founder > 0
+    ).stat_pedigree_inbreeding
+    actual = pedigree_inbreeding(
+        ds2, method="Hamilton-Kerr", allow_half_founders=n_half_founder > 0
+    ).stat_pedigree_inbreeding
+    np.testing.assert_array_almost_equal(actual, expect)
+
+
 def test_pedigree_inbreeding__raise_on_unknown_method():
     ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
     ds["parent_id"] = ["samples", "parents"], [
@@ -623,17 +735,28 @@ def test_pedigree_inbreeding__raise_on_unknown_method():
         pedigree_inbreeding(ds, method="unknown")
 
 
-def test_pedigree_inbreeding__raise_on_parent_dimension():
+def test_pedigree_inbreeding__diploid_raise_on_parent_dimension():
     ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
     ds["parent_id"] = ["samples", "parents"], [
         [".", ".", "."],
         [".", ".", "."],
         ["S0", "S1", "."],
     ]
-    with pytest.raises(
-        ValueError, match="Parent matrix must have shape \(samples, 2\)"  # noqa: W605
-    ):
-        pedigree_inbreeding(ds).compute()
+    with pytest.raises(ValueError, match="The parents dimension must be length 2"):
+        pedigree_inbreeding(ds, method="diploid").compute()
+
+
+def test_pedigree_inbreeding__Hamilton_Kerr_raise_on_too_many_parents():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", ".", "."],
+        [".", ".", "."],
+        ["S0", "S1", "."],
+    ]
+    ds["stat_Hamilton_Kerr_tau"] = xr.ones_like(ds["parent_id"], dtype=np.uint8)
+    ds["stat_Hamilton_Kerr_lambda"] = xr.zeros_like(ds["parent_id"], dtype=float)
+    with pytest.raises(ValueError, match="Sample with more than two parents"):
+        pedigree_inbreeding(ds, method="Hamilton-Kerr").compute()
 
 
 def test_pedigree_inbreeding__raise_on_not_diploid():
@@ -800,6 +923,47 @@ def test_pedigree_inverse_relationship__numpy_equivalence(
     np.testing.assert_array_almost_equal(actual, expect)
 
 
+@pytest.mark.parametrize("permute", [False, True])
+@pytest.mark.parametrize(
+    "n_sample, n_founder, n_half_founder, n_parent, seed",
+    [
+        (100, 2, 0, 3, 0),
+        (200, 10, 50, 5, 3),  # test half-founders
+    ],
+)
+def test_pedigree_inverse_relationship__Hamilton_Kerr_compress_parent_dimension(
+    n_sample, n_founder, n_half_founder, n_parent, seed, permute
+):
+    parent = random_parent_matrix(
+        n_sample, n_founder, n_half_founder, selfing=True, permute=permute, seed=seed
+    )
+    # mock complex ploidy manipulations between diploid, triploid and tetraploid material
+    tau = np.random.randint(1, 3, size=parent.shape)
+    lambda_ = np.random.beta(0.5, 0.5, size=parent.shape)
+    # reference case with parents dim length = 2
+    dims = ["samples", "parents"]
+    ds1 = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=n_sample)
+    ds1["parent"] = dims, parent
+    ds1["stat_Hamilton_Kerr_tau"] = dims, tau
+    ds1["stat_Hamilton_Kerr_lambda"] = dims, lambda_
+    # test case with parents dim length > 2
+    parent, tau, lambda_ = widen_parent_arrays(
+        parent, tau, lambda_, n_parent=n_parent, seed=seed
+    )
+    ds2 = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=n_sample)
+    ds2["parent"] = dims, parent
+    ds2["stat_Hamilton_Kerr_tau"] = dims, tau
+    ds2["stat_Hamilton_Kerr_lambda"] = dims, lambda_
+    assert (ds1.dims["parents"], ds2.dims["parents"]) == (2, n_parent)
+    expect = pedigree_inverse_relationship(
+        ds1, method="Hamilton-Kerr", allow_half_founders=n_half_founder > 0
+    ).stat_pedigree_inverse_relationship
+    actual = pedigree_inverse_relationship(
+        ds2, method="Hamilton-Kerr", allow_half_founders=n_half_founder > 0
+    ).stat_pedigree_inverse_relationship
+    np.testing.assert_array_almost_equal(actual, expect)
+
+
 def test_pedigree_inverse_relationship__raise_on_unknown_method():
     ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
     ds["parent_id"] = ["samples", "parents"], [
@@ -813,17 +977,28 @@ def test_pedigree_inverse_relationship__raise_on_unknown_method():
         pedigree_inverse_relationship(ds, method="unknown")
 
 
-def test_pedigree_inverse_relationship__raise_on_parent_dimension():
+def test_pedigree_inverse_relationship__additive_raise_on_parent_dimension():
     ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
     ds["parent_id"] = ["samples", "parents"], [
         [".", ".", "."],
         [".", ".", "."],
         ["S0", "S1", "."],
     ]
-    with pytest.raises(
-        ValueError, match="Parent matrix must have shape \(samples, 2\)"  # noqa: W605
-    ):
-        pedigree_inverse_relationship(ds).compute()
+    with pytest.raises(ValueError, match="The parents dimension must be length 2"):
+        pedigree_inverse_relationship(ds, method="additive")
+
+
+def test_pedigree_inverse_relationship__Hamilton_Kerr_raise_on_too_many_parents():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", ".", "."],
+        [".", ".", "."],
+        ["S0", "S1", "."],
+    ]
+    ds["stat_Hamilton_Kerr_tau"] = xr.ones_like(ds["parent_id"], dtype=np.uint8)
+    ds["stat_Hamilton_Kerr_lambda"] = xr.zeros_like(ds["parent_id"], dtype=float)
+    with pytest.raises(ValueError, match="Sample with more than two parents"):
+        pedigree_inverse_relationship(ds, method="Hamilton-Kerr").compute()
 
 
 def test_pedigree_inverse_relationship__raise_on_not_diploid():
@@ -846,3 +1021,28 @@ def test_pedigree_inverse_relationship__raise_on_half_founder():
     ]
     with pytest.raises(ValueError, match="Pedigree contains half-founders"):
         pedigree_inverse_relationship(ds).compute()
+
+
+def test_pedigree_inverse_relationship__raise_on_singular_kinship_matrix():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=4, seed=1)
+    ds.sample_id.values  # doctest: +NORMALIZE_WHITESPACE
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S0"],
+        ["S1", "S2"],
+    ]
+    ds["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], [
+        [1, 1],
+        [1, 1],
+        [2, 2],
+        [2, 2],
+    ]
+    ds["stat_Hamilton_Kerr_lambda"] = xr.zeros_like(ds["stat_Hamilton_Kerr_tau"], float)
+    # check kinship is singular
+    K = pedigree_kinship(ds, method="Hamilton-Kerr").stat_pedigree_kinship.values
+    with pytest.raises(np.linalg.LinAlgError, match="Singular matrix"):
+        np.linalg.inv(K)
+    # check sgkit message
+    with pytest.raises(ValueError, match="Singular kinship matrix"):
+        pedigree_inverse_relationship(ds, method="Hamilton-Kerr").compute()

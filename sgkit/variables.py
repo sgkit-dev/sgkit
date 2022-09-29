@@ -725,8 +725,14 @@ stat_Hamilton_Kerr_tau, stat_Hamilton_Kerr_tau_spec = SgkitVariables.register_va
         ndim=2,
         kind="u",
         __doc__="""
-Ploidy of the gametes derived from each parent, for each individual, which
-must sum to the ploidy of the individual.
+Numerical contribution of each parent, for each individual, which must sum to the
+ploidy of the individual. This can be interpreted as gametic ploidy in the case of
+sexual reproduction, or more broadly as the number of genome copies inherited in
+asexual reproduction. Values should be included for all parents even when parents
+are unknown or not included within a dataset. The dimensions of this variable must
+match those of :data:`sgkit.variables.parent_spec`.
+
+See also: :data:`sgkit.variables.stat_Hamilton_Kerr_lambda_spec`.
 """,
     )
 )
@@ -740,7 +746,13 @@ must sum to the ploidy of the individual.
         ndim=2,
         kind="f",
         __doc__="""
-Probability of IBD among gamete alleles resulting from meiotic processes.
+The probability that two (randomly chosen without replacement) homologues, inherited
+from a single parent, were derived from a single chromosomal copy within that parent.
+This variable may be used to encode an increased probability of IBD resulting from
+meiotic or asexual processes. The dimensions of this variable must match those of
+:data:`sgkit.variables.parent_spec`.
+
+See also: :data:`sgkit.variables.stat_Hamilton_Kerr_tau_spec`.
 """,
     )
 )
