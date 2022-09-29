@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>sgkit.infer_sample_ploidy</title>
+    <title>sgkit.genomic_relationship</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -46,8 +46,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.infer_variant_ploidy" href="sgkit.infer_variant_ploidy.html" />
-    <link rel="prev" title="sgkit.infer_call_ploidy" href="sgkit.infer_call_ploidy.html" /> 
+    <link rel="next" title="sgkit.gwas_linear_regression" href="sgkit.gwas_linear_regression.html" />
+    <link rel="prev" title="sgkit.Garud_H" href="sgkit.Garud_H.html" /> 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -270,8 +270,8 @@
      sgkit.Garud_H
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="sgkit.genomic_relationship.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      sgkit.genomic_relationship
     </a>
    </li>
@@ -390,8 +390,8 @@
      sgkit.infer_call_ploidy
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="sgkit.infer_sample_ploidy.html">
      sgkit.infer_sample_ploidy
     </a>
    </li>
@@ -928,7 +928,7 @@ title="Source repository"
       </li>
       
       <li>
-        <a href="https://github.com/pystatgen/sgkit/issues/new?title=Issue%20on%20page%20%2Fgenerated/sgkit.infer_sample_ploidy.html&body=Your%20issue%20content%20here."
+        <a href="https://github.com/pystatgen/sgkit/issues/new?title=Issue%20on%20page%20%2Fgenerated/sgkit.genomic_relationship.html&body=Your%20issue%20content%20here."
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -945,7 +945,7 @@ title="Open an issue"
       </li>
       
       <li>
-        <a href="https://github.com/pystatgen/sgkit/edit/master/generated/sgkit.infer_sample_ploidy.rst"
+        <a href="https://github.com/pystatgen/sgkit/edit/master/generated/sgkit.genomic_relationship.rst"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -976,7 +976,7 @@ title="Edit this page"
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>sgkit.infer_sample_ploidy</h1>
+                <h1>sgkit.genomic_relationship</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -987,26 +987,35 @@ title="Edit this page"
             <main id="main-content" role="main">
                 
               <div>
-                 <section id="sgkit-infer-sample-ploidy">
-<h1>sgkit.infer_sample_ploidy<a class="headerlink" href="#sgkit-infer-sample-ploidy" title="Permalink to this headline">#</a></h1>
+                 <section id="sgkit-genomic-relationship">
+<h1>sgkit.genomic_relationship<a class="headerlink" href="#sgkit-genomic-relationship" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="sgkit.infer_sample_ploidy">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">infer_sample_ploidy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_ploidy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_ploidy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.infer_sample_ploidy" title="Permalink to this definition">#</a></dt>
-<dd><p>Infer the ploidy of each sample across all variants based on
-the number of fill (non-allele) values in call genotypes.</p>
+<dt class="sig sig-object py" id="sgkit.genomic_relationship">
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">genomic_relationship</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_dosage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_dosage'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancestral_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ploidy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.genomic_relationship" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute a genomic relationship matrix (GRM).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.6.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing genotype calls.</p>
+<dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.6.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing call genotype dosages.</p>
 </dd>
-<dt><strong>call_genotype</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype'</span></code>)</dt><dd><p>Input variable name holding call_genotype as defined by
-<a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a>.
-Must be present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>.</p>
+<dt><strong>call_dosage</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_dosage'</span></code>)</dt><dd><p>Input variable name holding call_dosage as defined by
+<a class="reference internal" href="sgkit.variables.call_dosage_spec.html#sgkit.variables.call_dosage_spec" title="sgkit.variables.call_dosage_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_dosage_spec</span></code></a>.</p>
 </dd>
-<dt><strong>call_ploidy</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_ploidy'</span></code>)</dt><dd><p>Input variable name holding call_ploidy as defined by
-<a class="reference internal" href="sgkit.variables.call_ploidy_spec.html#sgkit.variables.call_ploidy_spec" title="sgkit.variables.call_ploidy_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_ploidy_spec</span></code></a>.
-If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
-using <a class="reference internal" href="sgkit.infer_call_ploidy.html#sgkit.infer_call_ploidy" title="sgkit.infer_call_ploidy"><code class="xref py py-func docutils literal notranslate"><span class="pre">infer_call_ploidy()</span></code></a>.</p>
+<dt><strong>estimator</strong> : <span class="annotation terse">{‘VanRaden’} | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘VanRaden’]]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Specifies a relatedness estimator to use. Currently the only option
+is <code class="docutils literal notranslate"><span class="pre">&quot;VanRaden&quot;</span></code> which uses the method described by VanRaden 2008 [1]
+and generalized to autopolyploids by Ashraf et al 2016 [2] and
+Bilton 2020 [3].</p>
+</dd>
+<dt><strong>ancestral_frequency</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Frequency of variant alleles corresponding to call_dosage within
+the ancestral/base/reference population.
+These values should range from zero to one.
+If the sample population was derived under Hardy-Weinberg
+equilibrium, then the ancestral frequencies may be approximated
+as the mean dosage of the sample population divided by its ploidy.</p>
+</dd>
+<dt><strong>ploidy</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Ploidy level of all samples within the dataset.
+By default this is inferred from the size of the “ploidy” dimension
+of the dataset.</p>
 </dd>
 <dt><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
@@ -1019,9 +1028,60 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
 <dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.6.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.sample_ploidy_spec.html#sgkit.variables.sample_ploidy_spec" title="sgkit.variables.sample_ploidy_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_ploidy_spec</span></code></a>.</p>
+<dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.stat_genomic_relationship_spec.html#sgkit.variables.stat_genomic_relationship_spec" title="sgkit.variables.stat_genomic_relationship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_genomic_relationship_spec</span></code></a>
+which is a matrix of pairwise relationships among all samples.
+The dimensions are named <code class="docutils literal notranslate"><span class="pre">samples_0</span></code> and <code class="docutils literal notranslate"><span class="pre">samples_1</span></code>.</p>
 </dd>
 </dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This function is only applicable to fixed-ploidy, biallelic datasets.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If an unknown estimator is specified.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If ploidy is not specified and cannot be inferred.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If ancestral_frequency is required but not specified.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If ancestral_frequency is the incorrect shape.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_call_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># use reference allele count as dosage</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;call_dosage&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">call_allele_count</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">call_dosage</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">    array([[2, 1, 1],</span>
+<span class="go">        [1, 1, 1],</span>
+<span class="go">        [2, 1, 0],</span>
+<span class="go">        [2, 1, 1],</span>
+<span class="go">        [1, 0, 0],</span>
+<span class="go">        [1, 1, 2]], dtype=uint8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># use sample population frequency as ancestral frequency</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_frequency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">call_dosage</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;ploidy&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">genomic_relationship</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">ancestral_frequency</span><span class="o">=</span><span class="s2">&quot;sample_frequency&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">stat_genomic_relationship</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">    array([[ 0.93617021, -0.21276596, -0.72340426],</span>
+<span class="go">        [-0.21276596,  0.17021277,  0.04255319],</span>
+<span class="go">        [-0.72340426,  0.04255319,  0.68085106]])</span>
+</pre></div>
+</div>
+<p class="rubric">References</p>
+<p>[1] - P. M. VanRaden 2008.
+“Efficient Methods to Compute Genomic Predictions.”
+Journal of Dairy Science 91 (11): 4414-4423.</p>
+<p>[2] - B. H. Ashraf, S. Byrne, D. Fé, A. Czaban, T. Asp, M. G. Pedersen, I. Lenk,
+N. Roulund, T. Didion, C. S. Jensen, J. Jensen and L. L. Janss 2016.
+“Estimating genomic heritabilities at the level of family-pool samples of
+perennial ryegrass using genotyping-by-sequencing”
+Theoretical Applied Genetics 129: 45-52</p>
+<p>[3] - T. Bilton 2020.
+“Developing statistical methods for genetic analysis of genotypes from
+genotyping-by-sequencing data”
+PhD thesis, University of Otago.</p>
 </dd></dl>
 
 </section>
@@ -1037,17 +1097,17 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
                 
     <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="sgkit.infer_call_ploidy.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="sgkit.Garud_H.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">sgkit.infer_call_ploidy</p>
+            <p class="prev-next-title">sgkit.Garud_H</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="sgkit.infer_variant_ploidy.html" title="next page">
+    <a class='right-next' id="next-link" href="sgkit.gwas_linear_regression.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">sgkit.infer_variant_ploidy</p>
+        <p class="prev-next-title">sgkit.gwas_linear_regression</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
