@@ -257,8 +257,9 @@ def pca(
     ... )
     >>> ds.compute() # doctest: +NORMALIZE_WHITESPACE
     <xarray.Dataset>
-    Dimensions:                              (components: 2, samples: 150, variants: 100)
-    Dimensions without coordinates: components, samples, variants
+    Dimensions:                              (samples: 150, components: 2,
+                                              variants: 100)
+    Dimensions without coordinates: samples, components, variants
     Data variables:
         sample_pca_projection                (samples, components) float32 0.0103...
         sample_pca_component                 (variants, components) float32 0.096...
@@ -273,7 +274,7 @@ def pca(
     ...     .plot.scatter(x=("sample_pca_projection", 0), y=("sample_pca_projection", 1))
     ... )
     >>> ax
-    <AxesSubplot:xlabel='(sample_pca_projection, 0)', ylabel='(sample_pca_projection, 1)'>
+    <AxesSubplot: xlabel='(sample_pca_projection, 0)', ylabel='(sample_pca_projection, 1)'>
 
     References
     ----------

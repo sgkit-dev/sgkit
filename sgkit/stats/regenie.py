@@ -860,8 +860,9 @@ def regenie(
     >>> res = regenie(ds, dosage="call_dosage", covariates="sample_covariate", traits="sample_trait", merge=False)
     >>> res.compute() # doctest: +NORMALIZE_WHITESPACE
     <xarray.Dataset>
-    Dimensions:                  (alphas: 5, blocks: 2, contigs: 2, outcomes: 5, samples: 50)
-    Dimensions without coordinates: alphas, blocks, contigs, outcomes, samples
+    Dimensions:                  (blocks: 2, alphas: 5, samples: 50, outcomes: 5,
+                                  contigs: 2)
+    Dimensions without coordinates: blocks, alphas, samples, outcomes, contigs
     Data variables:
         regenie_base_prediction  (blocks, alphas, samples, outcomes) float64 0.33...
         regenie_meta_prediction  (samples, outcomes) float64 -0.4588 0.78 ... 0.3734
