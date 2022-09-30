@@ -801,8 +801,8 @@ def Garud_H(
     """Compute the H1, H12, H123 and H2/H1 statistics for detecting signatures
     of soft sweeps, as defined in Garud et al. (2015).
 
-    By default, values of this statistic are calculated across all variants.
-    To compute values in windows, call :func:`window_by_position` or :func:`window_by_variant` before calling
+    This method requires a windowed dataset.
+    To window a dataset, call :func:`window_by_position` or :func:`window_by_variant` before calling
     this function.
 
     Parameters
@@ -846,6 +846,8 @@ def Garud_H(
     ------
     NotImplementedError
         If the dataset is not diploid.
+    ValueError
+        If the dataset is not windowed.
 
     Warnings
     --------
