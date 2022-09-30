@@ -9,11 +9,13 @@ from hypothesis import strategies as st
 from hypothesis.extra.numpy import arrays
 
 from sgkit.utils import (
+    DimensionWarning,
     MergeWarning,
     check_array_like,
     define_variable_if_absent,
     encode_array,
     hash_array,
+    match_dims,
     max_str_len,
     merge_datasets,
     smallest_numpy_int_dtype,
@@ -21,10 +23,36 @@ from sgkit.utils import (
 )
 
 
+@pytest.mark.parametrize(
+    "dims, spec, expect",
+    [
+        (("dim",), ("dim",), [[0]]),
+        (("dim0", "dim1"), ("dim0", "dim1"), [[0, 1]]),
+        (("dim0", "dim1"), ("dim0", "*"), [[0, 1]]),
+        (("dim0", "dim1"), ("*", "*"), [[0, 1]]),
+        (("dim0", "dim1"), ({"dim0", None}, {"dim1", None}), [[0, 1]]),
+        (("dim0", "dim1"), ({"*", None}, {"*", None}), [[0, 1]]),
+        (("dim0", "unknown"), ("dim0", "dim1"), np.empty((0, 2), int)),
+        (("dim0", "unknown"), ({"dim0", None}, {"dim1", None}), np.empty((0, 2), int)),
+        (("dim0", "dim1"), ("dim0", {"*", None}, {"*", None}), [[0, 1], [0, 2]]),
+        (
+            ("dim0", "dim1"),
+            ({"dim0", "dim1"}, {"dim1", None}, {"*", None}),
+            [[0, 1], [0, 2]],
+        ),
+        (("dim0", "dim1", "dim2"), ({"dim0", None}, "*", {"dim2", None}), [[0, 1, 2]]),
+        (("dim0", "dim2"), ({"dim0", None}, "*", {"dim2", None}), [[0, 1], [1, 2]]),
+    ],
+)
+def test_match_dims(dims, spec, expect):
+    observed = match_dims(dims, spec)
+    np.testing.assert_array_equal(expect, observed)
+
+
 def test_check_array_like():
     with pytest.raises(TypeError, match=r"Not an array. Missing attribute 'ndim'"):
         check_array_like("foo")
-    a = np.arange(100, dtype="i4")
+    a = xr.DataArray(np.arange(100, dtype="i4"), dims=["x"])
     with pytest.raises(TypeError, match=r"Array dtype \(int32\) does not match int64"):
         check_array_like(a, dtype="i8")
     with pytest.raises(
@@ -48,6 +76,10 @@ def test_check_array_like():
         match=r"Number of dimensions \(1\) does not match one of (\{2, 3\}|\{3, 2\})",
     ):
         check_array_like(a, ndim={2, 3})
+    with pytest.warns(DimensionWarning):
+        check_array_like(a, dims=("z",))
+    with pytest.warns(DimensionWarning):
+        check_array_like(a, dims=("x", "z"))
 
 
 @pytest.mark.parametrize(
