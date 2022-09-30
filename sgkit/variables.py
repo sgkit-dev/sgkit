@@ -966,13 +966,6 @@ variant_linreg_beta, variant_linreg_beta_spec = SgkitVariables.register_variable
     )
 )
 
-variant_linreg_effect, variant_linreg_effect_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec(
-        "variant_linreg_effect",
-        __doc__="""Effect size estimate for each variant and trait.""",
-    )
-)
-
 variant_call_rate, variant_call_rate_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "variant_call_rate",
