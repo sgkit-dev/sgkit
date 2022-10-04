@@ -125,7 +125,7 @@ def genomic_relationship(
     af = da.array(ds[ancestral_frequency].data)
     if af.shape != (n_variants,):
         raise ValueError(
-            "The reference_dosage variable must have one value per variant"
+            "The ancestral_frequency variable must have one value per variant"
         )
     ad = af * ploidy
     M = cd - ad[:, None]
