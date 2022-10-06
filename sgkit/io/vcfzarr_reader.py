@@ -1,5 +1,6 @@
 import tempfile
 import warnings
+from math import comb
 from pathlib import Path
 from typing import (
     Any,
@@ -22,7 +23,6 @@ import zarr
 from dask.delayed import Delayed
 from dask.optimization import fuse
 from fsspec import get_mapper
-from scipy.special import comb
 
 from sgkit.io.utils import INT_FILL, concatenate_and_rechunk, str_is_int
 
@@ -511,8 +511,7 @@ def vcf_number_to_dimension_and_size(
         return ("alleles", max_alt_alleles + 1)
     elif vcf_number == "G":
         n_alleles = max_alt_alleles + 1
-        # TODO: use Python 3.8's math.comb when we drop 3.7
-        n_genotypes = comb(n_alleles + ploidy - 1, ploidy, exact=True)
+        n_genotypes = comb(n_alleles + ploidy - 1, ploidy)
         return ("genotypes", n_genotypes)
     elif str_is_int(vcf_number):
         if "dimension" in field_def:
