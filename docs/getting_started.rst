@@ -10,7 +10,7 @@ Getting Started
 Installation
 ------------
 
-You can install sgkit with pip. Python 3.7, 3.8, 3.9, or 3.10 is required::
+You can install sgkit with pip. Python 3.8, 3.9, or 3.10 is required::
 
     $ pip install sgkit
 
