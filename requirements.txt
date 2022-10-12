@@ -1,4 +1,4 @@
-numpy < 1.23
+numpy
 xarray
 dask[array] >= 2022.01.0
 distributed >= 2022.01.0
