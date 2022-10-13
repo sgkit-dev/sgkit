@@ -1,4 +1,5 @@
 import warnings
+from itertools import product
 from typing import Any, Callable, Hashable, List, Mapping, Optional, Set, Tuple, Union
 
 import numpy as np
@@ -10,11 +11,73 @@ from . import variables
 from .typing import ArrayLike, DType
 
 
+class DimensionWarning(UserWarning):
+    "Warning about dimension mismatches."
+    pass
+
+
+def _match_dim(
+    dim: str, spec: Union[Set[Union[None, str]], str]
+) -> bool:  # pragma: no cover
+    if isinstance(spec, set):
+        return (dim in spec) or ("*" in spec)
+    else:
+        return (dim == spec) or ("*" == spec)
+
+
+def match_dims(
+    dims: Tuple[str], spec: Tuple[Union[Set[Union[None, str]], str]]
+) -> ArrayLike:
+    """Calculate all valid mappings of dimension to a specification.
+
+    Parameters
+    ----------
+    dims
+        Tuple of dimension names
+    spec
+        Tuple of expected dimension names.
+        A set may be used to indicate multiple valid names.
+        A set containing None may be used to indicate an optional dimension.
+        A wildcard ``"*"`` may be used to match any name.
+
+    Returns
+    -------
+    A matrix of shape (n_mappings, n_dims) with values encoding the integer
+    index of each dimension within the spec.
+    If there are no valid mappings then this matrix will have zero rows.
+    """
+    n_dims, n_spec = len(dims), len(spec)
+    # case of all dimensions present
+    if n_dims == n_spec:
+        # only one possible path
+        if all(_match_dim(d, s) for d, s in zip(dims, spec)):
+            return np.arange(n_dims)[None, :]
+        else:
+            return np.empty((0, n_dims), int)
+    # case of only required dims present
+    reqs = np.array([None not in s if isinstance(s, set) else True for s in spec])
+    n_reqs = reqs.sum()
+    if n_dims == n_reqs:
+        path = np.where(reqs)[0]
+        if all(_match_dim(d, spec[i]) for d, i in zip(dims, path)):
+            return path[None, :]
+        else:
+            return np.empty((0, n_dims), int)
+    # general case by enumeration
+    matches = [[i for i, s in enumerate(spec) if _match_dim(d, s)] for d in dims]
+    paths = np.array(list(product(*matches)))
+    ascending = (np.diff(paths) > 0).all(axis=-1)
+    all_reqs = reqs[paths].sum(axis=-1) == n_reqs
+    valid = np.logical_and(ascending, all_reqs)
+    return paths[valid]
+
+
 def check_array_like(
     a: Any,
     dtype: Union[None, DType, Set[DType]] = None,
     kind: Union[None, str, Set[str]] = None,
     ndim: Union[None, int, Set[int]] = None,
+    dims: Union[None, Tuple[Union[Set[Union[None, str]], str]]] = None,
 ) -> None:
     """Raise an error if an array does not match given attributes (dtype, kind, dimensions).
 
@@ -23,14 +86,19 @@ def check_array_like(
     a
         Array of any type.
     dtype
-        The dtype the array must have, by default None (don't check)
+        The dtype the array must have, by default None (don't check).
         If a set, then the array must have one of the dtypes in the set.
     kind
         The dtype kind the array must be, by default None (don't check).
         If a set, then the array must be one of the kinds in the set.
     ndim
-        Number of dimensions the array must have, by default None (don't check)
+        Number of dimensions the array must have, by default None (don't check).
         If a set, then the array must have one of the number of dimensions in the set.
+    dims
+        Expected dimension names of the array, by default None (don't check).
+        Sets of names are used to indicate multiple allowable names and a wildcard "*"
+        is used to match any name.
+        A set of names including ``None`` indicates an optional dimension.
 
     Raises
     ------
@@ -40,8 +108,14 @@ def check_array_like(
         * If `a` is not a dtype kind that matches `kind`.
     ValueError
         If the number of dimensions of `a` does not match `ndim`.
+
+    Warns
+    -----
+    DimensionWarning
+        If the dimension names of `a` do not match their expected values.
+
     """
-    array_attrs = "ndim", "dtype", "shape"
+    array_attrs = "ndim", "dtype", "shape", "dims"
     for k in array_attrs:
         if not hasattr(a, k):
             raise TypeError(f"Not an array. Missing attribute '{k}'")
@@ -70,6 +144,15 @@ def check_array_like(
                 )
         elif ndim != a.ndim:
             raise ValueError(f"Number of dimensions ({a.ndim}) does not match {ndim}")
+    if dims is not None:
+        n_mappings = len(match_dims(a.dims, dims))
+        if n_mappings < 1:
+            warnings.warn(f"Dimensions {a.dims} do not match {dims}", DimensionWarning)
+        if n_mappings > 1:
+            warnings.warn(
+                f"Dimensions {a.dims} match {n_mappings} ways to {dims}",
+                DimensionWarning,
+            )
 
 
 def encode_array(x: Union[ArrayLike, List[Any]]) -> Tuple[ArrayLike, List[Any]]:

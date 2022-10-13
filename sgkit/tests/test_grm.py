@@ -159,7 +159,7 @@ def test_genomic_relationship__raise_on_ancestral_frequency_shape():
     ds["ancestral_frequency"] = ds["call_dosage"].mean(dim="variants") / 2
     with pytest.raises(
         ValueError,
-        match="The reference_dosage variable must have one value per variant",
+        match="The ancestral_frequency variable must have one value per variant",
     ):
         genomic_relationship(ds, ancestral_frequency="ancestral_frequency", ploidy=2)
 
