@@ -1097,8 +1097,9 @@ data provided does not contain at least 2 contigs. Defined by
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">regenie</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">dosage</span><span class="o">=</span><span class="s2">&quot;call_dosage&quot;</span><span class="p">,</span> <span class="n">covariates</span><span class="o">=</span><span class="s2">&quot;sample_covariate&quot;</span><span class="p">,</span> <span class="n">traits</span><span class="o">=</span><span class="s2">&quot;sample_trait&quot;</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span> 
 <span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:                  (alphas: 5, blocks: 2, contigs: 2, outcomes: 5, samples: 50)</span>
-<span class="go">Dimensions without coordinates: alphas, blocks, contigs, outcomes, samples</span>
+<span class="go">Dimensions:                  (blocks: 2, alphas: 5, samples: 50, outcomes: 5,</span>
+<span class="go">                              contigs: 2)</span>
+<span class="go">Dimensions without coordinates: blocks, alphas, samples, outcomes, contigs</span>
 <span class="go">Data variables:</span>
 <span class="go">    regenie_base_prediction  (blocks, alphas, samples, outcomes) float64 0.33...</span>
 <span class="go">    regenie_meta_prediction  (samples, outcomes) float64 -0.4588 0.78 ... 0.3734</span>
