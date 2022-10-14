@@ -417,8 +417,6 @@ def vcf_to_zarr_sequential(
             filters.insert(0, "PASS")
 
         # Remember max lengths of variable-length strings
-        max_variant_id_length = 0
-        max_variant_allele_length = 0
         max_alt_alleles_seen = 0
 
         # Iterate through variants in batches of chunk_length
@@ -464,7 +462,6 @@ def vcf_to_zarr_sequential(
             for i, variant in enumerate(variants_chunk):
                 variant_id = variant.ID if variant.ID is not None else "."
                 variant_ids.append(variant_id)
-                max_variant_id_length = max(max_variant_id_length, len(variant_id))
                 try:
                     variant_contig[i] = variant_contig_names.index(variant.CHROM)
                 except ValueError:
@@ -480,9 +477,6 @@ def vcf_to_zarr_sequential(
                 elif len(alleles) < n_allele:
                     alleles = alleles + ([STR_FILL] * (n_allele - len(alleles)))
                 variant_alleles.append(alleles)
-                max_variant_allele_length = max(
-                    max_variant_allele_length, max(len(x) for x in alleles)
-                )
 
                 variant_quality[i] = (
                     variant.QUAL if variant.QUAL is not None else FLOAT32_MISSING
