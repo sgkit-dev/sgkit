@@ -21,11 +21,11 @@ import dask
 import fsspec
 import numpy as np
 import xarray as xr
+import zarr
 from cyvcf2 import VCF, Variant
 from numcodecs import PackBits
 
 from sgkit import variables
-from sgkit.io.dataset import load_dataset
 from sgkit.io.utils import (
     CHAR_FILL,
     CHAR_MISSING,
@@ -959,7 +959,7 @@ def vcf_to_zarr(
     )
 
     # Issue a warning if max_alt_alleles caused data to be dropped
-    ds = load_dataset(output)
+    ds = zarr.open(output)
     max_alt_alleles_seen = ds.attrs["max_alt_alleles_seen"]
     if max_alt_alleles_seen > max_alt_alleles:
         warnings.warn(
