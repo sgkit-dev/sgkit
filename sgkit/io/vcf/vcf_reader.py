@@ -327,40 +327,36 @@ class GenotypeFieldHandler(VcfFieldHandler):
         max_alt_alleles: int,
     ) -> None:
         n_sample = len(vcf.samples)
-        self.call_genotype = np.empty(
-            (chunk_length, n_sample, ploidy),
-            dtype=smallest_numpy_int_dtype(max_alt_alleles),
-        )
-        self.call_genotype_phased = np.empty((chunk_length, n_sample), dtype=bool)
         self.ploidy = ploidy
         self.mixed_ploidy = mixed_ploidy
         self.truncate_calls = truncate_calls
         self.max_alt_alleles = max_alt_alleles
+        self.fill = -2 if self.mixed_ploidy else -1
+        self.call_genotype = np.full(
+            (chunk_length, n_sample, ploidy),
+            self.fill,
+            dtype=smallest_numpy_int_dtype(max_alt_alleles),
+        )
+        self.call_genotype_phased = np.full((chunk_length, n_sample), 0, dtype=bool)
 
     def add_variant(self, i: int, variant: Any) -> None:
-        fill = -2 if self.mixed_ploidy else -1
         if variant.genotype is not None:
-            gt = variant.genotype.array(fill=fill)
+            gt = variant.genotype.array(fill=self.fill)
             gt_length = gt.shape[-1] - 1  # final element indicates phasing
             if (gt_length > self.ploidy) and not self.truncate_calls:
                 raise ValueError("Genotype call longer than ploidy.")
             n = min(self.call_genotype.shape[-1], gt_length)
             self.call_genotype[i, ..., 0:n] = gt[..., 0:n]
-            self.call_genotype[i, ..., n:] = fill
             self.call_genotype_phased[i] = gt[..., -1]
-
-            # set any calls that exceed maximum number of alt alleles as missing
-            self.call_genotype[i][self.call_genotype[i] > self.max_alt_alleles] = -1
-
-        else:
-            self.call_genotype[i] = fill
-            self.call_genotype_phased[i] = 0
 
     def truncate_array(self, length: int) -> None:
         self.call_genotype = self.call_genotype[:length]
         self.call_genotype_phased = self.call_genotype_phased[:length]
 
     def update_dataset(self, ds: xr.Dataset) -> None:
+        # set any calls that exceed maximum number of alt alleles as missing
+        self.call_genotype[self.call_genotype > self.max_alt_alleles] = -1
+
         ds["call_genotype"] = (
             [DIM_VARIANT, DIM_SAMPLE, DIM_PLOIDY],
             self.call_genotype,
