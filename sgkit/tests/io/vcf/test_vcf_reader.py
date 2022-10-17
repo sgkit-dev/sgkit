@@ -827,6 +827,19 @@ def test_vcf_to_zarr__parallel_with_fields(shared_datadir, tmp_path):
         variants=slice((0, 10001661), (0, 10001670))
     )
 
+    # check strings have not been truncated after concat_zarrs
+    assert_array_equal(
+        ds["variant_allele"],
+        np.array(
+            [
+                ["T", "C", "<NON_REF>", ""],
+                ["T", "<NON_REF>", "", ""],
+                ["T", "G", "<NON_REF>", ""],
+            ],
+            dtype="O",
+        ),
+    )
+
     # convert floats to ints to check nan type
     fill = FLOAT32_FILL
     assert_allclose(
