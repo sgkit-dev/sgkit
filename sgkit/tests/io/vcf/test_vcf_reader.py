@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import xarray as xr
 import zarr
-from numcodecs import Blosc, PackBits, VLenUTF8
+from numcodecs import Blosc, Delta, FixedScaleOffset, PackBits, VLenUTF8
 from numpy.testing import assert_allclose, assert_array_equal
 
 from sgkit import load_dataset, save_dataset
@@ -246,6 +246,10 @@ def test_vcf_to_zarr__compressor_and_filters(shared_datadir, is_path, tmp_path):
     assert z["variant_id_mask"].filters is None
     assert z["variant_id_mask"].chunks == (5,)
 
+    assert z["variant_position"].filters == [
+        Delta(dtype="i4", astype="i4")
+    ]  # sgkit default
+
 
 @pytest.mark.parametrize(
     "is_path",
@@ -259,7 +263,7 @@ def test_vcf_to_zarr__parallel_compressor_and_filters(
     output = tmp_path.joinpath("vcf_concat.zarr").as_posix()
     regions = ["20", "21"]
 
-    default_compressor = Blosc("zlib", 1, Blosc.NOSHUFFLE)
+    compressor = Blosc("zlib", 1, Blosc.NOSHUFFLE)
     variant_id_compressor = Blosc("zlib", 2, Blosc.NOSHUFFLE)
     encoding = dict(
         variant_id=dict(compressor=variant_id_compressor),
@@ -270,18 +274,29 @@ def test_vcf_to_zarr__parallel_compressor_and_filters(
         output,
         regions=regions,
         chunk_length=5_000,
-        compressor=default_compressor,
+        compressor=compressor,
         encoding=encoding,
     )
 
     # look at actual Zarr store to check compressor and filters
     z = zarr.open(output)
-    assert z["call_genotype"].compressor == default_compressor
-    assert z["call_genotype"].filters is None
-    assert z["call_genotype_mask"].filters == [PackBits()]
+    assert z["call_genotype"].compressor == compressor
+    assert z["call_genotype"].filters is None  # sgkit default
+    assert z["call_genotype"].chunks == (5000, 1, 2)
+    assert z["call_genotype_mask"].compressor == compressor
+    assert z["call_genotype_mask"].filters == [PackBits()]  # sgkit default
+    assert z["call_genotype_mask"].chunks == (5000, 1, 2)
 
     assert z["variant_id"].compressor == variant_id_compressor
+    assert z["variant_id"].filters == [VLenUTF8()]  # sgkit default
+    assert z["variant_id"].chunks == (5000,)
+    assert z["variant_id_mask"].compressor == compressor
     assert z["variant_id_mask"].filters is None
+    assert z["variant_id_mask"].chunks == (5000,)
+
+    assert z["variant_position"].filters == [
+        Delta(dtype="i4", astype="i4")
+    ]  # sgkit default
 
 
 @pytest.mark.parametrize(
@@ -992,7 +1007,20 @@ def test_vcf_to_zarr__field_number_G_non_diploid(shared_datadir, tmp_path):
     path = path_for_test(shared_datadir, "simple.output.mixed_depth.likelihoods.vcf")
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
-    vcf_to_zarr(path, output, ploidy=4, max_alt_alleles=3, fields=["FORMAT/GL"])
+    # store GL field as 2dp
+    encoding = {
+        "call_GL": {
+            "filters": [FixedScaleOffset(offset=0, scale=100, dtype="f4", astype="u1")]
+        }
+    }
+    vcf_to_zarr(
+        path,
+        output,
+        ploidy=4,
+        max_alt_alleles=3,
+        fields=["FORMAT/GL"],
+        encoding=encoding,
+    )
     ds = xr.open_zarr(output)
 
     # comb(n_alleles + ploidy - 1, ploidy) = comb(4 + 4 - 1, 4) = comb(7, 4) = 35

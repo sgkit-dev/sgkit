@@ -3,6 +3,7 @@ import platform
 try:
     from .vcf_partition import partition_into_regions
     from .vcf_reader import (
+        FloatFormatFieldWarning,
         MaxAltAllelesExceededWarning,
         concat_zarrs,
         vcf_to_zarr,
@@ -10,6 +11,7 @@ try:
     )
 
     __all__ = [
+        "FloatFormatFieldWarning",
         "MaxAltAllelesExceededWarning",
         "concat_zarrs",
         "partition_into_regions",

@@ -17,6 +17,7 @@ from .vcf_writer import canonicalize_vcf, zarr_to_vcf
     ],
 )
 @pytest.mark.filterwarnings(
+    "ignore::sgkit.io.vcf.FloatFormatFieldWarning",
     "ignore::sgkit.io.vcfzarr_reader.DimensionNameForFixedFormatFieldWarning",
 )
 def test_lossless_conversion(shared_datadir, tmp_path, vcf_file):

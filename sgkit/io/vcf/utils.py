@@ -3,10 +3,11 @@ import struct
 import tempfile
 import uuid
 from contextlib import contextmanager
-from typing import IO, Any, Dict, Iterator, Optional, Sequence, TypeVar
+from typing import IO, Any, Dict, Hashable, Iterator, Optional, Sequence, TypeVar
 from urllib.parse import urlparse
 
 import fsspec
+from numcodecs import Delta, PackBits
 from yarl import URL
 
 from sgkit.typing import PathType
@@ -168,6 +169,36 @@ def temporary_directory(
     finally:
         # Remove the temporary directory on exiting the context manager
         fs.rm(tempdir, recursive=True)
+
+
+def get_default_vcf_encoding(ds, chunk_length, chunk_width, compressor):
+    # Enforce uniform chunks in the variants dimension
+    # Also chunk in the samples direction
+    def get_chunk_size(dim: Hashable, size: int) -> int:
+        if dim == "variants":
+            return chunk_length
+        elif dim == "samples":
+            return chunk_width
+        else:
+            return size
+
+    default_encoding = {}
+    for var in ds.data_vars:
+        var_chunks = tuple(
+            get_chunk_size(dim, size)
+            for (dim, size) in zip(ds[var].dims, ds[var].shape)
+        )
+        default_encoding[var] = dict(chunks=var_chunks, compressor=compressor)
+
+        # Enable bit packing by default for boolean arrays
+        if ds[var].dtype.kind == "b":
+            default_encoding[var]["filters"] = [PackBits()]
+
+        # Position is monotonically increasing (within a contig) so benefits from delta encoding
+        if var == "variant_position":
+            default_encoding[var]["filters"] = [Delta(dtype="i4", astype="i4")]
+
+    return default_encoding
 
 
 def merge_encodings(

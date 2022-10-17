@@ -5,17 +5,7 @@ import warnings
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import (
-    Any,
-    Dict,
-    Hashable,
-    Iterator,
-    MutableMapping,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
-)
+from typing import Any, Dict, Iterator, MutableMapping, Optional, Sequence, Tuple, Union
 
 import dask
 import fsspec
@@ -23,7 +13,6 @@ import numpy as np
 import xarray as xr
 import zarr
 from cyvcf2 import VCF, Variant
-from numcodecs import PackBits
 
 from sgkit import variables
 from sgkit.io.utils import (
@@ -40,6 +29,7 @@ from sgkit.io.vcf import partition_into_regions
 from sgkit.io.vcf.utils import (
     build_url,
     chunks,
+    get_default_vcf_encoding,
     merge_encodings,
     temporary_directory,
     url_filename,
@@ -69,6 +59,12 @@ try:
 except ImportError:  # pragma: no cover
     warnings.warn("Cannot import Blosc, falling back to no compression", RuntimeWarning)
     DEFAULT_COMPRESSOR = None
+
+
+class FloatFormatFieldWarning(UserWarning):
+    """Warning for VCF FORMAT float fields, which can use a lot of storage."""
+
+    pass
 
 
 class MaxAltAllelesExceededWarning(UserWarning):
@@ -535,34 +531,33 @@ def vcf_to_zarr_sequential(
             ds.attrs["max_alt_alleles_seen"] = max_alt_alleles_seen
 
             if first_variants_chunk:
-                # Enforce uniform chunks in the variants dimension
-                # Also chunk in the samples direction
-
-                def get_chunk_size(dim: Hashable, size: int) -> int:
-                    if dim == "variants":
-                        return chunk_length
-                    elif dim == "samples":
-                        return chunk_width
-                    else:
-                        return size
-
-                default_encoding = {}
+                # ensure that booleans are not stored as int8 by xarray https://github.com/pydata/xarray/issues/4386
                 for var in ds.data_vars:
-                    var_chunks = tuple(
-                        get_chunk_size(dim, size)
-                        for (dim, size) in zip(ds[var].dims, ds[var].shape)
-                    )
-                    default_encoding[var] = dict(
-                        chunks=var_chunks, compressor=compressor
-                    )
                     if ds[var].dtype.kind == "b":
-                        # ensure that booleans are not stored as int8 by xarray https://github.com/pydata/xarray/issues/4386
                         ds[var].attrs["dtype"] = "bool"
-                        default_encoding[var]["filters"] = [PackBits()]
 
                 # values from function args (encoding) take precedence over default_encoding
+                default_encoding = get_default_vcf_encoding(
+                    ds, chunk_length, chunk_width, compressor
+                )
                 encoding = encoding or {}
                 merged_encoding = merge_encodings(default_encoding, encoding)
+
+                for var in ds.data_vars:
+                    # Issue warning for VCF FORMAT float fields with no filter
+                    if (
+                        var.startswith("call_")
+                        and ds[var].dtype == np.float32
+                        and (
+                            var not in merged_encoding
+                            or "filters" not in merged_encoding[var]
+                        )
+                    ):
+                        warnings.warn(
+                            f"Storing call variable {var} (FORMAT field) as a float can result in large file sizes. "
+                            f"Consider setting the encoding filters for this variable to FixedScaleOffset or similar.",
+                            FloatFormatFieldWarning,
+                        )
 
                 ds.to_zarr(output, mode="w", encoding=merged_encoding)
                 first_variants_chunk = False
