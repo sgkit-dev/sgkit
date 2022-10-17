@@ -37,7 +37,13 @@ from sgkit.io.utils import (
     STR_MISSING,
 )
 from sgkit.io.vcf import partition_into_regions
-from sgkit.io.vcf.utils import build_url, chunks, temporary_directory, url_filename
+from sgkit.io.vcf.utils import (
+    build_url,
+    chunks,
+    merge_encodings,
+    temporary_directory,
+    url_filename,
+)
 from sgkit.io.vcfzarr_reader import (
     concat_zarrs_optimized,
     vcf_number_to_dimension_and_size,
@@ -556,7 +562,7 @@ def vcf_to_zarr_sequential(
 
                 # values from function args (encoding) take precedence over default_encoding
                 encoding = encoding or {}
-                merged_encoding = {**default_encoding, **encoding}
+                merged_encoding = merge_encodings(default_encoding, encoding)
 
                 ds.to_zarr(output, mode="w", encoding=merged_encoding)
                 first_variants_chunk = False

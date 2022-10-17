@@ -6,7 +6,7 @@ import fsspec
 import pytest
 from callee.strings import StartsWith
 
-from sgkit.io.vcf.utils import build_url, chunks, temporary_directory
+from sgkit.io.vcf.utils import build_url, chunks, merge_encodings, temporary_directory
 from sgkit.io.vcf.vcf_reader import get_region_start
 
 
@@ -118,3 +118,14 @@ def test_chunks(x, n, expected_values):
 )
 def test_get_region_start(region: str, expected: int):
     assert get_region_start(region) == expected
+
+
+def test_merge_encodings():
+    default_encoding = dict(a=dict(a1=1, a2=2), b=dict(b1=5))
+    overrides = dict(a=dict(a1=0, a3=3), c=dict(c1=7))
+    assert merge_encodings(default_encoding, overrides) == dict(
+        a=dict(a1=0, a2=2, a3=3), b=dict(b1=5), c=dict(c1=7)
+    )
+
+    assert merge_encodings(default_encoding, {}) == default_encoding
+    assert merge_encodings({}, overrides) == overrides

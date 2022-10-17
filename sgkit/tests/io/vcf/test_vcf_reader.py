@@ -215,7 +215,7 @@ def test_vcf_to_zarr__compressor_and_filters(shared_datadir, is_path, tmp_path):
     path = path_for_test(shared_datadir, "sample.vcf.gz", is_path)
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
-    default_compressor = Blosc("zlib", 1, Blosc.NOSHUFFLE)
+    compressor = Blosc("zlib", 1, Blosc.NOSHUFFLE)
     variant_id_compressor = Blosc("zlib", 2, Blosc.NOSHUFFLE)
     encoding = dict(
         variant_id=dict(compressor=variant_id_compressor),
@@ -226,18 +226,25 @@ def test_vcf_to_zarr__compressor_and_filters(shared_datadir, is_path, tmp_path):
         output,
         chunk_length=5,
         chunk_width=2,
-        compressor=default_compressor,
+        compressor=compressor,
         encoding=encoding,
     )
 
     # look at actual Zarr store to check compressor and filters
     z = zarr.open(output)
-    assert z["call_genotype"].compressor == default_compressor
-    assert z["call_genotype"].filters is None
-    assert z["call_genotype_mask"].filters == [PackBits()]
+    assert z["call_genotype"].compressor == compressor
+    assert z["call_genotype"].filters is None  # sgkit default
+    assert z["call_genotype"].chunks == (5, 2, 2)
+    assert z["call_genotype_mask"].compressor == compressor
+    assert z["call_genotype_mask"].filters == [PackBits()]  # sgkit default
+    assert z["call_genotype_mask"].chunks == (5, 2, 2)
 
     assert z["variant_id"].compressor == variant_id_compressor
+    assert z["variant_id"].filters == [VLenUTF8()]  # sgkit default
+    assert z["variant_id"].chunks == (5,)
+    assert z["variant_id_mask"].compressor == compressor
     assert z["variant_id_mask"].filters is None
+    assert z["variant_id_mask"].chunks == (5,)
 
 
 @pytest.mark.parametrize(

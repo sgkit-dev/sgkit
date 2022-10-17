@@ -168,3 +168,32 @@ def temporary_directory(
     finally:
         # Remove the temporary directory on exiting the context manager
         fs.rm(tempdir, recursive=True)
+
+
+def merge_encodings(
+    default_encoding: Dict[str, Dict[str, Any]], overrides: Dict[str, Dict[str, Any]]
+) -> Dict[str, Dict[str, Any]]:
+    """Merge a dictionary of dictionaries specifying encodings with another dictionary of dictionaries of overriding encodings.
+
+    Parameters
+    ----------
+    default_encoding : Dict[str, Dict[str, Any]]
+        The default encoding dictionary.
+    overrides : Dict[str, Dict[str, Any]]
+        A dictionary containing selective overrides.
+
+    Returns
+    -------
+    Dict[str, Dict[str, Any]]
+        The merged encoding dictionary
+    """
+    merged = {}
+    for var, d in default_encoding.items():
+        if var in overrides:
+            merged[var] = {**d, **overrides[var]}
+        else:
+            merged[var] = d
+    for var, d in overrides.items():
+        if var not in merged:
+            merged[var] = d
+    return merged
