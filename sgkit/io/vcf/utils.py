@@ -196,7 +196,7 @@ def get_default_vcf_encoding(ds, chunk_length, chunk_width, compressor):
 
         # Position is monotonically increasing (within a contig) so benefits from delta encoding
         if var == "variant_position":
-            default_encoding[var]["filters"] = [Delta(dtype="i4", astype="i4")]
+            default_encoding[var]["filters"] = [Delta(ds[var].dtype)]
 
     return default_encoding
 
