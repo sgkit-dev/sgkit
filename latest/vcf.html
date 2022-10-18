@@ -1016,6 +1016,11 @@ title="Edit this page"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#compression">
+   Compression
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#low-level-operation">
    Low-level operation
   </a>
@@ -1107,6 +1112,11 @@ title="Edit this page"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#compression">
+   Compression
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#low-level-operation">
    Low-level operation
   </a>
@@ -1164,14 +1174,15 @@ title="Edit this page"
 <li><p><a class="reference internal" href="#partitioning" id="id5">Partitioning</a></p></li>
 <li><p><a class="reference internal" href="#chunk-sizes" id="id6">Chunk sizes</a></p></li>
 <li><p><a class="reference internal" href="#cloud-storage" id="id7">Cloud storage</a></p></li>
-<li><p><a class="reference internal" href="#low-level-operation" id="id8">Low-level operation</a></p></li>
-<li><p><a class="reference internal" href="#polyploid-and-mixed-ploidy-vcf" id="id9">Polyploid and mixed-ploidy VCF</a></p></li>
-<li><p><a class="reference internal" href="#example-converting-1000-genomes-vcf-to-zarr" id="id10">Example: converting 1000 genomes VCF to Zarr</a></p>
+<li><p><a class="reference internal" href="#compression" id="id8">Compression</a></p></li>
+<li><p><a class="reference internal" href="#low-level-operation" id="id9">Low-level operation</a></p></li>
+<li><p><a class="reference internal" href="#polyploid-and-mixed-ploidy-vcf" id="id10">Polyploid and mixed-ploidy VCF</a></p></li>
+<li><p><a class="reference internal" href="#example-converting-1000-genomes-vcf-to-zarr" id="id11">Example: converting 1000 genomes VCF to Zarr</a></p>
 <ul>
-<li><p><a class="reference internal" href="#install-sgkit" id="id11">Install sgkit</a></p></li>
-<li><p><a class="reference internal" href="#download-the-data" id="id12">Download the data</a></p></li>
-<li><p><a class="reference internal" href="#run-the-conversion" id="id13">Run the conversion</a></p></li>
-<li><p><a class="reference internal" href="#inspect-the-dataset" id="id14">Inspect the dataset</a></p></li>
+<li><p><a class="reference internal" href="#install-sgkit" id="id12">Install sgkit</a></p></li>
+<li><p><a class="reference internal" href="#download-the-data" id="id13">Download the data</a></p></li>
+<li><p><a class="reference internal" href="#run-the-conversion" id="id14">Run the conversion</a></p></li>
+<li><p><a class="reference internal" href="#inspect-the-dataset" id="id15">Inspect the dataset</a></p></li>
 </ul>
 </li>
 </ul>
@@ -1337,8 +1348,43 @@ cloud storage. You can access files stored on Amazon S3 or Google Cloud Storage
 using <code class="docutils literal notranslate"><span class="pre">s3://</span></code> or <code class="docutils literal notranslate"><span class="pre">gs://</span></code> URLs. Setting credentials or other options is
 typically achieved using environment variables for the underlying cloud store.</p>
 </section>
+<section id="compression">
+<h2><a class="toc-backref" href="#id8">Compression</a><a class="headerlink" href="#compression" title="Permalink to this headline">#</a></h2>
+<p>Zarr offers a lot of flexibility over controlling how data is compressed. Each variable can use
+a different <a class="reference external" href="https://zarr.readthedocs.io/en/stable/tutorial.html#compressors">compression algorithm</a>,
+and its own list of <a class="reference external" href="https://zarr.readthedocs.io/en/stable/tutorial.html#filters">filters</a>.</p>
+<p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function tries to choose good defaults for compression, using
+information about the variable’s dtype, and also the nature of the data being stored.</p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">variant_position</span></code> (from the VCF <code class="docutils literal notranslate"><span class="pre">POS</span></code> field) is a monotonically increasing integer
+(within a contig) so it benefits from using a delta encoding to store the differences in its values,
+since these are smaller integers that compress better. This encoding is specified using the NumCodecs
+<a class="reference external" href="https://numcodecs.readthedocs.io/en/stable/delta.html">Delta</a> codec as a Zarr filter.</p>
+<p>When converting from VCF you can specify the default compression algorithm to use for all variables
+by specifying <code class="docutils literal notranslate"><span class="pre">compressor</span></code> in the call to <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a>. There are trade-offs
+between compression speed and size, which this <a class="reference external" href="http://alimanfoo.github.io/2016/09/21/genotype-compression-benchmark.html">benchmark</a>
+does a good job of exploring.</p>
+<p>Sometimes you may want to override the compression for a particular variable. A good example of this
+is for VCF FORMAT fields that are floats. Floats don’t compress well, and since there is a value for
+every sample they can take up a lot of space. In many cases full float precision is not needed,
+so it is a good idea to use a filter to transform the float to an int, that takes less space.</p>
+<p>For example, the following code creates an encoding that can be passed to <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a>
+to store the VCF <code class="docutils literal notranslate"><span class="pre">DS</span></code> FORMAT field to 2 decimal places. (<code class="docutils literal notranslate"><span class="pre">DS</span></code> is a dosage field that is between 0 and 2
+so we know it will fit into an unsigned 8-bit int.):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numcodecs</span> <span class="kn">import</span> <span class="n">FixedScaleOffset</span>
+
+<span class="n">encoding</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;call_DS&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">FixedScaleOffset</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;f4&quot;</span><span class="p">,</span> <span class="n">astype</span><span class="o">=</span><span class="s2">&quot;u1&quot;</span><span class="p">)],</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that this encoding won’t work for floats that may be NaN. Consider using
+<a class="reference external" href="https://numcodecs.readthedocs.io/en/stable/quantize.html">Quantize</a> (with <code class="docutils literal notranslate"><span class="pre">astype=np.float16</span></code>)
+or <a class="reference external" href="https://numcodecs.readthedocs.io/en/stable/bitround.html">Bitround</a> in that case.</p>
+</section>
 <section id="low-level-operation">
-<span id="vcf-low-level-operation"></span><h2><a class="toc-backref" href="#id8">Low-level operation</a><a class="headerlink" href="#low-level-operation" title="Permalink to this headline">#</a></h2>
+<span id="vcf-low-level-operation"></span><h2><a class="toc-backref" href="#id9">Low-level operation</a><a class="headerlink" href="#low-level-operation" title="Permalink to this headline">#</a></h2>
 <p>Calling <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> runs a two-step operation:</p>
 <ol class="arabic simple">
 <li><p>Write the output for each input region to a separate temporary Zarr store</p></li>
@@ -1353,7 +1399,7 @@ that all workers can access the store (both for reading and writing).</p>
 <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarrs.html#sgkit.io.vcf.vcf_to_zarrs" title="sgkit.io.vcf.vcf_to_zarrs"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarrs()</span></code></a> followed by <a class="reference internal" href="generated/sgkit.io.vcf.concat_zarrs.html#sgkit.io.vcf.concat_zarrs" title="sgkit.io.vcf.concat_zarrs"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.concat_zarrs()</span></code></a>.</p>
 </section>
 <section id="polyploid-and-mixed-ploidy-vcf">
-<h2><a class="toc-backref" href="#id9">Polyploid and mixed-ploidy VCF</a><a class="headerlink" href="#polyploid-and-mixed-ploidy-vcf" title="Permalink to this headline">#</a></h2>
+<h2><a class="toc-backref" href="#id10">Polyploid and mixed-ploidy VCF</a><a class="headerlink" href="#polyploid-and-mixed-ploidy-vcf" title="Permalink to this headline">#</a></h2>
 <p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function can be used to convert polyploid VCF
 data to Zarr files stored in sgkit’s Xarray data representation by specifying the
 ploidy of the dataset using the <code class="docutils literal notranslate"><span class="pre">ploidy</span></code> parameter.</p>
@@ -1383,15 +1429,15 @@ such as polysomic inheritance and hence it is necessary to understand the type o
 present within any given dataset.</p>
 </section>
 <section id="example-converting-1000-genomes-vcf-to-zarr">
-<h2><a class="toc-backref" href="#id10">Example: converting 1000 genomes VCF to Zarr</a><a class="headerlink" href="#example-converting-1000-genomes-vcf-to-zarr" title="Permalink to this headline">#</a></h2>
+<h2><a class="toc-backref" href="#id11">Example: converting 1000 genomes VCF to Zarr</a><a class="headerlink" href="#example-converting-1000-genomes-vcf-to-zarr" title="Permalink to this headline">#</a></h2>
 <p>This section shows how to convert the <a class="reference external" href="https://www.internationalgenome.org/">1000 genomes</a> dataset into Zarr format for analysis in sgkit.</p>
 <p>For reference, the conversion (not including downloading the data) took about an hour on a machine with 32 vCPUs and 128GB of memory (GCP e2-standard-32).</p>
 <section id="install-sgkit">
-<h3><a class="toc-backref" href="#id11">Install sgkit</a><a class="headerlink" href="#install-sgkit" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id12">Install sgkit</a><a class="headerlink" href="#install-sgkit" title="Permalink to this headline">#</a></h3>
 <p>Install the main package using conda or pip, and the VCF extra package using pip, as described in <a class="reference internal" href="user_guide.html#installation"><span class="std std-ref">Installation</span></a>.</p>
 </section>
 <section id="download-the-data">
-<h3><a class="toc-backref" href="#id12">Download the data</a><a class="headerlink" href="#download-the-data" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id13">Download the data</a><a class="headerlink" href="#download-the-data" title="Permalink to this headline">#</a></h3>
 <p>Run the following to download the 1000 genomes VCF files over FTP:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>mkdir -p data/1kg
 for contig in {1..22}; do
@@ -1402,7 +1448,7 @@ done
 </div>
 </section>
 <section id="run-the-conversion">
-<h3><a class="toc-backref" href="#id13">Run the conversion</a><a class="headerlink" href="#run-the-conversion" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id14">Run the conversion</a><a class="headerlink" href="#run-the-conversion" title="Permalink to this headline">#</a></h3>
 <p>Run the following Python code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sgkit.io.vcf</span> <span class="kn">import</span> <span class="n">vcf_to_zarr</span>
 <span class="kn">from</span> <span class="nn">dask.distributed</span> <span class="kn">import</span> <span class="n">Client</span>
@@ -1428,7 +1474,7 @@ so don’t worry if it doesn’t look like it’s progressing.</p>
 for the <code class="docutils literal notranslate"><span class="pre">fields</span></code> and <code class="docutils literal notranslate"><span class="pre">field_defs</span></code> parameters for <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a>.</p>
 </section>
 <section id="inspect-the-dataset">
-<h3><a class="toc-backref" href="#id14">Inspect the dataset</a><a class="headerlink" href="#inspect-the-dataset" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id15">Inspect the dataset</a><a class="headerlink" href="#inspect-the-dataset" title="Permalink to this headline">#</a></h3>
 <p>When the conversion is complete, have a look at the dataset as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;1kg.zarr&quot;</span><span class="p">)</span>
