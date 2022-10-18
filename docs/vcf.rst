@@ -181,6 +181,47 @@ cloud storage. You can access files stored on Amazon S3 or Google Cloud Storage
 using ``s3://`` or ``gs://`` URLs. Setting credentials or other options is
 typically achieved using environment variables for the underlying cloud store.
 
+Compression
+-----------
+
+Zarr offers a lot of flexibility over controlling how data is compressed. Each variable can use
+a different `compression algorithm <https://zarr.readthedocs.io/en/stable/tutorial.html#compressors>`_,
+and its own list of `filters <https://zarr.readthedocs.io/en/stable/tutorial.html#filters>`_.
+
+The :func:`sgkit.io.vcf.vcf_to_zarr` function tries to choose good defaults for compression, using
+information about the variable's dtype, and also the nature of the data being stored.
+
+For example, ``variant_position`` (from the VCF ``POS`` field) is a monotonically increasing integer
+(within a contig) so it benefits from using a delta encoding to store the differences in its values,
+since these are smaller integers that compress better. This encoding is specified using the NumCodecs
+`Delta <https://numcodecs.readthedocs.io/en/stable/delta.html>`_ codec as a Zarr filter.
+
+When converting from VCF you can specify the default compression algorithm to use for all variables
+by specifying ``compressor`` in the call to :func:`sgkit.io.vcf.vcf_to_zarr`. There are trade-offs
+between compression speed and size, which this `benchmark <http://alimanfoo.github.io/2016/09/21/genotype-compression-benchmark.html>`_
+does a good job of exploring.
+
+Sometimes you may want to override the compression for a particular variable. A good example of this
+is for VCF FORMAT fields that are floats. Floats don't compress well, and since there is a value for
+every sample they can take up a lot of space. In many cases full float precision is not needed,
+so it is a good idea to use a filter to transform the float to an int, that takes less space.
+
+For example, the following code creates an encoding that can be passed to :func:`sgkit.io.vcf.vcf_to_zarr`
+to store the VCF ``DS`` FORMAT field to 2 decimal places. (``DS`` is a dosage field that is between 0 and 2
+so we know it will fit into an unsigned 8-bit int.)::
+
+    from numcodecs import FixedScaleOffset
+
+    encoding = {
+        "call_DS": {
+            "filters": [FixedScaleOffset(offset=0, scale=100, dtype="f4", astype="u1")],
+        },
+    }
+
+Note that this encoding won't work for floats that may be NaN. Consider using
+`Quantize <https://numcodecs.readthedocs.io/en/stable/quantize.html>`_ (with ``astype=np.float16``)
+or `Bitround <https://numcodecs.readthedocs.io/en/stable/bitround.html>`_ in that case.
+
 .. _vcf_low_level_operation:
 
 Low-level operation
