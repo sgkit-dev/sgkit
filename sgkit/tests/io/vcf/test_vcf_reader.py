@@ -14,7 +14,7 @@ from sgkit.io.vcf import (
     partition_into_regions,
     vcf_to_zarr,
 )
-from sgkit.io.vcf.vcf_reader import zarr_array_sizes
+from sgkit.io.vcf.vcf_reader import FloatFormatFieldWarning, zarr_array_sizes
 from sgkit.tests.io.test_dataset import assert_identical
 
 from .utils import path_for_test
@@ -297,6 +297,20 @@ def test_vcf_to_zarr__parallel_compressor_and_filters(
     assert z["variant_position"].filters == [
         Delta(dtype="i4", astype="i4")
     ]  # sgkit default
+
+
+def test_vcf_to_zarr__float_format_field_warning(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "simple.output.mixed_depth.likelihoods.vcf")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    with pytest.warns(FloatFormatFieldWarning):
+        vcf_to_zarr(
+            path,
+            output,
+            ploidy=4,
+            max_alt_alleles=3,
+            fields=["FORMAT/GL"],
+        )
 
 
 @pytest.mark.parametrize(
