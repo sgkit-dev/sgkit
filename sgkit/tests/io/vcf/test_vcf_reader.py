@@ -168,6 +168,11 @@ def test_vcf_to_zarr__large_vcf(shared_datadir, is_path, tmp_path):
     assert ds["variant_allele"].dtype == "O"
     assert ds["variant_id"].dtype == "O"
 
+    # check underlying zarr chunk size is 1 in samples dim
+    za = zarr.open(output)
+    assert za["sample_id"].chunks == (1,)
+    assert za["call_genotype"].chunks == (5000, 1, 2)
+
 
 def test_vcf_to_zarr__plain_vcf_with_no_index(shared_datadir, tmp_path):
     path = path_for_test(
