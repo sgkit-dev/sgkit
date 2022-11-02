@@ -525,6 +525,10 @@ def vcf_to_zarr_sequential(
             ds.attrs["filters"] = filters
             ds.attrs["vcf_zarr_version"] = "0.1"
             ds.attrs["vcf_header"] = vcf.raw_header
+            try:
+                ds.attrs["contig_lengths"] = vcf.seqlens
+            except AttributeError:
+                pass
 
             for field_handler in field_handlers:
                 field_handler.update_dataset(ds)
