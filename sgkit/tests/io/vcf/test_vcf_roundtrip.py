@@ -199,6 +199,9 @@ def test_all_fields(
     assert allel_ds_contigs <= sg_ds_contigs
     del allel_ds.attrs["contigs"]
     del sg_ds.attrs["contigs"]
+    # scikit-allel doesn't store contig lengths
+    if "contig_lengths" in sg_ds.attrs:
+        del sg_ds.attrs["contig_lengths"]
 
     if allel_ds_contigs < sg_ds_contigs:
         # variant_contig variables are not comparable, so remove them before comparison
