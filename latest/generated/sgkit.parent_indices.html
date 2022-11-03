@@ -993,16 +993,16 @@ within the samples dimension.</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.10.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing pedigree structure.</p>
 </dd>
-<dt><strong>sample_id</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'sample_id'</span></code>)</dt><dd><p>Input variable name holding sample_id as defined by
+<dt><strong>sample_id</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'sample_id'</span></code>)</dt><dd><p>Input variable name holding sample_id as defined by
 <a class="reference internal" href="sgkit.variables.sample_id_spec.html#sgkit.variables.sample_id_spec" title="sgkit.variables.sample_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_id_spec</span></code></a>.</p>
 </dd>
-<dt><strong>parent_id</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'parent_id'</span></code>)</dt><dd><p>Input variable name holding parent_id as defined by
+<dt><strong>parent_id</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'parent_id'</span></code>)</dt><dd><p>Input variable name holding parent_id as defined by
 <a class="reference internal" href="sgkit.variables.parent_id_spec.html#sgkit.variables.parent_id_spec" title="sgkit.variables.parent_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.parent_id_spec</span></code></a>.</p>
 </dd>
-<dt><strong>missing</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'.'</span></code>)</dt><dd><p>A value indicating unknown parents within the
+<dt><strong>missing</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'.'</span></code>)</dt><dd><p>A value indicating unknown parents within the
 <a class="reference internal" href="sgkit.variables.parent_id_spec.html#sgkit.variables.parent_id_spec" title="sgkit.variables.parent_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.parent_id_spec</span></code></a> array.</p>
 </dd>
-<dt><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
+<dt><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
 the computed output variables.
 See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
@@ -1017,8 +1017,8 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the ‘missing’ value is a known sample identifier.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.10)"><strong>KeyError</strong></a> – If a parent identifier is not a known sample identifier.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the ‘missing’ value is a known sample identifier.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.11)"><strong>KeyError</strong></a> – If a parent identifier is not a known sample identifier.</p></li>
 </ul>
 </dd>
 </dl>

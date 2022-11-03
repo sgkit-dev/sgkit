@@ -992,26 +992,26 @@ title="Edit this page"
 <dd class="field-odd"><dl class="simple">
 <dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.10.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing pedigree structure.</p>
 </dd>
-<dt><strong>method</strong> : <span class="annotation terse">{‘diploid’, ‘Hamilton-Kerr’}</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘diploid’, ‘Hamilton-Kerr’]</span> (default: <code class="docutils literal notranslate"><span class="pre">'diploid'</span></code>)</dt><dd><p>The method used for kinship estimation. Defaults to “diploid”
+<dt><strong>method</strong> : <span class="annotation terse">{‘diploid’, ‘Hamilton-Kerr’}</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘diploid’, ‘Hamilton-Kerr’]</span> (default: <code class="docutils literal notranslate"><span class="pre">'diploid'</span></code>)</dt><dd><p>The method used for kinship estimation. Defaults to “diploid”
 which is only suitable for pedigrees in which all samples are
 diploids resulting from sexual reproduction.
 The “Hamilton-Kerr” method is suitable for autopolyploid and
 mixed-ploidy datasets following Hamilton and Kerr 2017 [1].</p>
 </dd>
-<dt><strong>parent</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'parent'</span></code>)</dt><dd><p>Input variable name holding parents of each sample as defined by
+<dt><strong>parent</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'parent'</span></code>)</dt><dd><p>Input variable name holding parents of each sample as defined by
 <a class="reference internal" href="sgkit.variables.parent_spec.html#sgkit.variables.parent_spec" title="sgkit.variables.parent_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.parent_spec</span></code></a>.
 If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
 using <a class="reference internal" href="sgkit.parent_indices.html#sgkit.parent_indices" title="sgkit.parent_indices"><code class="xref py py-func docutils literal notranslate"><span class="pre">parent_indices()</span></code></a>.</p>
 </dd>
-<dt><strong>stat_Hamilton_Kerr_tau</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'stat_Hamilton_Kerr_tau'</span></code>)</dt><dd><p>Input variable name holding stat_Hamilton_Kerr_tau as defined
+<dt><strong>stat_Hamilton_Kerr_tau</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'stat_Hamilton_Kerr_tau'</span></code>)</dt><dd><p>Input variable name holding stat_Hamilton_Kerr_tau as defined
 by <a class="reference internal" href="sgkit.variables.stat_Hamilton_Kerr_tau_spec.html#sgkit.variables.stat_Hamilton_Kerr_tau_spec" title="sgkit.variables.stat_Hamilton_Kerr_tau_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Hamilton_Kerr_tau_spec</span></code></a>.
 This variable is only required for the “Hamilton-Kerr” method.</p>
 </dd>
-<dt><strong>stat_Hamilton_Kerr_lambda</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'stat_Hamilton_Kerr_lambda'</span></code>)</dt><dd><p>Input variable name holding stat_Hamilton_Kerr_lambda as defined
+<dt><strong>stat_Hamilton_Kerr_lambda</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'stat_Hamilton_Kerr_lambda'</span></code>)</dt><dd><p>Input variable name holding stat_Hamilton_Kerr_lambda as defined
 by <a class="reference internal" href="sgkit.variables.stat_Hamilton_Kerr_lambda_spec.html#sgkit.variables.stat_Hamilton_Kerr_lambda_spec" title="sgkit.variables.stat_Hamilton_Kerr_lambda_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Hamilton_Kerr_lambda_spec</span></code></a>.
 This variable is only required for the “Hamilton-Kerr” method.</p>
 </dd>
-<dt><strong>allow_half_founders</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</dt><dd><p>If False (the default) then a ValueError will be raised if any
+<dt><strong>allow_half_founders</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</dt><dd><p>If False (the default) then a ValueError will be raised if any
 individuals only have a single recorded parent.
 If True then the unrecorded parent will be assumed to be
 a unique founder unrelated to all other founders.
@@ -1020,7 +1020,7 @@ the tau and lambda parameters for gametes contributing to the
 unrecorded parent will be assumed to be equal to those of the
 gamete originating from that parent.</p>
 </dd>
-<dt><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
+<dt><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
 the computed output variables.</p>
 </dd>
@@ -1034,14 +1034,14 @@ the computed output variables.</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If an unknown method is specified.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the pedigree contains a directed loop.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the diploid method is used with a non-diploid dataset.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the diploid method is used and the parents dimension does not
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If an unknown method is specified.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the pedigree contains a directed loop.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the diploid method is used with a non-diploid dataset.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the diploid method is used and the parents dimension does not
     have a length of two.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the Hamilton-Kerr method is used and a sample has more than
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the Hamilton-Kerr method is used and a sample has more than
     two contributing parents.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the pedigree contains half-founders and allow_half_founders=False.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the pedigree contains half-founders and allow_half_founders=False.</p></li>
 </ul>
 </dd>
 </dl>
