@@ -32,6 +32,7 @@ def test_vcf_to_zarr__small_vcf(shared_datadir, is_path, tmp_path):
     ds = xr.open_zarr(output)
 
     assert ds.attrs["contigs"] == ["19", "20", "X"]
+    assert "contig_lengths" not in ds.attrs
     assert_array_equal(ds["variant_contig"], [0, 0, 1, 1, 1, 1, 1, 1, 2])
     assert_array_equal(
         ds["variant_position"],
@@ -155,6 +156,8 @@ def test_vcf_to_zarr__large_vcf(shared_datadir, is_path, tmp_path):
     vcf_to_zarr(path, output, chunk_length=5_000)
     ds = xr.open_zarr(output)
 
+    assert ds.attrs["contigs"] == ["20", "21"]
+    assert ds.attrs["contig_lengths"] == [63025520, 48129895]
     assert ds["sample_id"].shape == (1,)
     assert ds["call_genotype"].shape == (19910, 1, 2)
     assert ds["call_genotype_mask"].shape == (19910, 1, 2)
