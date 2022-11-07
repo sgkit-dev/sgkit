@@ -405,6 +405,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.window_by_genome.html">
+     sgkit.window_by_genome
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="generated/sgkit.window_by_position.html">
      sgkit.window_by_position
     </a>
@@ -1488,13 +1493,16 @@ are “windowing aware” and will compute values for windows defined in a datas
 are defined then the values will typically be computed for each variant. It is therefore
 important to define windows <em>before</em> computing statistics on a dataset.</p>
 <p>Windows are intervals that span the <code class="docutils literal notranslate"><span class="pre">variants</span></code> dimension in a dataset, and they are defined
-using the <a class="reference internal" href="generated/sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_variant()</span></code></a> and <a class="reference internal" href="generated/sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_position()</span></code></a> functions.
-The first function, <a class="reference internal" href="generated/sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_variant()</span></code></a>, is the simplest and produces windows with
+using the <a class="reference internal" href="generated/sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_variant()</span></code></a>, <a class="reference internal" href="generated/sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_position()</span></code></a>, and
+<a class="reference internal" href="generated/sgkit.window_by_genome.html#sgkit.window_by_genome" title="sgkit.window_by_genome"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_genome()</span></code></a> functions.</p>
+<p>The first function, <a class="reference internal" href="generated/sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_variant()</span></code></a>, is the simplest and produces windows with
 a fixed number of variants in each window, determined by the <code class="docutils literal notranslate"><span class="pre">size</span></code> argument. An
 optional <code class="docutils literal notranslate"><span class="pre">step</span></code> argument may be provided to control the spacing between windows. By default,
 it is the same as the <code class="docutils literal notranslate"><span class="pre">size</span></code>, giving contiguous windows.</p>
 <p>The second function, <a class="reference internal" href="generated/sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_position()</span></code></a>, produces windows whose size is measured
 by genomic position (base pairs). See the API documentation for usage and examples.</p>
+<p>The third function, <a class="reference internal" href="generated/sgkit.window_by_genome.html#sgkit.window_by_genome" title="sgkit.window_by_genome"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_genome()</span></code></a>, produces a single window spanning the whole
+genome, which can be used to compute whole-genome statistics.</p>
 <p>This example shows the effect of computing the diversity statistic: first with no windows defined,
 then with windows.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [40]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>

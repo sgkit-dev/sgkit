@@ -118,6 +118,7 @@ Utilities
    infer_variant_ploidy
    parent_indices
    simulate_genotype_call_dataset
+   window_by_genome
    window_by_position
    window_by_variant
 
