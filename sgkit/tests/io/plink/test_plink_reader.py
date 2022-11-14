@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
+import sgkit as sg
 from sgkit.io.plink import read_plink
 
 # This data was generated externally using Hail
@@ -151,3 +152,16 @@ def test_read_stat_alt_alleles(ds1):
         ds1["call_genotype"].clip(0, 2).sum(dim="ploidy").sum(dim="variants").values
     )
     np.testing.assert_equal(n_alt_alleles, [102, 95, 98, 94, 88, 91, 90, 98, 96, 103])
+
+
+def test_allele_frequency(ds1):
+    test_idx = np.array([0, 2, 5, 6, 7, 8])
+    test_expected = np.array(
+        ["G", "ACT", "ACT", "CGCGCG", "T", "T"], dtype=np.dtype("|S6")
+    )
+    ds_sub = sg.call_allele_frequencies(ds1.isel(variants=test_idx))
+    minor_allele = ds_sub.call_allele_count.sum(dim="samples").argmin(dim="alleles")
+    np.testing.assert_equal(
+        ds_sub.variant_allele.values[np.arange(len(minor_allele)), minor_allele.values],
+        test_expected,
+    )
