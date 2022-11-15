@@ -50,6 +50,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.extlinks",
     "scanpydoc",
     "IPython.sphinxext.ipython_console_highlighting",
     "IPython.sphinxext.ipython_directive",
@@ -57,6 +58,12 @@ extensions = [
     "ablog",
     *[p.stem for p in (HERE / "extensions").glob("*.py")],
 ]
+
+extlinks = {
+    "issue": ("https://github.com/pystatgen/sgkit/issues/%s", "GH %s"),
+    "pr": ("https://github.com/pystatgen/sgkit/pull/%s", "PR %s"),
+    "user": ("https://github.com/%s", "%s"),
+}
 
 
 # Workaround https://github.com/agronholm/sphinx-autodoc-typehints/issues/123
