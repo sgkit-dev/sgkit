@@ -132,7 +132,7 @@ def read_plink(
     fam_sep: str = " ",
     bim_sep: str = "\t",
     bim_int_contig: bool = False,
-    count_a1: bool = True,
+    count_a1: bool = False,
     lock: bool = False,
     persist: bool = True,
 ) -> Dataset:
@@ -176,11 +176,13 @@ def read_plink(
         encountered in the first `.bim` field.
     count_a1
         Whether or not allele counts should be for A1 or A2,
-        by default True. Typically A1 is the minor allele
+        by default False. Typically A1 is the minor allele
         and should be counted instead of A2. This is not enforced
         by PLINK though and it is up to the data generating process
         to ensure that A1 is in fact an alternate/minor/effect
-        allele. See https://www.cog-genomics.org/plink/1.9/formats
+        allele. Note that `count_a1` is not currently supported,
+        please open an issue if this is something you need.
+        See https://www.cog-genomics.org/plink/1.9/formats
         for more details.
     lock
         Whether or not to synchronize concurrent reads of `.bed`
@@ -229,6 +231,10 @@ def read_plink(
     if path and (bed_path or bim_path or fam_path):
         raise ValueError(
             "Either `path` or all 3 of `{bed,bim,fam}_path` must be specified but not both"
+        )
+    if count_a1:
+        raise NotImplementedError(
+            "`count_a1=True` currently not supported, please open an issue if this is something you need"
         )
     if path:
         bed_path, bim_path, fam_path = [

@@ -130,14 +130,14 @@ def test_read_call_values(ds1):
         [
             [1, 0],
             [1, 0],
-            [1, 1],
-            [1, 1],
+            [0, 0],
+            [0, 0],
             [-1, -1],
-            [0, 0],
-            [0, 0],
+            [1, 1],
             [1, 1],
             [0, 0],
-            [0, 0],
+            [1, 1],
+            [1, 1],
         ]
     )
     gt = ds1["call_genotype"].values
@@ -160,7 +160,7 @@ def test_read_stat_alt_alleles(ds1):
     n_alt_alleles = (
         ds1["call_genotype"].clip(0, 2).sum(dim="ploidy").sum(dim="variants").values
     )
-    np.testing.assert_equal(n_alt_alleles, [102, 95, 98, 94, 88, 91, 90, 98, 96, 103])
+    np.testing.assert_equal(n_alt_alleles, [88, 85, 84, 80, 84, 75, 82, 76, 88, 81])
 
 
 def test_allele_frequency(ds1):
@@ -176,9 +176,6 @@ def test_allele_frequency(ds1):
     )
 
 
-@pytest.mark.parametrize(
-    "ds2", [dict(count_a1=True), dict(count_a1=False)], indirect=True
-)
 def test_allele_order(ds2):
     # check allele order: REF=A1, ALT=A2
     np.testing.assert_equal(
@@ -197,3 +194,9 @@ def test_allele_order(ds2):
         mean_af,
         np.array([[0.3, 0.7], [0.4, 0.6]]),
     )
+
+
+def test_count_a1_not_implemented(shared_datadir):
+    path = shared_datadir / example_dataset_2
+    with pytest.raises(NotImplementedError):
+        read_plink(path=path, count_a1=True)
