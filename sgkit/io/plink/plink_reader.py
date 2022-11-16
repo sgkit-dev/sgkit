@@ -176,13 +176,10 @@ def read_plink(
         encountered in the first `.bim` field.
     count_a1
         Whether or not allele counts should be for A1 or A2,
-        by default False. Typically A1 is the minor allele
-        and should be counted instead of A2. This is not enforced
-        by PLINK though and it is up to the data generating process
-        to ensure that A1 is in fact an alternate/minor/effect
-        allele. Note that `count_a1` is not currently supported,
-        please open an issue if this is something you need.
-        See https://www.cog-genomics.org/plink/1.9/formats
+        by default False. Note that `count_a1=True` is not
+        currently supported, please open an issue if this is
+        something you need.
+        See https://www.cog-genomics.org/plink/1.9/data#ax_allele
         for more details.
     lock
         Whether or not to synchronize concurrent reads of `.bed`
