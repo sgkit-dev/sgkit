@@ -180,7 +180,8 @@ def get_default_vcf_encoding(ds, chunk_length, chunk_width, compressor):
         elif dim == "samples":
             return chunk_width
         else:
-            return size
+            # Avoid chunk size of 0
+            return max(size, 1)
 
     default_encoding = {}
     for var in ds.data_vars:
