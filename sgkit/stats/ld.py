@@ -275,17 +275,18 @@ def _ld_matrix(
     else:
         scores = np.empty(0)
 
-    rows = _ld_matrix_jit(
-        x,
-        chunk_window_starts,
-        chunk_window_stops,
-        abs_chunk_start,
-        chunk_max_window_start,
-        index_dtype,
-        value_dtype,
-        threshold,
-        scores,
-    )
+    with np.errstate(divide="ignore", invalid="ignore"):
+        rows = _ld_matrix_jit(
+            x,
+            chunk_window_starts,
+            chunk_window_stops,
+            abs_chunk_start,
+            chunk_max_window_start,
+            index_dtype,
+            value_dtype,
+            threshold,
+            scores,
+        )
 
     # convert rows to dataframe
     cols = [
