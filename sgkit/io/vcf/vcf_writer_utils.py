@@ -123,7 +123,7 @@ def ftoa(buf, p, value):
         return copy(buf, p, INF[0])
 
     # integer part
-    p = itoa(buf, p, int(value))
+    p = itoa(buf, p, int(np.around(value, 3)))
 
     # fractional part
     i = int(np.around(value * 1000))
@@ -260,7 +260,7 @@ def vcf_fixed_to_byte_buf_size(contigs, id, alleles, filters):
     buf_size += 1  # TAB
 
     # REF ALT
-    buf_size += len(alleles) * (alleles.dtype.itemsize + 1)
+    buf_size += alleles.shape[1] * (alleles.dtype.itemsize + 1)
     buf_size += 1  # TAB
 
     # QUAL
@@ -534,10 +534,14 @@ def vcf_info_to_byte_buf(buf, p, j, indexes, mask, info_prefixes, *arrays):
 
 
 def vcf_info_to_byte_buf_size(info_prefixes, *arrays):
+    if len(info_prefixes) == 0:
+        # DOT + TAB
+        return 2
+
     buf_size = 0
 
     buf_size += len(info_prefixes) * info_prefixes.dtype.itemsize  # prefixes
-    buf_size += len(info_prefixes)  # separators
+    buf_size += len(info_prefixes)  # separators (SEMICOLON and final TAB)
     buf_size += sum(len(a) for a in arrays)  # values
 
     return buf_size

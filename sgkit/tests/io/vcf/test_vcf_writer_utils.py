@@ -120,7 +120,7 @@ def test_vcf_fixed_to_byte_buf():
     filter_ = np.array([[True, False, False], [False, True, True]], dtype="bool")
 
     buf_size = vcf_fixed_to_byte_buf_size(contigs, id, alleles, filters)
-    assert buf_size == 60
+    assert buf_size == 63
 
     buf = np.empty(buf_size, dtype=np.uint8)
     p = vcf_fixed_to_byte_buf(

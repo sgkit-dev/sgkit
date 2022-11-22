@@ -62,6 +62,9 @@ def dataset_to_vcf(
 
         print(header_str, end="", file=output)
 
+        if n_variants == 0:
+            return
+
         header_info_fields = _info_fields(header_str)
         header_format_fields = _format_fields(header_str)
 
@@ -169,7 +172,7 @@ def dataset_to_vcf(
 
         buf_size = (
             vcf_fixed_to_byte_buf_size(contigs, id, alleles, filters)
-            + vcf_info_to_byte_buf_size(info_prefixes, info_bufs)
+            + vcf_info_to_byte_buf_size(info_prefixes, *info_bufs)
             + vcf_format_names_to_byte_buf_size(format_names)
             + sum(len(format_buf) for format_buf in format_bufs)
         )
