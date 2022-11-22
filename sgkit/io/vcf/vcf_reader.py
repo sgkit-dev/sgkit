@@ -307,9 +307,10 @@ class InfoAndFormatFieldHandler(VcfFieldHandler):
 
     def update_dataset(self, ds: xr.Dataset) -> None:
         # cyvcf2 represents missing Integer values as the minimum int32 value
-        # so change these to be the missing value
+        # and fill as minimum int32 value + 1, so change these to our missing and fill values
         if self.array.dtype == np.int32:
             self.array[self.array == np.iinfo(np.int32).min] = INT_MISSING
+            self.array[self.array == np.iinfo(np.int32).min + 1] = INT_FILL
 
         ds[self.variable_name] = (self.dims, self.array)
         if len(self.description) > 0:

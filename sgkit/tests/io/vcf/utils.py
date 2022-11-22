@@ -56,7 +56,9 @@ def assert_vcfs_close(f1, f2, *, rtol=1e-05, atol=1e-03):
                 atol=atol,
                 err_msg=f"QUAL not equal for variants\n{v1}{v2}",
             )
-            assert v1.FILTERS == v2.FILTERS, f"FILTER not equal for variants\n{v1}{v2}"
+            assert set(v1.FILTERS) == set(
+                v2.FILTERS
+            ), f"FILTER not equal for variants\n{v1}{v2}"
 
             assert (
                 dict(v1.INFO).keys() == dict(v2.INFO).keys()
