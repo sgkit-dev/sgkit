@@ -535,8 +535,9 @@ def test_pedigree_kinship__half_founder(method):
     )
 
 
+@pytest.mark.parametrize("initial_kinship", [True, False])
 @pytest.mark.parametrize("method", ["diploid", "Hamilton-Kerr"])
-def test_pedigree_kinship__raise_on_half_founder(method):
+def test_pedigree_kinship__raise_on_half_founder(method, initial_kinship):
     ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=5)
     ds["parent_id"] = ["samples", "parents"], [
         [".", "."],
@@ -548,8 +549,16 @@ def test_pedigree_kinship__raise_on_half_founder(method):
     if method == "Hamilton-Kerr":
         ds["stat_Hamilton_Kerr_tau"] = xr.ones_like(ds["parent_id"], dtype=np.uint8)
         ds["stat_Hamilton_Kerr_lambda"] = xr.zeros_like(ds["parent_id"], dtype=float)
+    if initial_kinship:
+        ds["founder_kinship"] = ["founders", "founders"], [[0.5, 0.0], [0.0, 0.5]]
+        ds["founder_indices"] = ["founders"], [0, 1]
+        kwargs = dict(
+            founder_kinship="founder_kinship", founder_indices="founder_indices"
+        )
+    else:
+        kwargs = dict()
     with pytest.raises(ValueError, match="Pedigree contains half-founders"):
-        pedigree_kinship(ds, method=method).compute()
+        pedigree_kinship(ds, method=method, **kwargs).compute()
 
 
 def test_pedigree_kinship__diploid_raise_on_parent_dimension():
@@ -591,6 +600,206 @@ def test_pedigree_kinship__raise_on_invalid_method():
     ]
     with pytest.raises(ValueError, match="Unknown method 'unknown'"):
         pedigree_kinship(ds, method="unknown")
+
+
+@pytest.mark.parametrize("method", ["diploid", "Hamilton-Kerr"])
+@pytest.mark.parametrize("permute", [False, True])
+@pytest.mark.parametrize(
+    "n_unknown, n_unknown_founders, n_known, n_known_founders, seed",
+    [
+        (10, 2, 10, 2, 0),
+        (50, 10, 100, 20, 1),
+        (100, 10, 1000, 100, 2),
+    ],
+)
+def test_pedigree_kinship__projection(
+    method, n_unknown, n_unknown_founders, n_known, n_known_founders, permute, seed
+):
+    # Simulate a pedigree with unknown and known sections and compute
+    # the kinship among founders of the known section based on the
+    # full pedigree.
+    # Kinship among known "founders" is then used to initialise kinship
+    # estimation for the rest of the known pedigree.
+    # The resulting kinship estimations for the known pedigree should
+    # match those of the same samples within the full pedigree.
+    n_total = n_unknown + n_known
+    unknown_pedigree = random_parent_matrix(
+        n_unknown, n_unknown_founders, seed=seed, selfing=True, permute=permute
+    )
+    known_pedigree = random_parent_matrix(
+        n_known, n_known_founders, seed=seed + 42, selfing=True, permute=permute
+    )
+    full_pedigree = np.concatenate((unknown_pedigree, known_pedigree))
+    # adjust indices of known samples within full pedigree and randomize known "founder" parents
+    full_pedigree[n_unknown:] += n_unknown
+    founder_idx = (full_pedigree == n_unknown - 1).all(axis=-1)
+    full_pedigree[founder_idx] = np.random.randint(
+        0, n_unknown, size=(founder_idx.sum(), 2)
+    )
+    # compute kinship for full pedigree and slice out expectation for known pedigree
+    ds_full = xr.Dataset()
+    ds_full["parent"] = ["samples", "parents"], full_pedigree
+    if method == "Hamilton-Kerr":
+        ds_full["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], np.random.randint(
+            1, 2, size=(n_total, 2)
+        )
+        ds_full["stat_Hamilton_Kerr_lambda"] = ["samples", "parents"], np.random.rand(
+            n_total * 2
+        ).reshape(n_total, 2)
+    ds_full = sg.pedigree_kinship(ds_full, method=method).compute()
+    expect = ds_full.stat_pedigree_kinship.values[n_unknown:, n_unknown:]
+    # compute kinship for known pedigree initialized with known founder kinships
+    ds_known = xr.Dataset()
+    ds_known["parent"] = ["samples", "parents"], known_pedigree
+    ds_known["founder_indices"] = ["founders"], np.where(
+        (known_pedigree < 0).all(axis=-1)
+    )[0]
+    founder_kinship = ds_full.stat_pedigree_kinship.values[founder_idx, :][
+        :, founder_idx
+    ]
+    ds_known["founder_kinship"] = ["founders", "founders"], founder_kinship
+    if method == "Hamilton-Kerr":
+        ds_known["stat_Hamilton_Kerr_tau"] = ds_full["stat_Hamilton_Kerr_tau"][
+            n_unknown:
+        ]
+        ds_known["stat_Hamilton_Kerr_lambda"] = ds_full["stat_Hamilton_Kerr_lambda"][
+            n_unknown:
+        ]
+    actual = sg.pedigree_kinship(
+        ds_known,
+        method=method,
+        founder_kinship="founder_kinship",
+        founder_indices="founder_indices",
+    ).stat_pedigree_kinship.values
+    np.testing.assert_array_equal(actual, expect)
+
+
+def test_pedigree_kinship__raise_on_single_founder_variable():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=5)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+        ["S1", "S2"],
+        ["S2", "S3"],
+    ]
+    ds1 = ds.copy()
+    ds1["founder_kinship"] = ["founders", "founders"], [[0.5, 0.1], [0.1, 0.5]]
+    with pytest.raises(
+        ValueError,
+        match="Variables founder_kinship and founder_indices must be specified together",
+    ):
+        pedigree_kinship(ds1, founder_kinship="founder_kinship")
+    ds2 = ds.copy()
+    ds2["founder_indices"] = ["founders"], [0, 1]
+    with pytest.raises(
+        ValueError,
+        match="Variables founder_kinship and founder_indices must be specified together",
+    ):
+        pedigree_kinship(ds2, founder_indices="founder_indices")
+
+
+def test_pedigree_kinship__raise_on_founder_variable_shape():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=5)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+        ["S1", "S2"],
+        ["S2", "S3"],
+    ]
+    ds["founder_kinship"] = ["founders", "founders"], [[0.5, 0.1], [0.1, 0.5]]
+    ds["founder_indices"] = ["founders2"], [0, 1, 2]
+    with pytest.raises(
+        ValueError,
+        match="Variables founder_kinship and founder_indices have mismatching dimensions",
+    ):
+        pedigree_kinship(
+            ds, founder_kinship="founder_kinship", founder_indices="founder_indices"
+        )
+
+
+def test_pedigree_kinship__raise_too_many_founders():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=5)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+        ["S1", "S2"],
+        ["S2", "S3"],
+    ]
+    ds["founder_kinship"] = ["founders", "founders"], np.random.rand(36).reshape(6, 6)
+    ds["founder_indices"] = ["founders"], np.arange(6)
+    with pytest.raises(
+        ValueError, match="The number of founders exceeds the total number of samples"
+    ):
+        pedigree_kinship(
+            ds, founder_kinship="founder_kinship", founder_indices="founder_indices"
+        )
+
+
+def test_pedigree_kinship__raise_on_missing_founder():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=5)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+        ["S1", "S2"],
+        ["S2", "S3"],
+    ]
+    ds["founder_kinship"] = ["founders", "founders"], [[0.5]]
+    ds["founder_indices"] = ["founders"], [0]
+    with pytest.raises(
+        ValueError, match="Initial kinship is not specified for all founders"
+    ):
+        pedigree_kinship(
+            ds, founder_kinship="founder_kinship", founder_indices="founder_indices"
+        ).compute()
+    ds["stat_Hamilton_Kerr_tau"] = xr.ones_like(ds.parent_id, dtype=int)
+    ds["stat_Hamilton_Kerr_lambda"] = xr.zeros_like(ds.parent_id, dtype=float)
+    with pytest.raises(
+        ValueError, match="Initial kinship is not specified for all founders"
+    ):
+        pedigree_kinship(
+            ds,
+            method="Hamilton-Kerr",
+            founder_kinship="founder_kinship",
+            founder_indices="founder_indices",
+        ).compute()
+
+
+def test_pedigree_kinship__raise_on_non_founder():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=5)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+        ["S1", "S2"],
+        ["S2", "S3"],
+    ]
+    ds["founder_kinship"] = ["founders", "founders"], [
+        [0.5, 0, 0],
+        [0, 0.5, 0],
+        [0.5, 0, 0],
+    ]
+    ds["founder_indices"] = ["founders"], [0, 1, 2]
+    with pytest.raises(
+        ValueError, match="Initial kinship is specified for a non-founder"
+    ):
+        pedigree_kinship(
+            ds, founder_kinship="founder_kinship", founder_indices="founder_indices"
+        ).compute()
+    ds["stat_Hamilton_Kerr_tau"] = xr.ones_like(ds.parent_id, dtype=int)
+    ds["stat_Hamilton_Kerr_lambda"] = xr.zeros_like(ds.parent_id, dtype=float)
+    with pytest.raises(
+        ValueError, match="Initial kinship is specified for a non-founder"
+    ):
+        pedigree_kinship(
+            ds,
+            method="Hamilton-Kerr",
+            founder_kinship="founder_kinship",
+            founder_indices="founder_indices",
+        ).compute()
 
 
 @pytest.mark.parametrize("selfing", [False, True])
