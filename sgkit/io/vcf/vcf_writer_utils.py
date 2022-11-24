@@ -25,6 +25,9 @@ ZERO = ord("0")
 PHASED = ord("|")
 UNPHASED = ord("/")
 
+INF = np.array(["inf"], dtype="S")
+NAN = np.array(["nan"], dtype="S")
+
 INT32_BUF_SIZE = len(str(np.iinfo(np.int32).min))
 FLOAT32_BUF_SIZE = INT32_BUF_SIZE + 4  # integer followed by '.' and 3 decimal places
 
@@ -110,10 +113,14 @@ def ftoa(buf, p, value):
     -------
     The position in the buffer after the last byte written.
     """
+    if np.isnan(value):
+        return copy(buf, p, NAN[0])
     if value < 0:
         buf[p] = MINUS
         p += 1
         value = -value
+    if np.isinf(value):
+        return copy(buf, p, INF[0])
 
     # integer part
     p = itoa(buf, p, int(value))

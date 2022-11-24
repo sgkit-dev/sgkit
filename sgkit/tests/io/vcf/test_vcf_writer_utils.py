@@ -80,6 +80,8 @@ def test_itoa_out_of_range():
         (1028.32, "1028.32"),
         (1028.329, "1028.329"),
         (1028.3217, "1028.322"),
+        (np.nan, "nan"),
+        (np.inf, "inf"),
     ],
 )
 def test_ftoa(f, a):
