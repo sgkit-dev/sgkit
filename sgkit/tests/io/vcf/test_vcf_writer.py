@@ -1,4 +1,5 @@
 import gzip
+from io import StringIO
 
 import pytest
 from cyvcf2 import VCF
@@ -6,10 +7,10 @@ from numpy.testing import assert_array_equal
 
 from sgkit.io.dataset import load_dataset
 from sgkit.io.vcf.vcf_reader import vcf_to_zarr, zarr_array_sizes
-from sgkit.io.vcf.vcf_writer import dataset_to_vcf
+from sgkit.io.vcf.vcf_writer import dataset_to_vcf, zarr_to_vcf
 
 from .utils import path_for_test
-from .vcf_writer import canonicalize_vcf, zarr_to_vcf
+from .vcf_writer import canonicalize_vcf
 
 
 def test_canonicalize_vcf(shared_datadir, tmp_path):
@@ -25,10 +26,11 @@ def test_canonicalize_vcf(shared_datadir, tmp_path):
         assert "NS=3;AN=6;AC=3,1;DP=9;AA=G" in f.read()
 
 
+@pytest.mark.parametrize("output_is_path", [True, False])
 @pytest.mark.filterwarnings(
     "ignore::sgkit.io.vcfzarr_reader.DimensionNameForFixedFormatFieldWarning",
 )
-def test_zarr_to_vcf(shared_datadir, tmp_path):
+def test_zarr_to_vcf(shared_datadir, tmp_path, output_is_path):
     path = path_for_test(shared_datadir, "sample.vcf.gz")
     intermediate = tmp_path.joinpath("intermediate.vcf.zarr").as_posix()
     output = tmp_path.joinpath("output.vcf").as_posix()
@@ -38,7 +40,14 @@ def test_zarr_to_vcf(shared_datadir, tmp_path):
         path, intermediate, fields=["INFO/*", "FORMAT/*"], mixed_ploidy=True, **kwargs
     )
 
-    zarr_to_vcf(intermediate, output)
+    if output_is_path:
+        output = tmp_path.joinpath("output.vcf").as_posix()
+        zarr_to_vcf(intermediate, output)
+    else:
+        output_str = StringIO()
+        zarr_to_vcf(intermediate, output_str)
+        with open(output, "w") as f:
+            f.write(output_str.getvalue())
 
     v = VCF(output)
 
