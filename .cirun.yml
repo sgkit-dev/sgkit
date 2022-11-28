@@ -1,5 +1,5 @@
 # Self-Hosted Github Action Runners on GCP via Cirun.io
-# Reference: https://docs.cirun.io/reference/yaml.html
+# Reference: https://docs.cirun.io/reference/yaml
 runners:
   - name: gpu-runner
     # Cloud Provider: GCP
@@ -12,15 +12,24 @@ runners:
     # to reduce provision time
     # Format => project_name:image_name
     machine_image: sgkit-dev:cirun-nvidia
+    region:
+      - us-central1-a
+      - us-central1-b
+      - us-central1-c
+      - us-central1-f
+      - us-east1-c
+      - us-east1-d
+      - us-east4-a
+      - us-east4-b
+      - us-east4-c
+      - us-west1-a
+      - us-west1-b
+      - us-west2-b
+      - us-west2-c
+      - us-west4-a
+      - us-west4-b
     # preemptible instances seems quite less reliable.
     preemptible: false
-    # Path of the relevant workflow file
-    workflow: .github/workflows/build-gpu.yml
-    # Number of runners to provision on every trigger on Actions job
-    # 3 because testing on Python 3.8, 3.9, 3.10
-    # See .github/workflows/build-gpu.yml
-    count: 3
     # Adding the GPU label, this matches the runs-on param from .github/workflows/build-gpu.yml
-    # So that this runner is selected for running .github/workflows/build-gpu.yml
     labels:
-      - gpu
+      - cirun-gpu-runner
