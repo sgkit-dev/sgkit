@@ -696,6 +696,99 @@ def test_pedigree_kinship__projection(
     np.testing.assert_array_equal(actual, expect)
 
 
+def test_pedigree_kinship__projection_pedkin():
+    # test against the terminal tool "pedkin" version 1.6
+    # published in:
+    # Kirkpatrick B, Ge S and Wang L (2018) "Efficient computation
+    # of the kinship coefficients" Bioinformatics 35 (6) 1002-1008
+    # doi: 10.1093/bioinformatics/bty725.
+    # Notes:
+    # * the pedigree used within this test is kept relatively small
+    #   to minimize the effect of floating-point errors when converting
+    #   to/from text files.
+    # * pedkin expects and checks for a dioecious pedigree and
+    #   will not return kinships if an individual is used both as a
+    #   father and mother.
+    # * pedkin works with long-format lower diagonal matrices
+    #   with inbreeding (rather than self-kinship) on the diagonal.
+    n_samples = 30
+    n_founders = 10
+    # simulate "unknown" pedigree of founders
+    ds_founder = xr.Dataset()
+    ds_founder["parent"] = ["samples", "parents"], random_parent_matrix(50, 10, seed=0)
+    ds_founder = sg.pedigree_kinship(ds_founder).compute()
+    ds_founder = sg.pedigree_inbreeding(ds_founder).compute()
+    founder_kinship = ds_founder.stat_pedigree_kinship.values[
+        -n_founders:, -n_founders:
+    ]
+    # simulate known pedigree descending from founders
+    # this must have strictly male or female individuals
+    # which is achieved by treating even indices as male
+    # and odd indices as female
+    ds = xr.Dataset()
+    np.random.seed(1)
+    parent = np.full((n_samples, 2), -1, int)
+    for i in range(n_founders, n_samples):
+        parent[i, 0] = np.random.choice(range(0, i, 2))  # father
+        parent[i, 1] = np.random.choice(range(1, i, 2))  # mother
+    ds["parent"] = ["samples", "parents"], parent
+    ds["founder_kinship"] = ["founders", "founders"], founder_kinship
+    ds["founder_indices"] = ["founders"], np.arange(n_founders)
+    # transform sgkit data into files suitable for pedkin
+    #
+    #    # pedigree file (one-based indices)
+    #    pd.DataFrame(dict(
+    #        family=np.ones(n_samples, int),
+    #        sample=np.arange(n_samples) + 1,
+    #        father=ds.parent.values[:,0] + 1,
+    #        mother=ds.parent.values[:,1] + 1,
+    #        sex=np.arange(n_samples) % 2 + 1,  # alternate male/female
+    #        phenotype=np.zeros(n_samples, int),
+    #    )).to_csv("pedkin_sim_ped.txt", sep=" ", header=False, index=False)
+    #
+    #    # lower triangle founder kinship with inbreeding on diagonal
+    #    founder_matrix = founder_kinship.copy()
+    #    np.fill_diagonal(founder_matrix, founder_inbreeding)
+    #    x, y = np.tril_indices(n_founders)
+    #    pd.DataFrame(dict(
+    #        family=np.ones(len(x), int),
+    #        founder_x=x + 1,
+    #        founder_y=y + 1,
+    #        kinship=founder_matrix[(x, y)],
+    #    )).to_csv("pedkin_sim_founder.txt", sep=" ", header=False, index=False)
+    #
+    #    # interested in all samples
+    #    pd.DataFrame(dict(
+    #        family=np.ones(n_samples, int),
+    #        sample=np.arange(n_samples) + 1,
+    #    )).to_csv("pedkin_sim_interest.txt", sep=" ", header=False, index=False)
+    #
+    # run with pedkin version 1.6 in the shell
+    #
+    #    ./pedkin e pedkin_sim_ped.txt pedkin_sim_founder.txt pedkin_sim_interest.txt pedkin_sim_out.txt
+    #
+    # load values computed with "pedkin" and transform into a matrix
+    path = pathlib.Path(__file__).parent.absolute()
+    pedkin_out = pd.read_csv(
+        path / "test_pedigree/pedkin_sim_out.txt", header=None, sep=" "
+    )
+    x = pedkin_out[1].values - 1
+    y = pedkin_out[2].values - 1
+    k = pedkin_out[3].values
+    expect = np.empty((n_samples, n_samples))
+    expect[(x, y)] = k
+    expect[(y, x)] = k
+    # compute actual kinship matrix and replace diagonal with inbreeding
+    ds = sg.pedigree_kinship(
+        ds,
+        founder_kinship="founder_kinship",
+        founder_indices="founder_indices",
+    ).compute()
+    actual = ds.stat_pedigree_kinship.values.copy()
+    np.fill_diagonal(actual, np.diag(actual) * 2 - 1)
+    np.testing.assert_array_almost_equal(expect, actual)
+
+
 def test_pedigree_kinship__raise_on_single_founder_variable():
     ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=5)
     ds["parent_id"] = ["samples", "parents"], [
