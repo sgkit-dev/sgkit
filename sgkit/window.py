@@ -227,6 +227,76 @@ def window_by_position(
     )
 
 
+def window_by_interval(
+    ds: Dataset,
+    *,
+    variant_contig: Hashable = variables.variant_contig,
+    variant_position: Hashable = variables.variant_position,
+    interval_contig_name: Hashable = variables.interval_contig_name,
+    interval_start: Hashable = variables.interval_start,
+    interval_stop: Hashable = variables.interval_stop,
+    merge: bool = True,
+) -> Dataset:
+    """Add window information to a dataset, using arbitrary intervals.
+
+    Intervals are defined using the variables ``interval_contig_name``,
+    ``interval_start``, and ``interval_stop``, where the start and stop
+    range acts like a Python slice, so the start position is inclusive,
+    and the stop position is exclusive.
+
+    Windows are defined over the ``variants`` dimension, and are
+    used by some downstream functions to calculate statistics for
+    each window. Windows never span contigs.
+
+    Parameters
+    ----------
+    ds
+        Genotype call dataset.
+    variant_contig
+        Name of variable containing variant contig indexes.
+        Defined by :data:`sgkit.variables.variant_contig_spec`.
+    variant_position
+        Name of variable containing variant positions.
+        Must be monotonically increasing within a contig.
+        Defined by :data:`sgkit.variables.variant_position_spec`.
+    interval_contig_name
+        Name of variable containing interval contig names.
+        Defined by :data:`sgkit.variables.interval_contig_name`.
+    interval_start
+        Name of variable containing interval start positions.
+        Defined by :data:`sgkit.variables.interval_start`.
+    interval_stop
+        Name of variable containing interval stop positions.
+        Defined by :data:`sgkit.variables.interval_stop`.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing the following variables:
+
+    - :data:`sgkit.variables.window_contig_spec` (windows):
+      The index values of window contigs.
+    - :data:`sgkit.variables.window_start_spec` (windows):
+      The index values of window start positions.
+    - :data:`sgkit.variables.window_stop_spec` (windows):
+      The index values of window stop positions.
+    """
+    return _window_per_contig(
+        ds,
+        variant_contig,
+        merge,
+        _get_windows_by_interval,
+        ds[variant_position].values,
+        ds[interval_contig_name].values,
+        ds[interval_start].values,
+        ds[interval_stop].values,
+    )
+
+
 def _window_per_contig(
     ds: Dataset,
     variant_contig: Hashable,
@@ -245,9 +315,9 @@ def _window_per_contig(
     contig_window_contigs = []
     contig_window_starts = []
     contig_window_stops = []
-    for i in range(n_contigs):
+    for i, contig in enumerate(ds.attrs["contigs"]):
         starts, stops = windowing_fn(
-            contig_bounds[i], contig_bounds[i + 1], *args, **kwargs
+            contig, contig_bounds[i], contig_bounds[i + 1], *args, **kwargs
         )
         contig_window_starts.append(starts)
         contig_window_stops.append(stops)
@@ -334,7 +404,7 @@ def window_by_genome(
 
 
 def _get_windows(
-    start: int, stop: int, size: int, step: int
+    contig: str, start: int, stop: int, size: int, step: int
 ) -> Tuple[ArrayLike, ArrayLike]:
     # Find the indexes for the start positions of all windows
     window_starts = np.arange(start, stop, step)
@@ -343,6 +413,7 @@ def _get_windows(
 
 
 def _get_windows_by_position(
+    contig: str,
     start: int,
     stop: int,
     size: int,
@@ -364,6 +435,24 @@ def _get_windows_by_position(
             np.searchsorted(contig_pos, window_start_pos + offset + size) + start
         )
     return window_starts, window_stops
+
+
+def _get_windows_by_interval(
+    contig: str,
+    start: int,
+    stop: int,
+    positions: ArrayLike,
+    interval_contig_name: ArrayLike,
+    interval_start: ArrayLike,
+    interval_stop: ArrayLike,
+) -> Tuple[ArrayLike, ArrayLike]:
+    contig_pos = positions[start:stop]
+    window_start_pos = interval_start[interval_contig_name == contig]
+    window_stop_pos = interval_stop[interval_contig_name == contig]
+    window_starts = np.searchsorted(contig_pos, window_start_pos) + start
+    window_stops = np.searchsorted(contig_pos, window_stop_pos) + start
+    non_empty_windows = window_starts != window_stops
+    return window_starts[non_empty_windows], window_stops[non_empty_windows]
 
 
 # Computing statistics for windows (internal code)
@@ -394,7 +483,7 @@ def moving_statistic(
         raise ValueError(
             f"Minimum chunk size ({min_chunksize}) must not be smaller than size ({size})."
         )
-    window_starts, window_stops = _get_windows(0, length, size, step)
+    window_starts, window_stops = _get_windows(None, 0, length, size, step)
     return window_statistic(
         values, statistic, window_starts, window_stops, dtype, **kwargs
     )
