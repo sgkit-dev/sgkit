@@ -455,6 +455,33 @@ across all samples for a variant.
     )
 )
 
+interval_contig_name, interval_contig_name_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "interval_contig_name",
+        ndim=1,
+        kind={"S", "U", "O"},
+        __doc__="""Interval contig name. Must match a contig defined in the ``contigs`` attribute.""",
+    )
+)
+
+interval_start, interval_start_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "interval_start",
+        ndim=1,
+        kind="i",
+        __doc__="""Interval start position (inclusive).""",
+    )
+)
+
+interval_stop, interval_stop_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "interval_stop",
+        ndim=1,
+        kind="i",
+        __doc__="""Interval stop position (exclusive).""",
+    )
+)
+
 stat_identity_by_state, stat_identity_by_state_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "stat_identity_by_state",

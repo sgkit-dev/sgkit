@@ -3,9 +3,16 @@ import re
 import allel
 import dask.array as da
 import numpy as np
+import pandas as pd
 import pytest
+import xarray as xr
 
-from sgkit import simulate_genotype_call_dataset, window_by_position, window_by_variant
+from sgkit import (
+    simulate_genotype_call_dataset,
+    window_by_interval,
+    window_by_position,
+    window_by_variant,
+)
 from sgkit.utils import MergeWarning
 from sgkit.variables import window_contig, window_start, window_stop
 from sgkit.window import (
@@ -141,7 +148,7 @@ def test_window_by_variant__multiple_contigs(
     ],
 )
 def test_get_windows(start, stop, size, step, window_starts_exp, window_stops_exp):
-    window_starts, window_stops = _get_windows(start, stop, size, step)
+    window_starts, window_stops = _get_windows(None, start, stop, size, step)
     np.testing.assert_equal(window_starts, window_starts_exp)
     np.testing.assert_equal(window_stops, window_stops_exp)
 
@@ -273,3 +280,82 @@ def test_window_by_position__invalid_arguments():
         window_by_position(
             ds, size=10, step=5, window_start_position="variant_position"
         )
+
+
+def test_window_by_interval():
+    #  0 0 0 0 0 0 0 0 0 0 0 0  (contigs)
+    #
+    #                    1 1 1  (positions)
+    #  1 2 3 4 5 6 7 8 9 0 1 2
+    #
+    #  0     1   2   3       4  (variants)
+    #  [-------)   [-----)      (intervals)
+    ds = simulate_genotype_call_dataset(n_variant=5, n_sample=3, seed=0)
+    assert not has_windows(ds)
+    ds["variant_position"] = (
+        ["variants"],
+        np.array([1, 4, 6, 8, 12]),
+    )
+    ds["interval_contig_name"] = (["intervals"], np.array([0, 0]))
+    ds["interval_start"] = (["intervals"], np.array([1, 7]))
+    ds["interval_stop"] = (["intervals"], np.array([5, 10]))
+    ds = window_by_interval(ds)
+    assert has_windows(ds)
+    np.testing.assert_equal(ds[window_contig].values, [0, 0])
+    np.testing.assert_equal(ds[window_start].values, [0, 3])
+    np.testing.assert_equal(ds[window_stop].values, [2, 4])
+
+
+def test_window_by_interval__multiple_contigs():
+    #  0 0 0 0 0 0 0 0 0 0 0 0 1 1 ... 1 1 1 1 1 1 ... (contigs)
+    #
+    #                    1 1 1         2 2 2 2 2 2     (positions)
+    #  1 2 3 4 5 6 7 8 9 0 1 2 1 2 ... 0 1 2 3 4 5 ...
+    #
+    #  0     1   2   3       4 5         6       7 ... (variants)
+    #  [-------)   [-----)       [---------)       ... (intervals)
+
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=3, n_contig=2)
+    ds["variant_position"] = (
+        ["variants"],
+        np.array([1, 4, 6, 8, 12, 1, 21, 25, 40, 55]),
+    )
+    assert not has_windows(ds)
+    ds["interval_contig_name"] = (["intervals"], np.array([0, 0, 1, 1]))
+    ds["interval_start"] = (["intervals"], np.array([1, 7, 2, 30]))
+    ds["interval_stop"] = (["intervals"], np.array([5, 10, 22, 50]))
+    ds = window_by_interval(ds)
+    assert has_windows(ds)
+    np.testing.assert_equal(ds[window_contig].values, [0, 0, 1, 1])
+    np.testing.assert_equal(ds[window_start].values, [0, 3, 6, 8])
+    np.testing.assert_equal(ds[window_stop].values, [2, 4, 7, 9])
+
+
+def test_window_by_interval__bed(shared_datadir):
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=3, n_contig=2)
+    assert not has_windows(ds)
+    ds["variant_position"] = (
+        ["variants"],
+        np.array([1, 4, 6, 8, 12, 1, 21, 25, 40, 55]),
+    )
+    ds.attrs["contigs"] = ["chr0", "chr1"]
+
+    # load intervals from BED file
+    bed = pd.read_csv(
+        shared_datadir / "sample.bed",
+        delimiter="\t",
+        names=["interval_contig_name", "interval_start", "interval_stop"],
+    )
+    ds_intervals = bed.to_xarray().rename_dims(index="intervals")
+    # convert to 1-based coords (doesn't matter for this test, but it would if the dataset were loaded from VCF, for example)
+    ds_intervals["interval_start"] = ds_intervals["interval_start"] + 1
+    ds_intervals["interval_stop"] = ds_intervals["interval_stop"] + 1
+
+    # merge datasets
+    ds = xr.merge([ds, ds_intervals])
+
+    ds = window_by_interval(ds)
+    assert has_windows(ds)
+    np.testing.assert_equal(ds[window_contig].values, [0, 0, 1, 1, 1, 1])
+    np.testing.assert_equal(ds[window_start].values, [0, 4, 5, 6, 8, 9])
+    np.testing.assert_equal(ds[window_stop].values, [4, 5, 6, 8, 9, 10])
