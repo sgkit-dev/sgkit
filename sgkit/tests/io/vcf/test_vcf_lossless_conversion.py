@@ -4,7 +4,7 @@ from numcodecs import FixedScaleOffset
 from sgkit.io.vcf.vcf_reader import vcf_to_zarr, zarr_array_sizes
 from sgkit.io.vcf.vcf_writer import zarr_to_vcf
 
-from .utils import assert_allclose, path_for_test
+from .utils import assert_vcfs_close, path_for_test
 
 
 @pytest.mark.parametrize(
@@ -58,4 +58,4 @@ def test_lossless_conversion(shared_datadir, tmp_path, vcf_file, encoding):
 
     zarr_to_vcf(intermediate, output)
 
-    assert_allclose(path, output)
+    assert_vcfs_close(path, output)

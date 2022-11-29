@@ -16,7 +16,7 @@ def path_for_test(shared_datadir: Path, file: str, is_path: bool = True) -> Path
     return path if is_path else str(path)
 
 
-def assert_allclose(f1, f2, *, rtol=1e-05, atol=1e-03):
+def assert_vcfs_close(f1, f2, *, rtol=1e-05, atol=1e-03):
     """Like :py:func:`numpy.testing.assert_allclose()`, but for VCF files.
 
     Raises an `AssertionError` if two VCF files are not equal to one another.
