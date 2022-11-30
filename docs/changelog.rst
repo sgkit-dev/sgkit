@@ -36,6 +36,8 @@ New Features
 - Add ``auto_rechunk`` option to ``sgkit.save_dataset`` to automatically rechunk
   the dataset before saving it to disk, if necessary, as zarr requires equal chunk
   sizes. (:user:`benjeffery`, :pr:`988`, :issue:`981`)
+- Implement gene-ε for gene set association analysis.
+  (:user:`tomwhite`, :pr:`975`, :issue:`692`)
 
 Breaking changes
 ~~~~~~~~~~~~~~~~

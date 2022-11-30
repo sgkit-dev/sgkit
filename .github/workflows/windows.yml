@@ -32,8 +32,11 @@ jobs:
       run: |
         conda install --file requirements.txt msprime
         pip install -r requirements-dev.txt
-    - name: Test with pytest and coverage
+    - name: Test with pytest
       # activate conda
       shell: bash -l {0}
+      # To avoid: 'UserWarning: KMeans is known to have a memory leak on Windows with MKL, when there are less chunks than available threads. You can avoid it by setting the environment variable OMP_NUM_THREADS=1'
+      env:
+        OMP_NUM_THREADS: 1
       run: |
         pytest -v

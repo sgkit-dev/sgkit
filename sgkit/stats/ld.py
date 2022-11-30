@@ -113,7 +113,7 @@ def map_windows_as_dataframe(
         if len(window_starts) == chunk_offset_index_stop:
             # if there are no more windows, then need to process the all windows in this chunk entirely
             chunk_max_window_start = max_stop
-        else:
+        else:  # pragma: no cover
             # otherwise only process up the start of the next window
             chunk_max_window_start = (
                 window_starts[chunk_offset_index_stop] - chunk_starts[chunk_index]
