@@ -1,5 +1,5 @@
 import math
-from typing import Any, Hashable, List, Optional, Tuple
+from typing import Any, Callable, Hashable, List, Optional, Sequence, Tuple
 
 import dask
 import dask.array as da
@@ -72,6 +72,68 @@ def rogers_huff_r2_between(gn0: ArrayLike, gn1: ArrayLike) -> float:  # pragma: 
     return rogers_huff_r_between(gn0, gn1) ** 2  # type: ignore
 
 
+def map_windows_as_dataframe(
+    func: Callable[..., DataFrame],
+    *args: Sequence[ArrayLike],
+    window_starts: ArrayLike,
+    window_stops: ArrayLike,
+    meta: Optional[Any],
+    **kwargs: Any,
+) -> DataFrame:
+
+    # Get chunks in leading dimension
+    chunks = args[0].chunks[0]
+
+    # Find windows in each chunk
+    window_lengths = window_stops - window_starts
+
+    chunk_starts = _sizes_to_start_offsets(chunks)
+    rel_window_starts, windows_per_chunk = _get_chunked_windows(
+        chunks, window_starts, window_stops
+    )
+    rel_window_stops = rel_window_starts + window_lengths
+    chunk_offset_indexes = _sizes_to_start_offsets(windows_per_chunk)
+
+    def to_df(args: Sequence[ArrayLike], chunk_index: int) -> DataFrame:
+        chunk_offset_index_start = chunk_offset_indexes[chunk_index]
+        chunk_offset_index_stop = chunk_offset_indexes[chunk_index + 1]
+        chunk_window_starts = rel_window_starts[
+            chunk_offset_index_start:chunk_offset_index_stop
+        ]
+        chunk_window_stops = rel_window_stops[
+            chunk_offset_index_start:chunk_offset_index_stop
+        ]
+        max_stop = np.max(chunk_window_stops) if len(chunk_window_stops) > 0 else 0  # type: ignore[no-untyped-call]
+        abs_chunk_start = chunk_starts[chunk_index]
+        abs_chunk_end = abs_chunk_start + max_stop  # this may extend into later chunks
+        block_args = [arr[abs_chunk_start:abs_chunk_end] for arr in args]
+
+        # Look at the next window (not in this chunk) to find out where to stop processing
+        # windows in this chunk
+        if len(window_starts) == chunk_offset_index_stop:
+            # if there are no more windows, then need to process the all windows in this chunk entirely
+            chunk_max_window_start = max_stop
+        else:
+            # otherwise only process up the start of the next window
+            chunk_max_window_start = (
+                window_starts[chunk_offset_index_stop] - chunk_starts[chunk_index]
+            )
+
+        f = dask.delayed(func)(
+            block_args,
+            chunk_window_starts=chunk_window_starts,
+            chunk_window_stops=chunk_window_stops,
+            abs_chunk_start=abs_chunk_start,
+            chunk_max_window_start=chunk_max_window_start,
+            **kwargs,
+        )
+        return dd.from_delayed([f], meta=meta)
+
+    return dd.concat(
+        [to_df(args, chunk_index) for chunk_index in range(len(windows_per_chunk))]
+    )
+
+
 def ld_matrix(
     ds: Dataset,
     *,
@@ -130,81 +192,37 @@ def ld_matrix(
     if variant_score is not None:
         variables.validate(ds, {variant_score: variables.variant_score_spec})
         scores = da.asarray(ds[variant_score])
+        args = (x, scores)
     else:
         scores = None
+        args = (x,)
 
-    # Find windows in each chunk
-    window_starts = ds.window_start.values
-    window_stops = ds.window_stop.values
-    window_lengths = window_stops - window_starts
+    index_dtype = np.int32
+    value_dtype = np.float32
+    meta: List[Tuple[str, DType]] = [
+        ("i", index_dtype),
+        ("j", index_dtype),
+        ("value", value_dtype),
+    ]
+    if scores is not None:
+        meta.append(("cmp", np.int8))
 
-    chunks = x.chunks[0]
-    chunk_starts = _sizes_to_start_offsets(chunks)
-    rel_window_starts, windows_per_chunk = _get_chunked_windows(
-        chunks, window_starts, window_stops
-    )
-    rel_window_stops = rel_window_starts + window_lengths
-    chunk_offset_indexes = _sizes_to_start_offsets(windows_per_chunk)
-
-    def to_ld_df(x: ArrayLike, chunk_index: int) -> DataFrame:
-        chunk_offset_index_start = chunk_offset_indexes[chunk_index]
-        chunk_offset_index_stop = chunk_offset_indexes[chunk_index + 1]
-        chunk_window_starts = rel_window_starts[
-            chunk_offset_index_start:chunk_offset_index_stop
-        ]
-        chunk_window_stops = rel_window_stops[
-            chunk_offset_index_start:chunk_offset_index_stop
-        ]
-        max_stop = np.max(chunk_window_stops) if len(chunk_window_stops) > 0 else 0  # type: ignore[no-untyped-call]
-        abs_chunk_start = chunk_starts[chunk_index]
-        abs_chunk_end = abs_chunk_start + max_stop  # this may extend into later chunks
-        block_x = x[abs_chunk_start:abs_chunk_end]
-        block_scores = (
-            scores[abs_chunk_start:abs_chunk_end] if scores is not None else None
-        )
-
-        # Look at the next window (not in this chunk) to find out where to stop processing
-        # windows in this chunk (see _ld_matrix_jit)
-        if len(window_starts) == chunk_offset_index_stop:
-            # if there are no more windows, then need to process the all windows in this chunk entirely
-            chunk_max_window_start = max_stop
-        else:  # pragma: no cover
-            # otherwise only process up the start of the next window
-            chunk_max_window_start = (
-                window_starts[chunk_offset_index_stop] - chunk_starts[chunk_index]
-            )
-
-        index_dtype = np.int32
-        value_dtype = np.float32
-
-        f = dask.delayed(_ld_matrix)(
-            block_x,
-            chunk_window_starts,
-            chunk_window_stops,
-            abs_chunk_start,
-            chunk_max_window_start,
-            index_dtype,
-            value_dtype,
-            threshold=threshold,
-            scores=block_scores,
-        )
-        meta: List[Tuple[str, DType]] = [
-            ("i", index_dtype),
-            ("j", index_dtype),
-            ("value", value_dtype),
-        ]
-        if scores is not None:
-            meta.append(("cmp", np.int8))
-        return dd.from_delayed([f], meta=meta)
-
-    return dd.concat(
-        [to_ld_df(x, chunk_index) for chunk_index in range(len(windows_per_chunk))]
+    return map_windows_as_dataframe(
+        _ld_matrix,
+        *args,
+        window_starts=ds.window_start.values,
+        window_stops=ds.window_stop.values,
+        meta=meta,
+        index_dtype=index_dtype,
+        value_dtype=value_dtype,
+        threshold=threshold,
     )
 
 
 @numba_jit(nogil=True)  # type: ignore
 def _ld_matrix_jit(
     x: ArrayLike,
+    scores: ArrayLike,
     chunk_window_starts: ArrayLike,
     chunk_window_stops: ArrayLike,
     abs_chunk_start: int,
@@ -212,7 +230,6 @@ def _ld_matrix_jit(
     index_dtype: DType,
     value_dtype: DType,
     threshold: float,
-    scores: ArrayLike,
 ) -> List[Any]:  # pragma: no cover
 
     rows = list()
@@ -257,7 +274,7 @@ def _ld_matrix_jit(
 
 
 def _ld_matrix(
-    x: ArrayLike,
+    args: Sequence[ArrayLike],
     chunk_window_starts: ArrayLike,
     chunk_window_stops: ArrayLike,
     abs_chunk_start: int,
@@ -265,19 +282,19 @@ def _ld_matrix(
     index_dtype: DType,
     value_dtype: DType,
     threshold: float = np.nan,
-    scores: Optional[ArrayLike] = None,
 ) -> ArrayLike:
 
-    x = np.asarray(x)
+    x = np.asarray(args[0])
 
-    if scores is not None:
-        scores = np.asarray(scores)
+    if len(args) == 2:
+        scores = np.asarray(args[1])
     else:
         scores = np.empty(0)
 
     with np.errstate(divide="ignore", invalid="ignore"):
         rows = _ld_matrix_jit(
             x,
+            scores,
             chunk_window_starts,
             chunk_window_stops,
             abs_chunk_start,
@@ -285,7 +302,6 @@ def _ld_matrix(
             index_dtype,
             value_dtype,
             threshold,
-            scores,
         )
 
     # convert rows to dataframe
