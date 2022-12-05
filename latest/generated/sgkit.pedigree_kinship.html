@@ -995,12 +995,12 @@ title="Edit this page"
 <h1>sgkit.pedigree_kinship<a class="headerlink" href="#sgkit-pedigree-kinship" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgkit.pedigree_kinship">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">pedigree_kinship</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'diploid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'parent'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_Hamilton_Kerr_tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stat_Hamilton_Kerr_tau'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_Hamilton_Kerr_lambda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stat_Hamilton_Kerr_lambda'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_half_founders</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.pedigree_kinship" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">pedigree_kinship</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'diploid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'parent'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_Hamilton_Kerr_tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stat_Hamilton_Kerr_tau'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_Hamilton_Kerr_lambda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stat_Hamilton_Kerr_lambda'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_half_founders</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">founder_kinship</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">founder_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.pedigree_kinship" title="Permalink to this definition">#</a></dt>
 <dd><p>Estimate expected pairwise kinship coefficients from pedigree structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing pedigree structure.</p>
+<dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.12.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing pedigree structure.</p>
 </dd>
 <dt><strong>method</strong> : <span class="annotation terse">{‘diploid’, ‘Hamilton-Kerr’}</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘diploid’, ‘Hamilton-Kerr’]</span> (default: <code class="docutils literal notranslate"><span class="pre">'diploid'</span></code>)</dt><dd><p>The method used for kinship estimation. Defaults to “diploid”
 which is only suitable for pedigrees in which all samples are
@@ -1030,6 +1030,17 @@ the tau and lambda parameters for gametes contributing to the
 unrecorded parent will be assumed to be equal to those of the
 gamete originating from that parent.</p>
 </dd>
+<dt><strong>founder_kinship</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Optionally specify a matrix of pairwise kinship estimates among
+founder samples which will be used to initialize pedigree estimates
+as outlined by Goudet et al. 2018 [2].
+This variable must be a square matrix of shape (founders, founders)
+and must be used in conjunction with founder_indices.</p>
+</dd>
+<dt><strong>founder_indices</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Optionally specify an array of integer indices mapping rows/columns
+in the founder_kinship matrix to sample positions in the samples
+dimension (i.e., the order of rows in the parent array).
+This variable must have the same length as founder_kinship.</p>
+</dd>
 <dt><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
 the computed output variables.</p>
@@ -1037,7 +1048,7 @@ the computed output variables.</p>
 </dl>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.12.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.stat_pedigree_kinship_spec.html#sgkit.variables.stat_pedigree_kinship_spec" title="sgkit.variables.stat_pedigree_kinship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_kinship_spec</span></code></a>.</p>
@@ -1052,6 +1063,12 @@ the computed output variables.</p>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the Hamilton-Kerr method is used and a sample has more than
     two contributing parents.</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the pedigree contains half-founders and allow_half_founders=False.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If only one of the <code class="docutils literal notranslate"><span class="pre">founder_kinship</span></code> or <code class="docutils literal notranslate"><span class="pre">founder_indices</span></code>
+    variables is specified.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the <code class="docutils literal notranslate"><span class="pre">founder_kinship</span></code> or <code class="docutils literal notranslate"><span class="pre">founder_indices</span></code> variables have
+    inconsistent shapes.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If a founder is missing from the <code class="docutils literal notranslate"><span class="pre">founder_indices</span></code> array or if
+    a non-founder is indicated by this array.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1069,6 +1086,11 @@ are self-kinship estimates as opposed to inbreeding estimates.</p>
 <p class="admonition-title">Note</p>
 <p>Dimensions of <a class="reference internal" href="sgkit.variables.stat_pedigree_kinship_spec.html#sgkit.variables.stat_pedigree_kinship_spec" title="sgkit.variables.stat_pedigree_kinship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_kinship_spec</span></code></a> are named
 <code class="docutils literal notranslate"><span class="pre">samples_0</span></code> and <code class="docutils literal notranslate"><span class="pre">samples_1</span></code>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If founder kinships are specified for a half-founder, then that individual
+will be treated as a full-founder by ignoring its known parent.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1098,6 +1120,36 @@ variable must have either one or two non-zero values.</p>
 <span class="go">       [0.   , 0.5  , 0.25 , 0.125],</span>
 <span class="go">       [0.25 , 0.25 , 0.5  , 0.375],</span>
 <span class="go">       [0.375, 0.125, 0.375, 0.625]])</span>
+</pre></div>
+</div>
+<p>Inbred diploid pedigree with related founders:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([&#39;S0&#39;, &#39;S1&#39;, &#39;S2&#39;, &#39;S3&#39;], dtype=&#39;&lt;U2&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;parent_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;parents&quot;</span><span class="p">],</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;S0&quot;</span><span class="p">,</span> <span class="s2">&quot;S1&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;S0&quot;</span><span class="p">,</span> <span class="s2">&quot;S2&quot;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># add &quot;known&quot; kinships among founders</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;founder_kinship&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;founders&quot;</span><span class="p">,</span> <span class="s2">&quot;founders&quot;</span><span class="p">],</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># founder kinships correspond to the first two samples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;founder_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;founders&quot;</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">pedigree_kinship</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">ds</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">founder_kinship</span><span class="o">=</span><span class="s2">&quot;founder_kinship&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">founder_indices</span><span class="o">=</span><span class="s2">&quot;founder_indices&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;stat_pedigree_kinship&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([[0.5  , 0.1  , 0.3  , 0.4  ],</span>
+<span class="go">       [0.1  , 0.6  , 0.35 , 0.225],</span>
+<span class="go">       [0.3  , 0.35 , 0.55 , 0.425],</span>
+<span class="go">       [0.4  , 0.225, 0.425, 0.65 ]])</span>
 </pre></div>
 </div>
 <p>Somatic doubling and unreduced gamete:</p>
@@ -1162,9 +1214,11 @@ column to indicate clonal propagation:</p>
 </pre></div>
 </div>
 <p class="rubric">References</p>
-<p>[1] - Matthew G. Hamilton, and Richard J. Kerr 2017.
+<p>[1] - Matthew G. Hamilton and Richard J. Kerr 2017.
 “Computation of the inverse additive relationship matrix for autopolyploid
 and multiple-ploidy populations.” Theoretical and Applied Genetics 131: 851-860.</p>
+<p>[2] - Jérôme Goudet, Tomas Kay and Bruce S. Weir 2018.
+“How to estimate kinship.” Molecular Ecology 27: 4121-4135.</p>
 </dd></dl>
 
 </section>
