@@ -36,7 +36,7 @@ def test_vcf_values(data):
 
 
 @given(vcf_string=vcf())
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], deadline=None)
 @pytest.mark.filterwarnings(
     "ignore::sgkit.io.vcf.FloatFormatFieldWarning",
     "ignore::sgkit.io.vcfzarr_reader.DimensionNameForFixedFormatFieldWarning",
