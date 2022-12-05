@@ -1,4 +1,4 @@
-from typing import Hashable, Tuple, Union
+from typing import Hashable, Tuple
 
 import dask.array as da
 import numpy as np
@@ -110,7 +110,7 @@ def parent_indices(
 
 
 @numba_jit
-def topological_argsort(parent: ArrayLike) -> ArrayLike:  # pragma: no cover
+def topological_argsort(parent: ArrayLike) -> ArrayLike:
     """Find a topological ordering of samples within a pedigree such
     that no individual occurs before its parents.
 
@@ -174,7 +174,7 @@ def topological_argsort(parent: ArrayLike) -> ArrayLike:  # pragma: no cover
 
 
 @numba_jit
-def _is_pedigree_sorted(parent: ArrayLike) -> bool:  # pragma: no cover
+def _is_pedigree_sorted(parent: ArrayLike) -> bool:
     n_samples, n_parents = parent.shape
     for i in range(n_samples):
         for j in range(n_parents):
@@ -185,9 +185,7 @@ def _is_pedigree_sorted(parent: ArrayLike) -> bool:  # pragma: no cover
 
 
 @numba_jit
-def _raise_on_half_founder(
-    parent: ArrayLike, tau: ArrayLike = None
-) -> None:  # pragma: no cover
+def _raise_on_half_founder(parent: ArrayLike, tau: ArrayLike = None) -> None:
     for i in range(len(parent)):
         p = parent[i, 0]
         q = parent[i, 1]
@@ -204,9 +202,7 @@ def _raise_on_half_founder(
 
 
 @numba_jit
-def _insert_diploid_self_kinship(
-    kinship: ArrayLike, parent: ArrayLike, i: int
-) -> None:  # pragma: no cover
+def _insert_diploid_self_kinship(kinship: ArrayLike, parent: ArrayLike, i: int) -> None:
     # self kinship of i with parents p and q
     p = parent[i, 0]
     q = parent[i, 1]
@@ -219,7 +215,7 @@ def _insert_diploid_self_kinship(
 @numba_jit
 def _insert_diploid_pair_kinship(
     kinship: ArrayLike, parent: ArrayLike, i: int, j: int
-) -> None:  # pragma: no cover
+) -> None:
     # kinship of i with j where j < i and i has parents p and q
     p = parent[i, 0]
     q = parent[i, 1]
@@ -233,7 +229,7 @@ def _insert_diploid_pair_kinship(
 @numba_jit
 def kinship_diploid(
     parent: ArrayLike, allow_half_founders: bool = False, dtype: type = np.float64
-) -> ArrayLike:  # pragma: no cover
+) -> ArrayLike:
     """Calculate pairwise expected kinship from a pedigree assuming all
     individuals are diploids.
 
@@ -268,7 +264,7 @@ def kinship_diploid(
         If the parents dimension does not have a length of 2.
     """
     if parent.shape[1] != 2:
-        raise ValueError("Parent matrix must have shape (samples, 2)")
+        raise ValueError("The parents dimension must be length 2")
     if not allow_half_founders:
         _raise_on_half_founder(parent)
     n = len(parent)
@@ -294,9 +290,105 @@ def kinship_diploid(
 
 
 @numba_jit
-def _inbreeding_as_self_kinship(
-    inbreeding: float, ploidy: int
-) -> float:  # pragma: no cover
+def _identify_founders_diploid(parent: ArrayLike) -> ArrayLike:
+    n = len(parent)
+    out = np.zeros(n, dtype=np.bool8)
+    for i in range(n):
+        if (parent[i, 0] < 0) or (parent[i, 1] < 0):
+            out[i] = True
+    return out
+
+
+@numba_jit
+def project_kinship_diploid(
+    parent: ArrayLike,
+    founder_kinship: ArrayLike,
+    founder_indices: ArrayLike,
+    allow_half_founders: bool = False,
+) -> ArrayLike:
+    """Project founder kinships along a pedigree to their decedents assuming
+    all individuals are diploid.
+
+    Parameters
+    ----------
+    parent
+        A matrix of shape (samples, parents) containing the indices of each
+        sample's parents with negative values indicating unknown parents as
+        defined in :data:`sgkit.variables.parent_spec`.
+    founder_kinship
+        A matrix of shape (founders, founders) containing kinship values among
+        founding samples.
+    founder_indices
+        An integer array of length founders mapping each founder to a sample
+        in the pedigree.
+    allow_half_founders
+        If False (the default) then a ValueError will be raised if any
+        individuals only have a single recorded parent.
+        If True then the unrecorded parent will be assumed to be
+        a unique founder unrelated to all other founders.
+
+    Note
+    ----
+    Any non-founders included in the founder_kinship and founder_indices arrays
+    will be treated as founders by ignoring their parentage.
+
+    Returns
+    -------
+    kinship
+        A square matrix of kinship estimates with self-kinship values on
+        the diagonal.
+
+    Raises
+    ------
+    ValueError
+        If the pedigree contains a directed loop.
+    ValueError
+        If the pedigree contains half-founders and allow_half_founders=False.
+    ValueError
+        If kinship is not specified for a founder or is specified for a non-founder.
+    ValueError
+        If the parents dimension does not have a length of 2.
+    """
+    n = len(parent)
+    f = len(founder_indices)
+    assert f < n
+    assert founder_kinship.shape == (f, f)
+    if parent.shape[1] != 2:
+        raise ValueError("The parents dimension must be length 2")
+    if not allow_half_founders:
+        _raise_on_half_founder(parent)
+    is_founder = _identify_founders_diploid(parent)
+    if not is_founder[founder_indices].all():
+        raise ValueError("Initial kinship is specified for a non-founder")
+    if is_founder.sum() > f:
+        raise ValueError("Initial kinship is not specified for all founders")
+    kinship = np.zeros((n, n), dtype=founder_kinship.dtype)
+    # populate kinship matrix with founder kinships
+    for idx in range(f):
+        i = founder_indices[idx]
+        for jdx in range(f):
+            j = founder_indices[jdx]
+            kinship[i, j] = founder_kinship[idx, jdx]
+    # order must have founders first
+    order = topological_argsort(parent)
+    order = np.concatenate(
+        (
+            order[is_founder[order]],
+            order[~is_founder[order]],
+        )
+    )
+    # project founder kinships to other samples
+    for idx in range(f, n):
+        i = order[idx]
+        _insert_diploid_self_kinship(kinship, parent, i)
+        for jdx in range(idx):
+            j = order[jdx]
+            _insert_diploid_pair_kinship(kinship, parent, i, j)
+    return kinship
+
+
+@numba_jit
+def _inbreeding_as_self_kinship(inbreeding: float, ploidy: int) -> float:
     """Calculate self-kinship of an individual."""
     return (1 + (ploidy - 1) * inbreeding) / ploidy
 
@@ -304,7 +396,7 @@ def _inbreeding_as_self_kinship(
 @numba_jit
 def _hamilton_kerr_inbreeding_founder(
     lambda_p: float, lambda_q: float, ploidy_i: int
-) -> float:  # pragma: no cover
+) -> float:
     """Calculate inbreeding coefficient of a founder i where p and q
     are the unrecorded parents of i.
     """
@@ -324,7 +416,7 @@ def _hamilton_kerr_inbreeding_non_founder(
     ploidy_q: int,
     kinship_qq: float,
     kinship_pq: float,
-) -> float:  # pragma: no cover
+) -> float:
     """Calculate the inbreeding coefficient of a non founder
     individual i with parents p and q.
     """
@@ -351,7 +443,7 @@ def _hamilton_kerr_inbreeding_half_founder(
     kinship_pp: float,
     tau_q: int,
     lambda_q: float,
-) -> float:  # pragma: no cover
+) -> float:
     """Calculate the inbreeding coefficient of a half-founder i
     with known parent p and unknown parent q.
 
@@ -380,7 +472,7 @@ def _hamilton_kerr_inbreeding_half_founder(
 @numba_jit
 def _insert_hamilton_kerr_self_kinship(
     kinship: ArrayLike, parent: ArrayLike, tau: ArrayLike, lambda_: ArrayLike, i: int
-) -> None:  # pragma: no cover
+) -> None:
     p = parent[i, 0]
     q = parent[i, 1]
     tau_p = tau[i, 0]
@@ -433,7 +525,7 @@ def _hamilton_kerr_pair_kinship(
     tau_q: int,
     kinship_pj: float,
     kinship_qj: float,
-) -> float:  # pragma: no cover
+) -> float:
     ploidy_i = tau_p + tau_q
     return (tau_p / ploidy_i) * kinship_pj + (tau_q / ploidy_i) * kinship_qj
 
@@ -441,7 +533,7 @@ def _hamilton_kerr_pair_kinship(
 @numba_jit
 def _insert_hamilton_kerr_pair_kinship(
     kinship: ArrayLike, parent: ArrayLike, tau: ArrayLike, i: int, j: int
-) -> None:  # pragma: no cover
+) -> None:
     p = parent[i, 0]
     q = parent[i, 1]
     tau_p = tau[i, 0]
@@ -456,7 +548,7 @@ def _insert_hamilton_kerr_pair_kinship(
 @numba_jit
 def _compress_hamilton_kerr_parameters(
     parent: ArrayLike, tau: ArrayLike, lambda_: ArrayLike
-) -> Tuple[ArrayLike, ArrayLike, ArrayLike]:  # pragma: no cover
+) -> Tuple[ArrayLike, ArrayLike, ArrayLike]:
     """Compress arrays use in Hamilton-Kerr methods to have only two columns.
 
     The Hamilton-Kerr methods are defined such that each individual may
@@ -467,8 +559,6 @@ def _compress_hamilton_kerr_parameters(
     can be re-coded to have a width of two (i.e., two parent columns).
     """
     n_sample, n_parent = parent.shape
-    if n_parent == 2:
-        return parent, tau, lambda_
     new_parent = parent[:, 0:2].copy()
     new_tau = tau[:, 0:2].copy()
     new_lambda = lambda_[:, 0:2].copy()
@@ -516,7 +606,7 @@ def kinship_Hamilton_Kerr(
     lambda_: ArrayLike,
     allow_half_founders: bool = False,
     dtype: type = np.float64,
-) -> ArrayLike:  # pragma: no cover
+) -> ArrayLike:
     """Calculate pairwise expected kinship from a pedigree with variable ploidy.
 
     Parameters
@@ -580,6 +670,109 @@ def kinship_Hamilton_Kerr(
     return kinship
 
 
+@numba_jit
+def _identify_founders_Hamilton_Kerr(parent: ArrayLike, tau: ArrayLike) -> ArrayLike:
+    n, p = parent.shape
+    out = np.zeros(n, dtype=np.bool8)
+    for i in range(n):
+        for j in range(p):
+            if (parent[i, j] < 0) and tau[i, j] > 0:
+                out[i] = True
+    return out
+
+
+@numba_jit
+def project_kinship_Hamilton_Kerr(
+    parent: ArrayLike,
+    tau: ArrayLike,
+    lambda_: ArrayLike,
+    founder_kinship: ArrayLike,
+    founder_indices: ArrayLike,
+    allow_half_founders: bool = False,
+) -> ArrayLike:
+    """Project founder kinships along a pedigree to their decedents within
+    an autopolyploid or mixed-ploidy pedigree.
+
+    Parameters
+    ----------
+    parent
+        A matrix of shape (samples, parents) containing the indices of each
+        sample's parents with negative values indicating unknown parents as
+        defined in :data:`sgkit.variables.parent_spec`.
+    tau
+        A matrix of shape (samples, parents) containing
+        :data:`sgkit.variables.stat_Hamilton_Kerr_tau_spec`.
+    lambda_
+        A matrix of shape (samples, parents) containing
+        :data:`sgkit.variables.stat_Hamilton_Kerr_lambda_spec`.
+    founder_kinship
+        A matrix of shape (founders, founders) containing kinship values among
+        founding samples.
+    founder_indices
+        An integer array of length founders mapping each founder to a sample
+        in the pedigree.
+    allow_half_founders
+        If False (the default) then a ValueError will be raised if any
+        individuals only have a single recorded parent.
+        If True then the unrecorded parent will be assumed to be
+        a unique founder unrelated to all other founders.
+
+    Returns
+    -------
+    kinship
+        A square matrix of kinship estimates with self-kinship values on
+        the diagonal.
+
+    Raises
+    ------
+    ValueError
+        If the pedigree contains a directed loop.
+    ValueError
+        If the pedigree contains half-founders and allow_half_founders=False.
+    ValueError
+        If kinship is not specified for a founder or is specified for a non-founder.
+    ValueError
+        If a sample has more than two contributing parents.
+    """
+    n = len(parent)
+    f = len(founder_indices)
+    assert f < n
+    assert founder_kinship.shape == (f, f)
+    if parent.shape[1] != 2:
+        parent, tau, lambda_ = _compress_hamilton_kerr_parameters(parent, tau, lambda_)
+    if not allow_half_founders:
+        _raise_on_half_founder(parent, tau)
+    is_founder = _identify_founders_Hamilton_Kerr(parent, tau)
+    if not is_founder[founder_indices].all():
+        raise ValueError("Initial kinship is specified for a non-founder")
+    if is_founder.sum() > f:
+        raise ValueError("Initial kinship is not specified for all founders")
+    order = topological_argsort(parent)
+    kinship = np.zeros((n, n), dtype=founder_kinship.dtype)
+    # populate kinship matrix with founder kinships
+    for idx in range(f):
+        i = founder_indices[idx]
+        for jdx in range(f):
+            j = founder_indices[jdx]
+            kinship[i, j] = founder_kinship[idx, jdx]
+    # order must have founders first
+    order = topological_argsort(parent)
+    order = np.concatenate(
+        (
+            order[is_founder[order]],
+            order[~is_founder[order]],
+        )
+    )
+    # project founder kinships to other samples
+    for idx in range(f, n):
+        i = order[idx]
+        _insert_hamilton_kerr_self_kinship(kinship, parent, tau, lambda_, i)
+        for jdx in range(idx):
+            j = order[jdx]
+            _insert_hamilton_kerr_pair_kinship(kinship, parent, tau, i, j)
+    return kinship
+
+
 def pedigree_kinship(
     ds: Dataset,
     *,
@@ -588,6 +781,8 @@ def pedigree_kinship(
     stat_Hamilton_Kerr_tau: Hashable = variables.stat_Hamilton_Kerr_tau,
     stat_Hamilton_Kerr_lambda: Hashable = variables.stat_Hamilton_Kerr_lambda,
     allow_half_founders: bool = False,
+    founder_kinship: Hashable = None,
+    founder_indices: Hashable = None,
     merge: bool = True,
 ) -> Dataset:
     """Estimate expected pairwise kinship coefficients from pedigree structure.
@@ -624,6 +819,17 @@ def pedigree_kinship(
         the tau and lambda parameters for gametes contributing to the
         unrecorded parent will be assumed to be equal to those of the
         gamete originating from that parent.
+    founder_kinship
+        Optionally specify a matrix of pairwise kinship estimates among
+        founder samples which will be used to initialize pedigree estimates
+        as outlined by Goudet et al. 2018 [2].
+        This variable must be a square matrix of shape (founders, founders)
+        and must be used in conjunction with founder_indices.
+    founder_indices
+        Optionally specify an array of integer indices mapping rows/columns
+        in the founder_kinship matrix to sample positions in the samples
+        dimension (i.e., the order of rows in the parent array).
+        This variable must have the same length as founder_kinship.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -649,6 +855,15 @@ def pedigree_kinship(
         two contributing parents.
     ValueError
         If the pedigree contains half-founders and allow_half_founders=False.
+    ValueError
+        If only one of the ``founder_kinship`` or ``founder_indices``
+        variables is specified.
+    ValueError
+        If the ``founder_kinship`` or ``founder_indices`` variables have
+        inconsistent shapes.
+    ValueError
+        If a founder is missing from the ``founder_indices`` array or if
+        a non-founder is indicated by this array.
 
     Note
     ----
@@ -664,6 +879,11 @@ def pedigree_kinship(
     ----
     Dimensions of :data:`sgkit.variables.stat_pedigree_kinship_spec` are named
     ``samples_0`` and ``samples_1``.
+
+    Note
+    ----
+    If founder kinships are specified for a half-founder, then that individual
+    will be treated as a full-founder by ignoring its known parent.
 
     Note
     ----
@@ -696,6 +916,36 @@ def pedigree_kinship(
            [0.   , 0.5  , 0.25 , 0.125],
            [0.25 , 0.25 , 0.5  , 0.375],
            [0.375, 0.125, 0.375, 0.625]])
+
+    Inbred diploid pedigree with related founders:
+
+    >>> import sgkit as sg
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, seed=1)
+    >>> ds.sample_id.values # doctest: +NORMALIZE_WHITESPACE
+    array(['S0', 'S1', 'S2', 'S3'], dtype='<U2')
+    >>> ds["parent_id"] = ["samples", "parents"], [
+    ...     [".", "."],
+    ...     [".", "."],
+    ...     ["S0", "S1"],
+    ...     ["S0", "S2"]
+    ... ]
+    >>> # add "known" kinships among founders
+    >>> ds["founder_kinship"] = ["founders", "founders"], [
+    ...     [0.5, 0.1],
+    ...     [0.1, 0.6],
+    ... ]
+    >>> # founder kinships correspond to the first two samples
+    >>> ds["founder_indices"] = ["founders"], [0, 1]
+    >>> ds = sg.pedigree_kinship(
+    ...     ds,
+    ...     founder_kinship="founder_kinship",
+    ...     founder_indices="founder_indices",
+    ... )
+    >>> ds["stat_pedigree_kinship"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[0.5  , 0.1  , 0.3  , 0.4  ],
+           [0.1  , 0.6  , 0.35 , 0.225],
+           [0.3  , 0.35 , 0.55 , 0.425],
+           [0.4  , 0.225, 0.425, 0.65 ]])
 
     Somatic doubling and unreduced gamete:
 
@@ -760,25 +1010,59 @@ def pedigree_kinship(
 
     References
     ----------
-    [1] - Matthew G. Hamilton, and Richard J. Kerr 2017.
+    [1] - Matthew G. Hamilton and Richard J. Kerr 2017.
     "Computation of the inverse additive relationship matrix for autopolyploid
     and multiple-ploidy populations." Theoretical and Applied Genetics 131: 851-860.
+
+    [2] - Jérôme Goudet, Tomas Kay and Bruce S. Weir 2018.
+    "How to estimate kinship." Molecular Ecology 27: 4121-4135.
     """
     if method not in {"diploid", "Hamilton-Kerr"}:
         raise ValueError("Unknown method '{}'".format(method))
     ds = define_variable_if_absent(ds, variables.parent, parent, parent_indices)
     variables.validate(ds, {parent: variables.parent_spec})
     parent = da.asarray(ds[parent].data, chunks=ds[parent].shape)
+    if (founder_kinship is not None) or (founder_indices is not None):
+        if (founder_kinship is None) or (founder_indices is None):
+            raise ValueError(
+                "Variables founder_kinship and founder_indices must be specified together"
+            )
+        founder_kinship = da.asarray(
+            ds[founder_kinship].data, chunks=ds[founder_kinship].shape
+        )
+        founder_indices = da.asarray(
+            ds[founder_indices].data, chunks=ds[founder_indices].shape
+        )
+        n_founders = len(founder_indices)
+        if founder_kinship.shape != (n_founders, n_founders):
+            raise ValueError(
+                "Variables founder_kinship and founder_indices have mismatching dimensions"
+            )
+        if n_founders > len(parent):
+            raise ValueError(
+                "The number of founders exceeds the total number of samples"
+            )
     if method == "diploid":
         # check ploidy dimension and assume diploid if it's absent
         if ds.dims.get("ploidy", 2) != 2:
             raise ValueError("Dataset is not diploid")
-        if ds.dims["parents"] != 2:
-            raise ValueError("The parents dimension must be length 2")
-        func = da.gufunc(
-            kinship_diploid, signature="(n, p) -> (n, n)", output_dtypes=float
-        )
-        kinship = func(parent, allow_half_founders=allow_half_founders)
+        if founder_kinship is None:
+            func = da.gufunc(
+                kinship_diploid, signature="(n, p) -> (n, n)", output_dtypes=float
+            )
+            kinship = func(parent, allow_half_founders=allow_half_founders)
+        else:
+            func = da.gufunc(
+                project_kinship_diploid,
+                signature="(n, p),(f, f),(f)-> (n, n)",
+                output_dtypes=float,
+            )
+            kinship = func(
+                parent,
+                founder_kinship,
+                founder_indices,
+                allow_half_founders=allow_half_founders,
+            )
     elif method == "Hamilton-Kerr":
         tau = da.asarray(
             ds[stat_Hamilton_Kerr_tau].data, ds[stat_Hamilton_Kerr_tau].shape
@@ -786,12 +1070,29 @@ def pedigree_kinship(
         lambda_ = da.asarray(
             ds[stat_Hamilton_Kerr_lambda].data, ds[stat_Hamilton_Kerr_lambda].shape
         )
-        func = da.gufunc(
-            kinship_Hamilton_Kerr,
-            signature="(n, p),(n, p),(n, p) -> (n, n)",
-            output_dtypes=float,
-        )
-        kinship = func(parent, tau, lambda_, allow_half_founders=allow_half_founders)
+        if founder_kinship is None:
+            func = da.gufunc(
+                kinship_Hamilton_Kerr,
+                signature="(n, p),(n, p),(n, p) -> (n, n)",
+                output_dtypes=float,
+            )
+            kinship = func(
+                parent, tau, lambda_, allow_half_founders=allow_half_founders
+            )
+        else:
+            func = da.gufunc(
+                project_kinship_Hamilton_Kerr,
+                signature="(n, p),(n, p),(n, p),(f, f),(f)-> (n, n)",
+                output_dtypes=float,
+            )
+            kinship = func(
+                parent,
+                tau,
+                lambda_,
+                founder_kinship,
+                founder_indices,
+                allow_half_founders=allow_half_founders,
+            )
     new_ds = create_dataset(
         {
             variables.stat_pedigree_kinship: xr.DataArray(
@@ -895,9 +1196,7 @@ def pedigree_relationship(
 
 
 @numba_jit
-def _position_sort_pair(
-    x: int, y: int, position: ArrayLike
-) -> tuple:  # pragma: no cover
+def _position_sort_pair(x: int, y: int, position: ArrayLike) -> tuple:
     if x < 0:
         return (x, y)
     elif y < 0:
@@ -914,7 +1213,7 @@ def inbreeding_Hamilton_Kerr(
     tau: ArrayLike,
     lambda_: ArrayLike,
     allow_half_founders: bool = False,
-) -> Tuple[ArrayLike, ArrayLike]:  # pragma: no cover
+) -> Tuple[ArrayLike, ArrayLike]:
     """Calculate expected inbreeding coefficients from a pedigree with variable ploidy.
 
     Parameters
@@ -1048,16 +1347,12 @@ def inbreeding_Hamilton_Kerr(
             else:
                 # get required kinship dependencies
                 pq_key = _position_sort_pair(parent[i, 0], parent[i, 1], position)
-                kinship_pq = 0.0 if (p < 0) and (q < 0) else kinship.get(pq_key, np.nan)
+                # kinship_pq is never absent when stack is initialized with parental pairs
+                kinship_pq = 0.0 if (p < 0) and (q < 0) else kinship[pq_key]
                 kinship_pp = 0.0 if p < 0 else kinship.get((p, p), np.nan)
                 kinship_qq = 0.0 if q < 0 else kinship.get((q, q), np.nan)
                 # check for missing kinships and add them to stack
                 dependencies = True
-                if np.isnan(kinship_pq):
-                    dependencies = False
-                    idx -= 1
-                    stack[idx, 0] = p
-                    stack[idx, 1] = q
                 if np.isnan(kinship_pp):
                     dependencies = False
                     idx -= 1
@@ -1368,14 +1663,10 @@ def _update_inverse_additive_relationships(
     self_kinship: ArrayLike,
     parent_kinship: ArrayLike,
     i: int,
-    tau: Union[ArrayLike, None] = None,
-) -> None:  # pragma: no cover
+    tau: ArrayLike,
+) -> None:
     p, q = parent[i]
-    if tau is None:
-        # assume diploid
-        tau_p, tau_q = 1, 1
-    else:
-        tau_p, tau_q = tau[i, 0], tau[i, 1]
+    tau_p, tau_q = tau[i, 0], tau[i, 1]
     # weighted contribution of each parent
     ploidy_i = tau_p + tau_q
     weight_p, weight_q = tau_p / ploidy_i, tau_q / ploidy_i
@@ -1426,7 +1717,7 @@ def inverse_relationship_Hamilton_Kerr(
     tau: ArrayLike,
     lambda_: ArrayLike,
     allow_half_founders: bool = False,
-) -> ArrayLike:  # pragma: no cover
+) -> ArrayLike:
     """Compute the inverse of the additive relationship matrix from
     pedigree structure.
 
