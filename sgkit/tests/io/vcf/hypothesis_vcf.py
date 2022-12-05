@@ -33,7 +33,13 @@ class Field:
     vcf_number: str
 
     def get_header(self):
-        return f'##{self.category}=<ID={self.vcf_key},Type={self.vcf_type},Number={self.vcf_number},Description="{self.category},Type={self.vcf_type},Number={self.vcf_number}">'
+        return (
+            f"##{self.category}=<"
+            f"ID={self.vcf_key},"
+            f"Type={self.vcf_type},"
+            f"Number={self.vcf_number},"
+            f'Description="{self.category},Type={self.vcf_type},Number={self.vcf_number}">'
+        )
 
 
 # references to the VCF spec are for https://samtools.github.io/hts-specs/VCFv4.3.pdf
