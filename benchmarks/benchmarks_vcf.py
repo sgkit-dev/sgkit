@@ -6,7 +6,9 @@ import tempfile
 import time
 from pathlib import Path
 
-from sgkit.io.vcf.vcf_reader import vcf_to_zarr
+from numcodecs import FixedScaleOffset
+
+from sgkit.io.vcf.vcf_reader import vcf_to_zarr, zarr_array_sizes
 from sgkit.io.vcf.vcf_writer import zarr_to_vcf
 
 
@@ -76,3 +78,68 @@ def _time_func(func, *args, **kwargs):
 
 def _to_mb_per_s(bytes, duration):
     return bytes / (1_000_000 * duration)
+
+
+class VcfCompressionSuite:
+    def setup(self) -> None:
+
+        asv_env_dir = os.environ["ASV_ENV_DIR"]
+        self.input_vcf = Path(
+            asv_env_dir,
+            "project/sgkit/tests/io/vcf/data/1kg_target_chr20_38_imputed_chr20_500000.vcf.bgz",
+        )
+
+        tmp_path = Path(tempfile.mkdtemp())
+        self.output_zarr = tmp_path.joinpath("1000G.out.zarr")
+
+    # use track_* asv methods since we want to measure compression size not time
+
+    def track_zarr_compression_size(self) -> None:
+
+        encoding = {
+            "variant_AF": {
+                "filters": [
+                    FixedScaleOffset(offset=0, scale=10000, dtype="f4", astype="u2")
+                ],
+            },
+            "call_DS": {
+                "filters": [
+                    FixedScaleOffset(offset=0, scale=100, dtype="f4", astype="u1")
+                ],
+            },
+            "variant_DR2": {
+                "filters": [
+                    FixedScaleOffset(offset=0, scale=100, dtype="f4", astype="u1")
+                ],
+            },
+        }
+
+        kwargs = zarr_array_sizes(self.input_vcf)
+
+        vcf_to_zarr(
+            self.input_vcf,
+            self.output_zarr,
+            fields=["INFO/*", "FORMAT/*"],
+            chunk_length=500_000,
+            encoding=encoding,
+            **kwargs,
+        )
+
+        original_size = du(self.input_vcf)
+        zarr_size = du(self.output_zarr)
+
+        return float(zarr_size) / original_size
+
+
+def get_file_size(file):
+    return file.stat().st_size
+
+
+def get_dir_size(dir):
+    return sum(f.stat().st_size for f in dir.glob("**/*") if f.is_file())
+
+
+def du(file):
+    if file.is_file():
+        return get_file_size(file)
+    return get_dir_size(file)
