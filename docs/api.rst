@@ -4,10 +4,10 @@ API reference
 
 This page provides an auto-generated summary of sgkits's API.
 
-IO/imports
-==========
+IO/imports and exports
+======================
 
-See :ref:`reading_genetic_data`
+See :ref:`reading_and_writing_genetic_data`
 
 BGEN
 -----
@@ -29,8 +29,8 @@ PLINK
 
    read_plink
 
-VCF
----
+VCF (reading)
+-------------
 
 .. currentmodule:: sgkit.io.vcf
 .. autosummary::
@@ -55,6 +55,16 @@ For converting from `scikit-allel's VCF Zarr representation <https://scikit-alle
    :toctree: generated/
 
    read_scikit_allel_vcfzarr
+
+VCF (writing)
+-------------
+
+.. currentmodule:: sgkit.io.vcf
+.. autosummary::
+   :toctree: generated/
+
+   dataset_to_vcf
+   zarr_to_vcf
 
 Dataset
 -------
