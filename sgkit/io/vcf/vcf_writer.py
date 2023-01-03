@@ -32,6 +32,34 @@ def dataset_to_vcf(
 ) -> None:
     """Convert a dataset to a VCF file.
 
+    The VCF fields included in the output are those in the ``vcf_header``
+    attribute of the dataset. There is currently no way to change the fields
+    that are included apart from by manually updating this attribute.
+
+    Float fields are written with up to 3 decimal places of precision.
+    Exponent/scientific notation is *not* supported, so values less than
+    ``5e-4`` will be rounded to zero.
+
+    Data is written sequentially to VCF, using Numba to optimize the write
+    throughput speed. Speeds in the region of 100 MB/s have been observed on
+    an Apple M1 machine from 2020.
+
+    Data is loaded into memory in chunks sized according to the chunking along
+    the variants dimension. Chunking in other dimensions (such as samples) is
+    ignored for the purposes of writing VCF. If the dataset is not chunked
+    (because it does not originate from Zarr or Dask, for example), then it
+    will all be loaded into memory at once.
+
+    The output is *not* compressed or indexed. It is therefore recommended to
+    post-process the output using external tools such as ``bgzip(1)``,
+    ``bcftools(1)``, or ``tabix(1)``.
+
+    This example shows how to convert a Zarr dataset to bgzip-compressed VCF by
+    writing it to standard output then applying an external compressor::
+
+        python -c 'import sys; from sgkit.io.vcf import zarr_to_vcf; zarr_to_vcf("in.zarr", sys.stdout)'
+            | bgzip > out.vcf.gz
+
     Warnings
     --------
     This function requires the dataset to have a ``vcf_header`` attribute
@@ -274,6 +302,10 @@ def zarr_to_vcf(
     output: Union[PathType, TextIO],
 ) -> None:
     """Convert a Zarr file to a VCF file.
+
+    A convenience for :func:`sgkit.load_dataset` followed by :func:`dataset_to_vcf`.
+
+    Refer to :func:`dataset_to_vcf` for details and limitations.
 
     Warnings
     --------
