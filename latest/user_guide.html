@@ -1378,7 +1378,7 @@ variable names.</p>
 <span class="gp">In [3]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[[</span><span class="s1">&#39;variant_allele&#39;</span><span class="p">,</span> <span class="s1">&#39;call_genotype&#39;</span><span class="p">]]</span>
 
 <span class="gp">In [4]: </span><span class="n">ds</span>
-<span class="gh">Out[4]: </span><span class="go"></span>
+<span class="gh">Out[4]: </span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
 <span class="go">Dimensions:         (variants: 100, alleles: 2, samples: 50, ploidy: 2)</span>
 <span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
@@ -1391,7 +1391,7 @@ variable names.</p>
 
 <span class="go"># Use the default variable (call_genotype)</span>
 <span class="gp">In [5]: </span><span class="n">sg</span><span class="o">.</span><span class="n">count_call_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">call_allele_count</span>
-<span class="gh">Out[5]: </span><span class="go"></span>
+<span class="gh">Out[5]: </span>
 <span class="go">&lt;xarray.DataArray &#39;call_allele_count&#39; (variants: 100, samples: 50, alleles: 2)&gt;</span>
 <span class="go">dask.array&lt;count_alleles, shape=(100, 50, 2), dtype=uint8, chunksize=(100, 50, 2), chunktype=numpy.ndarray&gt;</span>
 <span class="go">Dimensions without coordinates: variants, samples, alleles</span>
@@ -1403,7 +1403,7 @@ variable names.</p>
 <span class="gp">In [6]: </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;my_call_genotype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;call_genotype&quot;</span><span class="p">]</span>
 
 <span class="gp">In [7]: </span><span class="n">sg</span><span class="o">.</span><span class="n">count_call_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">call_genotype</span><span class="o">=</span><span class="s2">&quot;my_call_genotype&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">call_allele_count</span>
-<span class="gh">Out[7]: </span><span class="go"></span>
+<span class="gh">Out[7]: </span>
 <span class="go">&lt;xarray.DataArray &#39;call_allele_count&#39; (variants: 100, samples: 50, alleles: 2)&gt;</span>
 <span class="go">dask.array&lt;count_alleles, shape=(100, 50, 2), dtype=uint8, chunksize=(100, 50, 2), chunktype=numpy.ndarray&gt;</span>
 <span class="go">Dimensions without coordinates: variants, samples, alleles</span>
@@ -1421,7 +1421,7 @@ If the dataset doesn’t contain <code class="docutils literal notranslate"><spa
 call <a class="reference internal" href="generated/sgkit.count_call_alleles.html#sgkit.count_call_alleles" title="sgkit.count_call_alleles"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.count_call_alleles()</span></code></a> to populate it, before running its own computation.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="go"># The following will create call_allele_count and variant_allele_count</span>
 <span class="gp">In [8]: </span><span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-<span class="gh">Out[8]: </span><span class="go"></span>
+<span class="gh">Out[8]: </span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
 <span class="go">Dimensions:               (variants: 100, alleles: 2, samples: 50, ploidy: 2)</span>
 <span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
@@ -1452,7 +1452,7 @@ to have created the variable in that case.</p>
 <span class="g g-Whitespace">    </span><span class="mi">137</span>     <span class="n">call_allele_count</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">=</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count</span><span class="p">,</span>
 <span class="g g-Whitespace">    </span><span class="mi">138</span>     <span class="n">merge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="g g-Whitespace">    </span><span class="mi">139</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">140</span>     <span class="sd">&quot;&quot;&quot;Compute allele count from per-sample allele counts, or genotype calls.</span>
+<span class="g g-Whitespace">    </span><span class="mi">140</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Compute allele count from per-sample allele counts, or genotype calls.</span>
 <span class="g g-Whitespace">    </span><span class="mi">141</span><span class="sd"> </span>
 <span class="g g-Whitespace">    </span><span class="mi">142</span><span class="sd">     Parameters</span>
 <span class="sd">   (...)</span>
@@ -1498,7 +1498,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="gp">In [12]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[[</span><span class="s1">&#39;variant_allele&#39;</span><span class="p">,</span> <span class="s1">&#39;call_genotype&#39;</span><span class="p">]]</span>
 
 <span class="gp">In [13]: </span><span class="n">ds</span>
-<span class="gh">Out[13]: </span><span class="go"></span>
+<span class="gh">Out[13]: </span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
 <span class="go">Dimensions:         (variants: 100, alleles: 2, samples: 50, ploidy: 2)</span>
 <span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
@@ -1513,7 +1513,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="gp">In [14]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 
 <span class="gp">In [15]: </span><span class="n">ds</span>
-<span class="gh">Out[15]: </span><span class="go"></span>
+<span class="gh">Out[15]: </span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
 <span class="go">Dimensions:               (variants: 100, alleles: 2, samples: 50, ploidy: 2)</span>
 <span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
@@ -1539,7 +1539,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 
 <span class="go"># New variables can also be returned in their own dataset</span>
 <span class="gp">In [19]: </span><span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="gh">Out[19]: </span><span class="go"></span>
+<span class="gh">Out[19]: </span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
 <span class="go">Dimensions:               (variants: 100, alleles: 2)</span>
 <span class="go">Dimensions without coordinates: variants, alleles</span>
@@ -1548,7 +1548,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 
 <span class="go"># This can be useful for merging multiple datasets manually</span>
 <span class="gp">In [20]: </span><span class="n">ds</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
-<span class="gh">Out[20]: </span><span class="go"></span>
+<span class="gh">Out[20]: </span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
 <span class="go">Dimensions:               (variants: 100, alleles: 2, samples: 50, ploidy: 2)</span>
 <span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
@@ -1570,7 +1570,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="gp">In [23]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[[</span><span class="s1">&#39;variant_allele&#39;</span><span class="p">,</span> <span class="s1">&#39;call_genotype&#39;</span><span class="p">]]</span>
 
 <span class="gp">In [24]: </span><span class="n">ds</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">variant_allele_count</span><span class="o">=</span><span class="s2">&quot;my_variant_allele_count&quot;</span><span class="p">))</span>
-<span class="gh">Out[24]: </span><span class="go"></span>
+<span class="gh">Out[24]: </span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
 <span class="go">Dimensions:                  (variants: 100, alleles: 2, samples: 50, ploidy: 2)</span>
 <span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
@@ -1619,7 +1619,7 @@ indexing and uniqueness within Xarray/Pandas, since this is critical for underst
 <span class="gp">   ....: </span>
 
 <span class="gp">In [30]: </span><span class="n">numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">alt_allele_count</span><span class="p">)(</span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-<span class="gh">Out[30]: </span><span class="go"></span>
+<span class="gh">Out[30]: </span>
 <span class="go">array([[ 0,  1,  1],</span>
 <span class="go">       [ 1,  1, -1],</span>
 <span class="go">       [-1,  1,  2],</span>
@@ -1660,11 +1660,11 @@ indexing and uniqueness within Xarray/Pandas, since this is critical for underst
 <span class="gp">   ....: </span>    <span class="n">ac</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 <span class="gp">   ....: </span>
 
-<span class="go">[                                        ] | 0% Completed | 206.20 us</span>
-<span class="go">[########################################] | 100% Completed | 100.52 ms</span>
+<span class="go">[                                        ] | 0% Completed | 203.30 us</span>
+<span class="go">[########################################] | 100% Completed | 100.45 ms</span>
 
 <span class="gp">In [35]: </span><span class="n">ac</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
-<span class="gh">Out[35]: </span><span class="go"></span>
+<span class="gh">Out[35]: </span>
 <span class="go">&lt;xarray.DataArray &#39;variant_allele_count&#39; (variants: 5, alleles: 2)&gt;</span>
 <span class="go">array([[50, 40],</span>
 <span class="go">       [40, 52],</span>
