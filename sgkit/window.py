@@ -261,13 +261,13 @@ def window_by_interval(
         Defined by :data:`sgkit.variables.variant_position_spec`.
     interval_contig_name
         Name of variable containing interval contig names.
-        Defined by :data:`sgkit.variables.interval_contig_name`.
+        Defined by :data:`sgkit.variables.interval_contig_name_spec`.
     interval_start
         Name of variable containing interval start positions.
-        Defined by :data:`sgkit.variables.interval_start`.
+        Defined by :data:`sgkit.variables.interval_start_spec`.
     interval_stop
         Name of variable containing interval stop positions.
-        Defined by :data:`sgkit.variables.interval_stop`.
+        Defined by :data:`sgkit.variables.interval_stop_spec`.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
