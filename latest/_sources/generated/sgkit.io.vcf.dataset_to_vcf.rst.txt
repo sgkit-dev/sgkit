@@ -1,0 +1,6 @@
+﻿sgkit.io.vcf.dataset\_to\_vcf
+=============================
+
+.. currentmodule:: sgkit.io.vcf
+
+.. autofunction:: dataset_to_vcf

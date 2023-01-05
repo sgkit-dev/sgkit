@@ -210,6 +210,16 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.io.vcf.dataset_to_vcf.html">
+     sgkit.io.vcf.dataset_to_vcf
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.io.vcf.zarr_to_vcf.html">
+     sgkit.io.vcf.zarr_to_vcf
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="generated/sgkit.load_dataset.html">
      sgkit.load_dataset
     </a>
@@ -991,8 +1001,8 @@ title="Edit this page"
     <nav id="bd-toc-nav" aria-label="Page">
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#io-imports">
-   IO/imports
+  <a class="reference internal nav-link" href="#io-imports-and-exports">
+   IO/imports and exports
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
@@ -1006,11 +1016,16 @@ title="Edit this page"
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#vcf">
-     VCF
+    <a class="reference internal nav-link" href="#vcf-reading">
+     VCF (reading)
     </a>
     <ul class="nav section-nav flex-column">
     </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#vcf-writing">
+     VCF (writing)
+    </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#dataset">
@@ -1054,8 +1069,8 @@ title="Edit this page"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#io-imports">
-   IO/imports
+  <a class="reference internal nav-link" href="#io-imports-and-exports">
+   IO/imports and exports
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
@@ -1069,11 +1084,16 @@ title="Edit this page"
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#vcf">
-     VCF
+    <a class="reference internal nav-link" href="#vcf-reading">
+     VCF (reading)
     </a>
     <ul class="nav section-nav flex-column">
     </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#vcf-writing">
+     VCF (writing)
+    </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#dataset">
@@ -1109,9 +1129,9 @@ title="Edit this page"
                  <section id="api-reference">
 <h1>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">#</a></h1>
 <p>This page provides an auto-generated summary of sgkits’s API.</p>
-<section id="io-imports">
-<h2>IO/imports<a class="headerlink" href="#io-imports" title="Permalink to this headline">#</a></h2>
-<p>See <a class="reference internal" href="user_guide.html#reading-genetic-data"><span class="std std-ref">Reading genetic data</span></a></p>
+<section id="io-imports-and-exports">
+<h2>IO/imports and exports<a class="headerlink" href="#io-imports-and-exports" title="Permalink to this headline">#</a></h2>
+<p>See <a class="reference internal" href="user_guide.html#reading-and-writing-genetic-data"><span class="std std-ref">Reading and writing genetic data</span></a></p>
 <section id="bgen">
 <h3>BGEN<a class="headerlink" href="#bgen" title="Permalink to this headline">#</a></h3>
 <table class="longtable table autosummary">
@@ -1146,8 +1166,8 @@ title="Edit this page"
 </tbody>
 </table>
 </section>
-<section id="vcf">
-<h3>VCF<a class="headerlink" href="#vcf" title="Permalink to this headline">#</a></h3>
+<section id="vcf-reading">
+<h3>VCF (reading)<a class="headerlink" href="#vcf-reading" title="Permalink to this headline">#</a></h3>
 <table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
@@ -1186,6 +1206,23 @@ title="Edit this page"
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.read_scikit_allel_vcfzarr.html#sgkit.read_scikit_allel_vcfzarr" title="sgkit.read_scikit_allel_vcfzarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_scikit_allel_vcfzarr</span></code></a>(path[, field_defs])</p></td>
 <td><p>Read a VCF Zarr file created using scikit-allel.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="vcf-writing">
+<h3>VCF (writing)<a class="headerlink" href="#vcf-writing" title="Permalink to this headline">#</a></h3>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.vcf.dataset_to_vcf.html#sgkit.io.vcf.dataset_to_vcf" title="sgkit.io.vcf.dataset_to_vcf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataset_to_vcf</span></code></a>(input, output)</p></td>
+<td><p>Convert a dataset to a VCF file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.io.vcf.zarr_to_vcf.html#sgkit.io.vcf.zarr_to_vcf" title="sgkit.io.vcf.zarr_to_vcf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zarr_to_vcf</span></code></a>(input, output)</p></td>
+<td><p>Convert a Zarr file to a VCF file.</p></td>
 </tr>
 </tbody>
 </table>
