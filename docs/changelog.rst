@@ -33,6 +33,9 @@ New Features
   (:user:`tomwhite`, :pr:`946`, :issue:`464`)
 - Add VCF export functions.
   (:user:`tomwhite`, :pr:`953`, :issue:`924`)
+- Add ``auto_rechunk`` option to ``sgkit.save_dataset`` to automatically rechunk
+  the dataset before saving it to disk, if necessary, as zarr requires equal chunk
+  sizes. (:user:`benjeffery`, :pr:`988`, :issue:`981`)
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
