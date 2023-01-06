@@ -13,6 +13,7 @@ def save_dataset(
     ds: Dataset,
     store: Union[PathType, MutableMapping[str, bytes]],
     storage_options: Optional[Dict[str, str]] = None,
+    auto_rechunk: Optional[bool] = None,
     **kwargs: Any
 ) -> None:
     """Save a dataset to Zarr storage.
@@ -28,6 +29,9 @@ def save_dataset(
         Zarr store or path to directory in file system to save to.
     storage_options:
         Any additional parameters for the storage backend (see ``fsspec.open``).
+    auto_rechunk:
+        If True, automatically rechunk the dataset to uniform chunks before saving,
+        if necessary. This is required for Zarr, but can be expensive. Defaults to False.
     kwargs
         Additional arguments to pass to :meth:`xarray.Dataset.to_zarr`.
     """
@@ -36,6 +40,8 @@ def save_dataset(
         store = fsspec.get_mapper(store, **storage_options)
     elif isinstance(store, Path):
         store = str(store)
+    if auto_rechunk is None:
+        auto_rechunk = False
     for v in ds:
         # Workaround for https://github.com/pydata/xarray/issues/4380
         ds[v].encoding.pop("chunks", None)
@@ -48,7 +54,34 @@ def save_dataset(
             filters.remove(var_len_str_codec)
             ds[v].encoding["filters"] = filters
 
-    ds.to_zarr(store, **kwargs)
+    if auto_rechunk:
+        # This logic for checking if rechunking is necessary is
+        # taken from xarray/backends/zarr.py#L109.
+        # We can't try to save and catch the error as by that
+        # point the zarr store is non-empty.
+        if any(len(set(chunks[:-1])) > 1 for chunks in ds.chunks.values()) or any(
+            (chunks[0] < chunks[-1]) for chunks in ds.chunks.values()
+        ):
+            # Here we use the max chunk size as the target chunk size as for the commonest
+            # case of subsetting an existing dataset, this will be closest to the original
+            # intended chunk size.
+            ds = ds.chunk(
+                chunks={dim: max(chunks) for dim, chunks in ds.chunks.items()}
+            )
+
+    # Catch unequal chunking errors to provide a more helpful error message
+    try:
+        ds.to_zarr(store, **kwargs)
+    except ValueError as e:
+        if "Zarr requires uniform chunk sizes" in str(
+            e
+        ) or "Final chunk of Zarr array must be the same size" in str(e):
+            raise ValueError(
+                "Zarr requires uniform chunk sizes. Use the `auto_rechunk` argument to"
+                "`save_dataset` to automatically rechunk the dataset."
+            ) from e
+        else:
+            raise e
 
 
 def load_dataset(

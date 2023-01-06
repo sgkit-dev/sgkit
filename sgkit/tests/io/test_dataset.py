@@ -46,3 +46,63 @@ def test_save_and_load_dataset__mutable_mapping():
     store2: MutableMapping[str, bytes] = {}
     save_dataset(ds2, store2)
     assert_identical(ds, load_dataset(store2))
+
+
+def test_save_unequal_chunks_error():
+    # Make all dimensions the same size for ease of testing
+    ds = simulate_genotype_call_dataset(
+        n_variant=10, n_sample=10, n_ploidy=10, n_allele=10
+    )
+    # Normal zarr errors shouldn't be caught
+    with pytest.raises(ValueError, match="path '' contains an array"):
+        save_dataset(ds, {".zarray": ""})
+
+    # Make the dataset have unequal chunk sizes across all dimensions
+    ds = ds.chunk({dim: (1, 3, 5, 1) for dim in ds.dims})
+
+    # Check we get the sgkit error message
+    with pytest.raises(
+        ValueError, match="Zarr requires uniform chunk sizes. Use the `auto_rechunk`"
+    ):
+        save_dataset(ds, {})
+
+    # xarray gives a different error message when there are two chunks, so check that too
+    ds = ds.chunk({dim: (4, 6) for dim in ds.dims})
+    with pytest.raises(
+        ValueError, match="Zarr requires uniform chunk sizes. Use the `auto_rechunk`"
+    ):
+        save_dataset(ds, {})
+
+
+def test_save_auto_rechunk():
+    # Make all dimensions the same size for ease of testing
+    ds = simulate_genotype_call_dataset(
+        n_variant=10, n_sample=10, n_ploidy=10, n_allele=10
+    )
+    # Make the dataset have unequal chunk sizes across all dimensions
+    ds = ds.chunk({dim: (1, 3, 5, 1) for dim in ds.dims})
+
+    # Default is to not rechunk
+    with pytest.raises(
+        ValueError, match="Zarr requires uniform chunk sizes. Use the `auto_rechunk`"
+    ):
+        save_dataset(ds, {})
+
+    # Rechunking off
+    with pytest.raises(
+        ValueError, match="Zarr requires uniform chunk sizes. Use the `auto_rechunk`"
+    ):
+        save_dataset(ds, {}, auto_rechunk=False)
+
+    store = {}
+    save_dataset(ds, store, auto_rechunk=True)
+    assert_identical(ds, load_dataset(store))
+
+    # An equal chunked ds retains its original chunking
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=10)
+    ds = ds.chunk({dim: 5 for dim in ds.dims})
+    store2 = {}
+    save_dataset(ds, store2, auto_rechunk=True)
+    ds_loaded = load_dataset(store2)
+    assert_identical(ds, ds_loaded)
+    assert ds_loaded.chunks == ds.chunks
