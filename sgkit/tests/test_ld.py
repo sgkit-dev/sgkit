@@ -71,7 +71,7 @@ def ldm_df(
     diag: bool = False,
 ) -> DataFrame:
     ds = simulate_genotype_call_dataset(n_variant=x.shape[0], n_sample=x.shape[1])
-    ds["dosage"] = (["variants", "samples"], x)
+    ds["call_dosage"] = (["variants", "samples"], x)
     ds = window_by_variant(ds, size=size, step=step)
     df = ld_matrix(ds, threshold=threshold).compute()
     if not diag:
@@ -127,7 +127,7 @@ def test_dtypes(dtype):
 def test_ld_matrix__raise_on_no_windows():
     x = np.zeros((5, 10))
     ds = simulate_genotype_call_dataset(n_variant=x.shape[0], n_sample=x.shape[1])
-    ds["dosage"] = (["variants", "samples"], x)
+    ds["call_dosage"] = (["variants", "samples"], x)
 
     with pytest.raises(ValueError, match="Dataset must be windowed for ld_matrix"):
         ld_matrix(ds)
@@ -164,7 +164,7 @@ def test_vs_skallel(args):
     x, size, step, threshold, chunks = args
 
     ds = simulate_genotype_call_dataset(n_variant=x.shape[0], n_sample=x.shape[1])
-    ds["dosage"] = (["variants", "samples"], da.asarray(x).rechunk({0: chunks}))
+    ds["call_dosage"] = (["variants", "samples"], da.asarray(x).rechunk({0: chunks}))
     ds = window_by_variant(ds, size=size, step=step)
 
     ldm = ld_matrix(ds, threshold=threshold)
@@ -191,7 +191,7 @@ def test_scores():
     x[8, :-5] = 1
 
     ds = simulate_genotype_call_dataset(n_variant=x.shape[0], n_sample=x.shape[1])
-    ds["dosage"] = (["variants", "samples"], x)
+    ds["call_dosage"] = (["variants", "samples"], x)
     ds = window_by_variant(ds, size=10)
 
     ldm = ld_matrix(ds, threshold=0.2)

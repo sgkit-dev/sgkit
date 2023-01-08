@@ -159,7 +159,6 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.cohort_allele_count_spec
     variables.cohort_allele_frequency_spec
     variables.covariates_spec
-    variables.dosage_spec
     variables.genotype_count_spec
     variables.interval_contig_name_spec
     variables.interval_start_spec
