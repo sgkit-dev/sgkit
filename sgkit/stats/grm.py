@@ -109,6 +109,11 @@ def genomic_relationship(
     genotyping-by-sequencing data"
     PhD thesis, University of Otago.
     """
+    variables.validate(
+        ds,
+        {call_dosage: variables.call_dosage_spec},
+    )
+
     estimator = estimator or "VanRaden"
     if estimator not in {"VanRaden"}:
         raise ValueError("Unknown estimator '{}'".format(estimator))
