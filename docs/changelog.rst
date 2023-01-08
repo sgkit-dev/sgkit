@@ -46,6 +46,12 @@ Breaking changes
   defaulted to ``True`` but now defaults to ``False``. Furthermore, ``True``
   is no longer supported since it is not clear how it should behave.
   (:user:`tomwhite`, :pr:`952`, :issue:`947`)
+- The ``dosage`` variable specification has been removed and all references
+  to it have been replaced with :data:`sgkit.variables.call_dosage_spec`
+  which has been generalized to include integer encodings. Additionally,
+  the default value for the ``dosage`` parameter in :func:`ld_matrix` and
+  :func:`ld_prune` has been changed from ``'dosage'`` to ``'call_dosage'``.
+  (:user:`timothymillar`, :pr:`995`, :issue:`875`)
 
 .. Deprecations
 .. ~~~~~~~~~~~~

@@ -262,9 +262,16 @@ corresponding to the frequencies of non-missing occurrences of each allele.
 call_dosage, call_dosage_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "call_dosage",
-        kind="f",
+        kind={"f", "i", "u"},
         dims=("variants", "samples"),
-        __doc__="""Dosages, encoded as floats, with NaN indicating a missing value.""",
+        __doc__="""
+Dosages, encoded as floats, with NaN indicating a missing value.
+Dosages can represent one of several possible quantities, e.g.:
+- Alternate allele counts
+- Recessive or dominant allele encodings
+- True dosages as computed from imputed or probabilistic variant calls
+- Any other custom encoding in a user-defined variable
+""",
     )
 )
 
@@ -423,20 +430,6 @@ covariates, covariates_spec = SgkitVariables.register_variable(
 Covariate variable names. Must correspond to 1 or 2D dataset
 variables of shape (samples[, covariates]). All covariate arrays
 will be concatenated along the second axis (columns).
-""",
-    )
-)
-
-dosage, dosage_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec(
-        "dosage",
-        __doc__="""
-Dosage variable name. Where "dosage" array can contain represent
-one of several possible quantities, e.g.:
-- Alternate allele counts
-- Recessive or dominant allele encodings
-- True dosages as computed from imputed or probabilistic variant calls
-- Any other custom encoding in a user-defined variable
 """,
     )
 )

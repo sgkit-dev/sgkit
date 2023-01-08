@@ -502,21 +502,10 @@ def test_regenie_loco_regression__raise_on_contig_mismatch():
         )
 
 
-def test_regenie_loco_regression__raise_on_non_2D():
+def test_regenie_loco_regression__rechunk_Q_by_X():
     # Sample count too low relative to core covariate will cause
     # degrees of freedom to be zero
     ds = _generate_regenie_test_dataset()
-
-    # Add third dimension to `dosage`. By changing number of chunks,
-    # we also cover `Q.rechunk(X.chunksize)` in this test.
-    ds = ds.assign(
-        dosage=(
-            ("variants", "samples", "third"),
-            da.asarray([ds["dosage"].data], chunks=10).reshape(
-                (len(ds["variants"]), len(ds["samples"]), 1)
-            ),
-        )
-    )
 
     # Match expected `regenie_loco_prediction` shape validation
     ds = ds.assign(
@@ -526,14 +515,31 @@ def test_regenie_loco_regression__raise_on_non_2D():
         )
     )
 
-    with pytest.raises(ValueError, match="All arguments must be 2D"):
-        regenie_loco_regression(
-            ds,
-            dosage="dosage",
-            covariates="sample_covariates",
-            traits="sample_traits",
-            variant_contig="variant_contig",
-            regenie_loco_prediction="regenie_loco_prediction",
-            call_genotype="call_genotype",
-            merge=False,
-        )
+    expect = regenie_loco_regression(
+        ds,
+        dosage="dosage",
+        covariates="sample_covariates",
+        traits="sample_traits",
+        variant_contig="variant_contig",
+        regenie_loco_prediction="regenie_loco_prediction",
+        call_genotype="call_genotype",
+        merge=False,
+    ).compute()
+
+    # Change number of chunks to trigger `Q.rechunk(X.chunksize)`
+    ds = ds.assign(dosage=ds.dosage.chunk(10))
+
+    asctual = regenie_loco_regression(
+        ds,
+        dosage="dosage",
+        covariates="sample_covariates",
+        traits="sample_traits",
+        variant_contig="variant_contig",
+        regenie_loco_prediction="regenie_loco_prediction",
+        call_genotype="call_genotype",
+        merge=False,
+    ).compute()
+
+    np.testing.assert_array_almost_equal(
+        expect.variant_linreg_beta, asctual.variant_linreg_beta
+    )
