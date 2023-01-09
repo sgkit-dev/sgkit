@@ -792,6 +792,21 @@ def test_vcf_to_zarr__filter_not_defined_in_header(shared_datadir, tmp_path):
         vcf_to_zarr(path, output)
 
 
+def test_vcf_to_zarr__info_name_clash(shared_datadir, tmp_path):
+    # info_name_clash.vcf has an info field called 'id' which would be mapped to
+    # 'variant_id', clashing with the fixed field of the same name
+    path = path_for_test(shared_datadir, "info_name_clash.vcf")
+    output = tmp_path.joinpath("info_name_clash.zarr").as_posix()
+
+    vcf_to_zarr(path, output)  # OK if problematic field is ignored
+
+    with pytest.raises(
+        ValueError,
+        match=r"Generated name for INFO field 'id' clashes with 'variant_id' from fixed VCF fields.",
+    ):
+        vcf_to_zarr(path, output, fields=["INFO/id"])
+
+
 def test_vcf_to_zarr__large_number_of_contigs(shared_datadir, tmp_path):
     path = path_for_test(shared_datadir, "Homo_sapiens_assembly38.headerOnly.vcf.gz")
     output = tmp_path.joinpath("vcf.zarr").as_posix()
