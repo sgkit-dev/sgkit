@@ -419,6 +419,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.window_by_interval.html">
+     sgkit.window_by_interval
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="generated/sgkit.window_by_position.html">
      sgkit.window_by_position
     </a>
@@ -426,11 +431,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="generated/sgkit.window_by_variant.html">
      sgkit.window_by_variant
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="generated/sgkit.variables.regenie_base_prediction_spec.html">
-     sgkit.variables.regenie_base_prediction_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -529,8 +529,28 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.interval_contig_name_spec.html">
+     sgkit.variables.interval_contig_name_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.interval_start_spec.html">
+     sgkit.variables.interval_start_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.interval_stop_spec.html">
+     sgkit.variables.interval_stop_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="generated/sgkit.variables.ld_prune_index_to_drop_spec.html">
      sgkit.variables.ld_prune_index_to_drop_spec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/sgkit.variables.regenie_base_prediction_spec.html">
+     sgkit.variables.regenie_base_prediction_spec
     </a>
    </li>
    <li class="toctree-l2">
@@ -1015,18 +1035,13 @@ title="Edit this page"
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#deprecations">
-     Deprecations
+    <a class="reference internal nav-link" href="#improvements">
+     Improvements
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#bug-fixes">
      Bug fixes
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#documentation">
-     Documentation
     </a>
    </li>
   </ul>
@@ -1066,18 +1081,13 @@ title="Edit this page"
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#deprecations">
-     Deprecations
+    <a class="reference internal nav-link" href="#improvements">
+     Improvements
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#bug-fixes">
      Bug fixes
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#documentation">
-     Documentation
     </a>
    </li>
   </ul>
@@ -1097,24 +1107,71 @@ title="Edit this page"
 <span id="changelog-0-6-0"></span><h2>0.6.0 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">#</a></h2>
 <section id="new-features">
 <h3>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>Add support for Python 3.10.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/813">PR 813</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/801">GH 801</a>)</p></li>
+<li><p>Add pedigree support. This allows parent-child relationships to be
+stored in sgkit, and provides a number of new pedigree methods:
+<a class="reference internal" href="generated/sgkit.pedigree_inbreeding.html#sgkit.pedigree_inbreeding" title="sgkit.pedigree_inbreeding"><code class="xref py py-func docutils literal notranslate"><span class="pre">pedigree_inbreeding()</span></code></a>, <a class="reference internal" href="generated/sgkit.pedigree_inverse_relationship.html#sgkit.pedigree_inverse_relationship" title="sgkit.pedigree_inverse_relationship"><code class="xref py py-func docutils literal notranslate"><span class="pre">pedigree_inverse_relationship()</span></code></a>,
+<a class="reference internal" href="generated/sgkit.pedigree_kinship.html#sgkit.pedigree_kinship" title="sgkit.pedigree_kinship"><code class="xref py py-func docutils literal notranslate"><span class="pre">pedigree_kinship()</span></code></a>, and <a class="reference internal" href="generated/sgkit.pedigree_relationship.html#sgkit.pedigree_relationship" title="sgkit.pedigree_relationship"><code class="xref py py-func docutils literal notranslate"><span class="pre">pedigree_relationship()</span></code></a>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/786">GH 786</a>)</p></li>
+<li><p>Implement a function to calculate the VanRaden genomic relationship matrix,
+<a class="reference internal" href="generated/sgkit.genomic_relationship.html#sgkit.genomic_relationship" title="sgkit.genomic_relationship"><code class="xref py py-func docutils literal notranslate"><span class="pre">genomic_relationship()</span></code></a>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/903">PR 903</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/874">GH 874</a>)</p></li>
+<li><p>Generic functions for cohort sums and means.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/867">PR 867</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/730">GH 730</a>)</p></li>
+<li><p>Toggle numba caching by environment variable <code class="docutils literal notranslate"><span class="pre">SGKIT_DISABLE_NUMBA_CACHE</span></code>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/870">PR 870</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/869">GH 869</a>)</p></li>
+<li><p>Add <a class="reference internal" href="generated/sgkit.window_by_genome.html#sgkit.window_by_genome" title="sgkit.window_by_genome"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_genome()</span></code></a> for computing whole-genome statistics.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/945">PR 945</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/893">GH 893</a>)</p></li>
+<li><p>Add <a class="reference internal" href="generated/sgkit.window_by_interval.html#sgkit.window_by_interval" title="sgkit.window_by_interval"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_interval()</span></code></a> to create windows from arbitrary intervals.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/974">PR 974</a>)</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">contig_lengths</span></code> dataset attribute if found in the VCF file.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/946">PR 946</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/464">GH 464</a>)</p></li>
+<li><p>Add VCF export functions.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/953">PR 953</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/924">GH 924</a>)</p></li>
+</ul>
 </section>
 <section id="breaking-changes">
 <h3>Breaking changes<a class="headerlink" href="#breaking-changes" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
+<li><p>Remove support for Python 3.7.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/927">PR 927</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/802">GH 802</a>)</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">count_a1</span></code> parameter to <a class="reference internal" href="generated/sgkit.io.plink.read_plink.html#sgkit.io.plink.read_plink" title="sgkit.io.plink.read_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.read_plink()</span></code></a> previously
 defaulted to <code class="docutils literal notranslate"><span class="pre">True</span></code> but now defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>. Furthermore, <code class="docutils literal notranslate"><span class="pre">True</span></code>
 is no longer supported since it is not clear how it should behave.
 (<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/952">PR 952</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/947">GH 947</a>)</p></li>
 </ul>
 </section>
-<section id="deprecations">
-<h3>Deprecations<a class="headerlink" href="#deprecations" title="Permalink to this headline">#</a></h3>
+<section id="improvements">
+<h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>Improvements to VCF parsing performance.
+(<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/933">PR 933</a>)</p></li>
+<li><p>Improve default VCF compression.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/937">PR 937</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/925">GH 925</a>)</p></li>
+<li><p>Ensure chunking is not excessive in samples dimension.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/943">PR 943</a>)</p></li>
+<li><p>Add asv benchmarks for VCF performance.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/976">PR 976</a>)</p></li>
+<li><p>Add asv benchmarks for VCF compression size.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/978">PR 978</a>)</p></li>
+</ul>
 </section>
 <section id="bug-fixes">
 <h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">#</a></h3>
-</section>
-<section id="documentation">
-<h3>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>Allow chunking in the samples dimension for <a class="reference internal" href="generated/sgkit.identity_by_state.html#sgkit.identity_by_state" title="sgkit.identity_by_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">identity_by_state()</span></code></a>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/837">PR 837</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/836">GH 836</a>)</p></li>
+<li><p>Remove VLenUTF8 from filters to avoid double encoding error.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/852">PR 852</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/785">GH 785</a>)</p></li>
+<li><p>Fix numpy input for <code class="docutils literal notranslate"><span class="pre">Weir_Goudet_beta</span></code>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/865">PR 865</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/861">GH 861</a>)</p></li>
+<li><p>Fix <code class="docutils literal notranslate"><span class="pre">get_region_start</span></code> to work with contig names that have colons and dashes.
+(<a class="reference external" href="https://github.com/d-laub">d-laub</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/883">PR 883</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/882">GH 882</a>)</p></li>
+<li><p>Fixes to VCF reading and writing found by hypothesis testing.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/972">PR 972</a>)</p></li>
+</ul>
 </section>
 </section>
 </section>

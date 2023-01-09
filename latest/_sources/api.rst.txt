@@ -129,6 +129,7 @@ Utilities
    parent_indices
    simulate_genotype_call_dataset
    window_by_genome
+   window_by_interval
    window_by_position
    window_by_variant
 
@@ -142,7 +143,6 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
 .. autosummary::
    :toctree: generated/
 
-    variables.regenie_base_prediction_spec
     variables.call_allele_count_spec
     variables.call_allele_frequency_spec
     variables.call_dosage_spec
@@ -162,7 +162,11 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.covariates_spec
     variables.dosage_spec
     variables.genotype_count_spec
+    variables.interval_contig_name_spec
+    variables.interval_start_spec
+    variables.interval_stop_spec
     variables.ld_prune_index_to_drop_spec
+    variables.regenie_base_prediction_spec
     variables.regenie_loco_prediction_spec
     variables.regenie_meta_prediction_spec
     variables.parent_spec
