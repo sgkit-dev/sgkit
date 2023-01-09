@@ -71,6 +71,49 @@ def test_zarr_to_vcf(shared_datadir, tmp_path, output_is_path):
     )
 
 
+@pytest.mark.parametrize("in_memory_ds", [True, False])
+@pytest.mark.filterwarnings(
+    "ignore::sgkit.io.vcfzarr_reader.DimensionNameForFixedFormatFieldWarning",
+)
+def test_dataset_to_vcf(shared_datadir, tmp_path, in_memory_ds):
+    path = path_for_test(shared_datadir, "sample.vcf.gz")
+    intermediate = tmp_path.joinpath("intermediate.vcf.zarr").as_posix()
+    output = tmp_path.joinpath("output.vcf").as_posix()
+
+    kwargs = zarr_array_sizes(path)
+    vcf_to_zarr(
+        path, intermediate, fields=["INFO/*", "FORMAT/*"], mixed_ploidy=True, **kwargs
+    )
+
+    ds = load_dataset(intermediate)
+
+    if in_memory_ds:
+        ds = ds.load()
+
+    dataset_to_vcf(ds, output)
+
+    v = VCF(output)
+
+    assert v.samples == ["NA00001", "NA00002", "NA00003"]
+
+    variant = next(v)
+
+    assert variant.CHROM == "19"
+    assert variant.POS == 111
+    assert variant.ID is None
+    assert variant.REF == "A"
+    assert variant.ALT == ["C"]
+    assert variant.QUAL == pytest.approx(9.6)
+    assert variant.FILTER is None
+
+    assert variant.genotypes == [[0, 0, True], [0, 0, True], [0, 1, False]]
+
+    assert_array_equal(
+        variant.format("HQ"),
+        [[10, 15], [10, 10], [3, 3]],
+    )
+
+
 @pytest.mark.filterwarnings(
     "ignore::sgkit.io.vcfzarr_reader.DimensionNameForFixedFormatFieldWarning",
 )

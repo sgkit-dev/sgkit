@@ -9,14 +9,17 @@ try:
         vcf_to_zarr,
         vcf_to_zarrs,
     )
+    from .vcf_writer import dataset_to_vcf, zarr_to_vcf
 
     __all__ = [
         "FloatFormatFieldWarning",
         "MaxAltAllelesExceededWarning",
         "concat_zarrs",
+        "dataset_to_vcf",
         "partition_into_regions",
         "vcf_to_zarr",
         "vcf_to_zarrs",
+        "zarr_to_vcf",
     ]
 except ImportError as e:  # pragma: no cover
     if platform.system() == "Windows":

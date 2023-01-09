@@ -8,17 +8,18 @@ User Guide
    :local:
 
 
-.. _reading_genetic_data:
+.. _reading_and_writing_genetic_data:
 
-Reading genetic data
-====================
+Reading and writing genetic data
+================================
 
 .. _installation:
 
 Installation
 ------------
 
-Sgkit can read standard genetic file formats, including VCF, PLINK, and BGEN.
+Sgkit can read standard genetic file formats, including VCF, PLINK, and BGEN. It can also export
+to VCF.
 
 If sgkit has been installed using conda, support for reading BGEN and PLINK is included, but
 VCF is not because there is no Windows support for cyvcf2, the library we use for reading VCF data.
@@ -90,6 +91,9 @@ VCF
 The :func:`sgkit.io.vcf.vcf_to_zarr` function converts one or more VCF files to
 Zarr files stored in sgkit's Xarray data representation, which can then be opened
 as a :class:`xarray.Dataset`.
+
+The :func:`sgkit.io.vcf.dataset_to_vcf` and :func:`sgkit.io.vcf.zarr_to_vcf` functions
+convert sgkit's Xarray data representation to VCF.
 
 See :ref:`vcf` for installation instructions, and details on using VCF in sgkit.
 
