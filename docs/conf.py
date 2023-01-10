@@ -125,20 +125,27 @@ intersphinx_mapping = dict(
 
 # -- Options for HTML output -------------------------------------------------
 
+version = sgkit.__version__
+if "dev" in version or version == "unknown":
+    version = "latest"
+
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_book_theme"
-html_title = ""
-html_logo = "_static/sgkit_trnsprnt.png"
+html_theme = "pydata_sphinx_theme"
 
+# https://pydata-sphinx-theme.readthedocs.io/en/latest/user_guide/configuring.html
 html_theme_options = {
-    "repository_url": "https://github.com/pystatgen/sgkit",
-    "use_repository_button": True,
-    "use_issues_button": True,
-    "use_edit_page_button": True,
-    "use_download_button": False,
-    "use_fullscreen_button": False,
+    "github_url": "https://github.com/pystatgen/sgkit",
+    "logo": {
+        "image_light": "sgkit_trnsprnt.png",
+        "image_dark": "sgkit_blue_trnsprnt.png",
+    },
+    "navbar_end": ["version-switcher", "theme-switcher", "navbar-icon-links"],
+    "switcher": {
+        "json_url": "_static/switcher.json",
+        "version_match": version,
+    },
 }
 
 html_css_files = [
