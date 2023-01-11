@@ -47,7 +47,7 @@ def test_vcf_to_zarr(tmp_path, vcf_string):
     note(f"vcf:\n{vcf_string}")
 
     input = tmp_path.joinpath("input.vcf")
-    output = tmp_path.joinpath("output.zarr")
+    output = dict()  # in-memory Zarr is guaranteed to be case-sensitive
 
     with open(input, "w") as f:
         f.write(vcf_string)

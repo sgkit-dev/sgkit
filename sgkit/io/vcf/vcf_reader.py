@@ -60,6 +60,17 @@ except ImportError:  # pragma: no cover
     warnings.warn("Cannot import Blosc, falling back to no compression", RuntimeWarning)
     DEFAULT_COMPRESSOR = None
 
+# From VCF fixed fields
+RESERVED_VARIABLE_NAMES = [
+    "variant_contig",
+    "variant_position",
+    "variant_id",
+    "variant_id_mask",
+    "variant_allele",
+    "variant_quality",
+    "variant_filter",
+]
+
 
 class FloatFormatFieldWarning(UserWarning):
     """Warning for VCF FORMAT float fields, which can use a lot of storage."""
@@ -209,6 +220,10 @@ class VcfFieldHandler:
             dims = [DIM_VARIANT, DIM_SAMPLE]
             n_sample = len(vcf.samples)
             chunksize = (chunk_length, n_sample)
+        if variable_name in RESERVED_VARIABLE_NAMES:
+            raise ValueError(
+                f"Generated name for INFO field '{key}' clashes with '{variable_name}' from fixed VCF fields."
+            )
         if dimension is not None:
             dims.append(dimension)
             chunksize += (size,)
