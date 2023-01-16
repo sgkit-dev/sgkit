@@ -67,6 +67,7 @@ RESERVED_INFO_KEYS = [
     "SOMATIC",
     "VALIDATED",
     "1000G",
+    "id",  # conflicts with 'variant_id' variable; see RESERVED_VARIABLE_NAMES in vcf_reader.py
 ]
 
 # [Table 2: Reserved genotype keys]
