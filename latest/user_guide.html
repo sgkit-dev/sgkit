@@ -511,6 +511,7 @@
 <ul>
 <li><p><a class="reference internal" href="#monitoring-operations" id="id24">Monitoring operations</a></p></li>
 <li><p><a class="reference internal" href="#visualizing-computations" id="id25">Visualizing computations</a></p></li>
+<li><p><a class="reference internal" href="#disabling-the-numba-cache" id="id26">Disabling the Numba cache</a></p></li>
 </ul>
 </li>
 </ul>
@@ -887,8 +888,8 @@ indexing and uniqueness within Xarray/Pandas, since this is critical for underst
 <span class="gp">   ....: </span>    <span class="n">ac</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 <span class="gp">   ....: </span>
 
-<span class="go">[                                        ] | 0% Completed | 218.11 us</span>
-<span class="go">[########################################] | 100% Completed | 100.52 ms</span>
+<span class="go">[                                        ] | 0% Completed | 286.81 us</span>
+<span class="go">[########################################] | 100% Completed | 100.59 ms</span>
 
 <span class="gp">In [35]: </span><span class="n">ac</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 <span class="gh">Out[35]: </span>
@@ -939,6 +940,24 @@ the graph just a few chunks, as shown in this example.</p>
 </div>
 <a class="reference internal image-reference" href="_images/order.png"><img alt="_images/order.png" class="align-center" src="_images/order.png" style="width: 600px;" /></a>
 <p>Task order number is shown in circular boxes, colored from red to yellow.</p>
+</section>
+<section id="disabling-the-numba-cache">
+<h3><a class="toc-backref" href="#id26">Disabling the Numba cache</a><a class="headerlink" href="#disabling-the-numba-cache" title="Permalink to this headline">#</a></h3>
+<p>Internally, sgkit uses the <a class="reference external" href="https://numba.pydata.org/">Numba JIT compiler</a> to accelerate some methods.
+These methods will be compiled the first time that they are used following a new installation.
+The compiled methods are automatically cached so that recompilation is not required in future sessions.
+However, this may occasionally cause issues with some setups.</p>
+<p>Caching of compiled sgkit methods can be disabled by setting the environment variable <code class="docutils literal notranslate"><span class="pre">SGKIT_DISABLE_NUMBA_CACHE</span></code> to <code class="docutils literal notranslate"><span class="pre">1</span></code>.
+This variable can also be set from within a python session <em>before</em> loading sgkit.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [43]: </span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="gp">In [44]: </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;SGKIT_DISABLE_NUMBA_CACHE&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;1&#39;</span>
+
+<span class="gp">In [45]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+</pre></div>
+</div>
+<p>With caching disabled, these methods will be compiled the first time that they are called during each session.
+Refer to the <a class="reference external" href="https://numba.readthedocs.io/en/stable/developer/caching.html">Numba notes on caching</a> for more information.</p>
 </section>
 </section>
 </section>
@@ -1095,6 +1114,11 @@ the graph just a few chunks, as shown in this example.</p>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#visualizing-computations">
      Visualizing computations
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#disabling-the-numba-cache">
+     Disabling the Numba cache
     </a>
    </li>
   </ul>
