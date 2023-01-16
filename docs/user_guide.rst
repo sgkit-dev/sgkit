@@ -339,3 +339,24 @@ By passing keyword arguments to ``visualize`` we can see the order tasks will ru
     :align: center
 
 Task order number is shown in circular boxes, colored from red to yellow.
+
+Disabling the Numba cache
+-------------------------
+
+Internally, sgkit uses the `Numba JIT compiler <https://numba.pydata.org/>`_ to accelerate some methods.
+These methods will be compiled the first time that they are used following a new installation.
+The compiled methods are automatically cached so that recompilation is not required in future sessions. 
+However, this may occasionally cause issues with some setups.
+
+Caching of compiled sgkit methods can be disabled by setting the environment variable ``SGKIT_DISABLE_NUMBA_CACHE`` to ``1``.
+This variable can also be set from within a python session *before* loading sgkit.
+
+.. ipython:: python
+    :okwarning:
+
+    import os
+    os.environ['SGKIT_DISABLE_NUMBA_CACHE']='1'
+    import sgkit as sg
+
+With caching disabled, these methods will be compiled the first time that they are called during each session.
+Refer to the `Numba notes on caching <https://numba.readthedocs.io/en/stable/developer/caching.html>`_ for more information.
