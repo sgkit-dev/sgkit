@@ -38,7 +38,6 @@ from .stats.pedigree import (
     pedigree_inbreeding,
     pedigree_inverse_relationship,
     pedigree_kinship,
-    pedigree_relationship,
 )
 from .stats.popgen import (
     Fst,
@@ -97,7 +96,6 @@ __all__ = [
     "pedigree_inbreeding",
     "pedigree_inverse_relationship",
     "pedigree_kinship",
-    "pedigree_relationship",
     "sample_stats",
     "variant_stats",
     "diversity",
