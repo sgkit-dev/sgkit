@@ -106,7 +106,6 @@ Methods
    pedigree_inbreeding
    pedigree_inverse_relationship
    pedigree_kinship
-   pedigree_relationship
    pc_relate
    regenie
    sample_stats

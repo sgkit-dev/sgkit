@@ -780,12 +780,16 @@ def pedigree_kinship(
     parent: Hashable = variables.parent,
     stat_Hamilton_Kerr_tau: Hashable = variables.stat_Hamilton_Kerr_tau,
     stat_Hamilton_Kerr_lambda: Hashable = variables.stat_Hamilton_Kerr_lambda,
+    return_relationship: bool = False,
     allow_half_founders: bool = False,
     founder_kinship: Hashable = None,
     founder_indices: Hashable = None,
     merge: bool = True,
 ) -> Dataset:
     """Estimate expected pairwise kinship coefficients from pedigree structure.
+
+    This method can optionally return the additive relationship matrix
+    (ARM or A-matrix).
 
     Parameters
     ----------
@@ -810,6 +814,9 @@ def pedigree_kinship(
         Input variable name holding stat_Hamilton_Kerr_lambda as defined
         by :data:`sgkit.variables.stat_Hamilton_Kerr_lambda_spec`.
         This variable is only required for the "Hamilton-Kerr" method.
+    return_relationship
+        If True, the additive relationship matrix will be returned in
+        addition to the kinship matrix.
     allow_half_founders
         If False (the default) then a ValueError will be raised if any
         individuals only have a single recorded parent.
@@ -837,7 +844,9 @@ def pedigree_kinship(
 
     Returns
     -------
-    A dataset containing :data:`sgkit.variables.stat_pedigree_kinship_spec`.
+    A dataset containing :data:`sgkit.variables.stat_pedigree_kinship_spec`
+    and, if return_relationship is True,
+    :data:`sgkit.variables.stat_pedigree_relationship_spec`.
 
     Raises
     ------
@@ -877,7 +886,8 @@ def pedigree_kinship(
 
     Note
     ----
-    Dimensions of :data:`sgkit.variables.stat_pedigree_kinship_spec` are named
+    Dimensions of :data:`sgkit.variables.stat_pedigree_kinship_spec` and
+    :data:`sgkit.variables.stat_pedigree_relationship_spec` are named
     ``samples_0`` and ``samples_1``.
 
     Note
@@ -898,7 +908,7 @@ def pedigree_kinship(
     Examples
     --------
 
-    Inbred diploid pedigree:
+    Inbred diploid pedigree returning additive relationship matrix:
 
     >>> import sgkit as sg
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, seed=1)
@@ -910,12 +920,17 @@ def pedigree_kinship(
     ...     ["S0", "S1"],
     ...     ["S0", "S2"]
     ... ]
-    >>> ds = sg.pedigree_kinship(ds)
+    >>> ds = sg.pedigree_kinship(ds, return_relationship=True)
     >>> ds["stat_pedigree_kinship"].values # doctest: +NORMALIZE_WHITESPACE
     array([[0.5  , 0.   , 0.25 , 0.375],
            [0.   , 0.5  , 0.25 , 0.125],
            [0.25 , 0.25 , 0.5  , 0.375],
            [0.375, 0.125, 0.375, 0.625]])
+    >>> ds["stat_pedigree_relationship"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[1.  , 0.  , 0.5 , 0.75],
+           [0.  , 1.  , 0.5 , 0.25],
+           [0.5 , 0.5 , 1.  , 0.75],
+           [0.75, 0.25, 0.75, 1.25]])
 
     Inbred diploid pedigree with related founders:
 
@@ -930,7 +945,7 @@ def pedigree_kinship(
     ...     ["S0", "S2"]
     ... ]
     >>> # add "known" kinships among founders
-    >>> ds["founder_kinship"] = ["founders", "founders"], [
+    >>> ds["founder_kinship"] = ["founders_0", "founders_1"], [
     ...     [0.5, 0.1],
     ...     [0.1, 0.6],
     ... ]
@@ -1093,105 +1108,21 @@ def pedigree_kinship(
                 founder_indices,
                 allow_half_founders=allow_half_founders,
             )
-    new_ds = create_dataset(
-        {
-            variables.stat_pedigree_kinship: xr.DataArray(
-                kinship, dims=["samples_0", "samples_1"]
-            ),
+    dims = ["samples_0", "samples_1"]
+    if return_relationship:
+        relationship = kinship * 2
+        if method == "Hamilton-Kerr":
+            ploidy = tau.sum(axis=-1)
+            relationship *= np.sqrt(ploidy[None, :] / 2 * ploidy[:, None] / 2)
+        arrays = {
+            variables.stat_pedigree_kinship: xr.DataArray(kinship, dims=dims),
+            variables.stat_pedigree_relationship: xr.DataArray(relationship, dims=dims),
         }
-    )
-    return conditional_merge_datasets(ds, new_ds, merge)
-
-
-def pedigree_relationship(
-    ds: Dataset,
-    *,
-    method: Literal["additive"] = "additive",
-    stat_pedigree_kinship: Hashable = variables.stat_pedigree_kinship,
-    sample_ploidy: Hashable = None,
-    merge: bool = True,
-) -> Dataset:
-    """Calculate a relationship matrix from pedigree structure
-
-    Parameters
-    ----------
-    ds
-        Dataset containing pedigree structure.
-    method
-        The method used for relationship estimation. Currently the only
-        option is "additive".
-    stat_pedigree_kinship
-        Input variable name holding pedigree kinship matrix as defined
-        by :data:`sgkit.variables.stat_pedigree_kinship_spec`.
-    sample_ploidy
-        Optional input variable name holding the ploidy of each sample
-        as defined by :data:`sgkit.variables.sample_ploidy_spec`.
-        By default the ploidy for all samples will be assumed to be equal
-        to the size of the ploidy dimension. If the ploidy dimension is
-        absent, then all samples will be assumed to be diploid.
-    merge
-        If True (the default), merge the input dataset and the computed
-        output variables into a single dataset, otherwise return only
-        the computed output variables.
-
-    Returns
-    -------
-    A dataset containing :data:`sgkit.variables.stat_pedigree_relationship_spec`.
-
-    Raises
-    ------
-    ValueError
-        If an unknown method is specified.
-
-    Note
-    -----
-    Dimensions of :data:`sgkit.variables.stat_pedigree_relationship_spec`
-    are named ``samples_0`` and ``samples_1``.
-
-    Examples
-    --------
-
-    >>> import sgkit as sg
-    >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, seed=1)
-    >>> ds.sample_id.values # doctest: +NORMALIZE_WHITESPACE
-    array(['S0', 'S1', 'S2', 'S3'], dtype='<U2')
-    >>> ds["parent_id"] = ["samples", "parents"], [
-    ...     [".", "."],
-    ...     [".", "."],
-    ...     ["S0", "S1"],
-    ...     ["S0", "S2"]
-    ... ]
-    >>> ds = sg.pedigree_kinship(ds)
-    >>> ds = sg.pedigree_relationship(ds)
-    >>> ds["stat_pedigree_relationship"].values # doctest: +NORMALIZE_WHITESPACE
-    array([[1.  , 0.  , 0.5 , 0.75],
-           [0.  , 1.  , 0.5 , 0.25],
-           [0.5 , 0.5 , 1.  , 0.75],
-           [0.75, 0.25, 0.75, 1.25]])
-
-    """
-    if method not in {"additive"}:
-        raise ValueError("Unknown method '{}'".format(method))
-    variables.validate(
-        ds, {stat_pedigree_kinship: variables.stat_pedigree_kinship_spec}
-    )
-    kinship = ds[stat_pedigree_kinship].data
-    if sample_ploidy is None:
-        ploidy = ds.dims.get("ploidy", 2)
     else:
-        ploidy = ds[sample_ploidy].data
-    if method == "additive":
-        if isinstance(ploidy, int):
-            A = kinship * ploidy
-        else:
-            A = kinship * 2 * np.sqrt(ploidy[None, :] / 2 * ploidy[:, None] / 2)
-    new_ds = create_dataset(
-        {
-            variables.stat_pedigree_relationship: xr.DataArray(
-                A, dims=["samples_0", "samples_1"]
-            ),
+        arrays = {
+            variables.stat_pedigree_kinship: xr.DataArray(kinship, dims=dims),
         }
-    )
+    new_ds = create_dataset(arrays)
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
