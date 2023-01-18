@@ -15,7 +15,7 @@ New Features
   (:user:`tomwhite`, :pr:`813`, :issue:`801`)
 - Add pedigree support. This allows parent-child relationships to be
   stored in sgkit, and provides a number of new pedigree methods:
-  :func:`pedigree_inbreeding`, :func:`pedigree_inverse_relationship`,
+  :func:`pedigree_inbreeding`, :func:`pedigree_inverse_kinship`,
   and :func:`pedigree_kinship`.
   (:user:`timothymillar`, :issue:`786`)
 - Implement a function to calculate the VanRaden genomic relationship matrix,
