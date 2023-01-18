@@ -1,17 +1,25 @@
+import math
 from typing import Any, List, Union
 
 import dask.array as da
 import numpy as np
 import pytest
 import xarray as xr
+from scipy.special import comb
 from xarray import Dataset
 
 from sgkit.stats.aggregation import (
+    _COMB_REP_LOOKUP,
+    _biallelic_genotype_index,
+    _comb,
+    _comb_with_replacement,
+    _sorted_genotype_index,
     call_allele_frequencies,
     cohort_allele_frequencies,
     count_call_alleles,
     count_cohort_alleles,
     count_variant_alleles,
+    count_variant_genotypes,
     individual_heterozygosity,
     infer_call_ploidy,
     infer_sample_ploidy,
@@ -261,6 +269,292 @@ def test_count_cohort_alleles__chunked(chunks):
     ac2 = count_cohort_alleles(ds)
     assert isinstance(ac2["cohort_allele_count"].data, da.Array)
     xr.testing.assert_equal(ac1, ac2)
+
+
+@pytest.mark.parametrize(
+    "n, k",
+    [
+        (0, 0),
+        (1, 0),
+        (0, 1),
+        (20, 4),
+        (100, 3),
+        (30, 20),
+        (1, 1),
+        (2, 7),
+        (7, 2),
+        (87, 4),
+    ],
+)
+def test_comb(n, k):
+    assert _comb(n, k) == comb(n, k, exact=True)
+
+
+@pytest.mark.parametrize(
+    "n, k",
+    [
+        (0, 0),
+        (1, 0),
+        (0, 1),
+        (20, 4),
+        (100, 3),
+        (30, 20),
+        (1, 1),
+        (2, 7),
+        (7, 2),
+        (87, 4),
+    ],
+)
+def test_comb_with_replacement(n, k):
+    assert _comb_with_replacement(n, k) == comb(n, k, exact=True, repetition=True)
+
+
+def test__COMB_REP_LOOKUP():
+    ns, ks = _COMB_REP_LOOKUP.shape
+    for n in range(ns):
+        for k in range(ks):
+            assert _COMB_REP_LOOKUP[n, k] == comb(n, k, exact=True, repetition=True)
+
+
+@pytest.mark.parametrize(
+    "genotype, expect",
+    [
+        ([-1, 0], -1),
+        ([0, -1], -1),
+        ([0, 0], 0),
+        ([0, 1], 1),
+        ([1, 0], 1),
+        ([1, 1], 2),
+        ([0, 0, 0], 0),
+        ([0, 1, 0], 1),
+        ([1, 1, 1], 3),
+        ([0, 0, 0, 0], 0),
+        ([0, 1, 0, 1], 2),
+        ([1, 1, 0, 1], 3),
+    ],
+)
+def test__biallelic_genotype_index(genotype, expect):
+    genotype = np.array(genotype)
+    assert _biallelic_genotype_index(genotype) == expect
+
+
+def test__biallelic_genotype_index__raise_on_not_biallelic():
+    genotype = np.array([1, 2, 0, 1])
+    with pytest.raises(ValueError, match="Allele value > 1"):
+        _biallelic_genotype_index(genotype)
+
+
+def test__biallelic_genotype_index__raise_on_mixed_ploidy():
+    genotype = np.array([1, 1, 0, -2])
+    with pytest.raises(
+        ValueError, match="Mixed-ploidy genotype indicated by allele < -1"
+    ):
+        _biallelic_genotype_index(genotype)
+
+
+@pytest.mark.parametrize(
+    "genotype, expect",
+    [
+        ([-1, 0], -1),
+        ([0, 0], 0),
+        ([0, 1], 1),
+        ([1, 1], 2),
+        ([1, 2], 4),
+        ([2, 2], 5),
+        ([0, 3], 6),
+        ([2, 3], 8),
+        ([1, 2, 2], 8),
+        ([0, 0, 3], 10),
+        ([0, 2, 3], 13),
+        ([3, 3, 3, 3], 34),
+        ([11, 11, 11, 11], 1364),
+        ([0, 0, 0, 12], 1365),
+        ([42, 42, 42, 42, 42, 42], 12271511),
+        ([0, 0, 1, 1, 1, 43], 12271515),
+        ([-1, 0, 1, 1, 1, 43], -1),
+    ],
+)
+def test__sorted_genotype_index(genotype, expect):
+    genotype = np.array(genotype)
+    assert _sorted_genotype_index(genotype) == expect
+
+
+def test__sorted_genotype_index__raise_on_mixed_ploidy():
+    genotype = np.array([-2, 0, 1, 2])
+    with pytest.raises(
+        ValueError, match="Mixed-ploidy genotype indicated by allele < -1"
+    ):
+        _sorted_genotype_index(genotype)
+
+
+@pytest.mark.parametrize(
+    "n_variant, n_sample, missing_pct",
+    [
+        (100, 20, 0),
+        (77, 21, 0),
+        (53, 52, 0.1),
+    ],
+)
+@pytest.mark.parametrize(
+    "ploidy",
+    [2, 4, 7],
+)
+@pytest.mark.parametrize(
+    "chunked",
+    [False, True],
+)
+def test_count_variant_genotypes__biallelic(
+    n_variant, n_sample, missing_pct, ploidy, chunked
+):
+    # reference implementation
+    def count_biallelic_genotypes(calls, ploidy):
+        indices = calls.sum(axis=-1)
+        n_genotypes = ploidy + 1
+        count = indices[:, :, None] == np.arange(n_genotypes)[None, :]
+        partial = (calls < 0).any(axis=-1)
+        count[partial] = False
+        return count.sum(axis=1)
+
+    ds = simulate_genotype_call_dataset(
+        n_variant=n_variant,
+        n_sample=n_sample,
+        n_ploidy=ploidy,
+        missing_pct=missing_pct,
+        seed=0,
+    )
+    calls = ds.call_genotype.values
+    expect = count_biallelic_genotypes(calls, ploidy)
+    if chunked:
+        # chunk each dim
+        chunks = (
+            (n_variant // 2, n_variant - n_variant // 2),
+            (n_sample // 2, n_sample - n_sample // 2),
+            (ploidy // 2, ploidy - ploidy // 2),
+        )
+        ds["call_genotype"] = ds["call_genotype"].chunk(chunks)
+    actual = count_variant_genotypes(ds)["variant_genotype_count"].data
+    np.testing.assert_array_equal(expect, actual)
+
+
+def test_count_variant_genotypes__raise_on_not_biallelic():
+    ds = simulate_genotype_call_dataset(
+        n_variant=10,
+        n_sample=5,
+        n_allele=2,
+        seed=0,
+    )
+    ds["call_genotype"].data[2, 2, 1] = 2
+    with pytest.raises(ValueError, match="Allele value > 1"):
+        count_variant_genotypes(ds).compute()
+
+
+@pytest.mark.parametrize(
+    "genotypes",
+    [
+        [
+            [0, 0],
+            [0, 1],
+            [1, 1],
+            [0, 2],
+            [1, 2],
+            [2, 2],
+            [0, -1],  # partial
+            [1, -1],  # partial
+            [2, -1],  # partial
+        ],
+        [
+            [0, 0, 0],
+            [0, 0, 1],
+            [0, 1, 1],
+            [1, 1, 1],
+            [0, 0, 2],
+            [0, 1, 2],
+            [1, 1, 2],
+            [0, 2, 2],
+            [1, 2, 2],
+            [0, 1, -1],  # partial
+            [1, -1, -1],  # partial
+        ],
+        [
+            [0, 0, 0, 0],
+            [0, 0, 0, 1],
+            [0, 0, 1, 1],
+            [0, 1, 1, 1],
+            [1, 1, 1, 1],
+            [0, 0, 0, 2],
+            [0, 0, 1, 2],
+            [0, 1, 1, 2],
+            [1, 1, 1, 2],
+            [0, 0, 2, 2],
+            [0, 1, 2, 2],
+            [1, 1, 2, 2],
+            [0, 2, 2, 2],
+            [1, 2, 2, 2],
+            [2, 2, 2, 2],
+            [0, 0, 0, 3],
+            [0, 0, 1, 3],
+            [0, 1, 1, 3],
+            [1, 1, 1, 3],
+            [0, 0, 2, 3],
+            [0, 1, 2, 3],
+            [1, 1, 2, 3],
+            [0, 2, 2, 3],
+            [1, 2, 2, 3],
+            [2, 2, 2, 3],
+            [0, 0, 3, 3],
+            [0, 1, 3, 3],
+            [1, 1, 3, 3],
+            [0, 2, 3, 3],
+            [1, 2, 3, 3],
+            [2, 2, 3, 3],
+            [0, 3, 3, 3],
+            [1, 3, 3, 3],
+            [2, 3, 3, 3],
+            [3, 3, 3, 3],
+            [3, 3, 3, -1],  # final genotype is partial
+        ],
+    ],
+)
+def test_count_variant_genotypes__multiallelic(genotypes):
+    # Note: valid genotypes must be in VCF sort order
+    # with any partial genotypes at the end
+    genotypes = np.array(genotypes)
+    n_options, ploidy = genotypes.shape
+    n_valid = (genotypes >= 0).all(axis=-1).sum()
+    n_variant, n_sample = 100, 75
+    n_allele = genotypes.max() + 1
+    n_genotype = math.comb(n_allele + ploidy - 1, ploidy)
+    np.random.seed(0)
+    # randomly select genotype for each call
+    indices = np.random.randint(n_options, size=(n_variant, n_sample))
+    expect_indices = np.where(indices < n_valid, indices, -1)
+    expect = (expect_indices[:, :, None] == np.arange(n_genotype)).sum(axis=1)
+    # create call dataset matching those indices
+    calls = genotypes[indices]
+    rng = np.random.default_rng()
+    rng.shuffle(calls, axis=-1)  # randomize alleles within calls
+    ds = simulate_genotype_call_dataset(
+        n_variant=n_variant,
+        n_sample=n_sample,
+        n_allele=genotypes.max() + 1,
+        n_ploidy=ploidy,
+        seed=0,
+    )
+    ds["call_genotype"] = ds["call_genotype"].dims, calls
+    actual = count_variant_genotypes(ds)["variant_genotype_count"].data
+    np.testing.assert_array_equal(expect, actual)
+
+
+def test_count_variant_genotypes__raise_on_mixed_ploidy():
+    ds = simulate_genotype_call_dataset(
+        n_variant=10,
+        n_sample=5,
+        n_allele=2,
+        seed=0,
+    )
+    ds.call_genotype.attrs["mixed_ploidy"] = True
+    with pytest.raises(ValueError, match="Mixed-ploidy dataset"):
+        count_variant_genotypes(ds).compute()
 
 
 @pytest.mark.parametrize(

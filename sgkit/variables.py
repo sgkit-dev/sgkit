@@ -1020,6 +1020,25 @@ generating process used contig names that were also integers.
     )
 )
 
+variant_genotype_count, variant_genotype_count_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "variant_genotype_count",
+        kind={"i", "u"},
+        dims=("variants", "genotypes"),
+        __doc__="""
+The number of observations for each possible genotype at each variant.
+Counts are sorted following the ordering defined in the VCF specification.
+
+- For biallelic, diploid genotypes the ordering is ``00``, ``01``, ``11``
+  (homozygous reference, heterozygous, homozygous alternate).
+- For triallelic, diploid genotypes the ordering is ``00``, ``01``, ``11``,
+  ``02``, ``12``, ``22``
+- For triallelic, triploid genotypes the ordering is  ``000``, ``001``, ``011``,
+  ``111``, ``002``, ``012``, ``112``, ``022``, ``122``, ``222``
+""",
+    )
+)
+
 variant_hwe_p_value, variant_hwe_p_value_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "variant_hwe_p_value",
