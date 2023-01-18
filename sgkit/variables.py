@@ -842,6 +842,18 @@ See also: :data:`sgkit.variables.stat_Hamilton_Kerr_tau_spec`.
 )
 
 (
+    stat_pedigree_inverse_kinship,
+    stat_pedigree_inverse_kinship_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_pedigree_inverse_kinship",
+        dims=("samples_0", "samples_1"),
+        kind="f",
+        __doc__="""Inverse of a kinship matrix calculated from pedigree structure.""",
+    )
+)
+
+(
     stat_pedigree_inverse_relationship,
     stat_pedigree_inverse_relationship_spec,
 ) = SgkitVariables.register_variable(

@@ -1588,13 +1588,14 @@ def pedigree_inbreeding(
 
 
 @numba_jit
-def _update_inverse_additive_relationships(
+def _update_inverse_kinship(
     mtx: ArrayLike,
     parent: ArrayLike,
     self_kinship: ArrayLike,
     parent_kinship: ArrayLike,
     i: int,
     tau: ArrayLike,
+    return_relationship=False,
 ) -> None:
     p, q = parent[i]
     tau_p, tau_q = tau[i, 0], tau[i, 1]
@@ -1613,44 +1614,51 @@ def _update_inverse_additive_relationships(
         scalar = 1 / (self_kinship[i] - prod)
     except:  # noqa: E722
         raise ValueError("Singular kinship matrix")
-    # Calculate inverse kinships and adjust to inverse relationships.
-    # using sparse matrix multiplication.
-    # The inverse kinships are then adjusted to inverse relationships by
-    # dividing by a weighting of the ploidy of each pair of individuals.
+    # Calculate inverse kinships using sparse matrix multiplication.
+    # If kinships are to be returned as relationships then they
+    # are adjusted to inverse relationships by dividing bu a
+    # weighting of the ploidy of each pair of individuals.
     if p >= 0:
-        ploidy_p = 2 if tau is None else tau[p, 0] + tau[p, 1]
-        mtx[p, p] += (weight_p**2 * scalar) / ploidy_p
-        num = weight_p * scalar
-        denom = 2 * np.sqrt(ploidy_p / 2 * ploidy_i / 2)
-        frac = num / denom
-        mtx[p, i] -= frac
-        mtx[i, p] -= frac
+        val_pp = weight_p**2 * scalar
+        val_pi = weight_p * scalar
+        if return_relationship:
+            ploidy_p = tau[p, 0] + tau[p, 1]
+            val_pp /= ploidy_p
+            val_pi /= 2 * np.sqrt(ploidy_p / 2 * ploidy_i / 2)
+        mtx[p, p] += val_pp
+        mtx[p, i] -= val_pi
+        mtx[i, p] -= val_pi
     if q >= 0:
-        ploidy_q = 2 if tau is None else tau[q, 0] + tau[q, 1]
-        mtx[q, q] += (weight_q**2 * scalar) / ploidy_q
-        num = weight_q * scalar
-        denom = 2 * np.sqrt(ploidy_q / 2 * ploidy_i / 2)
-        frac = num / denom
-        mtx[q, i] -= frac
-        mtx[i, q] -= frac
+        val_qq = weight_q**2 * scalar
+        val_qi = weight_q * scalar
+        if return_relationship:
+            ploidy_q = tau[q, 0] + tau[q, 1]
+            val_qq /= ploidy_q
+            val_qi /= 2 * np.sqrt(ploidy_q / 2 * ploidy_i / 2)
+        mtx[q, q] += val_qq
+        mtx[q, i] -= val_qi
+        mtx[i, q] -= val_qi
     if (p >= 0) and (q >= 0):
-        num = weight_p * weight_q * scalar
-        denom = 2 * np.sqrt(ploidy_p / 2 * ploidy_q / 2)
-        frac = num / denom
-        mtx[p, q] += frac
-        mtx[q, p] += frac
-    mtx[i, i] += scalar / ploidy_i
+        val_pq = weight_p * weight_q * scalar
+        if return_relationship:
+            val_pq /= 2 * np.sqrt(ploidy_p / 2 * ploidy_q / 2)
+        mtx[p, q] += val_pq
+        mtx[q, p] += val_pq
+    val_ii = scalar
+    if return_relationship:
+        val_ii /= ploidy_i
+    mtx[i, i] += val_ii
 
 
 @numba_jit
-def inverse_relationship_Hamilton_Kerr(
+def inverse_kinship_Hamilton_Kerr(
     parent: ArrayLike,
     tau: ArrayLike,
-    lambda_: ArrayLike,
-    allow_half_founders: bool = False,
+    self_kinship: ArrayLike,
+    parent_kinship: ArrayLike,
+    return_relationship=False,
 ) -> ArrayLike:
-    """Compute the inverse of the additive relationship matrix from
-    pedigree structure.
+    """Compute the inverse of the kinship matrix from pedigree structure.
 
     Parameters
     ----------
@@ -1661,63 +1669,72 @@ def inverse_relationship_Hamilton_Kerr(
     tau
         A matrix of shape (samples, parents) containing
         :data:`sgkit.variables.stat_Hamilton_Kerr_tau_spec`.
-    lambda_
-        A matrix of shape (samples, parents) containing
-        :data:`sgkit.variables.stat_Hamilton_Kerr_lambda_spec`.
-    allow_half_founders
-        If False (the default) then a ValueError will be raised if any
-        individuals only have a single recorded parent.
-        If True then the unrecorded parent will be assumed to be
-        a unique founder unrelated to all other founders.
+    self_kinship
+        An array containing the self-kinship of each sample.
+    parent_kinship
+        An array containing the kinship between the parents of each sample.
+    return_relationship
+        If True then the inverse of the additive relationship matrix will
+        be returned instead of the inverse of the kinship matrix.
+
+    Notes
+    -----
+    The inbreeding and parent_kinship values must be calculated from only
+    the pedigree structure.
 
     Returns
     -------
-    The inverse of the additive relationship matrix.
+    The inverse of the kinship matrix.
 
     """
-    if parent.shape[1] != 2:
-        parent, tau, lambda_ = _compress_hamilton_kerr_parameters(parent, tau, lambda_)
-    inbreeding, parent_kinship = inbreeding_Hamilton_Kerr(
-        parent,
-        tau,
-        lambda_,
-        allow_half_founders=allow_half_founders,
-    )
-    ploidy = tau.sum(axis=-1)
-    self_kinship = _inbreeding_as_self_kinship(inbreeding, ploidy)
+    parent, tau, _ = _compress_hamilton_kerr_parameters(parent, tau, tau)
     order = topological_argsort(parent)
     n = len(parent)
     mtx = np.zeros((n, n))
     for i in order:
-        _update_inverse_additive_relationships(
-            mtx, parent, self_kinship, parent_kinship, i, tau=tau
+        _update_inverse_kinship(
+            mtx,
+            parent,
+            self_kinship,
+            parent_kinship,
+            i,
+            tau=tau,
+            return_relationship=return_relationship,
         )
     return mtx
 
 
-def pedigree_inverse_relationship(
+def inbreeding_as_self_kinship(inbreeding: ArrayLike, ploidy: ArrayLike) -> ArrayLike:
+    """Convert inbreeding coefficients to self-kinship coefficients."""
+    return (1 + (ploidy - 1) * inbreeding) / ploidy
+
+
+def pedigree_inverse_kinship(
     ds: Dataset,
     *,
-    method: Literal["additive", "Hamilton-Kerr"] = "additive",
+    method: Literal["diploid", "Hamilton-Kerr"] = "diploid",
     parent: Hashable = variables.parent,
     stat_Hamilton_Kerr_tau: Hashable = variables.stat_Hamilton_Kerr_tau,
     stat_Hamilton_Kerr_lambda: Hashable = variables.stat_Hamilton_Kerr_lambda,
+    return_relationship: bool = False,
     allow_half_founders: bool = False,
     merge: bool = True,
 ) -> Dataset:
-    """Calculate an inverse relationship matrix from pedigree structure.
+    """Calculate the inverse of the kinship matrix from pedigree structure.
+
+    This method can optionally return the inverse of the additive relationship
+    matrix (ARM or A-matrix).
 
     Parameters
     ----------
     ds
         Dataset containing pedigree structure.
     method
-        The method used for relationship estimation. Defaults to "additive"
-        which calculates the inverse of the additive relationship matrix for
-        pedigrees in which all samples are diploids resulting from sexual
-        reproduction. The "Hamilton-Kerr" method is suitable for autopolyploid
-        or mixed-ploidy datasets and calculates the inverse of the additive
-        relationship matrix following Hamilton and Kerr 2017 [1].
+        The method used for kinship estimation. Defaults to "diploid"
+        which is only suitable for pedigrees in which all samples are
+        diploids resulting from sexual reproduction.
+        The "Hamilton-Kerr" method is suitable for autopolyploid and
+        mixed-ploidy datasets following Hamilton and Kerr 2017 [1].
     parent
         Input variable name holding parents of each sample as defined by
         :data:`sgkit.variables.parent_spec`.
@@ -1731,6 +1748,9 @@ def pedigree_inverse_relationship(
         Input variable name holding stat_Hamilton_Kerr_lambda as defined
         by :data:`sgkit.variables.stat_Hamilton_Kerr_lambda_spec`.
         This variable is only required for the "Hamilton-Kerr" method.
+    return_relationship
+        If True, the inverse of the additive relationship matrix will
+        be returned in addition to the inverse of the kinship matrix.
     allow_half_founders
         If False (the default) then a ValueError will be raised if any
         individuals only have a single recorded parent.
@@ -1747,7 +1767,9 @@ def pedigree_inverse_relationship(
 
     Returns
     -------
-    A dataset containing :data:`sgkit.variables.stat_pedigree_inverse_relationship_spec`.
+    A dataset containing :data:`sgkit.variables.stat_pedigree_inverse_kinship_spec`.
+    and, if return_relationship is True,
+    :data:`sgkit.variables.stat_pedigree_inverse_relationship_spec`.
 
     Raises
     ------
@@ -1756,10 +1778,10 @@ def pedigree_inverse_relationship(
     ValueError
         If the (intermediate) kinship matrix is singular.
     ValueError
-        If a diploid specific method is used with a non-diploid dataset.
+        If the diploid method is used with a non-diploid dataset.
     ValueError
-        If a diploid specific method is used and the parents dimension does
-        not have a length of two.
+        If the diploid method is used and the parents dimension does not
+        have a length of two.
     ValueError
         If the Hamilton-Kerr method is used and a sample has more than
         two contributing parents.
@@ -1768,7 +1790,8 @@ def pedigree_inverse_relationship(
 
     Note
     ----
-    Dimensions of :data:`sgkit.variables.stat_pedigree_inverse_relationship_spec`
+    Dimensions of :data:`sgkit.variables.stat_pedigree_inverse_kinship_spec`
+    and :data:`sgkit.variables.stat_pedigree_inverse_relationship_spec`
     are named ``samples_0`` and ``samples_1``.
 
     Note
@@ -1784,7 +1807,7 @@ def pedigree_inverse_relationship(
     Examples
     --------
 
-    Inbred diploid pedigree:
+    Inbred diploid pedigree returning inverse additive relationship matrix:
 
     >>> import sgkit as sg
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, seed=1)
@@ -1796,7 +1819,12 @@ def pedigree_inverse_relationship(
     ...     ["S0", "S1"],
     ...     ["S0", "S2"]
     ... ]
-    >>> ds = sg.pedigree_inverse_relationship(ds, method="additive")
+    >>> ds = sg.pedigree_inverse_kinship(ds, return_relationship=True)
+    >>> ds["stat_pedigree_inverse_kinship"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[ 4.,  1., -1., -2.],
+           [ 1.,  3., -2.,  0.],
+           [-1., -2.,  5., -2.],
+           [-2.,  0., -2.,  4.]])
     >>> ds["stat_pedigree_inverse_relationship"].values # doctest: +NORMALIZE_WHITESPACE
     array([[ 2. ,  0.5, -0.5, -1. ],
            [ 0.5,  1.5, -1. ,  0. ],
@@ -1826,12 +1854,12 @@ def pedigree_inverse_relationship(
     ...     [0.1, 0],  # increased probability of IBD in unreduced gamete
     ...     [0, 0],
     ... ]
-    >>> ds = sg.pedigree_inverse_relationship(ds, method="Hamilton-Kerr")
-    >>> ds["stat_pedigree_inverse_relationship"].values  # doctest: +NORMALIZE_WHITESPACE
-    array([[ 2.66666667,  1.1785113 , -2.3570226 ,  0.        ],
-           [ 1.1785113 ,  1.83333333, -1.66666667,  0.        ],
-           [-2.3570226 , -1.66666667,  4.35028249, -1.43818328],
-           [ 0.        ,  0.        , -1.43818328,  2.03389831]])
+    >>> ds = sg.pedigree_inverse_kinship(ds, method="Hamilton-Kerr")
+    >>> ds["stat_pedigree_inverse_kinship"].values  # doctest: +NORMALIZE_WHITESPACE
+    array([[ 5.33333333,  3.33333333, -6.66666667,  0.        ],
+           [ 3.33333333,  7.33333333, -6.66666667,  0.        ],
+           [-6.66666667, -6.66666667, 17.40112994, -4.06779661],
+           [ 0.        ,  0.        , -4.06779661,  4.06779661]])
 
     Unreduced gamete and half-clone using a third parent
     column to indicate clonal propagation:
@@ -1857,12 +1885,12 @@ def pedigree_inverse_relationship(
     ...     [0.1, 0, 0],  # increased probability of IBD in unreduced gamete
     ...     [0, 0, 0],
     ... ]
-    >>> ds = sg.pedigree_inverse_relationship(ds, method="Hamilton-Kerr")
-    >>> ds["stat_pedigree_inverse_relationship"].values  # doctest: +NORMALIZE_WHITESPACE
-    array([[ 2.66666667,  1.1785113 , -2.3570226 ,  0.        ],
-           [ 1.1785113 ,  1.83333333, -1.66666667,  0.        ],
-           [-2.3570226 , -1.66666667,  4.35028249, -1.43818328],
-           [ 0.        ,  0.        , -1.43818328,  2.03389831]])
+    >>> ds = sg.pedigree_inverse_kinship(ds, method="Hamilton-Kerr")
+    >>> ds["stat_pedigree_inverse_kinship"].values  # doctest: +NORMALIZE_WHITESPACE
+    array([[ 5.33333333,  3.33333333, -6.66666667,  0.        ],
+           [ 3.33333333,  7.33333333, -6.66666667,  0.        ],
+           [-6.66666667, -6.66666667, 17.40112994, -4.06779661],
+           [ 0.        ,  0.        , -4.06779661,  4.06779661]])
 
     References
     ----------
@@ -1870,12 +1898,12 @@ def pedigree_inverse_relationship(
     "Computation of the inverse additive relationship matrix for autopolyploid
     and multiple-ploidy populations." Theoretical and Applied Genetics 131: 851-860.
     """
-    if method not in {"additive", "Hamilton-Kerr"}:
+    if method not in {"diploid", "Hamilton-Kerr"}:
         raise ValueError("Unknown method '{}'".format(method))
     ds = define_variable_if_absent(ds, variables.parent, parent, parent_indices)
     variables.validate(ds, {parent: variables.parent_spec})
     parent = ds[parent].data
-    if method == "additive":
+    if method == "diploid":
         # check ploidy dimension and assume diploid if it's absent
         if ds.dims.get("ploidy", 2) != 2:
             raise ValueError("Dataset is not diploid")
@@ -1886,17 +1914,42 @@ def pedigree_inverse_relationship(
     elif method == "Hamilton-Kerr":
         tau = ds[stat_Hamilton_Kerr_tau].data
         lambda_ = ds[stat_Hamilton_Kerr_lambda].data
-    func = da.gufunc(
-        inverse_relationship_Hamilton_Kerr,
-        signature="(n, p),(n, p),(n, p) -> (n, n)",
+    # calculate self_kinship and parent_kinship arrays
+    # TODO: option to pull these from an existing kinship matrix?
+    func_inbreeding = da.gufunc(
+        inbreeding_Hamilton_Kerr,
+        signature="(n, p), (n, p), (n, p) -> (n), (n)",
+        output_dtypes=(float, float),
+    )
+    inbreeding, parent_kinship = func_inbreeding(
+        parent, tau, lambda_, allow_half_founders=allow_half_founders
+    )
+    self_kinship = inbreeding_as_self_kinship(inbreeding, tau.sum(axis=-1))
+    func_inverse = da.gufunc(
+        inverse_kinship_Hamilton_Kerr,
+        signature="(n, p),(n, p),(n),(n) -> (n, n)",
         output_dtypes=float,
     )
-    A_inv = func(parent, tau, lambda_, allow_half_founders=allow_half_founders)
-    new_ds = create_dataset(
-        {
+    # calculate matrix inverse(s)
+    kinship_inv = func_inverse(parent, tau, self_kinship, parent_kinship)
+    dims = ["samples_0", "samples_1"]
+    if return_relationship:
+        A_inv = func_inverse(
+            parent, tau, self_kinship, parent_kinship, return_relationship=True
+        )
+        arrays = {
+            variables.stat_pedigree_inverse_kinship: xr.DataArray(
+                kinship_inv, dims=dims
+            ),
             variables.stat_pedigree_inverse_relationship: xr.DataArray(
-                A_inv, dims=["samples_0", "samples_1"]
+                A_inv, dims=dims
             ),
         }
-    )
+    else:
+        arrays = {
+            variables.stat_pedigree_inverse_kinship: xr.DataArray(
+                kinship_inv, dims=dims
+            ),
+        }
+    new_ds = create_dataset(arrays)
     return conditional_merge_datasets(ds, new_ds, merge)
