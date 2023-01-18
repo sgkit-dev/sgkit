@@ -50,8 +50,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.pedigree_relationship" href="sgkit.pedigree_relationship.html" />
-    <link rel="prev" title="sgkit.pedigree_inverse_relationship" href="sgkit.pedigree_inverse_relationship.html" /> 
+    <link rel="next" title="sgkit.pc_relate" href="sgkit.pc_relate.html" />
+    <link rel="prev" title="sgkit.pedigree_inverse_kinship" href="sgkit.pedigree_inverse_kinship.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="None">  
 <style type="text/css">
@@ -503,9 +503,8 @@
 <li class="toctree-l1"><a class="reference internal" href="sgkit.observed_heterozygosity.html">sgkit.observed_heterozygosity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pbs.html">sgkit.pbs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_inbreeding.html">sgkit.pedigree_inbreeding</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_inverse_relationship.html">sgkit.pedigree_inverse_relationship</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_inverse_kinship.html">sgkit.pedigree_inverse_kinship</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.pedigree_kinship</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_relationship.html">sgkit.pedigree_relationship</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pc_relate.html">sgkit.pc_relate</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.regenie.html">sgkit.regenie</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.sample_stats.html">sgkit.sample_stats</a></li>
@@ -585,6 +584,7 @@
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_observed_heterozygosity_spec.html">sgkit.variables.stat_observed_heterozygosity_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_pbs_spec.html">sgkit.variables.stat_pbs_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_pedigree_inbreeding_spec.html">sgkit.variables.stat_pedigree_inbreeding_spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_pedigree_inverse_kinship_spec.html">sgkit.variables.stat_pedigree_inverse_kinship_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_pedigree_inverse_relationship_spec.html">sgkit.variables.stat_pedigree_inverse_relationship_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_pedigree_kinship_spec.html">sgkit.variables.stat_pedigree_kinship_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_pedigree_relationship_spec.html">sgkit.variables.stat_pedigree_relationship_spec</a></li>
@@ -647,8 +647,10 @@
 <h1>sgkit.pedigree_kinship<a class="headerlink" href="#sgkit-pedigree-kinship" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgkit.pedigree_kinship">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">pedigree_kinship</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'diploid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'parent'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_Hamilton_Kerr_tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stat_Hamilton_Kerr_tau'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_Hamilton_Kerr_lambda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stat_Hamilton_Kerr_lambda'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_half_founders</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">founder_kinship</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">founder_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.pedigree_kinship" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">pedigree_kinship</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'diploid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'parent'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_Hamilton_Kerr_tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stat_Hamilton_Kerr_tau'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_Hamilton_Kerr_lambda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stat_Hamilton_Kerr_lambda'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_relationship</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_half_founders</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">founder_kinship</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">founder_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.pedigree_kinship" title="Permalink to this definition">#</a></dt>
 <dd><p>Estimate expected pairwise kinship coefficients from pedigree structure.</p>
+<p>This method can optionally return the additive relationship matrix
+(ARM or A-matrix).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -672,6 +674,9 @@ This variable is only required for the “Hamilton-Kerr” method.</p>
 <dt><strong>stat_Hamilton_Kerr_lambda</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'stat_Hamilton_Kerr_lambda'</span></code>)</dt><dd><p>Input variable name holding stat_Hamilton_Kerr_lambda as defined
 by <a class="reference internal" href="sgkit.variables.stat_Hamilton_Kerr_lambda_spec.html#sgkit.variables.stat_Hamilton_Kerr_lambda_spec" title="sgkit.variables.stat_Hamilton_Kerr_lambda_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Hamilton_Kerr_lambda_spec</span></code></a>.
 This variable is only required for the “Hamilton-Kerr” method.</p>
+</dd>
+<dt><strong>return_relationship</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</dt><dd><p>If True, the additive relationship matrix will be returned in
+addition to the kinship matrix.</p>
 </dd>
 <dt><strong>allow_half_founders</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</dt><dd><p>If False (the default) then a ValueError will be raised if any
 individuals only have a single recorded parent.
@@ -703,7 +708,9 @@ the computed output variables.</p>
 <dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2022.12.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.stat_pedigree_kinship_spec.html#sgkit.variables.stat_pedigree_kinship_spec" title="sgkit.variables.stat_pedigree_kinship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_kinship_spec</span></code></a>.</p>
+<dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.stat_pedigree_kinship_spec.html#sgkit.variables.stat_pedigree_kinship_spec" title="sgkit.variables.stat_pedigree_kinship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_kinship_spec</span></code></a>
+and, if return_relationship is True,
+<a class="reference internal" href="sgkit.variables.stat_pedigree_relationship_spec.html#sgkit.variables.stat_pedigree_relationship_spec" title="sgkit.variables.stat_pedigree_relationship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_relationship_spec</span></code></a>.</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
@@ -736,7 +743,8 @@ are self-kinship estimates as opposed to inbreeding estimates.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Dimensions of <a class="reference internal" href="sgkit.variables.stat_pedigree_kinship_spec.html#sgkit.variables.stat_pedigree_kinship_spec" title="sgkit.variables.stat_pedigree_kinship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_kinship_spec</span></code></a> are named
+<p>Dimensions of <a class="reference internal" href="sgkit.variables.stat_pedigree_kinship_spec.html#sgkit.variables.stat_pedigree_kinship_spec" title="sgkit.variables.stat_pedigree_kinship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_kinship_spec</span></code></a> and
+<a class="reference internal" href="sgkit.variables.stat_pedigree_relationship_spec.html#sgkit.variables.stat_pedigree_relationship_spec" title="sgkit.variables.stat_pedigree_relationship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_relationship_spec</span></code></a> are named
 <code class="docutils literal notranslate"><span class="pre">samples_0</span></code> and <code class="docutils literal notranslate"><span class="pre">samples_1</span></code>.</p>
 </div>
 <div class="admonition note">
@@ -755,7 +763,7 @@ contributing parent. Therefore, each row of the <code class="docutils literal no
 variable must have either one or two non-zero values.</p>
 </div>
 <p class="rubric">Examples</p>
-<p>Inbred diploid pedigree:</p>
+<p>Inbred diploid pedigree returning additive relationship matrix:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">values</span> 
@@ -766,12 +774,17 @@ variable must have either one or two non-zero values.</p>
 <span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;S0&quot;</span><span class="p">,</span> <span class="s2">&quot;S1&quot;</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;S0&quot;</span><span class="p">,</span> <span class="s2">&quot;S2&quot;</span><span class="p">]</span>
 <span class="gp">... </span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">pedigree_kinship</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">pedigree_kinship</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">return_relationship</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;stat_pedigree_kinship&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
 <span class="go">array([[0.5  , 0.   , 0.25 , 0.375],</span>
 <span class="go">       [0.   , 0.5  , 0.25 , 0.125],</span>
 <span class="go">       [0.25 , 0.25 , 0.5  , 0.375],</span>
 <span class="go">       [0.375, 0.125, 0.375, 0.625]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;stat_pedigree_relationship&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([[1.  , 0.  , 0.5 , 0.75],</span>
+<span class="go">       [0.  , 1.  , 0.5 , 0.25],</span>
+<span class="go">       [0.5 , 0.5 , 1.  , 0.75],</span>
+<span class="go">       [0.75, 0.25, 0.75, 1.25]])</span>
 </pre></div>
 </div>
 <p>Inbred diploid pedigree with related founders:</p>
@@ -786,7 +799,7 @@ variable must have either one or two non-zero values.</p>
 <span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;S0&quot;</span><span class="p">,</span> <span class="s2">&quot;S2&quot;</span><span class="p">]</span>
 <span class="gp">... </span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># add &quot;known&quot; kinships among founders</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;founder_kinship&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;founders&quot;</span><span class="p">,</span> <span class="s2">&quot;founders&quot;</span><span class="p">],</span> <span class="p">[</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;founder_kinship&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;founders_0&quot;</span><span class="p">,</span> <span class="s2">&quot;founders_1&quot;</span><span class="p">],</span> <span class="p">[</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span>
 <span class="gp">... </span><span class="p">]</span>
@@ -886,17 +899,17 @@ and multiple-ploidy populations.” Theoretical and Applied Genetics 131: 851-86
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="sgkit.pedigree_inverse_relationship.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="sgkit.pedigree_inverse_kinship.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">sgkit.pedigree_inverse_relationship</p>
+          <p class="prev-next-title">sgkit.pedigree_inverse_kinship</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="sgkit.pedigree_relationship.html" title="next page">
+  <a class='right-next' id="next-link" href="sgkit.pc_relate.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">sgkit.pedigree_relationship</p>
+      <p class="prev-next-title">sgkit.pc_relate</p>
   </div>
   <i class="fa-solid fa-angle-right"></i>
   </a>
