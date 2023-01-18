@@ -38,6 +38,9 @@ New Features
   sizes. (:user:`benjeffery`, :pr:`988`, :issue:`981`)
 - Implement gene-ε for gene set association analysis.
   (:user:`tomwhite`, :pr:`975`, :issue:`692`)
+- Add :func:`count_variant_genotypes` to count the occurrence of each possible
+  genotype.
+  (:user:`timothymillar`, :issue:`911`, :pr:`1002`)
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
@@ -54,6 +57,13 @@ Breaking changes
   the default value for the ``dosage`` parameter in :func:`ld_matrix` and
   :func:`ld_prune` has been changed from ``'dosage'`` to ``'call_dosage'``.
   (:user:`timothymillar`, :pr:`995`, :issue:`875`)
+- The ``genotype_count`` variable has been removed in favour of
+  :data:`sgkit.variables.variant_genotype_count_spec` which follows VCF ordering
+  (i.e., homozygous reference, heterozygous, homozygous alternate for biallelic, 
+  diploid genotypes).
+  :func:`hardy_weinberg_test` now defaults to using 
+  :data:`sgkit.variables.variant_genotype_count_spec` for the ``genotype_count``
+  parameter. (:user:`timothymillar`, :issue:`911`, :pr:`1002`)
 
 .. Deprecations
 .. ~~~~~~~~~~~~

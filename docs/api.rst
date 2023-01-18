@@ -89,6 +89,7 @@ Methods
    count_call_alleles
    count_cohort_alleles
    count_variant_alleles
+   count_variant_genotypes
    divergence
    diversity
    Fst
@@ -210,6 +211,7 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.variant_allele_count_spec
     variables.variant_allele_frequency_spec
     variables.variant_allele_total_spec
+    variables.variant_genotype_count_spec
     variables.variant_linreg_beta_spec
     variables.variant_call_rate_spec
     variables.variant_contig_spec
