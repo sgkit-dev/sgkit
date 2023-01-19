@@ -136,8 +136,8 @@ def test_hwep_dataset__out_of_eq(ds_neq: Dataset) -> None:
 def test_hwep_dataset__precomputed_counts(ds_neq: Dataset) -> None:
     ds = ds_neq
     ac = ds["call_genotype"].sum(dim="ploidy")
-    cts = [1, 0, 2]  # arg order: hets, hom1, hom2
-    gtc = xr.concat([(ac == ct).sum(dim="samples") for ct in cts], dim="counts").T
+    cts = [0, 1, 2]  # arg order: hom1, hets, hom2
+    gtc = xr.concat([(ac == ct).sum(dim="samples") for ct in cts], dim="genotypes").T
     ds = ds.assign(**{"variant_genotype_count": gtc})
     p = hwep_test(ds, genotype_count="variant_genotype_count", merge=False)[
         "variant_hwe_p_value"
