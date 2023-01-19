@@ -434,20 +434,6 @@ will be concatenated along the second axis (columns).
     )
 )
 
-genotype_count, genotype_count_spec = SgkitVariables.register_variable(
-    ArrayLikeSpec(
-        "genotype_count",
-        ndim=2,
-        kind="i",
-        __doc__="""
-Genotype counts. Must correspond to an (`N`, 3) array where `N` is equal
-to the number of variants and the 3 columns contain heterozygous,
-homozygous reference, and homozygous alternate counts (in that order)
-across all samples for a variant.
-""",
-    )
-)
-
 interval_contig_name, interval_contig_name_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "interval_contig_name",
