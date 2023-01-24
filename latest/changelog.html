@@ -514,6 +514,12 @@ sizes. (<a class="reference external" href="https://github.com/benjeffery">benje
 defaulted to <code class="docutils literal notranslate"><span class="pre">True</span></code> but now defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>. Furthermore, <code class="docutils literal notranslate"><span class="pre">True</span></code>
 is no longer supported since it is not clear how it should behave.
 (<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/952">PR 952</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/947">GH 947</a>)</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">dosage</span></code> variable specification has been removed and all references
+to it have been replaced with <a class="reference internal" href="generated/sgkit.variables.call_dosage_spec.html#sgkit.variables.call_dosage_spec" title="sgkit.variables.call_dosage_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_dosage_spec</span></code></a>
+which has been generalized to include integer encodings. Additionally,
+the default value for the <code class="docutils literal notranslate"><span class="pre">dosage</span></code> parameter in <a class="reference internal" href="generated/sgkit.ld_matrix.html#sgkit.ld_matrix" title="sgkit.ld_matrix"><code class="xref py py-func docutils literal notranslate"><span class="pre">ld_matrix()</span></code></a> and
+<a class="reference internal" href="generated/sgkit.ld_prune.html#sgkit.ld_prune" title="sgkit.ld_prune"><code class="xref py py-func docutils literal notranslate"><span class="pre">ld_prune()</span></code></a> has been changed from <code class="docutils literal notranslate"><span class="pre">'dosage'</span></code> to <code class="docutils literal notranslate"><span class="pre">'call_dosage'</span></code>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/995">PR 995</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/875">GH 875</a>)</p></li>
 </ul>
 </section>
 <section id="improvements">
