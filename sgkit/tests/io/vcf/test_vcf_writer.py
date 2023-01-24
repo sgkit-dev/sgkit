@@ -7,7 +7,7 @@ from numpy.testing import assert_array_equal
 
 from sgkit.io.dataset import load_dataset
 from sgkit.io.vcf.vcf_reader import vcf_to_zarr, zarr_array_sizes
-from sgkit.io.vcf.vcf_writer import dataset_to_vcf, zarr_to_vcf
+from sgkit.io.vcf.vcf_writer import write_vcf, zarr_to_vcf
 
 from .utils import path_for_test
 from .vcf_writer import canonicalize_vcf
@@ -75,7 +75,7 @@ def test_zarr_to_vcf(shared_datadir, tmp_path, output_is_path):
 @pytest.mark.filterwarnings(
     "ignore::sgkit.io.vcfzarr_reader.DimensionNameForFixedFormatFieldWarning",
 )
-def test_dataset_to_vcf(shared_datadir, tmp_path, in_memory_ds):
+def test_write_vcf(shared_datadir, tmp_path, in_memory_ds):
     path = path_for_test(shared_datadir, "sample.vcf.gz")
     intermediate = tmp_path.joinpath("intermediate.vcf.zarr").as_posix()
     output = tmp_path.joinpath("output.vcf").as_posix()
@@ -90,7 +90,7 @@ def test_dataset_to_vcf(shared_datadir, tmp_path, in_memory_ds):
     if in_memory_ds:
         ds = ds.load()
 
-    dataset_to_vcf(ds, output)
+    write_vcf(ds, output)
 
     v = VCF(output)
 
@@ -117,7 +117,7 @@ def test_dataset_to_vcf(shared_datadir, tmp_path, in_memory_ds):
 @pytest.mark.filterwarnings(
     "ignore::sgkit.io.vcfzarr_reader.DimensionNameForFixedFormatFieldWarning",
 )
-def test_dataset_to_vcf__drop_fields(shared_datadir, tmp_path):
+def test_write_vcf__drop_fields(shared_datadir, tmp_path):
     path = path_for_test(shared_datadir, "sample.vcf.gz")
     intermediate = tmp_path.joinpath("intermediate.vcf.zarr").as_posix()
     output = tmp_path.joinpath("output.vcf").as_posix()
@@ -132,7 +132,7 @@ def test_dataset_to_vcf__drop_fields(shared_datadir, tmp_path):
     # drop an INFO field and a FORMAT field
     ds = ds.drop_vars(["variant_NS", "call_HQ"])
 
-    dataset_to_vcf(ds, output)
+    write_vcf(ds, output)
 
     # check dropped fields are not present in VCF
     v = VCF(output)

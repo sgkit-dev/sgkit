@@ -92,7 +92,7 @@ The :func:`sgkit.io.vcf.vcf_to_zarr` function converts one or more VCF files to
 Zarr files stored in sgkit's Xarray data representation, which can then be opened
 as a :class:`xarray.Dataset`.
 
-The :func:`sgkit.io.vcf.dataset_to_vcf` and :func:`sgkit.io.vcf.zarr_to_vcf` functions
+The :func:`sgkit.io.vcf.write_vcf` and :func:`sgkit.io.vcf.zarr_to_vcf` functions
 convert sgkit's Xarray data representation to VCF.
 
 See :ref:`vcf` for installation instructions, and details on using VCF in sgkit.
