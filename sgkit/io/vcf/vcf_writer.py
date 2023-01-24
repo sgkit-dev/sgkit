@@ -26,7 +26,7 @@ from sgkit.io.vcf.vcf_writer_utils import (
 from sgkit.typing import PathType
 
 
-def dataset_to_vcf(
+def write_vcf(
     input: Dataset,
     output: Union[PathType, TextIO],
 ) -> None:
@@ -303,9 +303,9 @@ def zarr_to_vcf(
 ) -> None:
     """Convert a Zarr file to a VCF file.
 
-    A convenience for :func:`sgkit.load_dataset` followed by :func:`dataset_to_vcf`.
+    A convenience for :func:`sgkit.load_dataset` followed by :func:`write_vcf`.
 
-    Refer to :func:`dataset_to_vcf` for details and limitations.
+    Refer to :func:`write_vcf` for details and limitations.
 
     Warnings
     --------
@@ -322,7 +322,7 @@ def zarr_to_vcf(
     """
 
     ds = load_dataset(input)
-    dataset_to_vcf(ds, output)
+    write_vcf(ds, output)
 
 
 def _info_fields(header_str):
