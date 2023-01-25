@@ -104,9 +104,8 @@ Methods
    observed_heterozygosity
    pbs
    pedigree_inbreeding
-   pedigree_inverse_relationship
+   pedigree_inverse_kinship
    pedigree_kinship
-   pedigree_relationship
    pc_relate
    regenie
    sample_stats
@@ -160,7 +159,6 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.cohort_allele_count_spec
     variables.cohort_allele_frequency_spec
     variables.covariates_spec
-    variables.dosage_spec
     variables.genotype_count_spec
     variables.interval_contig_name_spec
     variables.interval_start_spec
@@ -200,6 +198,7 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.stat_observed_heterozygosity_spec
     variables.stat_pbs_spec
     variables.stat_pedigree_inbreeding_spec
+    variables.stat_pedigree_inverse_kinship_spec
     variables.stat_pedigree_inverse_relationship_spec
     variables.stat_pedigree_kinship_spec
     variables.stat_pedigree_relationship_spec

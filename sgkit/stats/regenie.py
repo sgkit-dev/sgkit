@@ -773,7 +773,7 @@ def regenie(
     ----------
     dosage
         Name of genetic dosage variable.
-        Defined by :data:`sgkit.variables.dosage_spec`.
+        Defined by :data:`sgkit.variables.call_dosage_spec`.
     covariates
         Names of covariate variables (1D or 2D).
         Defined by :data:`sgkit.variables.covariates_spec`.
@@ -883,7 +883,10 @@ def regenie(
 
     variables.validate(
         ds,
-        {dosage: variables.dosage_spec, variant_contig: variables.variant_contig_spec},
+        {
+            dosage: variables.call_dosage_spec,
+            variant_contig: variables.variant_contig_spec,
+        },
         {c: variables.covariates_spec for c in covariates},
         {t: variables.traits_spec for t in traits},
     )

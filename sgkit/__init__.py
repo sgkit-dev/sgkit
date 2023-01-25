@@ -36,9 +36,8 @@ from .stats.pca import pca
 from .stats.pedigree import (
     parent_indices,
     pedigree_inbreeding,
-    pedigree_inverse_relationship,
+    pedigree_inverse_kinship,
     pedigree_kinship,
-    pedigree_relationship,
 )
 from .stats.popgen import (
     Fst,
@@ -95,9 +94,8 @@ __all__ = [
     "maximal_independent_set",
     "parent_indices",
     "pedigree_inbreeding",
-    "pedigree_inverse_relationship",
+    "pedigree_inverse_kinship",
     "pedigree_kinship",
-    "pedigree_relationship",
     "sample_stats",
     "variant_stats",
     "diversity",

@@ -143,7 +143,7 @@ def gwas_linear_regression(
         Dataset containing necessary dependent and independent variables.
     dosage
         Name of genetic dosage variable.
-        Defined by :data:`sgkit.variables.dosage_spec`.
+        Defined by :data:`sgkit.variables.call_dosage_spec`.
     covariates
         Names of covariate variables (1D or 2D).
         Defined by :data:`sgkit.variables.covariates_spec`.
@@ -201,7 +201,7 @@ def gwas_linear_regression(
 
     variables.validate(
         ds,
-        {dosage: variables.dosage_spec},
+        {dosage: variables.call_dosage_spec},
         {c: variables.covariates_spec for c in covariates},
         {t: variables.traits_spec for t in traits},
     )
@@ -271,7 +271,7 @@ def regenie_loco_regression(
         Dataset containing necessary dependent and independent variables.
     dosage
         Name of genetic dosage variable.
-        Defined by :data:`sgkit.variables.dosage_spec`.
+        Defined by :data:`sgkit.variables.call_dosage_spec`.
     covariates
         Name of covariate variable (1D or 2D), map_blocks_asnumpy
         Defined by :data:`sgkit.variables.traits_spec`.
@@ -319,7 +319,7 @@ def regenie_loco_regression(
 
     variables.validate(
         ds,
-        {dosage: variables.dosage_spec},
+        {dosage: variables.call_dosage_spec},
         {covariates: variables.covariates_spec},
         {traits: variables.traits_spec},
         {variant_contig: variables.variant_contig_spec},

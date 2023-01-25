@@ -75,7 +75,7 @@ def rogers_huff_r2_between(gn0: ArrayLike, gn1: ArrayLike) -> float:  # pragma: 
 def ld_matrix(
     ds: Dataset,
     *,
-    dosage: Hashable = variables.dosage,
+    dosage: Hashable = variables.call_dosage,
     threshold: Optional[float] = None,
     variant_score: Optional[Hashable] = None,
 ) -> DataFrame:
@@ -91,7 +91,7 @@ def ld_matrix(
         Dataset containing genotype dosages. Must already be windowed with :func:`window_by_position` or :func:`window_by_variant`.
     dosage
         Name of genetic dosage variable.
-        Defined by :data:`sgkit.variables.dosage_spec`.
+        Defined by :data:`sgkit.variables.call_dosage_spec`.
     threshold
         R2 threshold below which no variant pairs will be returned. This should almost
         always be something at least slightly above 0 to avoid the large density very
@@ -121,7 +121,7 @@ def ld_matrix(
             "Dataset must be windowed for ld_matrix. See the sgkit.window function."
         )
 
-    variables.validate(ds, {dosage: variables.dosage_spec})
+    variables.validate(ds, {dosage: variables.call_dosage_spec})
 
     x = da.asarray(ds[dosage])
 
@@ -396,7 +396,7 @@ def maximal_independent_set(df: DataFrame) -> Dataset:
 def ld_prune(
     ds: Dataset,
     *,
-    dosage: Hashable = variables.dosage,
+    dosage: Hashable = variables.call_dosage,
     threshold: float = 0.2,
     variant_score: Optional[Hashable] = None,
 ) -> Dataset:
@@ -418,7 +418,7 @@ def ld_prune(
         Dataset containing genotype dosages. Must already be windowed with :func:`window_by_position` or :func:`window_by_variant`.
     dosage
         Name of genetic dosage variable.
-        Defined by :data:`sgkit.variables.dosage_spec`.
+        Defined by :data:`sgkit.variables.call_dosage_spec`.
     threshold
         R2 threshold below which no variant pairs will be returned. This should almost
         always be something at least slightly above 0 to avoid the large density very
@@ -447,7 +447,7 @@ def ld_prune(
     10
 
     >>> # Calculate dosage
-    >>> ds["dosage"] = ds["call_genotype"].sum(dim="ploidy")
+    >>> ds["call_dosage"] = ds["call_genotype"].sum(dim="ploidy")
 
     >>> # Divide into windows of size five (variants)
     >>> ds = sg.window_by_variant(ds, size=5)
