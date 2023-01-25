@@ -63,7 +63,7 @@ VCF (writing)
 .. autosummary::
    :toctree: generated/
 
-   dataset_to_vcf
+   write_vcf
    zarr_to_vcf
 
 Dataset

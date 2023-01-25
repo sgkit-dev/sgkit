@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>sgkit.diversity &#8212; sgkit  documentation</title>
+    <title>sgkit.io.vcf.write_vcf &#8212; sgkit  documentation</title>
   
   
   
@@ -40,7 +40,7 @@
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.diversity';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.io.vcf.write_vcf';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
@@ -50,8 +50,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.Fst" href="sgkit.Fst.html" />
-    <link rel="prev" title="sgkit.divergence" href="sgkit.divergence.html" /> 
+    <link rel="next" title="sgkit.io.vcf.zarr_to_vcf" href="sgkit.io.vcf.zarr_to_vcf.html" />
+    <link rel="prev" title="sgkit.read_scikit_allel_vcfzarr" href="sgkit.read_scikit_allel_vcfzarr.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="None">  
 <style type="text/css">
@@ -474,22 +474,22 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.read_scikit_allel_vcfzarr.html">sgkit.read_scikit_allel_vcfzarr</a></li>
 </ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.write_vcf.html">sgkit.io.vcf.write_vcf</a></li>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.io.vcf.write_vcf</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.zarr_to_vcf.html">sgkit.io.vcf.zarr_to_vcf</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.load_dataset.html">sgkit.load_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.save_dataset.html">sgkit.save_dataset</a></li>
 </ul>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.call_allele_frequencies.html">sgkit.call_allele_frequencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.cohort_allele_frequencies.html">sgkit.cohort_allele_frequencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.count_call_alleles.html">sgkit.count_call_alleles</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.count_cohort_alleles.html">sgkit.count_cohort_alleles</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.count_variant_alleles.html">sgkit.count_variant_alleles</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.divergence.html">sgkit.divergence</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.diversity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.diversity.html">sgkit.diversity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.Fst.html">sgkit.Fst</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.Garud_H.html">sgkit.Garud_H</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.genomic_relationship.html">sgkit.genomic_relationship</a></li>
@@ -642,72 +642,54 @@
             
             
             <article class="bd-article" role="main">
-               <section id="sgkit-diversity">
-<h1>sgkit.diversity<a class="headerlink" href="#sgkit-diversity" title="Permalink to this headline">#</a></h1>
+               <section id="sgkit-io-vcf-write-vcf">
+<h1>sgkit.io.vcf.write_vcf<a class="headerlink" href="#sgkit-io-vcf-write-vcf" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="sgkit.diversity">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">diversity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cohort_allele_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cohort_allele_count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.diversity" title="Permalink to this definition">#</a></dt>
-<dd><p>Compute diversity from cohort allele counts.</p>
-<p>By default, values of this statistic are calculated per variant.
-To compute values in windows, call <a class="reference internal" href="sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_position()</span></code></a> or <a class="reference internal" href="sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_variant()</span></code></a> before calling
-this function.</p>
+<dt class="sig sig-object py" id="sgkit.io.vcf.write_vcf">
+<span class="sig-prename descclassname"><span class="pre">sgkit.io.vcf.</span></span><span class="sig-name descname"><span class="pre">write_vcf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.io.vcf.write_vcf" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert a dataset to a VCF file.</p>
+<p>The VCF fields included in the output are those in the <code class="docutils literal notranslate"><span class="pre">vcf_header</span></code>
+attribute of the dataset. There is currently no way to change the fields
+that are included apart from by manually updating this attribute.</p>
+<p>Float fields are written with up to 3 decimal places of precision.
+Exponent/scientific notation is <em>not</em> supported, so values less than
+<code class="docutils literal notranslate"><span class="pre">5e-4</span></code> will be rounded to zero.</p>
+<p>Data is written sequentially to VCF, using Numba to optimize the write
+throughput speed. Speeds in the region of 100 MB/s have been observed on
+an Apple M1 machine from 2020.</p>
+<p>Data is loaded into memory in chunks sized according to the chunking along
+the variants dimension. Chunking in other dimensions (such as samples) is
+ignored for the purposes of writing VCF. If the dataset is not chunked
+(because it does not originate from Zarr or Dask, for example), then it
+will all be loaded into memory at once.</p>
+<p>The output is <em>not</em> compressed or indexed. It is therefore recommended to
+post-process the output using external tools such as <code class="docutils literal notranslate"><span class="pre">bgzip(1)</span></code>,
+<code class="docutils literal notranslate"><span class="pre">bcftools(1)</span></code>, or <code class="docutils literal notranslate"><span class="pre">tabix(1)</span></code>.</p>
+<p>This example shows how to convert a Zarr dataset to bgzip-compressed VCF by
+writing it to standard output then applying an external compressor:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s1">&#39;import sys; from sgkit.io.vcf import zarr_to_vcf; zarr_to_vcf(&quot;in.zarr&quot;, sys.stdout)&#39;</span>
+    <span class="o">|</span> <span class="n">bgzip</span> <span class="o">&gt;</span> <span class="n">out</span><span class="o">.</span><span class="n">vcf</span><span class="o">.</span><span class="n">gz</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This function requires the dataset to have a <code class="docutils literal notranslate"><span class="pre">vcf_header</span></code> attribute
+containing the VCF header. VCF files converted to Zarr using <a class="reference internal" href="sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">vcf_to_zarr()</span></code></a>
+will contain this attribute, but datasets loaded from other sources will not.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.1.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Genotype call dataset.</p>
+<dt><strong>input</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.1.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset to convert to VCF.</p>
 </dd>
-<dt><strong>cohort_allele_count</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'cohort_allele_count'</span></code>)</dt><dd><p>Cohort allele count variable to use or calculate. Defined by
-<a class="reference internal" href="sgkit.variables.cohort_allele_count_spec.html#sgkit.variables.cohort_allele_count_spec" title="sgkit.variables.cohort_allele_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.cohort_allele_count_spec</span></code></a>.
-If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
-using <a class="reference internal" href="sgkit.count_cohort_alleles.html#sgkit.count_cohort_alleles" title="sgkit.count_cohort_alleles"><code class="xref py py-func docutils literal notranslate"><span class="pre">count_cohort_alleles()</span></code></a>.</p>
-</dd>
-<dt><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
-output variables into a single dataset, otherwise return only
-the computed output variables.
-See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
+<dt><strong>output</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TextIO" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIO</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TextIO" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIO</span></code></a>]</span></dt><dd><p>A path or text file object that the output VCF should be written to.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.1.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A dataset containing the diversity values, as defined by <a class="reference internal" href="sgkit.variables.stat_diversity_spec.html#sgkit.variables.stat_diversity_spec" title="sgkit.variables.stat_diversity_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_diversity_spec</span></code></a>.
-Shape (variants, cohorts), or (windows, cohorts) if windowing information is available.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
 </dd>
 </dl>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This method does not currently support datasets that are chunked along the
-samples dimension.</p>
-</div>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Divide samples into two cohorts</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sample_cohort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_cohort&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">sample_cohort</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">diversity</span><span class="p">(</span><span class="n">ds</span><span class="p">)[</span><span class="s2">&quot;stat_diversity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
-<span class="go">array([[0.5       , 0.66666667],</span>
-<span class="go">    [0.66666667, 0.5       ],</span>
-<span class="go">    [0.66666667, 0.66666667],</span>
-<span class="go">    [0.5       , 0.5       ],</span>
-<span class="go">    [0.5       , 0.5       ]])</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Divide into windows of size three (variants)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window_by_variant</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">diversity</span><span class="p">(</span><span class="n">ds</span><span class="p">)[</span><span class="s2">&quot;stat_diversity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
-<span class="go">array([[1.83333333, 1.83333333],</span>
-<span class="go">    [1.        , 1.        ]])</span>
-</pre></div>
-</div>
 </dd></dl>
 
 </section>
@@ -723,17 +705,17 @@ samples dimension.</p>
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="sgkit.divergence.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="sgkit.read_scikit_allel_vcfzarr.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">sgkit.divergence</p>
+          <p class="prev-next-title">sgkit.read_scikit_allel_vcfzarr</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="sgkit.Fst.html" title="next page">
+  <a class='right-next' id="next-link" href="sgkit.io.vcf.zarr_to_vcf.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">sgkit.Fst</p>
+      <p class="prev-next-title">sgkit.io.vcf.zarr_to_vcf</p>
   </div>
   <i class="fa-solid fa-angle-right"></i>
   </a>
@@ -758,7 +740,7 @@ samples dimension.</p>
 <div class="toc-item">
   
 <div class="tocsection sourcelink">
-    <a href="../_sources/generated/sgkit.diversity.rst.txt">
+    <a href="../_sources/generated/sgkit.io.vcf.write_vcf.rst.txt">
         <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
 </div>

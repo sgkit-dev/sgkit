@@ -583,7 +583,7 @@ arrays within an <a class="reference external" href="https://docs.xarray.dev/en/
 <p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function converts one or more VCF files to
 Zarr files stored in sgkit’s Xarray data representation, which can then be opened
 as a <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.1.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
-<p>The <a class="reference internal" href="generated/sgkit.io.vcf.dataset_to_vcf.html#sgkit.io.vcf.dataset_to_vcf" title="sgkit.io.vcf.dataset_to_vcf"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.dataset_to_vcf()</span></code></a> and <a class="reference internal" href="generated/sgkit.io.vcf.zarr_to_vcf.html#sgkit.io.vcf.zarr_to_vcf" title="sgkit.io.vcf.zarr_to_vcf"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.zarr_to_vcf()</span></code></a> functions
+<p>The <a class="reference internal" href="generated/sgkit.io.vcf.write_vcf.html#sgkit.io.vcf.write_vcf" title="sgkit.io.vcf.write_vcf"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.write_vcf()</span></code></a> and <a class="reference internal" href="generated/sgkit.io.vcf.zarr_to_vcf.html#sgkit.io.vcf.zarr_to_vcf" title="sgkit.io.vcf.zarr_to_vcf"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.zarr_to_vcf()</span></code></a> functions
 convert sgkit’s Xarray data representation to VCF.</p>
 <p>See <a class="reference internal" href="vcf.html#vcf"><span class="std std-ref">Reading VCF</span></a> for installation instructions, and details on using VCF in sgkit.</p>
 </section>
@@ -888,8 +888,8 @@ indexing and uniqueness within Xarray/Pandas, since this is critical for underst
 <span class="gp">   ....: </span>    <span class="n">ac</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 <span class="gp">   ....: </span>
 
-<span class="go">[                                        ] | 0% Completed | 200.50 us</span>
-<span class="go">[########################################] | 100% Completed | 100.57 ms</span>
+<span class="go">[                                        ] | 0% Completed | 359.52 us</span>
+<span class="go">[########################################] | 100% Completed | 100.69 ms</span>
 
 <span class="gp">In [35]: </span><span class="n">ac</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 <span class="gh">Out[35]: </span>

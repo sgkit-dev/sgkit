@@ -51,7 +51,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sgkit.load_dataset" href="sgkit.load_dataset.html" />
-    <link rel="prev" title="sgkit.io.vcf.dataset_to_vcf" href="sgkit.io.vcf.dataset_to_vcf.html" /> 
+    <link rel="prev" title="sgkit.io.vcf.write_vcf" href="sgkit.io.vcf.write_vcf.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="None">  
 <style type="text/css">
@@ -475,7 +475,7 @@
 <li class="toctree-l1"><a class="reference internal" href="sgkit.read_scikit_allel_vcfzarr.html">sgkit.read_scikit_allel_vcfzarr</a></li>
 </ul>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.dataset_to_vcf.html">sgkit.io.vcf.dataset_to_vcf</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.write_vcf.html">sgkit.io.vcf.write_vcf</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.io.vcf.zarr_to_vcf</a></li>
 </ul>
 <ul class="nav bd-sidenav">
@@ -648,8 +648,8 @@
 <dt class="sig sig-object py" id="sgkit.io.vcf.zarr_to_vcf">
 <span class="sig-prename descclassname"><span class="pre">sgkit.io.vcf.</span></span><span class="sig-name descname"><span class="pre">zarr_to_vcf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.io.vcf.zarr_to_vcf" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a Zarr file to a VCF file.</p>
-<p>A convenience for <a class="reference internal" href="sgkit.load_dataset.html#sgkit.load_dataset" title="sgkit.load_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.load_dataset()</span></code></a> followed by <a class="reference internal" href="sgkit.io.vcf.dataset_to_vcf.html#sgkit.io.vcf.dataset_to_vcf" title="sgkit.io.vcf.dataset_to_vcf"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset_to_vcf()</span></code></a>.</p>
-<p>Refer to <a class="reference internal" href="sgkit.io.vcf.dataset_to_vcf.html#sgkit.io.vcf.dataset_to_vcf" title="sgkit.io.vcf.dataset_to_vcf"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataset_to_vcf()</span></code></a> for details and limitations.</p>
+<p>A convenience for <a class="reference internal" href="sgkit.load_dataset.html#sgkit.load_dataset" title="sgkit.load_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.load_dataset()</span></code></a> followed by <a class="reference internal" href="sgkit.io.vcf.write_vcf.html#sgkit.io.vcf.write_vcf" title="sgkit.io.vcf.write_vcf"><code class="xref py py-func docutils literal notranslate"><span class="pre">write_vcf()</span></code></a>.</p>
+<p>Refer to <a class="reference internal" href="sgkit.io.vcf.write_vcf.html#sgkit.io.vcf.write_vcf" title="sgkit.io.vcf.write_vcf"><code class="xref py py-func docutils literal notranslate"><span class="pre">write_vcf()</span></code></a> for details and limitations.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This function requires the input Zarr file to have a <code class="docutils literal notranslate"><span class="pre">vcf_header</span></code> attribute
@@ -684,11 +684,11 @@ will contain this attribute, but datasets loaded from other sources will not.</p
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="sgkit.io.vcf.dataset_to_vcf.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="sgkit.io.vcf.write_vcf.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">sgkit.io.vcf.dataset_to_vcf</p>
+          <p class="prev-next-title">sgkit.io.vcf.write_vcf</p>
       </div>
   </a>
   <a class='right-next' id="next-link" href="sgkit.load_dataset.html" title="next page">
