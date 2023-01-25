@@ -93,6 +93,7 @@ Methods
    diversity
    Fst
    Garud_H
+   genee
    genomic_relationship
    gwas_linear_regression
    hardy_weinberg_test

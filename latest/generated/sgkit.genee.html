@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>sgkit.variables.variant_ploidy_spec &#8212; sgkit  documentation</title>
+    <title>sgkit.genee &#8212; sgkit  documentation</title>
   
   
   
@@ -40,7 +40,7 @@
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.variables.variant_ploidy_spec';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.genee';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
@@ -50,8 +50,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.variables.variant_position_spec" href="sgkit.variables.variant_position_spec.html" />
-    <link rel="prev" title="sgkit.variables.variant_linreg_p_value_spec" href="sgkit.variables.variant_linreg_p_value_spec.html" /> 
+    <link rel="next" title="sgkit.genomic_relationship" href="sgkit.genomic_relationship.html" />
+    <link rel="prev" title="sgkit.Garud_H" href="sgkit.Garud_H.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="None">  
 <style type="text/css">
@@ -482,7 +482,7 @@
 <li class="toctree-l1"><a class="reference internal" href="sgkit.load_dataset.html">sgkit.load_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.save_dataset.html">sgkit.save_dataset</a></li>
 </ul>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.call_allele_frequencies.html">sgkit.call_allele_frequencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.cohort_allele_frequencies.html">sgkit.cohort_allele_frequencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.count_call_alleles.html">sgkit.count_call_alleles</a></li>
@@ -492,7 +492,7 @@
 <li class="toctree-l1"><a class="reference internal" href="sgkit.diversity.html">sgkit.diversity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.Fst.html">sgkit.Fst</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.Garud_H.html">sgkit.Garud_H</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sgkit.genee.html">sgkit.genee</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.genee</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.genomic_relationship.html">sgkit.genomic_relationship</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.gwas_linear_regression.html">sgkit.gwas_linear_regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.hardy_weinberg_test.html">sgkit.hardy_weinberg_test</a></li>
@@ -527,7 +527,7 @@
 <li class="toctree-l1"><a class="reference internal" href="sgkit.window_by_position.html">sgkit.window_by_position</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.window_by_variant.html">sgkit.window_by_variant</a></li>
 </ul>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.call_allele_count_spec.html">sgkit.variables.call_allele_count_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.call_allele_frequency_spec.html">sgkit.variables.call_allele_frequency_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.call_dosage_spec.html">sgkit.variables.call_dosage_spec</a></li>
@@ -606,7 +606,7 @@
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.variant_n_hom_ref_spec.html">sgkit.variables.variant_n_hom_ref_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.variant_n_non_ref_spec.html">sgkit.variables.variant_n_non_ref_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.variant_linreg_p_value_spec.html">sgkit.variables.variant_linreg_p_value_spec</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.variables.variant_ploidy_spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.variables.variant_ploidy_spec.html">sgkit.variables.variant_ploidy_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.variant_position_spec.html">sgkit.variables.variant_position_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.variant_score_spec.html">sgkit.variables.variant_score_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.variant_linreg_t_value_spec.html">sgkit.variables.variant_linreg_t_value_spec</a></li>
@@ -643,13 +643,51 @@
             
             
             <article class="bd-article" role="main">
-               <section id="sgkit-variables-variant-ploidy-spec">
-<h1>sgkit.variables.variant_ploidy_spec<a class="headerlink" href="#sgkit-variables-variant-ploidy-spec" title="Permalink to this headline">#</a></h1>
-<dl class="py data">
-<dt class="sig sig-object py" id="sgkit.variables.variant_ploidy_spec">
-<span class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></span><span class="sig-name descname"><span class="pre">variant_ploidy_spec</span></span><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='variant_ploidy',</span> <span class="pre">__doc__='Ploidy</span> <span class="pre">of</span> <span class="pre">each</span> <span class="pre">variant</span> <span class="pre">calculated</span> <span class="pre">from</span> <span class="pre">call</span> <span class="pre">genotypes</span> <span class="pre">across</span> <span class="pre">all</span> <span class="pre">samples\nwith</span> <span class="pre">-1</span> <span class="pre">indicating</span> <span class="pre">variable</span> <span class="pre">ploidy.',</span> <span class="pre">kind='i',</span> <span class="pre">ndim=1,</span> <span class="pre">dims=('variants',))</span></em><a class="headerlink" href="#sgkit.variables.variant_ploidy_spec" title="Permalink to this definition">#</a></dt>
-<dd><p>Ploidy of each variant calculated from call genotypes across all samples
-with -1 indicating variable ploidy.</p>
+               <section id="sgkit-genee">
+<h1>sgkit.genee<a class="headerlink" href="#sgkit-genee" title="Permalink to this headline">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="sgkit.genee">
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">genee</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ld</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_covar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.genee" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute gene-ε as described in Cheng, et al. 2020 [1].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.1.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing beta values (OLS betas or regularized betas).</p>
+</dd>
+<dt><strong>ld</strong> : <span class="annotation terse"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> | <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.Array.html#dask.array.Array" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.Array.html#dask.array.Array" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code></a>]</span></dt><dd><p>2D array of LD values.</p>
+</dd>
+<dt><strong>reg_covar</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">1e-06</span></code>)</dt><dd><p>Non-negative regularization added to the diagonal of covariance.
+Passed to scikit-learn <code class="docutils literal notranslate"><span class="pre">GaussianMixture</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Unlike the implementation in [2], this function will always use the
+second mixture component with the largest variance, rather than
+the first mixture component with the largest variance if it is composed
+of more than 50% of the SNPs.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.dataframe.DataFrame.html#dask.dataframe.DataFrame" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>A dataframe containing the following fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">test_q</span></code>: test statistic</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">q_var</span></code>: test variance</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pval</span></code>: p-value</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>[1] - W. Cheng, S. Ramachandran, and L. Crawford (2020).
+Estimation of non-null SNP effect size distributions enables the detection of enriched genes underlying complex traits.
+PLOS Genetics. 16(6): e1008855.</p>
+<p>[2] - <a class="github reference external" href="https://github.com/ramachandran-lab/genee">ramachandran-lab/genee</a></p>
 </dd></dl>
 
 </section>
@@ -665,17 +703,17 @@ with -1 indicating variable ploidy.</p>
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="sgkit.variables.variant_linreg_p_value_spec.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="sgkit.Garud_H.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">sgkit.variables.variant_linreg_p_value_spec</p>
+          <p class="prev-next-title">sgkit.Garud_H</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="sgkit.variables.variant_position_spec.html" title="next page">
+  <a class='right-next' id="next-link" href="sgkit.genomic_relationship.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">sgkit.variables.variant_position_spec</p>
+      <p class="prev-next-title">sgkit.genomic_relationship</p>
   </div>
   <i class="fa-solid fa-angle-right"></i>
   </a>
@@ -700,7 +738,7 @@ with -1 indicating variable ploidy.</p>
 <div class="toc-item">
   
 <div class="tocsection sourcelink">
-    <a href="../_sources/generated/sgkit.variables.variant_ploidy_spec.rst.txt">
+    <a href="../_sources/generated/sgkit.genee.rst.txt">
         <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
 </div>
