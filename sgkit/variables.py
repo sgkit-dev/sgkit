@@ -434,6 +434,19 @@ will be concatenated along the second axis (columns).
     )
 )
 
+genotype_id, genotype_id_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "genotype_id",
+        dims=("genotypes",),
+        kind={"S", "U"},
+        __doc__="""
+VCF style genotype strings for all possible genotypes given the size of the
+ploidy and alleles dimensions. The ordering of genotype strings follows the
+ordering outlined in the VCF specification for arrays of size "G".
+""",
+    )
+)
+
 interval_contig_name, interval_contig_name_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "interval_contig_name",

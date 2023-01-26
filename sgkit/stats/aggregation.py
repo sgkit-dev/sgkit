@@ -15,6 +15,7 @@ from sgkit.utils import (
     conditional_merge_datasets,
     create_dataset,
     define_variable_if_absent,
+    smallest_numpy_int_dtype,
 )
 
 Dimension = Literal["samples", "variants"]
@@ -388,6 +389,8 @@ def count_variant_genotypes(
     ds: Dataset,
     *,
     call_genotype: Hashable = variables.call_genotype,
+    genotype_id: Hashable = variables.genotype_id,
+    assign_coords: bool = True,
     merge: bool = True,
 ) -> Dataset:
     """Count the number of calls of each possible genotype, at each variant.
@@ -404,6 +407,15 @@ def count_variant_genotypes(
         Input variable name holding call_genotype as defined by
         :data:`sgkit.variables.call_genotype_spec`.
         Must be present in ``ds``.
+    genotype_id
+        Input variable name holding genotype ids as defined by
+        :data:`sgkit.variables.call_genotype_spec`.
+        If this variable is not present in ds it will be automatically
+        computed.
+    assign_coords
+        If True (the default) then the genotype_id array will be assigned
+        as the coordinates for the "genotypes" dimension in the returned
+        dataset.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -444,7 +456,20 @@ def count_variant_genotypes(
            [0, 2, 0],
            [2, 0, 0]], dtype=uint64)
     """
-    variables.validate(ds, {call_genotype: variables.call_genotype_spec})
+    ds = define_variable_if_absent(
+        ds,
+        variables.genotype_id,
+        genotype_id,
+        genotype_coords,
+        assign_coords=assign_coords,
+    )
+    variables.validate(
+        ds,
+        {
+            call_genotype: variables.call_genotype_spec,
+            genotype_id: variables.genotype_id_spec,
+        },
+    )
     mixed_ploidy = ds[call_genotype].attrs.get("mixed_ploidy", False)
     if mixed_ploidy:
         raise ValueError("Mixed-ploidy dataset")
@@ -477,7 +502,185 @@ def count_variant_genotypes(
     new_ds = create_dataset(
         {variables.variant_genotype_count: (("variants", "genotypes"), C)}
     )
+    if assign_coords and not merge:
+        # pass through coords
+        new_ds = new_ds.assign_coords({"genotypes": ds.coords["genotypes"]})
     return conditional_merge_datasets(ds, new_ds, merge)
+
+
+@numba_guvectorize(  # type: ignore
+    [
+        "void(int64[:], int8[:], int8[:])",
+        "void(int64[:], int16[:], int16[:])",
+        "void(int64[:], int32[:], int32[:])",
+        "void(int64[:], int64[:], int64[:])",
+    ],
+    "(),(k)->(k)",
+)
+def _index_as_genotype(
+    index: int, _: ArrayLike, out: ArrayLike
+) -> None:  # pragma: no cover
+    """Convert the integer index of a genotype to a
+    genotype call following the VCF specification
+    for fields of length G.
+
+    Parameters
+    ----------
+    index
+        Index of genotype following the sort order described in the
+        VCF spec. An index less than 0 is invalid and will return an
+        uncalled genotype.
+    _
+        Dummy variable of length ploidy. The dtype of this variable is
+        used as the dtype of the returned genotype array.
+
+    Returns
+    -------
+    genotype
+        Integer alleles of the genotype call.
+    """
+    ploidy = len(out)
+    remainder = index
+    for index in range(ploidy):
+        # find allele n for position k
+        p = ploidy - index
+        n = -1
+        new = 0
+        prev = 0
+        while new <= remainder:
+            n += 1
+            prev = new
+            new = _comb_with_replacement(n, p)
+        n -= 1
+        remainder -= prev
+        out[p - 1] = n
+
+
+@numba_guvectorize(  # type: ignore
+    [
+        "void(uint8[:], uint8[:], uint8[:], uint8[:])",
+    ],
+    "(b),(),(c)->(c)",
+)
+def _format_genotype_bytes(
+    chars: ArrayLike, ploidy: int, _: ArrayLike, out: ArrayLike
+) -> None:  # pragma: no cover
+    ploidy = ploidy[0]
+    chars_per_allele = len(chars) // ploidy
+    slot = 0
+    for slot in range(ploidy):
+        offset_inp = slot * chars_per_allele
+        offset_out = slot * (chars_per_allele + 1)
+        if slot > 0:
+            out[offset_out - 1] = 47  # "/"
+        for char in range(chars_per_allele):
+            i = offset_inp + char
+            j = offset_out + char
+            val = chars[i]
+            if val == 45:  # "-"
+                if chars[i + 1] == 49:  # "1"
+                    # this is an unknown allele
+                    out[j] = 46  # "."
+                    out[j + 1 : j + chars_per_allele] = 0
+                    break
+                else:
+                    # < -1 indicates a gap
+                    out[j : j + chars_per_allele] = 0
+                    if slot > 0:
+                        # remove separator
+                        out[offset_out - 1] = 0
+                    break
+            else:
+                out[j] = val
+    # shuffle zeros to end
+    c = len(out)
+    for i in range(c):
+        if out[i] == 0:
+            for j in range(i + 1, c):
+                if out[j] != 0:
+                    out[i] = out[j]
+                    out[j] = 0
+                    break
+
+
+def _genotype_as_bytes(genotype: ArrayLike, max_allele_chars: int = 2) -> ArrayLike:
+    """Convert integer encoded genotype calls to (unphased)
+    VCF style byte strings.
+
+    Parameters
+    ----------
+    genotype
+        Genotype call.
+    max_allele_chars
+        Maximum number of chars required for any allele.
+        This should include signed sentinel values.
+
+    Returns
+    -------
+    genotype_string
+        Genotype encoded as byte string.
+    """
+    ploidy = genotype.shape[-1]
+    b = genotype.astype("|S{}".format(max_allele_chars))
+    b.dtype = np.uint8
+    n_num = b.shape[-1]
+    n_char = n_num + ploidy - 1
+    dummy = np.empty(n_char, np.uint8)
+    c = _format_genotype_bytes(b, ploidy, dummy)
+    c.dtype = "|S{}".format(n_char)
+    return np.squeeze(c)
+
+
+def genotype_coords(
+    ds: Dataset,
+    *,
+    chunks=10_000,
+    assign_coords: bool = True,
+    merge: bool = True,
+) -> Dataset:
+    """Generate all possible genotypes given a datasets ploidy
+    and maximum number of alleles.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing genotype calls.
+    chunks
+        Chunk size for the array of genotype strings.
+    assign_coords
+        If True (the default) then the generated genotype strings will
+        be assigned as the coordinates for the "genotypes" dimension
+        of the returned dataset.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing :data:`sgkit.variables.genotype_id_spec`
+    containing all possible genotype strings.
+    """
+    n_alleles = ds.dims["alleles"]
+    ploidy = ds.dims["ploidy"]
+    n_genotypes = _comb_with_replacement(n_alleles, ploidy)
+    max_chars = len(str(n_alleles - 1))
+    # dummy variable for ploidy dim also specifies output dtype
+    K = np.empty(ploidy, smallest_numpy_int_dtype(n_alleles - 1))
+    X = da.arange(n_genotypes, chunks=chunks)
+    chunks = X.chunks + (ploidy,)
+    G = da.map_blocks(_index_as_genotype, X, K, new_axis=1, chunks=chunks)
+    # allow enough room for all alleles and separators
+    dtype = "|S{}".format(max_chars * ploidy + ploidy - 1)
+    S = da.map_blocks(
+        _genotype_as_bytes, G, max_chars, drop_axis=1, dtype=dtype
+    ).astype("U")
+    new_ds = create_dataset({variables.genotype_id: ("genotypes", S)})
+    ds = conditional_merge_datasets(ds, new_ds, merge)
+    if assign_coords:
+        ds = ds.assign_coords({"genotypes": S})
+    return ds
 
 
 def count_genotypes(

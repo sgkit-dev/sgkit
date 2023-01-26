@@ -13,6 +13,8 @@ from sgkit.stats.aggregation import (
     _biallelic_genotype_index,
     _comb,
     _comb_with_replacement,
+    _genotype_as_bytes,
+    _index_as_genotype,
     _sorted_genotype_index,
     call_allele_frequencies,
     cohort_allele_frequencies,
@@ -20,6 +22,7 @@ from sgkit.stats.aggregation import (
     count_cohort_alleles,
     count_variant_alleles,
     count_variant_genotypes,
+    genotype_coords,
     individual_heterozygosity,
     infer_call_ploidy,
     infer_sample_ploidy,
@@ -379,12 +382,87 @@ def test__sorted_genotype_index(genotype, expect):
     assert _sorted_genotype_index(genotype) == expect
 
 
+@pytest.mark.parametrize("ploidy", [2, 3, 4, 5, 6])
+def test__index_as_genotype__round_trip(ploidy):
+    indices = np.arange(1000)
+    dummy = np.empty(ploidy, dtype=np.int8)
+    genotypes = _index_as_genotype(indices, dummy)
+    for i in range(len(genotypes)):
+        assert _sorted_genotype_index(genotypes[i]) == i
+
+
+def test__index_as_genotype__dtype():
+    for dtype in [np.int8, np.int16, np.int32, np.int64]:
+        dummy = np.empty(2, dtype=dtype)
+        assert _index_as_genotype(1, dummy).dtype == dtype
+
+
+@pytest.mark.parametrize(
+    "genotype, max_allele_chars, expect",
+    [
+        ([0, 1], 2, b"0/1"),
+        ([1, 2, 3, 1], 2, b"1/2/3/1"),
+        ([0, -1], 2, b"0/."),
+        ([0, -2], 2, b"0"),
+        ([0, -2, 1], 2, b"0/1"),
+        ([-1, -2, 1], 2, b"./1"),
+        ([22, -1, -2, 7, -2], 2, b"22/./7"),
+        ([0, 333], 2, b"0/33"),  # truncation
+        ([0, 333], 3, b"0/333"),
+        ([[0, 1, 2, -1], [0, 2, -2, -2]], 2, [b"0/1/2/.", b"0/2"]),
+    ],
+)
+def test__genotype_as_bytes(genotype, max_allele_chars, expect):
+    genotype = np.array(genotype)
+    np.testing.assert_array_equal(
+        expect,
+        _genotype_as_bytes(genotype, max_allele_chars),
+    )
+
+
 def test__sorted_genotype_index__raise_on_mixed_ploidy():
     genotype = np.array([-2, 0, 1, 2])
     with pytest.raises(
         ValueError, match="Mixed-ploidy genotype indicated by allele < -1"
     ):
         _sorted_genotype_index(genotype)
+
+
+@pytest.mark.parametrize(
+    "ploidy, n_allele, expect",
+    [
+        (2, 2, ["0/0", "0/1", "1/1"]),
+        (4, 2, ["0/0/0/0", "0/0/0/1", "0/0/1/1", "0/1/1/1", "1/1/1/1"]),
+        (2, 3, ["0/0", "0/1", "1/1", "0/2", "1/2", "2/2"]),
+    ],
+)
+def test_genotype_coords(ploidy, n_allele, expect):
+    ds = simulate_genotype_call_dataset(
+        n_variant=1, n_sample=1, n_allele=n_allele, n_ploidy=ploidy
+    )
+    np.testing.assert_array_equal(expect, genotype_coords(ds).genotype_id.values)
+    np.testing.assert_array_equal(expect, genotype_coords(ds)["genotypes"].values)
+    # coords assigned if merge=False
+    np.testing.assert_array_equal(
+        expect, genotype_coords(ds, merge=False)["genotypes"].values
+    )
+    # coords not assigned
+    np.testing.assert_array_equal(
+        np.arange(len(expect)),
+        genotype_coords(ds, assign_coords=False)["genotypes"].values,
+    )
+
+
+def test_genotype_coords__large_dtype():
+    # check that large allele number automatically uses a larger
+    # dtype so that the returned genotypes are correct.
+    # mock a dummy dataset with large dims
+    ds = xr.Dataset()
+    ds["foo"] = "alleles", np.arange(129)  # largest allele is 128
+    ds["bar"] = "ploidy", np.arange(2)
+    strings = genotype_coords(ds).genotype_id.values
+    assert len(strings) == 8385
+    assert strings[-1] == "128/128"
 
 
 @pytest.mark.parametrize(
@@ -543,6 +621,42 @@ def test_count_variant_genotypes__multiallelic(genotypes):
     ds["call_genotype"] = ds["call_genotype"].dims, calls
     actual = count_variant_genotypes(ds)["variant_genotype_count"].data
     np.testing.assert_array_equal(expect, actual)
+
+
+@pytest.mark.parametrize(
+    "ploidy, n_allele, expect",
+    [
+        (2, 2, ["0/0", "0/1", "1/1"]),
+        (4, 2, ["0/0/0/0", "0/0/0/1", "0/0/1/1", "0/1/1/1", "1/1/1/1"]),
+        (2, 3, ["0/0", "0/1", "1/1", "0/2", "1/2", "2/2"]),
+    ],
+)
+def test_count_variant_genotypes__coords(ploidy, n_allele, expect):
+    ds = simulate_genotype_call_dataset(
+        n_variant=1, n_sample=1, n_allele=n_allele, n_ploidy=ploidy
+    )
+    np.testing.assert_array_equal(
+        expect, count_variant_genotypes(ds).genotype_id.values
+    )
+    np.testing.assert_array_equal(
+        expect, count_variant_genotypes(ds)["genotypes"].values
+    )
+    # coords assigned if merge=False
+    np.testing.assert_array_equal(
+        expect, count_variant_genotypes(ds, merge=False)["genotypes"].values
+    )
+    # coords not assigned
+    np.testing.assert_array_equal(
+        np.arange(len(expect)),
+        count_variant_genotypes(ds, assign_coords=False)["genotypes"].values,
+    )
+    # coords not assigned with merge=False
+    np.testing.assert_array_equal(
+        np.arange(len(expect)),
+        count_variant_genotypes(ds, assign_coords=False, merge=False)[
+            "genotypes"
+        ].values,
+    )
 
 
 def test_count_variant_genotypes__raise_on_mixed_ploidy():
