@@ -149,7 +149,8 @@ def hardy_weinberg_test(
         Name of variable containing precomputed genotype counts for each variant
         as described in :data:`sgkit.variables.variant_genotype_count_spec`.
         If the variable is not present in ``ds``, it will be computed
-        using :func:`count_variant_genotypes`.
+        using :func:`count_variant_genotypes` which automatically assigns
+        coordinates to the ``genotypes`` dimension.
     ploidy
         Genotype ploidy, defaults to ``ploidy`` dimension of provided dataset.
         If the `ploidy` dimension is not present, then this value must be set explicitly.
@@ -168,10 +169,11 @@ def hardy_weinberg_test(
 
     Warnings
     --------
-    This function is only applicable to diploid, biallelic datasets and the
-    ``genotype_count`` array should have three columns which respectively
-    contain counts for homozygous reference, heterozygous, and homozygous
-    alternate genotypes.
+    This function is only applicable to diploid, biallelic datasets.
+    The ``genotype_count`` array should have three columns corresponding
+    to the ``genotypes`` dimension. These columns should have coordinates
+    ``'0/0'``, ``'0/1'``, and ``'1/1'`` which respectively contain counts for
+    homozygous reference, heterozygous, and homozygous alternate genotypes.
 
     Returns
     -------
@@ -180,18 +182,24 @@ def hardy_weinberg_test(
     variant_hwe_p_value : [array-like, shape: (N, O)]
         P values from HWE test for each variant as float in [0, 1].
 
+    Raises
+    ------
+    NotImplementedError
+        If the dataset is not limited to biallelic, diploid genotypes.
+    ValueError
+        If the ploidy or number of alleles are not specified and not
+        present as dimensions in the dataset.
+    ValueError
+        If no coordinates are assigned to the ``genotypes`` dimension.
+    KeyError
+        If the genotypes ``'0/0'``, ``'0/1'`` or ``'1/1'`` are not specified
+        as coordinates of the ``genotypes`` dimension.
+
     References
     ----------
     - [1] Wigginton, Janis E., David J. Cutler, and Goncalo R. Abecasis. 2005.
         “A Note on Exact Tests of Hardy-Weinberg Equilibrium.” American Journal of
         Human Genetics 76 (5): 887–93.
-
-    Raises
-    ------
-    NotImplementedError
-        If ploidy of provided dataset != 2
-    NotImplementedError
-        If maximum number of alleles in provided dataset != 2
     """
     ploidy = ploidy or ds.dims.get("ploidy")
     if not ploidy:
@@ -214,8 +222,18 @@ def hardy_weinberg_test(
     )
     variables.validate(ds, {genotype_count: variables.variant_genotype_count_spec})
 
-    # extract counts by type
-    obs_hom1, obs_hets, obs_hom2 = list(da.asarray(ds[genotype_count].data).T)
+    # extract counts by coords
+    if "genotypes" not in ds.coords:
+        raise ValueError("No coordinates for dimension 'genotypes'")
+    try:
+        key = "0/0"
+        obs_hom1 = da.asarray(ds[genotype_count].loc[:, key].data)
+        key = "0/1"
+        obs_hets = da.asarray(ds[genotype_count].loc[:, key].data)
+        key = "1/1"
+        obs_hom2 = da.asarray(ds[genotype_count].loc[:, key].data)
+    except KeyError as e:
+        raise KeyError("No counts for genotype '{}'".format(key)) from e
 
     # note obs_het is expected first
     p = da.map_blocks(hardy_weinberg_p_value_vec_jit, obs_hets, obs_hom1, obs_hom2)
