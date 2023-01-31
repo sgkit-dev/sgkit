@@ -757,21 +757,22 @@
 <span class="gp">In [18]: </span><span class="n">ds2</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">variants</span><span class="o">=</span><span class="p">(</span><span class="n">ds2</span><span class="o">.</span><span class="n">variant_hwe_p_value</span> <span class="o">&gt;</span> <span class="mf">1e-2</span><span class="p">))</span>
 <span class="gh">Out[18]: </span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:              (variants: 99, alleles: 2, samples: 50, ploidy: 2)</span>
+<span class="go">Dimensions:                 (variants: 99, genotypes: 3, alleles: 2,</span>
+<span class="go">                             samples: 50, ploidy: 2)</span>
+<span class="go">Coordinates:</span>
+<span class="go">  * genotypes               (genotypes) &lt;U3 &#39;0/0&#39; &#39;0/1&#39; &#39;1/1&#39;</span>
 <span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
 <span class="go">Data variables:</span>
-<span class="go">    variant_hwe_p_value  (variants) float64 dask.array&lt;chunksize=(99,), meta=np.ndarray&gt;</span>
-<span class="go">    variant_n_het        (variants) int64 22 18 26 29 18 15 ... 23 22 26 21 19</span>
-<span class="go">    variant_n_hom_ref    (variants) int64 11 13 3 6 8 13 9 ... 11 6 10 9 12 8 13</span>
-<span class="go">    variant_n_hom_alt    (variants) int64 7 12 11 6 17 10 14 ... 9 15 9 7 5 14 8</span>
-<span class="go">    variant_n_non_ref    (variants) int64 29 30 37 35 35 25 ... 32 29 31 35 27</span>
-<span class="go">    variant_contig       (variants) int64 0 0 0 0 1 1 1 ... 21 21 21 22 22 22 22</span>
-<span class="go">    variant_position     (variants) int64 0 2 3 4 0 1 2 3 4 ... 0 1 2 3 0 1 2 3</span>
-<span class="go">    variant_allele       (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; b&#39;T&#39; ... b&#39;T&#39; b&#39;A&#39;</span>
-<span class="go">    sample_id            (samples) &lt;U3 &#39;S0&#39; &#39;S1&#39; &#39;S2&#39; &#39;S3&#39; ... &#39;S47&#39; &#39;S48&#39; &#39;S49&#39;</span>
-<span class="go">    call_genotype        (variants, samples, ploidy) int8 0 0 1 0 1 ... 0 1 0 0</span>
-<span class="go">    call_genotype_mask   (variants, samples, ploidy) bool False False ... False</span>
-<span class="go">    pos0                 (variants) int64 -1 1 2 3 -1 0 1 2 ... 0 1 2 -1 0 1 2</span>
+<span class="go">    variant_hwe_p_value     (variants) float64 dask.array&lt;chunksize=(99,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_genotype_count  (variants, genotypes) uint64 dask.array&lt;chunksize=(99, 3), meta=np.ndarray&gt;</span>
+<span class="go">    genotype_id             (genotypes) &lt;U3 dask.array&lt;chunksize=(3,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_contig          (variants) int64 0 0 0 0 1 1 1 ... 21 21 22 22 22 22</span>
+<span class="go">    variant_position        (variants) int64 0 2 3 4 0 1 2 3 ... 0 1 2 3 0 1 2 3</span>
+<span class="go">    variant_allele          (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; b&#39;T&#39; ... b&#39;T&#39; b&#39;A&#39;</span>
+<span class="go">    sample_id               (samples) &lt;U3 &#39;S0&#39; &#39;S1&#39; &#39;S2&#39; ... &#39;S47&#39; &#39;S48&#39; &#39;S49&#39;</span>
+<span class="go">    call_genotype           (variants, samples, ploidy) int8 0 0 1 0 ... 0 1 0 0</span>
+<span class="go">    call_genotype_mask      (variants, samples, ploidy) bool False ... False</span>
+<span class="go">    pos0                    (variants) int64 -1 1 2 3 -1 0 1 ... 0 1 2 -1 0 1 2</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, ...</span>
 <span class="go">    source:   sgkit-unknown</span>

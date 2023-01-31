@@ -505,6 +505,9 @@ the dataset before saving it to disk, if necessary, as zarr requires equal chunk
 sizes. (<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/988">PR 988</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/981">GH 981</a>)</p></li>
 <li><p>Implement gene-ε for gene set association analysis.
 (<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/975">PR 975</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/692">GH 692</a>)</p></li>
+<li><p>Add <a class="reference internal" href="generated/sgkit.count_variant_genotypes.html#sgkit.count_variant_genotypes" title="sgkit.count_variant_genotypes"><code class="xref py py-func docutils literal notranslate"><span class="pre">count_variant_genotypes()</span></code></a> to count the occurrence of each possible
+genotype.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/911">GH 911</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1002">PR 1002</a>)</p></li>
 </ul>
 </section>
 <section id="breaking-changes">
@@ -522,6 +525,13 @@ which has been generalized to include integer encodings. Additionally,
 the default value for the <code class="docutils literal notranslate"><span class="pre">dosage</span></code> parameter in <a class="reference internal" href="generated/sgkit.ld_matrix.html#sgkit.ld_matrix" title="sgkit.ld_matrix"><code class="xref py py-func docutils literal notranslate"><span class="pre">ld_matrix()</span></code></a> and
 <a class="reference internal" href="generated/sgkit.ld_prune.html#sgkit.ld_prune" title="sgkit.ld_prune"><code class="xref py py-func docutils literal notranslate"><span class="pre">ld_prune()</span></code></a> has been changed from <code class="docutils literal notranslate"><span class="pre">'dosage'</span></code> to <code class="docutils literal notranslate"><span class="pre">'call_dosage'</span></code>.
 (<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/995">PR 995</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/875">GH 875</a>)</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">genotype_count</span></code> variable has been removed in favour of
+<a class="reference internal" href="generated/sgkit.variables.variant_genotype_count_spec.html#sgkit.variables.variant_genotype_count_spec" title="sgkit.variables.variant_genotype_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_genotype_count_spec</span></code></a> which follows VCF ordering
+(i.e., homozygous reference, heterozygous, homozygous alternate for biallelic,
+diploid genotypes).
+<a class="reference internal" href="generated/sgkit.hardy_weinberg_test.html#sgkit.hardy_weinberg_test" title="sgkit.hardy_weinberg_test"><code class="xref py py-func docutils literal notranslate"><span class="pre">hardy_weinberg_test()</span></code></a> now defaults to using
+<a class="reference internal" href="generated/sgkit.variables.variant_genotype_count_spec.html#sgkit.variables.variant_genotype_count_spec" title="sgkit.variables.variant_genotype_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_genotype_count_spec</span></code></a> for the <code class="docutils literal notranslate"><span class="pre">genotype_count</span></code>
+parameter. (<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/911">GH 911</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1002">PR 1002</a>)</p></li>
 </ul>
 </section>
 <section id="improvements">
