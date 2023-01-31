@@ -14,7 +14,7 @@ def save_dataset(
     store: Union[PathType, MutableMapping[str, bytes]],
     storage_options: Optional[Dict[str, str]] = None,
     auto_rechunk: Optional[bool] = None,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> None:
     """Save a dataset to Zarr storage.
 
@@ -87,6 +87,7 @@ def save_dataset(
 def load_dataset(
     store: Union[PathType, MutableMapping[str, bytes]],
     storage_options: Optional[Dict[str, str]] = None,
+    **kwargs: Any,
 ) -> Dataset:
     """Load a dataset from Zarr storage.
 
@@ -99,6 +100,8 @@ def load_dataset(
         Zarr store or path to directory in file system to load from.
     storage_options:
         Any additional parameters for the storage backend (see ``fsspec.open``).
+    kwargs
+        Additional arguments to pass to :func:`xarray.open_zarr`.
 
     Returns
     -------
@@ -110,7 +113,7 @@ def load_dataset(
         store = fsspec.get_mapper(store, **storage_options)
     elif isinstance(store, Path):
         store = str(store)
-    ds: Dataset = xr.open_zarr(store, concat_characters=False)  # type: ignore[no-untyped-call]
+    ds: Dataset = xr.open_zarr(store, concat_characters=False, **kwargs)  # type: ignore[no-untyped-call]
     for v in ds:
         # Workaround for https://github.com/pydata/xarray/issues/4386
         if v.endswith("_mask"):  # type: ignore
