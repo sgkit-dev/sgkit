@@ -1,3 +1,4 @@
+import math
 from typing import Any, Dict, Hashable
 
 import dask.array as da
@@ -7,13 +8,14 @@ from typing_extensions import Literal
 from xarray import Dataset
 
 from sgkit import variables
-from sgkit.accelerate import numba_guvectorize
+from sgkit.accelerate import numba_guvectorize, numba_jit
 from sgkit.stats.utils import cohort_sum
 from sgkit.typing import ArrayLike
 from sgkit.utils import (
     conditional_merge_datasets,
     create_dataset,
     define_variable_if_absent,
+    smallest_numpy_int_dtype,
 )
 
 Dimension = Literal["samples", "variants"]
@@ -283,6 +285,402 @@ def call_rate(ds: Dataset, dim: Dimension, call_genotype_mask: Hashable) -> Data
     return create_dataset(
         {f"{odim}_n_called": n_called, f"{odim}_call_rate": n_called / ds.dims[dim]}
     )
+
+
+@numba_jit(nogil=True)
+def _biallelic_genotype_index(genotype: ArrayLike) -> int:
+    index = 0
+    for i in range(len(genotype)):
+        a = genotype[i]
+        if a < 0:
+            if a < -1:
+                raise ValueError("Mixed-ploidy genotype indicated by allele < -1")
+            return -1
+        if a > 1:
+            raise ValueError("Allele value > 1")
+        index += a
+    return index
+
+
+@numba_guvectorize(  # type: ignore
+    [
+        "void(int8[:,:], uint64[:], uint64[:])",
+        "void(int16[:,:], uint64[:], uint64[:])",
+        "void(int32[:,:], uint64[:], uint64[:])",
+        "void(int64[:,:], uint64[:], uint64[:])",
+    ],
+    "(n, k),(g)->(g)",
+)
+def _count_biallelic_genotypes(
+    genotypes: ArrayLike, _: ArrayLike, out: ArrayLike
+) -> ArrayLike:  # pragma: no cover
+    out[:] = 0
+    for i in range(len(genotypes)):
+        index = _biallelic_genotype_index(genotypes[i])
+        if index >= 0:
+            out[index] += 1
+
+
+# implementation from github.com/PlantandFoodResearch/MCHap
+# TODO: replace with math.comb when supported by numba
+@numba_jit(nogil=True)
+def _comb(n: int, k: int) -> int:
+    if k > n:
+        return 0
+    r = 1
+    for d in range(1, k + 1):
+        gcd_ = math.gcd(r, d)
+        r //= gcd_
+        r *= n
+        r //= d // gcd_
+        n -= 1
+    return r
+
+
+_COMB_REP_LOOKUP = np.array(
+    [[math.comb(max(0, n + k - 1), k) for k in range(11)] for n in range(11)]
+)
+_COMB_REP_LOOKUP[0, 0] = 0  # special case
+
+
+@numba_jit(nogil=True)
+def _comb_with_replacement(n: int, k: int) -> int:
+    if (n < _COMB_REP_LOOKUP.shape[0]) and (k < _COMB_REP_LOOKUP.shape[1]):
+        return _COMB_REP_LOOKUP[n, k]
+    n = n + k - 1
+    return _comb(n, k)
+
+
+@numba_jit(nogil=True)
+def _sorted_genotype_index(genotype: ArrayLike) -> int:
+    # Warning: genotype alleles must be sorted in ascending order!
+    if genotype[0] < 0:
+        if genotype[0] < -1:
+            raise ValueError("Mixed-ploidy genotype indicated by allele < -1")
+        return -1
+    index = 0
+    for i in range(len(genotype)):
+        a = genotype[i]
+        index += _comb_with_replacement(a, i + 1)
+    return index
+
+
+@numba_guvectorize(  # type: ignore
+    [
+        "void(int8[:,:], uint64[:], uint64[:])",
+        "void(int16[:,:], uint64[:], uint64[:])",
+        "void(int32[:,:], uint64[:], uint64[:])",
+        "void(int64[:,:], uint64[:], uint64[:])",
+    ],
+    "(n, k),(g)->(g)",
+)
+def _count_sorted_genotypes(
+    genotypes: ArrayLike, _: ArrayLike, out: ArrayLike
+) -> ArrayLike:  # pragma: no cover
+    # Warning: genotype alleles must be sorted in ascending order!
+    out[:] = 0
+    for i in range(len(genotypes)):
+        index = _sorted_genotype_index(genotypes[i])
+        if index >= 0:
+            out[index] += 1
+
+
+def count_variant_genotypes(
+    ds: Dataset,
+    *,
+    call_genotype: Hashable = variables.call_genotype,
+    genotype_id: Hashable = variables.genotype_id,
+    assign_coords: bool = True,
+    merge: bool = True,
+) -> Dataset:
+    """Count the number of calls of each possible genotype, at each variant.
+
+    The "possible genotypes" at a given variant locus include all possible
+    combinations of the alleles at that locus, of size ploidy (i.e., all
+    multisets of those alleles with cardinality <ploidy>).
+
+    Parameters
+    ----------
+    ds
+        Dataset containing genotype calls.
+    call_genotype
+        Input variable name holding call_genotype as defined by
+        :data:`sgkit.variables.call_genotype_spec`.
+        Must be present in ``ds``.
+    genotype_id
+        Input variable name holding genotype ids as defined by
+        :data:`sgkit.variables.call_genotype_spec`.
+        If this variable is not present in ds it will be automatically
+        computed.
+    assign_coords
+        If True (the default) then the genotype_id array will be assigned
+        as the coordinates for the "genotypes" dimension in the returned
+        dataset.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing :data:`sgkit.variables.variant_genotype_count_spec`
+    of genotype counts with shape (variants, genotypes). Refer to the variable
+    documentation for examples of genotype ordering.
+
+    Warnings
+    --------
+    This method does not support mixed-ploidy datasets.
+
+    Raises
+    ------
+    ValueError
+        If the dataset contains mixed-ploidy genotype calls.
+
+    Examples
+    --------
+
+    >>> import sgkit as sg
+    >>> ds = sg.simulate_genotype_call_dataset(n_variant=4, n_sample=2, seed=1)
+    >>> sg.display_genotypes(ds) # doctest: +NORMALIZE_WHITESPACE
+    samples    S0   S1
+    variants
+    0         1/0  1/0
+    1         1/0  1/1
+    2         0/1  1/0
+    3         0/0  0/0
+
+    >>> sg.count_variant_genotypes(ds)["variant_genotype_count"].values # doctest: +NORMALIZE_WHITESPACE
+    array([[0, 2, 0],
+           [0, 1, 1],
+           [0, 2, 0],
+           [2, 0, 0]], dtype=uint64)
+    """
+    ds = define_variable_if_absent(
+        ds,
+        variables.genotype_id,
+        genotype_id,
+        genotype_coords,
+        assign_coords=assign_coords,
+    )
+    variables.validate(
+        ds,
+        {
+            call_genotype: variables.call_genotype_spec,
+            genotype_id: variables.genotype_id_spec,
+        },
+    )
+    mixed_ploidy = ds[call_genotype].attrs.get("mixed_ploidy", False)
+    if mixed_ploidy:
+        raise ValueError("Mixed-ploidy dataset")
+    ploidy = ds.dims["ploidy"]
+    n_alleles = ds.dims["alleles"]
+    n_genotypes = _comb_with_replacement(n_alleles, ploidy)
+    G = da.asarray(ds[call_genotype].data)
+    N = np.empty(n_genotypes, np.uint64)
+    shape = (G.chunks[0], n_genotypes)
+    if n_alleles == 2:
+        C = da.map_blocks(
+            _count_biallelic_genotypes,
+            G,
+            N,
+            drop_axis=(1, 2),
+            new_axis=1,
+            chunks=shape,
+            dtype=np.uint64,
+        )
+    else:
+        C = da.map_blocks(
+            _count_sorted_genotypes,
+            G.map_blocks(np.sort),  # must be sorted
+            N,
+            drop_axis=(1, 2),
+            new_axis=1,
+            chunks=shape,
+            dtype=np.uint64,
+        )
+    new_ds = create_dataset(
+        {variables.variant_genotype_count: (("variants", "genotypes"), C)}
+    )
+    if assign_coords and not merge:
+        # pass through coords
+        new_ds = new_ds.assign_coords({"genotypes": ds.coords["genotypes"]})
+    return conditional_merge_datasets(ds, new_ds, merge)
+
+
+@numba_guvectorize(  # type: ignore
+    [
+        "void(int64[:], int8[:], int8[:])",
+        "void(int64[:], int16[:], int16[:])",
+        "void(int64[:], int32[:], int32[:])",
+        "void(int64[:], int64[:], int64[:])",
+    ],
+    "(),(k)->(k)",
+)
+def _index_as_genotype(
+    index: int, _: ArrayLike, out: ArrayLike
+) -> None:  # pragma: no cover
+    """Convert the integer index of a genotype to a
+    genotype call following the VCF specification
+    for fields of length G.
+
+    Parameters
+    ----------
+    index
+        Index of genotype following the sort order described in the
+        VCF spec. An index less than 0 is invalid and will return an
+        uncalled genotype.
+    _
+        Dummy variable of length ploidy. The dtype of this variable is
+        used as the dtype of the returned genotype array.
+
+    Returns
+    -------
+    genotype
+        Integer alleles of the genotype call.
+    """
+    ploidy = len(out)
+    remainder = index
+    for index in range(ploidy):
+        # find allele n for position k
+        p = ploidy - index
+        n = -1
+        new = 0
+        prev = 0
+        while new <= remainder:
+            n += 1
+            prev = new
+            new = _comb_with_replacement(n, p)
+        n -= 1
+        remainder -= prev
+        out[p - 1] = n
+
+
+@numba_guvectorize(  # type: ignore
+    [
+        "void(uint8[:], uint8[:], uint8[:], uint8[:])",
+    ],
+    "(b),(),(c)->(c)",
+)
+def _format_genotype_bytes(
+    chars: ArrayLike, ploidy: int, _: ArrayLike, out: ArrayLike
+) -> None:  # pragma: no cover
+    ploidy = ploidy[0]
+    chars_per_allele = len(chars) // ploidy
+    slot = 0
+    for slot in range(ploidy):
+        offset_inp = slot * chars_per_allele
+        offset_out = slot * (chars_per_allele + 1)
+        if slot > 0:
+            out[offset_out - 1] = 47  # "/"
+        for char in range(chars_per_allele):
+            i = offset_inp + char
+            j = offset_out + char
+            val = chars[i]
+            if val == 45:  # "-"
+                if chars[i + 1] == 49:  # "1"
+                    # this is an unknown allele
+                    out[j] = 46  # "."
+                    out[j + 1 : j + chars_per_allele] = 0
+                    break
+                else:
+                    # < -1 indicates a gap
+                    out[j : j + chars_per_allele] = 0
+                    if slot > 0:
+                        # remove separator
+                        out[offset_out - 1] = 0
+                    break
+            else:
+                out[j] = val
+    # shuffle zeros to end
+    c = len(out)
+    for i in range(c):
+        if out[i] == 0:
+            for j in range(i + 1, c):
+                if out[j] != 0:
+                    out[i] = out[j]
+                    out[j] = 0
+                    break
+
+
+def _genotype_as_bytes(genotype: ArrayLike, max_allele_chars: int = 2) -> ArrayLike:
+    """Convert integer encoded genotype calls to (unphased)
+    VCF style byte strings.
+
+    Parameters
+    ----------
+    genotype
+        Genotype call.
+    max_allele_chars
+        Maximum number of chars required for any allele.
+        This should include signed sentinel values.
+
+    Returns
+    -------
+    genotype_string
+        Genotype encoded as byte string.
+    """
+    ploidy = genotype.shape[-1]
+    b = genotype.astype("|S{}".format(max_allele_chars))
+    b.dtype = np.uint8
+    n_num = b.shape[-1]
+    n_char = n_num + ploidy - 1
+    dummy = np.empty(n_char, np.uint8)
+    c = _format_genotype_bytes(b, ploidy, dummy)
+    c.dtype = "|S{}".format(n_char)
+    return np.squeeze(c)
+
+
+def genotype_coords(
+    ds: Dataset,
+    *,
+    chunks=10_000,
+    assign_coords: bool = True,
+    merge: bool = True,
+) -> Dataset:
+    """Generate all possible genotypes given a datasets ploidy
+    and maximum number of alleles.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing genotype calls.
+    chunks
+        Chunk size for the array of genotype strings.
+    assign_coords
+        If True (the default) then the generated genotype strings will
+        be assigned as the coordinates for the "genotypes" dimension
+        of the returned dataset.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing :data:`sgkit.variables.genotype_id_spec`
+    containing all possible genotype strings.
+    """
+    n_alleles = ds.dims["alleles"]
+    ploidy = ds.dims["ploidy"]
+    n_genotypes = _comb_with_replacement(n_alleles, ploidy)
+    max_chars = len(str(n_alleles - 1))
+    # dummy variable for ploidy dim also specifies output dtype
+    K = np.empty(ploidy, smallest_numpy_int_dtype(n_alleles - 1))
+    X = da.arange(n_genotypes, chunks=chunks)
+    chunks = X.chunks + (ploidy,)
+    G = da.map_blocks(_index_as_genotype, X, K, new_axis=1, chunks=chunks)
+    # allow enough room for all alleles and separators
+    dtype = "|S{}".format(max_chars * ploidy + ploidy - 1)
+    S = da.map_blocks(
+        _genotype_as_bytes, G, max_chars, drop_axis=1, dtype=dtype
+    ).astype("U")
+    new_ds = create_dataset({variables.genotype_id: ("genotypes", S)})
+    ds = conditional_merge_datasets(ds, new_ds, merge)
+    if assign_coords:
+        ds = ds.assign_coords({"genotypes": S})
+    return ds
 
 
 def count_genotypes(

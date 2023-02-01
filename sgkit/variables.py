@@ -434,16 +434,15 @@ will be concatenated along the second axis (columns).
     )
 )
 
-genotype_count, genotype_count_spec = SgkitVariables.register_variable(
+genotype_id, genotype_id_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
-        "genotype_count",
-        ndim=2,
-        kind="i",
+        "genotype_id",
+        dims=("genotypes",),
+        kind={"S", "U"},
         __doc__="""
-Genotype counts. Must correspond to an (`N`, 3) array where `N` is equal
-to the number of variants and the 3 columns contain heterozygous,
-homozygous reference, and homozygous alternate counts (in that order)
-across all samples for a variant.
+VCF style genotype strings for all possible genotypes given the size of the
+ploidy and alleles dimensions. The ordering of genotype strings follows the
+ordering outlined in the VCF specification for arrays of size "G".
 """,
     )
 )
@@ -1016,6 +1015,25 @@ variant_contig, variant_contig_spec = SgkitVariables.register_variable(
 Index corresponding to contig name for each variant. In some less common
 scenarios, this may also be equivalent to the contig names if the data
 generating process used contig names that were also integers.
+""",
+    )
+)
+
+variant_genotype_count, variant_genotype_count_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "variant_genotype_count",
+        kind={"i", "u"},
+        dims=("variants", "genotypes"),
+        __doc__="""
+The number of observations for each possible genotype at each variant.
+Counts are sorted following the ordering defined in the VCF specification.
+
+- For biallelic, diploid genotypes the ordering is ``00``, ``01``, ``11``
+  (homozygous reference, heterozygous, homozygous alternate).
+- For triallelic, diploid genotypes the ordering is ``00``, ``01``, ``11``,
+  ``02``, ``12``, ``22``
+- For triallelic, triploid genotypes the ordering is  ``000``, ``001``, ``011``,
+  ``111``, ``002``, ``012``, ``112``, ``022``, ``122``, ``222``
 """,
     )
 )

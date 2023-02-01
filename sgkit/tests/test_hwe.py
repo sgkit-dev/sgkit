@@ -136,9 +136,10 @@ def test_hwep_dataset__out_of_eq(ds_neq: Dataset) -> None:
 def test_hwep_dataset__precomputed_counts(ds_neq: Dataset) -> None:
     ds = ds_neq
     ac = ds["call_genotype"].sum(dim="ploidy")
-    cts = [1, 0, 2]  # arg order: hets, hom1, hom2
-    gtc = xr.concat([(ac == ct).sum(dim="samples") for ct in cts], dim="counts").T
+    cts = [0, 1, 2]  # arg order: hom1, hets, hom2
+    gtc = xr.concat([(ac == ct).sum(dim="samples") for ct in cts], dim="genotypes").T
     ds = ds.assign(**{"variant_genotype_count": gtc})
+    ds = ds.assign_coords(dict(genotypes=["0/0", "0/1", "1/1"]))
     p = hwep_test(ds, genotype_count="variant_genotype_count", merge=False)[
         "variant_hwe_p_value"
     ].values
@@ -176,4 +177,23 @@ def test_hwep_dataset__raise_on_nonbiallelic():
         NotImplementedError, match="HWE test only implemented for biallelic genotypes"
     ):
         ds = xr.Dataset({"x": (("ploidy", "alleles"), np.zeros((2, 3)))})
+        hwep_test(ds)
+
+
+def test_hwep__raise_on_no_coords():
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=5, n_allele=2, seed=0)
+    ds["variant_genotype_count"] = ["variants", "genotypes"], np.ones(
+        (10, 3), dtype=int
+    )
+    with pytest.raises(ValueError, match="No coordinates for dimension 'genotypes'"):
+        hwep_test(ds)
+
+
+def test_hwep__raise_on_missing_key():
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=5, n_allele=2, seed=0)
+    ds["variant_genotype_count"] = ["variants", "genotypes"], np.ones(
+        (10, 3), dtype=int
+    )
+    ds = ds.assign_coords(dict(genotypes=["0/0", "0/", "1/1"]))  # malformed
+    with pytest.raises(KeyError, match="No counts for genotype '0/1'"):
         hwep_test(ds)
