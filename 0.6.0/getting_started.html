@@ -1,0 +1,1266 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Getting Started &#8212; sgkit  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/typehints.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/docsearch.sbt.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'getting_started';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.6.0';
+        </script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script defer="defer" src="_static/docsearch.sbt.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="User Guide" href="user_guide.html" />
+    <link rel="prev" title="sgkit: Statistical genetics toolkit in Python" href="index.html" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="None">  
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <img src="_static/sgkit_trnsprnt.png" class="logo__image only-light" alt="Logo image">
+    <img src="_static/sgkit_blue_trnsprnt.png" class="logo__image only-dark" alt="Logo image">
+  
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Getting Started
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="vcf.html">
+                        Reading VCF
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api.html">
+                        API reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="how_do_i.html">
+                        How do I …
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="contributing.html">
+                        Contributing to sgkit
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="about.html">
+                        About
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="news.html">
+                        News
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="changelog.html">
+                        Changelog
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-toggle="dropdown">
+        0.6.0  <!-- this text may get changed later by javascript -->
+        <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+</div>
+      </div>
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/pystatgen/sgkit" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Getting Started
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="vcf.html">
+                        Reading VCF
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api.html">
+                        API reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="how_do_i.html">
+                        How do I …
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="contributing.html">
+                        Contributing to sgkit
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="about.html">
+                        About
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="news.html">
+                        News
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="changelog.html">
+                        Changelog
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-toggle="dropdown">
+        0.6.0  <!-- this text may get changed later by javascript -->
+        <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+</div>
+      </div>
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/pystatgen/sgkit" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+               <section id="getting-started">
+<span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">#</a></h1>
+<div class="contents local topic" id="table-of-contents">
+<p class="topic-title">Table of contents:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#installation" id="id5">Installation</a></p></li>
+<li><p><a class="reference internal" href="#overview" id="id6">Overview</a></p></li>
+<li><p><a class="reference internal" href="#data-structures" id="id7">Data structures</a></p></li>
+<li><p><a class="reference internal" href="#genetic-methods" id="id8">Genetic methods</a></p></li>
+<li><p><a class="reference internal" href="#missing-data" id="id9">Missing data</a></p></li>
+<li><p><a class="reference internal" href="#windowing" id="id10">Windowing</a></p></li>
+<li><p><a class="reference internal" href="#cohorts" id="id11">Cohorts</a></p></li>
+<li><p><a class="reference internal" href="#chaining-operations" id="id12">Chaining operations</a></p></li>
+<li><p><a class="reference internal" href="#chunked-arrays" id="id13">Chunked arrays</a></p></li>
+</ul>
+</div>
+<section id="installation">
+<h2><a class="toc-backref" href="#id5">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">#</a></h2>
+<p>You can install sgkit with pip. Python 3.8, 3.9, or 3.10 is required:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install sgkit
+</pre></div>
+</div>
+<p>Alternatively, you can use conda:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -c conda-forge sgkit
+</pre></div>
+</div>
+</section>
+<section id="overview">
+<h2><a class="toc-backref" href="#id6">Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">#</a></h2>
+<p>Sgkit is a general purpose toolkit for quantitative and population genetics.
+The primary goal of sgkit is to take advantage of powerful tools in the <a class="reference external" href="https://pydata.org/">PyData ecosystem</a>
+to facilitate interactive analysis of large-scale datasets. The main libraries we use are:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://xarray.pydata.org/en/stable/">Xarray</a>: N-D labeling for arrays and datasets</p></li>
+<li><p><a class="reference external" href="https://docs.dask.org/en/latest/">Dask</a>: Parallel computing on chunked arrays</p></li>
+<li><p><a class="reference external" href="https://zarr.readthedocs.io/en/stable/">Zarr</a>: Storage for chunked arrays</p></li>
+<li><p><a class="reference external" href="https://numpy.org/doc/stable/">Numpy</a>: N-D in-memory array manipulation</p></li>
+<li><p><a class="reference external" href="https://pandas.pydata.org/docs/">Pandas</a>: Tabular data frame manipulation</p></li>
+<li><p><a class="reference external" href="https://docs.cupy.dev/en/stable/">CuPy</a>: Numpy-like array interface for CUDA GPUs</p></li>
+</ul>
+</section>
+<section id="data-structures">
+<h2><a class="toc-backref" href="#id7">Data structures</a><a class="headerlink" href="#data-structures" title="Permalink to this headline">#</a></h2>
+<p>Sgkit uses Xarray <a class="reference external" href="http://xarray.pydata.org/en/stable/data-structures.html#dataset">Dataset</a> objects to model genetic data.
+Users are free to manipulate quantities within these objects as they see fit and a set of conventions for variable names,
+dimensions and underlying data types is provided to aid in workflow standardization. The example below illustrates a
+<code class="docutils literal notranslate"><span class="pre">Dataset</span></code> format that would result from an assay expressible as <a class="reference external" href="https://en.wikipedia.org/wiki/Variant_Call_Format">VCF</a>,
+<a class="reference external" href="https://www.cog-genomics.org/plink2">PLINK</a> or <a class="reference external" href="https://www.well.ox.ac.uk/~gav/bgen_format/">BGEN</a>.
+This is a guideline however, and a <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> seen in practice might include many more or fewer variables and dimensions.</p>
+<a class="reference internal image-reference" href="_images/data-structures-xarray.jpg"><img alt="_images/data-structures-xarray.jpg" class="align-center" src="_images/data-structures-xarray.jpg" style="width: 600px;" /></a>
+<p>The worked examples below show how to access and visualize data like this using Xarray. They also demonstrate
+several of the sgkit conventions in place for representing common genetic quantities.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+
+<span class="gp">In [2]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">n_contig</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
+
+<span class="gp">In [3]: </span><span class="n">ds</span>
+<span class="gh">Out[3]: </span><span class="go"></span>
+<span class="go">&lt;xarray.Dataset&gt;</span>
+<span class="go">Dimensions:             (variants: 1000, alleles: 2, samples: 250, ploidy: 2)</span>
+<span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
+<span class="go">Data variables:</span>
+<span class="go">    variant_contig      (variants) int64 0 0 0 0 0 0 0 ... 22 22 22 22 22 22 22</span>
+<span class="go">    variant_position    (variants) int64 0 1 2 3 4 5 6 ... 36 37 38 39 40 41 42</span>
+<span class="go">    variant_allele      (variants, alleles) |S1 b&#39;G&#39; b&#39;A&#39; b&#39;T&#39; ... b&#39;A&#39; b&#39;T&#39;</span>
+<span class="go">    sample_id           (samples) &lt;U4 &#39;S0&#39; &#39;S1&#39; &#39;S2&#39; ... &#39;S247&#39; &#39;S248&#39; &#39;S249&#39;</span>
+<span class="go">    call_genotype       (variants, samples, ploidy) int8 0 0 1 0 1 ... 0 0 0 0 1</span>
+<span class="go">    call_genotype_mask  (variants, samples, ploidy) bool False False ... False</span>
+<span class="go">Attributes:</span>
+<span class="go">    contigs:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, ...</span>
+<span class="go">    source:   sgkit-unknown</span>
+</pre></div>
+</div>
+<p>The presence of a single-nucleotide variant (SNV) is indicated above by the <code class="docutils literal notranslate"><span class="pre">call_genotype</span></code> variable, which contains
+an integer value corresponding to the index of the associated allele present (i.e. index into the <code class="docutils literal notranslate"><span class="pre">variant_allele</span></code> variable)
+for a sample at a given genome coordinate and chromosome. Every sgkit variable has a set of fixed semantics like this. For more
+information on this specific variable and any others, see <a class="reference internal" href="user_guide.html#genetic-variables"><span class="std std-ref">Genetic variables</span></a>.</p>
+<p>Data subsets can be accessed as shown here, using the features described in
+<a class="reference external" href="http://xarray.pydata.org/en/stable/indexing.html">Indexing and Selecting Xarray Data</a>:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+
+<span class="gp">In [5]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">n_contig</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
+
+<span class="go"># Subset the entire dataset to the first 10 variants/samples</span>
+<span class="gp">In [6]: </span><span class="n">ds</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">variants</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">samples</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="gh">Out[6]: </span><span class="go"></span>
+<span class="go">&lt;xarray.Dataset&gt;</span>
+<span class="go">Dimensions:             (variants: 10, alleles: 2, samples: 10, ploidy: 2)</span>
+<span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
+<span class="go">Data variables:</span>
+<span class="go">    variant_contig      (variants) int64 0 0 0 0 0 1 1 1 1 1</span>
+<span class="go">    variant_position    (variants) int64 0 1 2 3 4 0 1 2 3 4</span>
+<span class="go">    variant_allele      (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; b&#39;C&#39; ... b&#39;T&#39; b&#39;A&#39;</span>
+<span class="go">    sample_id           (samples) &lt;U3 &#39;S0&#39; &#39;S1&#39; &#39;S2&#39; &#39;S3&#39; ... &#39;S7&#39; &#39;S8&#39; &#39;S9&#39;</span>
+<span class="go">    call_genotype       (variants, samples, ploidy) int8 0 0 1 0 1 ... 0 1 1 1 1</span>
+<span class="go">    call_genotype_mask  (variants, samples, ploidy) bool False False ... False</span>
+<span class="go">Attributes:</span>
+<span class="go">    contigs:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, ...</span>
+<span class="go">    source:   sgkit-unknown</span>
+
+<span class="go"># Subset to a specific set of variables</span>
+<span class="gp">In [7]: </span><span class="n">ds</span><span class="p">[[</span><span class="s1">&#39;variant_allele&#39;</span><span class="p">,</span> <span class="s1">&#39;call_genotype&#39;</span><span class="p">]]</span>
+<span class="gh">Out[7]: </span><span class="go"></span>
+<span class="go">&lt;xarray.Dataset&gt;</span>
+<span class="go">Dimensions:         (variants: 100, alleles: 2, samples: 50, ploidy: 2)</span>
+<span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
+<span class="go">Data variables:</span>
+<span class="go">    variant_allele  (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; b&#39;C&#39; ... b&#39;T&#39; b&#39;T&#39; b&#39;A&#39;</span>
+<span class="go">    call_genotype   (variants, samples, ploidy) int8 0 0 1 0 1 0 ... 0 1 0 1 0 0</span>
+<span class="go">Attributes:</span>
+<span class="go">    contigs:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, ...</span>
+<span class="go">    source:   sgkit-unknown</span>
+
+<span class="go"># Extract a single variable</span>
+<span class="gp">In [8]: </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+<span class="gh">Out[8]: </span><span class="go"></span>
+<span class="go">&lt;xarray.DataArray &#39;call_genotype&#39; (variants: 3, samples: 3, ploidy: 2)&gt;</span>
+<span class="go">array([[[ 0,  0],</span>
+<span class="go">        [ 1,  0],</span>
+<span class="go">        [ 1,  0]],</span>
+
+<span class="go">       [[ 1,  1],</span>
+<span class="go">        [ 1,  0],</span>
+<span class="go">        [ 1, -1]],</span>
+
+<span class="go">       [[ 0,  1],</span>
+<span class="go">        [ 1,  1],</span>
+<span class="go">        [ 1,  1]]], dtype=int8)</span>
+<span class="go">Dimensions without coordinates: variants, samples, ploidy</span>
+<span class="go">Attributes:</span>
+<span class="go">    mixed_ploidy:  False</span>
+<span class="go">    comment:       Call genotype. Encoded as allele values (0 for the referen...</span>
+
+<span class="go"># Access the array underlying a single variable (this would return dask.array.Array if chunked)</span>
+<span class="gp">In [9]: </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="o">.</span><span class="n">data</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+<span class="gh">Out[9]: </span><span class="go"></span>
+<span class="go">array([[[ 0,  0],</span>
+<span class="go">        [ 1,  0],</span>
+<span class="go">        [ 1,  0]],</span>
+
+<span class="go">       [[ 1,  1],</span>
+<span class="go">        [ 1,  0],</span>
+<span class="go">        [ 1, -1]],</span>
+
+<span class="go">       [[ 0,  1],</span>
+<span class="go">        [ 1,  1],</span>
+<span class="go">        [ 1,  1]]], dtype=int8)</span>
+
+<span class="go"># Access the alleles corresponding to the calls for the first variant and sample</span>
+<span class="gp">In [10]: </span><span class="n">allele_indexes</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+<span class="gp">In [11]: </span><span class="n">allele_indexes</span>
+<span class="gh">Out[11]: </span><span class="go"></span>
+<span class="go">&lt;xarray.DataArray &#39;call_genotype&#39; (ploidy: 2)&gt;</span>
+<span class="go">array([0, 0], dtype=int8)</span>
+<span class="go">Dimensions without coordinates: ploidy</span>
+<span class="go">Attributes:</span>
+<span class="go">    mixed_ploidy:  False</span>
+<span class="go">    comment:       Call genotype. Encoded as allele values (0 for the referen...</span>
+
+<span class="gp">In [12]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_allele</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">allele_indexes</span><span class="p">]</span>
+<span class="gh">Out[12]: </span><span class="go"></span>
+<span class="go">&lt;xarray.DataArray &#39;variant_allele&#39; (ploidy: 2)&gt;</span>
+<span class="go">array([b&#39;T&#39;, b&#39;T&#39;], dtype=&#39;|S1&#39;)</span>
+<span class="go">Dimensions without coordinates: ploidy</span>
+<span class="go">Attributes:</span>
+<span class="go">    comment:  The possible alleles for the variant.</span>
+
+<span class="go"># Get a single item from an array as a Python scalar</span>
+<span class="gp">In [13]: </span><span class="n">ds</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gh">Out[13]: </span><span class="go">&#39;S0&#39;</span>
+</pre></div>
+</div>
+<p>Larger subsets of data can be visualized and/or summarized through various
+sgkit utilities as well as the Pandas/Xarray integration:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [14]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+
+<span class="gp">In [15]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
+
+<span class="go"># Show genotype calls with domain-specific display logic</span>
+<span class="gp">In [16]: </span><span class="n">sg</span><span class="o">.</span><span class="n">display_genotypes</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">max_variants</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">max_samples</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="gh">Out[16]: </span><span class="go"></span>
+<span class="go">samples    S0   S1   S2   S3  ... S246 S247 S248 S249</span>
+<span class="go">variants                      ...                    </span>
+<span class="go">0         0/0  1/0  1/0  0/1  ...  1/1  0/0  1/1  1/0</span>
+<span class="go">1         0/0  0/1  1/1  1/1  ...  0/1  1/0  0/.  0/0</span>
+<span class="go">2         1/1  0/1  1/0  0/1  ...  0/0  1/1  0/1  ./1</span>
+<span class="go">3         1/0  1/0  1/0  1/0  ...  1/1  1/0  0/1  1/.</span>
+<span class="go">...       ...  ...  ...  ...  ...  ...  ...  ...  ...</span>
+<span class="go">996       0/.  1/1  1/1  0/0  ...  ./.  0/0  1/0  ./0</span>
+<span class="go">997       0/0  ./0  1/0  1/1  ...  1/.  1/0  1/1  ./1</span>
+<span class="go">998       0/1  0/1  1/1  1/0  ...  0/0  0/0  0/1  ./1</span>
+<span class="go">999       1/0  0/1  1/0  1/1  ...  0/1  1/0  0/0  0/1</span>
+
+<span class="go">[1000 rows x 250 columns]</span>
+
+<span class="go"># A naive version of the above is also possible using only Xarray/Pandas and</span>
+<span class="go"># illustrates the flexibility that comes from being able to transition into</span>
+<span class="go"># and out of array/dataframe representations easily</span>
+<span class="gp">In [17]: </span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="p">[:</span><span class="mi">5</span><span class="p">,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span>
+<span class="gp">   ....: </span>    <span class="o">.</span><span class="n">unstack</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="gp">   ....: </span>    <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unstack</span><span class="p">())</span>
+<span class="gp">   ....: </span>
+<span class="gh">Out[17]: </span><span class="go"></span>
+<span class="go">samples       0      1      2      3      4</span>
+<span class="go">variants                                   </span>
+<span class="go">0         0.0/0  1.0/0  1.0/0  0.0/1    ./0</span>
+<span class="go">1         0.0/0  0.0/1  1.0/1  1.0/1    ./0</span>
+<span class="go">2         1.0/1  0.0/1  1.0/0  0.0/1  1.0/0</span>
+<span class="go">3         1.0/0  1.0/0  1.0/0  1.0/0  1.0/1</span>
+<span class="go">4           ./1    ./1  1.0/1  0.0/0  0.0/1</span>
+
+<span class="go"># Show call rate distribution for each variant using Pandas</span>
+<span class="gp">In [18]: </span><span class="n">df</span> <span class="o">=</span> <span class="o">~</span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype_mask</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+
+<span class="gp">In [19]: </span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gh">Out[19]: </span><span class="go"></span>
+<span class="go">                         call_genotype_mask</span>
+<span class="go">variants samples ploidy                    </span>
+<span class="go">0        0       0                     True</span>
+<span class="go">                 1                     True</span>
+<span class="go">         1       0                     True</span>
+<span class="go">                 1                     True</span>
+<span class="go">         2       0                     True</span>
+
+<span class="gp">In [20]: </span><span class="n">call_rates</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;variants&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="gp">In [21]: </span><span class="n">call_rates</span>
+<span class="gh">Out[21]: </span><span class="go"></span>
+<span class="go">          call_genotype_mask</span>
+<span class="go">variants                    </span>
+<span class="go">0                      0.898</span>
+<span class="go">1                      0.910</span>
+<span class="go">2                      0.926</span>
+<span class="go">3                      0.894</span>
+<span class="go">4                      0.892</span>
+<span class="go">...                      ...</span>
+<span class="go">995                    0.892</span>
+<span class="go">996                    0.906</span>
+<span class="go">997                    0.900</span>
+<span class="go">998                    0.900</span>
+<span class="go">999                    0.910</span>
+
+<span class="go">[1000 rows x 1 columns]</span>
+
+<span class="gp">In [22]: </span><span class="n">call_rates</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;hist&#39;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Call Rate Distribution&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gh">Out[22]: </span><span class="go">&lt;AxesSubplot: title={&#39;center&#39;: &#39;Call Rate Distribution&#39;}, ylabel=&#39;Frequency&#39;&gt;</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/call_rate_example.png"><img alt="_images/call_rate_example.png" src="_images/call_rate_example.png" style="width: 6in; height: 3in;" /></a>
+<p>This last example alludes to representations of missing data that are explained further in <a class="reference internal" href="#missing-data"><span class="std std-ref">Missing data</span></a>.</p>
+</section>
+<section id="genetic-methods">
+<span id="id2"></span><h2><a class="toc-backref" href="#id8">Genetic methods</a><a class="headerlink" href="#genetic-methods" title="Permalink to this headline">#</a></h2>
+<p>Genetic methods in sgkit are nearly always applied to individual <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> objects.  For a full list of
+available methods, see <a class="reference internal" href="api.html#api-methods"><span class="std std-ref">Methods</span></a>.</p>
+<p>In this example, the <code class="docutils literal notranslate"><span class="pre">variant_stats</span></code> method is applied to a dataset to compute a number of statistics
+across samples for each individual variant:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [23]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+
+<span class="gp">In [24]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
+
+<span class="gp">In [25]: </span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gh">Out[25]: </span><span class="go"></span>
+<span class="go">&lt;xarray.Dataset&gt;</span>
+<span class="go">Dimensions:                   (variants: 100, alleles: 2)</span>
+<span class="go">Dimensions without coordinates: variants, alleles</span>
+<span class="go">Data variables:</span>
+<span class="go">    variant_n_called          (variants) int64 40 42 43 40 41 ... 42 38 43 43 40</span>
+<span class="go">    variant_call_rate         (variants) float64 0.8 0.84 0.86 ... 0.86 0.86 0.8</span>
+<span class="go">    variant_n_het             (variants) int64 22 30 18 26 29 ... 23 22 26 21 19</span>
+<span class="go">    variant_n_hom_ref         (variants) int64 11 3 13 3 6 8 ... 6 10 9 12 8 13</span>
+<span class="go">    variant_n_hom_alt         (variants) int64 7 9 12 11 6 17 ... 15 9 7 5 14 8</span>
+<span class="go">    variant_n_non_ref         (variants) int64 29 39 30 37 35 ... 32 29 31 35 27</span>
+<span class="go">    variant_allele_count      (variants, alleles) uint64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
+<span class="go">    variant_allele_total      (variants) int64 90 92 93 88 91 ... 92 88 92 92 90</span>
+<span class="go">    variant_allele_frequency  (variants, alleles) float64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
+</pre></div>
+</div>
+<p>There are two ways that the results of every function are handled – either they are merged with the provided
+dataset or they are returned in a separate dataset.  See <a class="reference internal" href="user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
+</section>
+<section id="missing-data">
+<span id="id3"></span><h2><a class="toc-backref" href="#id9">Missing data</a><a class="headerlink" href="#missing-data" title="Permalink to this headline">#</a></h2>
+<p>Missing data in sgkit is represented using a sentinel value within data arrays
+(<code class="docutils literal notranslate"><span class="pre">-1</span></code> in integer arrays and <code class="docutils literal notranslate"><span class="pre">NaN</span></code> in float arrays) as well as a companion boolean mask array
+(<code class="docutils literal notranslate"><span class="pre">True</span></code> where data is missing).  These sentinel values are handled transparently in
+most sgkit functions and where this isn’t possible, limitations related to it are documented
+along with potential workarounds.</p>
+<p>This example demonstrates one such function where missing calls are ignored:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [26]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+
+<span class="gp">In [27]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_ploidy</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.3</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="gp">In [28]: </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span>
+<span class="gh">Out[28]: </span><span class="go"></span>
+<span class="go">&lt;xarray.DataArray &#39;call_genotype&#39; (variants: 1, samples: 4, ploidy: 2)&gt;</span>
+<span class="go">array([[[ 0,  0],</span>
+<span class="go">        [ 1,  1],</span>
+<span class="go">        [-1,  0],</span>
+<span class="go">        [-1, -1]]], dtype=int8)</span>
+<span class="go">Dimensions without coordinates: variants, samples, ploidy</span>
+<span class="go">Attributes:</span>
+<span class="go">    mixed_ploidy:  False</span>
+<span class="go">    comment:       Call genotype. Encoded as allele values (0 for the referen...</span>
+
+<span class="go"># Here, you can see that the missing calls above are not included in the allele counts</span>
+<span class="gp">In [29]: </span><span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span>
+<span class="gh">Out[29]: </span><span class="go"></span>
+<span class="go">&lt;xarray.DataArray &#39;variant_allele_count&#39; (variants: 1, alleles: 2)&gt;</span>
+<span class="go">dask.array&lt;sum-aggregate, shape=(1, 2), dtype=uint64, chunksize=(1, 2), chunktype=numpy.ndarray&gt;</span>
+<span class="go">Dimensions without coordinates: variants, alleles</span>
+<span class="go">Attributes:</span>
+<span class="go">    comment:  Variant allele counts. With shape (variants, alleles) and value...</span>
+</pre></div>
+</div>
+<p>A primary design goal in sgkit is to facilitate ad hoc analysis. There are many useful functions in
+the library but they are not enough on their own to accomplish many analyses. To that end, it is
+often helpful to be able to handle missing data in your own functions or exploratory summaries.
+Both the sentinel values and the boolean mask array help make this possible, where the sentinel values
+are typically more useful when implementing compiled operations and the boolean mask array is easier to use
+in a higher level API like Xarray or Numpy.  Only advanced users would likely ever need to worry
+about compiling their own functions (see <a class="reference internal" href="user_guide.html#custom-computations"><span class="std std-ref">Custom Computations</span></a> for more details).
+Using Xarray functions and the boolean mask is generally enough to accomplish most tasks, and this
+mask is often more efficient to operate on due to its high on-disk compression ratio.  This example
+shows how it can be used in the context of doing something simple like counting heterozygous calls:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [30]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+
+<span class="gp">In [31]: </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="gp">In [32]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_ploidy</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="go"># This array contains the allele indexes called for a sample</span>
+<span class="gp">In [33]: </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span>
+<span class="gh">Out[33]: </span><span class="go"></span>
+<span class="go">&lt;xarray.DataArray &#39;call_genotype&#39; (variants: 1, samples: 4, ploidy: 2)&gt;</span>
+<span class="go">array([[[-1,  0],</span>
+<span class="go">        [ 1,  1],</span>
+<span class="go">        [ 1,  0],</span>
+<span class="go">        [ 1,  1]]], dtype=int8)</span>
+<span class="go">Dimensions without coordinates: variants, samples, ploidy</span>
+<span class="go">Attributes:</span>
+<span class="go">    mixed_ploidy:  False</span>
+<span class="go">    comment:       Call genotype. Encoded as allele values (0 for the referen...</span>
+
+<span class="go"># This array represents only locations where the above calls are missing</span>
+<span class="gp">In [34]: </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype_mask</span>
+<span class="gh">Out[34]: </span><span class="go"></span>
+<span class="go">&lt;xarray.DataArray &#39;call_genotype_mask&#39; (variants: 1, samples: 4, ploidy: 2)&gt;</span>
+<span class="go">array([[[ True, False],</span>
+<span class="go">        [False, False],</span>
+<span class="go">        [False, False],</span>
+<span class="go">        [False, False]]])</span>
+<span class="go">Dimensions without coordinates: variants, samples, ploidy</span>
+<span class="go">Attributes:</span>
+<span class="go">    comment:  A flag for each call indicating which values are missing.</span>
+
+<span class="go"># Determine which calls are heterozygous</span>
+<span class="gp">In [35]: </span><span class="n">is_heterozygous</span> <span class="o">=</span> <span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+<span class="gp">In [36]: </span><span class="n">is_heterozygous</span>
+<span class="gh">Out[36]: </span><span class="go"></span>
+<span class="go">&lt;xarray.DataArray &#39;call_genotype&#39; (variants: 1, samples: 4)&gt;</span>
+<span class="go">array([[ True, False,  True, False]])</span>
+<span class="go">Dimensions without coordinates: variants, samples</span>
+
+<span class="go"># Count the number of heterozygous samples for the lone variant</span>
+<span class="gp">In [37]: </span><span class="n">is_heterozygous</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gh">Out[37]: </span><span class="go">2</span>
+
+<span class="go"># This is almost correct except that the calls for the first sample aren&#39;t</span>
+<span class="go"># really heterozygous, one of them is just missing.  Conditional logic like</span>
+<span class="go"># this can be used to isolate those values and replace them in the result:</span>
+<span class="gp">In [38]: </span><span class="n">xr</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype_mask</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;ploidy&#39;</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="n">is_heterozygous</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gh">Out[38]: </span><span class="go">1</span>
+
+<span class="go"># Now the result is correct -- only the third sample is heterozygous so the count should be 1.</span>
+<span class="go"># This how many sgkit functions handle missing data internally:</span>
+<span class="gp">In [39]: </span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_n_het</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gh">Out[39]: </span><span class="go">1</span>
+</pre></div>
+</div>
+</section>
+<section id="windowing">
+<h2><a class="toc-backref" href="#id10">Windowing</a><a class="headerlink" href="#windowing" title="Permalink to this headline">#</a></h2>
+<p>It is common to compute statistics in windows along the genome. Some <a class="reference internal" href="api.html#api-methods"><span class="std std-ref">Methods</span></a> in sgkit
+are “windowing aware” and will compute values for windows defined in a dataset. If no windows
+are defined then the values will typically be computed for each variant. It is therefore
+important to define windows <em>before</em> computing statistics on a dataset.</p>
+<p>Windows are intervals that span the <code class="docutils literal notranslate"><span class="pre">variants</span></code> dimension in a dataset, and they are defined
+using the <a class="reference internal" href="generated/sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_variant()</span></code></a>, <a class="reference internal" href="generated/sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_position()</span></code></a>, and
+<a class="reference internal" href="generated/sgkit.window_by_genome.html#sgkit.window_by_genome" title="sgkit.window_by_genome"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_genome()</span></code></a> functions.</p>
+<p>The first function, <a class="reference internal" href="generated/sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_variant()</span></code></a>, is the simplest and produces windows with
+a fixed number of variants in each window, determined by the <code class="docutils literal notranslate"><span class="pre">size</span></code> argument. An
+optional <code class="docutils literal notranslate"><span class="pre">step</span></code> argument may be provided to control the spacing between windows. By default,
+it is the same as the <code class="docutils literal notranslate"><span class="pre">size</span></code>, giving contiguous windows.</p>
+<p>The second function, <a class="reference internal" href="generated/sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_position()</span></code></a>, produces windows whose size is measured
+by genomic position (base pairs). See the API documentation for usage and examples.</p>
+<p>The third function, <a class="reference internal" href="generated/sgkit.window_by_genome.html#sgkit.window_by_genome" title="sgkit.window_by_genome"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.window_by_genome()</span></code></a>, produces a single window spanning the whole
+genome, which can be used to compute whole-genome statistics.</p>
+<p>This example shows the effect of computing the diversity statistic: first with no windows defined,
+then with windows.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [40]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+
+<span class="gp">In [41]: </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="gp">In [42]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="go"># Define a single cohort for all samples</span>
+<span class="gp">In [43]: </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_cohort&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s1">&#39;samples&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span>
+
+<span class="go"># The diversity statistic is computed for every variant since no windows are defined</span>
+<span class="gp">In [44]: </span><span class="n">sg</span><span class="o">.</span><span class="n">diversity</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gh">Out[44]: </span><span class="go"></span>
+<span class="go">&lt;xarray.Dataset&gt;</span>
+<span class="go">Dimensions:         (variants: 100, cohorts: 1)</span>
+<span class="go">Dimensions without coordinates: variants, cohorts</span>
+<span class="go">Data variables:</span>
+<span class="go">    stat_diversity  (variants, cohorts) float64 dask.array&lt;chunksize=(100, 1), meta=np.ndarray&gt;</span>
+
+<span class="go"># Define windows of size 20 variants. This creates a new dimension called `windows`, and</span>
+<span class="go"># some new variables for internal use.</span>
+<span class="gp">In [45]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window_by_variant</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="go"># The diversity statistic is now computed for every window</span>
+<span class="gp">In [46]: </span><span class="n">sg</span><span class="o">.</span><span class="n">diversity</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gh">Out[46]: </span><span class="go"></span>
+<span class="go">&lt;xarray.Dataset&gt;</span>
+<span class="go">Dimensions:         (windows: 5, cohorts: 1)</span>
+<span class="go">Dimensions without coordinates: windows, cohorts</span>
+<span class="go">Data variables:</span>
+<span class="go">    stat_diversity  (windows, cohorts) float64 dask.array&lt;chunksize=(5, 1), meta=np.ndarray&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="cohorts">
+<h2><a class="toc-backref" href="#id11">Cohorts</a><a class="headerlink" href="#cohorts" title="Permalink to this headline">#</a></h2>
+<p>During analysis we often want to be able to group samples into populations, and compute statistics
+based on these groups. Groups of samples are referred to as <em>cohorts</em> in sgkit.</p>
+<p>Cohorts are defined by a mapping from samples to cohort index. The following example creates
+a <code class="docutils literal notranslate"><span class="pre">sample_cohort</span></code> variable to group a dataset of ten samples into three cohorts. Note that first
+value is <code class="docutils literal notranslate"><span class="pre">-1</span></code>, which means the corresponding sample is not in any of the three cohorts, and
+will be ignored when computing cohort statistics.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [47]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+
+<span class="gp">In [48]: </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="gp">In [49]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="gp">In [50]: </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_cohort&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Typically the <code class="docutils literal notranslate"><span class="pre">sample_cohort</span></code> variable is derived from a dataframe that has the sample/cohort
+mapping.</p>
+<p>Cohort-level statistics can have repeated <code class="docutils literal notranslate"><span class="pre">cohorts</span></code> dimensions. <a class="reference internal" href="generated/sgkit.Fst.html#sgkit.Fst" title="sgkit.Fst"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.Fst()</span></code></a>, for example,
+produces statistics for <em>pairs</em> of cohorts, which is represented as a variable with dimensions
+<code class="docutils literal notranslate"><span class="pre">(windows,</span> <span class="pre">cohorts_0,</span> <span class="pre">cohorts_1)</span></code>, making it possible to read off the value of the statistic
+for any pair of cohorts.</p>
+<p>It’s convenient to name cohorts, to avoid errors that can occur when using index values. This
+example shows how to give cohorts names.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [51]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">window_by_variant</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="gp">In [52]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">Fst</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+
+<span class="gp">In [53]: </span><span class="n">cohort_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Africa&quot;</span><span class="p">,</span> <span class="s2">&quot;Asia&quot;</span><span class="p">,</span> <span class="s2">&quot;Europe&quot;</span><span class="p">]</span>
+
+<span class="gp">In [54]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">({</span><span class="s2">&quot;cohorts_0&quot;</span><span class="p">:</span> <span class="n">cohort_names</span><span class="p">,</span> <span class="s2">&quot;cohorts_1&quot;</span><span class="p">:</span> <span class="n">cohort_names</span><span class="p">})</span>
+
+<span class="gp">In [55]: </span><span class="n">ds</span><span class="o">.</span><span class="n">stat_Fst</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">cohorts_0</span><span class="o">=</span><span class="s2">&quot;Africa&quot;</span><span class="p">,</span> <span class="n">cohorts_1</span><span class="o">=</span><span class="s2">&quot;Asia&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+<span class="gh">Out[55]: </span><span class="go">array([ 0.00823045, -0.02510823,  0.04372041,  0.12240725, -0.11305475])</span>
+</pre></div>
+</div>
+<p>Methods that work with cohorts will, by default, operate over all cohorts at once. Sometimes
+however you might only want to run the computation for a subset of cohorts, in which case you can
+explicitly specify the cohorts when calling the function.</p>
+</section>
+<section id="chaining-operations">
+<h2><a class="toc-backref" href="#id12">Chaining operations</a><a class="headerlink" href="#chaining-operations" title="Permalink to this headline">#</a></h2>
+<p><a class="reference external" href="https://tomaugspurger.github.io/method-chaining.html">Method chaining</a> is a common practice with Python
+data tools that improves code readability and reduces the probability of introducing accidental namespace collisions.
+Sgkit functions are compatible with this idiom by default and this example shows to use it in conjunction with
+Xarray and Pandas operations in a single pipeline:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [56]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+
+<span class="gp">In [57]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
+
+<span class="go"># Use `pipe` to apply a single sgkit function to a dataset</span>
+<span class="gp">In [58]: </span><span class="n">ds_qc</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">)</span><span class="o">.</span><span class="n">drop_dims</span><span class="p">(</span><span class="s1">&#39;samples&#39;</span><span class="p">)</span>
+
+<span class="gp">In [59]: </span><span class="n">ds_qc</span>
+<span class="gh">Out[59]: </span><span class="go"></span>
+<span class="go">&lt;xarray.Dataset&gt;</span>
+<span class="go">Dimensions:                   (variants: 100, alleles: 2)</span>
+<span class="go">Dimensions without coordinates: variants, alleles</span>
+<span class="go">Data variables:</span>
+<span class="go">    variant_n_called          (variants) int64 40 42 43 40 41 ... 42 38 43 43 40</span>
+<span class="go">    variant_call_rate         (variants) float64 0.8 0.84 0.86 ... 0.86 0.86 0.8</span>
+<span class="go">    variant_n_het             (variants) int64 22 30 18 26 29 ... 23 22 26 21 19</span>
+<span class="go">    variant_n_hom_ref         (variants) int64 11 3 13 3 6 8 ... 6 10 9 12 8 13</span>
+<span class="go">    variant_n_hom_alt         (variants) int64 7 9 12 11 6 17 ... 15 9 7 5 14 8</span>
+<span class="go">    variant_n_non_ref         (variants) int64 29 39 30 37 35 ... 32 29 31 35 27</span>
+<span class="go">    variant_allele_count      (variants, alleles) uint64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
+<span class="go">    variant_allele_total      (variants) int64 90 92 93 88 91 ... 92 88 92 92 90</span>
+<span class="go">    variant_allele_frequency  (variants, alleles) float64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
+<span class="go">    variant_contig            (variants) int64 0 0 0 0 0 0 0 0 ... 0 0 0 0 0 0 0</span>
+<span class="go">    variant_position          (variants) int64 0 1 2 3 4 5 ... 94 95 96 97 98 99</span>
+<span class="go">    variant_allele            (variants, alleles) |S1 b&#39;T&#39; b&#39;C&#39; ... b&#39;T&#39; b&#39;A&#39;</span>
+<span class="go">Attributes:</span>
+<span class="go">    contigs:  [0]</span>
+<span class="go">    source:   sgkit-unknown</span>
+
+<span class="go"># Show statistics for one of the arrays to be used as a filter</span>
+<span class="gp">In [60]: </span><span class="n">ds_qc</span><span class="o">.</span><span class="n">variant_call_rate</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="gh">Out[60]: </span><span class="go"></span>
+<span class="go">count    100.000000</span>
+<span class="go">mean       0.804800</span>
+<span class="go">std        0.063125</span>
+<span class="go">min        0.560000</span>
+<span class="go">25%        0.780000</span>
+<span class="go">50%        0.800000</span>
+<span class="go">75%        0.840000</span>
+<span class="go">max        0.960000</span>
+<span class="go">Name: variant_call_rate, dtype: float64</span>
+
+<span class="go"># Build a pipeline that filters on call rate and computes Fst between two cohorts</span>
+<span class="go"># for windows of size 20 variants</span>
+<span class="gp">In [61]: </span><span class="p">(</span>
+<span class="gp">   ....: </span>    <span class="n">ds</span>
+<span class="gp">   ....: </span>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">)</span>
+<span class="gp">   ....: </span>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="k">lambda</span> <span class="n">ds</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">variants</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">variant_call_rate</span> <span class="o">&gt;</span> <span class="mf">.8</span><span class="p">))</span>
+<span class="gp">   ....: </span>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="k">lambda</span> <span class="n">ds</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">window_by_variant</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">))</span>
+<span class="gp">   ....: </span>    <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">sample_cohort</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s1">&#39;samples&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">   ....: </span>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">Fst</span><span class="p">)</span>
+<span class="gp">   ....: </span>    <span class="o">.</span><span class="n">stat_Fst</span><span class="o">.</span><span class="n">values</span>
+<span class="gp">   ....: </span><span class="p">)</span>
+<span class="gp">   ....: </span>
+<span class="gh">Out[61]: </span><span class="go"></span>
+<span class="go">array([[[        nan,  0.00091611],</span>
+<span class="go">        [ 0.00091611,         nan]],</span>
+
+<span class="go">       [[        nan,  0.00588756],</span>
+<span class="go">        [ 0.00588756,         nan]],</span>
+
+<span class="go">       [[        nan, -0.00550994],</span>
+<span class="go">        [-0.00550994,         nan]]])</span>
+</pre></div>
+</div>
+<p>This is possible because sgkit functions nearly always take a <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> as the first argument, create new
+variables, and then merge these new variables into a copy of the provided dataset in the returned value.
+See <a class="reference internal" href="user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
+</section>
+<section id="chunked-arrays">
+<h2><a class="toc-backref" href="#id13">Chunked arrays</a><a class="headerlink" href="#chunked-arrays" title="Permalink to this headline">#</a></h2>
+<p>Chunked arrays are required when working on large datasets. Libraries for managing chunked arrays such as <a class="reference external" href="https://docs.dask.org/en/latest/array.html">Dask Array</a>
+and <a class="reference external" href="https://zarr.readthedocs.io/en/stable/">Zarr</a> make it possible to implement blockwise algorithms that operate
+on subsets of arrays (in parallel) without ever requiring them to fit entirely in memory.</p>
+<p>By design, they behave almost identically to in-memory (typically Numpy) arrays within Xarray and can be interchanged freely when provided
+to sgkit functions. The most notable difference in behavior though is that operations on chunked arrays are <a class="reference external" href="https://tutorial.dask.org/01x_lazy.html">evaluated lazily</a>.
+This means that if an Xarray <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> contains only chunked arrays, no actual computations will be performed
+until one of the following occurs:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://xarray.pydata.org/en/stable/generated/xarray.Dataset.compute.html">Dataset.compute</a> is called</p></li>
+<li><p><a class="reference external" href="http://xarray.pydata.org/en/stable/generated/xarray.DataArray.compute.html">DataArray.compute</a> is called</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">DataArray.values</span></code> attribute is referenced</p></li>
+<li><p>Individual dask arrays are retrieved through the <code class="docutils literal notranslate"><span class="pre">DataArray.data</span></code> attribute and forced to evaluate via <a class="reference external" href="https://distributed.dask.org/en/latest/api.html#distributed.Client.compute">Client.compute</a>, <a class="reference external" href="https://tutorial.dask.org/03_array.html#Example">dask.array.Array.compute</a> or by coercing them to another array type (e.g. using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html">np.asarray</a>)</p></li>
+</ul>
+<p>This example shows a few of these features:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [62]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+
+<span class="gp">In [63]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
+
+<span class="go"># Chunk our original in-memory dataset using a blocksize of 50 in all dimensions.</span>
+<span class="gp">In [64]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">chunks</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="gp">In [65]: </span><span class="n">ds</span>
+<span class="gh">Out[65]: </span><span class="go"></span>
+<span class="go">&lt;xarray.Dataset&gt;</span>
+<span class="go">Dimensions:             (variants: 100, alleles: 2, samples: 50, ploidy: 2)</span>
+<span class="go">Dimensions without coordinates: variants, alleles, samples, ploidy</span>
+<span class="go">Data variables:</span>
+<span class="go">    variant_contig      (variants) int64 dask.array&lt;chunksize=(50,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_position    (variants) int64 dask.array&lt;chunksize=(50,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_allele      (variants, alleles) |S1 dask.array&lt;chunksize=(50, 2), meta=np.ndarray&gt;</span>
+<span class="go">    sample_id           (samples) &lt;U3 dask.array&lt;chunksize=(50,), meta=np.ndarray&gt;</span>
+<span class="go">    call_genotype       (variants, samples, ploidy) int8 dask.array&lt;chunksize=(50, 50, 2), meta=np.ndarray&gt;</span>
+<span class="go">    call_genotype_mask  (variants, samples, ploidy) bool dask.array&lt;chunksize=(50, 50, 2), meta=np.ndarray&gt;</span>
+<span class="go">Attributes:</span>
+<span class="go">    contigs:  [0]</span>
+<span class="go">    source:   sgkit-unknown</span>
+
+<span class="go"># Show the chunked array representing base pair position</span>
+<span class="gp">In [66]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span>
+<span class="gh">Out[66]: </span><span class="go"></span>
+<span class="go">&lt;xarray.DataArray &#39;variant_position&#39; (variants: 100)&gt;</span>
+<span class="go">dask.array&lt;xarray-variant_position, shape=(100,), dtype=int64, chunksize=(50,), chunktype=numpy.ndarray&gt;</span>
+<span class="go">Dimensions without coordinates: variants</span>
+<span class="go">Attributes:</span>
+<span class="go">    comment:  The reference position of the variant.</span>
+
+<span class="go"># Call compute via the dask.array API</span>
+<span class="gp">In [67]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">compute</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="gh">Out[67]: </span><span class="go">array([0, 1, 2, 3, 4])</span>
+
+<span class="go"># Coerce to numpy via Xarray</span>
+<span class="gp">In [68]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="gh">Out[68]: </span><span class="go">array([0, 1, 2, 3, 4])</span>
+
+<span class="go"># Compute without unboxing from xarray.DataArray</span>
+<span class="gp">In [69]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span><span class="o">.</span><span class="n">compute</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="gh">Out[69]: </span><span class="go"></span>
+<span class="go">&lt;xarray.DataArray &#39;variant_position&#39; (variants: 5)&gt;</span>
+<span class="go">array([0, 1, 2, 3, 4])</span>
+<span class="go">Dimensions without coordinates: variants</span>
+<span class="go">Attributes:</span>
+<span class="go">    comment:  The reference position of the variant.</span>
+</pre></div>
+</div>
+<p>Unlike this simplified example, real datasets often contain a mixture of chunked and unchunked arrays. Sgkit
+will often load smaller arrays directly into memory while leaving large arrays chunked as a trade-off between
+convenience and resource usage. This can always be modified by users though and sgkit functions that operate
+on a <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> should work regardless of the underlying array backend.</p>
+<p>See <a class="reference external" href="http://xarray.pydata.org/en/stable/dask.html#parallel-computing-with-dask">Parallel computing with Dask in Xarray</a>
+for more examples and information, as well as the Dask tutorials on
+<a class="reference external" href="https://tutorial.dask.org/03_array.html#dask.array-contains-these-algorithms">delayed array execution</a> and
+<a class="reference external" href="https://tutorial.dask.org/01x_lazy.html">lazy execution in Dask graphs</a>.</p>
+</section>
+</section>
+
+<div class="section">
+   
+</div>
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="index.html" title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title">sgkit: Statistical genetics toolkit in Python</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="user_guide.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title">User Guide</p>
+  </div>
+  <i class="fa-solid fa-angle-right"></i>
+  </a>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#installation">
+   Installation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#overview">
+   Overview
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#data-structures">
+   Data structures
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#genetic-methods">
+   Genetic methods
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#missing-data">
+   Missing data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#windowing">
+   Windowing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#cohorts">
+   Cohorts
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#chaining-operations">
+   Chaining operations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#chunked-arrays">
+   Chunked arrays
+  </a>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
+<div id="searchbox"></div>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+<div class="tocsection sourcelink">
+    <a href="_sources/getting_started.rst.txt">
+        <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+</div>
+
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2020, sgkit developers.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>

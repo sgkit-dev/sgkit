@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_pedigree\_inverse\_relationship\_spec
+===========================================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_pedigree_inverse_relationship_spec

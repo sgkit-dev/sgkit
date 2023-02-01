@@ -1,0 +1,6 @@
+﻿sgkit.window\_by\_position
+==========================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: window_by_position

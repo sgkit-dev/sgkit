@@ -1,0 +1,6 @@
+﻿sgkit.Tajimas\_D
+================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: Tajimas_D

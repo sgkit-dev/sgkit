@@ -1,0 +1,6 @@
+﻿sgkit.variables.sample\_pca\_explained\_variance\_ratio\_spec
+=============================================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: sample_pca_explained_variance_ratio_spec

@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_observed\_heterozygosity\_spec
+====================================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_observed_heterozygosity_spec

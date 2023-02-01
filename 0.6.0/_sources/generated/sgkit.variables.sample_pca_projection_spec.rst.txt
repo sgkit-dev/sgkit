@@ -1,0 +1,6 @@
+﻿sgkit.variables.sample\_pca\_projection\_spec
+=============================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: sample_pca_projection_spec

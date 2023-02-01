@@ -1,0 +1,6 @@
+﻿sgkit.parent\_indices
+=====================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: parent_indices

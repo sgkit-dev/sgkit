@@ -1,0 +1,27 @@
+[
+    {
+        "version": "latest",
+        "url": "https://pystatgen.github.io/sgkit/latest/"
+    },
+    {
+        "name": "0.5.0 (stable)",
+        "version": "0.5.0",
+        "url": "https://pystatgen.github.io/sgkit/0.5.0/"
+    },
+    {
+        "version": "0.4.0",
+        "url": "https://pystatgen.github.io/sgkit/0.4.0/"
+    },
+    {
+        "version": "0.3.0",
+        "url": "https://pystatgen.github.io/sgkit/0.3.0/"
+    },
+    {
+        "version": "0.2.0a1",
+        "url": "https://pystatgen.github.io/sgkit/0.2.0a1/"
+    },
+    {
+        "version": "0.1.0a1",
+        "url": "https://pystatgen.github.io/sgkit/0.1.0a1/"
+    }
+]

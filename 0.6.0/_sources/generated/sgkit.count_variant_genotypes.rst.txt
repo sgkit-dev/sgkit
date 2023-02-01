@@ -1,0 +1,6 @@
+﻿sgkit.count\_variant\_genotypes
+===============================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: count_variant_genotypes

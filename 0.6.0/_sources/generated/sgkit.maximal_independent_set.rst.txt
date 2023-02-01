@@ -1,0 +1,6 @@
+﻿sgkit.maximal\_independent\_set
+===============================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: maximal_independent_set

@@ -1,0 +1,6 @@
+﻿sgkit.variables.sample\_n\_het\_spec
+====================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: sample_n_het_spec
