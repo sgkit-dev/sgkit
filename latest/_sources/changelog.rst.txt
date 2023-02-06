@@ -8,8 +8,11 @@ Changelog
 0.7.0 (unreleased)
 -----------------------
 
-.. New Features
-.. ~~~~~~~~~~~~
+New Features
+~~~~~~~~~~~~
+
+- Add :func:`sgkit.io.plink.write_plink` function.
+  (:user:`tomwhite`, :pr:`1003`, :issue:`926`)
 
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~

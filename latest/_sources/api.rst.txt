@@ -28,6 +28,7 @@ PLINK
    :toctree: generated/
 
    read_plink
+   write_plink
 
 VCF (reading)
 -------------

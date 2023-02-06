@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>sgkit.identity_by_state &#8212; sgkit  documentation</title>
+    <title>sgkit.io.plink.write_plink &#8212; sgkit  documentation</title>
   
   
   
@@ -40,7 +40,7 @@
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.identity_by_state';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.io.plink.write_plink';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
@@ -50,8 +50,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.individual_heterozygosity" href="sgkit.individual_heterozygosity.html" />
-    <link rel="prev" title="sgkit.hardy_weinberg_test" href="sgkit.hardy_weinberg_test.html" /> 
+    <link rel="next" title="sgkit.io.vcf.vcf_to_zarr" href="sgkit.io.vcf.vcf_to_zarr.html" />
+    <link rel="prev" title="sgkit.io.plink.read_plink" href="sgkit.io.plink.read_plink.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="None">  
 <style type="text/css">
@@ -460,9 +460,9 @@
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.bgen.read_bgen.html">sgkit.io.bgen.read_bgen</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.bgen.rechunk_bgen.html">sgkit.io.bgen.rechunk_bgen</a></li>
 </ul>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.plink.read_plink.html">sgkit.io.plink.read_plink</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sgkit.io.plink.write_plink.html">sgkit.io.plink.write_plink</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.io.plink.write_plink</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.vcf_to_zarr.html">sgkit.io.vcf.vcf_to_zarr</a></li>
@@ -483,7 +483,7 @@
 <li class="toctree-l1"><a class="reference internal" href="sgkit.load_dataset.html">sgkit.load_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.save_dataset.html">sgkit.save_dataset</a></li>
 </ul>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.call_allele_frequencies.html">sgkit.call_allele_frequencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.cohort_allele_frequencies.html">sgkit.cohort_allele_frequencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.count_call_alleles.html">sgkit.count_call_alleles</a></li>
@@ -498,7 +498,7 @@
 <li class="toctree-l1"><a class="reference internal" href="sgkit.genomic_relationship.html">sgkit.genomic_relationship</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.gwas_linear_regression.html">sgkit.gwas_linear_regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.hardy_weinberg_test.html">sgkit.hardy_weinberg_test</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.identity_by_state</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.identity_by_state.html">sgkit.identity_by_state</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.individual_heterozygosity.html">sgkit.individual_heterozygosity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.ld_matrix.html">sgkit.ld_matrix</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.ld_prune.html">sgkit.ld_prune</a></li>
@@ -645,57 +645,55 @@
             
             
             <article class="bd-article" role="main">
-               <section id="sgkit-identity-by-state">
-<h1>sgkit.identity_by_state<a class="headerlink" href="#sgkit-identity-by-state" title="Permalink to this headline">#</a></h1>
+               <section id="sgkit-io-plink-write-plink">
+<h1>sgkit.io.plink.write_plink<a class="headerlink" href="#sgkit-io-plink-write-plink" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="sgkit.identity_by_state">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">identity_by_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_allele_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_allele_frequency'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.identity_by_state" title="Permalink to this definition">#</a></dt>
-<dd><p>Compute identity by state (IBS) probabilities between
-all pairs of samples.</p>
-<p>The IBS probability between a pair of individuals is the
-probability that a randomly drawn allele from the first individual
-is identical in state with a randomly drawn allele from the second
-individual at a single random locus.</p>
+<dt class="sig sig-object py" id="sgkit.io.plink.write_plink">
+<span class="sig-prename descclassname"><span class="pre">sgkit.io.plink.</span></span><span class="sig-name descname"><span class="pre">write_plink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bed_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bim_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fam_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.io.plink.write_plink" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert a dataset to a PLINK file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.1.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing call genotype alleles.</p>
+<dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.1.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset to convert to PLINK.</p>
 </dd>
-<dt><strong>call_allele_frequency</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_allele_frequency'</span></code>)</dt><dd><p>Input variable name holding call_allele_frequency as defined by
-<a class="reference internal" href="sgkit.variables.call_allele_frequency_spec.html#sgkit.variables.call_allele_frequency_spec" title="sgkit.variables.call_allele_frequency_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_allele_frequency_spec</span></code></a>.
-If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
-using <a class="reference internal" href="sgkit.call_allele_frequencies.html#sgkit.call_allele_frequencies" title="sgkit.call_allele_frequencies"><code class="xref py py-func docutils literal notranslate"><span class="pre">call_allele_frequencies()</span></code></a>.</p>
+<dt><strong>path</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Path to PLINK file set.
+This should not include a suffix, i.e. if the files are
+at <cite>data.{bed,fam,bim}</cite> then only ‘data’ should be
+provided (suffixes are added internally).
+Either this path must be provided or all 3 of
+<cite>bed_path</cite>, <cite>bim_path</cite> and <cite>fam_path</cite>.</p>
 </dd>
-<dt><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
-output variables into a single dataset, otherwise return only
-the computed output variables.
-See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
+<dt><strong>bed_path</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Path to PLINK bed file.
+This should be a full path including the <cite>.bed</cite> extension
+and cannot be specified in conjunction with <cite>path</cite>.</p>
+</dd>
+<dt><strong>bim_path</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Path to PLINK bim file.
+This should be a full path including the <cite>.bim</cite> extension
+and cannot be specified in conjunction with <cite>path</cite>.</p>
+</dd>
+<dt><strong>fam_path</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Path to PLINK fam file.
+This should be a full path including the <cite>.fam</cite> extension
+and cannot be specified in conjunction with <cite>path</cite>.</p>
 </dd>
 </dl>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This function is only applicable to diploid, biallelic datasets.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If <cite>path</cite> and one of <cite>bed_path</cite>, <cite>bim_path</cite> or <cite>fam_path</cite> are provided.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If ploidy of provided dataset != 2</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If maximum number of alleles in provided dataset != 2</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.1.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.stat_identity_by_state_spec.html#sgkit.variables.stat_identity_by_state_spec" title="sgkit.variables.stat_identity_by_state_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_identity_by_state_spec</span></code></a>
-which is a matrix of pairwise IBS probabilities among all samples.
-The dimensions are named <code class="docutils literal notranslate"><span class="pre">samples_0</span></code> and <code class="docutils literal notranslate"><span class="pre">samples_1</span></code>.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">display_genotypes</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span> 
-<span class="go">samples    S0   S1   S2</span>
-<span class="go">variants</span>
-<span class="go">0         0/0  1/1  1/0</span>
-<span class="go">1         1/1  1/1  1/0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">identity_by_state</span><span class="p">(</span><span class="n">ds</span><span class="p">)[</span><span class="s2">&quot;stat_identity_by_state&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
-<span class="go">array([[1. , 0.5, 0.5],</span>
-<span class="go">       [0.5, 1. , 0.5],</span>
-<span class="go">       [0.5, 0.5, 0.5]])</span>
-</pre></div>
-</div>
 </dd></dl>
 
 </section>
@@ -711,17 +709,17 @@ The dimensions are named <code class="docutils literal notranslate"><span class=
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="sgkit.hardy_weinberg_test.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="sgkit.io.plink.read_plink.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">sgkit.hardy_weinberg_test</p>
+          <p class="prev-next-title">sgkit.io.plink.read_plink</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="sgkit.individual_heterozygosity.html" title="next page">
+  <a class='right-next' id="next-link" href="sgkit.io.vcf.vcf_to_zarr.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">sgkit.individual_heterozygosity</p>
+      <p class="prev-next-title">sgkit.io.vcf.vcf_to_zarr</p>
   </div>
   <i class="fa-solid fa-angle-right"></i>
   </a>
@@ -746,7 +744,7 @@ The dimensions are named <code class="docutils literal notranslate"><span class=
 <div class="toc-item">
   
 <div class="tocsection sourcelink">
-    <a href="../_sources/generated/sgkit.identity_by_state.rst.txt">
+    <a href="../_sources/generated/sgkit.io.plink.write_plink.rst.txt">
         <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
 </div>
