@@ -187,13 +187,15 @@ def get_contigs(ds: xr.Dataset) -> ArrayLike:
         return np.array(ds.attrs["contigs"], dtype="S")
 
 
-def get_filters(ds: xr.Dataset) -> ArrayLike:
+def get_filters(ds: xr.Dataset) -> Optional[ArrayLike]:
     """Return the filters in a dataset."""
     if "filter_id" in ds:
         return ds["filter_id"].values
-    else:
+    elif "filters" in ds.attrs:
         warnings.warn(
             "The 'filters' VCF Zarr group attribute is deprecated and should be converted to a 'filter_id' array.",
             DeprecationWarning,
         )
         return np.array(ds.attrs["filters"], dtype="S")
+    else:
+        return None
