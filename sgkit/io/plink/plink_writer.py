@@ -9,6 +9,17 @@ from sgkit.typing import ArrayLike, PathType
 
 BED_READER_MISSING_INT_VALUE = -127
 
+FAM_VARIABLE_TO_BED_READER = {
+    # sgkit variable name : bed reader properties name
+    "sample_family_id": "fid",
+    "sample_member_id": "iid",
+    "sample_paternal_id": "father",
+    "sample_maternal_id": "mother",
+    "sample_sex": "sex",
+    "sample_phenotype": "pheno",
+    "variant_id": "sid",
+}
+
 
 def write_plink(
     ds: Dataset,
@@ -19,6 +30,20 @@ def write_plink(
     fam_path: Optional[PathType] = None,
 ) -> None:
     """Convert a dataset to a PLINK file.
+
+    If any of the following pedigree-specific variables are defined in the dataset
+    they will be included in the PLINK fam file. Otherwise, the PLINK fam file will
+    contain missing values for these fields, except for the within-family identifier
+    for samples, which will be taken from the dataset ``sample_id``.
+
+    - ``sample_family_id``: Family identifier commonly referred to as FID
+    - ``sample_member_id``: Within-family identifier for sample
+    - ``sample_paternal_id``: Within-family identifier for father of sample
+    - ``sample_maternal_id``: Within-family identifier for mother of sample
+    - ``sample_sex``: Sex code equal to 1 for male, 2 for female, and -1
+        for missing
+    - ``sample_phenotype``: Phenotype code equal to 1 for control, 2 for case,
+        and -1 for missing
 
     Parameters
     ----------
@@ -78,11 +103,12 @@ def write_plink(
         "bp_position": ds.variant_position.values,
         "allele_1": ds.variant_allele.values[:, 0],
         "allele_2": ds.variant_allele.values[:, 1],
-        "iid": ds.sample_id,
+        "iid": ds.sample_id.values,  # may be overridden by sample_member_id below (if present)
     }
 
-    if "variant_id" in ds:
-        properties["sid"] = ds.variant_id
+    for var, prop in FAM_VARIABLE_TO_BED_READER.items():
+        if var in ds:
+            properties[prop] = ds[var].values
 
     output_file = bed_path
     val = call_g.T

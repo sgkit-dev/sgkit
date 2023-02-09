@@ -106,8 +106,10 @@ def read_fam(path: PathType, sep: str = " ") -> DataFrame:
         v = v.where(v.isin(codes), np.nan)
         return v.fillna(-1).astype("int8")
 
-    df["paternal_id"] = df["paternal_id"].where(df["paternal_id"] != "0", None)
-    df["maternal_id"] = df["maternal_id"].where(df["maternal_id"] != "0", None)
+    # replace fam "0" with sgkit missing values (".")
+    df["family_id"] = df["family_id"].where(df["family_id"] != "0", ".")
+    df["paternal_id"] = df["paternal_id"].where(df["paternal_id"] != "0", ".")
+    df["maternal_id"] = df["maternal_id"].where(df["maternal_id"] != "0", ".")
     df["sex"] = coerce_code(df["sex"], [1, 2])
     df["phenotype"] = coerce_code(df["phenotype"], [1, 2])
 
@@ -209,7 +211,7 @@ def read_plink(
     The following pedigree-specific fields are also included:
 
     - ``sample_family_id``: Family identifier commonly referred to as FID
-    - ``sample_id``: Within-family identifier for sample
+    - ``sample_member_id`` and ``sample_id``: Within-family identifier for sample
     - ``sample_paternal_id``: Within-family identifier for father of sample
     - ``sample_maternal_id``: Within-family identifier for mother of sample
     - ``sample_sex``: Sex code equal to 1 for male, 2 for female, and -1
@@ -295,6 +297,4 @@ def read_plink(
     )
 
     # Assign PLINK-specific pedigree fields
-    return ds.assign(
-        {f"sample_{f}": (DIM_SAMPLE, arr_fam[f]) for f in arr_fam if f != "member_id"}
-    )
+    return ds.assign({f"sample_{f}": (DIM_SAMPLE, arr_fam[f]) for f in arr_fam})
