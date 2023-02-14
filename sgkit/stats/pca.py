@@ -274,7 +274,7 @@ def pca(
     ...     .plot.scatter(x=("sample_pca_projection", 0), y=("sample_pca_projection", 1))
     ... )
     >>> ax
-    <AxesSubplot: xlabel='(sample_pca_projection, 0)', ylabel='(sample_pca_projection, 1)'>
+    <Axes: xlabel='(sample_pca_projection, 0)', ylabel='(sample_pca_projection, 1)'>
 
     References
     ----------
