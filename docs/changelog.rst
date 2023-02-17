@@ -14,6 +14,9 @@ New Features
 - Add :func:`sgkit.io.plink.write_plink` function.
   (:user:`tomwhite`, :pr:`1003`, :issue:`926`)
 
+- Add ``phased`` option to :func:`simulate_genotype_call_dataset` function.
+  (:user:`tomwhite`, :pr:`1022`, :issue:`973`)
+
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
 
