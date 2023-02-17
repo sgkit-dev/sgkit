@@ -26,3 +26,6 @@ def test_simulate_genotype_call_dataset__phased(tmp_path):
     ds = simulate_genotype_call_dataset(n_variant=10, n_sample=10, phased=True)
     assert "call_genotype_phased" in ds
     assert np.all(ds["call_genotype_phased"])
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=10, phased=False)
+    assert "call_genotype_phased" in ds
+    assert not np.any(ds["call_genotype_phased"])
