@@ -1,7 +1,6 @@
 from typing import Hashable
 
 import dask.array as da
-import numpy as np
 from xarray import Dataset
 
 from sgkit import variables
@@ -74,10 +73,9 @@ def identity_by_state(
     )
     af = da.asarray(ds[call_allele_frequency])
     af0 = da.where(da.isnan(af), 0.0, af)
-    num = da.einsum("ixj,iyj->xy", af0, af0)
+    num = sum(m.T @ m for m in af0.transpose(2, 0, 1))
     called = da.nansum(af, axis=-1)
-    count = da.einsum("ix,iy->xy", called, called)
-    denom = da.where(count == 0, np.nan, count)
+    denom = called.T @ called
     new_ds = create_dataset(
         {
             variables.stat_identity_by_state: (
