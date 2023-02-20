@@ -10,6 +10,7 @@ from sgkit.testing import simulate_genotype_call_dataset
 from sgkit.typing import ArrayLike
 
 
+@pytest.mark.parametrize("skipna", [True, False])
 @pytest.mark.parametrize(
     "chunks",
     [
@@ -19,7 +20,7 @@ from sgkit.typing import ArrayLike
         ((1, 1), (3,), (1, 1)),
     ],
 )
-def test_identity_by_state__diploid_biallelic(chunks):
+def test_identity_by_state__diploid_biallelic(chunks, skipna):
     ds = simulate_genotype_call_dataset(
         n_variant=2,
         n_sample=3,
@@ -33,7 +34,7 @@ def test_identity_by_state__diploid_biallelic(chunks):
             ds.call_allele_count.dims,
             ds.call_allele_count.data.rechunk(chunks),
         )
-    ds = identity_by_state(ds)
+    ds = identity_by_state(ds, skipna=skipna)
     actual = ds.stat_identity_by_state.values
     expect = np.nanmean(
         np.array(
@@ -48,6 +49,7 @@ def test_identity_by_state__diploid_biallelic(chunks):
 
 
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
+@pytest.mark.parametrize("skipna", [True, False])
 @pytest.mark.parametrize(
     "chunks",
     [
@@ -57,7 +59,7 @@ def test_identity_by_state__diploid_biallelic(chunks):
         ((1, 1), (3,), (2, 1)),
     ],
 )
-def test_identity_by_state__tetraploid_multiallelic(chunks):
+def test_identity_by_state__tetraploid_multiallelic(chunks, skipna):
     ds = simulate_genotype_call_dataset(
         n_variant=2,
         n_sample=3,
@@ -72,9 +74,13 @@ def test_identity_by_state__tetraploid_multiallelic(chunks):
             ds.call_allele_count.dims,
             ds.call_allele_count.data.rechunk(chunks),
         )
-    ds = identity_by_state(ds)
+    ds = identity_by_state(ds, skipna=skipna)
     actual = ds.stat_identity_by_state.values
-    expect = np.nanmean(
+    if skipna:
+        mean_func = np.nanmean
+    else:
+        mean_func = np.mean
+    expect = mean_func(
         np.array(
             [
                 [
@@ -101,8 +107,8 @@ def test_identity_by_state__tetraploid_multiallelic(chunks):
     ],
 )
 @pytest.mark.parametrize("ploidy", [2, 4])
-@pytest.mark.parametrize("seed", [0, 1])
-def test_identity_by_state__reference_implementation(ploidy, chunks, seed):
+@pytest.mark.parametrize("skipna, seed", [(True, 0), (False, 1)])
+def test_identity_by_state__reference_implementation(ploidy, chunks, skipna, seed):
     ds = simulate_genotype_call_dataset(
         n_variant=sum(chunks[0]),
         n_sample=sum(chunks[1]),
@@ -116,11 +122,15 @@ def test_identity_by_state__reference_implementation(ploidy, chunks, seed):
         ds.call_allele_count.dims,
         ds.call_allele_count.data.rechunk(chunks),
     )
-    ds = identity_by_state(ds)
+    ds = identity_by_state(ds, skipna=skipna)
     actual = ds.stat_identity_by_state.values
     # reference implementation
     AF = ds.call_allele_frequency.data
-    expect = np.nanmean(
+    if skipna:
+        mean_func = np.nanmean
+    else:
+        mean_func = np.mean
+    expect = mean_func(
         (AF[..., None, :, :] * AF[..., :, None, :]).sum(axis=-1), axis=0
     ).compute()
     np.testing.assert_array_almost_equal(expect, actual)

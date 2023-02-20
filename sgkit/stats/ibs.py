@@ -16,6 +16,7 @@ def identity_by_state(
     ds: Dataset,
     *,
     call_allele_frequency: Hashable = variables.call_allele_frequency,
+    skipna: bool = True,
     merge: bool = True,
 ) -> Dataset:
     """Compute identity by state (IBS) probabilities between
@@ -35,6 +36,9 @@ def identity_by_state(
         :data:`sgkit.variables.call_allele_frequency_spec`.
         If the variable is not present in ``ds``, it will be computed
         using :func:`call_allele_frequencies`.
+    skipna
+        If True (the default), missing (nan) allele frequencies will be
+        skipped.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -72,10 +76,14 @@ def identity_by_state(
         ds, {call_allele_frequency: variables.call_allele_frequency_spec}
     )
     af = da.asarray(ds[call_allele_frequency])
-    af0 = da.where(da.isnan(af), 0.0, af)
-    num = sum(m.T @ m for m in af0.transpose(2, 0, 1))
-    called = da.nansum(af, axis=-1)
-    denom = called.T @ called
+    if skipna:
+        af0 = da.where(da.isnan(af), 0.0, af)
+        num = sum(m.T @ m for m in af0.transpose(2, 0, 1))
+        called = da.nansum(af, axis=-1)
+        denom = called.T @ called
+    else:
+        num = sum(m.T @ m for m in af.transpose(2, 0, 1))
+        denom = len(af)
     new_ds = create_dataset(
         {
             variables.stat_identity_by_state: (
