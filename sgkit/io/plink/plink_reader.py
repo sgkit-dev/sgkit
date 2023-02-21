@@ -39,6 +39,9 @@ BIM_FIELDS = [
 BIM_DF_DTYPE = dict([(f[0], f[1]) for f in BIM_FIELDS])
 BIM_ARRAY_DTYPE = dict([(f[0], f[2]) for f in BIM_FIELDS])
 
+INT_MISSING = -1
+STR_MISSING = "."
+
 
 class BedReader(object):
     def __init__(
@@ -81,8 +84,8 @@ class BedReader(object):
         #       (missing would then be NaN)
         arr = arr.astype(self.dtype)
         # Add a ploidy dimension, so allele counts of 0, 1, 2 correspond to 00, 10, 11
-        call0 = np.where(arr < 0, -1, np.where(arr == 0, 0, 1))
-        call1 = np.where(arr < 0, -1, np.where(arr == 2, 1, 0))
+        call0 = np.where(arr < 0, INT_MISSING, np.where(arr == 0, 0, 1))
+        call1 = np.where(arr < 0, INT_MISSING, np.where(arr == 2, 1, 0))
         arr = np.stack([call0, call1], axis=-1)
         # Apply final slice to 3D result
         return arr[:, :, idx[-1]]
@@ -104,12 +107,12 @@ def read_fam(path: PathType, sep: str = " ") -> DataFrame:
         # Set non-ints and unexpected codes to missing (-1)
         v = dd.to_numeric(v, errors="coerce")
         v = v.where(v.isin(codes), np.nan)
-        return v.fillna(-1).astype("int8")
+        return v.fillna(INT_MISSING).astype("int8")
 
     # replace fam "0" with sgkit missing values (".")
-    df["family_id"] = df["family_id"].where(df["family_id"] != "0", ".")
-    df["paternal_id"] = df["paternal_id"].where(df["paternal_id"] != "0", ".")
-    df["maternal_id"] = df["maternal_id"].where(df["maternal_id"] != "0", ".")
+    df["family_id"] = df["family_id"].where(df["family_id"] != "0", STR_MISSING)
+    df["paternal_id"] = df["paternal_id"].where(df["paternal_id"] != "0", STR_MISSING)
+    df["maternal_id"] = df["maternal_id"].where(df["maternal_id"] != "0", STR_MISSING)
     df["sex"] = coerce_code(df["sex"], [1, 2])
     df["phenotype"] = coerce_code(df["phenotype"], [1, 2])
 
@@ -210,15 +213,17 @@ def read_plink(
 
     The following pedigree-specific fields are also included:
 
-    - ``sample_family_id``: Family identifier commonly referred to as FID
+    - ``sample_family_id``: Family identifier commonly referred to as FID,
+        "." for missing
     - ``sample_member_id`` and ``sample_id``: Within-family identifier for sample
-    - ``sample_paternal_id``: Within-family identifier for father of sample
-    - ``sample_maternal_id``: Within-family identifier for mother of sample
+    - ``sample_paternal_id``: Within-family identifier for father of sample,
+        "." for missing
+    - ``sample_maternal_id``: Within-family identifier for mother of sample,
+        "." for missing
     - ``sample_sex``: Sex code equal to 1 for male, 2 for female, and -1
         for missing
     - ``sample_phenotype``: Phenotype code equal to 1 for control, 2 for case,
         and -1 for missing
-
 
     See https://www.cog-genomics.org/plink/1.9/formats#fam for more details.
 

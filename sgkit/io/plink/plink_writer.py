@@ -8,6 +8,8 @@ from sgkit.accelerate import numba_guvectorize
 from sgkit.typing import ArrayLike, PathType
 
 BED_READER_MISSING_INT_VALUE = -127
+INT_MISSING = -1
+STR_MISSING = "."
 
 FAM_VARIABLE_TO_BED_READER = {
     # sgkit variable name : bed reader properties name
@@ -108,7 +110,12 @@ def write_plink(
 
     for var, prop in FAM_VARIABLE_TO_BED_READER.items():
         if var in ds:
-            properties[prop] = ds[var].values
+            values = ds[var].values
+            if values.dtype.kind in ("O", "S", "U"):
+                values = np.where(values == STR_MISSING, "0", values)
+            elif values.dtype.kind in ("i", "u"):
+                values = np.where(values == INT_MISSING, 0, values)
+            properties[prop] = values
 
     output_file = bed_path
     val = call_g.T
