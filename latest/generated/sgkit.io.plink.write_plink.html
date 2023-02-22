@@ -651,6 +651,26 @@
 <dt class="sig sig-object py" id="sgkit.io.plink.write_plink">
 <span class="sig-prename descclassname"><span class="pre">sgkit.io.plink.</span></span><span class="sig-name descname"><span class="pre">write_plink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bed_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bim_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fam_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.io.plink.write_plink" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a dataset to a PLINK file.</p>
+<p>If any of the following pedigree-specific variables are defined in the dataset
+they will be included in the PLINK fam file. Otherwise, the PLINK fam file will
+contain missing values for these fields, except for the within-family identifier
+for samples, which will be taken from the dataset <code class="docutils literal notranslate"><span class="pre">sample_id</span></code>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_family_id</span></code>: Family identifier commonly referred to as FID</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_member_id</span></code>: Within-family identifier for sample</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_paternal_id</span></code>: Within-family identifier for father of sample</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_maternal_id</span></code>: Within-family identifier for mother of sample</p></li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sample_sex</span></code>: Sex code equal to 1 for male, 2 for female, and -1</dt><dd><p>for missing</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sample_phenotype</span></code>: Phenotype code equal to 1 for control, 2 for case,</dt><dd><p>and -1 for missing</p>
+</dd>
+</dl>
+</li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">

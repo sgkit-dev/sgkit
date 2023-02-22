@@ -724,10 +724,22 @@ of this dataset includes:</p>
 </ul>
 <p>The following pedigree-specific fields are also included:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">sample_family_id</span></code>: Family identifier commonly referred to as FID</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sample_id</span></code>: Within-family identifier for sample</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sample_paternal_id</span></code>: Within-family identifier for father of sample</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sample_maternal_id</span></code>: Within-family identifier for mother of sample</p></li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sample_family_id</span></code>: Family identifier commonly referred to as FID,</dt><dd><p>”.” for missing</p>
+</dd>
+</dl>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_member_id</span></code> and <code class="docutils literal notranslate"><span class="pre">sample_id</span></code>: Within-family identifier for sample</p></li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sample_paternal_id</span></code>: Within-family identifier for father of sample,</dt><dd><p>”.” for missing</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sample_maternal_id</span></code>: Within-family identifier for mother of sample,</dt><dd><p>”.” for missing</p>
+</dd>
+</dl>
+</li>
 <li><dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">sample_sex</span></code>: Sex code equal to 1 for male, 2 for female, and -1</dt><dd><p>for missing</p>
 </dd>
@@ -739,13 +751,11 @@ of this dataset includes:</p>
 </dl>
 </li>
 </ul>
+<p>See <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#fam">https://www.cog-genomics.org/plink/1.9/formats#fam</a> for more details.</p>
 </p>
 </dd>
-</dl>
-<p>See <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#fam">https://www.cog-genomics.org/plink/1.9/formats#fam</a> for more details.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If <cite>path</cite> and one of <cite>bed_path</cite>, <cite>bim_path</cite> or <cite>fam_path</cite> are provided.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If <cite>path</cite> and one of <cite>bed_path</cite>, <cite>bim_path</cite> or <cite>fam_path</cite> are provided.</p>
 </dd>
 </dl>
 </dd></dl>
