@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from sgkit import display_genotypes
-from sgkit.display import truncate
+from sgkit.display import genotype_as_bytes, truncate
 from sgkit.testing import simulate_genotype_call_dataset
 
 
@@ -243,3 +243,31 @@ def test_truncate_fails_with_only_one_dimension():
         ValueError, match="Truncation is only supported for two dimensions"
     ):
         truncate(ds, {"variants": 10})
+
+
+@pytest.mark.parametrize(
+    "genotype, phased, max_allele_chars, expect",
+    [
+        ([0, 1], False, 2, b"0/1"),
+        ([1, 2, 3, 1], True, 2, b"1|2|3|1"),
+        ([0, -1], False, 2, b"0/."),
+        ([0, -2], False, 2, b"0"),
+        ([0, -2, 1], True, 2, b"0|1"),
+        ([-1, -2, 1], False, 2, b"./1"),
+        ([22, -1, -2, 7, -2], False, 2, b"22/./7"),
+        ([0, 333], False, 2, b"0/33"),  # truncation
+        ([0, 333], False, 3, b"0/333"),
+        (
+            [[0, 1, 2, -1], [0, 2, -2, -2]],
+            np.array([False, True]),
+            2,
+            [b"0/1/2/.", b"0|2"],
+        ),
+    ],
+)
+def test_genotype_as_bytes(genotype, phased, max_allele_chars, expect):
+    genotype = np.array(genotype)
+    np.testing.assert_array_equal(
+        expect,
+        genotype_as_bytes(genotype, phased, max_allele_chars),
+    )

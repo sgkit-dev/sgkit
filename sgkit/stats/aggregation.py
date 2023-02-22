@@ -9,6 +9,7 @@ from xarray import Dataset
 
 from sgkit import variables
 from sgkit.accelerate import numba_guvectorize, numba_jit
+from sgkit.display import genotype_as_bytes
 from sgkit.stats.utils import cohort_sum
 from sgkit.typing import ArrayLike
 from sgkit.utils import (
@@ -556,81 +557,6 @@ def _index_as_genotype(
         out[p - 1] = n
 
 
-@numba_guvectorize(  # type: ignore
-    [
-        "void(uint8[:], uint8[:], uint8[:], uint8[:])",
-    ],
-    "(b),(),(c)->(c)",
-)
-def _format_genotype_bytes(
-    chars: ArrayLike, ploidy: int, _: ArrayLike, out: ArrayLike
-) -> None:  # pragma: no cover
-    ploidy = ploidy[0]
-    chars_per_allele = len(chars) // ploidy
-    slot = 0
-    for slot in range(ploidy):
-        offset_inp = slot * chars_per_allele
-        offset_out = slot * (chars_per_allele + 1)
-        if slot > 0:
-            out[offset_out - 1] = 47  # "/"
-        for char in range(chars_per_allele):
-            i = offset_inp + char
-            j = offset_out + char
-            val = chars[i]
-            if val == 45:  # "-"
-                if chars[i + 1] == 49:  # "1"
-                    # this is an unknown allele
-                    out[j] = 46  # "."
-                    out[j + 1 : j + chars_per_allele] = 0
-                    break
-                else:
-                    # < -1 indicates a gap
-                    out[j : j + chars_per_allele] = 0
-                    if slot > 0:
-                        # remove separator
-                        out[offset_out - 1] = 0
-                    break
-            else:
-                out[j] = val
-    # shuffle zeros to end
-    c = len(out)
-    for i in range(c):
-        if out[i] == 0:
-            for j in range(i + 1, c):
-                if out[j] != 0:
-                    out[i] = out[j]
-                    out[j] = 0
-                    break
-
-
-def _genotype_as_bytes(genotype: ArrayLike, max_allele_chars: int = 2) -> ArrayLike:
-    """Convert integer encoded genotype calls to (unphased)
-    VCF style byte strings.
-
-    Parameters
-    ----------
-    genotype
-        Genotype call.
-    max_allele_chars
-        Maximum number of chars required for any allele.
-        This should include signed sentinel values.
-
-    Returns
-    -------
-    genotype_string
-        Genotype encoded as byte string.
-    """
-    ploidy = genotype.shape[-1]
-    b = genotype.astype("|S{}".format(max_allele_chars))
-    b.dtype = np.uint8
-    n_num = b.shape[-1]
-    n_char = n_num + ploidy - 1
-    dummy = np.empty(n_char, np.uint8)
-    c = _format_genotype_bytes(b, ploidy, dummy)
-    c.dtype = "|S{}".format(n_char)
-    return np.squeeze(c)
-
-
 def genotype_coords(
     ds: Dataset,
     *,
@@ -674,7 +600,7 @@ def genotype_coords(
     # allow enough room for all alleles and separators
     dtype = "|S{}".format(max_chars * ploidy + ploidy - 1)
     S = da.map_blocks(
-        _genotype_as_bytes, G, max_chars, drop_axis=1, dtype=dtype
+        genotype_as_bytes, G, False, max_chars, drop_axis=1, dtype=dtype
     ).astype("U")
     new_ds = create_dataset({variables.genotype_id: ("genotypes", S)})
     ds = conditional_merge_datasets(ds, new_ds, merge)
