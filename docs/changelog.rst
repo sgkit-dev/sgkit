@@ -32,8 +32,11 @@ Improvements
 - Add ``skipna`` option to method `sgkit.identity_by_state`.
   (:user:`timothymillar`, :pr:`1028`, :issue:`1027`)
 
-.. Bug fixes
-.. ~~~~~~~~~
+Bug fixes
+~~~~~~~~~
+
+- Correct formatting of mixed-ploidy data in :func:`sgkit.display_genotypes`.
+  (:user:`timothymillar`, :pr:`1030`, :issue:`571`)
 
 .. Documentation
 .. ~~~~~~~~~~~~~
