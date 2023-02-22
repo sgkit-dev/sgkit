@@ -167,52 +167,18 @@ def truncate(ds: xr.Dataset, max_sizes: Mapping[Hashable, int]) -> xr.Dataset:
     The reason for this is so that pandas can be used to display the array as a table,
     and correctly truncate rows or columns (shown as ellipses ...).
     """
-
-    if len(max_sizes) != 2:
-        raise ValueError("Truncation is only supported for two dimensions")
-
-    dims = list(max_sizes.keys())
-    max_dim = max_sizes[dims[0]], max_sizes[dims[1]]
-    n_dim = ds.sizes[dims[0]], ds.sizes[dims[1]]
-
-    if n_dim[0] <= max_dim[0] + 2 and n_dim[1] <= max_dim[1] + 2:
-        # No truncation required
-        return ds
-
-    if n_dim[0] <= max_dim[0] + 1:
-        # Truncate dim1 only
-        m_dim = n_dim[0], max_dim[1] // 2 + 1
-        rows = [[(0, 0), (0, m_dim[1])]]
-    elif n_dim[1] <= max_dim[1] + 1:
-        # Truncate dim0 only
-        m_dim = max_dim[0] // 2 + 1, n_dim[1]
-        rows = [[(0, 0)], [(m_dim[0], 0)]]
-    else:
-        # Truncate both dimensions
-        m_dim = max_dim[0] // 2 + 1, max_dim[1] // 2 + 1
-        rows = [[(0, 0), (0, m_dim[1])], [(m_dim[0], 0), (m_dim[0], m_dim[1])]]
-
-    limits = {dims[0]: m_dim[0], dims[1]: m_dim[1]}
-    slices = {k: slice(v) for k, v in limits.items()}
-    ds_abbr: xr.Dataset = xr.combine_nested(
-        [
-            [
-                # Roll all of these simultaneously along with any indexes/coords
-                # and then clip them using the same slice for each corner
-                ds.roll(dict(zip(limits, roll)), roll_coords=True).isel(  # type: ignore[misc]
-                    **slices  # type: ignore[arg-type]
-                )
-                for roll in row
-            ]
-            for row in rows
-        ],
-        concat_dim=limits.keys(),  # type: ignore[arg-type]
-    )
-
-    assert ds_abbr.sizes[dims[0]] <= max_dim[0] + 2
-    assert ds_abbr.sizes[dims[1]] <= max_dim[1] + 2
-
-    return ds_abbr
+    sel = dict()
+    for dim, size in max_sizes.items():
+        if ds.dims[dim] <= size:
+            # No truncation required
+            pass
+        else:
+            n_head = size // 2 + size % 2 + 1  # + 1 for ellipses
+            n_tail = -size // 2
+            head = ds[dim][0:n_head]
+            tail = ds[dim][n_tail:]
+            sel[dim] = np.append(head, tail)
+    return ds.sel(sel)
 
 
 def set_index_if_unique(ds: xr.Dataset, dim: str, index: str) -> xr.Dataset:

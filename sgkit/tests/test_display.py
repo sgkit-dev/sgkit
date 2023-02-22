@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from sgkit import display_genotypes
-from sgkit.display import genotype_as_bytes, truncate
+from sgkit.display import genotype_as_bytes
 from sgkit.testing import simulate_genotype_call_dataset
 
 
@@ -235,14 +235,6 @@ def test_display_genotypes__large():
 
         [100000 rows x 1000 columns]"""  # noqa: W291
     assert str(disp) == dedent(expected)
-
-
-def test_truncate_fails_with_only_one_dimension():
-    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=10, seed=0)
-    with pytest.raises(
-        ValueError, match="Truncation is only supported for two dimensions"
-    ):
-        truncate(ds, {"variants": 10})
 
 
 @pytest.mark.parametrize(
