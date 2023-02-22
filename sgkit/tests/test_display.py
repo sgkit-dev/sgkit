@@ -2,6 +2,7 @@ from textwrap import dedent
 
 import numpy as np
 import pytest
+import xarray as xr
 
 from sgkit import display_genotypes
 from sgkit.display import genotype_as_bytes
@@ -140,8 +141,11 @@ def test_display_genotypes__truncated_columns():
     assert str(disp) == dedent(expected)
 
 
-def test_display_genotypes__truncated_rows_and_columns():
+@pytest.mark.parametrize("chunked", [False, True])
+def test_display_genotypes__truncated_rows_and_columns(chunked):
     ds = simulate_genotype_call_dataset(n_variant=10, n_sample=10, seed=0)
+    if chunked:
+        ds = ds.chunk(dict(variants=5, samples=5))
     disp = display_genotypes(ds, max_variants=4, max_samples=4)
     expected = """\
         samples    S0   S1  ...   S8   S9
@@ -221,6 +225,131 @@ def test_display_genotypes__truncated_rows_and_columns():
     assert expected_html in disp._repr_html_()
 
 
+@pytest.mark.parametrize("chunked", [False, True])
+def test_display_genotypes__mixed_ploidy_and_phase(chunked):
+    ds = simulate_genotype_call_dataset(
+        n_variant=10, n_sample=10, n_ploidy=4, phased=False, missing_pct=0.1, seed=0
+    )
+    # convert some samples to diploid
+    ds.call_genotype.data[:, 0:3, 2:] = -2
+    # make some samples phased
+    ds.call_genotype_phased.data[:, 2:8] = True
+    if chunked:
+        ds = ds.chunk(dict(variants=5, samples=5))
+    disp = display_genotypes(ds, max_variants=6, max_samples=6)
+    expected = """\
+        samples    S0   S1   S2  ...       S7       S8       S9
+        variants                 ...                           
+        0         0/0  1/0  1|0  ...  1|1|1|0  ./0/0/0  1/./1/1
+        1         1/1  0/0  0|.  ...  0|1|0|1  0/1/1/0  ./0/0/0
+        2         0/1  1/0  1|0  ...  1|.|1|0  1/1/1/0  ./0/1/0
+        ...       ...  ...  ...  ...      ...      ...      ...
+        7         1/0  1/1  0|0  ...  0|1|0|1  1/0/1/0  0/0/1/1
+        8         0/1  1/0  0|1  ...  .|0|1|0  ./1/1/0  0/1/0/.
+        9         ./0  1/1  0|1  ...  1|0|0|1  1/./0/1  0/1/0/1
+
+        [10 rows x 10 columns]"""  # noqa: W291
+    assert str(disp) == dedent(expected)
+    expected_html = """<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>samples</th>
+      <th>S0</th>
+      <th>S1</th>
+      <th>S2</th>
+      <th>...</th>
+      <th>S7</th>
+      <th>S8</th>
+      <th>S9</th>
+    </tr>
+    <tr>
+      <th>variants</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0/0</td>
+      <td>1/0</td>
+      <td>1|0</td>
+      <td>...</td>
+      <td>1|1|1|0</td>
+      <td>./0/0/0</td>
+      <td>1/./1/1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1/1</td>
+      <td>0/0</td>
+      <td>0|.</td>
+      <td>...</td>
+      <td>0|1|0|1</td>
+      <td>0/1/1/0</td>
+      <td>./0/0/0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0/1</td>
+      <td>1/0</td>
+      <td>1|0</td>
+      <td>...</td>
+      <td>1|.|1|0</td>
+      <td>1/1/1/0</td>
+      <td>./0/1/0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1/0</td>
+      <td>1/1</td>
+      <td>0|0</td>
+      <td>...</td>
+      <td>0|1|0|1</td>
+      <td>1/0/1/0</td>
+      <td>0/0/1/1</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0/1</td>
+      <td>1/0</td>
+      <td>0|1</td>
+      <td>...</td>
+      <td>.|0|1|0</td>
+      <td>./1/1/0</td>
+      <td>0/1/0/.</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>./0</td>
+      <td>1/1</td>
+      <td>0|1</td>
+      <td>...</td>
+      <td>1|0|0|1</td>
+      <td>1/./0/1</td>
+      <td>0/1/0/1</td>
+    </tr>
+  </tbody>
+</table>
+<p>10 rows x 10 columns</p></div>""".strip()
+    assert expected_html in disp._repr_html_()
+
+
 def test_display_genotypes__large():
     ds = simulate_genotype_call_dataset(n_variant=100_000, n_sample=1000, seed=0)
     disp = display_genotypes(ds, max_variants=4, max_samples=4)
@@ -234,6 +363,31 @@ def test_display_genotypes__large():
         99999     1/0  1/0  ...  1/0  1/0
 
         [100000 rows x 1000 columns]"""  # noqa: W291
+    assert str(disp) == dedent(expected)
+
+
+def test_display_genotypes__large_alleles():
+    np.random.seed(0)
+    ds = xr.Dataset()
+    ds["sample_id"] = "samples", list("ABCDE")
+    ds["variant_position"] = "variants", np.arange(10)
+    ds["allele"] = "alleles", np.arange(1050)
+    ds["call_genotype"] = ["variants", "samples", "ploidy"], np.random.randint(
+        950, 1050, size=(10, 5, 2)
+    )
+    disp = display_genotypes(ds, max_variants=6, max_samples=4)
+    expected = """\
+      samples           A          B  ...         D          E
+      variants                        ...                     
+      0           994/997  1014/1017  ...  1033/971   986/1037
+      1         1020/1038   1038/962  ...  989/1037   996/1038
+      2          1031/987   975/1027  ...  970/1030  1019/1029
+      ...             ...        ...  ...       ...        ...
+      7           985/961   996/1032  ...  964/1049   1003/962
+      8          992/1034  1025/1018  ...   997/953  1026/1002
+      9          1028/965   970/1049  ...  1029/963   1035/998
+
+      [10 rows x 5 columns]"""  # noqa: W291
     assert str(disp) == dedent(expected)
 
 

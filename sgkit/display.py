@@ -219,43 +219,37 @@ def display_genotypes(
     -------
     A printable object to display genotype information.
     """
-
-    # Create a copy to avoid clobbering original indexes
-    ds_calls = ds.copy()
-
-    # Set indexes only if not already set (allows users to have different row/col labels)
-    # and if setting them produces a unique index
+    # create a truncated dataset with required variables
+    variables = ["call_genotype", "sample_id"]
+    if "call_genotype_phased" in ds:
+        variables.append("call_genotype_phased")
+    if "variant_id" in ds:
+        variables.append("variant_id")
+    else:
+        variables.append("variant_position")
+    ds_calls = ds[variables]
+    ds_calls = truncate(
+        ds_calls, max_sizes={"variants": max_variants, "samples": max_samples}
+    )
     if isinstance(ds_calls.get_index("samples"), pd.RangeIndex):
         ds_calls = set_index_if_unique(ds_calls, "samples", "sample_id")
     if isinstance(ds_calls.get_index("variants"), pd.RangeIndex):
         variant_index = "variant_id" if "variant_id" in ds_calls else "variant_position"
         ds_calls = set_index_if_unique(ds_calls, "variants", variant_index)
-
-    # Restrict to genotype call variables
+    # convert call genotypes to strings
+    calls = ds_calls["call_genotype"].values
+    max_chars = max(2, len(str(ds.dims["alleles"] - 1)))
     if "call_genotype_phased" in ds_calls:
-        ds_calls = ds_calls[
-            ["call_genotype", "call_genotype_mask", "call_genotype_phased"]
-        ]
+        phased = ds_calls["call_genotype_phased"].values
     else:
-        ds_calls = ds_calls[["call_genotype", "call_genotype_mask"]]
-
-    # Truncate the dataset then convert to a dataframe
-    ds_abbr = truncate(
-        ds_calls, max_sizes={"variants": max_variants, "samples": max_samples}
-    )
-    df = ds_abbr.to_dataframe().unstack(level="ploidy")
-
-    # Convert each genotype to a string representation
-    def calls_to_str(r: pd.DataFrame) -> str:
-        gt = r["call_genotype"].astype(str)
-        gt_mask = r["call_genotype_mask"].astype(bool)
-        gt[gt_mask] = "."
-        if "call_genotype_phased" in r and r["call_genotype_phased"][0]:
-            return "|".join(gt)
-        return "/".join(gt)
-
-    df = df.apply(calls_to_str, axis=1).unstack("samples")
-
+        phased = False
+    strings = genotype_as_bytes(calls, phased, max_chars).astype("U")
+    # wrap them in a dataframe
+    df = pd.DataFrame(strings)
+    df.columns = ds_calls["samples"].values
+    df.columns.name = "samples"
+    df.index = ds_calls["variants"].values
+    df.index.name = "variants"
     return GenotypeDisplay(
         df,
         (ds.sizes["variants"], ds.sizes["samples"]),
