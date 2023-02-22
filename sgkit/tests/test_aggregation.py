@@ -13,7 +13,6 @@ from sgkit.stats.aggregation import (
     _biallelic_genotype_index,
     _comb,
     _comb_with_replacement,
-    _genotype_as_bytes,
     _index_as_genotype,
     _sorted_genotype_index,
     call_allele_frequencies,
@@ -395,29 +394,6 @@ def test__index_as_genotype__dtype():
     for dtype in [np.int8, np.int16, np.int32, np.int64]:
         dummy = np.empty(2, dtype=dtype)
         assert _index_as_genotype(1, dummy).dtype == dtype
-
-
-@pytest.mark.parametrize(
-    "genotype, max_allele_chars, expect",
-    [
-        ([0, 1], 2, b"0/1"),
-        ([1, 2, 3, 1], 2, b"1/2/3/1"),
-        ([0, -1], 2, b"0/."),
-        ([0, -2], 2, b"0"),
-        ([0, -2, 1], 2, b"0/1"),
-        ([-1, -2, 1], 2, b"./1"),
-        ([22, -1, -2, 7, -2], 2, b"22/./7"),
-        ([0, 333], 2, b"0/33"),  # truncation
-        ([0, 333], 3, b"0/333"),
-        ([[0, 1, 2, -1], [0, 2, -2, -2]], 2, [b"0/1/2/.", b"0/2"]),
-    ],
-)
-def test__genotype_as_bytes(genotype, max_allele_chars, expect):
-    genotype = np.array(genotype)
-    np.testing.assert_array_equal(
-        expect,
-        _genotype_as_bytes(genotype, max_allele_chars),
-    )
 
 
 def test__sorted_genotype_index__raise_on_mixed_ploidy():
