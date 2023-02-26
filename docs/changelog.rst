@@ -26,10 +26,10 @@ New Features
 Improvements
 ~~~~~~~~~~~~
 
-- Improve performance scaling of method `sgkit.identity_by_state`
+- Improve performance scaling of method :func:`sgkit.identity_by_state`
   with number of samples.
   (:user:`timothymillar`, :pr:`1028`, :issue:`1026`)
-- Add ``skipna`` option to method `sgkit.identity_by_state`.
+- Add ``skipna`` option to method :func:`sgkit.identity_by_state`.
   (:user:`timothymillar`, :pr:`1028`, :issue:`1027`)
 
 Bug fixes
