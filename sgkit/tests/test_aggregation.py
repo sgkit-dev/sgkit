@@ -9,12 +9,6 @@ from scipy.special import comb
 from xarray import Dataset
 
 from sgkit.stats.aggregation import (
-    _COMB_REP_LOOKUP,
-    _biallelic_genotype_index,
-    _comb,
-    _comb_with_replacement,
-    _index_as_genotype,
-    _sorted_genotype_index,
     call_allele_frequencies,
     cohort_allele_frequencies,
     count_call_alleles,
@@ -28,6 +22,14 @@ from sgkit.stats.aggregation import (
     infer_variant_ploidy,
     sample_stats,
     variant_stats,
+)
+from sgkit.stats.aggregation_numba_fns import (
+    _COMB_REP_LOOKUP,
+    _biallelic_genotype_index,
+    _comb,
+    _comb_with_replacement,
+    _index_as_genotype,
+    _sorted_genotype_index,
 )
 from sgkit.testing import simulate_genotype_call_dataset
 from sgkit.typing import ArrayLike
