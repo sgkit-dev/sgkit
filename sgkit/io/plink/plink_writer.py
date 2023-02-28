@@ -1,9 +1,10 @@
-from typing import Optional
+from typing import MutableMapping, Optional, Union
 
 import numpy as np
 from bed_reader import to_bed
 from xarray import Dataset
 
+from sgkit import load_dataset
 from sgkit.accelerate import numba_guvectorize
 from sgkit.typing import ArrayLike, PathType
 
@@ -128,6 +129,48 @@ def write_plink(
         bim_filepath=bim_path,
         fam_filepath=fam_path,
     )
+
+
+def zarr_to_plink(
+    input: Union[PathType, MutableMapping[str, bytes]],
+    *,
+    path: Optional[PathType] = None,
+    bed_path: Optional[PathType] = None,
+    bim_path: Optional[PathType] = None,
+    fam_path: Optional[PathType] = None,
+) -> None:
+    """Convert a Zarr on-disk store to a PLINK file.
+
+    A convenience for :func:`sgkit.load_dataset` followed by :func:`write_plink`.
+
+    Refer to :func:`write_plink` for details and limitations.
+
+    Parameters
+    ----------
+    input
+        Zarr store or path to directory in file system.
+    path
+        Path to PLINK file set.
+        This should not include a suffix, i.e. if the files are
+        at `data.{bed,fam,bim}` then only 'data' should be
+        provided (suffixes are added internally).
+        Either this path must be provided or all 3 of
+        `bed_path`, `bim_path` and `fam_path`.
+    bed_path
+        Path to PLINK bed file.
+        This should be a full path including the `.bed` extension
+        and cannot be specified in conjunction with `path`.
+    bim_path
+        Path to PLINK bim file.
+        This should be a full path including the `.bim` extension
+        and cannot be specified in conjunction with `path`.
+    fam_path
+        Path to PLINK fam file.
+        This should be a full path including the `.fam` extension
+        and cannot be specified in conjunction with `path`.
+    """
+    ds = load_dataset(input)
+    write_plink(ds, path=path, bed_path=bed_path, bim_path=bim_path, fam_path=fam_path)
 
 
 @numba_guvectorize(  # type: ignore
