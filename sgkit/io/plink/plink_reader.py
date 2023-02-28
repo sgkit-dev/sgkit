@@ -1,6 +1,6 @@
 """PLINK 1.9 reader implementation"""
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Dict, List, MutableMapping, Optional, Tuple, Union
 
 import dask.array as da
 import dask.dataframe as dd
@@ -9,7 +9,7 @@ from bed_reader import open_bed
 from dask.dataframe import DataFrame
 from xarray import Dataset
 
-from sgkit import create_genotype_call_dataset
+from sgkit import create_genotype_call_dataset, save_dataset
 from sgkit.io.utils import dataframe_to_dict
 from sgkit.model import DIM_SAMPLE
 from sgkit.typing import ArrayLike, NDArray
@@ -303,3 +303,88 @@ def read_plink(
 
     # Assign PLINK-specific pedigree fields
     return ds.assign({f"sample_{f}": (DIM_SAMPLE, arr_fam[f]) for f in arr_fam})
+
+
+def plink_to_zarr(
+    *,
+    path: Optional[PathType] = None,
+    bed_path: Optional[PathType] = None,
+    bim_path: Optional[PathType] = None,
+    fam_path: Optional[PathType] = None,
+    output: Union[PathType, MutableMapping[str, bytes]],
+    chunks: Union[str, int, tuple] = "auto",
+    fam_sep: str = " ",
+    bim_sep: str = "\t",
+    bim_int_contig: bool = False,
+    lock: bool = False,
+    persist: bool = True,
+    storage_options: Optional[Dict[str, str]] = None,
+) -> None:
+    """Convert a PLINK file to a Zarr on-disk store.
+
+    A convenience for :func:`read_plink` followed by :func:`sgkit.save_dataset`.
+
+    Refer to :func:`read_plink` for details and limitations.
+
+    Parameters
+    ----------
+    path
+        Path to PLINK file set.
+        This should not include a suffix, i.e. if the files are
+        at `data.{bed,fam,bim}` then only 'data' should be
+        provided (suffixes are added internally).
+        Either this path must be provided or all 3 of
+        `bed_path`, `bim_path` and `fam_path`.
+    bed_path
+        Path to PLINK bed file.
+        This should be a full path including the `.bed` extension
+        and cannot be specified in conjunction with `path`.
+    bim_path
+        Path to PLINK bim file.
+        This should be a full path including the `.bim` extension
+        and cannot be specified in conjunction with `path`.
+    fam_path
+        Path to PLINK fam file.
+        This should be a full path including the `.fam` extension
+        and cannot be specified in conjunction with `path`.
+    output
+        Zarr store or path to directory in file system.
+    chunks
+        Chunk size for genotype (i.e. `.bed`) data, by default "auto"
+    fam_sep
+        Delimiter for `.fam` file, by default " "
+    bim_sep
+        Delimiter for `.bim` file, by default "\t"
+    bim_int_contig
+        Whether or not the contig/chromosome name in the `.bim`
+        file should be interpreted as an integer, by default False.
+        If False, then the `variant/contig` field in the resulting
+        dataset will contain the indexes of corresponding strings
+        encountered in the first `.bim` field.
+    lock
+        Whether or not to synchronize concurrent reads of `.bed`
+        file blocks, by default False. This is passed through to
+        [dask.array.from_array](https://docs.dask.org/en/latest/array-api.html#dask.array.from_array).
+    persist
+        Whether or not to persist `.fam` and `.bim` information in
+        memory, by default True. This is an important performance
+        consideration as the plain text files for this data will
+        be read multiple times when False. This can lead to load
+        times that are upwards of 10x slower.
+    storage_options
+        Any additional parameters for the storage backend (see ``fsspec.open``).
+    """
+
+    ds = read_plink(
+        path=path,
+        bed_path=bed_path,
+        bim_path=bim_path,
+        fam_path=fam_path,
+        chunks=chunks,
+        fam_sep=fam_sep,
+        bim_sep=bim_sep,
+        bim_int_contig=bim_int_contig,
+        lock=lock,
+        persist=persist,
+    )
+    save_dataset(ds, output, storage_options=storage_options)

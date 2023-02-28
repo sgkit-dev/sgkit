@@ -27,8 +27,10 @@ PLINK
 .. autosummary::
    :toctree: generated/
 
+   plink_to_zarr
    read_plink
    write_plink
+   zarr_to_plink
 
 VCF (reading)
 -------------
