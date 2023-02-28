@@ -340,7 +340,6 @@ def concat_zarrs_optimized(
     # NOTE: that this uses _to_zarr function defined here that is needed to avoid
     # race conditions between writing the array contents and its metadata
     # see https://github.com/pystatgen/sgkit/pull/486
-    delayed = []  # do all the rechunking operations in one computation
     for var in vars_to_rechunk:
         dtype = None
         if fix_strings and var in {"variant_id", "variant_allele"}:
@@ -374,8 +373,7 @@ def concat_zarrs_optimized(
             attrs=first_zarr_group[var].attrs.asdict(),
             **_to_zarr_kwargs,
         )
-        d = _fuse_delayed(d)  # type: ignore[no-untyped-call]
-        delayed.append(d)
+        da.compute(_fuse_delayed(d))  # type: ignore[no-untyped-call]
 
     # copy variables that are not rechunked (e.g. sample_id)
     for var in vars_to_copy:
@@ -404,10 +402,7 @@ def concat_zarrs_optimized(
             attrs=first_zarr_group[var].attrs.asdict(),
             **_to_zarr_kwargs,
         )
-        d = _fuse_delayed(d)  # type: ignore[no-untyped-call]
-        delayed.append(d)
-
-    da.compute(*delayed)
+        da.compute(_fuse_delayed(d))  # type: ignore[no-untyped-call]
 
     # copy unchanged variables and top-level metadata
     with zarr.open_group(output) as output_zarr:
