@@ -24,7 +24,6 @@ from .aggregation import (
     count_variant_alleles,
     individual_heterozygosity,
 )
-from .utils import cohort_nanmean
 
 
 def diversity(
@@ -1002,6 +1001,8 @@ def observed_heterozygosity(
     array([[1.5, 2.5],
         [1. , 1. ]])
     """
+    from .cohort_numba_fns import cohort_nanmean
+
     ds = define_variable_if_absent(
         ds,
         variables.call_heterozygosity,
