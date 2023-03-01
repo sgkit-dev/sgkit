@@ -12,7 +12,6 @@ from sgkit.utils import (
     conditional_merge_datasets,
     create_dataset,
     define_variable_if_absent,
-    hash_array,
 )
 from sgkit.window import has_windows, window_statistic
 
@@ -635,6 +634,8 @@ def _Garud_h_cohorts(
     gt: np.ndarray, sample_cohort: np.ndarray, n_cohorts: int, ct: np.ndarray
 ) -> np.ndarray:
     # transpose to hash columns (haplotypes)
+    from .popgen_numba_fns import hash_array
+
     haplotypes = hash_array(gt.transpose()).transpose().flatten()
     arr = np.full((n_cohorts, N_GARUD_H_STATS), np.nan)
     for c in np.nditer(ct):
