@@ -8,7 +8,6 @@ from xarray import Dataset
 
 from sgkit import variables
 from sgkit.display import genotype_as_bytes
-from sgkit.stats.utils import cohort_sum
 from sgkit.typing import ArrayLike
 from sgkit.utils import (
     conditional_merge_datasets,
@@ -222,6 +221,8 @@ def count_cohort_alleles(
             [[3, 1],
             [1, 3]]], dtype=uint64)
     """
+    from .cohort_numba_fns import cohort_sum
+
     ds = define_variable_if_absent(
         ds, variables.call_allele_count, call_allele_count, count_call_alleles
     )
