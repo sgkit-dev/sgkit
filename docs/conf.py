@@ -141,6 +141,8 @@ html_theme_options = {
         "image_light": "sgkit_trnsprnt.png",
         "image_dark": "sgkit_blue_trnsprnt.png",
     },
+    # https://github.com/pydata/pydata-sphinx-theme/issues/1220
+    "icon_links": [],
     "navbar_end": ["version-switcher", "theme-switcher", "navbar-icon-links"],
     "switcher": {
         "json_url": "_static/switcher.json",
