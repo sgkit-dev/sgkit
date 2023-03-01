@@ -8,6 +8,8 @@ import pytest
 import tskit  # type: ignore
 import xarray as xr
 from allel import hudson_fst
+from hypothesis import given, settings
+from hypothesis import strategies as st
 
 from sgkit import (
     Fst,
@@ -23,6 +25,7 @@ from sgkit import (
     simulate_genotype_call_dataset,
     variables,
 )
+from sgkit.stats.popgen_numba_fns import hash_array
 from sgkit.typing import ArrayLike
 from sgkit.window import window_by_genome, window_by_variant
 
@@ -695,3 +698,25 @@ def test_observed_heterozygosity__scikit_allel_comparison(
     )
     # add cohort dimension to scikit-allel result
     np.testing.assert_almost_equal(ho_sg, ho_sa[..., None])
+
+
+@given(st.integers(2, 50), st.integers(1, 50))
+@settings(deadline=None)  # avoid problem with numba jit compilation
+def test_hash_array(n_rows, n_cols):
+    # construct an array with random repeated rows
+    x = np.random.randint(-2, 10, size=(n_rows // 2, n_cols))
+    rows = np.random.choice(x.shape[0], n_rows, replace=True)
+    x = x[rows, :]
+
+    # find unique column counts (exact method)
+    _, expected_inverse, expected_counts = np.unique(
+        x, axis=0, return_inverse=True, return_counts=True
+    )
+
+    # hash columns, then find unique column counts using the hash values
+    h = hash_array(x)
+    _, inverse, counts = np.unique(h, return_inverse=True, return_counts=True)
+
+    # counts[inverse] gives the count for each column in x
+    # these should be the same for both ways of counting
+    np.testing.assert_equal(counts[inverse], expected_counts[expected_inverse])

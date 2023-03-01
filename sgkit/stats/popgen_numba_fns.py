@@ -151,3 +151,34 @@ def _pbs_cohorts(
         norm = 1 + (t[i, j] + t[i, k] + t[j, k]) / 2
         ret = ret / norm
         out[i, j, k] = ret
+
+
+@numba_guvectorize(  # type: ignore
+    [
+        "void(int8[:], int64[:])",
+        "void(int16[:], int64[:])",
+        "void(int32[:], int64[:])",
+        "void(int64[:], int64[:])",
+    ],
+    "(n)->()",
+)
+def hash_array(x: ArrayLike, out: ArrayLike) -> None:  # pragma: no cover
+    """Hash entries of ``x`` using the DJBX33A hash function.
+
+    This is ~5 times faster than calling ``tobytes()`` followed
+    by ``hash()`` on array columns. This function also does not
+    hold the GIL, making it suitable for use with the Dask
+    threaded scheduler.
+
+    Parameters
+    ----------
+    x
+        1D array of type integer.
+
+    Returns
+    -------
+    Array containing a single hash value of type int64.
+    """
+    out[0] = 5381
+    for i in range(x.shape[0]):
+        out[0] = out[0] * 33 + x[i]
