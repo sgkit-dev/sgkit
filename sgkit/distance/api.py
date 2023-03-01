@@ -4,7 +4,6 @@ import dask.array as da
 import numpy as np
 from typing_extensions import Literal
 
-from sgkit.distance import metrics
 from sgkit.typing import ArrayLike
 
 MetricTypes = Literal["euclidean", "correlation"]
@@ -98,6 +97,8 @@ def pairwise_distance(
            [ 2.62956526e-01,  0.00000000e+00,  2.14285714e-01],
            [ 2.82353505e-03,  2.14285714e-01,  0.00000000e+00]])
     """
+    from sgkit.distance import metrics  # defer numba compilation
+
     valid_devices = DeviceTypes.__args__  # type: ignore[attr-defined]
     if device not in valid_devices:
         raise ValueError(
