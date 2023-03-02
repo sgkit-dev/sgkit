@@ -416,7 +416,10 @@ def vcf_to_zarr_sequential(
     fields: Optional[Sequence[str]] = None,
     exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
+    read_chunk_length: Optional[int] = None,
 ) -> None:
+    if read_chunk_length is None:
+        read_chunk_length = chunk_length
     with open_vcf(input) as vcf:
         sample_id = np.array(vcf.samples, dtype="O")
         n_allele = max_alt_alleles + 1
@@ -436,7 +439,7 @@ def vcf_to_zarr_sequential(
         # Remember max lengths of variable-length strings
         max_alt_alleles_seen = 0
 
-        # Iterate through variants in batches of chunk_length
+        # Iterate through variants in batches of read_chunk_length
 
         if region is None:
             variants = vcf
@@ -444,8 +447,8 @@ def vcf_to_zarr_sequential(
             variants = vcf(region)
 
         variant_contig_dtype = smallest_numpy_int_dtype(len(variant_contig_names))
-        variant_contig = np.empty(chunk_length, dtype=variant_contig_dtype)
-        variant_position = np.empty(chunk_length, dtype="i4")
+        variant_contig = np.empty(read_chunk_length, dtype=variant_contig_dtype)
+        variant_position = np.empty(read_chunk_length, dtype="i4")
 
         fields = fields or ["FORMAT/GT"]  # default to GT as the only extra field
         fields = _normalize_fields(vcf, fields)
@@ -457,7 +460,7 @@ def vcf_to_zarr_sequential(
             VcfFieldHandler.for_field(
                 vcf,
                 field,
-                chunk_length,
+                read_chunk_length,
                 ploidy,
                 mixed_ploidy,
                 truncate_calls,
@@ -468,11 +471,15 @@ def vcf_to_zarr_sequential(
         ]
 
         first_variants_chunk = True
-        for variants_chunk in chunks(region_filter(variants, region), chunk_length):
+        for variants_chunk in chunks(
+            region_filter(variants, region), read_chunk_length
+        ):
             variant_ids = []
             variant_alleles = []
-            variant_quality = np.empty(chunk_length, dtype="f4")
-            variant_filter = np.full((chunk_length, len(filters)), False, dtype="bool")
+            variant_quality = np.empty(read_chunk_length, dtype="f4")
+            variant_filter = np.full(
+                (read_chunk_length, len(filters)), False, dtype="bool"
+            )
 
             i = -1  # initialize in case of empty variants_chunk
             for i, variant in enumerate(variants_chunk):
@@ -505,8 +512,8 @@ def vcf_to_zarr_sequential(
                 for field_handler in field_handlers:
                     field_handler.add_variant(i, variant)
 
-            # Truncate np arrays (if last chunk is smaller than chunk_length)
-            if i + 1 < chunk_length:
+            # Truncate np arrays (if last chunk is smaller than read_chunk_length)
+            if i + 1 < read_chunk_length:
                 variant_contig = variant_contig[: i + 1]
                 variant_position = variant_position[: i + 1]
                 variant_quality = variant_quality[: i + 1]
@@ -606,6 +613,7 @@ def vcf_to_zarr_parallel(
     fields: Optional[Sequence[str]] = None,
     exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
+    read_chunk_length: Optional[int] = None,
     retain_temp_files: Optional[bool] = None,
 ) -> None:
     """Convert specified regions of one or more VCF files to zarr files, then concat, rechunk, write to zarr"""
@@ -635,6 +643,7 @@ def vcf_to_zarr_parallel(
             fields=fields,
             exclude_fields=exclude_fields,
             field_defs=field_defs,
+            read_chunk_length=read_chunk_length,
         )
 
         concat_zarrs(
@@ -660,6 +669,7 @@ def vcf_to_zarrs(
     fields: Optional[Sequence[str]] = None,
     exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
+    read_chunk_length: Optional[int] = None,
 ) -> Sequence[str]:
     """Convert VCF files to multiple Zarr on-disk stores, one per region.
 
@@ -722,6 +732,15 @@ def vcf_to_zarrs(
         (which is defined as Number 2 in the VCF header) as ``haplotypes``.
         (Note that Number ``A`` is the number of alternate alleles, see section 1.4.2 of the
         VCF spec https://samtools.github.io/hts-specs/VCFv4.3.pdf.)
+    read_chunk_length
+        Length (number of variants) of chunks to read from the VCF file at a time. Use this
+        option to reduce memory usage by using a value lower than ``chunk_length`` with a small
+        cost in extra run time. The increase in runtime becomes higher as the ratio of
+        ``read_chunk_length`` to  Defaults to ``None``, which means that a value equal
+        to ``chunk_length`` is used. The memory usage of the conversion process is
+        proportional to ``read_chunk_length*n_samples*(1+n_ploidy)`` so this option is
+        mainly useful for very large numbers of samples and/or where a large ``chunk_size``
+        is desirable to reduce the number of dask tasks needed in downstream analysis.
 
     Returns
     -------
@@ -767,6 +786,7 @@ def vcf_to_zarrs(
                 region=region,
                 chunk_length=chunk_length,
                 chunk_width=chunk_width,
+                read_chunk_length=read_chunk_length,
                 compressor=compressor,
                 encoding=encoding,
                 ploidy=ploidy,
@@ -838,6 +858,7 @@ def vcf_to_zarr(
     fields: Optional[Sequence[str]] = None,
     exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
+    read_chunk_length: Optional[int] = None,
     retain_temp_files: Optional[bool] = None,
 ) -> None:
     """Convert VCF files to a single Zarr on-disk store.
@@ -926,6 +947,15 @@ def vcf_to_zarr(
         (which is defined as Number 2 in the VCF header) as ``haplotypes``.
         (Note that Number ``A`` is the number of alternate alleles, see section 1.4.2 of the
         VCF spec https://samtools.github.io/hts-specs/VCFv4.3.pdf.)
+    read_chunk_length
+        Length (number of variants) of chunks to read from the VCF file at a time. Use this
+        option to reduce memory usage by using a value lower than ``chunk_length`` with a small
+        cost in extra run time. The increase in runtime becomes higher as the ratio of
+        ``read_chunk_length`` to  Defaults to ``None``, which means that a value equal
+        to ``chunk_length`` is used. The memory usage of the conversion process is
+        proportional to ``read_chunk_length*n_samples*(1+n_ploidy)`` so this option is
+        mainly useful for very large numbers of samples and/or where a large ``chunk_size``
+        is desirable to reduce the number of dask tasks needed in downstream analysis.
     retain_temp_files
         If True, intermediate files are retained after the final output is written. Defaults
         to deleting intermediate files. Intermediate files are deleted in a single process,
@@ -969,6 +999,7 @@ def vcf_to_zarr(
         regions,  # type: ignore
         chunk_length=chunk_length,
         chunk_width=chunk_width,
+        read_chunk_length=read_chunk_length,
         compressor=compressor,
         encoding=encoding,
         ploidy=ploidy,
