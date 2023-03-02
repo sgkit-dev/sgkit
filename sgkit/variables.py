@@ -306,7 +306,10 @@ call_genotype_mask, call_genotype_mask_spec = SgkitVariables.register_variable(
     )
 )
 
-(call_genotype_fill, call_genotype_fill_spec,) = SgkitVariables.register_variable(
+(
+    call_genotype_fill,
+    call_genotype_fill_spec,
+) = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "call_genotype_fill",
         kind="b",

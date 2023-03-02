@@ -80,7 +80,6 @@ def map_windows_as_dataframe(
     meta: Optional[Any],
     **kwargs: Any,
 ) -> DataFrame:
-
     # Get chunks in leading dimension
     chunks = args[0].chunks[0]
 
@@ -231,7 +230,6 @@ def _ld_matrix_jit(
     value_dtype: DType,
     threshold: float,
 ) -> List[Any]:  # pragma: no cover
-
     rows = list()
     no_threshold = np.isnan(threshold)
 
@@ -283,7 +281,6 @@ def _ld_matrix(
     value_dtype: DType,
     threshold: float = np.nan,
 ) -> ArrayLike:
-
     x = np.asarray(args[0])
 
     if len(args) == 2:

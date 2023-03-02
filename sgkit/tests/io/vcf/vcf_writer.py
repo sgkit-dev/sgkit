@@ -305,7 +305,6 @@ def canonicalize_vcf(input: PathType, output: PathType) -> None:
     """Canonicalize the fields in a VCF file by writing all INFO fields in the order that they appear in the header."""
 
     with open_vcf(input) as vcf:
-
         info_field_names = _info_fields(vcf.raw_header)
 
         w = Writer(str(output), vcf)

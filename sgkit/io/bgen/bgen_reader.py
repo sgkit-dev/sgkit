@@ -53,7 +53,6 @@ METAFILE_DTYPE = dict(
 
 
 class BgenReader:
-
     name = "bgen_reader"
 
     def __init__(

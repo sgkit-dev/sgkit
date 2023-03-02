@@ -75,7 +75,6 @@ def create_sg_vcfzarr(
 
 
 def fix_missing_fields(ds: Dataset) -> Dataset:
-
     # drop variables and attributes that are not included in scikit-allel
     ds = ds.drop_vars("call_genotype_phased")
     ds = ds.drop_vars("variant_filter")

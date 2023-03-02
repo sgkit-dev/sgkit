@@ -417,7 +417,6 @@ def vcf_to_zarr_sequential(
     exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> None:
-
     with open_vcf(input) as vcf:
         sample_id = np.array(vcf.samples, dtype="O")
         n_allele = max_alt_alleles + 1
@@ -470,7 +469,6 @@ def vcf_to_zarr_sequential(
 
         first_variants_chunk = True
         for variants_chunk in chunks(region_filter(variants, region), chunk_length):
-
             variant_ids = []
             variant_alleles = []
             variant_quality = np.empty(chunk_length, dtype="f4")
@@ -617,7 +615,6 @@ def vcf_to_zarr_parallel(
     with temporary_directory(
         prefix="vcf_to_zarr_", dir=tempdir, storage_options=tempdir_storage_options
     ) as tmpdir:
-
         paths = vcf_to_zarrs(
             input,
             tmpdir,
@@ -808,7 +805,7 @@ def concat_zarrs(
     ds = xr.open_zarr(  # type: ignore[no-untyped-call]
         fsspec.get_mapper(urls[0], **storage_options), concat_characters=False
     )
-    for (var, arr) in ds.data_vars.items():
+    for var, arr in ds.data_vars.items():
         if arr.dims[0] == "variants":
             vars_to_rechunk.append(var)
         else:
@@ -995,7 +992,6 @@ def zarr_array_sizes(input: PathType) -> Dict[str, Any]:
     """Make a pass through a VCF/BCF file to determine sizes for storage in Zarr."""
 
     with open_vcf(input) as vcf:
-
         ploidy = -1
         alt_alleles = 0
 
@@ -1030,7 +1026,9 @@ def zarr_array_sizes(input: PathType) -> Dict[str, Any]:
             try:
                 if variant.genotype is not None:
                     ploidy = max(ploidy, variant.genotype.ploidy)
-            except Exception:  # cyvcf2 raises an Exception "couldn't get genotypes for variant"
+            except (
+                Exception
+            ):  # cyvcf2 raises an Exception "couldn't get genotypes for variant"
                 pass  # no genotype information
             alt_alleles = max(alt_alleles, len(variant.ALT))
 

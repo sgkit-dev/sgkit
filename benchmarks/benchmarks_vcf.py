@@ -14,7 +14,6 @@ from sgkit.io.vcf.vcf_writer import zarr_to_vcf
 
 class VcfSpeedSuite:
     def setup(self) -> None:
-
         asv_env_dir = os.environ["ASV_ENV_DIR"]
         path = Path(
             asv_env_dir,
@@ -82,7 +81,6 @@ def _to_mb_per_s(bytes, duration):
 
 class VcfCompressionSuite:
     def setup(self) -> None:
-
         asv_env_dir = os.environ["ASV_ENV_DIR"]
         self.input_vcf = Path(
             asv_env_dir,
@@ -95,7 +93,6 @@ class VcfCompressionSuite:
     # use track_* asv methods since we want to measure compression size not time
 
     def track_zarr_compression_size(self) -> None:
-
         encoding = {
             "variant_AF": {
                 "filters": [
