@@ -8,7 +8,6 @@ from xarray import Dataset
 
 from sgkit import variables
 from sgkit.display import genotype_as_bytes
-from sgkit.typing import ArrayLike
 from sgkit.utils import (
     conditional_merge_datasets,
     create_dataset,
@@ -377,36 +376,6 @@ def count_variant_genotypes(
         # pass through coords
         new_ds = new_ds.assign_coords({"genotypes": ds.coords["genotypes"]})
     return conditional_merge_datasets(ds, new_ds, merge)
-
-
-def _genotype_as_bytes(genotype: ArrayLike, max_allele_chars: int = 2) -> ArrayLike:
-    """Convert integer encoded genotype calls to (unphased)
-    VCF style byte strings.
-
-    Parameters
-    ----------
-    genotype
-        Genotype call.
-    max_allele_chars
-        Maximum number of chars required for any allele.
-        This should include signed sentinel values.
-
-    Returns
-    -------
-    genotype_string
-        Genotype encoded as byte string.
-    """
-    from .aggregation_numba_fns import _format_genotype_bytes
-
-    ploidy = genotype.shape[-1]
-    b = genotype.astype("|S{}".format(max_allele_chars))
-    b.dtype = np.uint8
-    n_num = b.shape[-1]
-    n_char = n_num + ploidy - 1
-    dummy = np.empty(n_char, np.uint8)
-    c = _format_genotype_bytes(b, ploidy, dummy)
-    c.dtype = "|S{}".format(n_char)
-    return np.squeeze(c)
 
 
 def genotype_coords(
