@@ -1,3 +1,4 @@
+import os
 from typing import MutableMapping
 
 import numpy as np
@@ -1506,3 +1507,26 @@ def test_spec(shared_datadir, tmp_path):
     )
 
     assert_array_equal(group["sample_id"], ["NA00001", "NA00002", "NA00003"])
+
+
+@pytest.mark.parametrize(
+    "retain_temp_files",
+    [True, False],
+)
+def test_vcf_to_zarr__retain_files(shared_datadir, tmp_path, retain_temp_files):
+    path = path_for_test(shared_datadir, "sample.vcf.gz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+    temp_path = tmp_path.joinpath("temp").as_posix()
+
+    vcf_to_zarr(
+        path,
+        output,
+        chunk_length=5,
+        chunk_width=2,
+        tempdir=temp_path,
+        retain_temp_files=retain_temp_files,
+        target_part_size="500B",
+    )
+    ds = xr.open_zarr(output)
+    assert ds.attrs["contigs"] == ["19", "20", "X"]
+    assert (len(os.listdir(temp_path)) == 0) != retain_temp_files

@@ -24,6 +24,9 @@ New Features
 - Add :func:`sgkit.convert_call_to_index` method.
   (:user:`timothymillar`, :pr:`1050`, :issue:`1048`)
 
+- Add ``retain_temp_files`` to :func:`sgkit.io.vcf.vcf_to_zarr` function.
+  (:user:`benjeffery`, :pr:`1046`, :issue:`1036`)
+
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
 

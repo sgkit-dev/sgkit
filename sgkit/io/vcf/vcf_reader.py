@@ -606,6 +606,7 @@ def vcf_to_zarr_parallel(
     fields: Optional[Sequence[str]] = None,
     exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
+    retain_temp_files: Optional[bool] = None,
 ) -> None:
     """Convert specified regions of one or more VCF files to zarr files, then concat, rechunk, write to zarr"""
 
@@ -613,7 +614,10 @@ def vcf_to_zarr_parallel(
         temp_chunk_length = chunk_length
 
     with temporary_directory(
-        prefix="vcf_to_zarr_", dir=tempdir, storage_options=tempdir_storage_options
+        prefix="vcf_to_zarr_",
+        dir=tempdir,
+        storage_options=tempdir_storage_options,
+        retain_temp_files=retain_temp_files,
     ) as tmpdir:
         paths = vcf_to_zarrs(
             input,
@@ -834,6 +838,7 @@ def vcf_to_zarr(
     fields: Optional[Sequence[str]] = None,
     exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
+    retain_temp_files: Optional[bool] = None,
 ) -> None:
     """Convert VCF files to a single Zarr on-disk store.
 
@@ -921,6 +926,10 @@ def vcf_to_zarr(
         (which is defined as Number 2 in the VCF header) as ``haplotypes``.
         (Note that Number ``A`` is the number of alternate alleles, see section 1.4.2 of the
         VCF spec https://samtools.github.io/hts-specs/VCFv4.3.pdf.)
+    retain_temp_files
+        If True, intermediate files are retained after the final output is written. Defaults
+        to deleting intermediate files. Intermediate files are deleted in a single process,
+        so for large VCF files this can be slow.
     """
 
     if temp_chunk_length is not None:
@@ -952,6 +961,7 @@ def vcf_to_zarr(
             temp_chunk_length=temp_chunk_length,
             tempdir=tempdir,
             tempdir_storage_options=tempdir_storage_options,
+            retain_temp_files=retain_temp_files,
         )
     convert_func(
         input,  # type: ignore

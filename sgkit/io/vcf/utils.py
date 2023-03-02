@@ -129,6 +129,7 @@ def temporary_directory(
     prefix: Optional[str] = None,
     dir: Optional[PathType] = None,
     storage_options: Optional[Dict[str, str]] = None,
+    retain_temp_files: Optional[bool] = None,
 ) -> Iterator[str]:
     """Create a temporary directory in a fsspec filesystem.
 
@@ -144,7 +145,9 @@ def temporary_directory(
         The directory may be specified as any fsspec URL.
     storage_options : Optional[Dict[str, str]], optional
         Any additional parameters for the storage backend (see `fsspec.open`).
-
+    retain_temp_files : Optional[bool], optional
+        If True, the temporary directory will not be removed on exiting the context manager.
+        Defaults to None, which means the directory will be removed.
     Yields
     -------
     Generator[str, None, None]
@@ -168,7 +171,8 @@ def temporary_directory(
         yield tempdir
     finally:
         # Remove the temporary directory on exiting the context manager
-        fs.rm(tempdir, recursive=True)
+        if not retain_temp_files:
+            fs.rm(tempdir, recursive=True)
 
 
 def get_default_vcf_encoding(ds, chunk_length, chunk_width, compressor):
