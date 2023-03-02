@@ -153,7 +153,7 @@ def vcfzarr_to_zarr(
                 # convert contig group to zarr and save in tmpdir
                 ds = _vcfzarr_to_dataset(vcfzarr[contig], contig, variant_contig_names)
                 if i == 0:
-                    for (var, arr) in ds.data_vars.items():
+                    for var, arr in ds.data_vars.items():
                         if arr.dims[0] == "variants":
                             vars_to_rechunk.append(var)
                         else:
@@ -176,7 +176,6 @@ def _vcfzarr_to_dataset(
     fix_strings: bool = True,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> xr.Dataset:
-
     variant_position = da.from_zarr(vcfzarr["variants/POS"])
 
     if contig is None:
@@ -258,7 +257,7 @@ def _vcfzarr_to_dataset(
 
     # Fix string types to include length
     if fix_strings:
-        for (var, arr) in ds.data_vars.items():
+        for var, arr in ds.data_vars.items():
             kind = arr.dtype.kind
             if kind in ["O", "U", "S"]:
                 # Compute fixed-length string dtype for array
@@ -411,7 +410,6 @@ def concat_zarrs_optimized(
 
     # copy unchanged variables and top-level metadata
     with zarr.open_group(output) as output_zarr:
-
         # copy top-level attributes
         group_attrs = dict(first_zarr_group.attrs)
         if "max_alt_alleles_seen" in group_attrs:

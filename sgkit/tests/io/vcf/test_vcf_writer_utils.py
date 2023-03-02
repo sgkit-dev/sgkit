@@ -479,7 +479,6 @@ def test_interleave_speed():
     reps = 200
     bytes_written = 0
     for _ in range(reps):
-
         print(".", end="")
 
         vcf_ints_to_byte_buf(a_buf, 0, a, indexes[0])

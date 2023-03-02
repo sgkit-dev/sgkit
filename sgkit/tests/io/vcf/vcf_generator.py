@@ -82,7 +82,6 @@ class Field:
 
 
 def generate_header(info_fields, format_fields, vcf_samples):
-
     output = io.StringIO()
 
     print("##fileformat=VCFv4.3", file=output)

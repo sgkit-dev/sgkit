@@ -499,7 +499,6 @@ def window_statistic(
     new_axis: Union[None, int, Iterable[int]] = None,
     **kwargs: Any,
 ) -> da.Array:
-
     values = da.asarray(values)
     desired_chunks = chunks or values.chunks
 

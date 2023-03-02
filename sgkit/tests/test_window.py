@@ -193,7 +193,6 @@ def test_get_windows(start, stop, size, step, window_starts_exp, window_stops_ex
 def test_get_chunked_windows(
     chunks, window_starts, window_stops, rel_window_starts_exp, windows_per_chunk_exp
 ):
-
     rel_window_starts_actual, windows_per_chunk_actual = _get_chunked_windows(
         chunks, window_starts, window_stops
     )
