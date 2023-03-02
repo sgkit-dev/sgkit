@@ -22,14 +22,20 @@ from .utils import path_for_test
 
 
 @pytest.mark.parametrize(
+    "read_chunk_length",
+    [None, 1],
+)
+@pytest.mark.parametrize(
     "is_path",
     [True, False],
 )
-def test_vcf_to_zarr__small_vcf(shared_datadir, is_path, tmp_path):
+def test_vcf_to_zarr__small_vcf(shared_datadir, is_path, read_chunk_length, tmp_path):
     path = path_for_test(shared_datadir, "sample.vcf.gz", is_path)
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
-    vcf_to_zarr(path, output, chunk_length=5, chunk_width=2)
+    vcf_to_zarr(
+        path, output, chunk_length=5, chunk_width=2, read_chunk_length=read_chunk_length
+    )
     ds = xr.open_zarr(output)
 
     assert ds.attrs["contigs"] == ["19", "20", "X"]
@@ -146,15 +152,19 @@ def test_vcf_to_zarr__max_alt_alleles(shared_datadir, is_path, tmp_path):
 
 
 @pytest.mark.parametrize(
+    "read_chunk_length",
+    [None, 1_000],
+)
+@pytest.mark.parametrize(
     "is_path",
     [True, False],
 )
 @pytest.mark.filterwarnings("ignore::sgkit.io.vcf.MaxAltAllelesExceededWarning")
-def test_vcf_to_zarr__large_vcf(shared_datadir, is_path, tmp_path):
+def test_vcf_to_zarr__large_vcf(shared_datadir, is_path, read_chunk_length, tmp_path):
     path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz", is_path)
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
-    vcf_to_zarr(path, output, chunk_length=5_000)
+    vcf_to_zarr(path, output, chunk_length=5_000, read_chunk_length=read_chunk_length)
     ds = xr.open_zarr(output)
 
     assert ds.attrs["contigs"] == ["20", "21"]
