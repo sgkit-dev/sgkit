@@ -31,6 +31,8 @@ Improvements
   (:user:`timothymillar`, :pr:`1028`, :issue:`1026`)
 - Add ``skipna`` option to method :func:`sgkit.identity_by_state`.
   (:user:`timothymillar`, :pr:`1028`, :issue:`1027`)
+- Importing ``sgkit`` is now much faster due to deferred numba compilation.
+  (:user:`tomwhite`, :pr:`1039`, :issue:`939`)
 
 Bug fixes
 ~~~~~~~~~
