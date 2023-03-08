@@ -85,8 +85,8 @@ PLINK
 The :func:`sgkit.io.plink.read_plink` function loads a single PLINK dataset as Dask
 arrays within an :class:`xarray.Dataset` from ``bed``, ``bim``, and ``fam`` files.
 
-The :func:`sgkit.io.plink.write_plink` function converts sgkit's Xarray data representation
-to PLINK.
+The :func:`sgkit.io.plink.write_plink` and :func:`sgkit.io.plink.zarr_to_plink`
+functions convert sgkit's Xarray data representation to PLINK.
 
 VCF
 ---

@@ -637,8 +637,8 @@ as a <a class="reference external" href="https://docs.xarray.dev/en/stable/gener
 <h3><a class="toc-backref" href="#id9">PLINK</a><a class="headerlink" href="#plink" title="Permalink to this headline">#</a></h3>
 <p>The <a class="reference internal" href="generated/sgkit.io.plink.read_plink.html#sgkit.io.plink.read_plink" title="sgkit.io.plink.read_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.read_plink()</span></code></a> function loads a single PLINK dataset as Dask
 arrays within an <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.2.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a> from <code class="docutils literal notranslate"><span class="pre">bed</span></code>, <code class="docutils literal notranslate"><span class="pre">bim</span></code>, and <code class="docutils literal notranslate"><span class="pre">fam</span></code> files.</p>
-<p>The <a class="reference internal" href="generated/sgkit.io.plink.write_plink.html#sgkit.io.plink.write_plink" title="sgkit.io.plink.write_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.write_plink()</span></code></a> function converts sgkit’s Xarray data representation
-to PLINK.</p>
+<p>The <a class="reference internal" href="generated/sgkit.io.plink.write_plink.html#sgkit.io.plink.write_plink" title="sgkit.io.plink.write_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.write_plink()</span></code></a> and <a class="reference internal" href="generated/sgkit.io.plink.zarr_to_plink.html#sgkit.io.plink.zarr_to_plink" title="sgkit.io.plink.zarr_to_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.zarr_to_plink()</span></code></a>
+functions convert sgkit’s Xarray data representation to PLINK.</p>
 </section>
 <section id="vcf">
 <h3><a class="toc-backref" href="#id10">VCF</a><a class="headerlink" href="#vcf" title="Permalink to this headline">#</a></h3>
@@ -950,8 +950,8 @@ indexing and uniqueness within Xarray/Pandas, since this is critical for underst
 <span class="gp">   ....: </span>    <span class="n">ac</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 <span class="gp">   ....: </span>
 
-<span class="go">[                                        ] | 0% Completed | 221.40 us</span>
-<span class="go">[########################################] | 100% Completed | 100.46 ms</span>
+<span class="go">[                                        ] | 0% Completed | 273.60 us</span>
+<span class="go">[########################################] | 100% Completed | 100.79 ms</span>
 
 <span class="gp">In [35]: </span><span class="n">ac</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 <span class="gh">Out[35]: </span>
@@ -1154,7 +1154,7 @@ Refer to the <a class="reference external" href="https://numba.readthedocs.io/en
     <div class="footer-items__end">
       
         <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.1.
 </p></div>
       
     </div>
