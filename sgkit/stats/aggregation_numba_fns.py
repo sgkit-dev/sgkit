@@ -66,6 +66,19 @@ def _biallelic_genotype_index(genotype: ArrayLike) -> int:
 
 @numba_guvectorize(  # type: ignore
     [
+        "void(int8[:], int64[:])",
+        "void(int16[:], int64[:])",
+        "void(int32[:], int64[:])",
+        "void(int64[:], int64[:])",
+    ],
+    "(k)->()",
+)
+def biallelic_genotype_call_index(genotype: ArrayLike, out: ArrayLike) -> int:
+    out[0] = _biallelic_genotype_index(genotype)
+
+
+@numba_guvectorize(  # type: ignore
+    [
         "void(int8[:,:], uint64[:], uint64[:])",
         "void(int16[:,:], uint64[:], uint64[:])",
         "void(int32[:,:], uint64[:], uint64[:])",
@@ -125,6 +138,20 @@ def _sorted_genotype_index(genotype: ArrayLike) -> int:
         a = genotype[i]
         index += _comb_with_replacement(a, i + 1)
     return index
+
+
+@numba_guvectorize(  # type: ignore
+    [
+        "void(int8[:], int64[:])",
+        "void(int16[:], int64[:])",
+        "void(int32[:], int64[:])",
+        "void(int64[:], int64[:])",
+    ],
+    "(k)->()",
+)
+def sorted_genotype_call_index(genotype: ArrayLike, out: ArrayLike) -> int:
+    # Warning: genotype alleles must be sorted in ascending order!
+    out[0] = _sorted_genotype_index(genotype)
 
 
 @numba_guvectorize(  # type: ignore

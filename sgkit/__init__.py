@@ -27,7 +27,7 @@ from .stats.aggregation import (
     variant_stats,
 )
 from .stats.association import gwas_linear_regression, regenie_loco_regression
-from .stats.conversion import convert_probability_to_call
+from .stats.conversion import convert_call_to_index, convert_probability_to_call
 from .stats.genee import genee
 from .stats.grm import genomic_relationship
 from .stats.hwe import hardy_weinberg_test
@@ -73,6 +73,7 @@ __all__ = [
     "call_allele_frequencies",
     "create_genotype_call_dataset",
     "cohort_allele_frequencies",
+    "convert_call_to_index",
     "convert_probability_to_call",
     "count_variant_alleles",
     "count_call_alleles",
