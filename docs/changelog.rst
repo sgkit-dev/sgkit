@@ -17,6 +17,10 @@ New Features
 - Add ``phased`` option to :func:`simulate_genotype_call_dataset` function.
   (:user:`tomwhite`, :pr:`1022`, :issue:`973`)
 
+- Add :func:`sgkit.io.plink.plink_to_zarr` and
+  :func:`sgkit.io.plink.zarr_to_plink` convenience functions
+  (:user:`tomwhite`, :pr:`1047`, :issue:`1004`)
+
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
 
