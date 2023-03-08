@@ -3,11 +3,151 @@ from typing import Any, List, Tuple
 import dask.array as da
 import numpy as np
 import pytest
+from scipy.special import comb
 from xarray import Dataset
 
 from sgkit import variables
 from sgkit.stats.conversion import convert_call_to_index, convert_probability_to_call
+from sgkit.stats.conversion_numba_fns import (
+    _COMB_REP_LOOKUP,
+    _biallelic_genotype_index,
+    _comb,
+    _comb_with_replacement,
+    _index_as_genotype,
+    _sorted_genotype_index,
+)
 from sgkit.testing import simulate_genotype_call_dataset
+
+
+@pytest.mark.parametrize(
+    "n, k",
+    [
+        (0, 0),
+        (1, 0),
+        (0, 1),
+        (20, 4),
+        (100, 3),
+        (30, 20),
+        (1, 1),
+        (2, 7),
+        (7, 2),
+        (87, 4),
+    ],
+)
+def test_comb(n, k):
+    assert _comb(n, k) == comb(n, k, exact=True)
+
+
+@pytest.mark.parametrize(
+    "n, k",
+    [
+        (0, 0),
+        (1, 0),
+        (0, 1),
+        (20, 4),
+        (100, 3),
+        (30, 20),
+        (1, 1),
+        (2, 7),
+        (7, 2),
+        (87, 4),
+    ],
+)
+def test_comb_with_replacement(n, k):
+    assert _comb_with_replacement(n, k) == comb(n, k, exact=True, repetition=True)
+
+
+def test__COMB_REP_LOOKUP():
+    ns, ks = _COMB_REP_LOOKUP.shape
+    for n in range(ns):
+        for k in range(ks):
+            assert _COMB_REP_LOOKUP[n, k] == comb(n, k, exact=True, repetition=True)
+
+
+@pytest.mark.parametrize(
+    "genotype, expect",
+    [
+        ([-1, 0], -1),
+        ([0, -1], -1),
+        ([0, 0], 0),
+        ([0, 1], 1),
+        ([1, 0], 1),
+        ([1, 1], 2),
+        ([0, 0, 0], 0),
+        ([0, 1, 0], 1),
+        ([1, 1, 1], 3),
+        ([0, 0, 0, 0], 0),
+        ([0, 1, 0, 1], 2),
+        ([1, 1, 0, 1], 3),
+    ],
+)
+def test__biallelic_genotype_index(genotype, expect):
+    genotype = np.array(genotype)
+    assert _biallelic_genotype_index(genotype) == expect
+
+
+def test__biallelic_genotype_index__raise_on_not_biallelic():
+    genotype = np.array([1, 2, 0, 1])
+    with pytest.raises(ValueError, match="Allele value > 1"):
+        _biallelic_genotype_index(genotype)
+
+
+def test__biallelic_genotype_index__raise_on_mixed_ploidy():
+    genotype = np.array([1, 1, 0, -2])
+    with pytest.raises(
+        ValueError, match="Mixed-ploidy genotype indicated by allele < -1"
+    ):
+        _biallelic_genotype_index(genotype)
+
+
+@pytest.mark.parametrize(
+    "genotype, expect",
+    [
+        ([-1, 0], -1),
+        ([0, 0], 0),
+        ([0, 1], 1),
+        ([1, 1], 2),
+        ([1, 2], 4),
+        ([2, 2], 5),
+        ([0, 3], 6),
+        ([2, 3], 8),
+        ([1, 2, 2], 8),
+        ([0, 0, 3], 10),
+        ([0, 2, 3], 13),
+        ([3, 3, 3, 3], 34),
+        ([11, 11, 11, 11], 1364),
+        ([0, 0, 0, 12], 1365),
+        ([42, 42, 42, 42, 42, 42], 12271511),
+        ([0, 0, 1, 1, 1, 43], 12271515),
+        ([-1, 0, 1, 1, 1, 43], -1),
+    ],
+)
+def test__sorted_genotype_index(genotype, expect):
+    genotype = np.array(genotype)
+    assert _sorted_genotype_index(genotype) == expect
+
+
+@pytest.mark.parametrize("ploidy", [2, 3, 4, 5, 6])
+def test__index_as_genotype__round_trip(ploidy):
+    indices = np.arange(1000)
+    dummy = np.empty(ploidy, dtype=np.int8)
+    genotypes = _index_as_genotype(indices, dummy)
+    for i in range(len(genotypes)):
+        assert _sorted_genotype_index(genotypes[i]) == i
+
+
+def test__index_as_genotype__dtype():
+    for dtype in [np.int8, np.int16, np.int32, np.int64]:
+        dummy = np.empty(2, dtype=dtype)
+        assert _index_as_genotype(1, dummy).dtype == dtype
+
+
+def test__sorted_genotype_index__raise_on_mixed_ploidy():
+    genotype = np.array([-2, 0, 1, 2])
+    with pytest.raises(
+        ValueError, match="Mixed-ploidy genotype indicated by allele < -1"
+    ):
+        _sorted_genotype_index(genotype)
 
 
 @pytest.mark.parametrize("chunk", [False, True])
