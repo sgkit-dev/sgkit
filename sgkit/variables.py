@@ -357,6 +357,40 @@ completely missing genotype calls.
     )
 )
 
+
+(
+    call_genotype_index,
+    call_genotype_index_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "call_genotype_index",
+        kind="i",
+        dims=("variants", "samples"),
+        __doc__="""
+Single integer values encoding each call genotype. Each unique integer corresponds
+to a unique call genotype following the VCF specification for arrays of size "G".
+For biallelic genotypes, this is the count of the alternate allele. Values of -1
+indicate call genotypes with missing alleles.
+""",
+    )
+)
+
+(
+    call_genotype_index_mask,
+    call_genotype_index_mask_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "call_genotype_index_mask",
+        kind="b",
+        dims=("variants", "samples"),
+        __doc__="""
+A flag for each call genotype index indicating missing indices (-1) which correspond
+to call genotypes with missing alleles.
+""",
+    )
+)
+
+
 (
     call_genotype_probability,
     call_genotype_probability_spec,

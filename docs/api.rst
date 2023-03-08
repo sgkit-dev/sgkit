@@ -124,6 +124,7 @@ Utilities
 .. autosummary::
    :toctree: generated/
 
+   convert_call_to_index
    convert_probability_to_call
    display_genotypes
    filter_partial_calls
@@ -159,6 +160,8 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.call_genotype_phased_spec
     variables.call_genotype_probability_spec
     variables.call_genotype_probability_mask_spec
+    variables.call_genotype_index_spec
+    variables.call_genotype_index_mask_spec
     variables.call_heterozygosity_spec
     variables.call_ploidy_spec
     variables.cohort_allele_count_spec
