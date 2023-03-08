@@ -90,7 +90,7 @@ def convert_call_to_index(
            [ 6, 20]]...)
     """
     variables.validate(ds, {call_genotype: variables.call_genotype_spec})
-    from .aggregation_numba_fns import (
+    from .conversion_numba_fns import (
         biallelic_genotype_call_index,
         sorted_genotype_call_index,
     )
