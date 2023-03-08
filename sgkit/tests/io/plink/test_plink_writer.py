@@ -1,3 +1,5 @@
+from filecmp import cmp
+
 import pandas as pd
 import pytest
 
@@ -33,11 +35,9 @@ def test_write_plink(shared_datadir, tmp_path, plink_in, fam_sep):
     write_plink(ds, path=path)
 
     # check bed files are the same
-    bed_path = path.with_suffix(".bed")
-    with open((shared_datadir / plink_in).with_suffix(".bed"), "rb") as expected, open(
-        bed_path, "rb"
-    ) as actual:
-        assert expected.read() == actual.read()
+    bed_path_expected = (shared_datadir / plink_in).with_suffix(".bed")
+    bed_path_actual = path.with_suffix(".bed")
+    assert cmp(bed_path_expected, bed_path_actual)
 
     # check bim files are the same
     bim_expected = read_bim((shared_datadir / plink_in).with_suffix(".bim")).compute()
@@ -69,11 +69,9 @@ def test_zarr_to_plink(shared_datadir, tmp_path, plink_in, fam_sep):
     zarr_to_plink(zarr_path, path=path)
 
     # check bed files are the same
-    bed_path = path.with_suffix(".bed")
-    with open((shared_datadir / plink_in).with_suffix(".bed"), "rb") as expected, open(
-        bed_path, "rb"
-    ) as actual:
-        assert expected.read() == actual.read()
+    bed_path_expected = (shared_datadir / plink_in).with_suffix(".bed")
+    bed_path_actual = path.with_suffix(".bed")
+    assert cmp(bed_path_expected, bed_path_actual)
 
     # check bim files are the same
     bim_expected = read_bim((shared_datadir / plink_in).with_suffix(".bim")).compute()
