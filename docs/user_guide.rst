@@ -219,6 +219,35 @@ Merge can be used to rename output variables too.
 Note that there is a limitation where intermediate variables (``call_allele_count`` in this case)
 are not returned if ``merge=False``. See https://github.com/pystatgen/sgkit/issues/405.
 
+.. _python_interop:
+
+Interop with other Python libraries
+-----------------------------------
+
+It's usually easier to pass genetic data between Python libraries as simple NumPy arrays,
+rather than saving them in files. In sgkit, any data variable can be computed and extracted
+as a NumPy array using the ``.values`` property.
+
+Genetic data is usually stored in a :data:`sgkit.variables.call_genotype_spec` array
+which has three dimensions (variants, samples and ploidy). This data structure can be
+difficult to work with in generic statistical libraries and it is often necessary to
+convert genotypes to a single value per call. The :func:`sgkit.convert_call_to_index`
+method converts call genotypes into :data:`sgkit.variables.call_genotype_index_spec`
+which represents each call as a single integer value. For biallelic datasets, this
+value is simply the count of the alternate allele. Genotype calls with missing alleles
+will be converted to a ``-1``.
+
+.. ipython:: python
+    :okwarning:
+
+    import sgkit as sg
+    # Simulate biallelic genotype calls
+    ds = sg.simulate_genotype_call_dataset(n_variant=10, n_sample=8, missing_pct=.1, seed=0)
+    sg.display_genotypes(ds)
+
+    # Convert genotype calls into a numpy array of alternate allele counts
+    sg.convert_call_to_index(ds).call_genotype_index.values
+
 Custom naming conventions
 -------------------------
 
