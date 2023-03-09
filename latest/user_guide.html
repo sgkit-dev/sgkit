@@ -551,27 +551,28 @@ document.write(`
 <ul>
 <li><p><a class="reference internal" href="#genetic-variables" id="id13">Genetic variables</a></p></li>
 <li><p><a class="reference internal" href="#dataset-merge-behavior" id="id14">Dataset merge behavior</a></p></li>
-<li><p><a class="reference internal" href="#custom-naming-conventions" id="id15">Custom naming conventions</a></p></li>
-<li><p><a class="reference internal" href="#adding-custom-data-to-a-dataset" id="id16">Adding custom data to a Dataset</a></p></li>
+<li><p><a class="reference internal" href="#interop-with-other-python-libraries" id="id15">Interop with other Python libraries</a></p></li>
+<li><p><a class="reference internal" href="#custom-naming-conventions" id="id16">Custom naming conventions</a></p></li>
+<li><p><a class="reference internal" href="#adding-custom-data-to-a-dataset" id="id17">Adding custom data to a Dataset</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#methods" id="id17">Methods</a></p>
+<li><p><a class="reference internal" href="#methods" id="id18">Methods</a></p>
 <ul>
-<li><p><a class="reference internal" href="#custom-computations" id="id18">Custom Computations</a></p></li>
-<li><p><a class="reference internal" href="#pca" id="id19">PCA</a></p></li>
+<li><p><a class="reference internal" href="#custom-computations" id="id19">Custom Computations</a></p></li>
+<li><p><a class="reference internal" href="#pca" id="id20">PCA</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#deployment" id="id20">Deployment</a></p>
+<li><p><a class="reference internal" href="#deployment" id="id21">Deployment</a></p>
 <ul>
-<li><p><a class="reference internal" href="#deploying-sgkit-on-a-cluster" id="id21">Deploying sgkit on a cluster</a></p></li>
-<li><p><a class="reference internal" href="#using-gpus" id="id22">Using GPUs</a></p></li>
+<li><p><a class="reference internal" href="#deploying-sgkit-on-a-cluster" id="id22">Deploying sgkit on a cluster</a></p></li>
+<li><p><a class="reference internal" href="#using-gpus" id="id23">Using GPUs</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#troubleshooting" id="id23">Troubleshooting</a></p>
+<li><p><a class="reference internal" href="#troubleshooting" id="id24">Troubleshooting</a></p>
 <ul>
-<li><p><a class="reference internal" href="#monitoring-operations" id="id24">Monitoring operations</a></p></li>
-<li><p><a class="reference internal" href="#visualizing-computations" id="id25">Visualizing computations</a></p></li>
-<li><p><a class="reference internal" href="#disabling-the-numba-cache" id="id26">Disabling the Numba cache</a></p></li>
+<li><p><a class="reference internal" href="#monitoring-operations" id="id25">Monitoring operations</a></p></li>
+<li><p><a class="reference internal" href="#visualizing-computations" id="id26">Visualizing computations</a></p></li>
+<li><p><a class="reference internal" href="#disabling-the-numba-cache" id="id27">Disabling the Numba cache</a></p></li>
 </ul>
 </li>
 </ul>
@@ -876,31 +877,80 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <p>Note that there is a limitation where intermediate variables (<code class="docutils literal notranslate"><span class="pre">call_allele_count</span></code> in this case)
 are not returned if <code class="docutils literal notranslate"><span class="pre">merge=False</span></code>. See <a class="github reference external" href="https://github.com/pystatgen/sgkit/issues/405">pystatgen/sgkit#405</a>.</p>
 </section>
+<section id="interop-with-other-python-libraries">
+<span id="python-interop"></span><h3><a class="toc-backref" href="#id15">Interop with other Python libraries</a><a class="headerlink" href="#interop-with-other-python-libraries" title="Permalink to this headline">#</a></h3>
+<p>It’s usually easier to pass genetic data between Python libraries as simple NumPy arrays,
+rather than saving them in files. In sgkit, any data variable can be computed and extracted
+as a NumPy array using the <code class="docutils literal notranslate"><span class="pre">.values</span></code> property.</p>
+<p>Genetic data is usually stored in a <a class="reference internal" href="generated/sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a> array
+which has three dimensions (variants, samples and ploidy). This data structure can be
+difficult to work with in generic statistical libraries and it is often necessary to
+convert genotypes to a single value per call. The <a class="reference internal" href="generated/sgkit.convert_call_to_index.html#sgkit.convert_call_to_index" title="sgkit.convert_call_to_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.convert_call_to_index()</span></code></a>
+method converts call genotypes into <a class="reference internal" href="generated/sgkit.variables.call_genotype_index_spec.html#sgkit.variables.call_genotype_index_spec" title="sgkit.variables.call_genotype_index_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_index_spec</span></code></a>
+which represents each call as a single integer value. For biallelic datasets, this
+value is simply the count of the alternate allele. Genotype calls with missing alleles
+will be converted to a <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [25]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+
+<span class="go"># Simulate biallelic genotype calls</span>
+<span class="gp">In [26]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="gp">In [27]: </span><span class="n">sg</span><span class="o">.</span><span class="n">display_genotypes</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gh">Out[27]: </span>
+<span class="go">samples    S0   S1   S2   S3   S4   S5   S6   S7</span>
+<span class="go">variants                                        </span>
+<span class="go">0         0/0  1/0  1/0  0/1  1/0  0/1  0/0  ./0</span>
+<span class="go">1         1/1  0/0  1/0  0/.  1/0  1/1  1/1  1/0</span>
+<span class="go">2         1/0  0/0  1/0  1/1  1/1  1/1  0/0  0/.</span>
+<span class="go">3         0/.  1/0  1/0  1/.  0/0  1/0  0/1  ./0</span>
+<span class="go">4         0/0  0/.  0/1  0/1  0/1  1/0  1/.  0/.</span>
+<span class="go">5         0/1  0/0  1/0  0/1  1/0  1/1  0/0  1/0</span>
+<span class="go">6         0/0  1/1  1/1  1/0  1/0  ./0  1/0  1/0</span>
+<span class="go">7         1/1  1/0  0/0  1/0  1/1  0/0  0/1  0/1</span>
+<span class="go">8         1/0  1/1  0/1  1/0  1/0  0/.  1/0  0/1</span>
+<span class="go">9         0/1  ./1  1/1  0/.  1/.  1/0  0/1  0/.</span>
+
+<span class="go"># Convert genotype calls into a numpy array of alternate allele counts</span>
+<span class="gp">In [28]: </span><span class="n">sg</span><span class="o">.</span><span class="n">convert_call_to_index</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">call_genotype_index</span><span class="o">.</span><span class="n">values</span>
+<span class="gh">Out[28]: </span>
+<span class="go">array([[ 0,  1,  1,  1,  1,  1,  0, -1],</span>
+<span class="go">       [ 2,  0,  1, -1,  1,  2,  2,  1],</span>
+<span class="go">       [ 1,  0,  1,  2,  2,  2,  0, -1],</span>
+<span class="go">       [-1,  1,  1, -1,  0,  1,  1, -1],</span>
+<span class="go">       [ 0, -1,  1,  1,  1,  1, -1, -1],</span>
+<span class="go">       [ 1,  0,  1,  1,  1,  2,  0,  1],</span>
+<span class="go">       [ 0,  2,  2,  1,  1, -1,  1,  1],</span>
+<span class="go">       [ 2,  1,  0,  1,  2,  0,  1,  1],</span>
+<span class="go">       [ 1,  2,  1,  1,  1, -1,  1,  1],</span>
+<span class="go">       [ 1, -1,  2, -1, -1,  1,  1, -1]])</span>
+</pre></div>
+</div>
+</section>
 <section id="custom-naming-conventions">
-<h3><a class="toc-backref" href="#id15">Custom naming conventions</a><a class="headerlink" href="#custom-naming-conventions" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id16">Custom naming conventions</a><a class="headerlink" href="#custom-naming-conventions" title="Permalink to this headline">#</a></h3>
 <p>TODO: Show to use a custom naming convention via Xarray renaming features.</p>
 </section>
 <section id="adding-custom-data-to-a-dataset">
-<h3><a class="toc-backref" href="#id16">Adding custom data to a Dataset</a><a class="headerlink" href="#adding-custom-data-to-a-dataset" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id17">Adding custom data to a Dataset</a><a class="headerlink" href="#adding-custom-data-to-a-dataset" title="Permalink to this headline">#</a></h3>
 <p>TODO:  Show how something like sample metadata can be joined to an existing Xarray dataset. Also briefly explain
 indexing and uniqueness within Xarray/Pandas, since this is critical for understanding joins.</p>
 </section>
 </section>
 <section id="methods">
-<h2><a class="toc-backref" href="#id17">Methods</a><a class="headerlink" href="#methods" title="Permalink to this headline">#</a></h2>
+<h2><a class="toc-backref" href="#id18">Methods</a><a class="headerlink" href="#methods" title="Permalink to this headline">#</a></h2>
 <section id="custom-computations">
-<span id="id4"></span><h3><a class="toc-backref" href="#id18">Custom Computations</a><a class="headerlink" href="#custom-computations" title="Permalink to this headline">#</a></h3>
+<span id="id4"></span><h3><a class="toc-backref" href="#id19">Custom Computations</a><a class="headerlink" href="#custom-computations" title="Permalink to this headline">#</a></h3>
 <p>TODO: Finish explaining how Numba works and how users might apply it</p>
 <p>Here is an example that demonstrates an alt allele count:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [25]: </span><span class="kn">import</span> <span class="nn">numba</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [29]: </span><span class="kn">import</span> <span class="nn">numba</span>
 
-<span class="gp">In [26]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<span class="gp">In [30]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 
-<span class="gp">In [27]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">In [31]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="gp">In [28]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.2</span><span class="p">)</span>
+<span class="gp">In [32]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.2</span><span class="p">)</span>
 
-<span class="gp">In [29]: </span><span class="k">def</span> <span class="nf">alt_allele_count</span><span class="p">(</span><span class="n">gt</span><span class="p">):</span>
+<span class="gp">In [33]: </span><span class="k">def</span> <span class="nf">alt_allele_count</span><span class="p">(</span><span class="n">gt</span><span class="p">):</span>
 <span class="gp">   ....: </span>    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">gt</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
 <span class="gp">   ....: </span>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">(</span><span class="o">*</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
 <span class="gp">   ....: </span>        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">gt</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">):</span>
@@ -908,8 +958,8 @@ indexing and uniqueness within Xarray/Pandas, since this is critical for underst
 <span class="gp">   ....: </span>    <span class="k">return</span> <span class="n">out</span>
 <span class="gp">   ....: </span>
 
-<span class="gp">In [30]: </span><span class="n">numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">alt_allele_count</span><span class="p">)(</span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-<span class="gh">Out[30]: </span>
+<span class="gp">In [34]: </span><span class="n">numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">alt_allele_count</span><span class="p">)(</span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="gh">Out[34]: </span>
 <span class="go">array([[ 0,  1,  1],</span>
 <span class="go">       [ 1,  1, -1],</span>
 <span class="go">       [-1,  1,  2],</span>
@@ -919,42 +969,42 @@ indexing and uniqueness within Xarray/Pandas, since this is critical for underst
 </div>
 </section>
 <section id="pca">
-<h3><a class="toc-backref" href="#id19">PCA</a><a class="headerlink" href="#pca" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id20">PCA</a><a class="headerlink" href="#pca" title="Permalink to this headline">#</a></h3>
 <p>TODO: Describe the upstream tools for PCA (i.e. those in dask-ml/scikit-learn)</p>
 </section>
 </section>
 <section id="deployment">
-<h2><a class="toc-backref" href="#id20">Deployment</a><a class="headerlink" href="#deployment" title="Permalink to this headline">#</a></h2>
+<h2><a class="toc-backref" href="#id21">Deployment</a><a class="headerlink" href="#deployment" title="Permalink to this headline">#</a></h2>
 <section id="deploying-sgkit-on-a-cluster">
-<h3><a class="toc-backref" href="#id21">Deploying sgkit on a cluster</a><a class="headerlink" href="#deploying-sgkit-on-a-cluster" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id22">Deploying sgkit on a cluster</a><a class="headerlink" href="#deploying-sgkit-on-a-cluster" title="Permalink to this headline">#</a></h3>
 <p>TODO: Create a tutorial on running sgkit at scale</p>
 </section>
 <section id="using-gpus">
-<h3><a class="toc-backref" href="#id22">Using GPUs</a><a class="headerlink" href="#using-gpus" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id23">Using GPUs</a><a class="headerlink" href="#using-gpus" title="Permalink to this headline">#</a></h3>
 <p>TODO: Show CuPy examples</p>
 </section>
 </section>
 <section id="troubleshooting">
-<h2><a class="toc-backref" href="#id23">Troubleshooting</a><a class="headerlink" href="#troubleshooting" title="Permalink to this headline">#</a></h2>
+<h2><a class="toc-backref" href="#id24">Troubleshooting</a><a class="headerlink" href="#troubleshooting" title="Permalink to this headline">#</a></h2>
 <section id="monitoring-operations">
-<h3><a class="toc-backref" href="#id24">Monitoring operations</a><a class="headerlink" href="#monitoring-operations" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id25">Monitoring operations</a><a class="headerlink" href="#monitoring-operations" title="Permalink to this headline">#</a></h3>
 <p>The simplest way to monitor operations when running sgkit on a single host is to use <a class="reference external" href="https://docs.dask.org/en/latest/diagnostics-local.html">Dask local diagnostics</a>.</p>
 <p>As an example, this code shows how to track the progress of a single sgkit function:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [31]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [35]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 
-<span class="gp">In [32]: </span><span class="kn">from</span> <span class="nn">dask.diagnostics</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="gp">In [36]: </span><span class="kn">from</span> <span class="nn">dask.diagnostics</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
 
-<span class="gp">In [33]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
+<span class="gp">In [37]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
 
-<span class="gp">In [34]: </span><span class="k">with</span> <span class="n">ProgressBar</span><span class="p">():</span>
+<span class="gp">In [38]: </span><span class="k">with</span> <span class="n">ProgressBar</span><span class="p">():</span>
 <span class="gp">   ....: </span>    <span class="n">ac</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 <span class="gp">   ....: </span>
 
-<span class="go">[                                        ] | 0% Completed | 273.60 us</span>
-<span class="go">[########################################] | 100% Completed | 100.79 ms</span>
+<span class="go">[                                        ] | 0% Completed | 244.90 us</span>
+<span class="go">[########################################] | 100% Completed | 100.63 ms</span>
 
-<span class="gp">In [35]: </span><span class="n">ac</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
-<span class="gh">Out[35]: </span>
+<span class="gp">In [39]: </span><span class="n">ac</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="gh">Out[39]: </span>
 <span class="go">&lt;xarray.DataArray &#39;variant_allele_count&#39; (variants: 5, alleles: 2)&gt;</span>
 <span class="go">array([[50, 40],</span>
 <span class="go">       [40, 52],</span>
@@ -972,50 +1022,50 @@ commonly used local diagnostics.</p>
 <p>For similar monitoring in a distributed cluster, see <a class="reference external" href="https://docs.dask.org/en/latest/diagnostics-distributed.html">Dask distributed diagnostics</a>.</p>
 </section>
 <section id="visualizing-computations">
-<h3><a class="toc-backref" href="#id25">Visualizing computations</a><a class="headerlink" href="#visualizing-computations" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id26">Visualizing computations</a><a class="headerlink" href="#visualizing-computations" title="Permalink to this headline">#</a></h3>
 <p>Dask allows you to <a class="reference external" href="https://docs.dask.org/en/latest/graphviz.html">visualize the task graph</a> of a computation
 before running it, which can be handy when trying to understand where the bottlenecks are.</p>
 <p>In most cases the number of tasks is too large to visualize, so it’s useful to restrict
 the graph just a few chunks, as shown in this example.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [36]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [40]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 
-<span class="gp">In [37]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
+<span class="gp">In [41]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
 
 <span class="go"># Rechunk to illustrate multiple tasks</span>
-<span class="gp">In [38]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">chunk</span><span class="p">({</span><span class="s2">&quot;variants&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="s2">&quot;samples&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">})</span>
+<span class="gp">In [42]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">chunk</span><span class="p">({</span><span class="s2">&quot;variants&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="s2">&quot;samples&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">})</span>
 
-<span class="gp">In [39]: </span><span class="n">counts</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_call_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">call_allele_count</span><span class="o">.</span><span class="n">data</span>
+<span class="gp">In [43]: </span><span class="n">counts</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_call_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">call_allele_count</span><span class="o">.</span><span class="n">data</span>
 
 <span class="go"># Restrict to first 3 chunks in variants dimension</span>
-<span class="gp">In [40]: </span><span class="n">counts</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[:</span><span class="mi">3</span><span class="o">*</span><span class="n">counts</span><span class="o">.</span><span class="n">chunksize</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="o">...</span><span class="p">]</span>
+<span class="gp">In [44]: </span><span class="n">counts</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[:</span><span class="mi">3</span><span class="o">*</span><span class="n">counts</span><span class="o">.</span><span class="n">chunksize</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="o">...</span><span class="p">]</span>
 
-<span class="gp">In [41]: </span><span class="n">counts</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">optimize_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gh">Out[41]: </span><span class="go">&lt;IPython.core.display.Image object&gt;</span>
+<span class="gp">In [45]: </span><span class="n">counts</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">optimize_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gh">Out[45]: </span><span class="go">&lt;IPython.core.display.Image object&gt;</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="_images/mydask.png"><img alt="_images/mydask.png" class="align-center" src="_images/mydask.png" style="width: 600px;" /></a>
 <p>By passing keyword arguments to <code class="docutils literal notranslate"><span class="pre">visualize</span></code> we can see the order tasks will run in:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="go"># Graph where colors indicate task ordering</span>
-<span class="gp">In [42]: </span><span class="n">counts</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;order&quot;</span><span class="p">,</span> <span class="n">optimize_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;order&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;autumn&quot;</span><span class="p">,</span> <span class="n">node_attr</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;penwidth&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">})</span>
-<span class="gh">Out[42]: </span><span class="go">&lt;IPython.core.display.Image object&gt;</span>
+<span class="gp">In [46]: </span><span class="n">counts</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;order&quot;</span><span class="p">,</span> <span class="n">optimize_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;order&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;autumn&quot;</span><span class="p">,</span> <span class="n">node_attr</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;penwidth&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">})</span>
+<span class="gh">Out[46]: </span><span class="go">&lt;IPython.core.display.Image object&gt;</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="_images/order.png"><img alt="_images/order.png" class="align-center" src="_images/order.png" style="width: 600px;" /></a>
 <p>Task order number is shown in circular boxes, colored from red to yellow.</p>
 </section>
 <section id="disabling-the-numba-cache">
-<h3><a class="toc-backref" href="#id26">Disabling the Numba cache</a><a class="headerlink" href="#disabling-the-numba-cache" title="Permalink to this headline">#</a></h3>
+<h3><a class="toc-backref" href="#id27">Disabling the Numba cache</a><a class="headerlink" href="#disabling-the-numba-cache" title="Permalink to this headline">#</a></h3>
 <p>Internally, sgkit uses the <a class="reference external" href="https://numba.pydata.org/">Numba JIT compiler</a> to accelerate some methods.
 These methods will be compiled the first time that they are used following a new installation.
 The compiled methods are automatically cached so that recompilation is not required in future sessions.
 However, this may occasionally cause issues with some setups.</p>
 <p>Caching of compiled sgkit methods can be disabled by setting the environment variable <code class="docutils literal notranslate"><span class="pre">SGKIT_DISABLE_NUMBA_CACHE</span></code> to <code class="docutils literal notranslate"><span class="pre">1</span></code>.
 This variable can also be set from within a python session <em>before</em> loading sgkit.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [43]: </span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [47]: </span><span class="kn">import</span> <span class="nn">os</span>
 
-<span class="gp">In [44]: </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;SGKIT_DISABLE_NUMBA_CACHE&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;1&#39;</span>
+<span class="gp">In [48]: </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;SGKIT_DISABLE_NUMBA_CACHE&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;1&#39;</span>
 
-<span class="gp">In [45]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<span class="gp">In [49]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 </pre></div>
 </div>
 <p>With caching disabled, these methods will be compiled the first time that they are called during each session.
@@ -1080,6 +1130,7 @@ Refer to the <a class="reference external" href="https://numba.readthedocs.io/en
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#datasets">Datasets</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#genetic-variables">Genetic variables</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-merge-behavior">Dataset merge behavior</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interop-with-other-python-libraries">Interop with other Python libraries</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#custom-naming-conventions">Custom naming conventions</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-custom-data-to-a-dataset">Adding custom data to a Dataset</a></li>
 </ul>

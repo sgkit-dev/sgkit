@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>sgkit.sample_stats &#8212; sgkit  documentation</title>
+    <title>sgkit.convert_call_to_index &#8212; sgkit  documentation</title>
   
   
   
@@ -43,7 +43,7 @@
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.sample_stats';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.convert_call_to_index';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
@@ -53,8 +53,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.Tajimas_D" href="sgkit.Tajimas_D.html" />
-    <link rel="prev" title="sgkit.regenie" href="sgkit.regenie.html" /> 
+    <link rel="next" title="sgkit.convert_probability_to_call" href="sgkit.convert_probability_to_call.html" />
+    <link rel="prev" title="sgkit.Weir_Goudet_beta" href="sgkit.Weir_Goudet_beta.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="None"/>  
 <style type="text/css">
@@ -518,7 +518,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.load_dataset.html">sgkit.load_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.save_dataset.html">sgkit.save_dataset</a></li>
 </ul>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.call_allele_frequencies.html">sgkit.call_allele_frequencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.cohort_allele_frequencies.html">sgkit.cohort_allele_frequencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.count_call_alleles.html">sgkit.count_call_alleles</a></li>
@@ -545,13 +545,13 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_kinship.html">sgkit.pedigree_kinship</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pc_relate.html">sgkit.pc_relate</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.regenie.html">sgkit.regenie</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.sample_stats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.sample_stats.html">sgkit.sample_stats</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.Tajimas_D.html">sgkit.Tajimas_D</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variant_stats.html">sgkit.variant_stats</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.Weir_Goudet_beta.html">sgkit.Weir_Goudet_beta</a></li>
 </ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="sgkit.convert_call_to_index.html">sgkit.convert_call_to_index</a></li>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.convert_call_to_index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.convert_probability_to_call.html">sgkit.convert_probability_to_call</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.display_genotypes.html">sgkit.display_genotypes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.filter_partial_calls.html">sgkit.filter_partial_calls</a></li>
@@ -693,7 +693,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">sgkit.sample_stats</li>
+    <li class="breadcrumb-item active" aria-current="page">sgkit.convert_call_to_index</li>
   </ul>
 </nav>
 </div>
@@ -709,29 +709,20 @@ document.write(`
                 
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
-                   <section id="sgkit-sample-stats">
-<h1>sgkit.sample_stats<a class="headerlink" href="#sgkit-sample-stats" title="Permalink to this headline">#</a></h1>
+                   <section id="sgkit-convert-call-to-index">
+<h1>sgkit.convert_call_to_index<a class="headerlink" href="#sgkit-convert-call-to-index" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="sgkit.sample_stats">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">sample_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype_mask'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant_allele_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'variant_allele_count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.sample_stats" title="Permalink to this definition">#</a></dt>
-<dd><p>Compute quality control sample statistics from genotype calls.</p>
+<dt class="sig sig-object py" id="sgkit.convert_call_to_index">
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">convert_call_to_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.convert_call_to_index" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert each call genotype to a single integer value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.2.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing genotype calls.</p>
 </dd>
-<dt><strong>call_genotype</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype'</span></code>)</dt><dd><p>Input variable name holding call_genotype.
-Defined by <a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a>.
+<dt><strong>call_genotype</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype'</span></code>)</dt><dd><p>Input variable name holding call_genotype as defined by
+<a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a>.
 Must be present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>.</p>
-</dd>
-<dt><strong>call_genotype_mask</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype_mask'</span></code>)</dt><dd><p>Input variable name holding call_genotype_mask.
-Defined by <a class="reference internal" href="sgkit.variables.call_genotype_mask_spec.html#sgkit.variables.call_genotype_mask_spec" title="sgkit.variables.call_genotype_mask_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_mask_spec</span></code></a>
-Must be present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>.</p>
-</dd>
-<dt><strong>variant_allele_count</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'variant_allele_count'</span></code>)</dt><dd><p>Input variable name holding variant_allele_count,
-as defined by <a class="reference internal" href="sgkit.variables.variant_allele_count_spec.html#sgkit.variables.variant_allele_count_spec" title="sgkit.variables.variant_allele_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_allele_count_spec</span></code></a>.
-If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
-using <a class="reference internal" href="sgkit.count_variant_alleles.html#sgkit.count_variant_alleles" title="sgkit.count_variant_alleles"><code class="xref py py-func docutils literal notranslate"><span class="pre">count_variant_alleles()</span></code></a>.</p>
 </dd>
 <dt><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
@@ -744,24 +735,64 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
 <dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.2.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><p>A dataset containing the following variables:</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="sgkit.variables.sample_n_called_spec.html#sgkit.variables.sample_n_called_spec" title="sgkit.variables.sample_n_called_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_n_called_spec</span></code></a> (samples):
-The number of variants with called genotypes.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.sample_call_rate_spec.html#sgkit.variables.sample_call_rate_spec" title="sgkit.variables.sample_call_rate_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_call_rate_spec</span></code></a> (samples):
-The fraction of variants with called genotypes.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.sample_n_het_spec.html#sgkit.variables.sample_n_het_spec" title="sgkit.variables.sample_n_het_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_n_het_spec</span></code></a> (samples):
-The number of variants with heterozygous calls.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.sample_n_hom_ref_spec.html#sgkit.variables.sample_n_hom_ref_spec" title="sgkit.variables.sample_n_hom_ref_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_n_hom_ref_spec</span></code></a> (samples):
-The number of variants with homozygous reference calls.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.sample_n_hom_alt_spec.html#sgkit.variables.sample_n_hom_alt_spec" title="sgkit.variables.sample_n_hom_alt_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_n_hom_alt_spec</span></code></a> (samples):
-The number of variants with homozygous alternate calls.</p></li>
-<li><p><a class="reference internal" href="sgkit.variables.sample_n_non_ref_spec.html#sgkit.variables.sample_n_non_ref_spec" title="sgkit.variables.sample_n_non_ref_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_n_non_ref_spec</span></code></a> (samples):
-The number of variants that are not homozygous reference calls.</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.call_genotype_index_spec.html#sgkit.variables.call_genotype_index_spec" title="sgkit.variables.call_genotype_index_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_index_spec</span></code></a>
+and <a class="reference internal" href="sgkit.variables.call_genotype_index_mask_spec.html#sgkit.variables.call_genotype_index_mask_spec" title="sgkit.variables.call_genotype_index_mask_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_index_mask_spec</span></code></a>. Genotype
+calls with missing alleles will result in an index of <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
 </dd>
 </dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This method does not support mixed-ploidy datasets.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the dataset contains mixed-ploidy genotype calls.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">n_variant</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">n_sample</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">missing_pct</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">display_genotypes</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span> 
+<span class="go">samples    S0   S1</span>
+<span class="go">variants</span>
+<span class="go">0         ./0  1/0</span>
+<span class="go">1         1/0  1/1</span>
+<span class="go">2         0/1  1/0</span>
+<span class="go">3         ./0  0/0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">convert_call_to_index</span><span class="p">(</span><span class="n">ds</span><span class="p">)[</span><span class="s2">&quot;call_genotype_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([[-1,  1],</span>
+<span class="go">       [ 1,  2],</span>
+<span class="go">       [ 1,  1],</span>
+<span class="go">       [-1,  0]]...)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">n_variant</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">n_sample</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">n_allele</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">missing_pct</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">display_genotypes</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span> 
+<span class="go">samples    S0   S1</span>
+<span class="go">variants</span>
+<span class="go">0         5/4  1/0</span>
+<span class="go">1         7/7  8/8</span>
+<span class="go">2         4/7  ./9</span>
+<span class="go">3         3/0  5/5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">convert_call_to_index</span><span class="p">(</span><span class="n">ds</span><span class="p">)[</span><span class="s2">&quot;call_genotype_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
+<span class="go">array([[19,  1],</span>
+<span class="go">       [35, 44],</span>
+<span class="go">       [32, -1],</span>
+<span class="go">       [ 6, 20]]...)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -778,20 +809,20 @@ The number of variants that are not homozygous reference calls.</p></li>
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="sgkit.regenie.html"
+       href="sgkit.Weir_Goudet_beta.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">sgkit.regenie</p>
+        <p class="prev-next-title">sgkit.Weir_Goudet_beta</p>
       </div>
     </a>
     <a class="right-next"
-       href="sgkit.Tajimas_D.html"
+       href="sgkit.convert_probability_to_call.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">sgkit.Tajimas_D</p>
+        <p class="prev-next-title">sgkit.convert_probability_to_call</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -806,7 +837,7 @@ The number of variants that are not homozygous reference calls.</p></li>
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="../_sources/generated/sgkit.sample_stats.rst.txt">
+    <a href="../_sources/generated/sgkit.convert_call_to_index.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

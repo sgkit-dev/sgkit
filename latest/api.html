@@ -551,6 +551,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.Weir_Goudet_beta.html">sgkit.Weir_Goudet_beta</a></li>
 </ul>
 <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sgkit.convert_call_to_index.html">sgkit.convert_call_to_index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.convert_probability_to_call.html">sgkit.convert_probability_to_call</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.display_genotypes.html">sgkit.display_genotypes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.filter_partial_calls.html">sgkit.filter_partial_calls</a></li>
@@ -577,6 +578,8 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.variables.call_genotype_phased_spec.html">sgkit.variables.call_genotype_phased_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.variables.call_genotype_probability_spec.html">sgkit.variables.call_genotype_probability_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.variables.call_genotype_probability_mask_spec.html">sgkit.variables.call_genotype_probability_mask_spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sgkit.variables.call_genotype_index_spec.html">sgkit.variables.call_genotype_index_spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sgkit.variables.call_genotype_index_mask_spec.html">sgkit.variables.call_genotype_index_mask_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.variables.call_heterozygosity_spec.html">sgkit.variables.call_heterozygosity_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.variables.call_ploidy_spec.html">sgkit.variables.call_ploidy_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.variables.cohort_allele_count_spec.html">sgkit.variables.cohort_allele_count_spec</a></li>
@@ -940,40 +943,43 @@ document.write(`
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.convert_probability_to_call.html#sgkit.convert_probability_to_call" title="sgkit.convert_probability_to_call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_probability_to_call</span></code></a>(ds[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.convert_call_to_index.html#sgkit.convert_call_to_index" title="sgkit.convert_call_to_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_call_to_index</span></code></a>(ds, *[, ...])</p></td>
+<td><p>Convert each call genotype to a single integer value.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.convert_probability_to_call.html#sgkit.convert_probability_to_call" title="sgkit.convert_probability_to_call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_probability_to_call</span></code></a>(ds[, ...])</p></td>
 <td><p>Convert genotype probabilities to hard calls.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.display_genotypes.html#sgkit.display_genotypes" title="sgkit.display_genotypes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_genotypes</span></code></a>(ds[, max_variants, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.display_genotypes.html#sgkit.display_genotypes" title="sgkit.display_genotypes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_genotypes</span></code></a>(ds[, max_variants, ...])</p></td>
 <td><p>Display genotype calls.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.filter_partial_calls.html#sgkit.filter_partial_calls" title="sgkit.filter_partial_calls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_partial_calls</span></code></a>(ds, *[, call_genotype, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.filter_partial_calls.html#sgkit.filter_partial_calls" title="sgkit.filter_partial_calls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_partial_calls</span></code></a>(ds, *[, call_genotype, ...])</p></td>
 <td><p>Replace partial genotype calls with missing values.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.infer_call_ploidy.html#sgkit.infer_call_ploidy" title="sgkit.infer_call_ploidy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_call_ploidy</span></code></a>(ds, *[, call_genotype, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.infer_call_ploidy.html#sgkit.infer_call_ploidy" title="sgkit.infer_call_ploidy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_call_ploidy</span></code></a>(ds, *[, call_genotype, ...])</p></td>
 <td><p>Infer the ploidy of each call genotype based on the number of fill (non-allele) values in each call genotype.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.infer_sample_ploidy.html#sgkit.infer_sample_ploidy" title="sgkit.infer_sample_ploidy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_sample_ploidy</span></code></a>(ds, *[, call_genotype, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.infer_sample_ploidy.html#sgkit.infer_sample_ploidy" title="sgkit.infer_sample_ploidy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_sample_ploidy</span></code></a>(ds, *[, call_genotype, ...])</p></td>
 <td><p>Infer the ploidy of each sample across all variants based on the number of fill (non-allele) values in call genotypes.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.infer_variant_ploidy.html#sgkit.infer_variant_ploidy" title="sgkit.infer_variant_ploidy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_variant_ploidy</span></code></a>(ds, *[, call_genotype, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.infer_variant_ploidy.html#sgkit.infer_variant_ploidy" title="sgkit.infer_variant_ploidy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_variant_ploidy</span></code></a>(ds, *[, call_genotype, ...])</p></td>
 <td><p>Infer the ploidy at each variant across all samples based on the number of fill (non-allele) values in call genotypes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.parent_indices.html#sgkit.parent_indices" title="sgkit.parent_indices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parent_indices</span></code></a>(ds, *[, sample_id, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.parent_indices.html#sgkit.parent_indices" title="sgkit.parent_indices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parent_indices</span></code></a>(ds, *[, sample_id, ...])</p></td>
 <td><p>Calculate the integer indices for the parents of each sample within the samples dimension.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset" title="sgkit.simulate_genotype_call_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_genotype_call_dataset</span></code></a>(n_variant, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset" title="sgkit.simulate_genotype_call_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_genotype_call_dataset</span></code></a>(n_variant, ...)</p></td>
 <td><p>Simulate genotype calls and variant/sample data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.window_by_genome.html#sgkit.window_by_genome" title="sgkit.window_by_genome"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_genome</span></code></a>(ds, *[, merge])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.window_by_genome.html#sgkit.window_by_genome" title="sgkit.window_by_genome"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_genome</span></code></a>(ds, *[, merge])</p></td>
 <td><p>Add a window spanning the whole genome to a dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.window_by_interval.html#sgkit.window_by_interval" title="sgkit.window_by_interval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_interval</span></code></a>(ds, *[, variant_contig, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.window_by_interval.html#sgkit.window_by_interval" title="sgkit.window_by_interval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_interval</span></code></a>(ds, *[, variant_contig, ...])</p></td>
 <td><p>Add window information to a dataset, using arbitrary intervals.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_position</span></code></a>(ds, *, size[, step, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_position</span></code></a>(ds, *, size[, step, ...])</p></td>
 <td><p>Add window information to a dataset, measured by distance along the genome.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_variant</span></code></a>(ds, *, size[, step, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_variant</span></code></a>(ds, *, size[, step, ...])</p></td>
 <td><p>Add window information to a dataset, measured by number of variants.</p></td>
 </tr>
 </tbody>
@@ -1023,6 +1029,12 @@ document.write(`
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.call_genotype_probability_mask_spec.html#sgkit.variables.call_genotype_probability_mask_spec" title="sgkit.variables.call_genotype_probability_mask_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.call_genotype_probability_mask_spec</span></code></a></p></td>
 <td><p>A flag for each call indicating which values are missing.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.call_genotype_index_spec.html#sgkit.variables.call_genotype_index_spec" title="sgkit.variables.call_genotype_index_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.call_genotype_index_spec</span></code></a></p></td>
+<td><p>Single integer values encoding each call genotype.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variables.call_genotype_index_mask_spec.html#sgkit.variables.call_genotype_index_mask_spec" title="sgkit.variables.call_genotype_index_mask_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.call_genotype_index_mask_spec</span></code></a></p></td>
+<td><p>A flag for each call genotype index indicating missing indices (-1) which correspond to call genotypes with missing alleles.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.call_heterozygosity_spec.html#sgkit.variables.call_heterozygosity_spec" title="sgkit.variables.call_heterozygosity_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.call_heterozygosity_spec</span></code></a></p></td>
 <td><p>Observed heterozygosity of each call genotype.</p></td>
