@@ -29,7 +29,11 @@ from .stats.aggregation import (
 from .stats.association import gwas_linear_regression, regenie_loco_regression
 from .stats.conversion import convert_call_to_index, convert_probability_to_call
 from .stats.genee import genee
-from .stats.grm import genomic_relationship
+from .stats.grm import (
+    genomic_relationship,
+    hybrid_inverse_relationship,
+    hybrid_relationship,
+)
 from .stats.hwe import hardy_weinberg_test
 from .stats.ibs import Weir_Goudet_beta, identity_by_state
 from .stats.ld import ld_matrix, ld_prune, maximal_independent_set
@@ -89,6 +93,8 @@ __all__ = [
     "regenie",
     "regenie_loco_regression",
     "hardy_weinberg_test",
+    "hybrid_relationship",
+    "hybrid_inverse_relationship",
     "identity_by_state",
     "individual_heterozygosity",
     "infer_call_ploidy",
