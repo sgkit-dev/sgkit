@@ -21,6 +21,9 @@ New Features
   :func:`sgkit.io.plink.zarr_to_plink` convenience functions
   (:user:`tomwhite`, :pr:`1047`, :issue:`1004`)
 
+- Add :func:`sgkit.convert_call_to_index` method.
+  (:user:`timothymillar`, :pr:`1050`, :issue:`1048`)
+
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
 
