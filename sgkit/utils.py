@@ -2,6 +2,7 @@ import warnings
 from itertools import product
 from typing import Any, Callable, Hashable, List, Mapping, Optional, Set, Tuple, Union
 
+import dask.array as da
 import numpy as np
 from xarray import Dataset
 
@@ -384,7 +385,7 @@ def max_str_len(a: ArrayLike) -> ArrayLike:
     if a.dtype.kind not in {"U", "S"}:
         raise ValueError(f"Array must have string dtype (got dtype {a.dtype})")
 
-    lens = np.frompyfunc(len, 1, 1)(a)  # type: ignore[no-untyped-call]
+    lens = da.frompyfunc(len, 1, 1)(a)  # type: ignore[no-untyped-call]
     if isinstance(a, np.ndarray):
         lens = np.asarray(lens)
     if a.ndim == 0:
