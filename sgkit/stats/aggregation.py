@@ -320,7 +320,7 @@ def count_variant_genotypes(
            [0, 2, 0],
            [2, 0, 0]], dtype=uint64)
     """
-    from .aggregation_numba_fns import (
+    from .conversion_numba_fns import (
         _comb_with_replacement,
         _count_biallelic_genotypes,
         _count_sorted_genotypes,
@@ -409,7 +409,7 @@ def genotype_coords(
     A dataset containing :data:`sgkit.variables.genotype_id_spec`
     containing all possible genotype strings.
     """
-    from .aggregation_numba_fns import _comb_with_replacement, _index_as_genotype
+    from .conversion_numba_fns import _comb_with_replacement, _index_as_genotype
 
     n_alleles = ds.dims["alleles"]
     ploidy = ds.dims["ploidy"]
