@@ -39,6 +39,7 @@ VCF (reading)
 .. autosummary::
    :toctree: generated/
 
+   read_vcf
    vcf_to_zarr
 
 For more low-level control:

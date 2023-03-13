@@ -32,14 +32,15 @@ New Features
 - Add ``retain_temp_files`` to :func:`sgkit.io.vcf.vcf_to_zarr` function.
   (:user:`benjeffery`, :pr:`1046`, :issue:`1036`)
 
+- Add :func:`sgkit.io.vcf.read_vcf` convenience function.
+  (:user:`tomwhite`, :pr:`1052`, :issue:`1004`)
+
 Bug fixes
 ~~~~~~~~~
 
 - ``vcf_to_zarrs`` was outputting zarr files with ``temp_chunk_length`` sized chunks. This has now been fixed
   so that the chunks are ``chunk_length`` sized.
   (:user:`benjeffery`, :pr:`1044`,)
-
-
 
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
