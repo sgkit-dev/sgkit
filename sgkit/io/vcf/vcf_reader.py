@@ -15,6 +15,7 @@ import zarr
 from cyvcf2 import VCF, Variant
 
 from sgkit import variables
+from sgkit.io.dataset import load_dataset
 from sgkit.io.utils import (
     CHAR_FILL,
     CHAR_MISSING,
@@ -1027,6 +1028,139 @@ def vcf_to_zarr(
             f"Some alternate alleles were dropped, since actual max value {max_alt_alleles_seen} exceeded max_alt_alleles setting of {max_alt_alleles}.",
             MaxAltAllelesExceededWarning,
         )
+
+
+def read_vcf(
+    input: Union[PathType, Sequence[PathType]],
+    *,
+    target_part_size: Union[None, int, str] = "auto",
+    regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]] = None,
+    chunk_length: int = 10_000,
+    chunk_width: int = 1_000,
+    compressor: Optional[Any] = DEFAULT_COMPRESSOR,
+    encoding: Optional[Any] = None,
+    temp_chunk_length: Optional[int] = None,
+    tempdir: Optional[PathType] = None,
+    tempdir_storage_options: Optional[Dict[str, str]] = None,
+    ploidy: int = 2,
+    mixed_ploidy: bool = False,
+    truncate_calls: bool = False,
+    max_alt_alleles: int = DEFAULT_MAX_ALT_ALLELES,
+    fields: Optional[Sequence[str]] = None,
+    exclude_fields: Optional[Sequence[str]] = None,
+    field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
+) -> xr.Dataset:
+    """Read VCF dataset.
+
+    A convenience for :func:`vcf_to_zarr` followed by :func:`sgkit.load_dataset`.
+    Note that the output Zarr store in ``tempdir`` is not deleted after this function
+    returns, so must be deleted manually by the user.
+
+    Refer to :func:`vcf_to_zarr` for details and limitations.
+
+    Parameters
+    ----------
+    input
+        A path (or paths) to the input BCF or VCF file (or files). VCF files should
+        be compressed and have a ``.tbi`` or ``.csi`` index file. BCF files should
+        have a ``.csi`` index file.
+    target_part_size
+        The desired size, in bytes, of each (compressed) part of the input to be
+        processed in parallel. Defaults to ``"auto"``, which will pick a good size
+        (currently 20MB). A value of None means that the input will be processed
+        sequentially. The setting will be ignored if ``regions`` is also specified.
+    regions
+        Genomic region or regions to extract variants for. For multiple inputs, multiple
+        input regions are specified as a sequence of values which may be None, or a
+        sequence of region strings. Takes priority over ``target_part_size`` if both
+        are not None.
+    chunk_length
+        Length (number of variants) of chunks in which data are stored, by default 10,000.
+    chunk_width
+        Width (number of samples) to use when storing chunks in output, by default 1,000.
+    compressor
+        Zarr compressor, by default Blosc + zstd with compression level 7 and auto-shuffle.
+        No compression is used when set as None.
+    encoding
+        Variable-specific encodings for xarray, specified as a nested dictionary with
+        variable names as keys and dictionaries of variable specific encodings as values.
+        Can be used to override Zarr compressor and filters on a per-variable basis,
+        e.g., ``{"call_genotype": {"compressor": Blosc("zstd", 9)}}``.
+    temp_chunk_length
+        Length (number of variants) of chunks for temporary intermediate files. Set this
+        to be smaller than ``chunk_length`` to avoid memory errors when loading files with
+        very large numbers of samples. Must be evenly divisible into ``chunk_length``.
+        Defaults to ``chunk_length`` if not set.
+    tempdir
+        Temporary directory where intermediate files are stored. The default None means
+        use the system default temporary directory.
+    tempdir_storage_options:
+        Any additional parameters for the storage backend for tempdir (see ``fsspec.open``).
+    ploidy
+        The (maximum) ploidy of genotypes in the VCF file.
+    mixed_ploidy
+        If True, genotype calls with fewer alleles than the specified ploidy will be padded
+        with the fill (non-allele) sentinel value of -2. If false, calls with fewer alleles than
+        the specified ploidy will be treated as incomplete and will be padded with the
+        missing-allele sentinel value of -1.
+    truncate_calls
+        If True, genotype calls with more alleles than the specified (maximum) ploidy value
+        will be truncated to size ploidy. If false, calls with more alleles than the
+        specified ploidy will raise an exception.
+    max_alt_alleles
+        The (maximum) number of alternate alleles in the VCF file. Any records with more than
+        this number of alternate alleles will have the extra alleles dropped (the `variant_allele`
+        variable will be truncated). Any call genotype fields with the extra alleles will
+        be changed to the missing-allele sentinel value of -1.
+    fields
+        Extra fields to extract data for. A list of strings, with ``INFO`` or ``FORMAT`` prefixes.
+        Wildcards are permitted too, for example: ``["INFO/*", "FORMAT/DP"]``.
+    field_defs
+        Per-field information that overrides the field definitions in the VCF header, or
+        provides extra information needed in the dataset representation. Definitions
+        are a represented as a dictionary whose keys are the field names, and values are
+        dictionaries with any of the following keys: ``Number``, ``Type``, ``Description``,
+        ``dimension``. The first three correspond to VCF header values, and ``dimension`` is
+        the name of the final dimension in the array for the case where ``Number`` is a fixed
+        integer larger than 1. For example,
+        ``{"INFO/AC": {"Number": "A"}, "FORMAT/HQ": {"dimension": "haplotypes"}}``
+        overrides the ``INFO/AC`` field to be Number ``A`` (useful if the VCF defines it as
+        having variable length with ``.``), and names the final dimension of the ``HQ`` array
+        (which is defined as Number 2 in the VCF header) as ``haplotypes``.
+        (Note that Number ``A`` is the number of alternate alleles, see section 1.4.2 of the
+        VCF spec https://samtools.github.io/hts-specs/VCFv4.3.pdf.)
+
+    """
+
+    # Need to retain zarr file backing the returned dataset
+    with temporary_directory(
+        prefix="read_vcf_",
+        suffix=".zarr",
+        dir=tempdir,
+        storage_options=tempdir_storage_options,
+        retain_temp_files=True,
+    ) as output:
+        vcf_to_zarr(
+            input,
+            output,
+            target_part_size=target_part_size,
+            regions=regions,
+            chunk_length=chunk_length,
+            chunk_width=chunk_width,
+            compressor=compressor,
+            encoding=encoding,
+            temp_chunk_length=temp_chunk_length,
+            tempdir=tempdir,
+            tempdir_storage_options=tempdir_storage_options,
+            ploidy=ploidy,
+            mixed_ploidy=mixed_ploidy,
+            truncate_calls=truncate_calls,
+            max_alt_alleles=max_alt_alleles,
+            fields=fields,
+            exclude_fields=exclude_fields,
+            field_defs=field_defs,
+        )
+        return load_dataset(output)
 
 
 def count_variants(path: PathType, region: Optional[str] = None) -> int:

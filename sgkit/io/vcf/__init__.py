@@ -6,6 +6,7 @@ try:
         FloatFormatFieldWarning,
         MaxAltAllelesExceededWarning,
         concat_zarrs,
+        read_vcf,
         vcf_to_zarr,
         vcf_to_zarrs,
     )
@@ -16,6 +17,7 @@ try:
         "MaxAltAllelesExceededWarning",
         "concat_zarrs",
         "partition_into_regions",
+        "read_vcf",
         "vcf_to_zarr",
         "vcf_to_zarrs",
         "write_vcf",

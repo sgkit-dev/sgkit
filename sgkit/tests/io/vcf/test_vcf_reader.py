@@ -16,6 +16,7 @@ from sgkit.io.utils import FLOAT32_FILL, INT_FILL, INT_MISSING
 from sgkit.io.vcf import (
     MaxAltAllelesExceededWarning,
     partition_into_regions,
+    read_vcf,
     vcf_to_zarr,
 )
 from sgkit.io.vcf.vcf_reader import FloatFormatFieldWarning, zarr_array_sizes
@@ -32,14 +33,25 @@ from .utils import path_for_test
     "is_path",
     [True, False],
 )
-def test_vcf_to_zarr__small_vcf(shared_datadir, is_path, read_chunk_length, tmp_path):
+@pytest.mark.parametrize("to_zarr", [True, False])
+@pytest.mark.filterwarnings("ignore::xarray.coding.variables.SerializationWarning")
+def test_vcf_to_zarr__small_vcf(
+    shared_datadir, is_path, read_chunk_length, tmp_path, to_zarr
+):
     path = path_for_test(shared_datadir, "sample.vcf.gz", is_path)
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
-    vcf_to_zarr(
-        path, output, chunk_length=5, chunk_width=2, read_chunk_length=read_chunk_length
-    )
-    ds = xr.open_zarr(output)
+    if to_zarr:
+        vcf_to_zarr(
+            path,
+            output,
+            chunk_length=5,
+            chunk_width=2,
+            read_chunk_length=read_chunk_length,
+        )
+        ds = xr.open_zarr(output)
+    else:
+        ds = read_vcf(path, chunk_length=5, chunk_width=2)
 
     assert ds.attrs["contigs"] == ["19", "20", "X"]
     assert "contig_lengths" not in ds.attrs
@@ -123,12 +135,11 @@ def test_vcf_to_zarr__small_vcf(shared_datadir, is_path, read_chunk_length, tmp_
     assert ds["call_genotype_mask"].chunks[2][0] == 2
 
     # save and load again to test https://github.com/pydata/xarray/issues/3476
-    with pytest.warns(xr.coding.variables.SerializationWarning):
-        path2 = tmp_path / "ds2.zarr"
-        if not is_path:
-            path2 = str(path2)
-        save_dataset(ds, path2)
-        assert_identical(ds, load_dataset(path2))
+    path2 = tmp_path / "ds2.zarr"
+    if not is_path:
+        path2 = str(path2)
+    save_dataset(ds, path2)
+    assert_identical(ds, load_dataset(path2))
 
 
 @pytest.mark.parametrize(
