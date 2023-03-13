@@ -1,3 +1,4 @@
+import warnings
 from typing import Any, Dict, Hashable, List, Optional
 
 import numpy as np
@@ -8,6 +9,7 @@ import sgkit as sg
 from .typing import ArrayLike
 from .utils import create_dataset
 
+DIM_CONTIG = "contigs"
 DIM_VARIANT = "variants"
 DIM_SAMPLE = "samples"
 DIM_PLOIDY = "ploidy"
@@ -61,6 +63,7 @@ def create_genotype_call_dataset(
     The dataset of genotype calls.
     """
     data_vars: Dict[Hashable, Any] = {
+        "contig_id": ([DIM_CONTIG], np.array(variant_contig_names, dtype=str)),
         "variant_contig": ([DIM_VARIANT], variant_contig),
         "variant_position": ([DIM_VARIANT], variant_position),
         "variant_allele": ([DIM_VARIANT, DIM_ALLELE], variant_allele),
@@ -139,6 +142,7 @@ def create_genotype_dosage_dataset(
 
     """
     data_vars: Dict[Hashable, Any] = {
+        "contig_id": ([DIM_CONTIG], np.array(variant_contig_names, dtype=str)),
         "variant_contig": ([DIM_VARIANT], variant_contig),
         "variant_position": ([DIM_VARIANT], variant_position),
         "variant_allele": ([DIM_VARIANT, DIM_ALLELE], variant_allele),
@@ -156,5 +160,40 @@ def create_genotype_dosage_dataset(
     }
     if variant_id is not None:
         data_vars["variant_id"] = ([DIM_VARIANT], variant_id)
-    attrs: Dict[Hashable, Any] = {"contigs": variant_contig_names}
+    attrs: Dict[Hashable, Any] = {
+        "contigs": variant_contig_names,
+        "source": f"sgkit-{sg.__version__}",
+    }
     return create_dataset(data_vars=data_vars, attrs=attrs)
+
+
+def num_contigs(ds: xr.Dataset) -> ArrayLike:
+    """Return the number of contigs in a dataset."""
+    if DIM_CONTIG in ds.dims:
+        return ds.dims[DIM_CONTIG]
+    else:
+        return len(ds.attrs["contigs"])
+
+
+def get_contigs(ds: xr.Dataset) -> ArrayLike:
+    """Return the contigs in a dataset."""
+    if "contig_id" in ds:
+        return ds["contig_id"].values
+    else:
+        warnings.warn(
+            "The 'contigs' VCF Zarr group attribute is deprecated and should be converted to a 'contig_id' array.",
+            DeprecationWarning,
+        )
+        return np.array(ds.attrs["contigs"], dtype="S")
+
+
+def get_filters(ds: xr.Dataset) -> ArrayLike:
+    """Return the filters in a dataset."""
+    if "filter_id" in ds:
+        return ds["filter_id"].values
+    else:
+        warnings.warn(
+            "The 'filters' VCF Zarr group attribute is deprecated and should be converted to a 'filter_id' array.",
+            DeprecationWarning,
+        )
+        return np.array(ds.attrs["filters"], dtype="S")

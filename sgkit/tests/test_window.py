@@ -295,7 +295,7 @@ def test_window_by_interval():
         ["variants"],
         np.array([1, 4, 6, 8, 12]),
     )
-    ds["interval_contig_name"] = (["intervals"], np.array([0, 0]))
+    ds["interval_contig_name"] = (["intervals"], np.array(["0", "0"]))
     ds["interval_start"] = (["intervals"], np.array([1, 7]))
     ds["interval_stop"] = (["intervals"], np.array([5, 10]))
     ds = window_by_interval(ds)
@@ -320,7 +320,7 @@ def test_window_by_interval__multiple_contigs():
         np.array([1, 4, 6, 8, 12, 1, 21, 25, 40, 55]),
     )
     assert not has_windows(ds)
-    ds["interval_contig_name"] = (["intervals"], np.array([0, 0, 1, 1]))
+    ds["interval_contig_name"] = (["intervals"], np.array(["0", "0", "1", "1"]))
     ds["interval_start"] = (["intervals"], np.array([1, 7, 2, 30]))
     ds["interval_stop"] = (["intervals"], np.array([5, 10, 22, 50]))
     ds = window_by_interval(ds)
@@ -337,7 +337,7 @@ def test_window_by_interval__bed(shared_datadir):
         ["variants"],
         np.array([1, 4, 6, 8, 12, 1, 21, 25, 40, 55]),
     )
-    ds.attrs["contigs"] = ["chr0", "chr1"]
+    ds["contig_id"] = (["contigs"], np.array(["chr0", "chr1"]))
 
     # load intervals from BED file
     bed = pd.read_csv(

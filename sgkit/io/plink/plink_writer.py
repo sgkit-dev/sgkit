@@ -6,6 +6,7 @@ from xarray import Dataset
 
 from sgkit import load_dataset
 from sgkit.accelerate import numba_guvectorize
+from sgkit.model import get_contigs
 from sgkit.typing import ArrayLike, PathType
 
 BED_READER_MISSING_INT_VALUE = -127
@@ -102,7 +103,7 @@ def write_plink(
     call_g = collapse_ploidy(ds.call_genotype.values)
 
     properties = {
-        "chromosome": np.take(ds.attrs["contigs"], ds.variant_contig.values),
+        "chromosome": np.take(get_contigs(ds), ds.variant_contig.values),
         "bp_position": ds.variant_position.values,
         "allele_1": ds.variant_allele.values[:, 0],
         "allele_2": ds.variant_allele.values[:, 1],

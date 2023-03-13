@@ -40,6 +40,7 @@ from sgkit.io.vcfzarr_reader import (
     vcf_number_to_dimension_and_size,
 )
 from sgkit.model import (
+    DIM_CONTIG,
     DIM_FILTER,
     DIM_PLOIDY,
     DIM_SAMPLE,
@@ -545,10 +546,12 @@ def vcf_to_zarr_sequential(
             ds["variant_quality"] = ([DIM_VARIANT], variant_quality)
             ds["variant_filter"] = ([DIM_VARIANT, DIM_FILTER], variant_filter)
             ds.attrs["filters"] = filters
-            ds.attrs["vcf_zarr_version"] = "0.1"
+            ds["filter_id"] = ([DIM_FILTER], np.array(filters, dtype="O"))
+            ds.attrs["vcf_zarr_version"] = "0.2"
             ds.attrs["vcf_header"] = vcf.raw_header
             try:
                 ds.attrs["contig_lengths"] = vcf.seqlens
+                ds["contig_length"] = ([DIM_CONTIG], np.array(vcf.seqlens))
             except AttributeError:
                 pass
 
