@@ -40,7 +40,7 @@ def test_read_scikit_allel_vcfzarr(shared_datadir, tmpdir):
     vcfzarr_path = create_vcfzarr(shared_datadir, tmpdir)
     ds = read_scikit_allel_vcfzarr(vcfzarr_path)
 
-    assert ds.attrs["contigs"] == ["19", "20", "X"]
+    assert_array_equal(ds["contig_id"], ["19", "20", "X"])
     assert_array_equal(ds["variant_contig"], [0, 0, 1, 1, 1, 1, 1, 1, 2])
     assert_array_equal(
         ds["variant_position"],
@@ -139,7 +139,7 @@ def test_vcfzarr_to_zarr(
     # Note that variant_allele values are byte strings, not unicode strings (unlike for read_scikit_allel_vcfzarr)
     # We should make the two consistent.
 
-    assert ds.attrs["contigs"] == ["19", "20", "X"]
+    assert_array_equal(ds["contig_id"], ["19", "20", "X"])
     assert_array_equal(ds["variant_contig"], [0, 0, 1, 1, 1, 1, 1, 1, 2])
     assert_array_equal(
         ds["variant_position"],

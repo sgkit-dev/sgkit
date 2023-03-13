@@ -78,6 +78,7 @@ def fix_missing_fields(ds: Dataset) -> Dataset:
     # drop variables and attributes that are not included in scikit-allel
     ds = ds.drop_vars("call_genotype_phased")
     ds = ds.drop_vars("variant_filter")
+    ds = ds.drop_vars("filter_id")
     del ds.attrs["filters"]
     del ds.attrs["max_alt_alleles_seen"]
     del ds.attrs["vcf_zarr_version"]
@@ -193,16 +194,22 @@ def test_all_fields(
 
     # scikit-allel only records contigs for which there are actual variants,
     # whereas sgkit records contigs from the header
-    allel_ds_contigs = set(allel_ds.attrs["contigs"])
-    sg_ds_contigs = set(sg_ds.attrs["contigs"])
+    allel_ds_contigs = set(allel_ds["contig_id"].values)
+    sg_ds_contigs = set(sg_ds["contig_id"].values)
     assert allel_ds_contigs <= sg_ds_contigs
     del allel_ds.attrs["contigs"]
     del sg_ds.attrs["contigs"]
     # scikit-allel doesn't store contig lengths
     if "contig_lengths" in sg_ds.attrs:
         del sg_ds.attrs["contig_lengths"]
+    if "contig_length" in sg_ds:
+        del sg_ds["contig_length"]
 
     if allel_ds_contigs < sg_ds_contigs:
+        # remove contig ids since they can differ (see comment above)
+        del allel_ds["contig_id"]
+        del sg_ds["contig_id"]
+
         # variant_contig variables are not comparable, so remove them before comparison
         del allel_ds["variant_contig"]
         del sg_ds["variant_contig"]

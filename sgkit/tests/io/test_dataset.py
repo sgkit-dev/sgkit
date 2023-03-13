@@ -51,7 +51,7 @@ def test_save_and_load_dataset__mutable_mapping():
 def test_save_unequal_chunks_error():
     # Make all dimensions the same size for ease of testing
     ds = simulate_genotype_call_dataset(
-        n_variant=10, n_sample=10, n_ploidy=10, n_allele=10
+        n_variant=10, n_sample=10, n_ploidy=10, n_allele=10, n_contig=10
     )
     # Normal zarr errors shouldn't be caught
     with pytest.raises(ValueError, match="path '' contains an array"):
@@ -77,7 +77,7 @@ def test_save_unequal_chunks_error():
 def test_save_auto_rechunk():
     # Make all dimensions the same size for ease of testing
     ds = simulate_genotype_call_dataset(
-        n_variant=10, n_sample=10, n_ploidy=10, n_allele=10
+        n_variant=10, n_sample=10, n_ploidy=10, n_allele=10, n_contig=10
     )
     # Make the dataset have unequal chunk sizes across all dimensions
     ds = ds.chunk({dim: (1, 3, 5, 1) for dim in ds.dims})

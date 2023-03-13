@@ -459,6 +459,15 @@ corresponding to the frequencies of non-missing occurrences of each allele.
     )
 )
 
+contig_id, contig_id_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "contig_id",
+        dims=("contigs",),
+        kind={"S", "U", "O"},
+        __doc__="""Contig identifiers.""",
+    )
+)
+
 covariates, covariates_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "covariates",

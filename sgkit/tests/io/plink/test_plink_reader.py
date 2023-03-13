@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 import xarray as xr
+from numpy.testing import assert_array_equal
 
 import sgkit as sg
 from sgkit.io.plink import read_plink
@@ -97,14 +98,14 @@ def test_read_slicing(ds1):
 def test_read_int_contig(ds1):
     # Test contig parse as int (the value is always "1" in .bed for ds1)
     assert np.all(ds1["variant_contig"].values == 1)
-    assert ds1.attrs["contigs"] == ["1"]
+    assert_array_equal(ds1["contig_id"], ["1"])
 
 
 @pytest.mark.parametrize("ds1", [dict(bim_int_contig=False)], indirect=True)
 def test_read_str_contig(ds1):
     # Test contig indexing as string (the value is always "1" in .bed for ds1)
     assert np.all(ds1["variant_contig"].values == 0)
-    assert ds1.attrs["contigs"] == ["1"]
+    assert_array_equal(ds1["contig_id"], ["1"])
 
 
 def test_read_call_values(ds1):
