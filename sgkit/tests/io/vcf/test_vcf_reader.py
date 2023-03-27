@@ -1,4 +1,7 @@
 import os
+import tempfile
+from os import listdir
+from os.path import join
 from typing import MutableMapping
 
 import numpy as np
@@ -41,10 +44,12 @@ def test_vcf_to_zarr__small_vcf(shared_datadir, is_path, read_chunk_length, tmp_
     assert ds.attrs["contigs"] == ["19", "20", "X"]
     assert "contig_lengths" not in ds.attrs
     assert_array_equal(ds["variant_contig"], [0, 0, 1, 1, 1, 1, 1, 1, 2])
+    assert ds["variant_contig"].chunks[0][0] == 5
     assert_array_equal(
         ds["variant_position"],
         [111, 112, 14370, 17330, 1110696, 1230237, 1234567, 1235237, 10],
     )
+    assert ds["variant_position"].chunks[0][0] == 5
     assert_array_equal(
         ds["variant_allele"].values.tolist(),
         [
@@ -59,18 +64,22 @@ def test_vcf_to_zarr__small_vcf(shared_datadir, is_path, read_chunk_length, tmp_
             ["AC", "A", "ATG", "C"],
         ],
     )
+    assert ds["variant_allele"].chunks[0][0] == 5
     assert ds["variant_allele"].dtype == "O"
     assert_array_equal(
         ds["variant_id"],
         [".", ".", "rs6054257", ".", "rs6040355", ".", "microsat1", ".", "rsTest"],
     )
+    assert ds["variant_id"].chunks[0][0] == 5
     assert ds["variant_id"].dtype == "O"
     assert_array_equal(
         ds["variant_id_mask"],
         [True, True, False, True, False, True, False, True, False],
     )
+    assert ds["variant_id_mask"].chunks[0][0] == 5
 
     assert_array_equal(ds["sample_id"], ["NA00001", "NA00002", "NA00003"])
+    assert ds["sample_id"].chunks[0][0] == 2
 
     call_genotype = np.array(
         [
@@ -101,8 +110,17 @@ def test_vcf_to_zarr__small_vcf(shared_datadir, is_path, read_chunk_length, tmp_
         dtype=bool,
     )
     assert_array_equal(ds["call_genotype"], call_genotype)
+    assert ds["call_genotype"].chunks[0][0] == 5
+    assert ds["call_genotype"].chunks[1][0] == 2
+    assert ds["call_genotype"].chunks[2][0] == 2
     assert_array_equal(ds["call_genotype_mask"], call_genotype < 0)
+    assert ds["call_genotype_mask"].chunks[0][0] == 5
+    assert ds["call_genotype_mask"].chunks[1][0] == 2
+    assert ds["call_genotype_mask"].chunks[2][0] == 2
     assert_array_equal(ds["call_genotype_phased"], call_genotype_phased)
+    assert ds["call_genotype_mask"].chunks[0][0] == 5
+    assert ds["call_genotype_mask"].chunks[1][0] == 2
+    assert ds["call_genotype_mask"].chunks[2][0] == 2
 
     # save and load again to test https://github.com/pydata/xarray/issues/3476
     with pytest.warns(xr.coding.variables.SerializationWarning):
@@ -406,13 +424,27 @@ def test_vcf_to_zarr__parallel_temp_chunk_length(shared_datadir, is_path, tmp_pa
     regions = ["20", "21"]
 
     # Use a temp_chunk_length that is smaller than chunk_length
-    vcf_to_zarr(
-        path, output, regions=regions, chunk_length=5_000, temp_chunk_length=2_500
-    )
+    # Open the temporary parts to check that they have the right temp chunk length
+    with tempfile.TemporaryDirectory() as tempdir:
+        vcf_to_zarr(
+            path,
+            output,
+            regions=regions,
+            chunk_length=5_000,
+            temp_chunk_length=2_500,
+            tempdir=tempdir,
+            retain_temp_files=True,
+        )
+        inner_temp_dir = join(tempdir, listdir(tempdir)[0])
+        parts_dir = join(inner_temp_dir, listdir(inner_temp_dir)[0])
+        part = xr.open_zarr(join(parts_dir, "part-0.zarr"))
+        assert part["call_genotype"].chunks[0][0] == 2_500
+        assert part["variant_position"].chunks[0][0] == 2_500
     ds = xr.open_zarr(output)
 
     assert ds["sample_id"].shape == (1,)
     assert ds["call_genotype"].shape == (19910, 1, 2)
+    assert ds["call_genotype"].chunks[0][0] == 5_000
     assert ds["call_genotype_mask"].shape == (19910, 1, 2)
     assert ds["call_genotype_phased"].shape == (19910, 1)
     assert ds["variant_allele"].shape == (19910, 4)
@@ -420,6 +452,7 @@ def test_vcf_to_zarr__parallel_temp_chunk_length(shared_datadir, is_path, tmp_pa
     assert ds["variant_id"].shape == (19910,)
     assert ds["variant_id_mask"].shape == (19910,)
     assert ds["variant_position"].shape == (19910,)
+    assert ds["variant_position"].chunks[0][0] == 5_000
 
     assert ds["variant_allele"].dtype == "O"
     assert ds["variant_id"].dtype == "O"
