@@ -324,6 +324,7 @@ def concat_zarrs_optimized(
     vars_to_rechunk: List[Hashable],
     vars_to_copy: List[Hashable],
     fix_strings: bool = False,
+    chunk_length: Optional[int] = None,
 ) -> None:
     if isinstance(output, Path):
         output = str(output)
@@ -344,8 +345,13 @@ def concat_zarrs_optimized(
         if fix_strings and var in {"variant_id", "variant_allele"}:
             max_len = _get_max_len(zarr_groups, f"max_length_{var}")
             dtype = f"S{max_len}"
+        assert first_zarr_group[var].attrs["_ARRAY_DIMENSIONS"][0] == "variants"
+        target_chunks = None
+        if chunk_length is not None:
+            target_chunks = list(first_zarr_group[var].chunks)
+            target_chunks[0] = chunk_length
         arr = concatenate_and_rechunk(
-            [group[var] for group in zarr_groups], dtype=dtype
+            [group[var] for group in zarr_groups], dtype=dtype, chunks=target_chunks
         )
 
         _to_zarr_kwargs = dict(

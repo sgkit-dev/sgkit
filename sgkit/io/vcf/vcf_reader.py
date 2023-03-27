@@ -650,6 +650,7 @@ def vcf_to_zarr_parallel(
             paths,
             output,
             storage_options=tempdir_storage_options,
+            chunk_length=chunk_length,
         )
 
 
@@ -736,11 +737,12 @@ def vcf_to_zarrs(
         Length (number of variants) of chunks to read from the VCF file at a time. Use this
         option to reduce memory usage by using a value lower than ``chunk_length`` with a small
         cost in extra run time. The increase in runtime becomes higher as the ratio of
-        ``read_chunk_length`` to  Defaults to ``None``, which means that a value equal
-        to ``chunk_length`` is used. The memory usage of the conversion process is
-        proportional to ``read_chunk_length*n_samples*(1+n_ploidy)`` so this option is
-        mainly useful for very large numbers of samples and/or where a large ``chunk_size``
-        is desirable to reduce the number of dask tasks needed in downstream analysis.
+        ``read_chunk_length`` to ``chunk_length`` decreases. Defaults to ``None``, which
+        means that a value equal to ``chunk_length`` is used. The memory usage of the
+        conversion process is proportional to ``read_chunk_length*n_samples*(1+n_ploidy)``
+        so this option is mainly useful for very large numbers of samples and/or where a
+        large ``chunk_size`` is desirable to reduce the number of dask tasks needed in
+        downstream analysis.
 
     Returns
     -------
@@ -807,6 +809,7 @@ def concat_zarrs(
     output: Union[PathType, MutableMapping[str, bytes]],
     *,
     storage_options: Optional[Dict[str, str]] = None,
+    chunk_length: Optional[int] = None,
 ) -> None:
     """Concatenate multiple Zarr stores into a single Zarr store.
 
@@ -821,6 +824,9 @@ def concat_zarrs(
         Zarr store or path to directory in file system.
     storage_options
         Any additional parameters for the storage backend (see ``fsspec.open``).
+    chunk_length
+       The length of the variant dimension chunks in the output Zarr store. If not specified,
+       the chunk length of the first input Zarr store is used.
     """
 
     vars_to_rechunk = []
@@ -835,7 +841,9 @@ def concat_zarrs(
         else:
             vars_to_copy.append(var)
 
-    concat_zarrs_optimized(urls, output, vars_to_rechunk, vars_to_copy)
+    concat_zarrs_optimized(
+        urls, output, vars_to_rechunk, vars_to_copy, chunk_length=chunk_length
+    )
 
 
 def vcf_to_zarr(
