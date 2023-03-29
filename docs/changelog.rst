@@ -35,12 +35,15 @@ New Features
 - Add :func:`sgkit.io.vcf.read_vcf` convenience function.
   (:user:`tomwhite`, :pr:`1052`, :issue:`1004`)
 
-- Add :func:`sgkit.hybrid_relationship`, :func:`sgkit.hybrid_inverse_relationship` 
+- Add :func:`sgkit.hybrid_relationship`, :func:`sgkit.hybrid_inverse_relationship`
   and :func:`invert_relationship_matrix` methods.
   (:user:`timothymillar`, :pr:`1053`, :issue:`993`)
 
 - Add :func:`sgkit.io.vcf.zarr_array_sizes` for determining array sizes for storage in Zarr.
   (:user:`tomwhite`, :pr:`1073`, :issue:`734`)
+
+- Add `additional_variant_fields` to :func:`sgkit.simulate_genotype_call_dataset` function.
+  (:user:`benjeffery`, :pr:`1056`)
 
 Bug fixes
 ~~~~~~~~~
