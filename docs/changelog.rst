@@ -35,6 +35,10 @@ New Features
 - Add :func:`sgkit.io.vcf.read_vcf` convenience function.
   (:user:`tomwhite`, :pr:`1052`, :issue:`1004`)
 
+- Add :func:`sgkit.hybrid_relationship`, :func:`sgkit.hybrid_inverse_relationship` 
+  and :func:`invert_relationship_matrix` methods.
+  (:user:`timothymillar`, :pr:`1053`, :issue:`993`)
+
 Bug fixes
 ~~~~~~~~~
 
