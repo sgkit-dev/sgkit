@@ -62,9 +62,10 @@ def write_vcf(
 
     Warnings
     --------
-    This function requires the dataset to have a ``vcf_header`` attribute
-    containing the VCF header. VCF files converted to Zarr using :func:`vcf_to_zarr`
-    will contain this attribute, but datasets loaded from other sources will not.
+    This function requires the dataset to have the ``vcf_header`` and ``filters``
+    attributes containing the VCF header and filters. VCF files converted to Zarr using
+    :func:`vcf_to_zarr` will contain these attributes, but datasets loaded from other
+    sources may not.
 
     Parameters
     ----------
