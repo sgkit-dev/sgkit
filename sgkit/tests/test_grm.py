@@ -7,7 +7,12 @@ import pytest
 import xarray as xr
 
 import sgkit as sg
-from sgkit import genomic_relationship, hybrid_inverse_relationship, hybrid_relationship
+from sgkit import (
+    genomic_relationship,
+    hybrid_inverse_relationship,
+    hybrid_relationship,
+    invert_relationship_matrix,
+)
 
 
 @pytest.mark.parametrize(
@@ -176,6 +181,92 @@ def test_genomic_relationship__raise_on_ancestral_frequency_missing():
         genomic_relationship(ds, ploidy=2)
 
 
+def test_invert_relationship_matrix__full():
+    ds = xr.Dataset()
+    ds["relationship"] = ["samples_0", "samples_1"], [
+        [1.0, 0.0, 0.0, 0.5, 0.0, 0.25],
+        [0.0, 1.0, 0.0, 0.5, 0.5, 0.5],
+        [0.0, 0.0, 1.0, 0.0, 0.5, 0.25],
+        [0.5, 0.5, 0.0, 1.0, 0.25, 0.625],
+        [0.0, 0.5, 0.5, 0.25, 1.0, 0.625],
+        [0.25, 0.5, 0.25, 0.625, 0.625, 1.125],
+    ]
+    expect = np.linalg.inv(ds.relationship.values)
+    actual = invert_relationship_matrix(
+        ds,
+        relationship="relationship",
+    ).stat_inverse_relationship.values
+    np.testing.assert_array_almost_equal(expect, actual)
+
+
+@pytest.mark.parametrize(
+    "subset",
+    [
+        [False, False, False, True, True, True],
+        [True, True, False, False, True, True],
+        [True, False, True, False, True, False],
+    ],
+)
+def test_invert_relationship_matrix__subset(subset):
+    ds = xr.Dataset()
+    ds["relationship"] = ["samples_0", "samples_1"], [
+        [1.0, 0.0, 0.0, 0.5, 0.0, 0.25],
+        [0.0, 1.0, 0.0, 0.5, 0.5, 0.5],
+        [0.0, 0.0, 1.0, 0.0, 0.5, 0.25],
+        [0.5, 0.5, 0.0, 1.0, 0.25, 0.625],
+        [0.0, 0.5, 0.5, 0.25, 1.0, 0.625],
+        [0.25, 0.5, 0.25, 0.625, 0.625, 1.125],
+    ]
+    ds["subset"] = "samples", subset
+    idx = np.ix_(subset, subset)
+    expect = np.full((6, 6), np.nan)
+    expect[idx] = np.linalg.inv(ds.relationship.values[idx])
+    actual = invert_relationship_matrix(
+        ds,
+        relationship="relationship",
+        subset_sample="subset",
+    ).stat_inverse_relationship
+    np.testing.assert_array_almost_equal(expect, actual)
+
+
+def test_invert_relationship_matrix__subset_rechunk():
+    ds = xr.Dataset()
+    ds["relationship"] = ["samples_0", "samples_1"], [
+        [1.0, 0.0, 0.0, 0.5, 0.0, 0.25],
+        [0.0, 1.0, 0.0, 0.5, 0.5, 0.5],
+        [0.0, 0.0, 1.0, 0.0, 0.5, 0.25],
+        [0.5, 0.5, 0.0, 1.0, 0.25, 0.625],
+        [0.0, 0.5, 0.5, 0.25, 1.0, 0.625],
+        [0.25, 0.5, 0.25, 0.625, 0.625, 1.125],
+    ]
+    ds["subset"] = "samples", [False, False, True, True, True, True]
+    idx = np.ix_(ds.subset.values, ds.subset.values)
+    expect = np.full((6, 6), np.nan)
+    expect[idx] = np.linalg.inv(ds.relationship.values[idx])
+    ds = ds.chunk(dict(samples_0=3, samples_1=3))
+    # raises due to non-square chunks of subset
+    with pytest.raises(
+        ValueError,
+        match=(
+            "All chunks must be a square matrix to perform lu decomposition. "
+            "Use .rechunk method to change the size of chunks."
+        ),
+    ):
+        actual = invert_relationship_matrix(
+            ds,
+            relationship="relationship",
+            subset_sample="subset",
+        ).stat_inverse_relationship
+    # use subset_rechunk option to rechunk the sub-matrix
+    actual = invert_relationship_matrix(
+        ds,
+        relationship="relationship",
+        subset_sample="subset",
+        subset_rechunk=2,
+    ).stat_inverse_relationship
+    np.testing.assert_array_almost_equal(expect, actual)
+
+
 def test_hybrid_relationship__raise_on_unknown_estimator():
     ds = xr.Dataset()
     ds["pedigree_relationship"] = ["samples_0", "samples_1"], [
@@ -193,12 +284,13 @@ def test_hybrid_relationship__raise_on_unknown_estimator():
             ds,
             pedigree_relationship="pedigree_relationship",
             genomic_relationship="genomic_relationship",
-            genomic_sample_index="genomic_sample_index",
+            genomic_sample="genomic_sample_index",
             estimator="unknown",
         )
 
 
-def test_hybrid_relationship__raise_on_no_indices():
+@pytest.mark.filterwarnings("ignore::UserWarning")
+def test_hybrid_relationship__raise_on_dims():
     ds = xr.Dataset()
     ds["pedigree_relationship"] = ["samples_0", "samples_1"], [
         [1.0, 0.0, 0.0],
@@ -206,11 +298,11 @@ def test_hybrid_relationship__raise_on_no_indices():
         [0.0, 0.0, 1.0],
     ]
     ds["genomic_relationship"] = ["genotypes_0", "genotypes_1"], [
-        [1.0, 0.0],
-        [0.0, 1.0],
+        [1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 0.0, 1.0],
     ]
-    message = "The genomic and pedigree matrices must share dimensions if genomic_sample_index is not defined"
-    with pytest.raises(ValueError, match=message):
+    with pytest.raises(ValueError, match="Matrices must share dimensions"):
         sg.hybrid_relationship(
             ds,
             pedigree_relationship="pedigree_relationship",
@@ -218,53 +310,30 @@ def test_hybrid_relationship__raise_on_no_indices():
         )
 
 
-def test_hybrid_relationship__raise_on_large_grm():
-    ds = xr.Dataset()
-    ds["pedigree_relationship"] = ["samples_0", "samples_1"], [
-        [1.0, 0.0],
-        [0.0, 1.0],
-    ]
-    ds["genomic_relationship"] = ["genotypes_0", "genotypes_1"], [
-        [1.0, 0.0, 0.0],
-        [0.0, 1.0, 0.0],
-        [0.0, 0.0, 1.0],
-    ]
-    ds["genomic_sample_index"] = "genotypes", [1, 2]
-    with pytest.raises(
-        ValueError, match="The genomic matrix cannot be larger than the pedigree matrix"
-    ):
-        sg.hybrid_relationship(
-            ds,
-            pedigree_relationship="pedigree_relationship",
-            genomic_relationship="genomic_relationship",
-            genomic_sample_index="genomic_sample_index",
-        )
-
-
-def test_hybrid_relationship__raise_on_subset_non_matching_dims():
+@pytest.mark.filterwarnings("ignore::UserWarning")
+def test_hybrid_relationship__raise_on_A22_dims():
     ds = xr.Dataset()
     ds["pedigree_relationship"] = ["samples_0", "samples_1"], [
         [1.0, 0.0, 0.0],
         [0.0, 1.0, 0.0],
         [0.0, 0.0, 1.0],
     ]
-    ds["genomic_relationship"] = ["genotypes_0", "genotypes_1"], [
-        [1.0, 0.0],
-        [0.0, 1.0],
+    ds["genomic_relationship"] = ["samples_0", "samples_1"], [
+        [1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 0.0, 1.0],
     ]
-    ds["pedigree_subset_inverse"] = ["others_0", "others_1"], [
-        [1.0, 0.0],
-        [0.0, 1.0],
+    ds["pedigree_sub_inverse"] = ["genotypes_0", "genotypes_1"], [
+        [1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 0.0, 1.0],
     ]
-    ds["genomic_sample_index"] = "genotypes", [1, 2]
-    message = "The dimensions of pedigree subset must match those of the genomic matrix"
-    with pytest.raises(ValueError, match=message):
+    with pytest.raises(ValueError, match="Matrices must share dimensions"):
         sg.hybrid_relationship(
             ds,
             pedigree_relationship="pedigree_relationship",
-            pedigree_subset_inverse_relationship="pedigree_subset_inverse",
             genomic_relationship="genomic_relationship",
-            genomic_sample_index="genomic_sample_index",
+            pedigree_subset_inverse_relationship="pedigree_sub_inverse",
         )
 
 
@@ -275,27 +344,28 @@ def test_hybrid_inverse_relationship__raise_on_unknown_estimator():
         [0.0, 1.0, 0.0],
         [0.0, 0.0, 1.0],
     ]
-    ds["genomic_inverse_relationship"] = ["genotypes_0", "genotypes_1"], [
-        [1.0, 0.0],
-        [0.0, 1.0],
+    ds["genomic_inverse_relationship"] = ["samples_0", "samples_1"], [
+        [1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 0.0, 1.0],
     ]
-    ds["pedigree_subset_inverse"] = ["genotypes_0", "genotypes_0"], [
-        [1.0, 0.0],
-        [0.0, 1.0],
+    ds["pedigree_subset_inverse"] = ["samples_0", "samples_1"], [
+        [1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 0.0, 1.0],
     ]
-    ds["genomic_sample_index"] = "genotypes", [1, 2]
     with pytest.raises(ValueError, match="Unknown estimator 'unknown'"):
         sg.hybrid_inverse_relationship(
             ds,
             pedigree_inverse_relationship="pedigree_inverse_relationship",
             pedigree_subset_inverse_relationship="pedigree_subset_inverse",
             genomic_inverse_relationship="genomic_inverse_relationship",
-            genomic_sample_index="genomic_sample_index",
             estimator="unknown",
         )
 
 
-def test_hybrid_inverse_relationship__raise_on_no_indices():
+@pytest.mark.filterwarnings("ignore::UserWarning")
+def test_hybrid_inverse_relationship__raise_on_dims():
     ds = xr.Dataset()
     ds["pedigree_inverse_relationship"] = ["samples_0", "samples_1"], [
         [1.0, 0.0, 0.0],
@@ -303,15 +373,16 @@ def test_hybrid_inverse_relationship__raise_on_no_indices():
         [0.0, 0.0, 1.0],
     ]
     ds["genomic_inverse_relationship"] = ["genotypes_0", "genotypes_1"], [
-        [1.0, 0.0],
-        [0.0, 1.0],
+        [1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 0.0, 1.0],
     ]
-    ds["pedigree_subset_inverse"] = ["genotypes_0", "genotypes_0"], [
-        [1.0, 0.0],
-        [0.0, 1.0],
+    ds["pedigree_subset_inverse"] = ["samples_0", "samples_1"], [
+        [1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 0.0, 1.0],
     ]
-    message = "The genomic and pedigree matrices must share dimensions if genomic_sample_index is not defined"
-    with pytest.raises(ValueError, match=message):
+    with pytest.raises(ValueError, match="Matrices must share dimensions"):
         sg.hybrid_inverse_relationship(
             ds,
             pedigree_inverse_relationship="pedigree_inverse_relationship",
@@ -320,59 +391,32 @@ def test_hybrid_inverse_relationship__raise_on_no_indices():
         )
 
 
-def test_hybrid_inverse_relationship__raise_on_large_grm():
+@pytest.mark.filterwarnings("ignore::UserWarning")
+def test_hybrid_inverse_relationship__raise_on_A22_dims():
     ds = xr.Dataset()
     ds["pedigree_inverse_relationship"] = ["samples_0", "samples_1"], [
-        [1.0, 0.0],
-        [0.0, 1.0],
-    ]
-    ds["genomic_inverse_relationship"] = ["genotypes_0", "genotypes_1"], [
         [1.0, 0.0, 0.0],
         [0.0, 1.0, 0.0],
         [0.0, 0.0, 1.0],
+    ]
+    ds["genomic_inverse_relationship"] = ["samples_0", "samples_1"], [
+        [1.0, 0.0, np.nan],
+        [0.0, 1.0, np.nan],
+        [np.nan, np.nan, np.nan],
     ]
     ds["pedigree_subset_inverse"] = ["genotypes_0", "genotypes_1"], [
-        [1.0, 0.0, 0.0],
-        [0.0, 1.0, 0.0],
-        [0.0, 0.0, 1.0],
+        [1.0, 0.0, np.nan],
+        [0.0, 1.0, np.nan],
+        [np.nan, np.nan, np.nan],
     ]
-    ds["genomic_sample_index"] = "genotypes", [1, 2]
-    with pytest.raises(
-        ValueError, match="The genomic matrix cannot be larger than the pedigree matrix"
-    ):
+    ds["genomic_sample"] = "sample", [True, True, False]
+    with pytest.raises(ValueError, match="Matrices must share dimensions"):
         sg.hybrid_inverse_relationship(
             ds,
             pedigree_inverse_relationship="pedigree_inverse_relationship",
             pedigree_subset_inverse_relationship="pedigree_subset_inverse",
             genomic_inverse_relationship="genomic_inverse_relationship",
-            genomic_sample_index="genomic_sample_index",
-        )
-
-
-def test_hybrid_inverse_relationship__raise_on_subset_non_matching_dims():
-    ds = xr.Dataset()
-    ds["pedigree_inverse_relationship"] = ["samples_0", "samples_1"], [
-        [1.0, 0.0, 0.0],
-        [0.0, 1.0, 0.0],
-        [0.0, 0.0, 1.0],
-    ]
-    ds["genomic_inverse_relationship"] = ["genotypes_0", "genotypes_1"], [
-        [1.0, 0.0],
-        [0.0, 1.0],
-    ]
-    ds["pedigree_subset_inverse"] = ["others_0", "others_1"], [
-        [1.0, 0.0],
-        [0.0, 1.0],
-    ]
-    ds["genomic_sample_index"] = "genotypes", [1, 2]
-    message = "The dimensions of pedigree subset must match those of the genomic matrix"
-    with pytest.raises(ValueError, match=message):
-        sg.hybrid_inverse_relationship(
-            ds,
-            pedigree_inverse_relationship="pedigree_inverse_relationship",
-            pedigree_subset_inverse_relationship="pedigree_subset_inverse",
-            genomic_inverse_relationship="genomic_inverse_relationship",
-            genomic_sample_index="genomic_sample_index",
+            genomic_sample="genomic_sample",
         )
 
 
@@ -382,90 +426,35 @@ def load_Legarra2009_example():
     grm = np.loadtxt(path / "test_grm/Legara2009_G_matrix.txt")
     ped = np.loadtxt(path / "test_grm/Legara2009_pedigree.txt").astype(int)
     ds = xr.Dataset()
-    ds["hybrid_relationship"] = ["samples_0", "samples_1"], hrm
-    ds["genomic_relationship"] = ["genotypes_0", "genotypes_1"], grm
-    ds["genomic_inverse_relationship"] = [
-        "genotypes_0",
-        "genotypes_1",
-    ], np.linalg.inv(grm)
-    ds["genomic_sample_index"] = "genotypes", np.arange(8, 12)
     ds["parent"] = ["samples", "parents"], ped
+    ds["hybrid_relationship"] = ["samples_0", "samples_1"], hrm
+    grm_pad = np.full_like(hrm, np.nan)
+    grm_pad[8:12, 8:12] = grm
+    ds["genomic_relationship"] = ["samples_0", "samples_1"], grm_pad
+    grm_inv = np.full_like(hrm, np.nan)
+    grm_inv[8:12, 8:12] = np.linalg.inv(grm)
+    ds["genomic_inverse_relationship"] = ["samples_0", "samples_1"], grm_inv
+    idx = np.zeros(len(hrm), bool)
+    idx[8:12] = True
+    ds["genomic_sample"] = "samples", idx
     return ds
 
 
 @pytest.mark.parametrize("samples_chunks", [None, 10])
-@pytest.mark.parametrize("genotypes_chunks", [None, 2])
 @pytest.mark.parametrize("grm_position", ["default", "first", "last", "mixed"])
-def test_hybrid_relationship__Legarra(grm_position, genotypes_chunks, samples_chunks):
+def test_hybrid_relationship__Legarra(grm_position, samples_chunks):
     # simulate example from Legarra et al 2009
     ds = load_Legarra2009_example()
     ds = sg.pedigree_kinship(ds, return_relationship=True)
     if grm_position == "first":
         # sort so GRM samples are first
-        idx = [
-            8,
-            9,
-            10,
-            11,
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            12,
-            13,
-            14,
-            15,
-            16,
-        ]
-        ds["genomic_sample_index"] = "genotypes", [0, 1, 2, 3]
+        idx = [8, 9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15, 16]
     elif grm_position == "last":
         # sort so GRM samples are last
-        idx = [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            12,
-            13,
-            14,
-            15,
-            16,
-            8,
-            9,
-            10,
-            11,
-        ]
-        ds["genomic_sample_index"] = "genotypes", [13, 14, 15, 16]
+        idx = [0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15, 16, 8, 9, 10, 11]
     elif grm_position == "mixed":
         # place GRM samples throughout ARM
-        idx = [
-            0,
-            1,
-            11,
-            2,
-            3,
-            4,
-            5,
-            8,
-            6,
-            7,
-            12,
-            10,
-            13,
-            14,
-            15,
-            9,
-            16,
-        ]
-        ds["genomic_sample_index"] = "genotypes", [7, 15, 11, 2]  # [8, 9, 10, 11]
+        idx = [0, 1, 11, 2, 3, 4, 5, 8, 6, 7, 12, 10, 13, 14, 15, 9, 16]
     else:
         # used default order
         idx = ds.samples.values
@@ -476,41 +465,33 @@ def test_hybrid_relationship__Legarra(grm_position, genotypes_chunks, samples_ch
             samples_1=idx,
         )
     )
-    chunks = {}
     if samples_chunks:
+        chunks = {}
         for dim in ["samples_0", "samples_1"]:
             chunks[dim] = samples_chunks
-    if genotypes_chunks:
-        for dim in ["genotypes_0", "genotypes_1"]:
-            chunks[dim] = genotypes_chunks
-    if len(chunks):
         ds = ds.chunk(chunks)
     expect = ds.hybrid_relationship.values
-
-    # check if inversion of A22 will raise an error due to uneven chunking
-    A = ds["stat_pedigree_relationship"].data
-    idx = ds["genomic_sample_index"].values
-    A22 = A[idx, :][:, idx]
-    chunks = A22.chunks[0]
-    if all(chunks[0] == i for i in chunks):
-        # chunks are square so automatic inversion will work
-        ds = hybrid_relationship(
-            ds,
-            genomic_relationship="genomic_relationship",
-            genomic_sample_index="genomic_sample_index",
-            pedigree_relationship="stat_pedigree_relationship",
-        )
-    else:
-        # chunks are not square so we provide a manually inverted chunk
-        ds["A22inv"] = ["genotypes_0", "genotypes_1"], np.linalg.inv(A22.compute())
-        ds = hybrid_relationship(
-            ds,
-            genomic_relationship="genomic_relationship",
-            genomic_sample_index="genomic_sample_index",
-            pedigree_relationship="stat_pedigree_relationship",
-            pedigree_subset_inverse_relationship="A22inv",
-        )
-    actual = ds.stat_hybrid_relationship.data.compute()
+    # automatic inversion of A22
+    actual = hybrid_relationship(
+        ds,
+        genomic_relationship="genomic_relationship",
+        pedigree_relationship="stat_pedigree_relationship",
+        genomic_sample="genomic_sample",
+    ).stat_hybrid_relationship.data.compute()
+    np.testing.assert_array_almost_equal(actual, expect, 2)
+    # manual inversion of A22
+    ds["subset_inverse_relationship"] = invert_relationship_matrix(
+        ds,
+        relationship="stat_pedigree_relationship",
+        subset_sample="genomic_sample",
+    ).stat_inverse_relationship
+    actual = hybrid_relationship(
+        ds,
+        genomic_relationship="genomic_relationship",
+        pedigree_relationship="stat_pedigree_relationship",
+        pedigree_subset_inverse_relationship="subset_inverse_relationship",
+        genomic_sample="genomic_sample",
+    ).stat_hybrid_relationship.data.compute()
     np.testing.assert_array_almost_equal(actual, expect, 2)
 
 
@@ -524,72 +505,20 @@ def test_hybrid_inverse_relationship__Legarra(
     ds = load_Legarra2009_example()
     ds = sg.pedigree_kinship(ds, return_relationship=True)
     ds = sg.pedigree_inverse_kinship(ds, return_relationship=True)
+    ds["pedigree_subset_inverse_relationship"] = sg.invert_relationship_matrix(
+        ds,
+        relationship="stat_pedigree_relationship",
+        subset_sample="genomic_sample",
+    ).stat_inverse_relationship
     if grm_position == "first":
         # sort so GRM samples are first
-        idx = [
-            8,
-            9,
-            10,
-            11,
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            12,
-            13,
-            14,
-            15,
-            16,
-        ]
-        ds["genomic_sample_index"] = "genotypes", [0, 1, 2, 3]
+        idx = [8, 9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15, 16]
     elif grm_position == "last":
         # sort so GRM samples are last
-        idx = [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            12,
-            13,
-            14,
-            15,
-            16,
-            8,
-            9,
-            10,
-            11,
-        ]
-        ds["genomic_sample_index"] = "genotypes", [13, 14, 15, 16]
+        idx = [0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15, 16, 8, 9, 10, 11]
     elif grm_position == "mixed":
         # place GRM samples throughout ARM
-        idx = [
-            0,
-            1,
-            11,
-            2,
-            3,
-            4,
-            5,
-            8,
-            6,
-            7,
-            12,
-            10,
-            13,
-            14,
-            15,
-            9,
-            16,
-        ]
-        ds["genomic_sample_index"] = "genotypes", [7, 15, 11, 2]  # [8, 9, 10, 11]
+        idx = [0, 1, 11, 2, 3, 4, 5, 8, 6, 7, 12, 10, 13, 14, 15, 9, 16]
     else:
         # used default order
         idx = ds.samples.values
@@ -600,19 +529,10 @@ def test_hybrid_inverse_relationship__Legarra(
             samples_1=idx,
         )
     )
-    idx = ds.genomic_sample_index.values
-    A22inv = np.linalg.inv(ds.stat_pedigree_relationship.values[idx, :][:, idx])
-    ds[
-        "pedigree_subset_inverse_relationship"
-    ] = ds.genomic_inverse_relationship.dims, da.array(A22inv)
-    chunks = {}
     if samples_chunks:
+        chunks = {}
         for dim in ["samples_0", "samples_1"]:
             chunks[dim] = samples_chunks
-    if genotypes_chunks:
-        for dim in ["genotypes_0", "genotypes_1"]:
-            chunks[dim] = genotypes_chunks
-    if len(chunks):
         ds = ds.chunk(chunks)
     expect = ds.hybrid_relationship.values
     ds = hybrid_inverse_relationship(
@@ -620,7 +540,7 @@ def test_hybrid_inverse_relationship__Legarra(
         genomic_inverse_relationship="genomic_inverse_relationship",
         pedigree_inverse_relationship="stat_pedigree_inverse_relationship",
         pedigree_subset_inverse_relationship="pedigree_subset_inverse_relationship",
-        genomic_sample_index="genomic_sample_index",
+        genomic_sample="genomic_sample",
     )
     actual = np.linalg.inv(ds.stat_hybrid_inverse_relationship.data.compute())
     np.testing.assert_array_almost_equal(actual, expect, 2)
@@ -636,6 +556,20 @@ def test_hybrid_relationship__sub_matrix_roundtrip(n_samples, n_genotypes, tau, 
     gen["call_dosage"] = gen.call_genotype.sum(dim="ploidy")
     gen["ancestral_frequency"] = gen["call_dosage"].mean(dim="samples") / 2
     gen = sg.genomic_relationship(gen, ancestral_frequency="ancestral_frequency")
+    sample_index = np.random.choice(
+        np.arange(n_samples), size=n_genotypes, replace=False
+    )
+    genomic_samples = np.zeros(n_samples, bool)
+    genomic_samples[sample_index] = True
+    sample_name = ["S{}".format(i) for i in sample_index]
+    gen = gen.assign_coords(
+        dict(
+            samples=sample_name,
+            samples_0=sample_name,
+            samples_1=sample_name,
+        )
+    )
+    gen = gen.compute()
 
     # pedigree dataset
     ds = xr.Dataset()
@@ -648,31 +582,36 @@ def test_hybrid_relationship__sub_matrix_roundtrip(n_samples, n_genotypes, tau, 
     ds = sg.pedigree_inverse_kinship(
         ds, return_relationship=True, allow_half_founders=True
     )
+    samples = ["S{}".format(i) for i in range(n_samples)]
+    ds = ds.assign_coords(
+        dict(
+            samples=samples,
+            samples_0=samples,
+            samples_1=samples,
+        )
+    )
 
     # merge in genomic matrices
-    G = gen.stat_genomic_relationship.data.round(3)
-    genomic_samples = np.random.choice(
-        np.arange(n_samples), size=n_genotypes, replace=False
-    )
-    ds["genomic_samples"] = "genotypes", genomic_samples
-    ds["stat_genomic_relationship"] = ["genotypes_0", "genotypes_1"], G
-    ds["stat_genomic_inverse_relationship"] = [
-        "genotypes_0",
-        "genotypes_1",
-    ], da.linalg.inv(G)
+    ds = ds.merge(gen.stat_genomic_relationship.round(3), join="left")
+    ds["genomic_samples"] = "samples", genomic_samples
 
-    # identify subset of pedigree matrix and invert
-    A22 = ds.stat_pedigree_relationship[genomic_samples, genomic_samples].data
-    ds["stat_pedigree_subset_inverse_relationship"] = [
-        "genotypes_0",
-        "genotypes_1",
-    ], da.linalg.inv(A22)
+    # inverse matrices
+    ds["stat_genomic_inverse_relationship"] = sg.invert_relationship_matrix(
+        ds,
+        relationship="stat_genomic_relationship",
+        subset_sample="genomic_samples",
+    ).stat_inverse_relationship
+    ds["stat_pedigree_subset_inverse_relationship"] = sg.invert_relationship_matrix(
+        ds,
+        relationship="stat_pedigree_relationship",
+        subset_sample="genomic_samples",
+    ).stat_inverse_relationship
 
     # calculate matrices
     ds = hybrid_relationship(
         ds,
         genomic_relationship="stat_genomic_relationship",
-        genomic_sample_index="genomic_samples",
+        genomic_sample="genomic_samples",
         pedigree_relationship="stat_pedigree_relationship",
         pedigree_subset_inverse_relationship="stat_pedigree_subset_inverse_relationship",
         tau=tau,
@@ -681,7 +620,7 @@ def test_hybrid_relationship__sub_matrix_roundtrip(n_samples, n_genotypes, tau, 
     ds = hybrid_inverse_relationship(
         ds,
         genomic_inverse_relationship="stat_genomic_inverse_relationship",
-        genomic_sample_index="genomic_samples",
+        genomic_sample="genomic_samples",
         pedigree_inverse_relationship="stat_pedigree_inverse_relationship",
         pedigree_subset_inverse_relationship="stat_pedigree_subset_inverse_relationship",
         tau=tau,
@@ -703,6 +642,15 @@ def test_hybrid_relationship__full_matrix_roundtrip(n_samples, tau, omega):
     gen["call_dosage"] = gen.call_genotype.sum(dim="ploidy")
     gen["ancestral_frequency"] = gen["call_dosage"].mean(dim="samples") / 2
     gen = sg.genomic_relationship(gen, ancestral_frequency="ancestral_frequency")
+    samples = ["S{}".format(i) for i in range(n_samples)]
+    gen = gen.assign_coords(
+        dict(
+            samples=samples,
+            samples_0=samples,
+            samples_1=samples,
+        )
+    )
+    gen = gen.compute()
 
     # pedigree dataset
     ds = xr.Dataset()
@@ -715,20 +663,29 @@ def test_hybrid_relationship__full_matrix_roundtrip(n_samples, tau, omega):
     ds = sg.pedigree_inverse_kinship(
         ds, return_relationship=True, allow_half_founders=True
     )
+    samples = ["S{}".format(i) for i in range(n_samples)]
+    ds = ds.assign_coords(
+        dict(
+            samples=samples,
+            samples_0=samples,
+            samples_1=samples,
+        )
+    )
 
     # merge in genomic matrices
-    G = gen.stat_genomic_relationship.data.round(3)
-    ds["stat_genomic_relationship"] = ["samples_0", "samples_1"], G
-    ds["stat_genomic_inverse_relationship"] = ["samples_0", "samples_1"], da.linalg.inv(
-        G
-    )
+    ds = ds.merge(gen.stat_genomic_relationship.round(3), join="left")
+
+    # inverse matrices
+    ds["stat_genomic_inverse_relationship"] = sg.invert_relationship_matrix(
+        ds,
+        relationship="stat_genomic_relationship",
+    ).stat_inverse_relationship
 
     # calculate matrices
     ds = hybrid_relationship(
         ds,
         genomic_relationship="stat_genomic_relationship",
         pedigree_relationship="stat_pedigree_relationship",
-        pedigree_subset_inverse_relationship="stat_pedigree_inverse_relationship",
         tau=tau,
         omega=omega,
     )
@@ -746,20 +703,17 @@ def test_hybrid_relationship__full_matrix_roundtrip(n_samples, tau, omega):
 
 
 @pytest.mark.parametrize(
-    "n, tau, omega, share_dims",
+    "n, tau, omega",
     [
-        (30, 1, 1, True),  # A.dims == G.dims
-        (30, 0.8, 1, True),
-        (30, 1, 1.1, True),
-        (30, 1, 1, False),  # A.dims != G.dims (but same size)
-        (30, 0.8, 1, False),
-        (30, 1, 1.1, False),
-        (100, 1, 1, False),  # A.dims != G.dims (different size)
-        (100, 1.2, 1, False),
-        (100, 1, 0.9, False),
+        (30, 1, 1),  # G-matrix is subset
+        (30, 0.8, 1),
+        (30, 1, 1.1),
+        (100, 1, 1),  # G-matrix is full
+        (100, 1.2, 1),
+        (100, 1, 0.9),
     ],
 )
-def test_hybrid_relationship__AGHmatrix(n, tau, omega, share_dims):
+def test_hybrid_relationship__AGHmatrix(n, tau, omega):
     # n is number of samples in A and H matrices
     # share_dims indicates that G and A have same dimensions
     #
@@ -812,36 +766,43 @@ def test_hybrid_relationship__AGHmatrix(n, tau, omega, share_dims):
     genotypes = G.index.values
     A = A.loc[samples, samples]
     H = H.loc[samples, samples]
-    if share_dims:
-        # same order (must have same number)
-        G = G.loc[samples, samples]
-    else:
-        # different order
-        G = G.loc[genotypes, genotypes]
+    G = G.loc[genotypes, genotypes]
     sample_index = {s: i for i, s in enumerate(samples)}
     genotype_index = [sample_index[g] for g in genotypes]
+    genomic_sample = np.zeros(len(A), bool)
+    genomic_sample[genotype_index] = True
     # create dataset
     ds = xr.Dataset()
     ds["pedigree_relationship"] = ["samples_0", "samples_1"], A.values
-    if share_dims:
-        # same dims
-        ds["genomic_relationship"] = ["samples_0", "samples_1"], G.values
-    else:
-        # different dims
-        ds["genomic_relationship"] = ["genotypes_0", "genotypes_1"], G.values
-        ds["genomic_sample_index"] = "genotypes", genotype_index
+    ds["genomic_relationship"] = ["samples_0", "samples_1"], np.full_like(A, np.nan)
+    ds.genomic_relationship[genomic_sample, genomic_sample] = G.values
+    ds["genomic_sample"] = "samples", genomic_sample
+    # automatically invert A22
     actual = sg.hybrid_relationship(
         ds,
         pedigree_relationship="pedigree_relationship",
         genomic_relationship="genomic_relationship",
-        genomic_sample_index=None if share_dims else "genomic_sample_index",
+        genomic_sample="genomic_sample",
         tau=tau,
         omega=omega,
     ).stat_hybrid_relationship.data
-    np.testing.assert_array_almost_equal(
-        actual,
-        H.values,
-    )
+    np.testing.assert_array_almost_equal(actual, H.values)
+    # manually invert A22
+    ds["subset_inverse_relationship"] = invert_relationship_matrix(
+        ds,
+        relationship="pedigree_relationship",
+        subset_sample="genomic_sample",
+    ).stat_inverse_relationship
+    actual = sg.hybrid_relationship(
+        ds,
+        pedigree_relationship="pedigree_relationship",
+        genomic_relationship="genomic_relationship",
+        pedigree_subset_inverse_relationship="subset_inverse_relationship",
+        genomic_sample="genomic_sample",
+        tau=tau,
+        omega=omega,
+    ).stat_hybrid_relationship.data
+    np.testing.assert_array_almost_equal(actual, H.values)
 
 
 @pytest.mark.parametrize(
@@ -872,43 +833,37 @@ def test_hybrid_inverse_relationship__AGHmatrix(n, tau, omega, share_dims):
     genotypes = G.index.values
     A = A.loc[samples, samples]
     H = H.loc[samples, samples]
-    if share_dims:
-        # same order (must have same number)
-        G = G.loc[samples, samples]
-    else:
-        # different order
-        G = G.loc[genotypes, genotypes]
-        A22 = A.loc[genotypes, genotypes]
+    G = G.loc[genotypes, genotypes]
     sample_index = {s: i for i, s in enumerate(samples)}
     genotype_index = [sample_index[g] for g in genotypes]
+    genomic_sample = np.zeros(len(A), bool)
+    genomic_sample[genotype_index] = True
     # create dataset
     ds = xr.Dataset()
     ds["pedigree_inverse_relationship"] = ["samples_0", "samples_1"], np.linalg.inv(
         A.values
     )
-    if share_dims:
-        # same dims
-        ds["genomic_inverse_relationship"] = ["samples_0", "samples_1"], np.linalg.inv(
-            G.values
-        )
-        ds["pedigree_subset_inverse_relationship"] = ds.pedigree_inverse_relationship
-    else:
-        # different dims
-        ds["genomic_inverse_relationship"] = [
-            "genotypes_0",
-            "genotypes_1",
-        ], np.linalg.inv(G.values)
-        ds["pedigree_subset_inverse_relationship"] = [
-            "genotypes_0",
-            "genotypes_1",
-        ], np.linalg.inv(A22.values)
-        ds["genomic_sample_index"] = "genotypes", genotype_index
+    ds["genomic_inverse_relationship"] = ["samples_0", "samples_1"], np.full_like(
+        A, np.nan
+    )
+    ds.genomic_inverse_relationship[genomic_sample, genomic_sample] = np.linalg.inv(
+        G.values
+    )
+    ds["pedigree_subset_inverse_relationship"] = [
+        "samples_0",
+        "samples_1",
+    ], np.full_like(A, np.nan)
+    A22 = A.values[genomic_sample, :][:, genomic_sample]
+    ds.pedigree_subset_inverse_relationship[
+        genomic_sample, genomic_sample
+    ] = np.linalg.inv(A22)
+    ds["genomic_sample"] = "samples", genomic_sample
     actual = sg.hybrid_inverse_relationship(
         ds,
         pedigree_inverse_relationship="pedigree_inverse_relationship",
         pedigree_subset_inverse_relationship="pedigree_subset_inverse_relationship",
         genomic_inverse_relationship="genomic_inverse_relationship",
-        genomic_sample_index=None if share_dims else "genomic_sample_index",
+        genomic_sample="genomic_sample",
         tau=tau,
         omega=omega,
     ).stat_hybrid_inverse_relationship.values
