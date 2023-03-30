@@ -33,6 +33,7 @@ from .stats.grm import (
     genomic_relationship,
     hybrid_inverse_relationship,
     hybrid_relationship,
+    invert_relationship_matrix,
 )
 from .stats.hwe import hardy_weinberg_test
 from .stats.ibs import Weir_Goudet_beta, identity_by_state
@@ -100,6 +101,7 @@ __all__ = [
     "infer_call_ploidy",
     "infer_sample_ploidy",
     "infer_variant_ploidy",
+    "invert_relationship_matrix",
     "ld_matrix",
     "ld_prune",
     "maximal_independent_set",

@@ -6,6 +6,7 @@ from typing_extensions import Literal
 from xarray import Dataset
 
 from sgkit import variables
+from sgkit.typing import ArrayLike
 from sgkit.utils import conditional_merge_datasets, create_dataset
 
 
@@ -150,52 +151,171 @@ def genomic_relationship(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-def _expand_matrix(m, like, x_indices, y_indices):
-    _M = da.zeros((like.shape[0], m.shape[1]), chunks=(like.chunks[0], m.chunks[1]))
+def _expand_matrix(
+    m: ArrayLike,
+    like: ArrayLike,
+    x_indices: ArrayLike,
+    y_indices: ArrayLike,
+    pad: float = np.nan,
+):
+    # TODO: replace all instances of this function when dask supports nd fancy indexing
+    _M = da.full((like.shape[0], m.shape[1]), pad, chunks=(like.chunks[0], m.chunks[1]))
     _M[x_indices] = m
-    M = da.zeros_like(like)
+    M = da.full_like(like, pad)
     M[:, y_indices] = _M
     return M
 
 
-def _hybrid_full_matrix_Martini(Ainv, G, tau=1, omega=1):
+def _sub_matrix_inv(
+    M: ArrayLike, indices: ArrayLike, pad: float = np.nan, chunks: Optional[int] = None
+):
+    m = M[indices, :][:, indices]
+    if chunks is not None:
+        m = m.rechunk(chunks)
+    m_inv = da.linalg.inv(m)
+    return _expand_matrix(m_inv, M, indices, indices, pad=pad)
+
+
+def invert_relationship_matrix(
+    ds: Dataset,
+    *,
+    relationship: Hashable,
+    subset_sample: Hashable = None,
+    subset_rechunk: Optional[int] = None,
+    merge: bool = True,
+) -> Dataset:
+    """Calculate the inverse relationship (sub-) matrix.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing a relationship matrix.
+    relationship
+        Variable containing the relationship matrix.
+    subset_sample
+        Optionally specify a variable containing an array of booleans which
+        indicate samples defining a sub-matrix of relationships to invert.
+    subset_rechunk
+        Optionally specify sizes for re-chunking the sub-matrix defined by
+        the subset variable. This can be used to avoid value errors caused
+        by uneven chunk sizes in the resulting sub-matrix.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing :data:`sgkit.variables.stat_inverse_relationship_spec`
+    The dimensions are named ``samples_0`` and ``samples_1``. If a subset of
+    samples was specified, then nan values are used to indicate relationships
+    that are not included within the subset.
+
+    Examples
+    --------
+
+    >>> import xarray as xr
+    >>> import sgkit as sg
+    >>> ds = xr.Dataset()
+    >>> ds["stat_pedigree_relationship"] = ["samples_0", "samples_1"], [
+    ...     [1.   , 0.   , 0.   , 0.5  , 0.   , 0.25 ],
+    ...     [0.   , 1.   , 0.   , 0.5  , 0.5  , 0.5  ],
+    ...     [0.   , 0.   , 1.   , 0.   , 0.5  , 0.25 ],
+    ...     [0.5  , 0.5  , 0.   , 1.   , 0.25 , 0.625],
+    ...     [0.   , 0.5  , 0.5  , 0.25 , 1.   , 0.625],
+    ...     [0.25 , 0.5  , 0.25 , 0.625, 0.625, 1.125]
+    ... ]
+    >>> sg.invert_relationship_matrix(
+    ...     ds,
+    ...     relationship="stat_pedigree_relationship",
+    ... ).stat_inverse_relationship.values  # doctest: +NORMALIZE_WHITESPACE
+    array([[ 1.5,  0.5,  0. , -1. ,  0. ,  0. ],
+           [ 0.5,  2. ,  0.5, -1. , -1. ,  0. ],
+           [ 0. ,  0.5,  1.5,  0. , -1. ,  0. ],
+           [-1. , -1. ,  0. ,  2.5,  0.5, -1. ],
+           [ 0. , -1. , -1. ,  0.5,  2.5, -1. ],
+           [ 0. ,  0. ,  0. , -1. , -1. ,  2. ]])
+    >>> # inverse of a sub-matrix
+    >>> ds["subset_sample"] = "samples", [False, False, False, True, True, True]
+    >>> sg.invert_relationship_matrix(
+    ...     ds,
+    ...     relationship="stat_pedigree_relationship",
+    ...     subset_sample="subset_sample",
+    ... ).stat_inverse_relationship.values.round(3)  # doctest: +NORMALIZE_WHITESPACE
+    array([[   nan,    nan,    nan,    nan,    nan,    nan],
+           [   nan,    nan,    nan,    nan,    nan,    nan],
+           [   nan,    nan,    nan,    nan,    nan,    nan],
+           [   nan,    nan,    nan,  1.567,  0.233, -1.   ],
+           [   nan,    nan,    nan,  0.233,  1.567, -1.   ],
+           [   nan,    nan,    nan, -1.   , -1.   ,  2.   ]])
+    """
+    A = da.array(ds[relationship].data)
+    if subset_sample is None:
+        Ainv = da.linalg.inv(A)
+    else:
+        idx = ds[subset_sample].values
+        Ainv = _sub_matrix_inv(A, idx, chunks=subset_rechunk)
+    new_ds = create_dataset(
+        {
+            variables.stat_inverse_relationship: (
+                ("samples_0", "samples_1"),
+                Ainv,
+            )
+        }
+    )
+    return conditional_merge_datasets(ds, new_ds, merge)
+
+
+def _hybrid_full_matrix_Martini(
+    Ainv: ArrayLike, G: ArrayLike, tau: float = 1, omega: float = 1
+):
     # calculate sub-matrices of H
     if (tau == 1) and (omega == 1):
         H = G
     elif omega == 1:
-        H = 1 / tau * G
-        # H = da.linalg.inv(tau * da.linalg.inv(G))
+        H = G / tau
     else:
-        H = da.linalg.inv(tau * da.linalg.inv(G) + (1 - omega) * Ainv)
+        Hinv = tau * da.linalg.inv(G) + (1 - omega) * Ainv
+        H = da.linalg.inv(Hinv)
     return H
 
 
-def _hybrid_sub_matrix_Martini(A, G, Gidx, tau=1, omega=1, A22inv=None):
-    n = len(A)
-    # indices of non G-matrix
-    bools = np.ones(n, bool)
-    bools[Gidx] = False
-    Gnot = np.where(bools)[0]
-    # get sub-matrices of A
-    A11 = A[Gnot, :][:, Gnot]
-    A12 = A[Gnot, :][:, Gidx]
-    A21 = A[Gidx, :][:, Gnot]
-    A22 = A[Gidx, :][:, Gidx]
+def _hybrid_sub_matrix_Martini(
+    A: ArrayLike,
+    G: ArrayLike,
+    is_genomic: ArrayLike,
+    tau: float = 1,
+    omega: float = 1,
+    A22inv: Optional[ArrayLike] = None,
+):
+    # Note: `is_genomic` must be a numpy array to determine matrix sizes
+    not_genomic = ~is_genomic  # indices of non G-matrix
+    # get sub-matrices
+    G22 = G[is_genomic, :][:, is_genomic]
+    A11 = A[not_genomic, :][:, not_genomic]
+    A12 = A[not_genomic, :][:, is_genomic]
+    A21 = A[is_genomic, :][:, not_genomic]
+    A22 = A[is_genomic, :][:, is_genomic]
     # optional inversions required for consistent API
     if A22inv is None:
         A22inv = da.linalg.inv(A22)
-    if (tau == 1) and (omega == 1):
-        H22 = G
-    elif omega == 1:
-        H22 = 1 / tau * G
     else:
-        H22 = da.linalg.inv(tau * da.linalg.inv(G) + (1 - omega) * A22inv)
+        A22inv = A22inv[is_genomic, :][:, is_genomic]
+    if (tau == 1) and (omega == 1):
+        H22 = G22
+    elif omega == 1:
+        H22 = G22 / tau
+    else:
+        H22inv = tau * da.linalg.inv(G22) + (1 - omega) * A22inv
+        H22 = da.linalg.inv(H22inv)
     tmp = A12 @ A22inv @ (H22 - A22)
     H11 = A11 + tmp @ A22inv @ A21
     H12 = A12 + tmp
     H21 = H12.T
     # return H-matrix in the initial order
-    if np.all(Gnot == np.arange(len(Gnot))):
+    n_genomic = is_genomic.sum()
+    if np.all(is_genomic[-n_genomic:]):
         # G-matrix is lower right
         H = da.vstack(
             [
@@ -203,7 +323,7 @@ def _hybrid_sub_matrix_Martini(A, G, Gidx, tau=1, omega=1, A22inv=None):
                 da.hstack([H21, H22]),
             ]
         )
-    elif np.all(Gidx == np.arange(len(Gidx))):
+    elif np.all(is_genomic[0:n_genomic]):
         # G-matrix is upper left
         H = da.vstack(
             [
@@ -213,10 +333,10 @@ def _hybrid_sub_matrix_Martini(A, G, Gidx, tau=1, omega=1, A22inv=None):
         )
     else:
         # General case
-        H11 = _expand_matrix(H11, A, Gnot, Gnot)
-        H12 = _expand_matrix(H12, A, Gnot, Gidx)
+        H11 = _expand_matrix(H11, A, not_genomic, not_genomic, pad=0.0)
+        H12 = _expand_matrix(H12, A, not_genomic, is_genomic, pad=0.0)
         H21 = H12.T
-        H22 = _expand_matrix(H22, A, Gidx, Gidx)
+        H22 = _expand_matrix(H22, A, is_genomic, is_genomic, pad=0.0)
         H = sum([H11, H12, H21, H22])
     return H
 
@@ -227,7 +347,7 @@ def hybrid_relationship(
     genomic_relationship: Hashable,
     pedigree_relationship: Hashable = None,
     pedigree_subset_inverse_relationship: Hashable = None,
-    genomic_sample_index: Optional[Hashable] = None,
+    genomic_sample: Optional[Hashable] = None,
     estimator: Optional[Literal["Martini"]] = None,
     tau: float = 1.0,
     omega: float = 1.0,
@@ -241,25 +361,25 @@ def hybrid_relationship(
     ds
         Dataset containing the inverse genomic and pedigree relationship matrices.
     genomic_relationship
-        A genomic relationship matrix. This may include all samples, or a subset
-        of samples in the dataset.
+        Genomic relationship matrix as defined by
+        :data:`sgkit.variables.stat_genomic_relationship_spec`.
+        This may include unknown relationships indicated by nan values.
     pedigree_relationship
         Pedigree relationship matrix as defined by
         :data:`sgkit.variables.stat_pedigree_relationship_spec`.
     pedigree_subset_inverse_relationship
         Optionally specify a variable containing the inverse of the subset of the
-        pedigree relationship matrix corresponding to the genomic samples (with
-        matching dimensions). If absent, this argument will be automatically computed
-        from the pedigree relationship matrix. If all samples are included in the
-        genomic relationship matrix, then this variable is equivalent to
+        pedigree relationship matrix corresponding to the genomic samples as defined
+        by :data:`sgkit.variables.stat_inverse_relationship_spec`.
+        If absent, this argument will be automatically computed from the pedigree
+        relationship matrix. If all samples are included in the genomic relationship
+        matrix, then this variable is equivalent to
         :data:`sgkit.variables.stat_pedigree_inverse_relationship_spec` and the
         pedigree_relationship variable is ignored.
-    genomic_sample_index
-        Optionally specify an array of integer indices mapping rows and columns
-        of the genomic relationship matrix to sample positions within the
-        pedigree relationship matrix.
-        This variable is required if the genomic relationship matrix is smaller
-        than (i.e., a subset of) the pedigree relationship matrix.
+    genomic_sample
+        Optionally specify a variable containing an array of booleans which indicate
+        the subset of samples with genomic relationships. If absent, it is assumed
+        that genomic relationships are present for all samples.
     estimator
         Specifies the estimator used to combine matrices. Currently the only option
         is ``"Martini"`` following Martini et al 2018 [1] which expands on the
@@ -280,40 +400,38 @@ def hybrid_relationship(
     which is a matrix of pairwise relationships among all samples.
     The dimensions are named ``samples_0`` and ``samples_1``.
 
-    Note
-    ----
-    This method is more efficient when samples from the genomic relationship matrix
-    are in ascending order and correspond to the first or last samples in the pedigree
-    relationship matrix..
-
-    Warnings
-    --------
-    The ``pedigree_subset_inverse_relationship`` parameter must be calculated as
-    the inverse of a subset of the pedigree relationship matrix, rather than
-    a subset of the inverse of the pedigree relationship matrix.
-
     Raises
     ------
     ValueError
         If an unknown estimator is specified.
     ValueError
-        If ``genomic_sample_index`` is not specified and the genomic and pedigree
-        relationship matrices do not have the same dimensions.
-    ValueError
-        If the genomic relationship matrix is larger than the pedigree
-        relationship matrix.
-    ValueError
-        If ``pedigree_subset_inverse_relationship`` is specified and its dimensions
-        do not match those of the genomic relationship matrix.
+        If the matrices do not have the same dimensions.
+
+    Note
+    ----
+    This method is more efficient when samples with genomic relationships are
+    adjacent to one another and are the first or last samples in the dataset.
+
+    Warnings
+    --------
+    The ``pedigree_subset_inverse_relationship`` parameter must be calculated as
+    the inverse of a subset of the pedigree relationship matrix, rather than
+    a subset of the inverse of the pedigree relationship matrix. See method
+    :func:`invert_relationship_matrix`.
+
+    See Also
+    --------
+    :func:`hybrid_inverse_relationship`
 
     Examples
     --------
 
     >>> import xarray as xr
     >>> import sgkit as sg
+    >>> from numpy import nan
     >>> ds = xr.Dataset()
     >>> # A-matrix
-    >>> ds["pedigree_relationship"] = ["samples_0", "samples_1"], [
+    >>> ds["stat_pedigree_relationship"] = ["samples_0", "samples_1"], [
     ...     [1.   , 0.   , 0.   , 0.5  , 0.   , 0.25 ],
     ...     [0.   , 1.   , 0.   , 0.5  , 0.5  , 0.5  ],
     ...     [0.   , 0.   , 1.   , 0.   , 0.5  , 0.25 ],
@@ -322,18 +440,21 @@ def hybrid_relationship(
     ...     [0.25 , 0.5  , 0.25 , 0.625, 0.625, 1.125]
     ... ]
     >>> # G-matrix
-    >>> ds["genomic_relationship"] = ["genotypes_0", "genotypes_1"], [
-    ...     [1.3 , 0.3 , 0.71],
-    ...     [0.3 , 1.3 , 0.73],
-    ...     [0.71, 0.73, 1.45],
+    >>> ds["stat_genomic_relationship"] = ["samples_0", "samples_1"], [
+    ...     [nan,  nan,  nan,  nan,  nan,  nan],
+    ...     [nan,  nan,  nan,  nan,  nan,  nan],
+    ...     [nan,  nan,  nan,  nan,  nan,  nan],
+    ...     [nan,  nan,  nan, 1.3 , 0.3 , 0.71],
+    ...     [nan,  nan,  nan, 0.3 , 1.3 , 0.73],
+    ...     [nan,  nan,  nan, 0.71, 0.73, 1.45],
     ... ]
-    >>> # indices of G-matrix samples within A-matrix
-    >>> ds["genomic_sample_index"] = "genotypes", [3, 4, 5]
+    >>> # samples included in G-matrix
+    >>> ds["genomic_sample"] = "samples", [False, False, False, True, True, True]
     >>> ds = sg.hybrid_relationship(
     ...     ds,
-    ...     pedigree_relationship="pedigree_relationship",
-    ...     genomic_relationship="genomic_relationship",
-    ...     genomic_sample_index="genomic_sample_index",
+    ...     pedigree_relationship="stat_pedigree_relationship",
+    ...     genomic_relationship="stat_genomic_relationship",
+    ...     genomic_sample="genomic_sample",
     ... )
     >>> ds.stat_hybrid_relationship.values.round(3)  # doctest: +NORMALIZE_WHITESPACE
     array([[ 1.084,  0.056, -0.028,  0.653, -0.013,  0.281],
@@ -359,67 +480,59 @@ def hybrid_relationship(
     "A unified approach to utilize phenotypic, full pedigree, and genomic information for genetic
     evaluation of Holstein final score."
     Journal of Dairy Science 93 (2): 743-752.
-
     """
-    estimator = estimator or "Martini"
+    if estimator is None:
+        estimator = "Martini"
     if estimator not in {"Martini"}:
         raise ValueError("Unknown estimator '{}'".format(estimator))
-
-    # Genomic relationship
+    variables.validate(
+        ds,
+        {
+            genomic_relationship: variables.stat_genomic_relationship_spec,
+            pedigree_relationship: variables.stat_pedigree_relationship_spec,
+        },
+    )
     G_dims = ds[genomic_relationship].dims
+    A_dims = ds[pedigree_relationship].dims
+    if G_dims != A_dims:
+        raise ValueError("Matrices must share dimensions")
     G = da.array(ds[genomic_relationship].data)
+    A = da.array(ds[pedigree_relationship].data)
 
-    # Pedigree relationship:
-    if (genomic_sample_index is None) and (
-        pedigree_subset_inverse_relationship is not None
-    ):
-        # special case where only the inverse is needed
+    # get genomic sample indices
+    if genomic_sample is None:
+        is_genomic = np.ones(len(A), bool)
+    else:
+        # evaluated eagerly for indexing sub-matrices
+        is_genomic = ds[genomic_sample].values
+
+    # get inverse of pedigree subset
+    if pedigree_subset_inverse_relationship is None:
+        A22inv = None
+    else:
         variables.validate(
             ds,
             {
                 pedigree_subset_inverse_relationship: variables.stat_pedigree_inverse_relationship_spec,
             },
         )
-        A_dims = ds[pedigree_subset_inverse_relationship].dims
-        Ainv = da.array(ds[pedigree_subset_inverse_relationship].data)
-        A = None
-    else:
-        variables.validate(
-            ds,
-            {
-                pedigree_relationship: variables.stat_pedigree_relationship_spec,
-            },
-        )
-        A_dims = ds[pedigree_relationship].dims
-        A = da.array(ds[pedigree_relationship].data)
-        if pedigree_subset_inverse_relationship is not None:
-            A22_dims = ds[pedigree_subset_inverse_relationship].dims
-            A22inv = da.array(ds[pedigree_subset_inverse_relationship].data)
-            if A22_dims != G_dims:
-                raise ValueError(
-                    "The dimensions of pedigree subset must match those of the genomic matrix"
-                )
-        else:
-            A22inv = None
-    if ds.dims[G_dims[0]] > ds.dims[A_dims[0]]:
-        raise ValueError("The genomic matrix cannot be larger than the pedigree matrix")
-    # compute H-matrix
-    if G_dims == A_dims:
-        # Following Martini with a full G-matrix
-        if pedigree_subset_inverse_relationship is None:
-            # resort to inverse of full matrix for consistent API
+        A22inv_dims = ds[pedigree_subset_inverse_relationship].dims
+        if A22inv_dims != A_dims:
+            raise ValueError("Matrices must share dimensions")
+        A22inv = da.array(ds[pedigree_subset_inverse_relationship])
+
+    # calculate H-matrix
+    if is_genomic.all():
+        # special case where only the inverse is needed
+        if A22inv is None:
             Ainv = da.linalg.inv(A)
+        else:
+            Ainv = A22inv
         H = _hybrid_full_matrix_Martini(Ainv=Ainv, G=G, tau=tau, omega=omega)
     else:
-        # Following Martini with G-matrix as a subset of A-matrix
-        if genomic_sample_index is None:
-            raise ValueError(
-                "The genomic and pedigree matrices must share dimensions"
-                " if genomic_sample_index is not defined"
-            )
-        Gidx = ds[genomic_sample_index].values
+        # sub-matrix case
         H = _hybrid_sub_matrix_Martini(
-            A=A, G=G, Gidx=Gidx, A22inv=A22inv, tau=tau, omega=omega
+            A=A, G=G, is_genomic=is_genomic, A22inv=A22inv, tau=tau, omega=omega
         )
     new_ds = create_dataset(
         {
@@ -432,33 +545,45 @@ def hybrid_relationship(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-def _hybrid_inverse_full_matrix_Martini(Ainv, Ginv, tau=1, omega=1):
+def _hybrid_inverse_full_matrix_Martini(
+    Ainv: ArrayLike, Ginv: ArrayLike, tau: float = 1, omega: float = 1
+):
     # calculate sub-matrices of H
     Hinv = Ainv + (tau * Ginv) - (omega * Ainv)
     return Hinv
 
 
-def _hybrid_inverse_sub_matrix_Martini(Ainv, Ginv, A22inv, Gidx, tau=1, omega=1):
-    n = len(Ainv)
-    m = len(Gidx)
+def _hybrid_inverse_sub_matrix_Martini(
+    Ainv: ArrayLike,
+    Ginv: ArrayLike,
+    A22inv: ArrayLike,
+    is_genomic: ArrayLike,
+    tau: float = 1,
+    omega: float = 1,
+):
+    # Note: `is_genomic` must be a numpy array to determine matrix sizes
+    n_samples = len(Ainv)
+    n_genomic = is_genomic.sum()
+    Ginv = Ginv[is_genomic, :][:, is_genomic]
+    A22inv = A22inv[is_genomic, :][:, is_genomic]
     Z22 = (tau * Ginv) - (omega * A22inv)
-    if np.all(Gidx == np.arange(m)):
+    if np.all(is_genomic[0:n_genomic]):
         # genomic samples are first
         start = 0
-        stop = m
+        stop = n_genomic
         Hinv = Ainv.copy()
         Ainv22 = Ainv[start:stop, start:stop]
         Hinv[start:stop, start:stop] = Ainv22 + Z22
-    elif np.all(Gidx == np.arange(n - m, n)):
+    elif np.all(is_genomic[-n_genomic:]):
         # genomic samples are last
-        start = n - m
-        stop = n
+        start = n_samples - n_genomic
+        stop = n_samples
         Hinv = Ainv.copy()
         Ainv22 = Ainv[start:stop, start:stop]
         Hinv[start:stop, start:stop] = Ainv22 + Z22
     else:
         # general case
-        Hinv = Ainv + _expand_matrix(Z22, Ainv, Gidx, Gidx)
+        Hinv = Ainv + _expand_matrix(Z22, Ainv, is_genomic, is_genomic, pad=0.0)
     return Hinv
 
 
@@ -468,37 +593,36 @@ def hybrid_inverse_relationship(
     genomic_inverse_relationship: Hashable,
     pedigree_inverse_relationship: Hashable,
     pedigree_subset_inverse_relationship: Hashable = None,
-    genomic_sample_index: Optional[Hashable] = None,
+    genomic_sample: Optional[Hashable] = None,
     estimator: Optional[Literal["Martini"]] = None,
     tau: float = 1.0,
     omega: float = 1.0,
     merge: bool = True,
 ) -> Dataset:
-    """Compute the inverse of a hybrid relationship matrix (AKA the HRM or H-matrix).
+    """Compute the inverse of a hybrid relationship matrix (AKA the HRM or H-matrix)
+    combining pedigree and genomic information.
 
     Parameters
     ----------
     ds
         Dataset containing the inverse of genomic and pedigree relationship matrices.
     genomic_inverse_relationship
-        Inverse of a genomic relationship matrix. This may include all samples, or
-        a subset of samples in the dataset.
+        Inverse of a genomic relationship matrix. This may be the inverse of a relationship
+        matrix for a subset of samples with unknown values indicated by nan values as defined
+        by :data:`sgkit.variables.stat_inverse_relationship_spec`.
     pedigree_inverse_relationship
         Inverse of a pedigree relationship matrix as defined by
         :data:`sgkit.variables.stat_pedigree_inverse_relationship_spec`.
     pedigree_subset_inverse_relationship
         Inverse of the subset of the pedigree relationship matrix corresponding to
-        the genomic samples. The dimensions of this variable must match those of the
-        genomic_inverse_relationship.
-        If all pedigreed samples are included in the genomic relationship matrix, then this
-        variable is equal to :data:`sgkit.variables.stat_pedigree_inverse_relationship_spec`
-        and the pedigree_inverse_relationship variable will be used.
-    genomic_sample_index
-        Optionally specify an array of integer indices mapping rows and columns
-        of the inverse genomic relationships to sample positions in the
-        inverse pedigree relationships matrix.
-        This variable is required if the inverse genomic relationship matrix
-        is smaller than the inverse pedigree relationship matrix.
+        the genomic samples as defined by
+        :data:`sgkit.variables.stat_inverse_relationship_spec`.
+        If all samples are included in the genomic relationship matrix, then this variable
+        is not required.
+    genomic_sample
+        Optionally specify a variable containing an array of booleans which indicate
+        the subset of samples with genomic relationships. If absent, it is assumed
+        that genomic relationships are present for all samples.
     estimator
         Specifies the estimator used to combine matrices. Currently the only option
         is ``"Martini"`` following Martini et al 2018 [1] which expands on the
@@ -519,6 +643,13 @@ def hybrid_inverse_relationship(
     which is a matrix of pairwise relationships among all samples.
     The dimensions are named ``samples_0`` and ``samples_1``.
 
+    Raises
+    ------
+    ValueError
+        If an unknown estimator is specified.
+    ValueError
+        If the matrices do not have the same dimensions.
+
     Note
     ----
     This method is more efficient when samples from the genomic relationship matrix
@@ -529,27 +660,19 @@ def hybrid_inverse_relationship(
     --------
     The ``pedigree_subset_inverse_relationship`` parameter must be calculated as
     the inverse of a subset of the pedigree relationship matrix, rather than
-    a subset of the inverse of the pedigree relationship matrix.
+    a subset of the inverse of the pedigree relationship matrix. See method
+    :func:`invert_relationship_matrix`.
 
-    Raises
-    ------
-    ValueError
-        If an unknown estimator is specified.
-    ValueError
-        If ``genomic_sample_index`` is not specified and the genomic and pedigree
-        relationship matrices do not have the same dimensions.
-    ValueError
-        If the genomic relationship matrix is larger than the pedigree
-        relationship matrix.
-    ValueError
-        If the dimensions of ``pedigree_subset_inverse_relationship`` do not match
-        those of the genomic relationship matrix.
+    See Also
+    --------
+    :func:`hybrid_relationship`
 
     Examples
     --------
 
     >>> import xarray as xr
     >>> import sgkit as sg
+    >>> from numpy import nan
     >>> ds = xr.Dataset()
     >>> # A-matrix
     >>> ds["pedigree_relationship"] = ["samples_0", "samples_1"], [
@@ -561,40 +684,39 @@ def hybrid_inverse_relationship(
     ...     [0.25 , 0.5  , 0.25 , 0.625, 0.625, 1.125]
     ... ]
     >>> # G-matrix
-    >>> ds["genomic_relationship"] = ["genotypes_0", "genotypes_1"], [
-    ...     [1.3 , 0.3 , 0.71],
-    ...     [0.3 , 1.3 , 0.73],
-    ...     [0.71, 0.73, 1.45],
+    >>> ds["genomic_relationship"] = ["samples_0", "samples_1"], [
+    ...     [nan,  nan,  nan,  nan,  nan,  nan],
+    ...     [nan,  nan,  nan,  nan,  nan,  nan],
+    ...     [nan,  nan,  nan,  nan,  nan,  nan],
+    ...     [nan,  nan,  nan, 1.3 , 0.3 , 0.71],
+    ...     [nan,  nan,  nan, 0.3 , 1.3 , 0.73],
+    ...     [nan,  nan,  nan, 0.71, 0.73, 1.45],
     ... ]
-    >>> # indices of G-matrix samples within A-matrix
-    >>> ds["genomic_sample_index"] = "genotypes", [3, 4, 5]
+    >>> # samples included in G-matrix
+    >>> ds["genomic_sample"] = "samples", [False, False, False, True, True, True]
     >>> # inverse of A-matrix
-    >>> ds["pedigree_inverse_relationship"] = (
-    ...     ds["pedigree_relationship"].dims,
-    ...     np.linalg.inv(ds["pedigree_relationship"].data),
-    ... )
+    >>> ds["pedigree_inverse_relationship"] = sg.invert_relationship_matrix(
+    ...     ds,
+    ...     relationship="pedigree_relationship"
+    ... ).stat_inverse_relationship
     >>> # inverse of G-matrix
-    >>> ds["genomic_inverse_relationship"] = (
-    ...     ds["genomic_relationship"].dims,
-    ...     np.linalg.inv(ds["genomic_relationship"].data),
-    ... )
-    >>> # subset "A22" of A-matrix
-    >>> index = ds["genomic_sample_index"].values
-    >>> ds["pedigree_subset_relationship"] = (
-    ...     ds["genomic_relationship"].dims,
-    ...     ds["pedigree_relationship"][index, index].values,
-    ... )
-    >>> # inverse of "A22"
-    >>> ds["pedigree_subset_inverse_relationship"] = (
-    ...     ds["genomic_relationship"].dims,
-    ...     np.linalg.inv(ds["pedigree_subset_relationship"].data),
-    ... )
+    >>> ds["genomic_inverse_relationship"] = sg.invert_relationship_matrix(
+    ...     ds,
+    ...     relationship="genomic_relationship",
+    ...     subset_sample="genomic_sample",
+    ... ).stat_inverse_relationship
+    >>> # inverse of A-matrix subset corresponding to G-matrix
+    >>> ds["pedigree_subset_inverse_relationship"] = sg.invert_relationship_matrix(
+    ...     ds,
+    ...     relationship="pedigree_relationship",
+    ...     subset_sample="genomic_sample",
+    ... ).stat_inverse_relationship
     >>> ds = sg.hybrid_inverse_relationship(
     ...     ds,
     ...     genomic_inverse_relationship="genomic_inverse_relationship",
     ...     pedigree_inverse_relationship="pedigree_inverse_relationship",
     ...     pedigree_subset_inverse_relationship="pedigree_subset_inverse_relationship",
-    ...     genomic_sample_index="genomic_sample_index",
+    ...     genomic_sample="genomic_sample",
     ... )
     >>> ds.stat_hybrid_inverse_relationship.values.round(3)  # doctest: +NORMALIZE_WHITESPACE
     array([[ 1.5  ,  0.5  ,  0.   , -1.   ,  0.   ,  0.   ],
@@ -621,42 +743,55 @@ def hybrid_inverse_relationship(
     evaluation of Holstein final score."
     Journal of Dairy Science 93 (2): 743-752.
     """
-    estimator = estimator or "Martini"
+    if estimator is None:
+        estimator = "Martini"
     if estimator not in {"Martini"}:
         raise ValueError("Unknown estimator '{}'".format(estimator))
     variables.validate(
         ds,
         {
+            genomic_inverse_relationship: variables.stat_inverse_relationship_spec,
             pedigree_inverse_relationship: variables.stat_pedigree_inverse_relationship_spec,
         },
     )
-    A_dims = ds[pedigree_inverse_relationship].dims
-    Ainv = da.array(ds[pedigree_inverse_relationship].data)
     G_dims = ds[genomic_inverse_relationship].dims
+    A_dims = ds[pedigree_inverse_relationship].dims
+    if G_dims != A_dims:
+        raise ValueError("Matrices must share dimensions")
     Ginv = da.array(ds[genomic_inverse_relationship].data)
-    if ds.dims[G_dims[0]] > ds.dims[A_dims[0]]:
-        raise ValueError("The genomic matrix cannot be larger than the pedigree matrix")
-    if G_dims == A_dims:
+    Ainv = da.array(ds[pedigree_inverse_relationship].data)
+
+    # get genomic sample indices
+    if genomic_sample is None:
+        is_genomic = np.ones(len(Ainv), bool)
+    else:
+        # evaluated eagerly for indexing sub-matrices
+        is_genomic = ds[genomic_sample].values
+
+    if is_genomic.all():
         # Following Martini with full G-matrix
         Hinv = _hybrid_inverse_full_matrix_Martini(
             Ainv=Ainv, Ginv=Ginv, tau=tau, omega=omega
         )
     else:
-        # Following Martini with G-matrix as a subset of A-matrix
-        if genomic_sample_index is None:
-            raise ValueError(
-                "The genomic and pedigree matrices must share dimensions"
-                " if genomic_sample_index is not defined"
-            )
-        A22_dims = ds[pedigree_subset_inverse_relationship].dims
-        A22inv = da.array(ds[pedigree_subset_inverse_relationship].data)
-        if A22_dims != G_dims:
-            raise ValueError(
-                "The dimensions of pedigree subset must match those of the genomic matrix"
-            )
-        Gidx = ds[genomic_sample_index].values
+        # Following Martini with sub G-matrix
+        variables.validate(
+            ds,
+            {
+                pedigree_subset_inverse_relationship: variables.stat_inverse_relationship_spec,
+            },
+        )
+        A22inv_dims = ds[pedigree_subset_inverse_relationship].dims
+        if A22inv_dims != A_dims:
+            raise ValueError("Matrices must share dimensions")
+        A22inv = da.array(ds[pedigree_subset_inverse_relationship])
         Hinv = _hybrid_inverse_sub_matrix_Martini(
-            Ainv=Ainv, Ginv=Ginv, A22inv=A22inv, Gidx=Gidx, tau=tau, omega=omega
+            Ainv=Ainv,
+            Ginv=Ginv,
+            A22inv=A22inv,
+            is_genomic=is_genomic,
+            tau=tau,
+            omega=omega,
         )
     new_ds = create_dataset(
         {

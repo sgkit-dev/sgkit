@@ -978,6 +978,22 @@ with self-kinship values on the diagonal.
     )
 )
 
+
+(
+    stat_inverse_relationship,
+    stat_inverse_relationship_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_inverse_relationship",
+        dims=("samples_0", "samples_1"),
+        kind="f",
+        __doc__="""
+The inverse of a relationship matrix. This may contain the inverse of a subset of
+a relationship matrix in which nan values indicate elements outside of the subset.
+""",
+    )
+)
+
 stat_Tajimas_D, stat_Tajimas_D_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "stat_Tajimas_D",
