@@ -54,7 +54,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sgkit.simulate_genotype_call_dataset" href="sgkit.simulate_genotype_call_dataset.html" />
-    <link rel="prev" title="sgkit.infer_variant_ploidy" href="sgkit.infer_variant_ploidy.html" /> 
+    <link rel="prev" title="sgkit.invert_relationship_matrix" href="sgkit.invert_relationship_matrix.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="None"/>  
 <style type="text/css">
@@ -534,6 +534,8 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.genomic_relationship.html">sgkit.genomic_relationship</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.gwas_linear_regression.html">sgkit.gwas_linear_regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.hardy_weinberg_test.html">sgkit.hardy_weinberg_test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.hybrid_inverse_relationship.html">sgkit.hybrid_inverse_relationship</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.hybrid_relationship.html">sgkit.hybrid_relationship</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.identity_by_state.html">sgkit.identity_by_state</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.individual_heterozygosity.html">sgkit.individual_heterozygosity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.ld_matrix.html">sgkit.ld_matrix</a></li>
@@ -559,6 +561,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.infer_call_ploidy.html">sgkit.infer_call_ploidy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.infer_sample_ploidy.html">sgkit.infer_sample_ploidy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.infer_variant_ploidy.html">sgkit.infer_variant_ploidy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.invert_relationship_matrix.html">sgkit.invert_relationship_matrix</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.parent_indices</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.simulate_genotype_call_dataset.html">sgkit.simulate_genotype_call_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.window_by_genome.html">sgkit.window_by_genome</a></li>
@@ -620,7 +623,10 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_genomic_relationship_spec.html">sgkit.variables.stat_genomic_relationship_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_Hamilton_Kerr_lambda_spec.html">sgkit.variables.stat_Hamilton_Kerr_lambda_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_Hamilton_Kerr_tau_spec.html">sgkit.variables.stat_Hamilton_Kerr_tau_spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_hybrid_relationship_spec.html">sgkit.variables.stat_hybrid_relationship_spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_hybrid_inverse_relationship_spec.html">sgkit.variables.stat_hybrid_inverse_relationship_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_identity_by_state_spec.html">sgkit.variables.stat_identity_by_state_spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_inverse_relationship_spec.html">sgkit.variables.stat_inverse_relationship_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_observed_heterozygosity_spec.html">sgkit.variables.stat_observed_heterozygosity_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_pbs_spec.html">sgkit.variables.stat_pbs_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_pedigree_inbreeding_spec.html">sgkit.variables.stat_pedigree_inbreeding_spec</a></li>
@@ -792,12 +798,12 @@ sorting and the addition or removal of samples.</p>
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="sgkit.infer_variant_ploidy.html"
+       href="sgkit.invert_relationship_matrix.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">sgkit.infer_variant_ploidy</p>
+        <p class="prev-next-title">sgkit.invert_relationship_matrix</p>
       </div>
     </a>
     <a class="right-next"

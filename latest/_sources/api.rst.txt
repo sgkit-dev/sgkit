@@ -102,6 +102,8 @@ Methods
    genomic_relationship
    gwas_linear_regression
    hardy_weinberg_test
+   hybrid_inverse_relationship
+   hybrid_relationship
    identity_by_state
    individual_heterozygosity
    ld_matrix
@@ -132,6 +134,7 @@ Utilities
    infer_call_ploidy
    infer_sample_ploidy
    infer_variant_ploidy
+   invert_relationship_matrix
    parent_indices
    simulate_genotype_call_dataset
    window_by_genome
@@ -202,7 +205,10 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.stat_genomic_relationship_spec
     variables.stat_Hamilton_Kerr_lambda_spec
     variables.stat_Hamilton_Kerr_tau_spec
+    variables.stat_hybrid_relationship_spec
+    variables.stat_hybrid_inverse_relationship_spec
     variables.stat_identity_by_state_spec
+    variables.stat_inverse_relationship_spec
     variables.stat_observed_heterozygosity_spec
     variables.stat_pbs_spec
     variables.stat_pedigree_inbreeding_spec

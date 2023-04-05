@@ -1,0 +1,6 @@
+﻿sgkit.hybrid\_inverse\_relationship
+===================================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: hybrid_inverse_relationship
