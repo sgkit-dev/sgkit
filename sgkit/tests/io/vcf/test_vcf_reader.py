@@ -20,6 +20,7 @@ from sgkit.io.vcf import (
     vcf_to_zarr,
 )
 from sgkit.io.vcf.vcf_reader import FloatFormatFieldWarning, zarr_array_sizes
+from sgkit.model import get_contigs, get_filters, num_contigs
 from sgkit.tests.io.test_dataset import assert_identical
 
 from .utils import path_for_test
@@ -53,8 +54,8 @@ def test_vcf_to_zarr__small_vcf(
     else:
         ds = read_vcf(path, chunk_length=5, chunk_width=2)
 
-    assert ds.attrs["contigs"] == ["19", "20", "X"]
-    assert "contig_lengths" not in ds.attrs
+    assert_array_equal(ds["contig_id"], ["19", "20", "X"])
+    assert "contig_length" not in ds
     assert_array_equal(ds["variant_contig"], [0, 0, 1, 1, 1, 1, 1, 1, 2])
     assert ds["variant_contig"].chunks[0][0] == 5
     assert_array_equal(
@@ -196,8 +197,8 @@ def test_vcf_to_zarr__large_vcf(shared_datadir, is_path, read_chunk_length, tmp_
     vcf_to_zarr(path, output, chunk_length=5_000, read_chunk_length=read_chunk_length)
     ds = xr.open_zarr(output)
 
-    assert ds.attrs["contigs"] == ["20", "21"]
-    assert ds.attrs["contig_lengths"] == [63025520, 48129895]
+    assert_array_equal(ds["contig_id"], ["20", "21"])
+    assert_array_equal(ds["contig_length"], [63025520, 48129895])
     assert ds["sample_id"].shape == (1,)
     assert ds["call_genotype"].shape == (19910, 1, 2)
     assert ds["call_genotype_mask"].shape == (19910, 1, 2)
@@ -717,7 +718,7 @@ def test_vcf_to_zarr__mixed_ploidy_vcf(
     ds = load_dataset(output)
 
     variant_dtype = "O"
-    assert ds.attrs["contigs"] == ["CHR1", "CHR2", "CHR3"]
+    assert_array_equal(ds["contig_id"], ["CHR1", "CHR2", "CHR3"])
     assert_array_equal(ds["variant_contig"], [0, 0])
     assert_array_equal(ds["variant_position"], [2, 7])
     assert_array_equal(
@@ -870,7 +871,7 @@ def test_vcf_to_zarr__large_number_of_contigs(shared_datadir, tmp_path):
 
     ds = xr.open_zarr(output)
 
-    assert len(ds.attrs["contigs"]) == 3366
+    assert len(ds["contig_id"]) == 3366
     assert ds["variant_contig"].dtype == np.int16  # needs larger dtype than np.int8
 
 
@@ -1265,7 +1266,7 @@ def test_spec(shared_datadir, tmp_path):
     group = zarr.open_group(output)
 
     # VCF Zarr group attributes
-    assert group.attrs["vcf_zarr_version"] == "0.1"
+    assert group.attrs["vcf_zarr_version"] == "0.2"
     assert group.attrs["vcf_header"].startswith("##fileformat=VCFv4.0")
     assert group.attrs["contigs"] == ["19", "20", "X"]
 
@@ -1294,6 +1295,8 @@ def test_spec(shared_datadir, tmp_path):
             "call_genotype_fill",
             "call_genotype_phased",
             "call_HQ",
+            "contig_id",
+            "filter_id",
             "sample_id",
         ]
     )
@@ -1582,5 +1585,23 @@ def test_vcf_to_zarr__retain_files(shared_datadir, tmp_path, retain_temp_files):
         target_part_size="500B",
     )
     ds = xr.open_zarr(output)
-    assert ds.attrs["contigs"] == ["19", "20", "X"]
+    assert_array_equal(ds["contig_id"], ["19", "20", "X"])
     assert (len(os.listdir(temp_path)) == 0) != retain_temp_files
+
+
+def test_vcf_to_zarr__legacy_contig_and_filter_attrs(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "sample.vcf.gz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+
+    vcf_to_zarr(path, output, chunk_length=5, chunk_width=2)
+    ds = xr.open_zarr(output)
+
+    # drop new contig_id and filter_id variables
+    ds = ds.drop_vars(["contig_id", "filter_id"])
+
+    # check that contigs and filters can still be retrieved (with a warning)
+    assert num_contigs(ds) == 3
+    with pytest.warns(DeprecationWarning):
+        assert_array_equal(get_contigs(ds), np.array(["19", "20", "X"], dtype="S"))
+    with pytest.warns(DeprecationWarning):
+        assert_array_equal(get_filters(ds), np.array(["PASS", "s50", "q10"], dtype="S"))

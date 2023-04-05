@@ -23,6 +23,7 @@ from sgkit.io.vcf.vcf_writer_utils import (
     vcf_values_to_byte_buf,
     vcf_values_to_byte_buf_size,
 )
+from sgkit.model import get_contigs, get_filters
 from sgkit.typing import PathType
 
 
@@ -88,8 +89,8 @@ def write_vcf(
         header_info_fields = _info_fields(header_str)
         header_format_fields = _format_fields(header_str)
 
-        contigs = np.array(input.attrs["contigs"], dtype="S")
-        filters = np.array(input.attrs["filters"], dtype="S")
+        contigs = get_contigs(input).astype("S")
+        filters = get_filters(input).astype("S")
 
         for ds in _variant_chunks(input):
             dataset_chunk_to_vcf(

@@ -5,6 +5,7 @@ import numpy as np
 from xarray import Dataset
 
 from sgkit import variables
+from sgkit.model import get_contigs, num_contigs
 from sgkit.utils import conditional_merge_datasets, create_dataset
 from sgkit.variables import window_contig, window_start, window_stop
 
@@ -306,7 +307,7 @@ def _window_per_contig(
     **kwargs: Any,
 ) -> Dataset:
     n_variants = ds.dims["variants"]
-    n_contigs = len(ds.attrs["contigs"])
+    n_contigs = num_contigs(ds)
     contig_ids = np.arange(n_contigs)
     variant_contig = ds["variant_contig"]
     contig_starts = np.searchsorted(variant_contig.values, contig_ids)
@@ -315,7 +316,7 @@ def _window_per_contig(
     contig_window_contigs = []
     contig_window_starts = []
     contig_window_stops = []
-    for i, contig in enumerate(ds.attrs["contigs"]):
+    for i, contig in enumerate(get_contigs(ds)):
         starts, stops = windowing_fn(
             contig, contig_bounds[i], contig_bounds[i + 1], *args, **kwargs
         )
