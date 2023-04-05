@@ -45,9 +45,14 @@ Bug fixes
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
 
-.. Deprecations
-.. ~~~~~~~~~~~~
+Deprecations
+~~~~~~~~~~~~
 
+- Store contig names in a ``contig_id`` array, and filters in a ``filter_id`` array.
+  This change duplicates the information stored in dataset attributes, which should
+  now be considered deprecated, and will be removed in a future release.
+  (:user:`tomwhite`, :pr:`1054`, :issue:`1035`)
+  
 Improvements
 ~~~~~~~~~~~~
 
