@@ -25,17 +25,26 @@ jobs:
           nvidia-smi
 
       - name: Set up Python
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v2.2.0
         env:
           CONDA: /home/runnerx/miniconda3
         with:
           python-version: ${{ matrix.python-version }}
           miniconda-version: "latest"
 
-      - name: Install dependencies
+      - name: Conda info
         run: |
-          conda install -c anaconda cudatoolkit
+          conda info
+          conda list
+
+      - name: Installing cudatoolkit and dependencies
+        run: |
+          conda install -c nvidia cudatoolkit
           pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Numba Information
+        run: |
+          numba -s
 
       - name: Run GPU tagged tests
         run: |

@@ -11,7 +11,7 @@ runners:
     # Custom image with NVIDIA drivers installed on Ubuntu-20.4
     # to reduce provision time
     # Format => project_name:image_name
-    machine_image: sgkit-dev:cirun-nvidia
+    machine_image: sgkit-dev:cirun-nvidia-v2
     region:
       - us-central1-a
       - us-central1-b
