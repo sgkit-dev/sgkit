@@ -892,6 +892,31 @@ See also: :data:`sgkit.variables.stat_Hamilton_Kerr_tau_spec`.
 )
 
 (
+    stat_hybrid_relationship,
+    stat_hybrid_relationship_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_hybrid_relationship",
+        dims=("samples_0", "samples_1"),
+        kind="f",
+        __doc__="""The hybrid relationship matrix or "H-matrix".""",
+    )
+)
+
+
+(
+    stat_hybrid_inverse_relationship,
+    stat_hybrid_inverse_relationship_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_hybrid_inverse_relationship",
+        dims=("samples_0", "samples_1"),
+        kind="f",
+        __doc__="""Inverse of the hybrid relationship matrix or "H-matrix".""",
+    )
+)
+
+(
     stat_pedigree_inverse_relationship,
     stat_pedigree_inverse_relationship_spec,
 ) = SgkitVariables.register_variable(
@@ -959,6 +984,22 @@ with self-kinship values on the diagonal.
         dims=("samples_0", "samples_1"),
         kind="f",
         __doc__="""Relationship matrix derived from pedigree structure.""",
+    )
+)
+
+
+(
+    stat_inverse_relationship,
+    stat_inverse_relationship_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_inverse_relationship",
+        dims=("samples_0", "samples_1"),
+        kind="f",
+        __doc__="""
+The inverse of a relationship matrix. This may contain the inverse of a subset of
+a relationship matrix in which nan values indicate elements outside of the subset.
+""",
     )
 )
 
