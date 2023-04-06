@@ -201,9 +201,13 @@ def call_metric_kernel(
     # possible value for a given compute capability.
 
     threads_per_block = (32, 32)
+    # Minimum grid size is 128 (12*12 = 144)
+    # Ref: https://github.com/numba/numba/blob/008077553b558bd183668ecd581d4d0bc54bd32c/numba/cuda/dispatcher.py#L534
+    default_blocks_per_grid = (12, 12)
+
     blocks_per_grid = (
-        math.ceil(out.shape[0] / threads_per_block[0]),
-        math.ceil(out.shape[1] / threads_per_block[1]),
+        max(default_blocks_per_grid[0], math.ceil(out.shape[0] / threads_per_block[0])),
+        max(default_blocks_per_grid[1], math.ceil(out.shape[1] / threads_per_block[1])),
     )
 
     metric_kernel[blocks_per_grid, threads_per_block](d_a, d_b, d_out)
