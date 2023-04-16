@@ -48,7 +48,6 @@ jobs:
       run: |
         pytest -v --cov=sgkit --cov-report=term-missing
     - name: Upload coverage to Codecov
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      run: |
-        codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
