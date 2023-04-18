@@ -19,7 +19,11 @@ from sgkit.io.vcf import (
     read_vcf,
     vcf_to_zarr,
 )
-from sgkit.io.vcf.vcf_reader import FloatFormatFieldWarning, zarr_array_sizes
+from sgkit.io.vcf.vcf_reader import (
+    FloatFormatFieldWarning,
+    merge_zarr_array_sizes,
+    zarr_array_sizes,
+)
 from sgkit.model import get_contigs, get_filters, num_contigs
 from sgkit.tests.io.test_dataset import assert_identical
 
@@ -1228,6 +1232,64 @@ def test_zarr_array_sizes(shared_datadir, vcf_file, expected_sizes):
     path = path_for_test(shared_datadir, vcf_file)
     sizes = zarr_array_sizes(path)
     assert sizes == expected_sizes
+
+
+def test_zarr_array_sizes__parallel(shared_datadir):
+    path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz")
+    regions = ["20", "21"]
+    sizes = zarr_array_sizes(path, regions=regions)
+    assert sizes == {
+        "max_alt_alleles": 7,
+        "field_defs": {"FORMAT/AD": {"Number": 8}},
+        "ploidy": 2,
+    }
+
+
+def test_zarr_array_sizes__multiple(shared_datadir):
+    paths = [
+        path_for_test(shared_datadir, "CEUTrio.20.gatk3.4.g.vcf.bgz"),
+        path_for_test(shared_datadir, "CEUTrio.21.gatk3.4.g.vcf.bgz"),
+    ]
+    sizes = zarr_array_sizes(paths, target_part_size=None)
+    assert sizes == {
+        "max_alt_alleles": 7,
+        "field_defs": {"FORMAT/AD": {"Number": 8}},
+        "ploidy": 2,
+    }
+
+
+def test_zarr_array_sizes__parallel_partitioned_by_size(shared_datadir):
+    path = path_for_test(
+        shared_datadir,
+        "1000G.phase3.broad.withGenotypes.chr20.10100000.vcf.gz",
+    )
+    sizes = zarr_array_sizes(path, target_part_size="4MB")
+    assert sizes == {
+        "max_alt_alleles": 3,
+        "field_defs": {"FORMAT/AD": {"Number": 4}},
+        "ploidy": 2,
+    }
+
+
+@pytest.mark.parametrize(
+    "all_kwargs, expected_sizes",
+    [
+        ([{"max_alt_alleles": 1}, {"max_alt_alleles": 2}], {"max_alt_alleles": 2}),
+        (
+            [{"max_alt_alleles": 1, "ploidy": 3}, {"max_alt_alleles": 2}],
+            {"max_alt_alleles": 2, "ploidy": 3},
+        ),
+        (
+            [
+                {"max_alt_alleles": 1, "field_defs": {"FORMAT/AD": {"Number": 8}}},
+                {"max_alt_alleles": 2, "field_defs": {"FORMAT/AD": {"Number": 6}}},
+            ],
+            {"max_alt_alleles": 2, "field_defs": {"FORMAT/AD": {"Number": 8}}},
+        ),
+    ],
+)
+def test_merge_zarr_array_sizes(all_kwargs, expected_sizes):
+    assert merge_zarr_array_sizes(all_kwargs) == expected_sizes
 
 
 def check_field(group, name, ndim, shape, dimension_names, dtype):

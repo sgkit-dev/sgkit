@@ -9,6 +9,7 @@ try:
         read_vcf,
         vcf_to_zarr,
         vcf_to_zarrs,
+        zarr_array_sizes,
     )
     from .vcf_writer import write_vcf, zarr_to_vcf
 
@@ -21,6 +22,7 @@ try:
         "vcf_to_zarr",
         "vcf_to_zarrs",
         "write_vcf",
+        "zarr_array_sizes",
         "zarr_to_vcf",
     ]
 except ImportError as e:  # pragma: no cover

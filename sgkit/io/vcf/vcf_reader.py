@@ -1174,9 +1174,60 @@ def count_variants(path: PathType, region: Optional[str] = None) -> int:
         return sum(1 for _ in region_filter(vcf, region))
 
 
-def zarr_array_sizes(input: PathType) -> Dict[str, Any]:
-    """Make a pass through a VCF/BCF file to determine sizes for storage in Zarr."""
+def zarr_array_sizes(
+    input: Union[PathType, Sequence[PathType]],
+    *,
+    regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]] = None,
+    target_part_size: Union[None, int, str] = "auto",
+) -> Dict[str, Any]:
+    """Make a pass through a VCF/BCF file to determine sizes for storage in Zarr.
 
+    By default, the input is processed in parts in parallel. However, if the input
+    is a single file, ``target_part_size`` is None, and ``regions`` is None,
+    then the operation will be carried out sequentially.
+
+    Parameters
+    ----------
+    input
+        A path (or paths) to the input BCF or VCF file (or files). VCF files should
+        be compressed and have a ``.tbi`` or ``.csi`` index file. BCF files should
+        have a ``.csi`` index file.
+    target_part_size
+        The desired size, in bytes, of each (compressed) part of the input to be
+        processed in parallel. Defaults to ``"auto"``, which will pick a good size
+        (currently 20MB). A value of None means that the input will be processed
+        sequentially. The setting will be ignored if ``regions`` is also specified.
+    regions
+        Genomic region or regions to extract variants for. For multiple inputs, multiple
+        input regions are specified as a sequence of values which may be None, or a
+        sequence of region strings. Takes priority over ``target_part_size`` if both
+        are not None.
+    """
+
+    if regions is None and target_part_size is not None:
+        if target_part_size == "auto":
+            target_part_size = "20MB"
+        if isinstance(input, str) or isinstance(input, Path):
+            regions = partition_into_regions(input, target_part_size=target_part_size)
+        else:
+            # Multiple inputs
+            inputs = input
+            regions = [
+                partition_into_regions(input, target_part_size=target_part_size)
+                for input in inputs
+            ]
+
+    if (isinstance(input, str) or isinstance(input, Path)) and (
+        regions is None or isinstance(regions, str)
+    ):
+        return zarr_array_sizes_sequential(input, regions)
+    else:
+        return zarr_array_sizes_parallel(input, regions)
+
+
+def zarr_array_sizes_sequential(
+    input: PathType, region: Optional[str] = None
+) -> Dict[str, Any]:
     with open_vcf(input) as vcf:
         ploidy = -1
         alt_alleles = 0
@@ -1191,7 +1242,12 @@ def zarr_array_sizes(input: PathType) -> Dict[str, Any]:
             key: {"Number": 1} for key in format.keys() if format[key]["Number"] == "."
         }
 
-        for variant in vcf:
+        if region is None:
+            variants = vcf
+        else:
+            variants = vcf(region)
+
+        for variant in region_filter(variants, region):
             for key, val in info_field_defs.items():
                 field_val = variant.INFO.get(key)
                 if field_val is not None:
@@ -1230,3 +1286,62 @@ def zarr_array_sizes(input: PathType) -> Dict[str, Any]:
         if ploidy > -1:
             kwargs["ploidy"] = ploidy
         return kwargs
+
+
+def zarr_array_sizes_parallel(
+    input: Union[PathType, Sequence[PathType]],
+    regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]],
+) -> Dict[str, Any]:
+    if isinstance(input, str) or isinstance(input, Path):
+        # Single input
+        inputs: Sequence[PathType] = [input]
+        assert regions is not None  # this would just be sequential case
+        input_regions: Sequence[Optional[Sequence[str]]] = [regions]  # type: ignore
+    else:
+        # Multiple inputs
+        inputs = input
+        if regions is None:
+            input_regions = [None] * len(inputs)
+        else:
+            if len(regions) == 0 or isinstance(regions[0], str):
+                raise ValueError(
+                    f"For multiple inputs, multiple input regions must be a sequence of sequence of strings: {regions}"
+                )
+            input_regions = regions
+
+    assert len(inputs) == len(input_regions)
+
+    tasks = []
+    for i, input in enumerate(inputs):
+        input_region_list = input_regions[i]
+        if input_region_list is None:
+            # single partition case: make a list so the loop below works
+            input_region_list = [None]  # type: ignore
+        for region in input_region_list:
+            task = dask.delayed(zarr_array_sizes_sequential)(
+                input,
+                region=region,
+            )
+            tasks.append(task)
+    all_kwargs = dask.compute(*tasks)
+    return merge_zarr_array_sizes(all_kwargs)
+
+
+def merge_zarr_array_sizes(all_kwargs: Sequence[Dict[str, Any]]):
+    """Merge a sequence of size kwargs using the largest size found in any of them."""
+
+    max_alt_alleles = max([kwargs["max_alt_alleles"] for kwargs in all_kwargs])
+    ploidy = max([kwargs.get("ploidy", -1) for kwargs in all_kwargs])
+
+    field_defs = {}
+    if len(all_kwargs) > 0 and "field_defs" in all_kwargs[0]:
+        for key in all_kwargs[0]["field_defs"].keys():
+            number = max([kwargs["field_defs"][key]["Number"] for kwargs in all_kwargs])
+            field_defs[key] = {"Number": number}
+
+    kwargs: Dict[str, Any] = {"max_alt_alleles": max_alt_alleles}
+    if len(field_defs) > 0:
+        kwargs["field_defs"] = field_defs
+    if ploidy > -1:
+        kwargs["ploidy"] = ploidy
+    return kwargs
