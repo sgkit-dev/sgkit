@@ -524,5 +524,5 @@ def vcf_number_to_dimension_and_size(
             )
             return (dim_name, int(vcf_number))
     raise ValueError(
-        f"{category} field '{key}' is defined as Number '{vcf_number}', which is not supported."
+        f"{category} field '{key}' is defined as Number '{vcf_number}', which is not supported. Consider specifying `field_defs` to provide a concrete size for this field."
     )
