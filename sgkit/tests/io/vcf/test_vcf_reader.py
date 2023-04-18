@@ -1185,7 +1185,7 @@ def test_vcf_to_zarr__fields_errors(shared_datadir, tmp_path):
 
     with pytest.raises(
         ValueError,
-        match=r"INFO field 'AC' is defined as Number '.', which is not supported.",
+        match=r"INFO field 'AC' is defined as Number '.', which is not supported. Consider specifying `field_defs` to provide a concrete size for this field.",
     ):
         vcf_to_zarr(path, output, fields=["INFO/AC"])
 
