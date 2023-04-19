@@ -1605,3 +1605,15 @@ def test_vcf_to_zarr__legacy_contig_and_filter_attrs(shared_datadir, tmp_path):
         assert_array_equal(get_contigs(ds), np.array(["19", "20", "X"], dtype="S"))
     with pytest.warns(DeprecationWarning):
         assert_array_equal(get_filters(ds), np.array(["PASS", "s50", "q10"], dtype="S"))
+
+
+def test_vcf_to_zarr__no_samples(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "no_samples.vcf.gz")
+    output = tmp_path.joinpath("vcf.zarr").as_posix()
+    vcf_to_zarr(path, output)
+    # Run with many parts to test concat_zarrs path also accepts no samples
+    vcf_to_zarr(path, output, target_part_size="1k")
+    ds = xr.open_zarr(output)
+    assert_array_equal(ds["sample_id"], [])
+    assert_array_equal(ds["contig_id"], ["1"])
+    assert ds.dims["variants"] == 973
