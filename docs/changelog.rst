@@ -46,6 +46,9 @@ Bug fixes
   so that the chunks are ``chunk_length`` sized.
   (:user:`benjeffery`, :pr:`1044`,)
 
+- ``vcf_to_zarrs`` failed with ``ZeroDivisionError`` when VCFs with no samples were converted.
+  (:user:`benjeffery`, :pr:`1069`, :issue:`1068`)
+
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
 
