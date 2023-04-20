@@ -566,6 +566,8 @@ and <a class="reference internal" href="generated/sgkit.invert_relationship_matr
 <li><p><code class="docutils literal notranslate"><span class="pre">vcf_to_zarrs</span></code> was outputting zarr files with <code class="docutils literal notranslate"><span class="pre">temp_chunk_length</span></code> sized chunks. This has now been fixed
 so that the chunks are <code class="docutils literal notranslate"><span class="pre">chunk_length</span></code> sized.
 (<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1044">PR 1044</a>,)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vcf_to_zarrs</span></code> failed with <code class="docutils literal notranslate"><span class="pre">ZeroDivisionError</span></code> when VCFs with no samples were converted.
+(<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1069">PR 1069</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/1068">GH 1068</a>)</p></li>
 </ul>
 </section>
 <section id="deprecations">
