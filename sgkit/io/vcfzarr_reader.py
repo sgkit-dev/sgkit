@@ -463,6 +463,9 @@ def _to_zarr(  # type: ignore[no-untyped-def]
         # assume the object passed is already a mapper
         mapper = url  # pragma: no cover
     chunks = [c[0] for c in arr.chunks]
+    # Zarr errors if we specify chunks of length 0 (#1068)
+    if sum(chunks) == 0:
+        chunks = None
     z = _zarr_create_with_attrs(  # type: ignore[no-untyped-call]
         shape=arr.shape,
         chunks=chunks,
