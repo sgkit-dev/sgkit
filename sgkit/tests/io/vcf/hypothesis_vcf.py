@@ -98,9 +98,14 @@ def vcf_field_keys(category):
     # exclude reserved keys because generated type and number may not match spec
     # [1.6.1 Fixed fields]
     field_key_regex = r"[A-Za-z_][0-9A-Za-z_.]"
+
+    def is_reserved_key(key):
+        return (category == "INFO" and key in RESERVED_INFO_KEYS) or (
+            category == "FORMAT" and key in RESERVED_FORMAT_KEYS
+        )
+
     return from_regex(field_key_regex, fullmatch=True).filter(
-        lambda key: (category == "INFO" and key not in RESERVED_INFO_KEYS)
-        or (key not in RESERVED_FORMAT_KEYS)
+        lambda key: not is_reserved_key(key)
     )
 
 
