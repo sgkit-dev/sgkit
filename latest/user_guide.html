@@ -977,7 +977,77 @@ indexing and uniqueness within Xarray/Pandas, since this is critical for underst
 <h2><a class="toc-backref" href="#id21">Deployment</a><a class="headerlink" href="#deployment" title="Permalink to this headline">#</a></h2>
 <section id="deploying-sgkit-on-a-cluster">
 <h3><a class="toc-backref" href="#id22">Deploying sgkit on a cluster</a><a class="headerlink" href="#deploying-sgkit-on-a-cluster" title="Permalink to this headline">#</a></h3>
-<p>TODO: Create a tutorial on running sgkit at scale</p>
+<p>For parallelism sgkit uses <a class="reference external" href="https://dask.org/">Dask</a> to distribute work across workers.
+These workers can either be local processes or remote processes running on a cluster.
+By default, dask creates a local cluster with one worker thread per CPU core on the machine.
+This is useful for testing and development, but for larger datasets it is often necessary
+to run on a cluster. There are several options for this including:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://kubernetes.dask.org/en/latest/">Dask Kubernetes</a></p></li>
+<li><p><a class="reference external" href="https://jobqueue.dask.org/en/latest/">Dask Jobqueue (PBS, Slurm, MOAB, SGE, LSF, and HTCondor.)</a></p></li>
+<li><p><a class="reference external" href="https://cloudprovider.dask.org/en/latest/">Dask Cloud Provider (AWS, GCP, Azure, etc.)</a></p></li>
+<li><p><a class="reference external" href="https://mpi.dask.org/en/latest/">Dask MPI</a></p></li>
+<li><p><a class="reference external" href="https://coiled.io/">Coiled</a></p></li>
+</ul>
+</div></blockquote>
+<p>Research institutions often use a job scheduler like Slurm, LFS or PBS to manage compute resources,
+so here is a worked example of using Dask Jobqueue to run sgkit on an LSF cluster. The
+process is similar for other schedulers, see the
+<a class="reference external" href="https://jobqueue.dask.org/en/latest/">Dask Jobqueue documentation</a></p>
+<p>The first step is to create a dask scheduler that sgkit connects to. It is often desirable
+to have this running in a separate process, in a python REPL or notebook, so that its scaling
+can be adjusted on the fly. This needs to be done on a login node or other machine that has
+job submission privileges.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dask_jobqueue</span> <span class="kn">import</span> <span class="n">LSFCluster</span>
+<span class="n">cluster</span> <span class="o">=</span> <span class="n">LSFCluster</span><span class="p">(</span>
+    <span class="n">cores</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>           <span class="c1"># Number of cores per-worker</span>
+    <span class="n">memory</span><span class="o">=</span><span class="s2">&quot;16GB&quot;</span><span class="p">,</span>     <span class="c1"># Amount of memory per-worker</span>
+    <span class="n">project</span><span class="o">=</span><span class="s2">&quot;myproject&quot;</span><span class="p">,</span>
+    <span class="n">queue</span><span class="o">=</span><span class="s2">&quot;myqueue&quot;</span><span class="p">,</span>   <span class="c1"># LSF queue</span>
+    <span class="n">walltime</span><span class="o">=</span><span class="s2">&quot;04:00&quot;</span><span class="p">,</span>  <span class="c1"># Set this to a reasonable value for your data size</span>
+    <span class="n">use_stdin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>    <span class="c1"># This is often required for dask to work with LSF</span>
+    <span class="n">lsf_units</span><span class="o">=</span><span class="s2">&quot;MB&quot;</span><span class="p">,</span>    <span class="c1"># This may very depending on your clusters config</span>
+    <span class="c1"># Any bash commands needed to setup the environment</span>
+    <span class="n">job_script_prolouge</span><span class="o">=</span><span class="s2">&quot;module load example/3.8.5&quot;</span><span class="p">,</span>
+    <span class="c1"># This last line is useful to gracefully rotate out workers as they reach</span>
+    <span class="c1"># the maximum wallclock time for the given queue. This allows a long-running</span>
+    <span class="c1"># cluster to run on queues with shorter wallclock limits, but that likely</span>
+    <span class="c1"># have higher priority.</span>
+    <span class="n">worker_extra_args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--lifetime&quot;</span><span class="p">,</span> <span class="s2">&quot;350m&quot;</span><span class="p">,</span> <span class="s2">&quot;--lifetime-stagger&quot;</span><span class="p">,</span> <span class="s2">&quot;5m&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Now that the cluster is created we can view its dashboard at the address from
+<code class="docutils literal notranslate"><span class="pre">cluster.dashboard_link</span></code>, at this point it will have zero workers.</p>
+<p>To launch workers we can request a fixed amount with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cluster</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>At which point the worker jobs will be scheduled and once they are running they will connect
+to the dask scheduler and be visible in the dashboard.</p>
+<p>The other option is to let dask adaptively scale the number of workers based on the amount
+of task that are queued up. This can prevent idle workers when there are no tasks to run,
+but there may be a short delay when new tasks are submitted while the workers are being
+scheduled. To enable this we can use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cluster</span><span class="o">.</span><span class="n">adapt</span><span class="p">(</span><span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maximum</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">wait_count</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The minimum and maximum are optional, but it is recommended to set them to reasonable values
+to prevent the cluster launching thousands of jobs. The wait_count is the number of update
+cycles that dask will wait before scaling down the cluster when there are no tasks to run.
+By default the update interval is 1s so the above command will wait 120s before scaling down.</p>
+<p>Now that the cluster is running we can connect to it from our sgkit code. The scheduler
+address is available from <code class="docutils literal notranslate"><span class="pre">cluster.scheduler_address</span></code>. Then in your sgkit code pass this
+value to the dask <code class="docutils literal notranslate"><span class="pre">Client</span></code> constructor:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<span class="kn">from</span> <span class="nn">dask.distributed</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="s2">&quot;http://scheduler-address:8786&quot;</span><span class="p">)</span>
+<span class="c1"># Now run sgkit code as normal</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">sgkit</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;mydata.zarr&quot;</span><span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">sgkit</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
 <section id="using-gpus">
 <h3><a class="toc-backref" href="#id23">Using GPUs</a><a class="headerlink" href="#using-gpus" title="Permalink to this headline">#</a></h3>
@@ -1000,8 +1070,8 @@ indexing and uniqueness within Xarray/Pandas, since this is critical for underst
 <span class="gp">   ....: </span>    <span class="n">ac</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 <span class="gp">   ....: </span>
 
-<span class="go">[                                        ] | 0% Completed | 231.31 us</span>
-<span class="go">[########################################] | 100% Completed | 100.62 ms</span>
+<span class="go">[                                        ] | 0% Completed | 305.51 us</span>
+<span class="go">[########################################] | 100% Completed | 100.71 ms</span>
 
 <span class="gp">In [39]: </span><span class="n">ac</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 <span class="gh">Out[39]: </span>
