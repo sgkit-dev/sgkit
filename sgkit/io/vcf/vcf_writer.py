@@ -82,17 +82,18 @@ def write_vcf(
 ) -> None:
     """Convert a dataset to a VCF file.
 
-    The VCF header to use is dictated by the ``vcf_header`` parameter, and the
-    ``vcf_header`` attribute on the input dataset. The ``vcf_header`` parameter
-    takes precedence and will be used if specified. Any variables in the dataset
-    that are not in the header will not be included in the output.
+    The VCF header to use is dictated by either the ``vcf_header`` parameter or the
+    ``vcf_header`` attribute on the input dataset.
 
-    Otherwise, if the ``vcf_header`` attribute is present (because the dataset
-    derives from one imported via :func:`vcf_to_zarr`) it will be used to
-    generate the new VCF header. Any variables in the dataset that are not
-    specified in the original header will have corresponding header lines
-    added, and any variables not in the dataset that are in the original
-    header will have the corresponding header line omitted.
+    If specified, the ``vcf_header`` parameter will be used, and any variables in the dataset
+    that are not in this header will not be included in the output.
+
+    If the ``vcf_header`` parameter is left as the default (`None`) and a ``vcf_header``
+    attribute is present in the dataset (such as one created by :func:`vcf_to_zarr`),
+    it will be used to generate the new VCF header. In this case, any variables in the
+    dataset that are not specified in this header will have corresponding header lines
+    added, and any lines in the header without a corresponding variable in the dataset
+    will be omitted.
 
     In the case of no ``vcf_header`` parameter or attribute, a VCF header will
     be generated, and will include all variables in the dataset.
