@@ -299,7 +299,87 @@ Deployment
 Deploying sgkit on a cluster
 ----------------------------
 
-TODO: Create a tutorial on running sgkit at scale
+For parallelism sgkit uses `Dask <https://dask.org/>`_ to distribute work across workers.
+These workers can either be local processes or remote processes running on a cluster.
+By default, dask creates a local cluster with one worker thread per CPU core on the machine.
+This is useful for testing and development, but for larger datasets it is often necessary
+to run on a cluster. There are several options for this including:
+
+ - `Dask Kubernetes <https://kubernetes.dask.org/en/latest/>`_
+ - `Dask Jobqueue (PBS, Slurm, MOAB, SGE, LSF, and HTCondor.) <https://jobqueue.dask.org/en/latest/>`_
+ - `Dask Cloud Provider (AWS, GCP, Azure, etc.) <https://cloudprovider.dask.org/en/latest/>`_
+ - `Dask MPI <https://mpi.dask.org/en/latest/>`_
+ - `Coiled <https://coiled.io/>`_
+
+Research institutions often use a job scheduler like Slurm, LFS or PBS to manage compute resources,
+so here is a worked example of using Dask Jobqueue to run sgkit on an LSF cluster. The
+process is similar for other schedulers, see the
+`Dask Jobqueue documentation <https://jobqueue.dask.org/en/latest/>`_
+
+The first step is to create a dask scheduler that sgkit connects to. It is often desirable
+to have this running in a separate process, in a python REPL or notebook, so that its scaling
+can be adjusted on the fly. This needs to be done on a login node or other machine that has
+job submission privileges.
+
+.. code-block:: python
+
+        from dask_jobqueue import LSFCluster
+        cluster = LSFCluster(
+            cores=1,           # Number of cores per-worker
+            memory="16GB",     # Amount of memory per-worker
+            project="myproject",
+            queue="myqueue",   # LSF queue
+            walltime="04:00",  # Set this to a reasonable value for your data size
+            use_stdin=True,    # This is often required for dask to work with LSF
+            lsf_units="MB",    # This may very depending on your clusters config
+            # Any bash commands needed to setup the environment
+            job_script_prolouge="module load example/3.8.5",
+            # This last line is useful to gracefully rotate out workers as they reach
+            # the maximum wallclock time for the given queue. This allows a long-running
+            # cluster to run on queues with shorter wallclock limits, but that likely
+            # have higher priority.
+            worker_extra_args=["--lifetime", "350m", "--lifetime-stagger", "5m"],
+        )
+
+Now that the cluster is created we can view its dashboard at the address from
+``cluster.dashboard_link``, at this point it will have zero workers.
+
+To launch workers we can request a fixed amount with:
+
+.. code-block:: python
+
+        cluster.scale(10)
+
+At which point the worker jobs will be scheduled and once they are running they will connect
+to the dask scheduler and be visible in the dashboard.
+
+The other option is to let dask adaptively scale the number of workers based on the amount
+of task that are queued up. This can prevent idle workers when there are no tasks to run,
+but there may be a short delay when new tasks are submitted while the workers are being
+scheduled. To enable this we can use:
+
+.. code-block:: python
+
+        cluster.adapt(minimum=0, maximum=100, wait_count=120)
+
+The minimum and maximum are optional, but it is recommended to set them to reasonable values
+to prevent the cluster launching thousands of jobs. The wait_count is the number of update
+cycles that dask will wait before scaling down the cluster when there are no tasks to run.
+By default the update interval is 1s so the above command will wait 120s before scaling down.
+
+Now that the cluster is running we can connect to it from our sgkit code. The scheduler
+address is available from ``cluster.scheduler_address``. Then in your sgkit code pass this
+value to the dask ``Client`` constructor:
+
+.. code-block:: python
+
+        import sgkit as sg
+        from dask.distributed import Client
+        client = Client("http://scheduler-address:8786")
+        # Now run sgkit code as normal
+        ds = sgkit.load_dataset("mydata.zarr")
+        ds = sgkit.variant_stats(ds)
+
 
 Using GPUs
 ----------
