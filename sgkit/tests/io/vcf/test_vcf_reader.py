@@ -5,6 +5,7 @@ from os.path import join
 from typing import MutableMapping
 
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 import zarr
@@ -22,6 +23,7 @@ from sgkit.io.vcf import (
 from sgkit.io.vcf.vcf_reader import (
     FloatFormatFieldWarning,
     merge_zarr_array_sizes,
+    vcf_to_parquet,
     zarr_array_sizes,
 )
 from sgkit.model import get_contigs, get_filters, num_contigs
@@ -1679,3 +1681,34 @@ def test_vcf_to_zarr__no_samples(shared_datadir, tmp_path):
     assert_array_equal(ds["sample_id"], [])
     assert_array_equal(ds["contig_id"], ["1"])
     assert ds.dims["variants"] == 973
+
+
+def test_vcf_to_parquet(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "sample.vcf.gz")
+    output = tmp_path.joinpath("vcf.parquet").as_posix()
+    vcf_to_parquet(path, output)
+
+    df = pd.read_parquet(output)
+    assert len(df) == 9
+    assert_array_equal(df[df["ID"] == "rs6040355"]["ALT"].tolist(), [["G", "T"]])
+
+
+def test_vcf_to_parquet__parallel(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "CEUTrio.20.21.gatk3.4.g.vcf.bgz")
+    output = tmp_path.joinpath("vcf.parquet").as_posix()
+    regions = ["20", "21"]
+    vcf_to_parquet(path, output, regions=regions)
+
+    df = pd.read_parquet(output)
+    assert len(df) == 19910
+
+
+def test_vcf_to_parquet__fields_errors(shared_datadir, tmp_path):
+    path = path_for_test(shared_datadir, "sample.vcf.gz")
+    output = tmp_path.joinpath("vcf.parquet").as_posix()
+
+    with pytest.raises(
+        ValueError,
+        match=r"FORMAT fields are not supported in `vcf_to_parquet`",
+    ):
+        vcf_to_parquet(path, output, fields=["FORMAT/DP"])
