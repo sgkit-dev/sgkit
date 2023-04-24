@@ -720,11 +720,20 @@ document.write(`
 <h1>sgkit.io.vcf.write_vcf<a class="headerlink" href="#sgkit-io-vcf-write-vcf" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgkit.io.vcf.write_vcf">
-<span class="sig-prename descclassname"><span class="pre">sgkit.io.vcf.</span></span><span class="sig-name descname"><span class="pre">write_vcf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.io.vcf.write_vcf" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">sgkit.io.vcf.</span></span><span class="sig-name descname"><span class="pre">write_vcf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vcf_header</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.io.vcf.write_vcf" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a dataset to a VCF file.</p>
-<p>The VCF fields included in the output are those in the <code class="docutils literal notranslate"><span class="pre">vcf_header</span></code>
-attribute of the dataset. There is currently no way to change the fields
-that are included apart from by manually updating this attribute.</p>
+<p>The VCF header to use is dictated by either the <code class="docutils literal notranslate"><span class="pre">vcf_header</span></code> parameter or the
+<code class="docutils literal notranslate"><span class="pre">vcf_header</span></code> attribute on the input dataset.</p>
+<p>If specified, the <code class="docutils literal notranslate"><span class="pre">vcf_header</span></code> parameter will be used, and any variables in the dataset
+that are not in this header will not be included in the output.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">vcf_header</span></code> parameter is left as the default (<cite>None</cite>) and a <code class="docutils literal notranslate"><span class="pre">vcf_header</span></code>
+attribute is present in the dataset (such as one created by <a class="reference internal" href="sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">vcf_to_zarr()</span></code></a>),
+it will be used to generate the new VCF header. In this case, any variables in the
+dataset that are not specified in this header will have corresponding header lines
+added, and any lines in the header without a corresponding variable in the dataset
+will be omitted.</p>
+<p>In the case of no <code class="docutils literal notranslate"><span class="pre">vcf_header</span></code> parameter or attribute, a VCF header will
+be generated, and will include all variables in the dataset.</p>
 <p>Float fields are written with up to 3 decimal places of precision.
 Exponent/scientific notation is <em>not</em> supported, so values less than
 <code class="docutils literal notranslate"><span class="pre">5e-4</span></code> will be rounded to zero.</p>
@@ -745,18 +754,16 @@ writing it to standard output then applying an external compressor:</p>
     <span class="o">|</span> <span class="n">bgzip</span> <span class="o">&gt;</span> <span class="n">out</span><span class="o">.</span><span class="n">vcf</span><span class="o">.</span><span class="n">gz</span>
 </pre></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This function requires the dataset to have a <code class="docutils literal notranslate"><span class="pre">vcf_header</span></code> attribute
-containing the VCF header. VCF files converted to Zarr using <a class="reference internal" href="sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">vcf_to_zarr()</span></code></a>
-will contain this attribute, but datasets loaded from other sources will not.</p>
-</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>input</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset to convert to VCF.</p>
 </dd>
 <dt><strong>output</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TextIO" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIO</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TextIO" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIO</span></code></a>]</span></dt><dd><p>A path or text file object that the output VCF should be written to.</p>
+</dd>
+<dt><strong>vcf_header</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>The VCF header to use (including the line starting with <code class="docutils literal notranslate"><span class="pre">#CHROM</span></code>). If None, then
+a header will be generated from the dataset <code class="docutils literal notranslate"><span class="pre">vcf_header</span></code> attribute (if present),
+or from scratch otherwise.</p>
 </dd>
 </dl>
 </dd>

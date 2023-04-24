@@ -570,6 +570,14 @@ so that the chunks are <code class="docutils literal notranslate"><span class="p
 (<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1069">PR 1069</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/1068">GH 1068</a>)</p></li>
 </ul>
 </section>
+<section id="breaking-changes">
+<h3>Breaking changes<a class="headerlink" href="#breaking-changes" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>Generate VCF header by default when writing VCF using <a class="reference internal" href="generated/sgkit.io.vcf.write_vcf.html#sgkit.io.vcf.write_vcf" title="sgkit.io.vcf.write_vcf"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.write_vcf()</span></code></a> or <a class="reference internal" href="generated/sgkit.io.vcf.zarr_to_vcf.html#sgkit.io.vcf.zarr_to_vcf" title="sgkit.io.vcf.zarr_to_vcf"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.zarr_to_vcf()</span></code></a>.
+Previously, the dataset had to contain a <code class="docutils literal notranslate"><span class="pre">vcf_header</span></code> attribute.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1021">PR 1021</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/1020">GH 1020</a>)</p></li>
+</ul>
+</section>
 <section id="deprecations">
 <h3>Deprecations<a class="headerlink" href="#deprecations" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
@@ -636,8 +644,8 @@ genotype.
 (<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/911">GH 911</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1002">PR 1002</a>)</p></li>
 </ul>
 </section>
-<section id="breaking-changes">
-<h3>Breaking changes<a class="headerlink" href="#breaking-changes" title="Permalink to this headline">#</a></h3>
+<section id="id3">
+<h3>Breaking changes<a class="headerlink" href="#id3" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
 <li><p>Remove support for Python 3.7.
 (<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/927">PR 927</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/802">GH 802</a>)</p></li>
@@ -660,8 +668,8 @@ diploid genotypes).
 parameter. (<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/911">GH 911</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1002">PR 1002</a>)</p></li>
 </ul>
 </section>
-<section id="id3">
-<h3>Improvements<a class="headerlink" href="#id3" title="Permalink to this headline">#</a></h3>
+<section id="id4">
+<h3>Improvements<a class="headerlink" href="#id4" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
 <li><p>Improvements to VCF parsing performance.
 (<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/933">PR 933</a>)</p></li>
@@ -675,8 +683,8 @@ parameter. (<a class="reference external" href="https://github.com/timothymillar
 (<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/978">PR 978</a>)</p></li>
 </ul>
 </section>
-<section id="id4">
-<h3>Bug fixes<a class="headerlink" href="#id4" title="Permalink to this headline">#</a></h3>
+<section id="id5">
+<h3>Bug fixes<a class="headerlink" href="#id5" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
 <li><p>Allow chunking in the samples dimension for <a class="reference internal" href="generated/sgkit.identity_by_state.html#sgkit.identity_by_state" title="sgkit.identity_by_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">identity_by_state()</span></code></a>.
 (<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/837">PR 837</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/836">GH 836</a>)</p></li>
@@ -737,6 +745,7 @@ parameter. (<a class="reference external" href="https://github.com/timothymillar
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unreleased">0.7.0 (unreleased)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new-features">New Features</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-fixes">Bug fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#breaking-changes">Breaking changes</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deprecations">Deprecations</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">Improvements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Bug fixes</a></li>
@@ -744,9 +753,9 @@ parameter. (<a class="reference external" href="https://github.com/timothymillar
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#february-2023">0.6.0 (1 February 2023)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">New Features</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#breaking-changes">Breaking changes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Improvements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Bug fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Breaking changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Bug fixes</a></li>
 </ul>
 </li>
 </ul>
