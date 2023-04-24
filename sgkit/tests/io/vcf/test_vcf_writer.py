@@ -156,14 +156,22 @@ def test_write_vcf__set_header(shared_datadir, tmp_path):
 
     write_vcf(ds, output, vcf_header=vcf_header)
 
-    # check dropped fields are not present in VCF
     v = VCF(output)
+    # check dropped fields are not present in VCF header
     assert "##INFO=<ID=NS" not in v.raw_header
     assert "##FORMAT=<ID=HQ" not in v.raw_header
+    # check added fields are present in VCF header
+    assert "##INFO=<ID=H3" in v.raw_header
+    assert "##FORMAT=<ID=GL" in v.raw_header
     count = 0
     for variant in v:
+        # check dropped fields are not present in VCF data
         assert "NS" not in dict(variant.INFO).keys()
         assert "HQ" not in variant.FORMAT
+        # check added fields are not present in VCF data
+        assert "H3" not in dict(variant.INFO).keys()
+        assert "GL" not in variant.FORMAT
+
         assert variant.genotypes is not None
         count += 1
     assert count == 9
