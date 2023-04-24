@@ -5,7 +5,17 @@ import warnings
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, MutableMapping, Optional, Sequence, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import dask
 import fsspec
@@ -755,30 +765,10 @@ def vcf_to_zarrs(
 
     output_storage_options = output_storage_options or {}
 
-    if isinstance(input, str) or isinstance(input, Path):
-        # Single input
-        inputs: Sequence[PathType] = [input]
-        assert regions is not None  # this would just be sequential case
-        input_regions: Sequence[Optional[Sequence[str]]] = [regions]  # type: ignore
-    else:
-        # Multiple inputs
-        inputs = input
-        if regions is None:
-            input_regions = [None] * len(inputs)
-        else:
-            if len(regions) == 0 or isinstance(regions[0], str):
-                raise ValueError(
-                    f"For multiple inputs, multiple input regions must be a sequence of sequence of strings: {regions}"
-                )
-            input_regions = regions
-
-    assert len(inputs) == len(input_regions)
-
     tasks = []
     parts = []
-    for i, input in enumerate(inputs):
+    for input, input_region_list in zip_input_and_regions(input, regions):
         filename = url_filename(str(input))
-        input_region_list = input_regions[i]
         if input_region_list is None:
             # single partition case: make a list so the loop below works
             input_region_list = [None]  # type: ignore
@@ -980,35 +970,11 @@ def vcf_to_zarr(
                 f"Temporary chunk length in variant dimension ({temp_chunk_length}) "
                 f"must evenly divide target chunk length {chunk_length}"
             )
-    if regions is None and target_part_size is not None:
-        if target_part_size == "auto":
-            target_part_size = "20MB"
-        if isinstance(input, str) or isinstance(input, Path):
-            regions = partition_into_regions(input, target_part_size=target_part_size)
-        else:
-            # Multiple inputs
-            inputs = input
-            regions = [
-                partition_into_regions(input, target_part_size=target_part_size)
-                for input in inputs
-            ]
 
-    if (isinstance(input, str) or isinstance(input, Path)) and (
-        regions is None or isinstance(regions, str)
-    ):
-        convert_func = vcf_to_zarr_sequential
-    else:
-        convert_func = functools.partial(
-            vcf_to_zarr_parallel,
-            temp_chunk_length=temp_chunk_length,
-            tempdir=tempdir,
-            tempdir_storage_options=tempdir_storage_options,
-            retain_temp_files=retain_temp_files,
-        )
-    convert_func(
-        input,  # type: ignore
-        output,
-        regions,  # type: ignore
+    # all arguments except input and region/regions
+    sequential_function = functools.partial(
+        vcf_to_zarr_sequential,
+        output=output,
         chunk_length=chunk_length,
         chunk_width=chunk_width,
         read_chunk_length=read_chunk_length,
@@ -1021,6 +987,33 @@ def vcf_to_zarr(
         fields=fields,
         exclude_fields=exclude_fields,
         field_defs=field_defs,
+    )
+    parallel_function = functools.partial(
+        vcf_to_zarr_parallel,
+        output=output,
+        chunk_length=chunk_length,
+        chunk_width=chunk_width,
+        read_chunk_length=read_chunk_length,
+        compressor=compressor,
+        encoding=encoding,
+        ploidy=ploidy,
+        mixed_ploidy=mixed_ploidy,
+        truncate_calls=truncate_calls,
+        max_alt_alleles=max_alt_alleles,
+        fields=fields,
+        exclude_fields=exclude_fields,
+        field_defs=field_defs,
+        temp_chunk_length=temp_chunk_length,
+        tempdir=tempdir,
+        tempdir_storage_options=tempdir_storage_options,
+        retain_temp_files=retain_temp_files,
+    )
+    process_vcfs(
+        input,
+        sequential_function,
+        parallel_function,
+        regions=regions,
+        target_part_size=target_part_size,
     )
 
     # Issue a warning if max_alt_alleles caused data to be dropped
@@ -1204,25 +1197,13 @@ def zarr_array_sizes(
         are not None.
     """
 
-    if regions is None and target_part_size is not None:
-        if target_part_size == "auto":
-            target_part_size = "20MB"
-        if isinstance(input, str) or isinstance(input, Path):
-            regions = partition_into_regions(input, target_part_size=target_part_size)
-        else:
-            # Multiple inputs
-            inputs = input
-            regions = [
-                partition_into_regions(input, target_part_size=target_part_size)
-                for input in inputs
-            ]
-
-    if (isinstance(input, str) or isinstance(input, Path)) and (
-        regions is None or isinstance(regions, str)
-    ):
-        return zarr_array_sizes_sequential(input, regions)
-    else:
-        return zarr_array_sizes_parallel(input, regions)
+    return process_vcfs(
+        input,
+        zarr_array_sizes_sequential,
+        zarr_array_sizes_parallel,
+        regions=regions,
+        target_part_size=target_part_size,
+    )
 
 
 def zarr_array_sizes_sequential(
@@ -1292,28 +1273,8 @@ def zarr_array_sizes_parallel(
     input: Union[PathType, Sequence[PathType]],
     regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]],
 ) -> Dict[str, Any]:
-    if isinstance(input, str) or isinstance(input, Path):
-        # Single input
-        inputs: Sequence[PathType] = [input]
-        assert regions is not None  # this would just be sequential case
-        input_regions: Sequence[Optional[Sequence[str]]] = [regions]  # type: ignore
-    else:
-        # Multiple inputs
-        inputs = input
-        if regions is None:
-            input_regions = [None] * len(inputs)
-        else:
-            if len(regions) == 0 or isinstance(regions[0], str):
-                raise ValueError(
-                    f"For multiple inputs, multiple input regions must be a sequence of sequence of strings: {regions}"
-                )
-            input_regions = regions
-
-    assert len(inputs) == len(input_regions)
-
     tasks = []
-    for i, input in enumerate(inputs):
-        input_region_list = input_regions[i]
+    for input, input_region_list in zip_input_and_regions(input, regions):
         if input_region_list is None:
             # single partition case: make a list so the loop below works
             input_region_list = [None]  # type: ignore
@@ -1345,3 +1306,60 @@ def merge_zarr_array_sizes(all_kwargs: Sequence[Dict[str, Any]]):
     if ploidy > -1:
         kwargs["ploidy"] = ploidy
     return kwargs
+
+
+def process_vcfs(
+    input: Union[PathType, Sequence[PathType]],
+    sequential_function: Callable,
+    parallel_function: Callable,
+    *,
+    regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]] = None,
+    target_part_size: Union[None, int, str] = "auto",
+) -> Any:
+    """A helper function to process VCFs in region chunks, using a sequential function
+    for single file and single region input, and a parallel function otherwise."""
+    if regions is None and target_part_size is not None:
+        if target_part_size == "auto":
+            target_part_size = "20MB"
+        if isinstance(input, str) or isinstance(input, Path):
+            regions = partition_into_regions(input, target_part_size=target_part_size)
+        else:
+            # Multiple inputs
+            inputs = input
+            regions = [
+                partition_into_regions(input, target_part_size=target_part_size)
+                for input in inputs
+            ]
+
+    if (isinstance(input, str) or isinstance(input, Path)) and (
+        regions is None or isinstance(regions, str)
+    ):
+        return sequential_function(input=input, region=regions)
+    else:
+        return parallel_function(input=input, regions=regions)
+
+
+def zip_input_and_regions(
+    input: Union[PathType, Sequence[PathType]],
+    regions: Union[None, Sequence[str], Sequence[Optional[Sequence[str]]]],
+) -> Any:
+    if isinstance(input, str) or isinstance(input, Path):
+        # Single input
+        inputs: Sequence[PathType] = [input]
+        assert regions is not None  # this would just be sequential case
+        input_regions: Sequence[Optional[Sequence[str]]] = [regions]  # type: ignore
+    else:
+        # Multiple inputs
+        inputs = input
+        if regions is None:
+            input_regions = [None] * len(inputs)
+        else:
+            if len(regions) == 0 or isinstance(regions[0], str):
+                raise ValueError(
+                    f"For multiple inputs, multiple input regions must be a sequence of sequence of strings: {regions}"
+                )
+            input_regions = regions
+
+    assert len(inputs) == len(input_regions)
+
+    return zip(inputs, input_regions)
