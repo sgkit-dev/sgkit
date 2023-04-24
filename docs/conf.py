@@ -59,6 +59,12 @@ extensions = [
     *[p.stem for p in (HERE / "extensions").glob("*.py")],
 ]
 
+# Enable math notation in mystnb
+myst_enable_extensions = [
+    "amsmath",
+    "dollarmath",
+]
+
 extlinks = {
     "issue": ("https://github.com/pystatgen/sgkit/issues/%s", "GH %s"),
     "pr": ("https://github.com/pystatgen/sgkit/pull/%s", "PR %s"),
