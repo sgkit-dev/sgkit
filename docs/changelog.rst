@@ -49,8 +49,12 @@ Bug fixes
 - ``vcf_to_zarrs`` failed with ``ZeroDivisionError`` when VCFs with no samples were converted.
   (:user:`benjeffery`, :pr:`1069`, :issue:`1068`)
 
-.. Breaking changes
-.. ~~~~~~~~~~~~~~~~
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- Generate VCF header by default when writing VCF using :func:`sgkit.io.vcf.write_vcf` or :func:`sgkit.io.vcf.zarr_to_vcf`.
+  Previously, the dataset had to contain a ``vcf_header`` attribute.
+  (:user:`tomwhite`, :pr:`1021`, :issue:`1020`)
 
 Deprecations
 ~~~~~~~~~~~~
