@@ -1,0 +1,6 @@
+﻿sgkit.io.vcf.zarr\_array\_sizes
+===============================
+
+.. currentmodule:: sgkit.io.vcf
+
+.. autofunction:: zarr_array_sizes

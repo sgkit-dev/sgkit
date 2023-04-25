@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>sgkit.variables.stat_genomic_relationship_spec &#8212; sgkit  documentation</title>
+    <title>sgkit.io.vcf.zarr_array_sizes &#8212; sgkit  documentation</title>
   
   
   
@@ -43,7 +43,7 @@
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.variables.stat_genomic_relationship_spec';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.io.vcf.zarr_array_sizes';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
@@ -53,8 +53,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.variables.stat_Hamilton_Kerr_lambda_spec" href="sgkit.variables.stat_Hamilton_Kerr_lambda_spec.html" />
-    <link rel="prev" title="sgkit.variables.stat_Garud_h2_h1_spec" href="sgkit.variables.stat_Garud_h2_h1_spec.html" /> 
+    <link rel="next" title="sgkit.read_scikit_allel_vcfzarr" href="sgkit.read_scikit_allel_vcfzarr.html" />
+    <link rel="prev" title="sgkit.io.vcf.concat_zarrs" href="sgkit.io.vcf.concat_zarrs.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="None"/>  
 <style type="text/css">
@@ -503,11 +503,11 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.read_vcf.html">sgkit.io.vcf.read_vcf</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.vcf_to_zarr.html">sgkit.io.vcf.vcf_to_zarr</a></li>
 </ul>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.partition_into_regions.html">sgkit.io.vcf.partition_into_regions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.vcf_to_zarrs.html">sgkit.io.vcf.vcf_to_zarrs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.concat_zarrs.html">sgkit.io.vcf.concat_zarrs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.zarr_array_sizes.html">sgkit.io.vcf.zarr_array_sizes</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.io.vcf.zarr_array_sizes</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.read_scikit_allel_vcfzarr.html">sgkit.read_scikit_allel_vcfzarr</a></li>
@@ -570,7 +570,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.window_by_position.html">sgkit.window_by_position</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.window_by_variant.html">sgkit.window_by_variant</a></li>
 </ul>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.call_allele_count_spec.html">sgkit.variables.call_allele_count_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.call_allele_frequency_spec.html">sgkit.variables.call_allele_frequency_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.call_dosage_spec.html">sgkit.variables.call_dosage_spec</a></li>
@@ -621,7 +621,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_Garud_h12_spec.html">sgkit.variables.stat_Garud_h12_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_Garud_h123_spec.html">sgkit.variables.stat_Garud_h123_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_Garud_h2_h1_spec.html">sgkit.variables.stat_Garud_h2_h1_spec</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.variables.stat_genomic_relationship_spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_genomic_relationship_spec.html">sgkit.variables.stat_genomic_relationship_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_Hamilton_Kerr_lambda_spec.html">sgkit.variables.stat_Hamilton_Kerr_lambda_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_Hamilton_Kerr_tau_spec.html">sgkit.variables.stat_Hamilton_Kerr_tau_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_hybrid_relationship_spec.html">sgkit.variables.stat_hybrid_relationship_spec</a></li>
@@ -701,7 +701,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">sgkit.variables.stat_genomic_relationship_spec</li>
+    <li class="breadcrumb-item active" aria-current="page">sgkit.io.vcf.zarr_array_sizes</li>
   </ul>
 </nav>
 </div>
@@ -717,12 +717,38 @@ document.write(`
                 
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
-                   <section id="sgkit-variables-stat-genomic-relationship-spec">
-<h1>sgkit.variables.stat_genomic_relationship_spec<a class="headerlink" href="#sgkit-variables-stat-genomic-relationship-spec" title="Permalink to this headline">#</a></h1>
-<dl class="py data">
-<dt class="sig sig-object py" id="sgkit.variables.stat_genomic_relationship_spec">
-<span class="sig-prename descclassname"><span class="pre">sgkit.variables.</span></span><span class="sig-name descname"><span class="pre">stat_genomic_relationship_spec</span></span><em class="property"> <span class="pre">=</span> <span class="pre">ArrayLikeSpec(default_name='stat_genomic_relationship',</span> <span class="pre">__doc__='\nGenomic</span> <span class="pre">relationship</span> <span class="pre">matrix</span> <span class="pre">(GRM).\n',</span> <span class="pre">kind='f',</span> <span class="pre">ndim=2,</span> <span class="pre">dims=('samples_0',</span> <span class="pre">'samples_1'))</span></em><a class="headerlink" href="#sgkit.variables.stat_genomic_relationship_spec" title="Permalink to this definition">#</a></dt>
-<dd><p>Genomic relationship matrix (GRM).</p>
+                   <section id="sgkit-io-vcf-zarr-array-sizes">
+<h1>sgkit.io.vcf.zarr_array_sizes<a class="headerlink" href="#sgkit-io-vcf-zarr-array-sizes" title="Permalink to this headline">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="sgkit.io.vcf.zarr_array_sizes">
+<span class="sig-prename descclassname"><span class="pre">sgkit.io.vcf.</span></span><span class="sig-name descname"><span class="pre">zarr_array_sizes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_part_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.io.vcf.zarr_array_sizes" title="Permalink to this definition">#</a></dt>
+<dd><p>Make a pass through a VCF/BCF file to determine sizes for storage in Zarr.</p>
+<p>By default, the input is processed in parts in parallel. However, if the input
+is a single file, <code class="docutils literal notranslate"><span class="pre">target_part_size</span></code> is None, and <code class="docutils literal notranslate"><span class="pre">regions</span></code> is None,
+then the operation will be carried out sequentially.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>input</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>]]</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>]]]</span></dt><dd><p>A path (or paths) to the input BCF or VCF file (or files). VCF files should
+be compressed and have a <code class="docutils literal notranslate"><span class="pre">.tbi</span></code> or <code class="docutils literal notranslate"><span class="pre">.csi</span></code> index file. BCF files should
+have a <code class="docutils literal notranslate"><span class="pre">.csi</span></code> index file.</p>
+</dd>
+<dt><strong>target_part_size</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">'auto'</span></code>)</dt><dd><p>The desired size, in bytes, of each (compressed) part of the input to be
+processed in parallel. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code>, which will pick a good size
+(currently 20MB). A value of None means that the input will be processed
+sequentially. The setting will be ignored if <code class="docutils literal notranslate"><span class="pre">regions</span></code> is also specified.</p>
+</dd>
+<dt><strong>regions</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]]</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]]]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Genomic region or regions to extract variants for. For multiple inputs, multiple
+input regions are specified as a sequence of values which may be None, or a
+sequence of region strings. Takes priority over <code class="docutils literal notranslate"><span class="pre">target_part_size</span></code> if both
+are not None.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><span class="annotation terse">{<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>}</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -742,20 +768,20 @@ document.write(`
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="sgkit.variables.stat_Garud_h2_h1_spec.html"
+       href="sgkit.io.vcf.concat_zarrs.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">sgkit.variables.stat_Garud_h2_h1_spec</p>
+        <p class="prev-next-title">sgkit.io.vcf.concat_zarrs</p>
       </div>
     </a>
     <a class="right-next"
-       href="sgkit.variables.stat_Hamilton_Kerr_lambda_spec.html"
+       href="sgkit.read_scikit_allel_vcfzarr.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">sgkit.variables.stat_Hamilton_Kerr_lambda_spec</p>
+        <p class="prev-next-title">sgkit.read_scikit_allel_vcfzarr</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -773,7 +799,7 @@ document.write(`
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="../_sources/generated/sgkit.variables.stat_genomic_relationship_spec.rst.txt">
+    <a href="../_sources/generated/sgkit.io.vcf.zarr_array_sizes.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
