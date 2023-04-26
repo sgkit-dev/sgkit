@@ -1,3 +1,4 @@
+import warnings
 from typing import Hashable, Tuple
 
 import dask.array as da
@@ -301,9 +302,8 @@ def _identify_founders_diploid(parent: ArrayLike) -> ArrayLike:
 
 @numba_jit
 def project_kinship_diploid(
+    initial: ArrayLike,
     parent: ArrayLike,
-    founder_kinship: ArrayLike,
-    founder_indices: ArrayLike,
     allow_half_founders: bool = False,
 ) -> ArrayLike:
     """Project founder kinships along a pedigree to their decedents assuming
@@ -311,16 +311,13 @@ def project_kinship_diploid(
 
     Parameters
     ----------
+    initial
+        A matrix of shape (samples, samples) containing kinship values among
+        founding samples.
     parent
         A matrix of shape (samples, parents) containing the indices of each
         sample's parents with negative values indicating unknown parents as
         defined in :data:`sgkit.variables.parent_spec`.
-    founder_kinship
-        A matrix of shape (founders, founders) containing kinship values among
-        founding samples.
-    founder_indices
-        An integer array of length founders mapping each founder to a sample
-        in the pedigree.
     allow_half_founders
         If False (the default) then a ValueError will be raised if any
         individuals only have a single recorded parent.
@@ -345,30 +342,17 @@ def project_kinship_diploid(
     ValueError
         If the pedigree contains half-founders and allow_half_founders=False.
     ValueError
-        If kinship is not specified for a founder or is specified for a non-founder.
-    ValueError
         If the parents dimension does not have a length of 2.
     """
-    n = len(parent)
-    f = len(founder_indices)
-    assert f < n
-    assert founder_kinship.shape == (f, f)
+    kinship = initial.copy()
+    n_sample = len(parent)
+    assert kinship.shape == (n_sample, n_sample)
     if parent.shape[1] != 2:
         raise ValueError("The parents dimension must be length 2")
     if not allow_half_founders:
         _raise_on_half_founder(parent)
     is_founder = _identify_founders_diploid(parent)
-    if not is_founder[founder_indices].all():
-        raise ValueError("Initial kinship is specified for a non-founder")
-    if is_founder.sum() > f:
-        raise ValueError("Initial kinship is not specified for all founders")
-    kinship = np.zeros((n, n), dtype=founder_kinship.dtype)
-    # populate kinship matrix with founder kinships
-    for idx in range(f):
-        i = founder_indices[idx]
-        for jdx in range(f):
-            j = founder_indices[jdx]
-            kinship[i, j] = founder_kinship[idx, jdx]
+    n_founder = is_founder.sum()
     # order must have founders first
     order = topological_argsort(parent)
     order = np.concatenate(
@@ -378,7 +362,7 @@ def project_kinship_diploid(
         )
     )
     # project founder kinships to other samples
-    for idx in range(f, n):
+    for idx in range(n_founder, n_sample):
         i = order[idx]
         _insert_diploid_self_kinship(kinship, parent, i)
         for jdx in range(idx):
@@ -683,11 +667,10 @@ def _identify_founders_Hamilton_Kerr(parent: ArrayLike, tau: ArrayLike) -> Array
 
 @numba_jit
 def project_kinship_Hamilton_Kerr(
+    initial: ArrayLike,
     parent: ArrayLike,
     tau: ArrayLike,
     lambda_: ArrayLike,
-    founder_kinship: ArrayLike,
-    founder_indices: ArrayLike,
     allow_half_founders: bool = False,
 ) -> ArrayLike:
     """Project founder kinships along a pedigree to their decedents within
@@ -695,6 +678,9 @@ def project_kinship_Hamilton_Kerr(
 
     Parameters
     ----------
+    initial
+        A matrix of shape (samples, samples) containing kinship values among
+        founding samples.
     parent
         A matrix of shape (samples, parents) containing the indices of each
         sample's parents with negative values indicating unknown parents as
@@ -705,12 +691,6 @@ def project_kinship_Hamilton_Kerr(
     lambda_
         A matrix of shape (samples, parents) containing
         :data:`sgkit.variables.stat_Hamilton_Kerr_lambda_spec`.
-    founder_kinship
-        A matrix of shape (founders, founders) containing kinship values among
-        founding samples.
-    founder_indices
-        An integer array of length founders mapping each founder to a sample
-        in the pedigree.
     allow_half_founders
         If False (the default) then a ValueError will be raised if any
         individuals only have a single recorded parent.
@@ -730,31 +710,17 @@ def project_kinship_Hamilton_Kerr(
     ValueError
         If the pedigree contains half-founders and allow_half_founders=False.
     ValueError
-        If kinship is not specified for a founder or is specified for a non-founder.
-    ValueError
         If a sample has more than two contributing parents.
     """
-    n = len(parent)
-    f = len(founder_indices)
-    assert f < n
-    assert founder_kinship.shape == (f, f)
+    kinship = initial.copy()
+    n_sample = len(parent)
+    assert kinship.shape == (n_sample, n_sample)
     if parent.shape[1] != 2:
         parent, tau, lambda_ = _compress_hamilton_kerr_parameters(parent, tau, lambda_)
     if not allow_half_founders:
         _raise_on_half_founder(parent, tau)
     is_founder = _identify_founders_Hamilton_Kerr(parent, tau)
-    if not is_founder[founder_indices].all():
-        raise ValueError("Initial kinship is specified for a non-founder")
-    if is_founder.sum() > f:
-        raise ValueError("Initial kinship is not specified for all founders")
-    order = topological_argsort(parent)
-    kinship = np.zeros((n, n), dtype=founder_kinship.dtype)
-    # populate kinship matrix with founder kinships
-    for idx in range(f):
-        i = founder_indices[idx]
-        for jdx in range(f):
-            j = founder_indices[jdx]
-            kinship[i, j] = founder_kinship[idx, jdx]
+    n_founder = is_founder.sum()
     # order must have founders first
     order = topological_argsort(parent)
     order = np.concatenate(
@@ -764,7 +730,7 @@ def project_kinship_Hamilton_Kerr(
         )
     )
     # project founder kinships to other samples
-    for idx in range(f, n):
+    for idx in range(n_founder, n_sample):
         i = order[idx]
         _insert_hamilton_kerr_self_kinship(kinship, parent, tau, lambda_, i)
         for jdx in range(idx):
@@ -827,16 +793,20 @@ def pedigree_kinship(
         unrecorded parent will be assumed to be equal to those of the
         gamete originating from that parent.
     founder_kinship
-        Optionally specify a matrix of pairwise kinship estimates among
-        founder samples which will be used to initialize pedigree estimates
-        as outlined by Goudet et al. 2018 [2].
-        This variable must be a square matrix of shape (founders, founders)
-        and must be used in conjunction with founder_indices.
+        Optionally specify an input kinship matrix as defined by
+        :data:`sgkit.variables.stat_genomic_kinship_spec`. Kinship
+        estimates among founders within this matrix will be used to
+        initialize the pedigree estimates as outlined by Goudet et al
+        2018 [2]. Kinship estimates for non-founders are ignored.
     founder_indices
         Optionally specify an array of integer indices mapping rows/columns
-        in the founder_kinship matrix to sample positions in the samples
+        in a founder_kinship sub-matrix to sample positions in the samples
         dimension (i.e., the order of rows in the parent array).
         This variable must have the same length as founder_kinship.
+
+        .. deprecated:: 0.7.0
+            Instead, use a 'founder_kinship' matrix with values for
+            all pairs of samples (these may be nan values).
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -865,14 +835,12 @@ def pedigree_kinship(
     ValueError
         If the pedigree contains half-founders and allow_half_founders=False.
     ValueError
-        If only one of the ``founder_kinship`` or ``founder_indices``
-        variables is specified.
+        If the dimension sizes of ``founder_kinship`` are not equal to
+        the number of samples in the pedigree (when ``founder_indices`` is
+        not specified).
     ValueError
-        If the ``founder_kinship`` or ``founder_indices`` variables have
-        inconsistent shapes.
-    ValueError
-        If a founder is missing from the ``founder_indices`` array or if
-        a non-founder is indicated by this array.
+        If the ``founder_kinship`` and ``founder_indices`` variables are
+        both specified and have inconsistent shapes.
 
     Note
     ----
@@ -935,6 +903,7 @@ def pedigree_kinship(
     Inbred diploid pedigree with related founders:
 
     >>> import sgkit as sg
+    >>> from numpy import nan
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, seed=1)
     >>> ds.sample_id.values # doctest: +NORMALIZE_WHITESPACE
     array(['S0', 'S1', 'S2', 'S3'], dtype='<U2')
@@ -945,16 +914,15 @@ def pedigree_kinship(
     ...     ["S0", "S2"]
     ... ]
     >>> # add "known" kinships among founders
-    >>> ds["founder_kinship"] = ["founders_0", "founders_1"], [
-    ...     [0.5, 0.1],
-    ...     [0.1, 0.6],
+    >>> ds["founder_kinship"] = ["samples_0", "samples_1"], [
+    ...     [0.5, 0.1, nan, nan],
+    ...     [0.1, 0.6, nan, nan],
+    ...     [nan, nan, nan, nan],
+    ...     [nan, nan, nan, nan],
     ... ]
-    >>> # founder kinships correspond to the first two samples
-    >>> ds["founder_indices"] = ["founders"], [0, 1]
     >>> ds = sg.pedigree_kinship(
     ...     ds,
     ...     founder_kinship="founder_kinship",
-    ...     founder_indices="founder_indices",
     ... )
     >>> ds["stat_pedigree_kinship"].values # doctest: +NORMALIZE_WHITESPACE
     array([[0.5  , 0.1  , 0.3  , 0.4  ],
@@ -1037,26 +1005,48 @@ def pedigree_kinship(
     ds = define_variable_if_absent(ds, variables.parent, parent, parent_indices)
     variables.validate(ds, {parent: variables.parent_spec})
     parent = da.asarray(ds[parent].data, chunks=ds[parent].shape)
-    if (founder_kinship is not None) or (founder_indices is not None):
-        if (founder_kinship is None) or (founder_indices is None):
-            raise ValueError(
-                "Variables founder_kinship and founder_indices must be specified together"
+    n_samples = len(parent)
+    if founder_kinship is not None:
+        if founder_indices is not None:
+            # Deprecated API
+            warnings.warn(
+                (
+                    "The 'founder_indices' parameter is deprecated and, instead, the "
+                    "dimension sizes of 'founder_kinship' should equal the number of samples"
+                ),
+                DeprecationWarning,
             )
-        founder_kinship = da.asarray(
-            ds[founder_kinship].data, chunks=ds[founder_kinship].shape
-        )
-        founder_indices = da.asarray(
-            ds[founder_indices].data, chunks=ds[founder_indices].shape
-        )
-        n_founders = len(founder_indices)
-        if founder_kinship.shape != (n_founders, n_founders):
-            raise ValueError(
-                "Variables founder_kinship and founder_indices have mismatching dimensions"
+            founder_kinship = da.asarray(
+                ds[founder_kinship].data, chunks=ds[founder_kinship].shape
             )
-        if n_founders > len(parent):
-            raise ValueError(
-                "The number of founders exceeds the total number of samples"
+            founder_indices = ds[founder_indices].values
+            n_founders = len(founder_indices)
+            if founder_kinship.shape != (n_founders, n_founders):
+                raise ValueError(
+                    "Variables founder_kinship and founder_indices have mismatching dimensions"
+                )
+            if n_founders > n_samples:
+                raise ValueError(
+                    "The number of founders exceeds the total number of samples"
+                )
+            # pad with nans for non-founder values
+            _founder_kinship_ff = founder_kinship
+            _founder_kinship_sf = da.full((n_samples, n_founders), np.nan)
+            _founder_kinship_sf[founder_indices] = _founder_kinship_ff
+            founder_kinship = da.full((n_samples, n_samples), np.nan)
+            founder_kinship[:, founder_indices] = _founder_kinship_sf
+        else:
+            # New API
+            variables.validate(
+                ds, {founder_kinship: variables.stat_genomic_kinship_spec}
             )
+            founder_kinship = da.asarray(
+                ds[founder_kinship].data, chunks=ds[founder_kinship].shape
+            )
+            if founder_kinship.shape != (n_samples, n_samples):
+                raise ValueError(
+                    "Dimension sizes of founder_kinship should equal the number of samples"
+                )
     if method == "diploid":
         # check ploidy dimension and assume diploid if it's absent
         if ds.dims.get("ploidy", 2) != 2:
@@ -1069,13 +1059,12 @@ def pedigree_kinship(
         else:
             func = da.gufunc(
                 project_kinship_diploid,
-                signature="(n, p),(f, f),(f)-> (n, n)",
+                signature="(n, n),(n, p)-> (n, n)",
                 output_dtypes=float,
             )
             kinship = func(
-                parent,
                 founder_kinship,
-                founder_indices,
+                parent,
                 allow_half_founders=allow_half_founders,
             )
     elif method == "Hamilton-Kerr":
@@ -1097,15 +1086,14 @@ def pedigree_kinship(
         else:
             func = da.gufunc(
                 project_kinship_Hamilton_Kerr,
-                signature="(n, p),(n, p),(n, p),(f, f),(f)-> (n, n)",
+                signature="(n, n),(n, p),(n, p),(n, p)-> (n, n)",
                 output_dtypes=float,
             )
             kinship = func(
+                founder_kinship,
                 parent,
                 tau,
                 lambda_,
-                founder_kinship,
-                founder_indices,
                 allow_half_founders=allow_half_founders,
             )
     dims = ["samples_0", "samples_1"]
