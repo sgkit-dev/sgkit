@@ -203,6 +203,7 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.stat_Garud_h12_spec
     variables.stat_Garud_h123_spec
     variables.stat_Garud_h2_h1_spec
+    variables.stat_genomic_kinship_spec
     variables.stat_genomic_relationship_spec
     variables.stat_Hamilton_Kerr_lambda_spec
     variables.stat_Hamilton_Kerr_tau_spec

@@ -826,6 +826,17 @@ stat_Garud_h2_h1, stat_Garud_h2_h1_spec = SgkitVariables.register_variable(
     )
 )
 
+stat_genomic_kinship, stat_genomic_kinship_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_genomic_kinship",
+        dims=("samples_0", "samples_1"),
+        kind="f",
+        __doc__="""
+Genomic kinship matrix with self-kinship values on the diagonal.
+""",
+    )
+)
+
 (
     stat_genomic_relationship,
     stat_genomic_relationship_spec,
