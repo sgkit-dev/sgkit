@@ -66,6 +66,11 @@ Deprecations
   This change duplicates the information stored in dataset attributes, which should
   now be considered deprecated, and will be removed in a future release.
   (:user:`tomwhite`, :pr:`1054`, :issue:`1035`)
+- Parameter ``founder_indices`` in :func:`sgkit.pedigree_kinship` is now considered
+  deprecated, and will be removed in a future release. Instead, the ``founder_kinship``
+  parameter now expects a full sized kinship matrix in which non-founder values are
+  ignored.
+  (:user:`timothymillar`, :pr:`1075`, :issue:`1061`)
   
 Improvements
 ~~~~~~~~~~~~
