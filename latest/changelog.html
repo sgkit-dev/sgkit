@@ -587,6 +587,11 @@ Previously, the dataset had to contain a <code class="docutils literal notransla
 This change duplicates the information stored in dataset attributes, which should
 now be considered deprecated, and will be removed in a future release.
 (<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1054">PR 1054</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/1035">GH 1035</a>)</p></li>
+<li><p>Parameter <code class="docutils literal notranslate"><span class="pre">founder_indices</span></code> in <a class="reference internal" href="generated/sgkit.pedigree_kinship.html#sgkit.pedigree_kinship" title="sgkit.pedigree_kinship"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.pedigree_kinship()</span></code></a> is now considered
+deprecated, and will be removed in a future release. Instead, the <code class="docutils literal notranslate"><span class="pre">founder_kinship</span></code>
+parameter now expects a full sized kinship matrix in which non-founder values are
+ignored.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1075">PR 1075</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/1061">GH 1061</a>)</p></li>
 </ul>
 </section>
 <section id="improvements">

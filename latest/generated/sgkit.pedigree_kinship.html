@@ -621,6 +621,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_Garud_h12_spec.html">sgkit.variables.stat_Garud_h12_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_Garud_h123_spec.html">sgkit.variables.stat_Garud_h123_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_Garud_h2_h1_spec.html">sgkit.variables.stat_Garud_h2_h1_spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_genomic_kinship_spec.html">sgkit.variables.stat_genomic_kinship_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_genomic_relationship_spec.html">sgkit.variables.stat_genomic_relationship_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_Hamilton_Kerr_lambda_spec.html">sgkit.variables.stat_Hamilton_Kerr_lambda_spec</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variables.stat_Hamilton_Kerr_tau_spec.html">sgkit.variables.stat_Hamilton_Kerr_tau_spec</a></li>
@@ -761,16 +762,21 @@ the tau and lambda parameters for gametes contributing to the
 unrecorded parent will be assumed to be equal to those of the
 gamete originating from that parent.</p>
 </dd>
-<dt><strong>founder_kinship</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Optionally specify a matrix of pairwise kinship estimates among
-founder samples which will be used to initialize pedigree estimates
-as outlined by Goudet et al. 2018 [2].
-This variable must be a square matrix of shape (founders, founders)
-and must be used in conjunction with founder_indices.</p>
+<dt><strong>founder_kinship</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Optionally specify an input kinship matrix as defined by
+<a class="reference internal" href="sgkit.variables.stat_genomic_kinship_spec.html#sgkit.variables.stat_genomic_kinship_spec" title="sgkit.variables.stat_genomic_kinship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_genomic_kinship_spec</span></code></a>. Kinship
+estimates among founders within this matrix will be used to
+initialize the pedigree estimates as outlined by Goudet et al
+2018 [2]. Kinship estimates for non-founders are ignored.</p>
 </dd>
-<dt><strong>founder_indices</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Optionally specify an array of integer indices mapping rows/columns
-in the founder_kinship matrix to sample positions in the samples
+<dt><strong>founder_indices</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p><p>Optionally specify an array of integer indices mapping rows/columns
+in a founder_kinship sub-matrix to sample positions in the samples
 dimension (i.e., the order of rows in the parent array).
 This variable must have the same length as founder_kinship.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.7.0: </span>Instead, use a ‘founder_kinship’ matrix with values for
+all pairs of samples (these may be nan values).</p>
+</div>
+</p>
 </dd>
 <dt><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
@@ -796,12 +802,11 @@ and, if return_relationship is True,
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the Hamilton-Kerr method is used and a sample has more than
     two contributing parents.</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the pedigree contains half-founders and allow_half_founders=False.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If only one of the <code class="docutils literal notranslate"><span class="pre">founder_kinship</span></code> or <code class="docutils literal notranslate"><span class="pre">founder_indices</span></code>
-    variables is specified.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the <code class="docutils literal notranslate"><span class="pre">founder_kinship</span></code> or <code class="docutils literal notranslate"><span class="pre">founder_indices</span></code> variables have
-    inconsistent shapes.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If a founder is missing from the <code class="docutils literal notranslate"><span class="pre">founder_indices</span></code> array or if
-    a non-founder is indicated by this array.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the dimension sizes of <code class="docutils literal notranslate"><span class="pre">founder_kinship</span></code> are not equal to
+    the number of samples in the pedigree (when <code class="docutils literal notranslate"><span class="pre">founder_indices</span></code> is
+    not specified).</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the <code class="docutils literal notranslate"><span class="pre">founder_kinship</span></code> and <code class="docutils literal notranslate"><span class="pre">founder_indices</span></code> variables are
+    both specified and have inconsistent shapes.</p></li>
 </ul>
 </dd>
 </dl>
@@ -863,6 +868,7 @@ variable must have either one or two non-zero values.</p>
 </div>
 <p>Inbred diploid pedigree with related founders:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">nan</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">values</span> 
 <span class="go">array([&#39;S0&#39;, &#39;S1&#39;, &#39;S2&#39;, &#39;S3&#39;], dtype=&#39;&lt;U2&#39;)</span>
@@ -873,16 +879,15 @@ variable must have either one or two non-zero values.</p>
 <span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;S0&quot;</span><span class="p">,</span> <span class="s2">&quot;S2&quot;</span><span class="p">]</span>
 <span class="gp">... </span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># add &quot;known&quot; kinships among founders</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;founder_kinship&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;founders_0&quot;</span><span class="p">,</span> <span class="s2">&quot;founders_1&quot;</span><span class="p">],</span> <span class="p">[</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;founder_kinship&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;samples_0&quot;</span><span class="p">,</span> <span class="s2">&quot;samples_1&quot;</span><span class="p">],</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">nan</span><span class="p">,</span> <span class="n">nan</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="n">nan</span><span class="p">,</span> <span class="n">nan</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="n">nan</span><span class="p">,</span> <span class="n">nan</span><span class="p">,</span> <span class="n">nan</span><span class="p">,</span> <span class="n">nan</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="n">nan</span><span class="p">,</span> <span class="n">nan</span><span class="p">,</span> <span class="n">nan</span><span class="p">,</span> <span class="n">nan</span><span class="p">],</span>
 <span class="gp">... </span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># founder kinships correspond to the first two samples</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;founder_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;founders&quot;</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">pedigree_kinship</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">ds</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">founder_kinship</span><span class="o">=</span><span class="s2">&quot;founder_kinship&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">founder_indices</span><span class="o">=</span><span class="s2">&quot;founder_indices&quot;</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;stat_pedigree_kinship&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> 
 <span class="go">array([[0.5  , 0.1  , 0.3  , 0.4  ],</span>
