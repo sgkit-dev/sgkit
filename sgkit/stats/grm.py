@@ -101,6 +101,8 @@ def genomic_relationship(
     Examples
     --------
 
+    Diploid dataset without missing data:
+
     >>> import sgkit as sg
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=6, n_sample=3, seed=0)
     >>> ds = sg.count_call_alleles(ds)
@@ -108,18 +110,96 @@ def genomic_relationship(
     >>> ds["call_dosage"] = ds.call_allele_count[:,:,0]
     >>> ds.call_dosage.values # doctest: +NORMALIZE_WHITESPACE
         array([[2, 1, 1],
-            [1, 1, 1],
-            [2, 1, 0],
-            [2, 1, 1],
-            [1, 0, 0],
-            [1, 1, 2]], dtype=uint8)
+               [1, 1, 1],
+               [2, 1, 0],
+               [2, 1, 1],
+               [1, 0, 0],
+               [1, 1, 2]], dtype=uint8)
     >>> # use sample population frequency as ancestral frequency
     >>> ds["sample_frequency"] = ds.call_dosage.mean(dim="samples") / ds.dims["ploidy"]
     >>> ds = sg.genomic_relationship(ds, ancestral_frequency="sample_frequency")
     >>> ds.stat_genomic_relationship.values # doctest: +NORMALIZE_WHITESPACE
         array([[ 0.93617021, -0.21276596, -0.72340426],
-            [-0.21276596,  0.17021277,  0.04255319],
-            [-0.72340426,  0.04255319,  0.68085106]])
+               [-0.21276596,  0.17021277,  0.04255319],
+               [-0.72340426,  0.04255319,  0.68085106]])
+
+    Skipping partial or missing genotype calls:
+
+    >>> import sgkit as sg
+    >>> import xarray as xr
+    >>> ds = sg.simulate_genotype_call_dataset(
+    ...     n_variant=6,
+    ...     n_sample=4,
+    ...     missing_pct=0.05,
+    ...     seed=0,
+    ... )
+    >>> ds = sg.count_call_alleles(ds)
+    >>> ds["call_dosage"] = xr.where(
+    ...     ds.call_genotype_mask.any(dim="ploidy"),
+    ...     np.nan,
+    ...     ds.call_allele_count[:,:,1],  # alternate allele
+    ... )
+    >>> ds.call_dosage.values  # doctest: +NORMALIZE_WHITESPACE
+    array([[ 0.,  1.,  1.,  1.],
+           [ 1., nan,  0.,  1.],
+           [ 2.,  0.,  1.,  1.],
+           [ 1.,  2., nan,  1.],
+           [ 1.,  0.,  1.,  2.],
+           [ 2.,  2.,  0.,  0.]])
+    >>> ds["sample_frequency"] = ds.call_dosage.mean(
+    ...     dim="samples", skipna=True
+    ... ) / ds.dims["ploidy"]
+    >>> ds = sg.genomic_relationship(
+    ...     ds, ancestral_frequency="sample_frequency", skipna=True
+    ... )
+    >>> ds.stat_genomic_relationship.values  # doctest: +NORMALIZE_WHITESPACE
+    array([[ 0.9744836 , -0.16978417, -0.58417266, -0.33778858],
+           [-0.16978417,  1.45323741, -0.47619048, -0.89496403],
+           [-0.58417266, -0.47619048,  0.62446043,  0.34820144],
+           [-0.33778858, -0.89496403,  0.34820144,  0.79951397]])
+
+    Using mean imputation to replace missing genotype calls:
+
+    >>> import sgkit as sg
+    >>> import xarray as xr
+    >>> ds = sg.simulate_genotype_call_dataset(
+    ...     n_variant=6,
+    ...     n_sample=4,
+    ...     missing_pct=0.05,
+    ...     seed=0,
+    ... )
+    >>> ds = sg.count_call_alleles(ds)
+    >>> ds["call_dosage"] = xr.where(
+    ...     ds.call_genotype_mask.any(dim="ploidy"),
+    ...     np.nan,
+    ...     ds.call_allele_count[:,:,1],  # alternate allele
+    ... )
+    >>> # use mean imputation to replace missing dosage
+    >>> ds["call_dosage_imputed"] = xr.where(
+    ...     ds.call_genotype_mask.any(dim="ploidy"),
+    ...     ds.call_dosage.mean(dim="samples", skipna=True),
+    ...     ds.call_dosage,
+    ... )
+    >>> ds.call_dosage_imputed.values  # doctest: +NORMALIZE_WHITESPACE
+    array([[0.        , 1.        , 1.        , 1.        ],
+           [1.        , 0.66666667, 0.        , 1.        ],
+           [2.        , 0.        , 1.        , 1.        ],
+           [1.        , 2.        , 1.33333333, 1.        ],
+           [1.        , 0.        , 1.        , 2.        ],
+           [2.        , 2.        , 0.        , 0.        ]])
+    >>> ds["sample_frequency"] = ds.call_dosage.mean(
+    ...     dim="samples", skipna=True
+    ... ) / ds.dims["ploidy"]
+    >>> ds = sg.genomic_relationship(
+    ...     ds,
+    ...     call_dosage="call_dosage_imputed",
+    ...     ancestral_frequency="sample_frequency",
+    ... )
+    >>> ds.stat_genomic_relationship.values  # doctest: +NORMALIZE_WHITESPACE
+    array([[ 0.9744836 , -0.14337789, -0.49331713, -0.33778858],
+           [-0.14337789,  1.2272175 , -0.32806804, -0.75577157],
+           [-0.49331713, -0.32806804,  0.527339  ,  0.29404617],
+           [-0.33778858, -0.75577157,  0.29404617,  0.79951397]])
 
     References
     ----------
