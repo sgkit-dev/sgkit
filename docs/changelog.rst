@@ -42,6 +42,9 @@ New Features
 - Add :func:`sgkit.io.vcf.zarr_array_sizes` for determining array sizes for storage in Zarr.
   (:user:`tomwhite`, :pr:`1073`, :issue:`734`)
 
+- Add ``skipna`` option to :func:`genomic_relationship` function.
+  (:user:`timothymillar`, :pr:`1078`, :issue:`1076`)
+
 Bug fixes
 ~~~~~~~~~
 
