@@ -10,6 +10,28 @@ from sgkit.typing import ArrayLike
 from sgkit.utils import conditional_merge_datasets, create_dataset
 
 
+def _grm_VanRaden(
+    call_dosage: ArrayLike,
+    ancestral_frequency: ArrayLike,
+    ploidy: int,
+    skipna: bool = False,
+):
+    ancestral_dosage = ancestral_frequency * ploidy
+    M = call_dosage - ancestral_dosage[:, None]
+    if skipna:
+        nans = da.isnan(M)
+        M0 = da.where(nans, 0, M)
+        numerator = M0.T @ M0
+        AD = ~nans * ancestral_dosage[:, None]
+        AFC = ~nans * (1 - ancestral_frequency[:, None])
+        denominator = AD.T @ AFC
+    else:
+        numerator = M.T @ M
+        denominator = (ancestral_dosage * (1 - ancestral_frequency)).sum()
+    G = numerator / denominator
+    return G
+
+
 def genomic_relationship(
     ds: Dataset,
     *,
@@ -17,6 +39,7 @@ def genomic_relationship(
     estimator: Optional[Literal["VanRaden"]] = None,
     ancestral_frequency: Optional[Hashable] = None,
     ploidy: Optional[int] = None,
+    skipna: bool = False,
     merge: bool = True,
 ) -> Dataset:
     """Compute a genomic relationship matrix (AKA the GRM or G-matrix).
@@ -44,6 +67,10 @@ def genomic_relationship(
         Ploidy level of all samples within the dataset.
         By default this is inferred from the size of the "ploidy" dimension
         of the dataset.
+    skipna
+        If True, missing (nan) values of 'call_dosage' will be skipped so
+        that the relationship between each pair of individuals is estimated
+        using only variants where both samples have non-nan values.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -134,11 +161,7 @@ def genomic_relationship(
         raise ValueError(
             "The ancestral_frequency variable must have one value per variant"
         )
-    ad = af * ploidy
-    M = cd - ad[:, None]
-    num = M.T @ M
-    denom = (ad * (1 - af)).sum()
-    G = num / denom
+    G = _grm_VanRaden(cd, af, ploidy=ploidy, skipna=skipna)
 
     new_ds = create_dataset(
         {

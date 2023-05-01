@@ -118,6 +118,80 @@ def test_genomic_relationship__VanRaden_AGHmatrix_tetraploid(chunks):
     np.testing.assert_array_almost_equal(actual, expect)
 
 
+def test_genomic_relationship__VanRaden_skipna():
+    # Test that skipna option skips values in call_dosage
+    # such that the relationship between each pair of individuals
+    # is calculated using only the variants where neither sample
+    # has missing data.
+    # This should be equivalent to calculating the GRM using
+    # multiple subsets of the variants and using pairwise
+    # values from the larges subset of variants that doesn't
+    # result in a nan value.
+    nan = np.nan
+    dosage = np.array(
+        [
+            [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 2.0, 0.0],
+            [1.0, 1.0, 1.0, 2.0, nan, 1.0, 1.0, 0.0, 1.0, 2.0],
+            [2.0, 2.0, 0.0, 0.0, nan, 1.0, 1.0, 1.0, 0.0, 1.0],
+            [1.0, 0.0, 0.0, 0.0, nan, 1.0, 1.0, 1.0, 1.0, 0.0],
+            [1.0, 0.0, 1.0, 1.0, nan, 2.0, 0.0, 1.0, 0.0, 2.0],
+            [2.0, 1.0, 1.0, 1.0, nan, 1.0, 2.0, nan, 0.0, 1.0],
+            [2.0, 0.0, 1.0, 1.0, nan, 2.0, 1.0, nan, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 2.0, nan, 1.0, 2.0, nan, 1.0, 0.0],
+            [1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, nan, 1.0, 1.0],
+            [2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, nan, 2.0, 1.0],
+            [1.0, 2.0, 2.0, 1.0, 2.0, 0.0, 1.0, nan, 1.0, 2.0],
+            [0.0, 0.0, 1.0, 2.0, 0.0, 1.0, 0.0, nan, 1.0, 2.0],
+            [1.0, 2.0, 1.0, 2.0, 2.0, 0.0, 1.0, nan, 1.0, 0.0],
+            [0.0, 2.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0],
+            [1.0, 1.0, 2.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0],
+            [2.0, 0.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 0.0, 2.0],
+            [1.0, 0.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 2.0, 1.0],
+            [2.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 2.0, 1.0, 1.0, 2.0, 0.0, 2.0, 1.0, 2.0],
+            [1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+        ]
+    )
+    ds = xr.Dataset()
+    ds["call_dosage"] = ["variants", "samples"], dosage
+    ds["ancestral_frequency"] = "variants", np.ones(len(dosage)) / 2
+    # calculating without skipna will result in nans in the GRM
+    expect = sg.genomic_relationship(
+        ds,
+        call_dosage="call_dosage",
+        ancestral_frequency="ancestral_frequency",
+        estimator="VanRaden",
+        ploidy=2,
+        skipna=False,
+    ).stat_genomic_relationship.values
+    assert np.isnan(expect).sum() > 0
+    # fill nan values using maximum subsets without missing data
+    idx_0 = ~np.isnan(dosage[:, 4])
+    idx_1 = ~np.isnan(dosage[:, 7])
+    idx_2 = np.logical_and(idx_0, idx_1)
+    for idx in [idx_0, idx_1, idx_2]:
+        sub = ds.sel(dict(variants=idx))
+        sub_expect = sg.genomic_relationship(
+            sub,
+            call_dosage="call_dosage",
+            ancestral_frequency="ancestral_frequency",
+            estimator="VanRaden",
+            ploidy=2,
+            skipna=False,
+        ).stat_genomic_relationship.values
+        expect = np.where(np.isnan(expect), sub_expect, expect)
+    # calculate actual value using skipna=True
+    actual = sg.genomic_relationship(
+        ds,
+        call_dosage="call_dosage",
+        ancestral_frequency="ancestral_frequency",
+        estimator="VanRaden",
+        ploidy=2,
+        skipna=True,
+    ).stat_genomic_relationship.values
+    np.testing.assert_array_equal(actual, expect)
+
+
 @pytest.mark.parametrize("ploidy", [2, 4])
 def test_genomic_relationship__detect_ploidy(ploidy):
     ds = xr.Dataset()
