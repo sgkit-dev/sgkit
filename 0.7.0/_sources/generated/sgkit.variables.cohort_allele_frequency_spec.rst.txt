@@ -1,0 +1,6 @@
+﻿sgkit.variables.cohort\_allele\_frequency\_spec
+===============================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: cohort_allele_frequency_spec

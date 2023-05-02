@@ -1,0 +1,6 @@
+﻿sgkit.io.plink.write\_plink
+===========================
+
+.. currentmodule:: sgkit.io.plink
+
+.. autofunction:: write_plink

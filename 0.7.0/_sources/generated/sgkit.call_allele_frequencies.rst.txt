@@ -1,0 +1,6 @@
+﻿sgkit.call\_allele\_frequencies
+===============================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: call_allele_frequencies

@@ -1,0 +1,6 @@
+﻿sgkit.observed\_heterozygosity
+==============================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: observed_heterozygosity

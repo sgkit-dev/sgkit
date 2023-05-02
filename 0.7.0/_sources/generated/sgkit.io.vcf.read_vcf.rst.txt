@@ -1,0 +1,6 @@
+﻿sgkit.io.vcf.read\_vcf
+======================
+
+.. currentmodule:: sgkit.io.vcf
+
+.. autofunction:: read_vcf

@@ -1,0 +1,6 @@
+﻿sgkit.io.plink.zarr\_to\_plink
+==============================
+
+.. currentmodule:: sgkit.io.plink
+
+.. autofunction:: zarr_to_plink

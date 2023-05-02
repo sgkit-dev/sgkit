@@ -1,0 +1,6 @@
+﻿sgkit.genomic\_relationship
+===========================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: genomic_relationship

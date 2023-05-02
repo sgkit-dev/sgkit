@@ -1,0 +1,6 @@
+﻿sgkit.window\_by\_interval
+==========================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: window_by_interval

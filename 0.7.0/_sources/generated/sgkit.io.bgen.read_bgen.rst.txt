@@ -1,0 +1,6 @@
+﻿sgkit.io.bgen.read\_bgen
+========================
+
+.. currentmodule:: sgkit.io.bgen
+
+.. autofunction:: read_bgen

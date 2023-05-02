@@ -1,0 +1,6 @@
+﻿sgkit.variables.sample\_call\_rate\_spec
+========================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: sample_call_rate_spec

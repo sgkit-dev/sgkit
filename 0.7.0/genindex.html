@@ -1,0 +1,995 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; sgkit  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/typehints.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/docsearch.sbt.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
+        </script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script defer="defer" src="_static/docsearch.sbt.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="None">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <img src="_static/sgkit_trnsprnt.png" class="logo__image only-light" alt="Logo image">
+    <img src="_static/sgkit_blue_trnsprnt.png" class="logo__image only-dark" alt="Logo image">
+  
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="getting_started.html">
+                        Getting Started
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="vcf.html">
+                        Reading VCF
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api.html">
+                        API reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="how_do_i.html">
+                        How do I …
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="contributing.html">
+                        Contributing to sgkit
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="about.html">
+                        About
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="news.html">
+                        News
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="changelog.html">
+                        Changelog
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-toggle="dropdown">
+        latest  <!-- this text may get changed later by javascript -->
+        <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+</div>
+      </div>
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/pystatgen/sgkit" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="getting_started.html">
+                        Getting Started
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="vcf.html">
+                        Reading VCF
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api.html">
+                        API reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="how_do_i.html">
+                        How do I …
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="contributing.html">
+                        Contributing to sgkit
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="about.html">
+                        About
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="news.html">
+                        News
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="changelog.html">
+                        Changelog
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-toggle="dropdown">
+        latest  <!-- this text may get changed later by javascript -->
+        <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+</div>
+      </div>
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/pystatgen/sgkit" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ | <a href="#Z"><strong>Z</strong></a>
+ 
+</div>
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.io.bgen.bgen_to_zarr.html#sgkit.io.bgen.bgen_to_zarr">bgen_to_zarr() (in module sgkit.io.bgen)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.variables.call_allele_count_spec.html#sgkit.variables.call_allele_count_spec">call_allele_count_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.call_allele_frequencies.html#sgkit.call_allele_frequencies">call_allele_frequencies() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.variables.call_allele_frequency_spec.html#sgkit.variables.call_allele_frequency_spec">call_allele_frequency_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.call_dosage_mask_spec.html#sgkit.variables.call_dosage_mask_spec">call_dosage_mask_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.call_dosage_spec.html#sgkit.variables.call_dosage_spec">call_dosage_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.call_genotype_complete_mask_spec.html#sgkit.variables.call_genotype_complete_mask_spec">call_genotype_complete_mask_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.call_genotype_complete_spec.html#sgkit.variables.call_genotype_complete_spec">call_genotype_complete_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.call_genotype_fill_spec.html#sgkit.variables.call_genotype_fill_spec">call_genotype_fill_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.call_genotype_index_mask_spec.html#sgkit.variables.call_genotype_index_mask_spec">call_genotype_index_mask_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.call_genotype_index_spec.html#sgkit.variables.call_genotype_index_spec">call_genotype_index_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.call_genotype_mask_spec.html#sgkit.variables.call_genotype_mask_spec">call_genotype_mask_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.call_genotype_phased_spec.html#sgkit.variables.call_genotype_phased_spec">call_genotype_phased_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.call_genotype_probability_mask_spec.html#sgkit.variables.call_genotype_probability_mask_spec">call_genotype_probability_mask_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.call_genotype_probability_spec.html#sgkit.variables.call_genotype_probability_spec">call_genotype_probability_spec (in module sgkit.variables)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec">call_genotype_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.call_heterozygosity_spec.html#sgkit.variables.call_heterozygosity_spec">call_heterozygosity_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.call_ploidy_spec.html#sgkit.variables.call_ploidy_spec">call_ploidy_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.cohort_allele_count_spec.html#sgkit.variables.cohort_allele_count_spec">cohort_allele_count_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.cohort_allele_frequencies.html#sgkit.cohort_allele_frequencies">cohort_allele_frequencies() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.variables.cohort_allele_frequency_spec.html#sgkit.variables.cohort_allele_frequency_spec">cohort_allele_frequency_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.io.vcf.concat_zarrs.html#sgkit.io.vcf.concat_zarrs">concat_zarrs() (in module sgkit.io.vcf)</a>
+</li>
+      <li><a href="generated/sgkit.convert_call_to_index.html#sgkit.convert_call_to_index">convert_call_to_index() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.convert_probability_to_call.html#sgkit.convert_probability_to_call">convert_probability_to_call() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.count_call_alleles.html#sgkit.count_call_alleles">count_call_alleles() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.count_cohort_alleles.html#sgkit.count_cohort_alleles">count_cohort_alleles() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.count_variant_alleles.html#sgkit.count_variant_alleles">count_variant_alleles() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.count_variant_genotypes.html#sgkit.count_variant_genotypes">count_variant_genotypes() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.variables.covariates_spec.html#sgkit.variables.covariates_spec">covariates_spec (in module sgkit.variables)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.display_genotypes.html#sgkit.display_genotypes">display_genotypes() (in module sgkit)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.divergence.html#sgkit.divergence">divergence() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.diversity.html#sgkit.diversity">diversity() (in module sgkit)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.filter_partial_calls.html#sgkit.filter_partial_calls">filter_partial_calls() (in module sgkit)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.Fst.html#sgkit.Fst">Fst() (in module sgkit)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.Garud_H.html#sgkit.Garud_H">Garud_H() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.genee.html#sgkit.genee">genee() (in module sgkit)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.genomic_relationship.html#sgkit.genomic_relationship">genomic_relationship() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.gwas_linear_regression.html#sgkit.gwas_linear_regression">gwas_linear_regression() (in module sgkit)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.hardy_weinberg_test.html#sgkit.hardy_weinberg_test">hardy_weinberg_test() (in module sgkit)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.hybrid_inverse_relationship.html#sgkit.hybrid_inverse_relationship">hybrid_inverse_relationship() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.hybrid_relationship.html#sgkit.hybrid_relationship">hybrid_relationship() (in module sgkit)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.identity_by_state.html#sgkit.identity_by_state">identity_by_state() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.individual_heterozygosity.html#sgkit.individual_heterozygosity">individual_heterozygosity() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.infer_call_ploidy.html#sgkit.infer_call_ploidy">infer_call_ploidy() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.infer_sample_ploidy.html#sgkit.infer_sample_ploidy">infer_sample_ploidy() (in module sgkit)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.infer_variant_ploidy.html#sgkit.infer_variant_ploidy">infer_variant_ploidy() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.variables.interval_contig_name_spec.html#sgkit.variables.interval_contig_name_spec">interval_contig_name_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.interval_start_spec.html#sgkit.variables.interval_start_spec">interval_start_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.interval_stop_spec.html#sgkit.variables.interval_stop_spec">interval_stop_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.invert_relationship_matrix.html#sgkit.invert_relationship_matrix">invert_relationship_matrix() (in module sgkit)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.ld_matrix.html#sgkit.ld_matrix">ld_matrix() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.ld_prune.html#sgkit.ld_prune">ld_prune() (in module sgkit)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.variables.ld_prune_index_to_drop_spec.html#sgkit.variables.ld_prune_index_to_drop_spec">ld_prune_index_to_drop_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.load_dataset.html#sgkit.load_dataset">load_dataset() (in module sgkit)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.maximal_independent_set.html#sgkit.maximal_independent_set">maximal_independent_set() (in module sgkit)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.observed_heterozygosity.html#sgkit.observed_heterozygosity">observed_heterozygosity() (in module sgkit)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.variables.parent_id_spec.html#sgkit.variables.parent_id_spec">parent_id_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.parent_indices.html#sgkit.parent_indices">parent_indices() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.variables.parent_spec.html#sgkit.variables.parent_spec">parent_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.io.vcf.partition_into_regions.html#sgkit.io.vcf.partition_into_regions">partition_into_regions() (in module sgkit.io.vcf)</a>
+</li>
+      <li><a href="generated/sgkit.pbs.html#sgkit.pbs">pbs() (in module sgkit)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.pc_relate.html#sgkit.pc_relate">pc_relate() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.variables.pc_relate_phi_spec.html#sgkit.variables.pc_relate_phi_spec">pc_relate_phi_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.pedigree_inbreeding.html#sgkit.pedigree_inbreeding">pedigree_inbreeding() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.pedigree_inverse_kinship.html#sgkit.pedigree_inverse_kinship">pedigree_inverse_kinship() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.pedigree_kinship.html#sgkit.pedigree_kinship">pedigree_kinship() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.io.plink.plink_to_zarr.html#sgkit.io.plink.plink_to_zarr">plink_to_zarr() (in module sgkit.io.plink)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.io.bgen.read_bgen.html#sgkit.io.bgen.read_bgen">read_bgen() (in module sgkit.io.bgen)</a>
+</li>
+      <li><a href="generated/sgkit.io.plink.read_plink.html#sgkit.io.plink.read_plink">read_plink() (in module sgkit.io.plink)</a>
+</li>
+      <li><a href="generated/sgkit.read_scikit_allel_vcfzarr.html#sgkit.read_scikit_allel_vcfzarr">read_scikit_allel_vcfzarr() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.io.vcf.read_vcf.html#sgkit.io.vcf.read_vcf">read_vcf() (in module sgkit.io.vcf)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.io.bgen.rechunk_bgen.html#sgkit.io.bgen.rechunk_bgen">rechunk_bgen() (in module sgkit.io.bgen)</a>
+</li>
+      <li><a href="generated/sgkit.regenie.html#sgkit.regenie">regenie() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.variables.regenie_base_prediction_spec.html#sgkit.variables.regenie_base_prediction_spec">regenie_base_prediction_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.regenie_loco_prediction_spec.html#sgkit.variables.regenie_loco_prediction_spec">regenie_loco_prediction_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.regenie_meta_prediction_spec.html#sgkit.variables.regenie_meta_prediction_spec">regenie_meta_prediction_spec (in module sgkit.variables)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.variables.sample_call_rate_spec.html#sgkit.variables.sample_call_rate_spec">sample_call_rate_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.sample_cohort_spec.html#sgkit.variables.sample_cohort_spec">sample_cohort_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.sample_id_spec.html#sgkit.variables.sample_id_spec">sample_id_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.sample_n_called_spec.html#sgkit.variables.sample_n_called_spec">sample_n_called_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.sample_n_het_spec.html#sgkit.variables.sample_n_het_spec">sample_n_het_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.sample_n_hom_alt_spec.html#sgkit.variables.sample_n_hom_alt_spec">sample_n_hom_alt_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.sample_n_hom_ref_spec.html#sgkit.variables.sample_n_hom_ref_spec">sample_n_hom_ref_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.sample_n_non_ref_spec.html#sgkit.variables.sample_n_non_ref_spec">sample_n_non_ref_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.sample_pca_component_spec.html#sgkit.variables.sample_pca_component_spec">sample_pca_component_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.sample_pca_explained_variance_ratio_spec.html#sgkit.variables.sample_pca_explained_variance_ratio_spec">sample_pca_explained_variance_ratio_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.sample_pca_explained_variance_spec.html#sgkit.variables.sample_pca_explained_variance_spec">sample_pca_explained_variance_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.sample_pca_loading_spec.html#sgkit.variables.sample_pca_loading_spec">sample_pca_loading_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.sample_pca_projection_spec.html#sgkit.variables.sample_pca_projection_spec">sample_pca_projection_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.sample_ploidy_spec.html#sgkit.variables.sample_ploidy_spec">sample_ploidy_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.sample_stats.html#sgkit.sample_stats">sample_stats() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.save_dataset.html#sgkit.save_dataset">save_dataset() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset">simulate_genotype_call_dataset() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_divergence_spec.html#sgkit.variables.stat_divergence_spec">stat_divergence_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_diversity_spec.html#sgkit.variables.stat_diversity_spec">stat_diversity_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_Fst_spec.html#sgkit.variables.stat_Fst_spec">stat_Fst_spec (in module sgkit.variables)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.variables.stat_Garud_h123_spec.html#sgkit.variables.stat_Garud_h123_spec">stat_Garud_h123_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_Garud_h12_spec.html#sgkit.variables.stat_Garud_h12_spec">stat_Garud_h12_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_Garud_h1_spec.html#sgkit.variables.stat_Garud_h1_spec">stat_Garud_h1_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_Garud_h2_h1_spec.html#sgkit.variables.stat_Garud_h2_h1_spec">stat_Garud_h2_h1_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_genomic_kinship_spec.html#sgkit.variables.stat_genomic_kinship_spec">stat_genomic_kinship_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_genomic_relationship_spec.html#sgkit.variables.stat_genomic_relationship_spec">stat_genomic_relationship_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_Hamilton_Kerr_lambda_spec.html#sgkit.variables.stat_Hamilton_Kerr_lambda_spec">stat_Hamilton_Kerr_lambda_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_Hamilton_Kerr_tau_spec.html#sgkit.variables.stat_Hamilton_Kerr_tau_spec">stat_Hamilton_Kerr_tau_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_hybrid_inverse_relationship_spec.html#sgkit.variables.stat_hybrid_inverse_relationship_spec">stat_hybrid_inverse_relationship_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_hybrid_relationship_spec.html#sgkit.variables.stat_hybrid_relationship_spec">stat_hybrid_relationship_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_identity_by_state_spec.html#sgkit.variables.stat_identity_by_state_spec">stat_identity_by_state_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_inverse_relationship_spec.html#sgkit.variables.stat_inverse_relationship_spec">stat_inverse_relationship_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_observed_heterozygosity_spec.html#sgkit.variables.stat_observed_heterozygosity_spec">stat_observed_heterozygosity_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_pbs_spec.html#sgkit.variables.stat_pbs_spec">stat_pbs_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_pedigree_inbreeding_spec.html#sgkit.variables.stat_pedigree_inbreeding_spec">stat_pedigree_inbreeding_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_pedigree_inverse_kinship_spec.html#sgkit.variables.stat_pedigree_inverse_kinship_spec">stat_pedigree_inverse_kinship_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_pedigree_inverse_relationship_spec.html#sgkit.variables.stat_pedigree_inverse_relationship_spec">stat_pedigree_inverse_relationship_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_pedigree_kinship_spec.html#sgkit.variables.stat_pedigree_kinship_spec">stat_pedigree_kinship_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_pedigree_relationship_spec.html#sgkit.variables.stat_pedigree_relationship_spec">stat_pedigree_relationship_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_Tajimas_D_spec.html#sgkit.variables.stat_Tajimas_D_spec">stat_Tajimas_D_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.stat_Weir_Goudet_beta_spec.html#sgkit.variables.stat_Weir_Goudet_beta_spec">stat_Weir_Goudet_beta_spec (in module sgkit.variables)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.Tajimas_D.html#sgkit.Tajimas_D">Tajimas_D() (in module sgkit)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.variables.traits_spec.html#sgkit.variables.traits_spec">traits_spec (in module sgkit.variables)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.variables.variant_allele_count_spec.html#sgkit.variables.variant_allele_count_spec">variant_allele_count_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_allele_frequency_spec.html#sgkit.variables.variant_allele_frequency_spec">variant_allele_frequency_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_allele_spec.html#sgkit.variables.variant_allele_spec">variant_allele_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_allele_total_spec.html#sgkit.variables.variant_allele_total_spec">variant_allele_total_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_call_rate_spec.html#sgkit.variables.variant_call_rate_spec">variant_call_rate_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_contig_spec.html#sgkit.variables.variant_contig_spec">variant_contig_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_genotype_count_spec.html#sgkit.variables.variant_genotype_count_spec">variant_genotype_count_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_hwe_p_value_spec.html#sgkit.variables.variant_hwe_p_value_spec">variant_hwe_p_value_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_id_spec.html#sgkit.variables.variant_id_spec">variant_id_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_linreg_beta_spec.html#sgkit.variables.variant_linreg_beta_spec">variant_linreg_beta_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_linreg_p_value_spec.html#sgkit.variables.variant_linreg_p_value_spec">variant_linreg_p_value_spec (in module sgkit.variables)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.variables.variant_linreg_t_value_spec.html#sgkit.variables.variant_linreg_t_value_spec">variant_linreg_t_value_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_n_called_spec.html#sgkit.variables.variant_n_called_spec">variant_n_called_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_n_het_spec.html#sgkit.variables.variant_n_het_spec">variant_n_het_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_n_hom_alt_spec.html#sgkit.variables.variant_n_hom_alt_spec">variant_n_hom_alt_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_n_hom_ref_spec.html#sgkit.variables.variant_n_hom_ref_spec">variant_n_hom_ref_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_n_non_ref_spec.html#sgkit.variables.variant_n_non_ref_spec">variant_n_non_ref_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_ploidy_spec.html#sgkit.variables.variant_ploidy_spec">variant_ploidy_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_position_spec.html#sgkit.variables.variant_position_spec">variant_position_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.variant_score_spec.html#sgkit.variables.variant_score_spec">variant_score_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variant_stats.html#sgkit.variant_stats">variant_stats() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr">vcf_to_zarr() (in module sgkit.io.vcf)</a>
+</li>
+      <li><a href="generated/sgkit.io.vcf.vcf_to_zarrs.html#sgkit.io.vcf.vcf_to_zarrs">vcf_to_zarrs() (in module sgkit.io.vcf)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.Weir_Goudet_beta.html#sgkit.Weir_Goudet_beta">Weir_Goudet_beta() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.window_by_genome.html#sgkit.window_by_genome">window_by_genome() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.window_by_interval.html#sgkit.window_by_interval">window_by_interval() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.window_by_position.html#sgkit.window_by_position">window_by_position() (in module sgkit)</a>
+</li>
+      <li><a href="generated/sgkit.window_by_variant.html#sgkit.window_by_variant">window_by_variant() (in module sgkit)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.variables.window_contig_spec.html#sgkit.variables.window_contig_spec">window_contig_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.window_start_spec.html#sgkit.variables.window_start_spec">window_start_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.variables.window_stop_spec.html#sgkit.variables.window_stop_spec">window_stop_spec (in module sgkit.variables)</a>
+</li>
+      <li><a href="generated/sgkit.io.plink.write_plink.html#sgkit.io.plink.write_plink">write_plink() (in module sgkit.io.plink)</a>
+</li>
+      <li><a href="generated/sgkit.io.vcf.write_vcf.html#sgkit.io.vcf.write_vcf">write_vcf() (in module sgkit.io.vcf)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Z">Z</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.io.vcf.zarr_array_sizes.html#sgkit.io.vcf.zarr_array_sizes">zarr_array_sizes() (in module sgkit.io.vcf)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/sgkit.io.plink.zarr_to_plink.html#sgkit.io.plink.zarr_to_plink">zarr_to_plink() (in module sgkit.io.plink)</a>
+</li>
+      <li><a href="generated/sgkit.io.vcf.zarr_to_vcf.html#sgkit.io.vcf.zarr_to_vcf">zarr_to_vcf() (in module sgkit.io.vcf)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div id="searchbox"></div>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2020, sgkit developers.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>
