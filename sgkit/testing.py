@@ -18,6 +18,7 @@ def simulate_genotype_call_dataset(
     seed: Optional[int] = 0,
     missing_pct: Optional[float] = None,
     phased: Optional[bool] = None,
+    additional_variant_fields: Optional[dict] = None,
 ) -> Dataset:
     """Simulate genotype calls and variant/sample data.
 
@@ -50,6 +51,9 @@ def simulate_genotype_call_dataset(
         The percentage of missing calls, must be within [0.0, 1.0], optional
     phased
         Whether genotypes are phased, default is unphased, optional
+    additional_variant_fields
+        Additional variant fields to add to the dataset as a dictionary of
+        {field_name: field_dtype}, optional
 
     Returns
     -------
@@ -62,6 +66,7 @@ def simulate_genotype_call_dataset(
     - :data:`sgkit.variables.call_genotype_spec` (variants, samples, ploidy)
     - :data:`sgkit.variables.call_genotype_mask_spec` (variants, samples, ploidy)
     - :data:`sgkit.variables.call_genotype_phased_spec` (variants, samples), if ``phased`` is not None
+    - Those specified in ``additional_variant_fields``, if provided
     """
     if missing_pct and (missing_pct < 0.0 or missing_pct > 1.0):
         raise ValueError("missing_pct must be within [0.0, 1.0]")
@@ -87,7 +92,7 @@ def simulate_genotype_call_dataset(
         ["A", "C", "G", "T"], size=(n_variant, n_allele)
     ).astype("S")
     sample_id = np.array([f"S{i}" for i in range(n_sample)])
-    return create_genotype_call_dataset(
+    ds = create_genotype_call_dataset(
         variant_contig_names=contig_names,
         variant_contig=contig,
         variant_position=position,
@@ -96,3 +101,18 @@ def simulate_genotype_call_dataset(
         call_genotype=call_genotype,
         call_genotype_phased=call_genotype_phased,
     )
+    # Add in each of the additional variant fields, if provided with random data
+    if additional_variant_fields is not None:
+        for field_name, field_dtype in additional_variant_fields.items():
+            if field_dtype in (np.float32, np.float64):
+                field = rs.rand(n_variant).astype(field_dtype)
+            elif field_dtype in (np.int8, np.int16, np.int32, np.int64):
+                field = rs.randint(0, 100, n_variant, dtype=field_dtype)
+            elif field_dtype is np.bool:
+                field = rs.rand(n_variant) > 0.5
+            elif field_dtype is np.str:
+                field = np.arange(n_variant).astype("S")
+            else:
+                raise ValueError(f"Unrecognized dtype {field_dtype}")
+            ds[field_name] = (("variants",), field)
+    return ds
