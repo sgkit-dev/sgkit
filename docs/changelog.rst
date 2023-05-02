@@ -3,9 +3,32 @@
 Changelog
 =========
 
+.. _changelog.0.8.0:
+
+0.8.0 (unreleased)
+-----------------------
+
+.. New Features
+.. ~~~~~~~~~~~~
+
+.. Breaking changes
+.. ~~~~~~~~~~~~~~~~
+
+.. Deprecations
+.. ~~~~~~~~~~~~
+
+.. Improvements
+.. ~~~~~~~~~~~~
+
+.. Bug fixes
+.. ~~~~~~~~~
+
+.. Documentation
+.. ~~~~~~~~~~~~~
+
 .. _changelog.0.7.0:
 
-0.7.0 (unreleased)
+0.7.0 (2 May 2023)
 -----------------------
 
 New Features
@@ -48,16 +71,6 @@ New Features
 - Add `additional_variant_fields` to :func:`sgkit.simulate_genotype_call_dataset` function.
   (:user:`benjeffery`, :pr:`1056`)
 
-Bug fixes
-~~~~~~~~~
-
-- ``vcf_to_zarrs`` was outputting zarr files with ``temp_chunk_length`` sized chunks. This has now been fixed
-  so that the chunks are ``chunk_length`` sized.
-  (:user:`benjeffery`, :pr:`1044`,)
-
-- ``vcf_to_zarrs`` failed with ``ZeroDivisionError`` when VCFs with no samples were converted.
-  (:user:`benjeffery`, :pr:`1069`, :issue:`1068`)
-
 Breaking changes
 ~~~~~~~~~~~~~~~~
 
@@ -91,6 +104,13 @@ Improvements
 
 Bug fixes
 ~~~~~~~~~
+
+- ``vcf_to_zarrs`` was outputting zarr files with ``temp_chunk_length`` sized chunks. This has now been fixed
+  so that the chunks are ``chunk_length`` sized.
+  (:user:`benjeffery`, :pr:`1044`,)
+
+- ``vcf_to_zarrs`` failed with ``ZeroDivisionError`` when VCFs with no samples were converted.
+  (:user:`benjeffery`, :pr:`1069`, :issue:`1068`)
 
 - Correct formatting of mixed-ploidy data in :func:`sgkit.display_genotypes`.
   (:user:`timothymillar`, :pr:`1030`, :issue:`571`)
