@@ -37,7 +37,7 @@ def test_simulate_genotype_call_dataset__additional_variant_fields():
         n_sample=10,
         phased=True,
         additional_variant_fields={
-            "variant_id": np.str,
+            "variant_id": str,
             "variant_filter": bool,
             "variant_quality": np.int8,
             "variant_yummyness": np.float32,
