@@ -1600,7 +1600,7 @@ def _update_inverse_kinship(
         prod += parent_kinship[i] * weight_p * weight_q * 2
     try:
         scalar = 1 / (self_kinship[i] - prod)
-    except:  # noqa: E722
+    except:  # pragma: no cover # noqa: E722
         raise ValueError("Singular kinship matrix")
     # Calculate inverse kinships using sparse matrix multiplication.
     # If kinships are to be returned as relationships then they
