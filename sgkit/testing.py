@@ -110,7 +110,7 @@ def simulate_genotype_call_dataset(
                 field = rs.randint(0, 100, n_variant, dtype=field_dtype)
             elif field_dtype is bool:
                 field = rs.rand(n_variant) > 0.5
-            elif field_dtype is np.str:
+            elif field_dtype is str:
                 field = np.arange(n_variant).astype("S")
             else:
                 raise ValueError(f"Unrecognized dtype {field_dtype}")
