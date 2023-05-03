@@ -293,7 +293,7 @@ def kinship_diploid(
 @numba_jit
 def _identify_founders_diploid(parent: ArrayLike) -> ArrayLike:
     n = len(parent)
-    out = np.zeros(n, dtype=np.bool8)
+    out = np.zeros(n, dtype=np.bool_)
     for i in range(n):
         if (parent[i, 0] < 0) or (parent[i, 1] < 0):
             out[i] = True
@@ -657,7 +657,7 @@ def kinship_Hamilton_Kerr(
 @numba_jit
 def _identify_founders_Hamilton_Kerr(parent: ArrayLike, tau: ArrayLike) -> ArrayLike:
     n, p = parent.shape
-    out = np.zeros(n, dtype=np.bool8)
+    out = np.zeros(n, dtype=np.bool_)
     for i in range(n):
         for j in range(p):
             if (parent[i, j] < 0) and tau[i, j] > 0:

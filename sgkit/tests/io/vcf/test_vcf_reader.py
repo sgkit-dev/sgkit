@@ -1452,7 +1452,7 @@ def test_spec(shared_datadir, tmp_path):
         ndim=1,
         shape=(variants,),
         dimension_names=["variants"],
-        dtype=np.bool_,
+        dtype=bool,
     )
     check_field(
         group,
@@ -1468,7 +1468,7 @@ def test_spec(shared_datadir, tmp_path):
         ndim=1,
         shape=(variants,),
         dimension_names=["variants"],
-        dtype=np.bool_,
+        dtype=bool,
     )
     check_field(
         group,
@@ -1518,7 +1518,7 @@ def test_spec(shared_datadir, tmp_path):
         ndim=2,
         shape=(variants, samples),
         dimension_names=["variants", "samples"],
-        dtype=np.bool_,
+        dtype=bool,
     )
 
     # Sample information

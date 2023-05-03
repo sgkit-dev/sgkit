@@ -38,7 +38,7 @@ def test_simulate_genotype_call_dataset__additional_variant_fields():
         phased=True,
         additional_variant_fields={
             "variant_id": np.str,
-            "variant_filter": np.bool,
+            "variant_filter": bool,
             "variant_quality": np.int8,
             "variant_yummyness": np.float32,
         },
@@ -46,7 +46,7 @@ def test_simulate_genotype_call_dataset__additional_variant_fields():
     assert "variant_id" in ds
     assert np.all(ds["variant_id"] == np.arange(10).astype("S"))
     assert "variant_filter" in ds
-    assert ds["variant_filter"].dtype == np.bool
+    assert ds["variant_filter"].dtype == bool
     assert "variant_quality" in ds
     assert ds["variant_quality"].dtype == np.int8
     assert "variant_yummyness" in ds

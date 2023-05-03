@@ -211,7 +211,7 @@ def dataset_chunk_to_vcf(
         var = f"variant_{key}"
         if var not in ds:
             continue
-        if ds[var].dtype == np.bool:
+        if ds[var].dtype == bool:
             values = ds[var].values
             info_mask[k] = create_mask(values)
             info_bufs.append(np.zeros(0, dtype=np.uint8))
