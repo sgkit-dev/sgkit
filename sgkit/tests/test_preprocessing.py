@@ -1,6 +1,8 @@
+from contextlib import nullcontext
 from typing import Any
 
 import allel.stats.preprocessing
+import dask
 import dask.array as da
 import numpy as np
 import pytest
@@ -61,11 +63,21 @@ def test_patterson_scaler__lazy_evaluation(allele_counts):
 def test_patterson_scaler__dtype(allele_counts, dtype, expected_dtype):
     scaler = sgkit.stats.preprocessing.PattersonScaler()
     expected_dtype = np.dtype(expected_dtype)
-    assert scaler.fit_transform(allele_counts.astype(dtype)).dtype == expected_dtype
-    assert scaler.transform(allele_counts.astype(dtype)).dtype == expected_dtype
-    assert scaler.inverse_transform(allele_counts.astype(dtype)).dtype == expected_dtype
-    assert scaler.mean_.dtype == expected_dtype
-    assert scaler.scale_.dtype == expected_dtype
+    # f2 produces a warning, see https://github.com/numpy/numpy/issues/23606#issuecomment-1512752172
+    # use Dask synchronous scheduler for np.errstate to be picked up
+    with dask.config.set(scheduler="synchronous"):
+        with np.errstate(over="ignore") if dtype == "f2" else nullcontext():
+            assert (
+                scaler.fit_transform(allele_counts.astype(dtype)).dtype
+                == expected_dtype
+            )
+            assert scaler.transform(allele_counts.astype(dtype)).dtype == expected_dtype
+            assert (
+                scaler.inverse_transform(allele_counts.astype(dtype)).dtype
+                == expected_dtype
+            )
+            assert scaler.mean_.dtype == expected_dtype
+            assert scaler.scale_.dtype == expected_dtype
 
 
 def test_patterson_scaler__raise_on_partial_fit(allele_counts):
@@ -83,23 +95,29 @@ def test_patterson_scaler__missing_data(dtype, use_nan):
     if use_nan:
         # Verify that nan and negative sentinel values are interchangeable
         ac = np.where(ac < 0, np.nan, ac)
-    scaler = sgkit.stats.preprocessing.PattersonScaler().fit(ac)
-    # Read means from columns of array; scale = sqrt(mean/2 * (1 - mean/2))
-    np.testing.assert_equal(scaler.mean_, np.array([1.0] * 3 + [np.nan]))
-    np.testing.assert_equal(scaler.scale_, np.array([0.5] * 3 + [np.nan]))
-    np.testing.assert_equal(
-        scaler.transform(ac),
-        np.array(
-            [
-                [-2.0, np.nan, np.nan, np.nan],
-                [0.0, -2.0, np.nan, np.nan],
-                [2.0, 2.0, 0.0, np.nan],
-            ]
-        ),
-    )
-    # Test inversion to original array
-    acr = scaler.inverse_transform(scaler.transform(ac))
-    np.testing.assert_equal(np.where(np.isnan(acr), np.nan if use_nan else -1, acr), ac)
+    # f2 produces a warning, see https://github.com/numpy/numpy/issues/23606#issuecomment-1512752172
+    # use Dask synchronous scheduler for np.errstate to be picked up
+    with dask.config.set(scheduler="synchronous"):
+        with np.errstate(over="ignore") if dtype == "f2" else nullcontext():
+            scaler = sgkit.stats.preprocessing.PattersonScaler().fit(ac)
+            # Read means from columns of array; scale = sqrt(mean/2 * (1 - mean/2))
+            np.testing.assert_equal(scaler.mean_, np.array([1.0] * 3 + [np.nan]))
+            np.testing.assert_equal(scaler.scale_, np.array([0.5] * 3 + [np.nan]))
+            np.testing.assert_equal(
+                scaler.transform(ac),
+                np.array(
+                    [
+                        [-2.0, np.nan, np.nan, np.nan],
+                        [0.0, -2.0, np.nan, np.nan],
+                        [2.0, 2.0, 0.0, np.nan],
+                    ]
+                ),
+            )
+            # Test inversion to original array
+            acr = scaler.inverse_transform(scaler.transform(ac))
+            np.testing.assert_equal(
+                np.where(np.isnan(acr), np.nan if use_nan else -1, acr), ac
+            )
 
 
 def test_filter_partial_calls():
