@@ -205,7 +205,7 @@ def array_to_values(arr, name="unknown"):
     """Convert an array from cyvcf2 to a 'present' flag, and an array with fill removed."""
     if isinstance(arr, str):  # this happens for the Type=String, Number=1 path
         arr = np.array([arr], dtype="O")
-    if arr.dtype == np.bool_:
+    if arr.dtype == bool:
         if arr.size == 1:
             return True, arr.item()
         else:

@@ -108,7 +108,7 @@ def simulate_genotype_call_dataset(
                 field = rs.rand(n_variant).astype(field_dtype)
             elif field_dtype in (np.int8, np.int16, np.int32, np.int64):
                 field = rs.randint(0, 100, n_variant, dtype=field_dtype)
-            elif field_dtype is np.bool:
+            elif field_dtype is bool:
                 field = rs.rand(n_variant) > 0.5
             elif field_dtype is np.str:
                 field = np.arange(n_variant).astype("S")

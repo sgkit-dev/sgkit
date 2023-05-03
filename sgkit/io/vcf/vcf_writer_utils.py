@@ -496,7 +496,7 @@ def vcf_genotypes_to_byte_buf_size(call_genotype):
 def create_mask(arr):
     """Return a mask array of shape ``arr.shape[0]` for masking out fill values."""
     axis = tuple(range(1, len(arr.shape)))
-    if arr.dtype == np.bool:
+    if arr.dtype == bool:
         return ~arr
     elif arr.dtype in (np.int8, np.int16, np.int32):
         return np.all(arr == INT_FILL, axis=axis)
