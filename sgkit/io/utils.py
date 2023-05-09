@@ -35,7 +35,7 @@ def dataframe_to_dict(
         kind = np.dtype(dt).kind
         if kind in ["U", "S"]:
             # Compute fixed-length string dtype for array
-            max_len = int(max_str_len(a))
+            max_len = max_str_len(a)
             dt = f"{kind}{max_len}"
         arrs[c] = a.astype(dt)
     return arrs

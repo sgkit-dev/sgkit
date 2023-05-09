@@ -4,6 +4,7 @@ from typing import Any, Callable, Hashable, List, Mapping, Optional, Set, Tuple,
 
 import dask.array as da
 import numpy as np
+import xarray as xr
 from xarray import Dataset
 
 from . import variables
@@ -375,8 +376,7 @@ def max_str_len(a: ArrayLike) -> ArrayLike:
 
     Returns
     -------
-    max_length
-        Scalar array with same type as provided array
+    max_length : int
     """
     if a.size == 0:
         raise ValueError("Max string length cannot be calculated for empty array")
@@ -389,9 +389,17 @@ def max_str_len(a: ArrayLike) -> ArrayLike:
     if isinstance(a, np.ndarray):
         lens = np.asarray(lens)
     if a.ndim == 0:
-        return lens
+        max_len = lens
     else:
-        return lens.max()
+        max_len = lens.max()
+    # convert to a python int
+    if isinstance(max_len, da.Array):
+        max_len = max_len.compute()
+    elif isinstance(max_len, xr.DataArray):
+        max_len = max_len.values
+    if isinstance(max_len, np.ndarray):
+        max_len = max_len.item()
+    return max_len
 
 
 def smallest_numpy_int_dtype(value: int) -> Optional[DType]:
