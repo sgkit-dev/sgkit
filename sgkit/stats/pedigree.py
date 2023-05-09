@@ -1941,3 +1941,204 @@ def pedigree_inverse_kinship(
         }
     new_ds = create_dataset(arrays)
     return conditional_merge_datasets(ds, new_ds, merge)
+
+
+@numba_jit(nogil=True)
+def _ancestor_depth(
+    initial: ArrayLike,
+    parent: ArrayLike,
+    order: ArrayLike,
+) -> ArrayLike:
+    depth = initial - 1
+    n_samples, n_parents = parent.shape
+    # reverse view of order
+    order = order[::-1]
+    for idx in range(n_samples):
+        i = order[idx]
+        depth_i = depth[i]
+        if depth_i >= 0:
+            for j in range(n_parents):
+                p = parent[i, j]
+                if p >= 0:
+                    depth_p = depth[p]
+                    if depth_p < 0:
+                        depth[p] = depth_i + 1
+                    else:
+                        depth[p] = min(depth_p, depth_i + 1)
+    return depth
+
+
+@numba_jit(nogil=True)
+def _descendent_depth(
+    initial: ArrayLike,
+    parent: ArrayLike,
+    order: ArrayLike,
+) -> ArrayLike:
+    depth = initial - 1
+    n_samples, n_parents = parent.shape
+    for idx in range(n_samples):
+        i = order[idx]
+        depth_i = depth[i]
+        for j in range(n_parents):
+            p = parent[i, j]
+            if p >= 0:
+                depth_p = depth[p]
+                if depth_p >= 0:
+                    if depth_i < 0 or depth_i > depth_p:
+                        depth_i = depth_p + 1
+                        depth[i] = depth_i
+    return depth
+
+
+def pedigree_sel(
+    ds: Dataset,
+    *,
+    samples: ArrayLike,
+    ancestor_depth: int = 0,
+    descendant_depth: int = 0,
+    parent: Hashable = variables.parent,
+    sample_id: Hashable = variables.sample_id,
+    parent_id: Hashable = variables.parent_id,
+    sel_samples_0: bool = True,
+    sel_samples_1: bool = True,
+    update_parent_id: bool = True,
+    drop_parent: bool = True,
+) -> Dataset:
+    """Return a new dataset with each array indexed along the 'samples' dimension
+    using a subset of samples and the optional inclusion of their relatives.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing pedigree structure.
+    samples
+        Coordinates of the 'samples' dimension or a boolean index with
+        length equal to the 'samples' dimension.
+    ancestor_depth
+        Optionally include ancestors of the specified 'samples' up to a
+        a maximum depth. Use ``-1`` to include ancestors at any depth.
+    descendant_depth
+        Optionally include descendants of the specified 'samples' up to a
+        a maximum depth. Use ``-1`` to include descendants at any depth.
+    parent
+        Input variable name holding parents of each sample as defined by
+        :data:`sgkit.variables.parent_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`parent_indices`.
+    sample_id
+        Input variable name holding sample_id as defined by
+        :data:`sgkit.variables.sample_id_spec`.
+    parent_id
+        Input variable name holding parent_id as defined by
+        :data:`sgkit.variables.parent_id_spec`.
+    sel_samples_0
+        If True (the default) and the dataset contains a 'samples_0' dimension,
+        the selection will also be applied to this dimension.
+    sel_samples_1
+        If True (the default) and the dataset contains a 'samples_1' dimension,
+        the selection will also be applied to this dimension.
+    update_parent_id
+        If True (the default), replace values of the 'parent_id' array with the
+        missing value (``'.'``) where the corresponding sample is not included in
+        the new dataset.
+    drop_parent
+        If True (the default), the 'parent' variable will be dropped from the
+        new dataset (this variable is invalidated by selecting samples).
+
+    Returns
+    -------
+    A dataset containing a subset of samples.
+
+    Examples
+    --------
+    Create a pedigree dataset with three generations
+
+    >>> ds = xr.Dataset()
+    >>> ds["sample_id"] = "samples", ["S0", "S1", "S2", "S3", "S4"]
+    >>> ds["parent_id"] = ["samples", "parents"], [
+    ...     [".", "."],
+    ...     [".", "."],
+    ...     ["S0", "S1"],
+    ...     ["S0", "S1"],
+    ...     ["S2", "."]
+    ... ]
+
+    Select the first sample using its integer coordinate and include its children
+
+    >>> ds1 = pedigree_sel(ds, samples=0, descendant_depth=1)
+    >>> ds1.sample_id.values  # doctest: +NORMALIZE_WHITESPACE
+    array(['S0', 'S2', 'S3'], dtype='<U2')
+    >>> ds1.parent_id.values  # doctest: +NORMALIZE_WHITESPACE
+    array([['.', '.'],
+           ['S0', '.'],
+           ['S0', '.']], dtype='<U2')
+
+    Select the third sample using a boolean index and include its parents
+
+    >>> ds2 = pedigree_sel(ds, samples=[False, False, True, False, False], ancestor_depth=1)
+    >>> ds2.sample_id.values  # doctest: +NORMALIZE_WHITESPACE
+    array(['S0', 'S1', 'S2'], dtype='<U2')
+    >>> ds2.parent_id.values  # doctest: +NORMALIZE_WHITESPACE
+    array([['.', '.'],
+           ['.', '.'],
+           ['S0', 'S1']], dtype='<U2')
+
+    Select the second sample using its 'sample_id' and include all of its descendants
+
+    >>> ds = ds.assign_coords(dict(samples=ds.sample_id.values))
+    >>> ds3 = pedigree_sel(ds, samples="S1", descendant_depth=-1)
+    >>> ds3.sample_id.values  # doctest: +NORMALIZE_WHITESPACE
+    array(['S1', 'S2', 'S3', 'S4'], dtype='<U2')
+    >>> ds3.parent_id.values  # doctest: +NORMALIZE_WHITESPACE
+    array([['.', '.'],
+           ['.', 'S1'],
+           ['.', 'S1'],
+           ['S2', '.']], dtype='<U2')
+    """
+    ds = define_variable_if_absent(
+        ds,
+        variables.parent,
+        parent,
+        parent_indices,
+    )
+    parent_var = parent
+    parent = ds[parent].values
+    order = topological_argsort(parent)
+    n_samples, _ = parent.shape
+    if ancestor_depth < 0:
+        ancestor_depth = n_samples
+    if descendant_depth < 0:
+        descendant_depth = n_samples
+    _initial = ds.samples.sel({"samples": samples}).values
+    initial = ds.samples.isin(_initial).values
+    idx = initial.copy()
+    if ancestor_depth > 0:
+        depth = _ancestor_depth(
+            initial,
+            parent,
+            order,
+        )
+        idx |= (depth >= 0) & (depth <= ancestor_depth)
+    if descendant_depth > 0:
+        depth = _descendent_depth(
+            initial,
+            parent,
+            order,
+        )
+        idx |= (depth >= 0) & (depth <= descendant_depth)
+    keep = ds.samples.values[idx]
+    selection = {"samples": keep}
+    if sel_samples_0 and ("samples_0" in ds.dims):
+        selection["samples_0"] = keep
+    if sel_samples_1 and ("samples_1" in ds.dims):
+        selection["samples_1"] = keep
+    new_ds = ds.sel(selection)
+    if update_parent_id:
+        new_ds[parent_id] = xr.where(
+            new_ds.parent_id.isin(new_ds[sample_id]),
+            new_ds.parent_id,
+            ".",
+        )
+    if drop_parent:
+        new_ds = new_ds.drop_vars(parent_var)
+    return new_ds

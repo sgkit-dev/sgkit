@@ -13,6 +13,7 @@ from sgkit.stats.pedigree import (
     pedigree_inbreeding,
     pedigree_inverse_kinship,
     pedigree_kinship,
+    pedigree_sel,
     topological_argsort,
 )
 
@@ -1338,3 +1339,185 @@ def test_pedigree_inverse_kinship__raise_on_singular_kinship_matrix():
     # check sgkit message
     with pytest.raises(ValueError, match="Singular kinship matrix"):
         pedigree_inverse_kinship(ds, method="Hamilton-Kerr").compute()
+
+
+def _nx_pedigree(ds):
+    graph = nx.DiGraph()
+    for s, pair in zip(ds.sample_id.values, ds.parent_id.values):
+        for p in pair:
+            if p != ".":
+                graph.add_edge(p, s)
+    return graph
+
+
+def _nx_ancestors(graph, samples, depth):
+    ancestors = set(samples).copy()
+    if depth == 0:
+        return ancestors
+    for s in samples:
+        ancestors |= set(graph.predecessors(s))
+    return _nx_ancestors(graph, ancestors, depth - 1)
+
+
+def _nx_descendants(graph, samples, depth):
+    descendants = set(samples).copy()
+    if depth == 0:
+        return descendants
+    for s in samples:
+        descendants |= set(graph.successors(s))
+    return _nx_descendants(graph, descendants, depth - 1)
+
+
+@pytest.mark.parametrize("selfing", [False, True])
+@pytest.mark.parametrize("permute", [False, True])
+@pytest.mark.parametrize(
+    "n_sel, ancestor_depth, descendant_depth",
+    [
+        (5, 0, 0),
+        (10, 2, 0),
+        (10, 0, 3),
+        (10, -1, 0),
+        (10, 0, -1),
+        (12, 7, 4),
+    ],
+)
+@pytest.mark.parametrize(
+    "n_sample, n_founder, n_half_founder, seed",
+    [
+        (30, 3, 2, 0),
+        (300, 10, 10, 0),
+    ],
+)
+def test_pedigree_sel__networkx(
+    n_sample,
+    n_founder,
+    n_half_founder,
+    n_sel,
+    ancestor_depth,
+    descendant_depth,
+    seed,
+    selfing,
+    permute,
+):
+    # simulate a pedigree dataset
+    parent = random_parent_matrix(
+        n_sample, n_founder, n_half_founder, selfing=selfing, permute=permute, seed=seed
+    )
+    ds = xr.Dataset()
+    sample_id = np.array(["S{}".format(i) for i in range(n_sample)])
+    ds["sample_id"] = "samples", sample_id
+    parent_id = [["S{}".format(i) if i >= 0 else "." for i in row] for row in parent]
+    ds["parent_id"] = ["samples", "parents"], parent_id
+    # indices of samples to select
+    np.random.seed(seed)
+    sel_idx = np.random.choice(np.arange(n_sample), size=n_sel, replace=False)
+    # expected sample ids via networkx
+    sel_id = sample_id[sel_idx]
+    graph = _nx_pedigree(ds)
+    expect = _nx_ancestors(
+        graph, sel_id, ancestor_depth if ancestor_depth >= 0 else n_sample
+    )
+    expect |= _nx_descendants(
+        graph, sel_id, descendant_depth if descendant_depth >= 0 else n_sample
+    )
+    # actual samples using integer coords
+    ds1 = pedigree_sel(
+        ds,
+        samples=sel_idx,
+        ancestor_depth=ancestor_depth,
+        descendant_depth=descendant_depth,
+    )
+    assert set(ds1.sample_id.values) == expect
+    # actual samples using boolean index
+    sel_bools = np.zeros(len(sample_id), bool)
+    sel_bools[sel_idx] = True
+    ds2 = pedigree_sel(
+        ds,
+        samples=sel_bools,
+        ancestor_depth=ancestor_depth,
+        descendant_depth=descendant_depth,
+    )
+    assert set(ds2.sample_id.values) == expect
+    # actual samples using identifiers
+    ds = ds.assign_coords(dict(samples=sample_id))
+    ds3 = pedigree_sel(
+        ds,
+        samples=sample_id[sel_idx],
+        ancestor_depth=ancestor_depth,
+        descendant_depth=descendant_depth,
+    )
+    assert set(ds3.samples.values) == expect
+
+
+def test_pedigree_sel__sel_dims():
+    ds = xr.Dataset()
+    ds["sample_id"] = "samples", ["S0", "S1", "S2", "S3", "S4"]
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+        ["S0", "S1"],
+        ["S2", "S3"],
+    ]
+    kinship = np.array(
+        [
+            [0.5, 0.0, 0.25, 0.25, 0.25],
+            [0.0, 0.5, 0.25, 0.25, 0.25],
+            [0.25, 0.25, 0.5, 0.25, 0.375],
+            [0.25, 0.25, 0.25, 0.5, 0.375],
+            [0.25, 0.25, 0.375, 0.375, 0.625],
+        ]
+    )
+    ds["stat_pedigree_kinship"] = ["samples_0", "samples_1"], kinship
+
+    # indices of selected samples
+    idx = np.array([0, 2, 3])
+
+    ds1 = pedigree_sel(ds, samples=0, descendant_depth=1)
+    np.testing.assert_array_equal(ds1.stat_pedigree_kinship, kinship[np.ix_(idx, idx)])
+    ds2 = pedigree_sel(ds, samples=0, descendant_depth=1, sel_samples_0=False)
+    np.testing.assert_array_equal(ds2.stat_pedigree_kinship, kinship[:, idx])
+    ds3 = pedigree_sel(ds, samples=0, descendant_depth=1, sel_samples_1=False)
+    np.testing.assert_array_equal(ds3.stat_pedigree_kinship, kinship[idx, :])
+    ds4 = pedigree_sel(
+        ds, samples=0, descendant_depth=1, sel_samples_0=False, sel_samples_1=False
+    )
+    np.testing.assert_array_equal(ds4.stat_pedigree_kinship, kinship)
+
+
+def test_pedigree_sel__update_parent_id():
+    ds = xr.Dataset()
+    ds["sample_id"] = "samples", ["S0", "S1", "S2", "S3", "S4"]
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+        ["S0", "S1"],
+        ["S2", "S3"],
+    ]
+    ds1 = pedigree_sel(ds, samples=0, descendant_depth=1)
+    np.testing.assert_array_equal(ds1.parent_id, [[".", "."], ["S0", "."], ["S0", "."]])
+    ds2 = pedigree_sel(ds, samples=0, descendant_depth=1, update_parent_id=False)
+    np.testing.assert_array_equal(
+        ds2.parent_id, [[".", "."], ["S0", "S1"], ["S0", "S1"]]
+    )
+
+
+def test_pedigree_sel__drop_parent():
+    ds = xr.Dataset()
+    ds["sample_id"] = "samples", ["S0", "S1", "S2", "S3", "S4"]
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+        ["S0", "S1"],
+        ["S2", "S3"],
+    ]
+    ds1 = pedigree_sel(ds, samples=0, descendant_depth=1)
+    assert "parent" not in ds1
+
+    ds2 = pedigree_sel(ds, samples=0, descendant_depth=1, drop_parent=False)
+    assert "parent" in ds2
+    np.testing.assert_array_equal(
+        ds2.parent, [[-1, -1], [0, 1], [0, 1]]  # indicates it is its own parent
+    )
