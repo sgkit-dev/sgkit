@@ -216,7 +216,7 @@ def test_max_str_len(dtype, chunks, backend, data):
             max_str_len(x)
     else:
         expected = max(map(len, np.asarray(x).ravel()))
-        actual = int(max_str_len(x))
+        actual = max_str_len(x)
         assert expected == actual
 
 
