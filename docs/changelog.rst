@@ -8,8 +8,11 @@ Changelog
 0.8.0 (unreleased)
 -----------------------
 
-.. New Features
-.. ~~~~~~~~~~~~
+New Features
+~~~~~~~~~~~~
+
+- Add :func:`pedigree_sel` function.
+  (:user:`timothymillar`, :pr:`1087`, :issue:`1033`)
 
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
