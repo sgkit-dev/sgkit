@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>sgkit.save_dataset &#8212; sgkit  documentation</title>
+    <title>sgkit.pedigree_sel &#8212; sgkit  documentation</title>
   
   
   
@@ -43,7 +43,7 @@
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.save_dataset';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.pedigree_sel';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
@@ -53,8 +53,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.call_allele_frequencies" href="sgkit.call_allele_frequencies.html" />
-    <link rel="prev" title="sgkit.load_dataset" href="sgkit.load_dataset.html" /> 
+    <link rel="next" title="sgkit.simulate_genotype_call_dataset" href="sgkit.simulate_genotype_call_dataset.html" />
+    <link rel="prev" title="sgkit.parent_indices" href="sgkit.parent_indices.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="None"/>  
 <style type="text/css">
@@ -516,9 +516,9 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.write_vcf.html">sgkit.io.vcf.write_vcf</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.zarr_to_vcf.html">sgkit.io.vcf.zarr_to_vcf</a></li>
 </ul>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.load_dataset.html">sgkit.load_dataset</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.save_dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.save_dataset.html">sgkit.save_dataset</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.call_allele_frequencies.html">sgkit.call_allele_frequencies</a></li>
@@ -554,7 +554,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variant_stats.html">sgkit.variant_stats</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.Weir_Goudet_beta.html">sgkit.Weir_Goudet_beta</a></li>
 </ul>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.convert_call_to_index.html">sgkit.convert_call_to_index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.convert_probability_to_call.html">sgkit.convert_probability_to_call</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.display_genotypes.html">sgkit.display_genotypes</a></li>
@@ -564,7 +564,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.infer_variant_ploidy.html">sgkit.infer_variant_ploidy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.invert_relationship_matrix.html">sgkit.invert_relationship_matrix</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.parent_indices.html">sgkit.parent_indices</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_sel.html">sgkit.pedigree_sel</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.pedigree_sel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.simulate_genotype_call_dataset.html">sgkit.simulate_genotype_call_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.window_by_genome.html">sgkit.window_by_genome</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.window_by_interval.html">sgkit.window_by_interval</a></li>
@@ -703,7 +703,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">sgkit.save_dataset</li>
+    <li class="breadcrumb-item active" aria-current="page">sgkit.pedigree_sel</li>
   </ul>
 </nav>
 </div>
@@ -719,34 +719,105 @@ document.write(`
                 
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
-                   <section id="sgkit-save-dataset">
-<h1>sgkit.save_dataset<a class="headerlink" href="#sgkit-save-dataset" title="Permalink to this headline">#</a></h1>
+                   <section id="sgkit-pedigree-sel">
+<h1>sgkit.pedigree_sel<a class="headerlink" href="#sgkit-pedigree-sel" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="sgkit.save_dataset">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">save_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_rechunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.save_dataset" title="Permalink to this definition">#</a></dt>
-<dd><p>Save a dataset to Zarr storage.</p>
-<p>This function is a thin wrapper around <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.to_zarr.html#xarray.Dataset.to_zarr" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.to_zarr()</span></code></a>
-that uses sensible defaults and makes it easier to use in a pipeline.</p>
+<dt class="sig sig-object py" id="sgkit.pedigree_sel">
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">pedigree_sel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancestor_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descendant_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'parent'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sample_id'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'parent_id'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sel_samples_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sel_samples_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_parent_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.pedigree_sel" title="Permalink to this definition">#</a></dt>
+<dd><p>Return a new dataset with each array indexed along the ‘samples’ dimension
+using a subset of samples and the optional inclusion of their relatives.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset to save.</p>
+<dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing pedigree structure.</p>
 </dd>
-<dt><strong>store</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.MutableMapping" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MutableMapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>]</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.MutableMapping" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MutableMapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>]]</span></dt><dd><p>Zarr store or path to directory in file system to save to.</p>
+<dt><strong>samples</strong> : <span class="annotation terse"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> | <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.Array.html#dask.array.Array" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.Array.html#dask.array.Array" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code></a>]</span></dt><dd><p>Coordinates of the ‘samples’ dimension or a boolean index with
+length equal to the ‘samples’ dimension.</p>
 </dd>
-<dt><strong>storage_options</strong> : <span class="annotation terse">{<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>} | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Any additional parameters for the storage backend (see <code class="docutils literal notranslate"><span class="pre">fsspec.open</span></code>).</p>
+<dt><strong>ancestor_depth</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Optionally include ancestors of the specified ‘samples’ up to a
+a maximum depth. Use <code class="docutils literal notranslate"><span class="pre">-1</span></code> to include ancestors at any depth.</p>
 </dd>
-<dt><strong>auto_rechunk</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>If True, automatically rechunk the dataset to uniform chunks before saving,
-if necessary. This is required for Zarr, but can be expensive. Defaults to False.</p>
+<dt><strong>descendant_depth</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</dt><dd><p>Optionally include descendants of the specified ‘samples’ up to a
+a maximum depth. Use <code class="docutils literal notranslate"><span class="pre">-1</span></code> to include descendants at any depth.</p>
 </dd>
-<dt><strong>kwargs</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></dt><dd><p>Additional arguments to pass to <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.to_zarr.html#xarray.Dataset.to_zarr" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.to_zarr()</span></code></a>.</p>
+<dt><strong>parent</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'parent'</span></code>)</dt><dd><p>Input variable name holding parents of each sample as defined by
+<a class="reference internal" href="sgkit.variables.parent_spec.html#sgkit.variables.parent_spec" title="sgkit.variables.parent_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.parent_spec</span></code></a>.
+If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
+using <a class="reference internal" href="sgkit.parent_indices.html#sgkit.parent_indices" title="sgkit.parent_indices"><code class="xref py py-func docutils literal notranslate"><span class="pre">parent_indices()</span></code></a>.</p>
+</dd>
+<dt><strong>sample_id</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'sample_id'</span></code>)</dt><dd><p>Input variable name holding sample_id as defined by
+<a class="reference internal" href="sgkit.variables.sample_id_spec.html#sgkit.variables.sample_id_spec" title="sgkit.variables.sample_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_id_spec</span></code></a>.</p>
+</dd>
+<dt><strong>parent_id</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'parent_id'</span></code>)</dt><dd><p>Input variable name holding parent_id as defined by
+<a class="reference internal" href="sgkit.variables.parent_id_spec.html#sgkit.variables.parent_id_spec" title="sgkit.variables.parent_id_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.parent_id_spec</span></code></a>.</p>
+</dd>
+<dt><strong>sel_samples_0</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default) and the dataset contains a ‘samples_0’ dimension,
+the selection will also be applied to this dimension.</p>
+</dd>
+<dt><strong>sel_samples_1</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default) and the dataset contains a ‘samples_1’ dimension,
+the selection will also be applied to this dimension.</p>
+</dd>
+<dt><strong>update_parent_id</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), replace values of the ‘parent_id’ array with the
+missing value (<code class="docutils literal notranslate"><span class="pre">'.'</span></code>) where the corresponding sample is not included in
+the new dataset.</p>
+</dd>
+<dt><strong>drop_parent</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), the ‘parent’ variable will be dropped from the
+new dataset (this variable is invalidated by selecting samples).</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dataset containing a subset of samples.</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<p>Create a pedigree dataset with three generations</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;S0&quot;</span><span class="p">,</span> <span class="s2">&quot;S1&quot;</span><span class="p">,</span> <span class="s2">&quot;S2&quot;</span><span class="p">,</span> <span class="s2">&quot;S3&quot;</span><span class="p">,</span> <span class="s2">&quot;S4&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;parent_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;parents&quot;</span><span class="p">],</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;S0&quot;</span><span class="p">,</span> <span class="s2">&quot;S1&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;S0&quot;</span><span class="p">,</span> <span class="s2">&quot;S1&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;S2&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Select the first sample using its integer coordinate and include its children</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds1</span> <span class="o">=</span> <span class="n">pedigree_sel</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">descendant_depth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds1</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">values</span>  
+<span class="go">array([&#39;S0&#39;, &#39;S2&#39;, &#39;S3&#39;], dtype=&#39;&lt;U2&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds1</span><span class="o">.</span><span class="n">parent_id</span><span class="o">.</span><span class="n">values</span>  
+<span class="go">array([[&#39;.&#39;, &#39;.&#39;],</span>
+<span class="go">       [&#39;S0&#39;, &#39;.&#39;],</span>
+<span class="go">       [&#39;S0&#39;, &#39;.&#39;]], dtype=&#39;&lt;U2&#39;)</span>
+</pre></div>
+</div>
+<p>Select the third sample using a boolean index and include its parents</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds2</span> <span class="o">=</span> <span class="n">pedigree_sel</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="n">ancestor_depth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds2</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">values</span>  
+<span class="go">array([&#39;S0&#39;, &#39;S1&#39;, &#39;S2&#39;], dtype=&#39;&lt;U2&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds2</span><span class="o">.</span><span class="n">parent_id</span><span class="o">.</span><span class="n">values</span>  
+<span class="go">array([[&#39;.&#39;, &#39;.&#39;],</span>
+<span class="go">       [&#39;.&#39;, &#39;.&#39;],</span>
+<span class="go">       [&#39;S0&#39;, &#39;S1&#39;]], dtype=&#39;&lt;U2&#39;)</span>
+</pre></div>
+</div>
+<p>Select the second sample using its ‘sample_id’ and include all of its descendants</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">samples</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds3</span> <span class="o">=</span> <span class="n">pedigree_sel</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="s2">&quot;S1&quot;</span><span class="p">,</span> <span class="n">descendant_depth</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds3</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">values</span>  
+<span class="go">array([&#39;S1&#39;, &#39;S2&#39;, &#39;S3&#39;, &#39;S4&#39;], dtype=&#39;&lt;U2&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds3</span><span class="o">.</span><span class="n">parent_id</span><span class="o">.</span><span class="n">values</span>  
+<span class="go">array([[&#39;.&#39;, &#39;.&#39;],</span>
+<span class="go">       [&#39;.&#39;, &#39;S1&#39;],</span>
+<span class="go">       [&#39;.&#39;, &#39;S1&#39;],</span>
+<span class="go">       [&#39;S2&#39;, &#39;.&#39;]], dtype=&#39;&lt;U2&#39;)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -766,20 +837,20 @@ if necessary. This is required for Zarr, but can be expensive. Defaults to False
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="sgkit.load_dataset.html"
+       href="sgkit.parent_indices.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">sgkit.load_dataset</p>
+        <p class="prev-next-title">sgkit.parent_indices</p>
       </div>
     </a>
     <a class="right-next"
-       href="sgkit.call_allele_frequencies.html"
+       href="sgkit.simulate_genotype_call_dataset.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">sgkit.call_allele_frequencies</p>
+        <p class="prev-next-title">sgkit.simulate_genotype_call_dataset</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -797,7 +868,7 @@ if necessary. This is required for Zarr, but can be expensive. Defaults to False
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="../_sources/generated/sgkit.save_dataset.rst.txt">
+    <a href="../_sources/generated/sgkit.pedigree_sel.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

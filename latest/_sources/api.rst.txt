@@ -137,6 +137,7 @@ Utilities
    infer_variant_ploidy
    invert_relationship_matrix
    parent_indices
+   pedigree_sel
    simulate_genotype_call_dataset
    window_by_genome
    window_by_interval
