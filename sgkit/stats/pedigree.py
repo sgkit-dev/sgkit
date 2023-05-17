@@ -2142,3 +2142,154 @@ def pedigree_sel(
     if drop_parent:
         new_ds = new_ds.drop_vars(parent_var)
     return new_ds
+
+
+def pedigree_contribution(
+    ds: Dataset,
+    *,
+    method: Literal["even", "variable"] = "even",
+    chunks: Hashable = -1,
+    parent: Hashable = variables.parent,
+    stat_Hamilton_Kerr_tau: Hashable = variables.stat_Hamilton_Kerr_tau,
+    merge: bool = True,
+) -> Dataset:
+    """Calculate the expected genomic contribution of each sample to each
+    other sample based on pedigree structure.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing pedigree structure.
+    method
+        The method used for estimating genomic contributions.
+        The 'even' method assumes that all samples are of a single,
+        even ploidy (e.g., diploid) and have even contributions
+        from each parent. The 'variable' method allows for un-even
+        contributions due to ploidy manipulation and/or clonal
+        reproduction.
+    chunks:
+        Optionally specify chunks for the returned array. A single chunk
+        is used by default. Currently, chunking is only supported for a
+        single axis.
+    parent
+        Input variable name holding parents of each sample as defined by
+        :data:`sgkit.variables.parent_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`parent_indices`.
+    stat_Hamilton_Kerr_tau
+        Input variable name holding stat_Hamilton_Kerr_tau as defined
+        by :data:`sgkit.variables.stat_Hamilton_Kerr_tau_spec`.
+        This variable is only required for the 'variable' method.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+
+    Returns
+    -------
+    A dataset containing :data:`sgkit.variables.stat_pedigree_contribution_spec`.
+
+    Raises
+    ------
+    ValueError
+        If an unknown method is specified.
+    ValueError
+        If the 'even' method is specified for an odd-ploidy dataset.
+    ValueError
+        If the 'even' method is specified and the length of the 'parents'
+        dimension is not 2.
+    NotImplementedError
+        If chunking is specified for both axes.
+
+    Note
+    ----
+    Dimensions of :data:`sgkit.variables.stat_pedigree_contribution_spec`
+    are named ``samples_0`` and ``samples_1``.
+
+    Examples
+    --------
+    >>> ds = xr.Dataset()
+    >>> ds["sample_id"] = "samples", ["S0", "S1", "S2", "S3", "S4", "S5"]
+    >>> ds["parent_id"] = ["samples", "parents"], [
+    ...     [ ".",  "."],
+    ...     [ ".",  "."],
+    ...     ["S1", "S0"],
+    ...     ["S2", "S0"],
+    ...     ["S0", "S2"],
+    ...     ["S1", "S3"]
+    ... ]
+    >>> ds = pedigree_contribution(ds)
+    >>> ds.stat_pedigree_contribution.values  # doctest: +NORMALIZE_WHITESPACE
+    array([[1.   , 0.   , 0.5  , 0.75 , 0.75 , 0.375],
+           [0.   , 1.   , 0.5  , 0.25 , 0.25 , 0.625],
+           [0.   , 0.   , 1.   , 0.5  , 0.5  , 0.25 ],
+           [0.   , 0.   , 0.   , 1.   , 0.   , 0.5  ],
+           [0.   , 0.   , 0.   , 0.   , 1.   , 0.   ],
+           [0.   , 0.   , 0.   , 0.   , 0.   , 1.   ]])
+    """
+    from .pedigree_numba_fns import contribution_from, contribution_to
+
+    if method not in {"even", "variable"}:
+        raise ValueError("Unknown method '{}'".format(method))
+    ds = define_variable_if_absent(
+        ds,
+        variables.parent,
+        parent,
+        parent_indices,
+    )
+    variables.validate(ds, {parent: variables.parent_spec})
+    parent = da.asarray(ds[parent].data, chunks=ds[parent].shape)
+    n_sample, n_parent = parent.shape
+    if method == "even":
+        if bool(ds.dims.get("ploidy", 2) % 2):
+            raise ValueError("The 'even' method requires an even-ploidy dataset")
+        if n_parent != 2:
+            raise ValueError(
+                "The 'even' requires that the 'parents' dimension has a length of 2"
+            )
+        parent_contribution = da.ones_like(parent, float) / 2
+    else:
+        variables.validate(
+            ds, {stat_Hamilton_Kerr_tau: variables.stat_Hamilton_Kerr_tau_spec}
+        )
+        tau = da.asarray(
+            ds[stat_Hamilton_Kerr_tau].data, chunks=ds[stat_Hamilton_Kerr_tau].shape
+        )
+        parent_contribution = tau / tau.sum(axis=-1, keepdims=True)
+    order = da.gufunc(
+        topological_argsort,
+        signature="(n,p)->(n)",
+        output_dtypes=np.uint64,
+    )(parent)
+    # create a dummy array for dask to work out chunks
+    chunks_0, chunks_1 = da.empty((n_sample, n_sample), chunks=chunks).chunks
+    if (len(chunks_0) > 1) and (len(chunks_1) > 1):
+        raise NotImplementedError("Chunking is only supported along a single axis")
+    elif len(chunks_0) == 1:
+        targets = da.arange(n_sample, chunks=chunks_1)
+        # transpose so that [x, y] is contribution of x to y
+        # TODO: dask already adds a transpose when calling the gufunc so
+        # avoiding that initial transpose somehow should be more efficient
+        contribution = contribution_to(
+            parent,
+            parent_contribution,
+            order,
+            targets,
+        ).T
+    else:
+        targets = da.arange(n_sample, chunks=chunks_0)
+        contribution = contribution_from(
+            parent,
+            parent_contribution,
+            order,
+            targets,
+        )
+    new_ds = create_dataset(
+        {
+            variables.stat_pedigree_contribution: (
+                ("samples_0", "samples_1"),
+                contribution,
+            )
+        }
+    )
+    return conditional_merge_datasets(ds, new_ds, merge)

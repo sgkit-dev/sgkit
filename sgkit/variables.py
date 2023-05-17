@@ -963,6 +963,23 @@ stat_pbs, stat_pbs_spec = SgkitVariables.register_variable(
 )
 
 (
+    stat_pedigree_contribution,
+    stat_pedigree_contribution_spec,
+) = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_pedigree_contribution",
+        dims=("samples_0", "samples_1"),
+        kind="f",
+        __doc__="""
+Expected proportional genomic contribution to and from each pair of samples
+based on pedigree structure. This is an asymmetric matrix in which the
+element [x, y] is the expected contribution of sample x to sample y.
+Diagonal values are always 1.
+""",
+    )
+)
+
+(
     stat_pedigree_inbreeding,
     stat_pedigree_inbreeding_spec,
 ) = SgkitVariables.register_variable(
