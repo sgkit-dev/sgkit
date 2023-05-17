@@ -10,6 +10,7 @@ import sgkit as sg
 from sgkit.stats.pedigree import (
     _insert_hamilton_kerr_self_kinship,
     parent_indices,
+    pedigree_contribution,
     pedigree_inbreeding,
     pedigree_inverse_kinship,
     pedigree_kinship,
@@ -1521,3 +1522,178 @@ def test_pedigree_sel__drop_parent():
     np.testing.assert_array_equal(
         ds2.parent, [[-1, -1], [0, 1], [0, 1]]  # indicates it is its own parent
     )
+
+
+def reference_pedigree_contribution(parent, tau):
+    """Reference implementation of pedigree contribution"""
+    assert parent.shape == tau.shape
+    n_sample = len(parent)
+    # start with every sample 'contributing' 100% of it's own genome
+    out = np.eye(n_sample)
+    # calculate the proportional contribution of each parent
+    parent_contribution = tau / tau.sum(axis=-1, keepdims=True)
+    # iterate through samples in order
+    order = topological_argsort(parent)
+    for i in order:
+        # iterate through each parent
+        for j in range(2):
+            p = parent[i, j]
+            if p >= 0:
+                # contributors to parent weighted by parent contribution
+                out[:, i] += out[:, p] * parent_contribution[i, j]
+    return out
+
+
+@pytest.mark.parametrize("axis", [0, 1])
+@pytest.mark.parametrize("method", ["even", "variable"])
+@pytest.mark.parametrize(
+    "n_sample, n_founder, seed, permute",
+    [
+        (4, 2, 0, False),
+        (20, 3, 0, False),
+        (25, 5, 1, True),
+    ],
+)
+def test_pedigree_contribution__refimp(
+    axis, method, n_sample, n_founder, permute, seed
+):
+    ds = xr.Dataset()
+    parent = random_parent_matrix(n_sample, n_founder, permute=permute, seed=seed)
+    ds["parent"] = ["samples", "parents"], parent
+    if method == "variable":
+        tau = np.random.randint(1, 3, size=parent.shape)
+        ds["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], tau.astype(np.uint64)
+    else:
+        tau = np.ones(parent.shape, int)
+    expect = reference_pedigree_contribution(parent, tau)
+    # use chunking to determine gufunc
+    if axis == 0:
+        chunks = (n_sample // 2, -1)
+    else:
+        chunks = (-1, n_sample // 2)
+    actual = pedigree_contribution(
+        ds, method=method, chunks=chunks
+    ).stat_pedigree_contribution.values
+    np.testing.assert_array_almost_equal(expect, actual)
+
+
+@pytest.mark.parametrize("axis", [0, 1])
+@pytest.mark.parametrize("method", ["even", "variable"])
+@pytest.mark.parametrize(
+    "n_sample, n_founder, seed, permute",
+    [
+        (30, 3, 0, False),
+        (300, 10, 0, False),
+        (500, 13, 0, True),
+    ],
+)
+def test_pedigree_contribution__founders_kinship(
+    axis, method, n_sample, n_founder, permute, seed
+):
+    # This test is based on the observation that the contribution
+    # of a founder to a non-founder is equal to the kinship of that
+    # founder with the non-founder so long as the founder is fully
+    # inbred and unrelated to other founders.
+    # This can be achieved by initializing pedigree kinship estimates
+    # using an identity matrix.
+    ds = xr.Dataset()
+    parent = random_parent_matrix(n_sample, n_founder, permute=permute, seed=seed)
+    ds["parent"] = ["samples", "parents"], parent
+    if method == "variable":
+        kinship_method = "Hamilton-Kerr"
+        tau = np.random.randint(1, 3, size=parent.shape)
+        ds["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], tau.astype(np.uint64)
+        ds["stat_Hamilton_Kerr_lambda"] = ["samples", "parents"], np.zeros(parent.shape)
+    else:
+        kinship_method = "diploid"
+    ds["eye"] = ["samples_0", "samples_1"], np.eye(n_sample)
+    ds = pedigree_kinship(ds, method=kinship_method, founder_kinship="eye")
+    # use chunking to determine gufunc
+    if axis == 0:
+        chunks = (n_sample // 2, -1)
+    else:
+        chunks = (-1, n_sample // 2)
+    ds = pedigree_contribution(ds, method=method, chunks=chunks)
+    ds = ds.compute()
+    is_founder = (ds.parent < 0).all(dim="parents").values
+    expect = ds.stat_pedigree_kinship[is_founder, :]
+    actual = ds.stat_pedigree_contribution[is_founder, :]
+    np.testing.assert_array_almost_equal(expect, actual)
+    # check asymmetry, that non-founders don't contribute to founders
+    expect = ds.eye[:, is_founder]
+    actual = ds.stat_pedigree_contribution[:, is_founder]
+    np.testing.assert_array_almost_equal(expect, actual)
+
+
+def test_pedigree_contribution__chunking():
+    ds = xr.Dataset()
+    parent = random_parent_matrix(500, 100, permute=True, seed=0)
+    ds["parent"] = ["samples", "parents"], parent
+    expect = pedigree_contribution(ds).stat_pedigree_contribution.data
+    actual_0 = pedigree_contribution(
+        ds, chunks=(50, -1)
+    ).stat_pedigree_contribution.data
+    actual_1 = pedigree_contribution(
+        ds, chunks=(-1, 100)
+    ).stat_pedigree_contribution.data
+    assert expect.chunks == ((500,), (500,))
+    assert actual_0.chunks == ((50,) * 10, (500,))
+    assert actual_1.chunks == ((500,), (100,) * 5)
+    np.testing.assert_array_almost_equal(expect, actual_0)
+    np.testing.assert_array_almost_equal(expect, actual_1)
+
+
+def test_pedigree_contribution__raise_on_unknown_method():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+    ]
+    with pytest.raises(ValueError, match="Unknown method 'unknown'"):
+        pedigree_contribution(ds, method="unknown")
+
+
+def test_pedigree_contribution__raise_on_odd_ploidy():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3, n_ploidy=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+    ]
+    with pytest.raises(
+        ValueError, match="The 'even' method requires an even-ploidy dataset"
+    ):
+        pedigree_contribution(ds)
+
+
+def test_pedigree_contribution__raise_on_parent_dim():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=3)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", ".", "."],
+        [".", ".", "."],
+        ["S0", "S1", "."],
+    ]
+    with pytest.raises(
+        ValueError,
+        match="The 'even' requires that the 'parents' dimension has a length of 2",
+    ):
+        pedigree_contribution(ds)
+
+
+def test_pedigree_contribution__raise_on_chunking():
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+        ["S0", "S1"],
+    ]
+    pedigree_contribution(ds, chunks=(2, 4))
+    pedigree_contribution(ds, chunks=(2, -1))
+    pedigree_contribution(ds, chunks=(-1, 2))
+    pedigree_contribution(ds, chunks=(4, 2))
+    with pytest.raises(
+        NotImplementedError, match="Chunking is only supported along a single axis"
+    ):
+        pedigree_contribution(ds, chunks=(2, 2))

@@ -42,6 +42,7 @@ from .stats.pc_relate import pc_relate
 from .stats.pca import pca
 from .stats.pedigree import (
     parent_indices,
+    pedigree_contribution,
     pedigree_inbreeding,
     pedigree_inverse_kinship,
     pedigree_kinship,
@@ -107,6 +108,7 @@ __all__ = [
     "ld_prune",
     "maximal_independent_set",
     "parent_indices",
+    "pedigree_contribution",
     "pedigree_inbreeding",
     "pedigree_inverse_kinship",
     "pedigree_kinship",
