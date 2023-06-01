@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>sgkit.regenie &#8212; sgkit  documentation</title>
+    <title>sgkit.pedigree_contribution &#8212; sgkit  documentation</title>
   
   
   
@@ -43,7 +43,7 @@
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.regenie';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.pedigree_contribution';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
@@ -53,8 +53,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.sample_stats" href="sgkit.sample_stats.html" />
-    <link rel="prev" title="sgkit.pc_relate" href="sgkit.pc_relate.html" /> 
+    <link rel="next" title="sgkit.pedigree_inbreeding" href="sgkit.pedigree_inbreeding.html" />
+    <link rel="prev" title="sgkit.pbs" href="sgkit.pbs.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="None"/>  
 <style type="text/css">
@@ -544,12 +544,12 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.maximal_independent_set.html">sgkit.maximal_independent_set</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.observed_heterozygosity.html">sgkit.observed_heterozygosity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pbs.html">sgkit.pbs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_contribution.html">sgkit.pedigree_contribution</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.pedigree_contribution</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_inbreeding.html">sgkit.pedigree_inbreeding</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_inverse_kinship.html">sgkit.pedigree_inverse_kinship</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_kinship.html">sgkit.pedigree_kinship</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pc_relate.html">sgkit.pc_relate</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.regenie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.regenie.html">sgkit.regenie</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.sample_stats.html">sgkit.sample_stats</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.Tajimas_D.html">sgkit.Tajimas_D</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variant_stats.html">sgkit.variant_stats</a></li>
@@ -705,7 +705,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">sgkit.regenie</li>
+    <li class="breadcrumb-item active" aria-current="page">sgkit.pedigree_contribution</li>
   </ul>
 </nav>
 </div>
@@ -721,136 +721,86 @@ document.write(`
                 
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
-                   <section id="sgkit-regenie">
-<h1>sgkit.regenie<a class="headerlink" href="#sgkit-regenie" title="Permalink to this headline">#</a></h1>
+                   <section id="sgkit-pedigree-contribution">
+<h1>sgkit.pedigree_contribution<a class="headerlink" href="#sgkit-pedigree-contribution" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="sgkit.regenie">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">regenie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dosage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant_contig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'variant_contig'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant_block_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_block_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alphas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orthogonalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.regenie" title="Permalink to this definition">#</a></dt>
-<dd><p>Regenie trait transformation.</p>
-<p><a class="reference external" href="https://github.com/rgcgithub/regenie">REGENIE</a> is a whole-genome
-regression technique that produces trait estimates for association
-tests. These estimates are subtracted from trait values and
-sampling statistics (p-values, standard errors, etc.) are evaluated
-against the residuals. See the REGENIE preprint [1] for more details.
-For a simpler technical overview, see [2] for a detailed description
-of the individual stages and separate regression models involved.</p>
+<dt class="sig sig-object py" id="sgkit.pedigree_contribution">
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">pedigree_contribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'even'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'parent'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_Hamilton_Kerr_tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stat_Hamilton_Kerr_tau'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.pedigree_contribution" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate the expected genomic contribution of each sample to each
+other sample based on pedigree structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>dosage</strong> : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></dt><dd><p>Name of genetic dosage variable.
-Defined by <a class="reference internal" href="sgkit.variables.call_dosage_spec.html#sgkit.variables.call_dosage_spec" title="sgkit.variables.call_dosage_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_dosage_spec</span></code></a>.</p>
+<dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing pedigree structure.</p>
 </dd>
-<dt><strong>covariates</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]]</span></dt><dd><p>Names of covariate variables (1D or 2D).
-Defined by <a class="reference internal" href="sgkit.variables.covariates_spec.html#sgkit.variables.covariates_spec" title="sgkit.variables.covariates_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.covariates_spec</span></code></a>.</p>
+<dt><strong>method</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘even’, ‘variable’] (default: <code class="docutils literal notranslate"><span class="pre">'even'</span></code>)</dt><dd><p>The method used for estimating genomic contributions.
+The ‘even’ method assumes that all samples are of a single,
+even ploidy (e.g., diploid) and have even contributions
+from each parent. The ‘variable’ method allows for un-even
+contributions due to ploidy manipulation and/or clonal
+reproduction.</p>
 </dd>
-<dt><strong>traits</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]]</span></dt><dd><p>Names of trait variables (1D or 2D).
-Defined by <a class="reference internal" href="sgkit.variables.traits_spec.html#sgkit.variables.traits_spec" title="sgkit.variables.traits_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.traits_spec</span></code></a>.</p>
+<dt><strong>chunks</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</dt><dd><p>Optionally specify chunks for the returned array. A single chunk
+is used by default. Currently, chunking is only supported for a
+single axis.</p>
 </dd>
-<dt><strong>variant_contig</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'variant_contig'</span></code>)</dt><dd><p>Name of the variant contig input variable.
-Definied by <a class="reference internal" href="sgkit.variables.variant_contig_spec.html#sgkit.variables.variant_contig_spec" title="sgkit.variables.variant_contig_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_contig_spec</span></code></a>.</p>
+<dt><strong>parent</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'parent'</span></code>)</dt><dd><p>Input variable name holding parents of each sample as defined by
+<a class="reference internal" href="sgkit.variables.parent_spec.html#sgkit.variables.parent_spec" title="sgkit.variables.parent_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.parent_spec</span></code></a>.
+If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
+using <a class="reference internal" href="sgkit.parent_indices.html#sgkit.parent_indices" title="sgkit.parent_indices"><code class="xref py py-func docutils literal notranslate"><span class="pre">parent_indices()</span></code></a>.</p>
 </dd>
-<dt><strong>variant_block_size</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Number of variants in each block.
-If int, this describes the number of variants in each block
-but the last which may be smaller.
-If Tuple[int, …], this must describe the desired number of
-variants in each block individually.
-Defaults to 1000 or num variants // 2, whichever is smaller.</p>
-</dd>
-<dt><strong>sample_block_size</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Number of samples in each block.
-If int, this describes the number of samples in each block
-but the last which may be smaller.
-If Tuple[int, …], this must describe the desired number of
-samples in each block individually.
-Defaults to 10 sample blocks split roughly across all possible
-samples or the number of samples, if that number is &lt; 10.</p>
-</dd>
-<dt><strong>alphas</strong> : <span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>List of alpha values to use for regularization, by default None.
-If not provided, these will be set automatically based on
-datasize and apriori heritability assumptions.</p>
-</dd>
-<dt><strong>add_intercept</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>Whether or not to add intercept to covariates, by default True.</p>
-</dd>
-<dt><strong>normalize</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</dt><dd><p>Rescale genotypes, traits, and covariates to have
-mean 0 and stdev 1, by default False.</p>
-</dd>
-<dt><strong>orthogonalize</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</dt><dd><p><strong>Experimental</strong>: Remove covariates through orthogonalization
-of genotypes and traits, by default False.</p>
+<dt><strong>stat_Hamilton_Kerr_tau</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'stat_Hamilton_Kerr_tau'</span></code>)</dt><dd><p>Input variable name holding stat_Hamilton_Kerr_tau as defined
+by <a class="reference internal" href="sgkit.variables.stat_Hamilton_Kerr_tau_spec.html#sgkit.variables.stat_Hamilton_Kerr_tau_spec" title="sgkit.variables.stat_Hamilton_Kerr_tau_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Hamilton_Kerr_tau_spec</span></code></a>.
+This variable is only required for the ‘variable’ method.</p>
 </dd>
 <dt><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
-the computed output variables.
-See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
+the computed output variables.</p>
 </dd>
 </dl>
 </dd>
-</dl>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Binary traits are not yet supported so all outcomes provided
-must be continuous.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>A dataset containing the following variables:</p>
-<ul class="simple">
-<li><dl class="simple">
-<dt><cite>regenie_base_prediction</cite> (blocks, alphas, samples, outcomes): Stage 1</dt><dd><p>predictions from ridge regression reduction. Defined by
-<a class="reference internal" href="sgkit.variables.regenie_base_prediction_spec.html#sgkit.variables.regenie_base_prediction_spec" title="sgkit.variables.regenie_base_prediction_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.regenie_base_prediction_spec</span></code></a>.</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.stat_pedigree_contribution_spec.html#sgkit.variables.stat_pedigree_contribution_spec" title="sgkit.variables.stat_pedigree_contribution_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_contribution_spec</span></code></a>.</p>
 </dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>regenie_meta_prediction</cite> (samples, outcomes): Stage 2 predictions from</dt><dd><p>the best meta estimator trained on the out-of-sample Stage 1
-predictions. Defined by <a class="reference internal" href="sgkit.variables.regenie_meta_prediction_spec.html#sgkit.variables.regenie_meta_prediction_spec" title="sgkit.variables.regenie_meta_prediction_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.regenie_meta_prediction_spec</span></code></a>.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>regenie_loco_prediction</cite> (contigs, samples, outcomes): LOCO predictions</dt><dd><p>resulting from Stage 2 predictions ignoring effects for variant
-blocks on held out contigs. This will be absent if the
-data provided does not contain at least 2 contigs. Defined by
-<a class="reference internal" href="sgkit.variables.regenie_loco_prediction_spec.html#sgkit.variables.regenie_loco_prediction_spec" title="sgkit.variables.regenie_loco_prediction_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.regenie_loco_prediction_spec</span></code></a>.</p>
-</dd>
-</dl>
-</li>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If an unknown method is specified.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the ‘even’ method is specified for an odd-ploidy dataset.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the ‘even’ method is specified and the length of the ‘parents’
+    dimension is not 2.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.11)"><strong>NotImplementedError</strong></a> – If chunking is specified for both axes.</p></li>
 </ul>
-</p>
-</dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If dosage, covariates, and trait arrays do not have the same number
-    of samples.</p>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Dimensions of <a class="reference internal" href="sgkit.variables.stat_pedigree_contribution_spec.html#sgkit.variables.stat_pedigree_contribution_spec" title="sgkit.variables.stat_pedigree_contribution_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_contribution_spec</span></code></a>
+are named <code class="docutils literal notranslate"><span class="pre">samples_0</span></code> and <code class="docutils literal notranslate"><span class="pre">samples_1</span></code>.</p>
+</div>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.testing</span> <span class="kn">import</span> <span class="n">simulate_genotype_call_dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sgkit.stats.regenie</span> <span class="kn">import</span> <span class="n">regenie</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">n_variant</span><span class="p">,</span> <span class="n">n_sample</span><span class="p">,</span> <span class="n">n_contig</span><span class="p">,</span> <span class="n">n_covariate</span><span class="p">,</span> <span class="n">n_trait</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="n">n_variant</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="n">n_sample</span><span class="p">,</span> <span class="n">n_contig</span><span class="o">=</span><span class="n">n_contig</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;call_dosage&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="s2">&quot;variants&quot;</span><span class="p">,</span> <span class="s2">&quot;samples&quot;</span><span class="p">),</span> <span class="n">rs</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_variant</span><span class="p">,</span> <span class="n">n_sample</span><span class="p">)))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_covariate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;covariates&quot;</span><span class="p">),</span> <span class="n">rs</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_sample</span><span class="p">,</span> <span class="n">n_covariate</span><span class="p">)))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_trait&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;traits&quot;</span><span class="p">),</span> <span class="n">rs</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_sample</span><span class="p">,</span> <span class="n">n_trait</span><span class="p">)))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">regenie</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">dosage</span><span class="o">=</span><span class="s2">&quot;call_dosage&quot;</span><span class="p">,</span> <span class="n">covariates</span><span class="o">=</span><span class="s2">&quot;sample_covariate&quot;</span><span class="p">,</span> <span class="n">traits</span><span class="o">=</span><span class="s2">&quot;sample_trait&quot;</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span> 
-<span class="go">&lt;xarray.Dataset&gt;</span>
-<span class="go">Dimensions:                  (blocks: 2, alphas: 5, samples: 50, outcomes: 5,</span>
-<span class="go">                              contigs: 2)</span>
-<span class="go">Dimensions without coordinates: blocks, alphas, samples, outcomes, contigs</span>
-<span class="go">Data variables:</span>
-<span class="go">    regenie_base_prediction  (blocks, alphas, samples, outcomes) float64 0.33...</span>
-<span class="go">    regenie_meta_prediction  (samples, outcomes) float64 -0.4588 0.78 ... 0.3734</span>
-<span class="go">    regenie_loco_prediction  (contigs, samples, outcomes) float64 0.4886 ... ...</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;S0&quot;</span><span class="p">,</span> <span class="s2">&quot;S1&quot;</span><span class="p">,</span> <span class="s2">&quot;S2&quot;</span><span class="p">,</span> <span class="s2">&quot;S3&quot;</span><span class="p">,</span> <span class="s2">&quot;S4&quot;</span><span class="p">,</span> <span class="s2">&quot;S5&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;parent_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;parents&quot;</span><span class="p">],</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>  <span class="s2">&quot;.&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>  <span class="s2">&quot;.&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;S1&quot;</span><span class="p">,</span> <span class="s2">&quot;S0&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;S2&quot;</span><span class="p">,</span> <span class="s2">&quot;S0&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;S0&quot;</span><span class="p">,</span> <span class="s2">&quot;S2&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s2">&quot;S1&quot;</span><span class="p">,</span> <span class="s2">&quot;S3&quot;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pedigree_contribution</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">stat_pedigree_contribution</span><span class="o">.</span><span class="n">values</span>  
+<span class="go">array([[1.   , 0.   , 0.5  , 0.75 , 0.75 , 0.375],</span>
+<span class="go">       [0.   , 1.   , 0.5  , 0.25 , 0.25 , 0.625],</span>
+<span class="go">       [0.   , 0.   , 1.   , 0.5  , 0.5  , 0.25 ],</span>
+<span class="go">       [0.   , 0.   , 0.   , 1.   , 0.   , 0.5  ],</span>
+<span class="go">       [0.   , 0.   , 0.   , 0.   , 1.   , 0.   ],</span>
+<span class="go">       [0.   , 0.   , 0.   , 0.   , 0.   , 1.   ]])</span>
 </pre></div>
 </div>
-<p class="rubric">References</p>
-<p>[1] - Mbatchou, J., L. Barnard, J. Backman, and A. Marcketta. 2020.
-“Computationally Efficient Whole Genome Regression for Quantitative and Binary
-Traits.” bioRxiv. <a class="reference external" href="https://www.biorxiv.org/content/10.1101/2020.06.19.162354v2.abstract">https://www.biorxiv.org/content/10.1101/2020.06.19.162354v2.abstract</a>.</p>
-<p>[2] - <a class="reference external" href="https://glow.readthedocs.io/en/latest/tertiary/whole-genome-regression.html">https://glow.readthedocs.io/en/latest/tertiary/whole-genome-regression.html</a></p>
 </dd></dl>
 
 </section>
@@ -870,20 +820,20 @@ Traits.” bioRxiv. <a class="reference external" href="https://www.biorxiv.org/
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="sgkit.pc_relate.html"
+       href="sgkit.pbs.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">sgkit.pc_relate</p>
+        <p class="prev-next-title">sgkit.pbs</p>
       </div>
     </a>
     <a class="right-next"
-       href="sgkit.sample_stats.html"
+       href="sgkit.pedigree_inbreeding.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">sgkit.sample_stats</p>
+        <p class="prev-next-title">sgkit.pedigree_inbreeding</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -901,7 +851,7 @@ Traits.” bioRxiv. <a class="reference external" href="https://www.biorxiv.org/
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="../_sources/generated/sgkit.regenie.rst.txt">
+    <a href="../_sources/generated/sgkit.pedigree_contribution.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

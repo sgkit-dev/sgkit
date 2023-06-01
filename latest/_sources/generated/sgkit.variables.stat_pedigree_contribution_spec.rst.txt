@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_pedigree\_contribution\_spec
+==================================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_pedigree_contribution_spec

@@ -11,6 +11,8 @@ Changelog
 New Features
 ~~~~~~~~~~~~
 
+- Add :func:`pedigree_contribution` function.
+  (:user:`timothymillar`, :pr:`1093`, :issue:`963`)
 - Add :func:`pedigree_sel` function.
   (:user:`timothymillar`, :pr:`1087`, :issue:`1033`)
 
