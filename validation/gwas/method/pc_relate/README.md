@@ -5,13 +5,11 @@ HapMap data.
 This code is scheduled as part of the Github Actions CI.
 
 To run manually, you need to first download the test data
-from `gs://sgkit-data/validation/hapmap_JPT_CHB_r23a_filtered.zip`,
-keep in mind that `sgkit-data` GCS bucket uses
-[Requester Pays config](https://cloud.google.com/storage/docs/requester-pays),
-and the file size is about 32MB.
+from `https://storage.googleapis.com/sgkit-data/validation/hapmap_JPT_CHB_r23a_filtered.zip`,
+the file size is about 32MB.
 
 ```bash
-gsutil -u $BILLING_PROJECT cp gs://sgkit-data/validation/hapmap_JPT_CHB_r23a_filtered.zip /tmp/
+wget https://storage.googleapis.com/sgkit-data/validation/hapmap_JPT_CHB_r23a_filtered.zip -P /tmp/
 ./run.sh /tmp/hapmap_JPT_CHB_r23a_filtered.zip
 ```
 
