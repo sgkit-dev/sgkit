@@ -10,8 +10,7 @@ TEST_DATA="$1"
 
 if [[ -z "$TEST_DATA" ]]; then
   echo "usage $0 <PATH_TO_TEST_DATA>" >&2
-  echo "You can download real test data from gs://sgkit-data/validation/hapmap_JPT_CHB_r23a_filtered.zip" >&2
-  echo "sgkit-data GCS bucket uses Requester Pays config: https://cloud.google.com/storage/docs/requester-pays" >&2
+  echo "You can download real test data from https://storage.googleapis.com/sgkit-data/validation/hapmap_JPT_CHB_r23a_filtered.zip" >&2
   exit 1
 fi
 
