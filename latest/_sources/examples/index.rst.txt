@@ -10,3 +10,4 @@ Example notebooks showing how to use sgkit.
    :hidden:
 
    gwas_tutorial
+   relatedness_tutorial
