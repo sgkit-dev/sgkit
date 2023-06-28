@@ -5,9 +5,11 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from sklearn.covariance import LedoitWolf
 
 import sgkit as sg
-from sgkit import (
+from sgkit.stats.grm import (
+    _shrinkage_Ledoit_Wolf,
     genomic_relationship,
     hybrid_inverse_relationship,
     hybrid_relationship,
@@ -16,6 +18,33 @@ from sgkit import (
 
 
 @pytest.mark.parametrize(
+    "n_variant, n_sample, ploidy, seed",
+    [
+        (10, 5, 2, 0),
+        (10, 50, 2, 0),
+        (10, 5, 4, 1),
+        (10, 50, 4, 2),
+        (100, 200, 2, 3),
+        (100, 200, 4, 4),
+        (80, 200, 6, 5),
+    ],
+)
+def test_shrinkage_Ledoit_Wolf(n_variant, n_sample, ploidy, seed):
+    np.random.seed(seed)
+    call_dosage = np.random.randint(0, ploidy + 1, size=(n_variant, n_sample))
+    ancestral_dosage = np.random.rand(n_variant) * ploidy
+    W = call_dosage - ancestral_dosage[:, None]
+    LW = LedoitWolf().fit(W)  # automatically mean centers
+    expect_cov, expect_delta = LW.covariance_, LW.shrinkage_
+    # mean center columns
+    X = W - W.mean(axis=0, keepdims=True)
+    actual_cov, actual_delta = _shrinkage_Ledoit_Wolf(X)
+    np.testing.assert_almost_equal(expect_cov, actual_cov)
+    np.testing.assert_almost_equal(expect_delta, actual_delta)
+
+
+@pytest.mark.parametrize("estimator", ["VanRaden", "Endelman-Jannink"])
+@pytest.mark.parametrize(
     "chunks",
     [
         None,
@@ -23,7 +52,7 @@ from sgkit import (
         (100, 50),
     ],
 )
-def test_genomic_relationship__VanRaden_rrBLUP_diploid(chunks):
+def test_genomic_relationship__rrBLUP_diploid(estimator, chunks):
     # Load reference data calculated with function A.mat
     # from the rrBLUP R library using the code:
     #
@@ -42,6 +71,18 @@ def test_genomic_relationship__VanRaden_rrBLUP_diploid(chunks):
     #        row.names=FALSE,
     #        col.names=FALSE,
     #    )
+    #    A <- rrBLUP::A.mat(
+    #        dose,
+    #        impute.method="mean",
+    #        shrink=TRUE,
+    #        min.MAF=0.0,
+    #    )
+    #    write.table(
+    #        A,
+    #        file="pine_snps_100_500_EJ_matrix.txt",
+    #        row.names=FALSE,
+    #        col.names=FALSE,
+    #    )
     #
     # Note the pine_snps_100_500.csv contains the first 100 samples
     # and 500 SNPs from the dataset published by Resende et al 2012:
@@ -53,7 +94,10 @@ def test_genomic_relationship__VanRaden_rrBLUP_diploid(chunks):
     dosage = np.loadtxt(
         path / "test_grm/pine_snps_100_500.csv", skiprows=1, delimiter=","
     ).T[1:]
-    expect = np.loadtxt(path / "test_grm/pine_snps_100_500_A_matrix.txt")
+    if estimator == "VanRaden":
+        expect = np.loadtxt(path / "test_grm/pine_snps_100_500_A_matrix.txt")
+    elif estimator == "Endelman-Jannink":
+        expect = np.loadtxt(path / "test_grm/pine_snps_100_500_EJ_matrix.txt")
     # replace sentinel values and perform mean imputation
     dosage[dosage == -9] = np.nan
     idx = np.isnan(dosage)
@@ -67,12 +111,13 @@ def test_genomic_relationship__VanRaden_rrBLUP_diploid(chunks):
     ds["call_dosage"] = ["variants", "samples"], dosage
     ds["ancestral_frequency"] = ds["call_dosage"].mean(dim="samples") / 2
     ds = genomic_relationship(
-        ds, ancestral_frequency="ancestral_frequency", estimator="VanRaden", ploidy=2
+        ds, ancestral_frequency="ancestral_frequency", estimator=estimator, ploidy=2
     ).compute()
     actual = ds.stat_genomic_relationship.values
     np.testing.assert_array_almost_equal(actual, expect)
 
 
+@pytest.mark.parametrize("estimator", ["VanRaden", "Endelman-Jannink"])
 @pytest.mark.parametrize(
     "chunks",
     [
@@ -81,9 +126,10 @@ def test_genomic_relationship__VanRaden_rrBLUP_diploid(chunks):
         (50, 25),
     ],
 )
-def test_genomic_relationship__VanRaden_AGHmatrix_tetraploid(chunks):
-    # Load reference data calculated with function Gmatrix
-    # from the AGHmatrix R library using the code:
+def test_genomic_relationship__tetraploid(estimator, chunks):
+    # Load reference data.
+    # The VanRaden estimator was calculated with the AGHmatrix R
+    # library using the code:
     #
     #    dose = data.matrix(read.csv('sim4x_snps.txt', header = F))
     #    A <- AGHmatrix::Gmatrix(
@@ -100,11 +146,33 @@ def test_genomic_relationship__VanRaden_AGHmatrix_tetraploid(chunks):
     #        col.names=FALSE,
     #    )
     #
+    # The Endelman-Jannink estimator was calculated with the rrBLUP
+    # R library using the code:
+    #
+    #    dose = data.matrix(read.csv('sim4x_snps.txt', header = F))
+    #    dose = dose / 2 - 1
+    #    A <- rrBLUP::A.mat(
+    #        dose,
+    #        impute.method="mean",
+    #        shrink=TRUE,
+    #        min.MAF=0.0,
+    #    )
+    #    A <- A * 2  # convert to 4x estimate
+    #    write.table(
+    #        A,
+    #        file="sim4x_snps_EJ_matrix.txt",
+    #        row.names=FALSE,
+    #        col.names=FALSE,
+    #    )
+    #
     # Where the 'sim4x_snps.txt' is the transposed
     # "call_dosage" array simulated within this test.
     #
     path = pathlib.Path(__file__).parent.absolute()
-    expect = np.loadtxt(path / "test_grm/sim4x_snps_A_matrix.txt")
+    if estimator == "VanRaden":
+        expect = np.loadtxt(path / "test_grm/sim4x_snps_A_matrix.txt")
+    elif estimator == "Endelman-Jannink":
+        expect = np.loadtxt(path / "test_grm/sim4x_snps_EJ_matrix.txt")
     ds = sg.simulate_genotype_call_dataset(
         n_variant=200, n_sample=50, n_ploidy=4, seed=0
     )
@@ -113,7 +181,9 @@ def test_genomic_relationship__VanRaden_AGHmatrix_tetraploid(chunks):
     if chunks:
         ds["call_dosage"] = ds["call_dosage"].chunk(chunks)
     ds["ancestral_frequency"] = ds["call_dosage"].mean(dim="samples") / 4
-    ds = genomic_relationship(ds, ancestral_frequency="ancestral_frequency")
+    ds = genomic_relationship(
+        ds, estimator=estimator, ancestral_frequency="ancestral_frequency"
+    )
     actual = ds.stat_genomic_relationship.values
     np.testing.assert_array_almost_equal(actual, expect)
 
@@ -232,7 +302,8 @@ def test_genomic_relationship__raise_on_unknown_estimator():
         )
 
 
-def test_genomic_relationship__raise_on_ancestral_frequency_shape():
+@pytest.mark.parametrize("estimator", ["VanRaden", "Endelman-Jannink"])
+def test_genomic_relationship__raise_on_ancestral_frequency_shape(estimator):
     ds = xr.Dataset()
     dosage = np.random.randint(0, 3, size=(10, 3))
     ds["call_dosage"] = ["variants", "samples"], dosage
@@ -241,18 +312,44 @@ def test_genomic_relationship__raise_on_ancestral_frequency_shape():
         ValueError,
         match="The ancestral_frequency variable must have one value per variant",
     ):
-        genomic_relationship(ds, ancestral_frequency="ancestral_frequency", ploidy=2)
+        genomic_relationship(
+            ds, estimator=estimator, ancestral_frequency="ancestral_frequency", ploidy=2
+        )
 
 
-def test_genomic_relationship__raise_on_ancestral_frequency_missing():
+@pytest.mark.parametrize("estimator", ["VanRaden", "Endelman-Jannink"])
+def test_genomic_relationship__raise_on_ancestral_frequency_missing(estimator):
     ds = xr.Dataset()
     dosage = np.random.randint(0, 3, size=(10, 3))
     ds["call_dosage"] = ["variants", "samples"], dosage
     with pytest.raises(
         ValueError,
-        match="The 'VanRaden' estimator requires ancestral_frequency",
+        match="The '{}' estimator requires the 'ancestral_frequency' argument".format(
+            estimator
+        ),
     ):
-        genomic_relationship(ds, ploidy=2)
+        genomic_relationship(ds, ploidy=2, estimator=estimator)
+
+
+@pytest.mark.parametrize("estimator", ["Endelman-Jannink"])
+def test_genomic_relationship__raise_on_skipna(estimator):
+    ds = xr.Dataset()
+    dosage = np.random.randint(0, 3, size=(10, 3))
+    ds["call_dosage"] = ["variants", "samples"], dosage
+    ds["ancestral_frequency"] = ds["call_dosage"].mean(dim="samples") / 2
+    with pytest.raises(
+        NotImplementedError,
+        match="The 'skipna' option is not implemented for the '{}' estimator".format(
+            estimator
+        ),
+    ):
+        genomic_relationship(
+            ds,
+            ancestral_frequency="ancestral_frequency",
+            estimator=estimator,
+            ploidy=2,
+            skipna=True,
+        )
 
 
 def test_invert_relationship_matrix__full():
