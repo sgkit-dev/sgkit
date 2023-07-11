@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from sgkit import display_genotypes
+from sgkit import display_genotypes, display_pedigree
 from sgkit.display import genotype_as_bytes
 from sgkit.testing import simulate_genotype_call_dataset
 
@@ -417,3 +417,192 @@ def test_genotype_as_bytes(genotype, phased, max_allele_chars, expect):
         expect,
         genotype_as_bytes(genotype, phased, max_allele_chars),
     )
+
+
+def pedigree_Hamilton_Kerr():
+    ds = xr.Dataset()
+    ds["sample_id"] = "samples", ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"]
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        [".", "S2"],
+        ["S1", "."],
+        ["S1", "S3"],
+        ["S1", "S3"],
+        ["S6", "S2"],
+        ["S6", "S2"],
+    ]
+    ds["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], [
+        [1, 1],
+        [2, 2],
+        [0, 2],
+        [2, 0],
+        [1, 1],
+        [2, 2],
+        [2, 2],
+        [2, 2],
+    ]
+    ds["stat_Hamilton_Kerr_lambda"] = ["samples", "parents"], [
+        [0.0, 0.0],
+        [0.167, 0.167],
+        [0.0, 0.167],
+        [0.041, 0.0],
+        [0.0, 0.0],
+        [0.918, 0.041],
+        [0.167, 0.167],
+        [0.167, 0.167],
+    ]
+    return ds
+
+
+def test_display_pedigree__no_coords():
+    ds = pedigree_Hamilton_Kerr()
+    graph = display_pedigree(ds)
+    expect = """    digraph {
+    \t0
+    \t1
+    \t2
+    \t3
+    \t4
+    \t5
+    \t6
+    \t7
+    \t1 -> 2
+    \t0 -> 3
+    \t0 -> 4
+    \t2 -> 4
+    \t0 -> 5
+    \t2 -> 5
+    \t5 -> 6
+    \t1 -> 6
+    \t5 -> 7
+    \t1 -> 7
+    }
+    """
+    assert str(graph) == dedent(expect)
+
+
+def test_display_pedigree__samples_coords():
+    ds = pedigree_Hamilton_Kerr()
+    ds = ds.assign_coords(samples=ds.sample_id)
+    graph = display_pedigree(ds)
+    expect = """    digraph {
+    \t0 [label=S1]
+    \t1 [label=S2]
+    \t2 [label=S3]
+    \t3 [label=S4]
+    \t4 [label=S5]
+    \t5 [label=S6]
+    \t6 [label=S7]
+    \t7 [label=S8]
+    \t1 -> 2
+    \t0 -> 3
+    \t0 -> 4
+    \t2 -> 4
+    \t0 -> 5
+    \t2 -> 5
+    \t5 -> 6
+    \t1 -> 6
+    \t5 -> 7
+    \t1 -> 7
+    }
+    """
+    assert str(graph) == dedent(expect)
+
+
+def test_display_pedigree__samples_coords_reorder():
+    ds = pedigree_Hamilton_Kerr()
+    ds = ds.sel(samples=[7, 3, 5, 0, 4, 1, 2, 6])
+    ds = ds.assign_coords(samples=ds.sample_id)
+    graph = display_pedigree(ds)
+    expect = """    digraph {
+    \t0 [label=S8]
+    \t1 [label=S4]
+    \t2 [label=S6]
+    \t3 [label=S1]
+    \t4 [label=S5]
+    \t5 [label=S2]
+    \t6 [label=S3]
+    \t7 [label=S7]
+    \t2 -> 0
+    \t5 -> 0
+    \t3 -> 1
+    \t3 -> 2
+    \t6 -> 2
+    \t3 -> 4
+    \t6 -> 4
+    \t5 -> 6
+    \t2 -> 7
+    \t5 -> 7
+    }
+    """
+    assert str(graph) == dedent(expect)
+
+
+def test_display_pedigree__samples_labels():
+    ds = pedigree_Hamilton_Kerr()
+    graph = display_pedigree(ds, node_attrs=dict(label=ds.sample_id))
+    expect = """    digraph {
+    \t0 [label=S1]
+    \t1 [label=S2]
+    \t2 [label=S3]
+    \t3 [label=S4]
+    \t4 [label=S5]
+    \t5 [label=S6]
+    \t6 [label=S7]
+    \t7 [label=S8]
+    \t1 -> 2
+    \t0 -> 3
+    \t0 -> 4
+    \t2 -> 4
+    \t0 -> 5
+    \t2 -> 5
+    \t5 -> 6
+    \t1 -> 6
+    \t5 -> 7
+    \t1 -> 7
+    }
+    """
+    assert str(graph) == dedent(expect)
+
+
+def test_display_pedigree__broadcast():
+    ds = pedigree_Hamilton_Kerr()
+    inbreeding = np.array([0.0, 0.077, 0.231, 0.041, 0.0, 0.197, 0.196, 0.196])
+    label = (ds.sample_id.str + "\n").str + inbreeding.astype("U")
+    edges = xr.where(
+        ds.stat_Hamilton_Kerr_tau == 2,
+        "black:black",
+        "black",
+    )
+    graph = display_pedigree(
+        ds,
+        graph_attrs=dict(splines="false", outputorder="edgesfirst"),
+        node_attrs=dict(
+            style="filled", fillcolor="black", fontcolor="white", label=label
+        ),
+        edge_attrs=dict(arrowhead="crow", color=edges),
+    )
+    expect = """    digraph {
+    \toutputorder=edgesfirst splines=false
+    \t0 [label="S1\n    0.0" fillcolor=black fontcolor=white style=filled]
+    \t1 [label="S2\n    0.077" fillcolor=black fontcolor=white style=filled]
+    \t2 [label="S3\n    0.231" fillcolor=black fontcolor=white style=filled]
+    \t3 [label="S4\n    0.041" fillcolor=black fontcolor=white style=filled]
+    \t4 [label="S5\n    0.0" fillcolor=black fontcolor=white style=filled]
+    \t5 [label="S6\n    0.197" fillcolor=black fontcolor=white style=filled]
+    \t6 [label="S7\n    0.196" fillcolor=black fontcolor=white style=filled]
+    \t7 [label="S8\n    0.196" fillcolor=black fontcolor=white style=filled]
+    \t1 -> 2 [arrowhead=crow color="black:black"]
+    \t0 -> 3 [arrowhead=crow color="black:black"]
+    \t0 -> 4 [arrowhead=crow color=black]
+    \t2 -> 4 [arrowhead=crow color=black]
+    \t0 -> 5 [arrowhead=crow color="black:black"]
+    \t2 -> 5 [arrowhead=crow color="black:black"]
+    \t5 -> 6 [arrowhead=crow color="black:black"]
+    \t1 -> 6 [arrowhead=crow color="black:black"]
+    \t5 -> 7 [arrowhead=crow color="black:black"]
+    \t1 -> 7 [arrowhead=crow color="black:black"]
+    }
+    """
+    assert str(graph) == dedent(expect)

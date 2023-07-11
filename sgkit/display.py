@@ -1,10 +1,13 @@
-from typing import Any, Hashable, Mapping, Tuple
+from typing import Any, Dict, Hashable, Mapping, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
+from sgkit import variables
+from sgkit.stats.pedigree import parent_indices
 from sgkit.typing import ArrayLike
+from sgkit.utils import define_variable_if_absent
 
 
 class GenotypeDisplay:
@@ -209,3 +212,77 @@ def display_genotypes(
         max_variants,
         max_samples,
     )
+
+
+def display_pedigree(
+    ds: xr.Dataset,
+    parent: Hashable = variables.parent,
+    graph_attrs: Optional[Dict[Hashable, str]] = None,
+    node_attrs: Optional[Dict[Hashable, ArrayLike]] = None,
+    edge_attrs: Optional[Dict[Hashable, ArrayLike]] = None,
+) -> Any:
+    """Display a pedigree dataset as a directed acyclic graph.
+
+    Parameters
+    ----------
+    ds
+        Dataset containing pedigree structure.
+    parent
+        Input variable name holding parents of each sample as defined by
+        :data:`sgkit.variables.parent_spec`.
+        If the variable is not present in ``ds``, it will be computed
+        using :func:`parent_indices`.
+    graph_attrs
+        Key-value pairs to pass through to graphviz as graph attributes.
+    node_attrs
+        Key-value pairs to pass through to graphviz as node attributes.
+        Values will be broadcast to have shape (samples, ).
+    edge_attrs
+        Key-value pairs to pass through to graphviz as edge attributes.
+        Values will be broadcast to have shape (samples, parents).
+
+    Raises
+    ------
+    RuntimeError
+        If the `Graphviz library <https://graphviz.readthedocs.io/en/stable/>`_ is not installed.
+
+    Returns
+    -------
+    A digraph representation of the pedigree.
+    """
+    try:
+        from graphviz import Digraph
+    except ImportError:  # pragma: no cover
+        raise RuntimeError(
+            "Visualizing pedigrees requires the `graphviz` python library and the `graphviz` system library to be installed."
+        )
+    ds = define_variable_if_absent(ds, variables.parent, parent, parent_indices)
+    variables.validate(ds, {parent: variables.parent_spec})
+    parent = ds[parent].values
+    n_samples, n_parent_types = parent.shape
+    graph_attrs = graph_attrs or {}
+    node_attrs = node_attrs or {}
+    edge_attrs = edge_attrs or {}
+    # default to using samples coordinates for labels
+    if ("label" not in node_attrs) and ("samples" in ds.coords):
+        node_attrs["label"] = ds.samples.values
+    # numpy broadcasting
+    node_attrs = {k: np.broadcast_to(v, n_samples) for k, v in node_attrs.items()}
+    edge_attrs = {k: np.broadcast_to(v, parent.shape) for k, v in edge_attrs.items()}
+    # initialize graph
+    graph = Digraph()
+    graph.attr(**graph_attrs)
+    # add nodes
+    for i in range(n_samples):
+        d = {k: str(v[i]) for k, v in node_attrs.items()}
+        graph.node(str(i), **d)
+    # add edges
+    for i in range(n_samples):
+        for j in range(n_parent_types):
+            p = parent[i, j]
+            if p >= 0:
+                d = {}
+                for k, v in edge_attrs.items():
+                    d[k] = str(v[i, j])
+                graph.edge(str(p), str(i), **d)
+    return graph
