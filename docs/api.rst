@@ -132,6 +132,7 @@ Utilities
    convert_call_to_index
    convert_probability_to_call
    display_genotypes
+   display_pedigree
    filter_partial_calls
    infer_call_ploidy
    infer_sample_ploidy

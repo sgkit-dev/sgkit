@@ -1,6 +1,6 @@
 from pkg_resources import DistributionNotFound, get_distribution  # type: ignore[import]
 
-from .display import display_genotypes
+from .display import display_genotypes, display_pedigree
 from .distance.api import pairwise_distance
 from .io.dataset import load_dataset, save_dataset
 from .io.vcfzarr_reader import read_scikit_allel_vcfzarr
@@ -88,6 +88,7 @@ __all__ = [
     "count_variant_genotypes",
     "create_genotype_dosage_dataset",
     "display_genotypes",
+    "display_pedigree",
     "filter_partial_calls",
     "genee",
     "genomic_relationship",
