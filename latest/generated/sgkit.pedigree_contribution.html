@@ -731,29 +731,29 @@ other sample based on pedigree structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.6.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></dt><dd><p>Dataset containing pedigree structure.</p>
+<dt><span><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.6.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Dataset containing pedigree structure.</p>
 </dd>
-<dt><strong>method</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘even’, ‘variable’] (default: <code class="docutils literal notranslate"><span class="pre">'even'</span></code>)</dt><dd><p>The method used for estimating genomic contributions.
+<dt><span><strong>method</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘even’, ‘variable’] (default: <code class="docutils literal notranslate"><span class="pre">'even'</span></code>)</span></dt><dd><p>The method used for estimating genomic contributions.
 The ‘even’ method assumes that all samples are of a single,
 even ploidy (e.g., diploid) and have even contributions
 from each parent. The ‘variable’ method allows for un-even
 contributions due to ploidy manipulation and/or clonal
 reproduction.</p>
 </dd>
-<dt><strong>chunks</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</dt><dd><p>Optionally specify chunks for the returned array. A single chunk
+<dt><span><strong>chunks</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</span></dt><dd><p>Optionally specify chunks for the returned array. A single chunk
 is used by default. Currently, chunking is only supported for a
 single axis.</p>
 </dd>
-<dt><strong>parent</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'parent'</span></code>)</dt><dd><p>Input variable name holding parents of each sample as defined by
+<dt><span><strong>parent</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'parent'</span></code>)</span></dt><dd><p>Input variable name holding parents of each sample as defined by
 <a class="reference internal" href="sgkit.variables.parent_spec.html#sgkit.variables.parent_spec" title="sgkit.variables.parent_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.parent_spec</span></code></a>.
 If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
 using <a class="reference internal" href="sgkit.parent_indices.html#sgkit.parent_indices" title="sgkit.parent_indices"><code class="xref py py-func docutils literal notranslate"><span class="pre">parent_indices()</span></code></a>.</p>
 </dd>
-<dt><strong>stat_Hamilton_Kerr_tau</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'stat_Hamilton_Kerr_tau'</span></code>)</dt><dd><p>Input variable name holding stat_Hamilton_Kerr_tau as defined
+<dt><span><strong>stat_Hamilton_Kerr_tau</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'stat_Hamilton_Kerr_tau'</span></code>)</span></dt><dd><p>Input variable name holding stat_Hamilton_Kerr_tau as defined
 by <a class="reference internal" href="sgkit.variables.stat_Hamilton_Kerr_tau_spec.html#sgkit.variables.stat_Hamilton_Kerr_tau_spec" title="sgkit.variables.stat_Hamilton_Kerr_tau_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Hamilton_Kerr_tau_spec</span></code></a>.
 This variable is only required for the ‘variable’ method.</p>
 </dd>
-<dt><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</dt><dd><p>If True (the default), merge the input dataset and the computed
+<dt><span><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</span></dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
 the computed output variables.</p>
 </dd>

@@ -15,6 +15,8 @@ New Features
   (:user:`timothymillar`, :pr:`1093`, :issue:`963`)
 - Add :func:`pedigree_sel` function.
   (:user:`timothymillar`, :pr:`1087`, :issue:`1033`)
+- Add 'Endelman-Jannink' estimator to :func:`genomic_relationship` function.
+  (:user:`timothymillar`, :pr:`1100`, :issue:`1062`)
 
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
