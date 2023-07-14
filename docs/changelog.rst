@@ -17,6 +17,8 @@ New Features
   (:user:`timothymillar`, :pr:`1087`, :issue:`1033`)
 - Add 'Endelman-Jannink' estimator to :func:`genomic_relationship` function.
   (:user:`timothymillar`, :pr:`1100`, :issue:`1062`)
+- Add :func:`display_pedigree` function.
+  (:user:`timothymillar`, :pr:`1104`, :issue:`1097`)
 
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
