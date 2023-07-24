@@ -21,3 +21,4 @@ asv
 networkx
 aiohttp
 requests
+graphviz
