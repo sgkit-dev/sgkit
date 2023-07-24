@@ -5,6 +5,5 @@ sphinx_autodoc_typehints>=1.14.0
 scanpydoc
 ipython
 matplotlib
-graphviz
 seaborn
 ablog!=0.10.27
