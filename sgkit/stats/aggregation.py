@@ -1,4 +1,4 @@
-from typing import Any, Dict, Hashable
+from typing import Hashable
 
 import dask.array as da
 import numpy as np
@@ -96,7 +96,9 @@ def count_call_alleles(
 def count_variant_alleles(
     ds: Dataset,
     *,
+    call_genotype: Hashable = variables.call_genotype,
     call_allele_count: Hashable = variables.call_allele_count,
+    using: Literal[variables.call_allele_count, variables.call_genotype] = variables.call_allele_count,  # type: ignore
     merge: bool = True,
 ) -> Dataset:
     """Compute allele count from per-sample allele counts, or genotype calls.
@@ -105,11 +107,22 @@ def count_variant_alleles(
     ----------
     ds
         Dataset containing genotype calls.
+    call_genotype
+        Input variable name holding call_genotype as defined by
+        :data:`sgkit.variables.call_genotype_spec`.
+        This variable is only used if specified by the 'using' argument.
     call_allele_count
         Input variable name holding call_allele_count as defined by
         :data:`sgkit.variables.call_allele_count_spec`.
+        This variable is only used if specified by the 'using' argument.
         If the variable is not present in ``ds``, it will be computed
         using :func:`count_call_alleles`.
+    using
+        specify the variable used to calculate allele counts from.
+        If ``'call_allele_count'`` (the default), the result will
+        be calculated from the call_allele_count variable.
+        If ``'call_genotype'``, the result will be calculated from
+        the call_genotype variable.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -121,6 +134,12 @@ def count_variant_alleles(
     A dataset containing :data:`sgkit.variables.variant_allele_count_spec`
     of allele counts with shape (variants, alleles) and values corresponding to
     the number of non-missing occurrences of each allele.
+
+    Note
+    ----
+    This method is more efficient when calculating allele counts directly from
+    the call_genotype variable unless the call_allele_count variable has already
+    been (or will be) calculated.
 
     Examples
     --------
@@ -141,14 +160,28 @@ def count_variant_alleles(
            [2, 2],
            [4, 0]], dtype=uint64)
     """
-    ds = define_variable_if_absent(
-        ds, variables.call_allele_count, call_allele_count, count_call_alleles
-    )
-    variables.validate(ds, {call_allele_count: variables.call_allele_count_spec})
+    if using == variables.call_allele_count:
+        ds = define_variable_if_absent(
+            ds, variables.call_allele_count, call_allele_count, count_call_alleles
+        )
+        variables.validate(ds, {call_allele_count: variables.call_allele_count_spec})
+        AC = ds[call_allele_count].sum(dim="samples")
+    elif using == variables.call_genotype:
+        from .aggregation_numba_fns import count_alleles
 
-    new_ds = create_dataset(
-        {variables.variant_allele_count: ds[call_allele_count].sum(dim="samples")}
-    )
+        variables.validate(ds, {call_genotype: variables.call_genotype_spec})
+        n_alleles = ds.dims["alleles"]
+        n_variant = ds.dims["variants"]
+        G = da.asarray(ds[call_genotype]).reshape((n_variant, -1))
+        shape = (G.chunks[0], n_alleles)
+        # use uint64 dummy array to return uin64 counts array
+        N = np.empty(n_alleles, dtype=np.uint64)
+        AC = da.map_blocks(count_alleles, G, N, chunks=shape, drop_axis=1, new_axis=1)
+        AC = xr.DataArray(AC, dims=["variants", "alleles"])
+    else:
+        options = {variables.call_genotype, variables.call_allele_count}
+        raise ValueError(f"The 'using' argument must be one of {options}.")
+    new_ds = create_dataset({variables.variant_allele_count: AC})
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
@@ -601,35 +634,9 @@ def cohort_allele_frequencies(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-def allele_frequency(
-    ds: Dataset,
-    call_genotype_mask: Hashable,
-    variant_allele_count: Hashable,
-) -> Dataset:
-    data_vars: Dict[Hashable, Any] = {}
-    # only compute variant allele count if not already in dataset
-    if variant_allele_count in ds:
-        variables.validate(
-            ds, {variant_allele_count: variables.variant_allele_count_spec}
-        )
-        AC = ds[variant_allele_count]
-    else:
-        AC = count_variant_alleles(ds, merge=False)[variables.variant_allele_count]
-        data_vars[variables.variant_allele_count] = AC
-
-    M = ds[call_genotype_mask].stack(calls=("samples", "ploidy"))
-    AN = (~M).sum(dim="calls")
-    assert AN.shape == (ds.dims["variants"],)
-
-    data_vars[variables.variant_allele_total] = AN
-    data_vars[variables.variant_allele_frequency] = AC / AN
-    return create_dataset(data_vars)
-
-
 def variant_stats(
     ds: Dataset,
     *,
-    call_genotype_mask: Hashable = variables.call_genotype_mask,
     call_genotype: Hashable = variables.call_genotype,
     variant_allele_count: Hashable = variables.variant_allele_count,
     merge: bool = True,
@@ -643,10 +650,6 @@ def variant_stats(
     call_genotype
         Input variable name holding call_genotype.
         Defined by :data:`sgkit.variables.call_genotype_spec`.
-        Must be present in ``ds``.
-    call_genotype_mask
-        Input variable name holding call_genotype_mask.
-        Defined by :data:`sgkit.variables.call_genotype_mask_spec`
         Must be present in ``ds``.
     variant_allele_count
         Input variable name holding variant_allele_count,
@@ -681,31 +684,85 @@ def variant_stats(
       The number of occurrences of all alleles.
     - :data:`sgkit.variables.variant_allele_frequency_spec` (variants, alleles):
       The frequency of occurrence of each allele.
+
+    Note
+    ----
+    If the dataset contains partial genotype calls (i.e., genotype calls with
+    a mixture of called and missing alleles), these genotypes will be ignored
+    when counting the number of homozygous, heterozygous or total genotype calls.
+    However, the called alleles will be counted when calculating allele counts
+    and frequencies using :func:`count_variant_alleles`.
+
+    Note
+    ----
+    When used on autopolyploid genotypes, this method treats genotypes calls
+    with any level of heterozygosity as 'heterozygous'. Only fully homozygous
+    genotype calls (e.g. 0/0/0/0) will be classified as 'homozygous'.
+
+    Warnings
+    --------
+    This method does not support mixed-ploidy datasets.
+
+    Raises
+    ------
+    ValueError
+        If the dataset contains mixed-ploidy genotype calls.
+
+    See Also
+    --------
+    :func:`count_variant_genotypes`
     """
-    variables.validate(
+    from .aggregation_numba_fns import count_hom
+
+    variables.validate(ds, {call_genotype: variables.call_genotype_spec})
+    mixed_ploidy = ds[call_genotype].attrs.get("mixed_ploidy", False)
+    if mixed_ploidy:
+        raise ValueError("Mixed-ploidy dataset")
+    AC = define_variable_if_absent(
         ds,
+        variables.variant_allele_count,
+        variant_allele_count,
+        count_variant_alleles,
+        using=variables.call_genotype,  # improved performance
+        merge=False,
+    )[variant_allele_count]
+    G = da.array(ds[call_genotype].data)
+    H = xr.DataArray(
+        da.map_blocks(
+            count_hom,
+            G,
+            np.zeros(3, np.uint64),
+            drop_axis=(1, 2),
+            new_axis=1,
+            dtype=np.int64,
+            chunks=(G.chunks[0], 3),
+        ),
+        dims=["variants", "categories"],
+    )
+    _, n_sample, _ = G.shape
+    n_called = H.sum(axis=-1)
+    call_rate = n_called / n_sample
+    n_hom_ref = H[:, 0]
+    n_hom_alt = H[:, 1]
+    n_het = H[:, 2]
+    n_non_ref = n_called - n_hom_ref
+    allele_total = AC.sum(axis=-1).astype(int)  # backwards compatibility
+    new_ds = xr.Dataset(
         {
-            call_genotype: variables.call_genotype_spec,
-            call_genotype_mask: variables.call_genotype_mask_spec,
-        },
+            variables.variant_n_called: n_called,
+            variables.variant_call_rate: call_rate,
+            variables.variant_n_het: n_het,
+            variables.variant_n_hom_ref: n_hom_ref,
+            variables.variant_n_hom_alt: n_hom_alt,
+            variables.variant_n_non_ref: n_non_ref,
+            variables.variant_allele_count: AC,
+            variables.variant_allele_total: allele_total,
+            variables.variant_allele_frequency: AC / allele_total,
+        }
     )
-    new_ds = xr.merge(
-        [
-            call_rate(ds, dim="samples", call_genotype_mask=call_genotype_mask),
-            count_genotypes(
-                ds,
-                dim="samples",
-                call_genotype=call_genotype,
-                call_genotype_mask=call_genotype_mask,
-                merge=False,
-            ),
-            allele_frequency(
-                ds,
-                call_genotype_mask=call_genotype_mask,
-                variant_allele_count=variant_allele_count,
-            ),
-        ]
-    )
+    # for backwards compatible behavior
+    if (variant_allele_count in ds) and merge:
+        new_ds = new_ds.drop_vars(variant_allele_count)
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
 
 

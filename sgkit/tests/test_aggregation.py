@@ -7,6 +7,7 @@ import pytest
 import xarray as xr
 from xarray import Dataset
 
+from sgkit import variables
 from sgkit.stats.aggregation import (
     call_allele_frequencies,
     cohort_allele_frequencies,
@@ -39,26 +40,44 @@ def get_dataset(
     return ds
 
 
-def test_count_variant_alleles__single_variant_single_sample():
-    ds = count_variant_alleles(get_dataset([[[1, 0]]]))
+@pytest.mark.parametrize(
+    "using", [variables.call_allele_count, variables.call_genotype]
+)
+def test_count_variant_alleles__single_variant_single_sample(using):
+    ds = count_variant_alleles(get_dataset([[[1, 0]]]), using=using)
     assert "call_genotype" in ds
     ac = ds["variant_allele_count"]
     np.testing.assert_equal(ac, np.array([[1, 1]]))
 
 
-def test_count_variant_alleles__multi_variant_single_sample():
-    ds = count_variant_alleles(get_dataset([[[0, 0]], [[0, 1]], [[1, 0]], [[1, 1]]]))
+@pytest.mark.parametrize(
+    "using", [variables.call_allele_count, variables.call_genotype]
+)
+def test_count_variant_alleles__multi_variant_single_sample(using):
+    ds = count_variant_alleles(
+        get_dataset([[[0, 0]], [[0, 1]], [[1, 0]], [[1, 1]]]),
+        using=using,
+    )
     ac = ds["variant_allele_count"]
     np.testing.assert_equal(ac, np.array([[2, 0], [1, 1], [1, 1], [0, 2]]))
 
 
-def test_count_variant_alleles__single_variant_multi_sample():
-    ds = count_variant_alleles(get_dataset([[[0, 0], [1, 0], [0, 1], [1, 1]]]))
+@pytest.mark.parametrize(
+    "using", [variables.call_allele_count, variables.call_genotype]
+)
+def test_count_variant_alleles__single_variant_multi_sample(using):
+    ds = count_variant_alleles(
+        get_dataset([[[0, 0], [1, 0], [0, 1], [1, 1]]]),
+        using=using,
+    )
     ac = ds["variant_allele_count"]
     np.testing.assert_equal(ac, np.array([[4, 4]]))
 
 
-def test_count_variant_alleles__multi_variant_multi_sample():
+@pytest.mark.parametrize(
+    "using", [variables.call_allele_count, variables.call_genotype]
+)
+def test_count_variant_alleles__multi_variant_multi_sample(using):
     ds = count_variant_alleles(
         get_dataset(
             [
@@ -67,13 +86,17 @@ def test_count_variant_alleles__multi_variant_multi_sample():
                 [[1, 1], [0, 1], [1, 0]],
                 [[1, 1], [1, 1], [1, 1]],
             ]
-        )
+        ),
+        using=using,
     )
     ac = ds["variant_allele_count"]
     np.testing.assert_equal(ac, np.array([[6, 0], [5, 1], [2, 4], [0, 6]]))
 
 
-def test_count_variant_alleles__missing_data():
+@pytest.mark.parametrize(
+    "using", [variables.call_allele_count, variables.call_genotype]
+)
+def test_count_variant_alleles__missing_data(using):
     ds = count_variant_alleles(
         get_dataset(
             [
@@ -82,13 +105,17 @@ def test_count_variant_alleles__missing_data():
                 [[1, 1], [-1, -1], [-1, 0]],
                 [[1, 1], [1, 1], [1, 1]],
             ]
-        )
+        ),
+        using=using,
     )
     ac = ds["variant_allele_count"]
     np.testing.assert_equal(ac, np.array([[0, 0], [2, 1], [1, 2], [0, 6]]))
 
 
-def test_count_variant_alleles__higher_ploidy():
+@pytest.mark.parametrize(
+    "using", [variables.call_allele_count, variables.call_genotype]
+)
+def test_count_variant_alleles__higher_ploidy(using):
     ds = count_variant_alleles(
         get_dataset(
             [
@@ -97,29 +124,49 @@ def test_count_variant_alleles__higher_ploidy():
             ],
             n_allele=4,
             n_ploidy=3,
-        )
+        ),
+        using=using,
     )
     ac = ds["variant_allele_count"]
     np.testing.assert_equal(ac, np.array([[1, 1, 1, 0], [1, 2, 2, 1]]))
 
 
-def test_count_variant_alleles__chunked():
+@pytest.mark.parametrize(
+    "using", [variables.call_allele_count, variables.call_genotype]
+)
+def test_count_variant_alleles__chunked(using):
     rs = np.random.RandomState(0)
     calls = rs.randint(0, 1, size=(50, 10, 2))
     ds = get_dataset(calls)
-    ac1 = count_variant_alleles(ds)
+    ac1 = count_variant_alleles(ds, using=using)
     # Coerce from numpy to multiple chunks in all dimensions
     ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))
-    ac2 = count_variant_alleles(ds)
+    ac2 = count_variant_alleles(ds, using=using)
     assert isinstance(ac2["variant_allele_count"].data, da.Array)
     xr.testing.assert_equal(ac1, ac2)
 
 
-def test_count_variant_alleles__no_merge():
-    ds = count_variant_alleles(get_dataset([[[1, 0]]]), merge=False)
+@pytest.mark.parametrize(
+    "using", [variables.call_allele_count, variables.call_genotype]
+)
+def test_count_variant_alleles__no_merge(using):
+    ds = count_variant_alleles(
+        get_dataset([[[1, 0]]]),
+        merge=False,
+        using=using,
+    )
     assert "call_genotype" not in ds
     ac = ds["variant_allele_count"]
     np.testing.assert_equal(ac, np.array([[1, 1]]))
+
+
+def test_count_variant_alleles__raise_on_unknown_using():
+    ds = simulate_genotype_call_dataset(n_variant=1, n_sample=2)
+    options = {variables.call_genotype, variables.call_allele_count}
+    with pytest.raises(
+        ValueError, match=f"The 'using' argument must be one of {options}."
+    ):
+        count_variant_alleles(ds, using="unknown")
 
 
 def test_count_call_alleles__single_variant_single_sample():
@@ -681,6 +728,70 @@ def test_variant_stats(precompute_variant_allele_count):
         vs["variant_allele_frequency"],
         np.array([[0.5, 0.5], [0.25, 0.75], [0.5, 0.5], [1, 0]]),
     )
+
+
+def test_variant_stats__multi_allelic():
+    ds = simulate_genotype_call_dataset(n_variant=2, n_sample=4, n_allele=4, seed=0)
+    ds["call_genotype"].data = [
+        [[0, 0], [0, 0], [1, 1], [2, 2]],
+        [[0, 0], [2, 3], [0, -1], [-1, 2]],
+    ]
+    vs = variant_stats(ds)
+    np.testing.assert_equal(vs["variant_n_called"], np.array([4, 2]))
+    np.testing.assert_equal(vs["variant_call_rate"], np.array([1, 1 / 2]))
+    np.testing.assert_equal(vs["variant_n_hom_ref"], np.array([2, 1]))
+    np.testing.assert_equal(vs["variant_n_hom_alt"], np.array([2, 0]))
+    np.testing.assert_equal(vs["variant_n_het"], np.array([0, 1]))
+    np.testing.assert_equal(vs["variant_n_non_ref"], np.array([2, 1]))
+    np.testing.assert_equal(
+        vs["variant_allele_count"], np.array([[4, 2, 2, 0], [3, 0, 2, 1]])
+    )
+    np.testing.assert_equal(vs["variant_allele_total"], np.array([8, 6]))
+    np.testing.assert_equal(
+        vs["variant_allele_frequency"],
+        np.array([[4 / 8, 2 / 8, 2 / 8, 0 / 8], [3 / 6, 0 / 6, 2 / 6, 1 / 6]]),
+    )
+
+
+def test_variant_stats__tetraploid():
+    ds = simulate_genotype_call_dataset(n_variant=2, n_sample=3, n_ploidy=4, seed=0)
+    ds["call_genotype"].data = [
+        [[0, 0, 0, 0], [0, 0, 0, 1], [1, 1, 1, 1]],
+        [[0, 0, 1, 1], [0, 1, 1, 1], [0, 0, -1, 0]],
+    ]
+    vs = variant_stats(ds)
+    np.testing.assert_equal(vs["variant_n_called"], np.array([3, 2]))
+    np.testing.assert_equal(vs["variant_call_rate"], np.array([1, 2 / 3]))
+    np.testing.assert_equal(vs["variant_n_hom_ref"], np.array([1, 0]))
+    np.testing.assert_equal(vs["variant_n_hom_alt"], np.array([1, 0]))
+    np.testing.assert_equal(vs["variant_n_het"], np.array([1, 2]))
+    np.testing.assert_equal(vs["variant_n_non_ref"], np.array([2, 2]))
+    np.testing.assert_equal(vs["variant_allele_count"], np.array([[7, 5], [6, 5]]))
+    np.testing.assert_equal(vs["variant_allele_total"], np.array([12, 11]))
+    np.testing.assert_equal(
+        vs["variant_allele_frequency"],
+        np.array([[7 / 12, 5 / 12], [6 / 11, 5 / 11]]),
+    )
+
+
+@pytest.mark.parametrize(
+    "chunks", [(-1, -1, -1), (100, -1, -1), (100, 10, -1), (100, 10, 1)]
+)
+def test_variant_stats__chunks(chunks):
+    ds = simulate_genotype_call_dataset(
+        n_variant=1000, n_sample=30, missing_pct=0.01, seed=0
+    )
+    expect = variant_stats(ds, merge=False).compute()
+    ds["call_genotype"] = ds["call_genotype"].chunk(chunks)
+    actual = variant_stats(ds, merge=False).compute()
+    assert actual.equals(expect)
+
+
+def test_variant_stats__raise_on_mixed_ploidy():
+    ds = simulate_genotype_call_dataset(n_variant=2, n_sample=2, n_ploidy=3, seed=0)
+    ds["call_genotype"].attrs["mixed_ploidy"] = True
+    with pytest.raises(ValueError, match="Mixed-ploidy dataset"):
+        variant_stats(ds)
 
 
 @pytest.mark.parametrize("precompute_variant_allele_count", [False, True])
