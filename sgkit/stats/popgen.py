@@ -430,7 +430,11 @@ def Tajimas_D(
            [1.10393559, 1.10393559]])
     """
     ds = define_variable_if_absent(
-        ds, variables.variant_allele_count, variant_allele_count, count_variant_alleles
+        ds,
+        variables.variant_allele_count,
+        variant_allele_count,
+        count_variant_alleles,
+        using=variables.call_genotype,
     )
     ds = define_variable_if_absent(
         ds, variables.stat_diversity, stat_diversity, diversity
