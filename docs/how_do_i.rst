@@ -135,11 +135,11 @@ Call :meth:`xarray.Dataset.sel` on the ``variants`` dimension:
 .. ipython:: python
 
     ds2 = sg.hardy_weinberg_test(ds)
-    ds2.sel(variants=(ds2.variant_hwe_p_value > 1e-2))
+    ds2.sel(variants=(ds2.variant_hwe_p_value > 1e-2).compute())
 
 .. note::
 
-   Filtering causes an eager Xarray computation.
+   The call to ``compute`` is needed to avoid an Xarray error.
 
 Find which new variables were added by a method?
 ------------------------------------------------
