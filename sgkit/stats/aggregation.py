@@ -270,18 +270,6 @@ def count_cohort_alleles(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-def _swap(dim: Dimension) -> Dimension:
-    return "samples" if dim == "variants" else "variants"
-
-
-def call_rate(ds: Dataset, dim: Dimension, call_genotype_mask: Hashable) -> Dataset:
-    odim = _swap(dim)[:-1]
-    n_called = (~ds[call_genotype_mask].any(dim="ploidy")).sum(dim=dim)
-    return create_dataset(
-        {f"{odim}_n_called": n_called, f"{odim}_call_rate": n_called / ds.dims[dim]}
-    )
-
-
 def count_variant_genotypes(
     ds: Dataset,
     *,
@@ -463,39 +451,6 @@ def genotype_coords(
     if assign_coords:
         ds = ds.assign_coords({"genotypes": S})
     return ds
-
-
-def count_genotypes(
-    ds: Dataset,
-    dim: Dimension,
-    call_genotype: Hashable = variables.call_genotype,
-    call_genotype_mask: Hashable = variables.call_genotype_mask,
-    merge: bool = True,
-) -> Dataset:
-    variables.validate(
-        ds,
-        {
-            call_genotype_mask: variables.call_genotype_mask_spec,
-            call_genotype: variables.call_genotype_spec,
-        },
-    )
-    odim = _swap(dim)[:-1]
-    M, G = ds[call_genotype_mask].any(dim="ploidy"), ds[call_genotype]
-    n_hom_ref = (G == 0).all(dim="ploidy")
-    n_hom_alt = ((G > 0) & (G[..., 0] == G)).all(dim="ploidy")
-    n_non_ref = (G > 0).any(dim="ploidy")
-    n_het = ~(n_hom_alt | n_hom_ref)
-    # This would 0 out the `het` case with any missing calls
-    agg = lambda x: xr.where(M, False, x).sum(dim=dim)  # type: ignore[no-untyped-call]
-    new_ds = create_dataset(
-        {
-            f"{odim}_n_het": agg(n_het),  # type: ignore[no-untyped-call]
-            f"{odim}_n_hom_ref": agg(n_hom_ref),  # type: ignore[no-untyped-call]
-            f"{odim}_n_hom_alt": agg(n_hom_alt),  # type: ignore[no-untyped-call]
-            f"{odim}_n_non_ref": agg(n_non_ref),  # type: ignore[no-untyped-call]
-        }
-    )
-    return conditional_merge_datasets(ds, new_ds, merge)
 
 
 def call_allele_frequencies(
@@ -769,9 +724,7 @@ def variant_stats(
 def sample_stats(
     ds: Dataset,
     *,
-    call_genotype_mask: Hashable = variables.call_genotype_mask,
     call_genotype: Hashable = variables.call_genotype,
-    variant_allele_count: Hashable = variables.variant_allele_count,
     merge: bool = True,
 ) -> Dataset:
     """Compute quality control sample statistics from genotype calls.
@@ -784,15 +737,6 @@ def sample_stats(
         Input variable name holding call_genotype.
         Defined by :data:`sgkit.variables.call_genotype_spec`.
         Must be present in ``ds``.
-    call_genotype_mask
-        Input variable name holding call_genotype_mask.
-        Defined by :data:`sgkit.variables.call_genotype_mask_spec`
-        Must be present in ``ds``.
-    variant_allele_count
-        Input variable name holding variant_allele_count,
-        as defined by :data:`sgkit.variables.variant_allele_count_spec`.
-        If the variable is not present in ``ds``, it will be computed
-        using :func:`count_variant_alleles`.
     merge
         If True (the default), merge the input dataset and the computed
         output variables into a single dataset, otherwise return only
@@ -815,25 +759,63 @@ def sample_stats(
       The number of variants with homozygous alternate calls.
     - :data:`sgkit.variables.sample_n_non_ref_spec` (samples):
       The number of variants that are not homozygous reference calls.
+
+    Note
+    ----
+    If the dataset contains partial genotype calls (i.e., genotype calls with
+    a mixture of called and missing alleles), these genotypes will be ignored
+    when counting the number of homozygous, heterozygous or total genotype calls.
+
+    Note
+    ----
+    When used on autopolyploid genotypes, this method treats genotypes calls
+    with any level of heterozygosity as 'heterozygous'. Only fully homozygous
+    genotype calls (e.g. 0/0/0/0) will be classified as 'homozygous'.
+
+    Warnings
+    --------
+    This method does not support mixed-ploidy datasets.
+
+    Raises
+    ------
+    ValueError
+        If the dataset contains mixed-ploidy genotype calls.
     """
-    variables.validate(
-        ds,
-        {
-            call_genotype: variables.call_genotype_spec,
-            call_genotype_mask: variables.call_genotype_mask_spec,
-        },
+    from .aggregation_numba_fns import count_hom
+
+    variables.validate(ds, {call_genotype: variables.call_genotype_spec})
+    mixed_ploidy = ds[call_genotype].attrs.get("mixed_ploidy", False)
+    if mixed_ploidy:
+        raise ValueError("Mixed-ploidy dataset")
+    G = da.array(ds[call_genotype].data)
+    H = xr.DataArray(
+        da.map_blocks(
+            count_hom,
+            G.transpose(1, 0, 2),
+            np.zeros(3, np.uint64),
+            drop_axis=(1, 2),
+            new_axis=1,
+            dtype=np.int64,
+            chunks=(G.chunks[1], 3),
+        ),
+        dims=["samples", "categories"],
     )
-    new_ds = xr.merge(
-        [
-            call_rate(ds, dim="variants", call_genotype_mask=call_genotype_mask),
-            count_genotypes(
-                ds,
-                dim="variants",
-                call_genotype=call_genotype,
-                call_genotype_mask=call_genotype_mask,
-                merge=False,
-            ),
-        ]
+    n_variant, _, _ = G.shape
+    n_called = H.sum(axis=-1)
+    call_rate = n_called / n_variant
+    n_hom_ref = H[:, 0]
+    n_hom_alt = H[:, 1]
+    n_het = H[:, 2]
+    n_non_ref = n_called - n_hom_ref
+    new_ds = xr.Dataset(
+        {
+            variables.sample_n_called: n_called,
+            variables.sample_call_rate: call_rate,
+            variables.sample_n_het: n_het,
+            variables.sample_n_hom_ref: n_hom_ref,
+            variables.sample_n_hom_alt: n_hom_alt,
+            variables.sample_n_non_ref: n_non_ref,
+        }
     )
     return conditional_merge_datasets(ds, variables.validate(new_ds), merge)
 
