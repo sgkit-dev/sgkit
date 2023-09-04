@@ -8,5 +8,3 @@ matplotlib
 graphviz
 seaborn
 ablog!=0.10.27
-#Pinned due to #934
-xarray<=2022.9.0
