@@ -2,6 +2,7 @@
 from pathlib import Path
 from typing import Any, Dict, List, MutableMapping, Optional, Tuple, Union
 
+import dask
 import dask.array as da
 import dask.dataframe as dd
 import numpy as np
@@ -245,64 +246,65 @@ def read_plink(
             f"{path}.{ext}" for ext in ["bed", "bim", "fam"]
         ]
 
-    # Load axis data first to determine dimension sizes
-    df_fam = read_fam(fam_path, sep=fam_sep)  # type: ignore[arg-type]
-    df_bim = read_bim(bim_path, sep=bim_sep)  # type: ignore[arg-type]
+    with dask.config.set({"dataframe.convert-string": False}):
+        # Load axis data first to determine dimension sizes
+        df_fam = read_fam(fam_path, sep=fam_sep)  # type: ignore[arg-type]
+        df_bim = read_bim(bim_path, sep=bim_sep)  # type: ignore[arg-type]
 
-    if persist:
-        df_fam = df_fam.persist()
-        df_bim = df_bim.persist()
+        if persist:
+            df_fam = df_fam.persist()
+            df_bim = df_bim.persist()
 
-    arr_fam = dataframe_to_dict(df_fam, dtype=FAM_ARRAY_DTYPE)
-    arr_bim = dataframe_to_dict(df_bim, dtype=BIM_ARRAY_DTYPE)
+        arr_fam = dataframe_to_dict(df_fam, dtype=FAM_ARRAY_DTYPE)
+        arr_bim = dataframe_to_dict(df_bim, dtype=BIM_ARRAY_DTYPE)
 
-    # Load genotyping data
-    call_genotype = da.from_array(
-        # Make sure to use asarray=False in order for masked arrays to propagate
-        BedReader(bed_path, (len(df_bim), len(df_fam)), count_A1=count_a1),  # type: ignore[arg-type]
-        chunks=chunks,
-        # Lock must be true with multiprocessing dask scheduler
-        # to not get bed-reader errors (it works w/ threading backend though)
-        lock=lock,
-        asarray=False,
-        name=f"bed_reader:read_plink:{bed_path}",
-    )
+        # Load genotyping data
+        call_genotype = da.from_array(
+            # Make sure to use asarray=False in order for masked arrays to propagate
+            BedReader(bed_path, (len(df_bim), len(df_fam)), count_A1=count_a1),  # type: ignore[arg-type]
+            chunks=chunks,
+            # Lock must be true with multiprocessing dask scheduler
+            # to not get bed-reader errors (it works w/ threading backend though)
+            lock=lock,
+            asarray=False,
+            name=f"bed_reader:read_plink:{bed_path}",
+        )
 
-    # If contigs are already integers, use them as-is
-    if bim_int_contig:
-        variant_contig = arr_bim["contig"].astype("int16")
-        variant_contig_names = da.unique(variant_contig).astype(str)
-        variant_contig_names = list(variant_contig_names.compute())
-    # Otherwise create index for contig names based
-    # on order of appearance in underlying .bim file
-    else:
-        variant_contig, variant_contig_names = encode_array(arr_bim["contig"].compute())  # type: ignore
-        variant_contig = variant_contig.astype("int16")
-        variant_contig_names = list(variant_contig_names)
+        # If contigs are already integers, use them as-is
+        if bim_int_contig:
+            variant_contig = arr_bim["contig"].astype("int16")
+            variant_contig_names = da.unique(variant_contig).astype(str)
+            variant_contig_names = list(variant_contig_names.compute())
+        # Otherwise create index for contig names based
+        # on order of appearance in underlying .bim file
+        else:
+            variant_contig, variant_contig_names = encode_array(arr_bim["contig"].compute())  # type: ignore
+            variant_contig = variant_contig.astype("int16")
+            variant_contig_names = list(variant_contig_names)
 
-    variant_position = arr_bim["pos"]
-    a1: ArrayLike = arr_bim["a1"].astype("str")
-    a2: ArrayLike = arr_bim["a2"].astype("str")
+        variant_position = arr_bim["pos"]
+        a1: ArrayLike = arr_bim["a1"].astype("str")
+        a2: ArrayLike = arr_bim["a2"].astype("str")
 
-    # Note: column_stack not implemented in Dask, must use [v|h]stack
-    variant_allele = da.hstack((a1[:, np.newaxis], a2[:, np.newaxis]))
-    variant_allele = variant_allele.astype("S")
-    variant_id = arr_bim["variant_id"]
+        # Note: column_stack not implemented in Dask, must use [v|h]stack
+        variant_allele = da.hstack((a1[:, np.newaxis], a2[:, np.newaxis]))
+        variant_allele = variant_allele.astype("S")
+        variant_id = arr_bim["variant_id"]
 
-    sample_id = arr_fam["member_id"]
+        sample_id = arr_fam["member_id"]
 
-    ds = create_genotype_call_dataset(
-        variant_contig_names=variant_contig_names,
-        variant_contig=variant_contig,
-        variant_position=variant_position,
-        variant_allele=variant_allele,
-        sample_id=sample_id,
-        call_genotype=call_genotype,
-        variant_id=variant_id,
-    )
+        ds = create_genotype_call_dataset(
+            variant_contig_names=variant_contig_names,
+            variant_contig=variant_contig,
+            variant_position=variant_position,
+            variant_allele=variant_allele,
+            sample_id=sample_id,
+            call_genotype=call_genotype,
+            variant_id=variant_id,
+        )
 
-    # Assign PLINK-specific pedigree fields
-    return ds.assign({f"sample_{f}": (DIM_SAMPLE, arr_fam[f]) for f in arr_fam})
+        # Assign PLINK-specific pedigree fields
+        return ds.assign({f"sample_{f}": (DIM_SAMPLE, arr_fam[f]) for f in arr_fam})
 
 
 def plink_to_zarr(

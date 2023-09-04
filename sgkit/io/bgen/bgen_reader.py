@@ -273,50 +273,53 @@ def read_bgen(
             f"`contig_dtype` must be of string or int type, not {contig_dtype}"
         )
 
-    path = Path(path)
-    sample_path = Path(sample_path) if sample_path else path.with_suffix(".sample")
+    with dask.config.set({"dataframe.convert-string": False}):
+        path = Path(path)
+        sample_path = Path(sample_path) if sample_path else path.with_suffix(".sample")
 
-    if sample_path.exists():
-        sample_id = read_samples(sample_path).sample_id.values.astype("U")
-    else:
-        sample_id = _default_sample_ids(path)
+        if sample_path.exists():
+            sample_id = read_samples(sample_path).sample_id.values.astype("U")
+        else:
+            sample_id = _default_sample_ids(path)
 
-    bgen_reader = BgenReader(path, metafile_path=metafile_path, dtype=gp_dtype)
+        bgen_reader = BgenReader(path, metafile_path=metafile_path, dtype=gp_dtype)
 
-    df = read_metafile(bgen_reader.metafile_path)
-    if persist:
-        df = df.persist()
-    arrs = dataframe_to_dict(df, METAFILE_DTYPE)
+        df = read_metafile(bgen_reader.metafile_path)
+        if persist:
+            df = df.persist()
+        arrs = dataframe_to_dict(df, METAFILE_DTYPE)
 
-    variant_id = arrs["id"]
-    variant_contig: ArrayLike = arrs["chrom"].astype(contig_dtype)
-    variant_contig, variant_contig_names = encode_contigs(variant_contig)
-    variant_contig_names = list(variant_contig_names)
-    variant_position = arrs["pos"]
-    variant_allele = da.hstack((arrs["a1"][:, np.newaxis], arrs["a2"][:, np.newaxis]))
+        variant_id = arrs["id"]
+        variant_contig: ArrayLike = arrs["chrom"].astype(contig_dtype)
+        variant_contig, variant_contig_names = encode_contigs(variant_contig)
+        variant_contig_names = list(variant_contig_names)
+        variant_position = arrs["pos"]
+        variant_allele = da.hstack(
+            (arrs["a1"][:, np.newaxis], arrs["a2"][:, np.newaxis])
+        )
 
-    call_genotype_probability = da.from_array(
-        bgen_reader,
-        chunks=chunks,
-        lock=lock,
-        fancy=False,
-        asarray=False,
-        name=f"{bgen_reader.name}:read_bgen:{path}",
-    )
-    call_dosage = _to_dosage(call_genotype_probability)
+        call_genotype_probability = da.from_array(
+            bgen_reader,
+            chunks=chunks,
+            lock=lock,
+            fancy=False,
+            asarray=False,
+            name=f"{bgen_reader.name}:read_bgen:{path}",
+        )
+        call_dosage = _to_dosage(call_genotype_probability)
 
-    ds: Dataset = create_genotype_dosage_dataset(
-        variant_contig_names=variant_contig_names,
-        variant_contig=variant_contig,
-        variant_position=variant_position,
-        variant_allele=variant_allele,
-        sample_id=sample_id,
-        call_dosage=call_dosage,
-        call_genotype_probability=call_genotype_probability,
-        variant_id=variant_id,
-    )
+        ds: Dataset = create_genotype_dosage_dataset(
+            variant_contig_names=variant_contig_names,
+            variant_contig=variant_contig,
+            variant_position=variant_position,
+            variant_allele=variant_allele,
+            sample_id=sample_id,
+            call_dosage=call_dosage,
+            call_genotype_probability=call_genotype_probability,
+            variant_id=variant_id,
+        )
 
-    return ds
+        return ds
 
 
 def _default_sample_ids(path: PathType) -> ArrayLike:
