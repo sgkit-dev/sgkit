@@ -794,21 +794,54 @@ def test_variant_stats__raise_on_mixed_ploidy():
         variant_stats(ds)
 
 
-@pytest.mark.parametrize("precompute_variant_allele_count", [False, True])
-def test_sample_stats(precompute_variant_allele_count):
+def test_sample_stats():
     ds = get_dataset(
         [[[1, 0], [-1, -1]], [[1, 0], [1, 1]], [[0, 1], [1, 0]], [[-1, -1], [0, 0]]]
     )
-    if precompute_variant_allele_count:
-        ds = count_variant_alleles(ds)
     ss = sample_stats(ds)
-
     np.testing.assert_equal(ss["sample_n_called"], np.array([3, 3]))
     np.testing.assert_equal(ss["sample_call_rate"], np.array([0.75, 0.75]))
     np.testing.assert_equal(ss["sample_n_hom_ref"], np.array([0, 1]))
     np.testing.assert_equal(ss["sample_n_hom_alt"], np.array([0, 1]))
     np.testing.assert_equal(ss["sample_n_het"], np.array([3, 1]))
     np.testing.assert_equal(ss["sample_n_non_ref"], np.array([3, 2]))
+
+
+def test_sample_stats__multi_allelic():
+    ds = simulate_genotype_call_dataset(n_variant=2, n_sample=4, n_allele=4, seed=0)
+    ds["call_genotype"].data = [
+        [[0, 0], [0, 0], [1, 1], [2, 2]],
+        [[0, 0], [2, 3], [0, -1], [-1, 2]],
+    ]
+    vs = sample_stats(ds)
+    np.testing.assert_equal(vs["sample_n_called"], np.array([2, 2, 1, 1]))
+    np.testing.assert_equal(vs["sample_call_rate"], np.array([1, 1, 0.5, 0.5]))
+    np.testing.assert_equal(vs["sample_n_hom_ref"], np.array([2, 1, 0, 0]))
+    np.testing.assert_equal(vs["sample_n_hom_alt"], np.array([0, 0, 1, 1]))
+    np.testing.assert_equal(vs["sample_n_het"], np.array([0, 1, 0, 0]))
+    np.testing.assert_equal(vs["sample_n_non_ref"], np.array([0, 1, 1, 1]))
+
+
+def test_sample_stats__tetraploid():
+    ds = simulate_genotype_call_dataset(n_variant=2, n_sample=3, n_ploidy=4, seed=0)
+    ds["call_genotype"].data = [
+        [[0, 0, 0, 0], [0, 0, 0, 1], [1, 1, 1, 1]],
+        [[0, 0, 1, 1], [0, 1, 1, 1], [0, 0, -1, 0]],
+    ]
+    vs = sample_stats(ds)
+    np.testing.assert_equal(vs["sample_n_called"], np.array([2, 2, 1]))
+    np.testing.assert_equal(vs["sample_call_rate"], np.array([1, 1, 0.5]))
+    np.testing.assert_equal(vs["sample_n_hom_ref"], np.array([1, 0, 0]))
+    np.testing.assert_equal(vs["sample_n_hom_alt"], np.array([0, 0, 1]))
+    np.testing.assert_equal(vs["sample_n_het"], np.array([1, 2, 0]))
+    np.testing.assert_equal(vs["sample_n_non_ref"], np.array([1, 2, 1]))
+
+
+def test_sample_stats__raise_on_mixed_ploidy():
+    ds = simulate_genotype_call_dataset(n_variant=2, n_sample=2, n_ploidy=3, seed=0)
+    ds["call_genotype"].attrs["mixed_ploidy"] = True
+    with pytest.raises(ValueError, match="Mixed-ploidy dataset"):
+        sample_stats(ds)
 
 
 def test_infer_call_ploidy():
