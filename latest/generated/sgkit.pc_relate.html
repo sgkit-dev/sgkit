@@ -769,7 +769,7 @@ corresponding kinship coefficient:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><span><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.6.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p><p>Dataset containing (S = num samples, V = num variants, D = ploidy, PC = num PC)</p>
+<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.8.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p><p>Dataset containing (S = num samples, V = num variants, D = ploidy, PC = num PC)</p>
 <ul class="simple">
 <li><p>genotype calls: (SxVxD)</p></li>
 <li><p>genotype calls mask: (SxVxD)</p></li>
@@ -777,21 +777,21 @@ corresponding kinship coefficient:</p>
 </ul>
 </p>
 </dd>
-<dt><span><strong>maf</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">0.01</span></code>)</span></dt><dd><p>individual minor allele frequency filter. If an individual’s estimated
+<dt><strong>maf</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">0.01</span></code>)</span></dt></dt><dd><p>individual minor allele frequency filter. If an individual’s estimated
 individual-specific minor allele frequency at a SNP is less than this value,
 that SNP will be excluded from the analysis for that individual.
 The default value is 0.01. Must be between (0.0, 0.1).</p>
 </dd>
-<dt><span><strong>call_genotype</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype'</span></code>)</span></dt><dd><p>Input variable name holding call_genotype.
+<dt><strong>call_genotype</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype'</span></code>)</span></dt></dt><dd><p>Input variable name holding call_genotype.
 Defined by <a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a>.</p>
 </dd>
-<dt><span><strong>call_genotype_mask</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype_mask'</span></code>)</span></dt><dd><p>Input variable name holding call_genotype_mask.
+<dt><strong>call_genotype_mask</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype_mask'</span></code>)</span></dt></dt><dd><p>Input variable name holding call_genotype_mask.
 Defined by <a class="reference internal" href="sgkit.variables.call_genotype_mask_spec.html#sgkit.variables.call_genotype_mask_spec" title="sgkit.variables.call_genotype_mask_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_mask_spec</span></code></a></p>
 </dd>
-<dt><span><strong>sample_pc</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'sample_pca_projection'</span></code>)</span></dt><dd><p>Input variable name holding sample principal components.
+<dt><strong>sample_pc</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'sample_pca_projection'</span></code>)</span></dt></dt><dd><p>Input variable name holding sample principal components.
 Defined by <a class="reference internal" href="sgkit.variables.sample_pca_projection_spec.html#sgkit.variables.sample_pca_projection_spec" title="sgkit.variables.sample_pca_projection_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.sample_pca_projection_spec</span></code></a></p>
 </dd>
-<dt><span><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</span></dt><dd><p>If True (the default), merge the input dataset and the computed
+<dt><strong>merge</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</span></dt></dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
 the computed output variables.
 See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
@@ -807,7 +807,7 @@ method from the GENESIS package version 2.18.0.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.6.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.8.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><p>Dataset containing (S = num samples):</p>

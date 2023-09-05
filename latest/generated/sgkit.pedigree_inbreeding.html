@@ -732,28 +732,28 @@ document.write(`
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><span><strong>ds</strong> : <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.6.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt><dd><p>Dataset containing pedigree structure.</p>
+<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.8.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing pedigree structure.</p>
 </dd>
-<dt><span><strong>method</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘diploid’, ‘Hamilton-Kerr’] (default: <code class="docutils literal notranslate"><span class="pre">'diploid'</span></code>)</span></dt><dd><p>The method used for inbreeding estimation. Defaults to “diploid”
+<dt><strong>method</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘diploid’, ‘Hamilton-Kerr’] (default: <code class="docutils literal notranslate"><span class="pre">'diploid'</span></code>)</span></dt></dt><dd><p>The method used for inbreeding estimation. Defaults to “diploid”
 which is only suitable for pedigrees in which all samples are
 diploids resulting from sexual reproduction.
 The “Hamilton-Kerr” method is suitable for autopolyploid and
 mixed-ploidy datasets following Hamilton and Kerr 2017 [1].</p>
 </dd>
-<dt><span><strong>parent</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'parent'</span></code>)</span></dt><dd><p>Input variable name holding parents of each sample as defined by
+<dt><strong>parent</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'parent'</span></code>)</span></dt></dt><dd><p>Input variable name holding parents of each sample as defined by
 <a class="reference internal" href="sgkit.variables.parent_spec.html#sgkit.variables.parent_spec" title="sgkit.variables.parent_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.parent_spec</span></code></a>.
 If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
 using <a class="reference internal" href="sgkit.parent_indices.html#sgkit.parent_indices" title="sgkit.parent_indices"><code class="xref py py-func docutils literal notranslate"><span class="pre">parent_indices()</span></code></a>.</p>
 </dd>
-<dt><span><strong>stat_Hamilton_Kerr_tau</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'stat_Hamilton_Kerr_tau'</span></code>)</span></dt><dd><p>Input variable name holding stat_Hamilton_Kerr_tau as defined
+<dt><strong>stat_Hamilton_Kerr_tau</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'stat_Hamilton_Kerr_tau'</span></code>)</span></dt></dt><dd><p>Input variable name holding stat_Hamilton_Kerr_tau as defined
 by <a class="reference internal" href="sgkit.variables.stat_Hamilton_Kerr_tau_spec.html#sgkit.variables.stat_Hamilton_Kerr_tau_spec" title="sgkit.variables.stat_Hamilton_Kerr_tau_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Hamilton_Kerr_tau_spec</span></code></a>.
 This variable is only required for the “Hamilton-Kerr” method.</p>
 </dd>
-<dt><span><strong>stat_Hamilton_Kerr_lambda</strong> : <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'stat_Hamilton_Kerr_lambda'</span></code>)</span></dt><dd><p>Input variable name holding stat_Hamilton_Kerr_lambda as defined
+<dt><strong>stat_Hamilton_Kerr_lambda</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'stat_Hamilton_Kerr_lambda'</span></code>)</span></dt></dt><dd><p>Input variable name holding stat_Hamilton_Kerr_lambda as defined
 by <a class="reference internal" href="sgkit.variables.stat_Hamilton_Kerr_lambda_spec.html#sgkit.variables.stat_Hamilton_Kerr_lambda_spec" title="sgkit.variables.stat_Hamilton_Kerr_lambda_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Hamilton_Kerr_lambda_spec</span></code></a>.
 This variable is only required for the “Hamilton-Kerr” method.</p>
 </dd>
-<dt><span><strong>allow_half_founders</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</span></dt><dd><p>If False (the default) then a ValueError will be raised if any
+<dt><strong>allow_half_founders</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</span></dt></dt><dd><p>If False (the default) then a ValueError will be raised if any
 individuals only have a single recorded parent.
 If True then the unrecorded parent will be assumed to be
 a unique founder unrelated to all other founders.
@@ -762,14 +762,14 @@ the tau and lambda parameters for gametes contributing to the
 unrecorded parent will be assumed to be equal to those of the
 gamete originating from that parent.</p>
 </dd>
-<dt><span><strong>merge</strong> : <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</span></dt><dd><p>If True (the default), merge the input dataset and the computed
+<dt><strong>merge</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</span></dt></dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
 the computed output variables.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.6.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.8.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.stat_pedigree_inbreeding_spec.html#sgkit.variables.stat_pedigree_inbreeding_spec" title="sgkit.variables.stat_pedigree_inbreeding_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_inbreeding_spec</span></code></a>.</p>
