@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>sgkit.hybrid_relationship &#8212; sgkit  documentation</title>
+    <title>sgkit.display_pedigree &#8212; sgkit  documentation</title>
   
   
   
@@ -43,9 +43,7 @@
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.hybrid_relationship';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sgkit.display_pedigree';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
@@ -55,8 +53,8 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.identity_by_state" href="sgkit.identity_by_state.html" />
-    <link rel="prev" title="sgkit.hybrid_inverse_relationship" href="sgkit.hybrid_inverse_relationship.html" /> 
+    <link rel="next" title="sgkit.filter_partial_calls" href="sgkit.filter_partial_calls.html" />
+    <link rel="prev" title="sgkit.display_genotypes" href="sgkit.display_genotypes.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="None"/>  
 <style type="text/css">
@@ -522,7 +520,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.load_dataset.html">sgkit.load_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.save_dataset.html">sgkit.save_dataset</a></li>
 </ul>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.call_allele_frequencies.html">sgkit.call_allele_frequencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.cohort_allele_frequencies.html">sgkit.cohort_allele_frequencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.count_call_alleles.html">sgkit.count_call_alleles</a></li>
@@ -538,7 +536,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.gwas_linear_regression.html">sgkit.gwas_linear_regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.hardy_weinberg_test.html">sgkit.hardy_weinberg_test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.hybrid_inverse_relationship.html">sgkit.hybrid_inverse_relationship</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.hybrid_relationship</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.hybrid_relationship.html">sgkit.hybrid_relationship</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.identity_by_state.html">sgkit.identity_by_state</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.individual_heterozygosity.html">sgkit.individual_heterozygosity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.ld_matrix.html">sgkit.ld_matrix</a></li>
@@ -557,11 +555,11 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.variant_stats.html">sgkit.variant_stats</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.Weir_Goudet_beta.html">sgkit.Weir_Goudet_beta</a></li>
 </ul>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.convert_call_to_index.html">sgkit.convert_call_to_index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.convert_probability_to_call.html">sgkit.convert_probability_to_call</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.display_genotypes.html">sgkit.display_genotypes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sgkit.display_pedigree.html">sgkit.display_pedigree</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.display_pedigree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.filter_partial_calls.html">sgkit.filter_partial_calls</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.infer_call_ploidy.html">sgkit.infer_call_ploidy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.infer_sample_ploidy.html">sgkit.infer_sample_ploidy</a></li>
@@ -708,7 +706,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">sgkit.hybrid_relationship</li>
+    <li class="breadcrumb-item active" aria-current="page">sgkit.display_pedigree</li>
   </ul>
 </nav>
 </div>
@@ -724,137 +722,42 @@ document.write(`
                 
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
-                   <section id="sgkit-hybrid-relationship">
-<h1>sgkit.hybrid_relationship<a class="headerlink" href="#sgkit-hybrid-relationship" title="Permalink to this headline">#</a></h1>
+                   <section id="sgkit-display-pedigree">
+<h1>sgkit.display_pedigree<a class="headerlink" href="#sgkit-display-pedigree" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="sgkit.hybrid_relationship">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">hybrid_relationship</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genomic_relationship</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pedigree_relationship</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pedigree_subset_inverse_relationship</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genomic_sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.hybrid_relationship" title="Permalink to this definition">#</a></dt>
-<dd><p>Compute a hybrid relationship matrix (AKA the HRM or H-matrix) combining pedigree
-and genomic information.</p>
+<dt class="sig sig-object py" id="sgkit.display_pedigree">
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">display_pedigree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'parent'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.display_pedigree" title="Permalink to this definition">#</a></dt>
+<dd><p>Display a pedigree dataset as a directed acyclic graph.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.8.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing the inverse genomic and pedigree relationship matrices.</p>
+<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.8.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing pedigree structure.</p>
 </dd>
-<dt><strong>genomic_relationship</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a></span></dt></dt><dd><p>Genomic relationship matrix as defined by
-<a class="reference internal" href="sgkit.variables.stat_genomic_relationship_spec.html#sgkit.variables.stat_genomic_relationship_spec" title="sgkit.variables.stat_genomic_relationship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_genomic_relationship_spec</span></code></a>.
-This may include unknown relationships indicated by nan values.</p>
+<dt><strong>parent</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'parent'</span></code>)</span></dt></dt><dd><p>Input variable name holding parents of each sample as defined by
+<a class="reference internal" href="sgkit.variables.parent_spec.html#sgkit.variables.parent_spec" title="sgkit.variables.parent_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.parent_spec</span></code></a>.
+If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
+using <a class="reference internal" href="sgkit.parent_indices.html#sgkit.parent_indices" title="sgkit.parent_indices"><code class="xref py py-func docutils literal notranslate"><span class="pre">parent_indices()</span></code></a>.</p>
 </dd>
-<dt><strong>pedigree_relationship</strong> <span class="classifier"><span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p>Pedigree relationship matrix as defined by
-<a class="reference internal" href="sgkit.variables.stat_pedigree_relationship_spec.html#sgkit.variables.stat_pedigree_relationship_spec" title="sgkit.variables.stat_pedigree_relationship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_relationship_spec</span></code></a>.</p>
+<dt><strong>graph_attrs</strong> <span class="classifier"><span class="annotation terse">{<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>} | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p>Key-value pairs to pass through to graphviz as graph attributes.</p>
 </dd>
-<dt><strong>pedigree_subset_inverse_relationship</strong> <span class="classifier"><span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p>Optionally specify a variable containing the inverse of the subset of the
-pedigree relationship matrix corresponding to the genomic samples as defined
-by <a class="reference internal" href="sgkit.variables.stat_inverse_relationship_spec.html#sgkit.variables.stat_inverse_relationship_spec" title="sgkit.variables.stat_inverse_relationship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_inverse_relationship_spec</span></code></a>.
-If absent, this argument will be automatically computed from the pedigree
-relationship matrix. If all samples are included in the genomic relationship
-matrix, then this variable is equivalent to
-<a class="reference internal" href="sgkit.variables.stat_pedigree_inverse_relationship_spec.html#sgkit.variables.stat_pedigree_inverse_relationship_spec" title="sgkit.variables.stat_pedigree_inverse_relationship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_pedigree_inverse_relationship_spec</span></code></a> and the
-pedigree_relationship variable is ignored.</p>
+<dt><strong>node_attrs</strong> <span class="classifier"><span class="annotation terse">{<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> | <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.Array.html#dask.array.Array" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code></a>} | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.Array.html#dask.array.Array" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code></a>]]]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p>Key-value pairs to pass through to graphviz as node attributes.
+Values will be broadcast to have shape (samples, ).</p>
 </dd>
-<dt><strong>genomic_sample</strong> <span class="classifier"><span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p>Optionally specify a variable containing an array of booleans which indicate
-the subset of samples with genomic relationships. If absent, it is assumed
-that genomic relationships are present for all samples.</p>
-</dd>
-<dt><strong>estimator</strong> <span class="classifier"><span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘Martini’] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘Martini’]]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p>Specifies the estimator used to combine matrices. Currently the only option
-is <code class="docutils literal notranslate"><span class="pre">&quot;Martini&quot;</span></code> following Martini et al 2018 [1] which expands on the
-estimators of Legarra et al 2009 [2] and Aguiler et al 2010 [3].</p>
-</dd>
-<dt><strong>tau</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">1.0</span></code>)</span></dt></dt><dd><p>Scaling factor for genomic relationships.</p>
-</dd>
-<dt><strong>omega</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">1.0</span></code>)</span></dt></dt><dd><p>Scaling factor for pedigree relationships.</p>
-</dd>
-<dt><strong>merge</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</span></dt></dt><dd><p>If True (the default), merge the input dataset and the computed
-output variables into a single dataset, otherwise return only
-the computed output variables.
-See <a class="reference internal" href="../user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
+<dt><strong>edge_attrs</strong> <span class="classifier"><span class="annotation terse">{<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> | <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.Array.html#dask.array.Array" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code></a>} | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.Array.html#dask.array.Array" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code></a>]]]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p>Key-value pairs to pass through to graphviz as edge attributes.
+Values will be broadcast to have shape (samples, parents).</p>
 </dd>
 </dl>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.8.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.stat_hybrid_relationship_spec.html#sgkit.variables.stat_hybrid_relationship_spec" title="sgkit.variables.stat_hybrid_relationship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_hybrid_relationship_spec</span></code></a>
-which is a matrix of pairwise relationships among all samples.
-The dimensions are named <code class="docutils literal notranslate"><span class="pre">samples_0</span></code> and <code class="docutils literal notranslate"><span class="pre">samples_1</span></code>.</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If an unknown estimator is specified.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the matrices do not have the same dimensions.</p></li>
-</ul>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – If the <a class="reference external" href="https://graphviz.readthedocs.io/en/stable/">Graphviz library</a> is not installed.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A digraph representation of the pedigree.</p>
 </dd>
 </dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This method is more efficient when samples with genomic relationships are
-adjacent to one another and are the first or last samples in the dataset.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">pedigree_subset_inverse_relationship</span></code> parameter must be calculated as
-the inverse of a subset of the pedigree relationship matrix, rather than
-a subset of the inverse of the pedigree relationship matrix. See method
-<a class="reference internal" href="sgkit.invert_relationship_matrix.html#sgkit.invert_relationship_matrix" title="sgkit.invert_relationship_matrix"><code class="xref py py-func docutils literal notranslate"><span class="pre">invert_relationship_matrix()</span></code></a>.</p>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference internal" href="sgkit.hybrid_inverse_relationship.html#sgkit.hybrid_inverse_relationship" title="sgkit.hybrid_inverse_relationship"><code class="xref py py-func docutils literal notranslate"><span class="pre">hybrid_inverse_relationship()</span></code></a></p>
-</div>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">nan</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># A-matrix</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;stat_pedigree_relationship&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;samples_0&quot;</span><span class="p">,</span> <span class="s2">&quot;samples_1&quot;</span><span class="p">],</span> <span class="p">[</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="mf">1.</span>   <span class="p">,</span> <span class="mf">0.</span>   <span class="p">,</span> <span class="mf">0.</span>   <span class="p">,</span> <span class="mf">0.5</span>  <span class="p">,</span> <span class="mf">0.</span>   <span class="p">,</span> <span class="mf">0.25</span> <span class="p">],</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.</span>   <span class="p">,</span> <span class="mf">1.</span>   <span class="p">,</span> <span class="mf">0.</span>   <span class="p">,</span> <span class="mf">0.5</span>  <span class="p">,</span> <span class="mf">0.5</span>  <span class="p">,</span> <span class="mf">0.5</span>  <span class="p">],</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.</span>   <span class="p">,</span> <span class="mf">0.</span>   <span class="p">,</span> <span class="mf">1.</span>   <span class="p">,</span> <span class="mf">0.</span>   <span class="p">,</span> <span class="mf">0.5</span>  <span class="p">,</span> <span class="mf">0.25</span> <span class="p">],</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.5</span>  <span class="p">,</span> <span class="mf">0.5</span>  <span class="p">,</span> <span class="mf">0.</span>   <span class="p">,</span> <span class="mf">1.</span>   <span class="p">,</span> <span class="mf">0.25</span> <span class="p">,</span> <span class="mf">0.625</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.</span>   <span class="p">,</span> <span class="mf">0.5</span>  <span class="p">,</span> <span class="mf">0.5</span>  <span class="p">,</span> <span class="mf">0.25</span> <span class="p">,</span> <span class="mf">1.</span>   <span class="p">,</span> <span class="mf">0.625</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.25</span> <span class="p">,</span> <span class="mf">0.5</span>  <span class="p">,</span> <span class="mf">0.25</span> <span class="p">,</span> <span class="mf">0.625</span><span class="p">,</span> <span class="mf">0.625</span><span class="p">,</span> <span class="mf">1.125</span><span class="p">]</span>
-<span class="gp">... </span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># G-matrix</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;stat_genomic_relationship&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;samples_0&quot;</span><span class="p">,</span> <span class="s2">&quot;samples_1&quot;</span><span class="p">],</span> <span class="p">[</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span> <span class="mf">1.3</span> <span class="p">,</span> <span class="mf">0.3</span> <span class="p">,</span> <span class="mf">0.71</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span> <span class="mf">0.3</span> <span class="p">,</span> <span class="mf">1.3</span> <span class="p">,</span> <span class="mf">0.73</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span>  <span class="n">nan</span><span class="p">,</span> <span class="mf">0.71</span><span class="p">,</span> <span class="mf">0.73</span><span class="p">,</span> <span class="mf">1.45</span><span class="p">],</span>
-<span class="gp">... </span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># samples included in G-matrix</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;genomic_sample&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">hybrid_relationship</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">ds</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">pedigree_relationship</span><span class="o">=</span><span class="s2">&quot;stat_pedigree_relationship&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">genomic_relationship</span><span class="o">=</span><span class="s2">&quot;stat_genomic_relationship&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">genomic_sample</span><span class="o">=</span><span class="s2">&quot;genomic_sample&quot;</span><span class="p">,</span>
-<span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">stat_hybrid_relationship</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  
-<span class="go">array([[ 1.084,  0.056, -0.028,  0.653, -0.013,  0.281],</span>
-<span class="go">       [ 0.056,  1.112,  0.056,  0.64 ,  0.64 ,  0.576],</span>
-<span class="go">       [-0.028,  0.056,  1.084, -0.013,  0.653,  0.295],</span>
-<span class="go">       [ 0.653,  0.64 , -0.013,  1.3  ,  0.3  ,  0.71 ],</span>
-<span class="go">       [-0.013,  0.64 ,  0.653,  0.3  ,  1.3  ,  0.73 ],</span>
-<span class="go">       [ 0.281,  0.576,  0.295,  0.71 ,  0.73 ,  1.45 ]])</span>
-</pre></div>
-</div>
-<p class="rubric">References</p>
-<p>[1] - J. W. R. Martini, M. F. Schrauf, C. A. Garcia-Baccino, E. C. G. Pimentel, S. Munilla,
-A. Roberg-Muñoz, R. J. C. Cantet, C. Reimer, N. Gao, V. Wimmer and H. Simianer 2018.
-“The effect of the <span class="math notranslate nohighlight">\(H^{-1}\)</span> scaling factors <span class="math notranslate nohighlight">\(\tau\)</span> and <span class="math notranslate nohighlight">\(\omega\)</span>
-on the structure of <span class="math notranslate nohighlight">\(H\)</span> in the single-step procedure.”
-Genetics Selection Evolution 50 (16).</p>
-<p>[2] - A. Legarra, I. Aguilar and I. Misztal 2009.
-“A relationship matrix including full pedigree and genomic information.”
-Journal of Dairy Science 92 (9): 4656-4663.</p>
-<p>[3] - I. Aguilar, I. Misztal, D. L. Johnson, A. Legarra, S. Tsuruta and T. J. Lawlor 2010.
-“A unified approach to utilize phenotypic, full pedigree, and genomic information for genetic
-evaluation of Holstein final score.”
-Journal of Dairy Science 93 (2): 743-752.</p>
 </dd></dl>
 
 </section>
@@ -874,20 +777,20 @@ Journal of Dairy Science 93 (2): 743-752.</p>
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="sgkit.hybrid_inverse_relationship.html"
+       href="sgkit.display_genotypes.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">sgkit.hybrid_inverse_relationship</p>
+        <p class="prev-next-title">sgkit.display_genotypes</p>
       </div>
     </a>
     <a class="right-next"
-       href="sgkit.identity_by_state.html"
+       href="sgkit.filter_partial_calls.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">sgkit.identity_by_state</p>
+        <p class="prev-next-title">sgkit.filter_partial_calls</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -905,7 +808,7 @@ Journal of Dairy Science 93 (2): 743-752.</p>
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="../_sources/generated/sgkit.hybrid_relationship.rst.txt">
+    <a href="../_sources/generated/sgkit.display_pedigree.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
