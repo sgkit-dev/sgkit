@@ -100,10 +100,11 @@ class MaxAltAllelesExceededWarning(UserWarning):
 def open_vcf(path: PathType) -> Iterator[VCF]:
     """A context manager for opening a VCF file."""
     vcf = VCF(path)
-    try:
-        yield vcf
-    finally:
-        vcf.close()
+    yield vcf
+    # This line is commented out as it causes a memory leak in cyvcf2
+    # See https://github.com/brentp/cyvcf2/pull/280
+    # We should reinstate this after a new release of cyvcf2
+    # vcf.close()
 
 
 def region_filter(
