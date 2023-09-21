@@ -429,7 +429,10 @@ def vcf_to_zarr_sequential(
     exclude_fields: Optional[Sequence[str]] = None,
     field_defs: Optional[Dict[str, Dict[str, Any]]] = None,
     read_chunk_length: Optional[int] = None,
+    check_if_done: bool = False,
 ) -> None:
+    if check_if_done and "_sgkit_parse_done" in output:
+        return
     if read_chunk_length is None:
         read_chunk_length = chunk_length
     with open_vcf(input) as vcf:
@@ -607,6 +610,7 @@ def vcf_to_zarr_sequential(
             else:
                 # Append along the variants dimension
                 ds.to_zarr(output, append_dim=DIM_VARIANT)
+    output["_sgkit_parse_done"] = b"done"
 
 
 def vcf_to_zarr_parallel(
@@ -792,6 +796,10 @@ def vcf_to_zarrs(
                 fields=fields,
                 exclude_fields=exclude_fields,
                 field_defs=field_defs,
+                # If a worker dies, dask will redo the tasks on that worker,
+                # which is unnecessary, with this flag the parse will be skipped
+                # if it has already been done.
+                check_if_done=True,
             )
             tasks.append(task)
     dask.compute(*tasks)
