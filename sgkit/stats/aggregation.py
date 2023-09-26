@@ -1058,7 +1058,7 @@ def individual_heterozygosity(
     variables.validate(ds, {call_allele_count: variables.call_allele_count_spec})
 
     AC = da.asarray(ds.call_allele_count)
-    K = AC.sum(axis=-1)
+    K = da.sum(AC, axis=-1)
     # use nan denominator to avoid divide by zero with K - 1
     K2 = da.where(K > 1, K, np.nan)
     AF = AC / K2[..., None]
