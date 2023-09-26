@@ -43,19 +43,19 @@ def cohort_reduction(gufunc: Callable) -> Callable:
 
     @wraps(gufunc)
     def func(x: ArrayLike, cohort: ArrayLike, n: int, axis: int = -1) -> ArrayLike:
-        x = da.swapaxes(da.asarray(x), axis, -1)
+        x = da.moveaxis(da.asarray(x), [axis, -1], [-1, axis])
         replaced = len(x.shape) - 1
         chunks = x.chunks[0:-1] + (n,)
         out = da.map_blocks(
             gufunc,
             x,
             cohort,
-            np.empty(n, np.int8),
+            da.empty(n, dtype=np.int8),
             chunks=chunks,
             drop_axis=replaced,
             new_axis=replaced,
         )
-        return da.swapaxes(out, axis, -1)
+        return da.moveaxis(out, [axis, -1], [-1, axis])
 
     return func
 
