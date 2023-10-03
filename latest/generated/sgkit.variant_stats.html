@@ -726,19 +726,15 @@ document.write(`
 <h1>sgkit.variant_stats<a class="headerlink" href="#sgkit-variant-stats" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgkit.variant_stats">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">variant_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype_mask'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant_allele_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'variant_allele_count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.variant_stats" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">variant_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant_allele_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'variant_allele_count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.variant_stats" title="Permalink to this definition">#</a></dt>
 <dd><p>Compute quality control variant statistics from genotype calls.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.8.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing genotype calls.</p>
+<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.9.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing genotype calls.</p>
 </dd>
 <dt><strong>call_genotype</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype'</span></code>)</span></dt></dt><dd><p>Input variable name holding call_genotype.
 Defined by <a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a>.
-Must be present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>.</p>
-</dd>
-<dt><strong>call_genotype_mask</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype_mask'</span></code>)</span></dt></dt><dd><p>Input variable name holding call_genotype_mask.
-Defined by <a class="reference internal" href="sgkit.variables.call_genotype_mask_spec.html#sgkit.variables.call_genotype_mask_spec" title="sgkit.variables.call_genotype_mask_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_mask_spec</span></code></a>
 Must be present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>.</p>
 </dd>
 <dt><strong>variant_allele_count</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'variant_allele_count'</span></code>)</span></dt></dt><dd><p>Input variable name holding variant_allele_count,
@@ -754,7 +750,7 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
 </dl>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.8.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.9.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><p>A dataset containing the following variables:</p>
@@ -781,6 +777,33 @@ The frequency of occurrence of each allele.</p></li>
 </p>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the dataset contains partial genotype calls (i.e., genotype calls with
+a mixture of called and missing alleles), these genotypes will be ignored
+when counting the number of homozygous, heterozygous or total genotype calls.
+However, the called alleles will be counted when calculating allele counts
+and frequencies using <a class="reference internal" href="sgkit.count_variant_alleles.html#sgkit.count_variant_alleles" title="sgkit.count_variant_alleles"><code class="xref py py-func docutils literal notranslate"><span class="pre">count_variant_alleles()</span></code></a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When used on autopolyploid genotypes, this method treats genotypes calls
+with any level of heterozygosity as ‘heterozygous’. Only fully homozygous
+genotype calls (e.g. 0/0/0/0) will be classified as ‘homozygous’.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This method does not support mixed-ploidy datasets.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the dataset contains mixed-ploidy genotype calls.</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="sgkit.count_variant_genotypes.html#sgkit.count_variant_genotypes" title="sgkit.count_variant_genotypes"><code class="xref py py-func docutils literal notranslate"><span class="pre">count_variant_genotypes()</span></code></a></p>
+</div>
 </dd></dl>
 
 </section>

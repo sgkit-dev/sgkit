@@ -726,17 +726,28 @@ document.write(`
 <h1>sgkit.count_variant_alleles<a class="headerlink" href="#sgkit-count-variant-alleles" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgkit.count_variant_alleles">
-<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">count_variant_alleles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_allele_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_allele_count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.count_variant_alleles" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">count_variant_alleles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_genotype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_genotype'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_allele_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_allele_count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'call_allele_count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.count_variant_alleles" title="Permalink to this definition">#</a></dt>
 <dd><p>Compute allele count from per-sample allele counts, or genotype calls.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.8.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing genotype calls.</p>
+<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.9.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing genotype calls.</p>
+</dd>
+<dt><strong>call_genotype</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_genotype'</span></code>)</span></dt></dt><dd><p>Input variable name holding call_genotype as defined by
+<a class="reference internal" href="sgkit.variables.call_genotype_spec.html#sgkit.variables.call_genotype_spec" title="sgkit.variables.call_genotype_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_genotype_spec</span></code></a>.
+This variable is only used if specified by the ‘using’ argument.</p>
 </dd>
 <dt><strong>call_allele_count</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_allele_count'</span></code>)</span></dt></dt><dd><p>Input variable name holding call_allele_count as defined by
 <a class="reference internal" href="sgkit.variables.call_allele_count_spec.html#sgkit.variables.call_allele_count_spec" title="sgkit.variables.call_allele_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_allele_count_spec</span></code></a>.
+This variable is only used if specified by the ‘using’ argument.
 If the variable is not present in <code class="docutils literal notranslate"><span class="pre">ds</span></code>, it will be computed
 using <a class="reference internal" href="sgkit.count_call_alleles.html#sgkit.count_call_alleles" title="sgkit.count_call_alleles"><code class="xref py py-func docutils literal notranslate"><span class="pre">count_call_alleles()</span></code></a>.</p>
+</dd>
+<dt><strong>using</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘call_allele_count’, ‘call_genotype’] (default: <code class="docutils literal notranslate"><span class="pre">'call_allele_count'</span></code>)</span></dt></dt><dd><p>specify the variable used to calculate allele counts from.
+If <code class="docutils literal notranslate"><span class="pre">'call_allele_count'</span></code> (the default), the result will
+be calculated from the call_allele_count variable.
+If <code class="docutils literal notranslate"><span class="pre">'call_genotype'</span></code>, the result will be calculated from
+the call_genotype variable.</p>
 </dd>
 <dt><strong>merge</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</span></dt></dt><dd><p>If True (the default), merge the input dataset and the computed
 output variables into a single dataset, otherwise return only
@@ -746,7 +757,7 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
 </dl>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.8.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.9.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.variant_allele_count_spec.html#sgkit.variables.variant_allele_count_spec" title="sgkit.variables.variant_allele_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_allele_count_spec</span></code></a>
@@ -754,6 +765,12 @@ of allele counts with shape (variants, alleles) and values corresponding to
 the number of non-missing occurrences of each allele.</p>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is more efficient when calculating allele counts directly from
+the call_genotype variable unless the call_allele_count variable has already
+been (or will be) calculated.</p>
+</div>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>

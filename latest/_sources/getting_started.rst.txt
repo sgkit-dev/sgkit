@@ -203,7 +203,7 @@ shows how it can be used in the context of doing something simple like counting 
 
     # Now the result is correct -- only the third sample is heterozygous so the count should be 1.
     # This how many sgkit functions handle missing data internally:
-    sg.variant_stats(ds).variant_n_het.item(0)
+    sg.variant_stats(ds).variant_n_het.values.item(0)
 
 Windowing
 ---------
@@ -320,8 +320,8 @@ Xarray and Pandas operations in a single pipeline:
     # for windows of size 20 variants
     (
         ds
-        # Add call rate and other statistics
-        .pipe(sg.variant_stats)
+        # Add and compute call rate and other statistics
+        .pipe(sg.variant_stats).compute()
         # Apply filter to include variants present across > 80% of samples
         .pipe(lambda ds: ds.sel(variants=ds.variant_call_rate > .8))
         # Create windows of size 20 variants

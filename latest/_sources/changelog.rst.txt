@@ -19,6 +19,8 @@ New Features
   (:user:`timothymillar`, :pr:`1100`, :issue:`1062`)
 - Add :func:`display_pedigree` function.
   (:user:`timothymillar`, :pr:`1104`, :issue:`1097`)
+- Add option to count variant alleles directly from call genotypes in function :func:`count_variant_alleles`.
+  (:user:`timothymillar`, :pr:`1119`, :issue:`1116`)
 
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
@@ -26,8 +28,11 @@ New Features
 .. Deprecations
 .. ~~~~~~~~~~~~
 
-.. Improvements
-.. ~~~~~~~~~~~~
+Improvements
+~~~~~~~~~~~~
+
+- Improve performance of :func:`variant_stats` and :func:`sample_stats` functions.
+  (:user:`timothymillar`, :pr:`1119`, :issue:`1116`)
 
 .. Bug fixes
 .. ~~~~~~~~~

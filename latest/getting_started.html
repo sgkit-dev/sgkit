@@ -804,14 +804,14 @@ across samples for each individual variant:</p>
 <span class="go">Dimensions:                   (variants: 100, alleles: 2)</span>
 <span class="go">Dimensions without coordinates: variants, alleles</span>
 <span class="go">Data variables:</span>
-<span class="go">    variant_n_called          (variants) int64 40 42 43 40 41 ... 42 38 43 43 40</span>
-<span class="go">    variant_call_rate         (variants) float64 0.8 0.84 0.86 ... 0.86 0.86 0.8</span>
-<span class="go">    variant_n_het             (variants) int64 22 30 18 26 29 ... 23 22 26 21 19</span>
-<span class="go">    variant_n_hom_ref         (variants) int64 11 3 13 3 6 8 ... 6 10 9 12 8 13</span>
-<span class="go">    variant_n_hom_alt         (variants) int64 7 9 12 11 6 17 ... 15 9 7 5 14 8</span>
-<span class="go">    variant_n_non_ref         (variants) int64 29 39 30 37 35 ... 32 29 31 35 27</span>
+<span class="go">    variant_n_called          (variants) int64 dask.array&lt;chunksize=(100,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_call_rate         (variants) float64 dask.array&lt;chunksize=(100,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_n_het             (variants) int64 dask.array&lt;chunksize=(100,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_n_hom_ref         (variants) int64 dask.array&lt;chunksize=(100,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_n_hom_alt         (variants) int64 dask.array&lt;chunksize=(100,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_n_non_ref         (variants) int64 dask.array&lt;chunksize=(100,), meta=np.ndarray&gt;</span>
 <span class="go">    variant_allele_count      (variants, alleles) uint64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
-<span class="go">    variant_allele_total      (variants) int64 90 92 93 88 91 ... 92 88 92 92 90</span>
+<span class="go">    variant_allele_total      (variants) int64 dask.array&lt;chunksize=(100,), meta=np.ndarray&gt;</span>
 <span class="go">    variant_allele_frequency  (variants, alleles) float64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
 </pre></div>
 </div>
@@ -914,7 +914,7 @@ shows how it can be used in the context of doing something simple like counting 
 
 <span class="go"># Now the result is correct -- only the third sample is heterozygous so the count should be 1.</span>
 <span class="go"># This how many sgkit functions handle missing data internally:</span>
-<span class="gp">In [39]: </span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_n_het</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">In [39]: </span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_n_het</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="gh">Out[39]: </span><span class="go">1</span>
 </pre></div>
 </div>
@@ -1031,14 +1031,14 @@ Xarray and Pandas operations in a single pipeline:</p>
 <span class="go">Dimensions:                   (variants: 100, alleles: 2, contigs: 1)</span>
 <span class="go">Dimensions without coordinates: variants, alleles, contigs</span>
 <span class="go">Data variables: (12/13)</span>
-<span class="go">    variant_n_called          (variants) int64 40 42 43 40 41 ... 42 38 43 43 40</span>
-<span class="go">    variant_call_rate         (variants) float64 0.8 0.84 0.86 ... 0.86 0.86 0.8</span>
-<span class="go">    variant_n_het             (variants) int64 22 30 18 26 29 ... 23 22 26 21 19</span>
-<span class="go">    variant_n_hom_ref         (variants) int64 11 3 13 3 6 8 ... 6 10 9 12 8 13</span>
-<span class="go">    variant_n_hom_alt         (variants) int64 7 9 12 11 6 17 ... 15 9 7 5 14 8</span>
-<span class="go">    variant_n_non_ref         (variants) int64 29 39 30 37 35 ... 32 29 31 35 27</span>
+<span class="go">    variant_n_called          (variants) int64 dask.array&lt;chunksize=(100,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_call_rate         (variants) float64 dask.array&lt;chunksize=(100,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_n_het             (variants) int64 dask.array&lt;chunksize=(100,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_n_hom_ref         (variants) int64 dask.array&lt;chunksize=(100,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_n_hom_alt         (variants) int64 dask.array&lt;chunksize=(100,), meta=np.ndarray&gt;</span>
+<span class="go">    variant_n_non_ref         (variants) int64 dask.array&lt;chunksize=(100,), meta=np.ndarray&gt;</span>
 <span class="go">    ...                        ...</span>
-<span class="go">    variant_allele_total      (variants) int64 90 92 93 88 91 ... 92 88 92 92 90</span>
+<span class="go">    variant_allele_total      (variants) int64 dask.array&lt;chunksize=(100,), meta=np.ndarray&gt;</span>
 <span class="go">    variant_allele_frequency  (variants, alleles) float64 dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
 <span class="go">    contig_id                 (contigs) &lt;U1 &#39;0&#39;</span>
 <span class="go">    variant_contig            (variants) int64 0 0 0 0 0 0 0 0 ... 0 0 0 0 0 0 0</span>
@@ -1065,7 +1065,7 @@ Xarray and Pandas operations in a single pipeline:</p>
 <span class="go"># for windows of size 20 variants</span>
 <span class="gp">In [61]: </span><span class="p">(</span>
 <span class="gp">   ....: </span>    <span class="n">ds</span>
-<span class="gp">   ....: </span>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">)</span>
+<span class="gp">   ....: </span>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">variant_stats</span><span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 <span class="gp">   ....: </span>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="k">lambda</span> <span class="n">ds</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">variants</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">variant_call_rate</span> <span class="o">&gt;</span> <span class="mf">.8</span><span class="p">))</span>
 <span class="gp">   ....: </span>    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="k">lambda</span> <span class="n">ds</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">window_by_variant</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">))</span>
 <span class="gp">   ....: </span>    <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">sample_cohort</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s1">&#39;samples&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
