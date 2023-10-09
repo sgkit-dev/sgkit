@@ -5,7 +5,6 @@ queue_rules:
       - status-success=build (3.8)
       - status-success=build (3.9)
       - status-success=build (3.10)
-      - status-success=win_build (3.8)
       - status-success=win_build (3.9)
       - approved-reviews-by=@pystatgen/committers
       - "#approved-reviews-by>=1"
@@ -18,7 +17,6 @@ pull_request_rules:
       - status-success=build (3.8)
       - status-success=build (3.9)
       - status-success=build (3.10)
-      - status-success=win_build (3.8)
       - status-success=win_build (3.9)
       - approved-reviews-by=@pystatgen/committers
       - "#approved-reviews-by>=1"
