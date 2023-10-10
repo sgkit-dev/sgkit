@@ -110,7 +110,7 @@ def parent_indices(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def topological_argsort(parent: ArrayLike) -> ArrayLike:
     """Find a topological ordering of samples within a pedigree such
     that no individual occurs before its parents.

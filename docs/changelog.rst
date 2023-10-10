@@ -21,6 +21,8 @@ New Features
   (:user:`timothymillar`, :pr:`1104`, :issue:`1097`)
 - Add option to count variant alleles directly from call genotypes in function :func:`count_variant_alleles`.
   (:user:`timothymillar`, :pr:`1119`, :issue:`1116`)
+- Add :func:`simulate_genedrop` function.
+  (:user:`timothymillar`, :pr:`1139`, :issue:`1107`)
 
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
