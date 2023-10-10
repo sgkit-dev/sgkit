@@ -28,6 +28,7 @@ from .stats.aggregation import (
 )
 from .stats.association import gwas_linear_regression, regenie_loco_regression
 from .stats.conversion import convert_call_to_index, convert_probability_to_call
+from .stats.genedrop import simulate_genedrop
 from .stats.genee import genee
 from .stats.grm import (
     genomic_relationship,
@@ -123,6 +124,7 @@ __all__ = [
     "Tajimas_D",
     "pbs",
     "pc_relate",
+    "simulate_genedrop",
     "simulate_genotype_call_dataset",
     "variables",
     "observed_heterozygosity",
