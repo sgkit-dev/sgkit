@@ -111,6 +111,7 @@ Methods
    ld_prune
    maximal_independent_set
    observed_heterozygosity
+   pairwise_distance
    pbs
    pedigree_contribution
    pedigree_inbreeding

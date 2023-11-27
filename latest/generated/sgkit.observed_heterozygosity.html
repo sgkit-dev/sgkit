@@ -53,7 +53,7 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sgkit.pbs" href="sgkit.pbs.html" />
+    <link rel="next" title="sgkit.pairwise_distance" href="sgkit.pairwise_distance.html" />
     <link rel="prev" title="sgkit.maximal_independent_set" href="sgkit.maximal_independent_set.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="None"/>  
@@ -543,6 +543,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.ld_prune.html">sgkit.ld_prune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.maximal_independent_set.html">sgkit.maximal_independent_set</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.observed_heterozygosity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.pairwise_distance.html">sgkit.pairwise_distance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pbs.html">sgkit.pbs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_contribution.html">sgkit.pedigree_contribution</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_inbreeding.html">sgkit.pedigree_inbreeding</a></li>
@@ -739,7 +740,7 @@ this function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.10.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing genotype calls.</p>
+<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing genotype calls.</p>
 </dd>
 <dt><strong>call_heterozygosity</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_heterozygosity'</span></code>)</span></dt></dt><dd><p>Input variable name holding call_heterozygosity as defined by
 <a class="reference internal" href="sgkit.variables.call_heterozygosity_spec.html#sgkit.variables.call_heterozygosity_spec" title="sgkit.variables.call_heterozygosity_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_heterozygosity_spec</span></code></a>.
@@ -757,7 +758,7 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
 </dl>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.10.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.stat_observed_heterozygosity_spec.html#sgkit.variables.stat_observed_heterozygosity_spec" title="sgkit.variables.stat_observed_heterozygosity_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_observed_heterozygosity_spec</span></code></a>
@@ -820,11 +821,11 @@ containing values within the inteval [0, 1] or nan.</p>
       </div>
     </a>
     <a class="right-next"
-       href="sgkit.pbs.html"
+       href="sgkit.pairwise_distance.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">sgkit.pbs</p>
+        <p class="prev-next-title">sgkit.pairwise_distance</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

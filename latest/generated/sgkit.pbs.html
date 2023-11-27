@@ -54,7 +54,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sgkit.pedigree_contribution" href="sgkit.pedigree_contribution.html" />
-    <link rel="prev" title="sgkit.observed_heterozygosity" href="sgkit.observed_heterozygosity.html" /> 
+    <link rel="prev" title="sgkit.pairwise_distance" href="sgkit.pairwise_distance.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="None"/>  
 <style type="text/css">
@@ -543,6 +543,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.ld_prune.html">sgkit.ld_prune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.maximal_independent_set.html">sgkit.maximal_independent_set</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.observed_heterozygosity.html">sgkit.observed_heterozygosity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.pairwise_distance.html">sgkit.pairwise_distance</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">sgkit.pbs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_contribution.html">sgkit.pedigree_contribution</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_inbreeding.html">sgkit.pedigree_inbreeding</a></li>
@@ -734,7 +735,7 @@ this function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.10.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Genotype call dataset.</p>
+<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Genotype call dataset.</p>
 </dd>
 <dt><strong>stat_Fst</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'stat_Fst'</span></code>)</span></dt></dt><dd><p>Fst variable to use or calculate. Defined by
 <a class="reference internal" href="sgkit.variables.stat_Fst_spec.html#sgkit.variables.stat_Fst_spec" title="sgkit.variables.stat_Fst_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_Fst_spec</span></code></a>.
@@ -753,7 +754,7 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
 </dl>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.10.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A dataset containing the PBS value between cohort triples, as defined by
@@ -807,12 +808,12 @@ samples dimension.</p>
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="sgkit.observed_heterozygosity.html"
+       href="sgkit.pairwise_distance.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">sgkit.observed_heterozygosity</p>
+        <p class="prev-next-title">sgkit.pairwise_distance</p>
       </div>
     </a>
     <a class="right-next"

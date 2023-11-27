@@ -543,6 +543,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.ld_prune.html">sgkit.ld_prune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.maximal_independent_set.html">sgkit.maximal_independent_set</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.observed_heterozygosity.html">sgkit.observed_heterozygosity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sgkit.pairwise_distance.html">sgkit.pairwise_distance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.pbs.html">sgkit.pbs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.pedigree_contribution.html">sgkit.pedigree_contribution</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.pedigree_inbreeding.html">sgkit.pedigree_inbreeding</a></li>
@@ -927,37 +928,40 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.observed_heterozygosity.html#sgkit.observed_heterozygosity" title="sgkit.observed_heterozygosity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">observed_heterozygosity</span></code></a>(ds, *[, ...])</p></td>
 <td><p>Compute per cohort observed heterozygosity.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pbs.html#sgkit.pbs" title="sgkit.pbs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pbs</span></code></a>(ds, *[, stat_Fst, cohorts, merge])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pairwise_distance.html#sgkit.pairwise_distance" title="sgkit.pairwise_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pairwise_distance</span></code></a>(x[, metric, split_every, ...])</p></td>
+<td><p>Calculates the pairwise distance between all pairs of row vectors in the given two dimensional array x.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.pbs.html#sgkit.pbs" title="sgkit.pbs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pbs</span></code></a>(ds, *[, stat_Fst, cohorts, merge])</p></td>
 <td><p>Compute the population branching statistic (PBS) between cohort triples.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.pedigree_contribution.html#sgkit.pedigree_contribution" title="sgkit.pedigree_contribution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pedigree_contribution</span></code></a>(ds, *[, method, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pedigree_contribution.html#sgkit.pedigree_contribution" title="sgkit.pedigree_contribution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pedigree_contribution</span></code></a>(ds, *[, method, ...])</p></td>
 <td><p>Calculate the expected genomic contribution of each sample to each other sample based on pedigree structure.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pedigree_inbreeding.html#sgkit.pedigree_inbreeding" title="sgkit.pedigree_inbreeding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pedigree_inbreeding</span></code></a>(ds, *[, method, parent, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.pedigree_inbreeding.html#sgkit.pedigree_inbreeding" title="sgkit.pedigree_inbreeding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pedigree_inbreeding</span></code></a>(ds, *[, method, parent, ...])</p></td>
 <td><p>Estimate expected inbreeding coefficients from pedigree structure.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.pedigree_inverse_kinship.html#sgkit.pedigree_inverse_kinship" title="sgkit.pedigree_inverse_kinship"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pedigree_inverse_kinship</span></code></a>(ds, *[, method, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pedigree_inverse_kinship.html#sgkit.pedigree_inverse_kinship" title="sgkit.pedigree_inverse_kinship"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pedigree_inverse_kinship</span></code></a>(ds, *[, method, ...])</p></td>
 <td><p>Calculate the inverse of the kinship matrix from pedigree structure.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pedigree_kinship.html#sgkit.pedigree_kinship" title="sgkit.pedigree_kinship"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pedigree_kinship</span></code></a>(ds, *[, method, parent, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.pedigree_kinship.html#sgkit.pedigree_kinship" title="sgkit.pedigree_kinship"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pedigree_kinship</span></code></a>(ds, *[, method, parent, ...])</p></td>
 <td><p>Estimate expected pairwise kinship coefficients from pedigree structure.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.pc_relate.html#sgkit.pc_relate" title="sgkit.pc_relate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pc_relate</span></code></a>(ds, *[, maf, call_genotype, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pc_relate.html#sgkit.pc_relate" title="sgkit.pc_relate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pc_relate</span></code></a>(ds, *[, maf, call_genotype, ...])</p></td>
 <td><p>Compute PC-Relate as described in Conomos, et al. 2016 [1].</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.regenie.html#sgkit.regenie" title="sgkit.regenie"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regenie</span></code></a>(ds, *, dosage, covariates, traits[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.regenie.html#sgkit.regenie" title="sgkit.regenie"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regenie</span></code></a>(ds, *, dosage, covariates, traits[, ...])</p></td>
 <td><p>Regenie trait transformation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.sample_stats.html#sgkit.sample_stats" title="sgkit.sample_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_stats</span></code></a>(ds, *[, call_genotype, merge])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.sample_stats.html#sgkit.sample_stats" title="sgkit.sample_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_stats</span></code></a>(ds, *[, call_genotype, merge])</p></td>
 <td><p>Compute quality control sample statistics from genotype calls.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.Tajimas_D.html#sgkit.Tajimas_D" title="sgkit.Tajimas_D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tajimas_D</span></code></a>(ds, *[, variant_allele_count, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.Tajimas_D.html#sgkit.Tajimas_D" title="sgkit.Tajimas_D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tajimas_D</span></code></a>(ds, *[, variant_allele_count, ...])</p></td>
 <td><p>Compute Tajimas' D for a genotype call dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.variant_stats.html#sgkit.variant_stats" title="sgkit.variant_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variant_stats</span></code></a>(ds, *[, call_genotype, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variant_stats.html#sgkit.variant_stats" title="sgkit.variant_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variant_stats</span></code></a>(ds, *[, call_genotype, ...])</p></td>
 <td><p>Compute quality control variant statistics from genotype calls.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.Weir_Goudet_beta.html#sgkit.Weir_Goudet_beta" title="sgkit.Weir_Goudet_beta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Weir_Goudet_beta</span></code></a>(ds, *[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.Weir_Goudet_beta.html#sgkit.Weir_Goudet_beta" title="sgkit.Weir_Goudet_beta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Weir_Goudet_beta</span></code></a>(ds, *[, ...])</p></td>
 <td><p>Estimate pairwise beta between all pairs of samples as described in Weir and Goudet 2017 [1].</p></td>
 </tr>
 </tbody>

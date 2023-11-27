@@ -543,6 +543,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.ld_prune.html">sgkit.ld_prune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.maximal_independent_set.html">sgkit.maximal_independent_set</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.observed_heterozygosity.html">sgkit.observed_heterozygosity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sgkit.pairwise_distance.html">sgkit.pairwise_distance</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pbs.html">sgkit.pbs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_contribution.html">sgkit.pedigree_contribution</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.pedigree_inbreeding.html">sgkit.pedigree_inbreeding</a></li>
@@ -734,7 +735,7 @@ this function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.10.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Genotype call dataset.</p>
+<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Genotype call dataset.</p>
 </dd>
 <dt><strong>estimator</strong> <span class="classifier"><span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p>Determines the formula to use for computing Fst.
 If None (the default), or <code class="docutils literal notranslate"><span class="pre">Hudson</span></code>, Fst is calculated
@@ -756,7 +757,7 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
 </dl>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.10.2.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A dataset containing the Fst value between pairs of cohorts, as defined by
