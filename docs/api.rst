@@ -86,6 +86,9 @@ Dataset
 Methods
 =======
 
+Basic genetics statistics
+-------------------------
+
 .. autosummary::
    :toctree: generated/
 
@@ -95,34 +98,69 @@ Methods
    count_cohort_alleles
    count_variant_alleles
    count_variant_genotypes
+   variant_stats
+   sample_stats
+
+Population genetic statistics
+-----------------------------
+
+.. autosummary::
+   :toctree: generated/
+
    divergence
    diversity
    Fst
    Garud_H
-   genee
-   genomic_relationship
-   gwas_linear_regression
-   hardy_weinberg_test
-   hybrid_inverse_relationship
-   hybrid_relationship
-   identity_by_state
    individual_heterozygosity
-   ld_matrix
-   ld_prune
-   maximal_independent_set
    observed_heterozygosity
-   pairwise_distance
    pbs
+   Tajimas_D
+
+Relatedness
+-----------
+
+.. autosummary::
+   :toctree: generated/
+
+   Weir_Goudet_beta
+   genomic_relationship
+   pc_relate
    pedigree_contribution
    pedigree_inbreeding
    pedigree_inverse_kinship
    pedigree_kinship
-   pc_relate
+   hybrid_inverse_relationship
+   hybrid_relationship
+   identity_by_state
+
+Linkage Disequilibrium
+----------------------
+
+.. autosummary::
+   :toctree: generated/
+
+   ld_matrix
+   ld_prune
+
+Genetic Association and Regression
+----------------------------------
+
+.. autosummary::
+   :toctree: generated/
+
+   gwas_linear_regression
    regenie
-   sample_stats
-   Tajimas_D
-   variant_stats
-   Weir_Goudet_beta
+   hardy_weinberg_test
+   genee
+
+Miscellaneous
+-------------
+
+.. autosummary::
+   :toctree: generated/
+
+   maximal_independent_set
+   pairwise_distance
 
 Utilities
 =========
