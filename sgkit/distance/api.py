@@ -21,10 +21,12 @@ def pairwise_distance(
 
     To illustrate the algorithm consider the following (4, 5) two dimensional array:
 
-    [e.00, e.01, e.02, e.03, e.04]
-    [e.10, e.11, e.12, e.13, e.14]
-    [e.20, e.21, e.22, e.23, e.24]
-    [e.30, e.31, e.32, e.33, e.34]
+    .. code-block:: none
+
+        [e.00, e.01, e.02, e.03, e.04]
+        [e.10, e.11, e.12, e.13, e.14]
+        [e.20, e.21, e.22, e.23, e.24]
+        [e.30, e.31, e.32, e.33, e.34]
 
     The rows of the above matrix are the set of vectors. Now let's label all
     the vectors as v0, v1, v2, v3.
@@ -34,10 +36,12 @@ def pairwise_distance(
     distance between each vector and every other vector, will result in 16
     distances and the resultant array will be of size (4, 4) as follows:
 
-    [v0.v0, v0.v1, v0.v2, v0.v3]
-    [v1.v0, v1.v1, v1.v2, v1.v3]
-    [v2.v0, v2.v1, v2.v2, v2.v3]
-    [v3.v0, v3.v1, v3.v2, v3.v3]
+    .. code-block:: none
+
+        [v0.v0, v0.v1, v0.v2, v0.v3]
+        [v1.v0, v1.v1, v1.v2, v1.v3]
+        [v2.v0, v2.v1, v2.v2, v2.v3]
+        [v3.v0, v3.v1, v3.v2, v3.v3]
 
     The (i, j) position in the resulting array (matrix) denotes the distance
     between vi and vj vectors.
