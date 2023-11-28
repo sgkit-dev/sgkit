@@ -731,20 +731,24 @@ document.write(`
 <dd><p>Calculates the pairwise distance between all pairs of row vectors in the
 given two dimensional array x.</p>
 <p>To illustrate the algorithm consider the following (4, 5) two dimensional array:</p>
-<p>[e.00, e.01, e.02, e.03, e.04]
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[e.00, e.01, e.02, e.03, e.04]
 [e.10, e.11, e.12, e.13, e.14]
 [e.20, e.21, e.22, e.23, e.24]
-[e.30, e.31, e.32, e.33, e.34]</p>
+[e.30, e.31, e.32, e.33, e.34]
+</pre></div>
+</div>
 <p>The rows of the above matrix are the set of vectors. Now let’s label all
 the vectors as v0, v1, v2, v3.</p>
 <p>The result will be a two dimensional symmetric matrix which will contain
 the distance between all pairs. Since there are 4 vectors, calculating the
 distance between each vector and every other vector, will result in 16
 distances and the resultant array will be of size (4, 4) as follows:</p>
-<p>[v0.v0, v0.v1, v0.v2, v0.v3]
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[v0.v0, v0.v1, v0.v2, v0.v3]
 [v1.v0, v1.v1, v1.v2, v1.v3]
 [v2.v0, v2.v1, v2.v2, v2.v3]
-[v3.v0, v3.v1, v3.v2, v3.v3]</p>
+[v3.v0, v3.v1, v3.v2, v3.v3]
+</pre></div>
+</div>
 <p>The (i, j) position in the resulting array (matrix) denotes the distance
 between vi and vj vectors.</p>
 <p>Negative and nan values are considered as missing values. They are ignored
