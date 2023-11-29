@@ -4,78 +4,311 @@ import xarray as xr
 
 import sgkit as sg
 from sgkit.accelerate import numba_jit
-from sgkit.stats.genedrop import _random_gamete_Hamilton_Kerr, simulate_genedrop
+from sgkit.stats.genedrop import simulate_genedrop
+from sgkit.stats.genedrop_numba_fns import _random_inheritance_Hamilton_Kerr
 from sgkit.stats.pedigree import _hamilton_kerr_inbreeding_founder
 from sgkit.tests.test_pedigree import load_hamilton_kerr_pedigree, random_parent_matrix
 
 
-@pytest.mark.parametrize("lambda_", [0.0, 0.1, 0.5])
-def test_random_gamete_Hamilton_Kerr__lambda(lambda_):
-    @numba_jit
-    def seed_numba(seed):
-        np.random.seed(seed)
+@numba_jit
+def seed_numba(seed):
+    np.random.seed(seed)
 
+
+def test_random_inheritance_Hamilton_Kerr():
+    seed_numba(1)
+    genotypes = np.array(
+        [
+            [0, 1, 2, 3],
+            [4, 5, 6, 7],
+            [-1, -1, -1, -1],
+        ]
+    )
+    parent = np.array(
+        [
+            [-1, -1],
+            [-1, -1],
+            [0, 1],
+        ]
+    )
+    tau = np.array(
+        [
+            [2, 2],
+            [2, 2],
+            [2, 2],
+        ],
+        dtype=np.uint64,
+    )
+    lambda_ = np.array(
+        [
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 0.25],
+        ]
+    )
+    marked = np.zeros(4, bool)
+    n_reps = 1_000_000
+    results = np.zeros((n_reps, 4), int)
+    for i in range(n_reps):
+        _random_inheritance_Hamilton_Kerr(genotypes, parent, tau, lambda_, marked, 2)
+        results[i] = genotypes[2]
+    # check for allelic bias in first parent
+    unique, counts = np.unique(results[:, 0], return_counts=True)
+    assert set(unique) == set(genotypes[0])  # all alleles present
+    np.testing.assert_allclose(1 / 4, counts / counts.sum(), atol=0.001)  # no bias
+    assert np.all(results[:, 0] != results[:, 1])  # no duplicates
+    # check for allelic bias in second parent (lambda > 0)
+    unique, counts = np.unique(results[:, 2], return_counts=True)
+    assert set(unique) == set(genotypes[1])  # all alleles present
+    np.testing.assert_allclose(1 / 4, counts / counts.sum(), atol=0.001)  # no bias
+    observed_lambda = np.mean(results[:, 2] == results[:, 3])
+    np.testing.assert_allclose(observed_lambda, 0.25, atol=0.001)  # lambda working
+
+
+@pytest.mark.parametrize(
+    "genotypes",
+    [
+        [
+            [0, 1, 2, 3],
+            [4, 5, -2, -2],  # padding after alleles
+            [-1, -1, -1, -1],
+        ],
+        [
+            [0, 1, 2, 3],
+            [-2, -2, 4, 5],  # padding before alleles
+            [-1, -1, -1, -1],
+        ],
+    ],
+)
+def test_random_inheritance_Hamilton_Kerr__mixed_ploidy(genotypes):
     seed_numba(0)
-    genotype = np.array([0, 1, 2, 3])
-    n_reps = 1000
-    homozygous = 0
-    for _ in range(n_reps):
-        gamete = _random_gamete_Hamilton_Kerr(genotype, 4, 2, lambda_)
-        if gamete[0] == gamete[1]:
-            homozygous += 1
-    if lambda_ == 0.0:
-        assert homozygous == 0
-    freq = homozygous / n_reps
-    assert round(lambda_, 1) == round(freq, 1)
+    genotypes = np.array(genotypes)
+    parent = np.array(
+        [
+            [-1, -1],
+            [-1, -1],
+            [0, 1],
+        ]
+    )
+    tau = np.array(
+        [
+            [2, 2],
+            [1, 1],
+            [2, 2],
+        ],
+        dtype=np.uint64,
+    )
+    lambda_ = np.array(
+        [
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 0.25],
+        ]
+    )
+    marked = np.zeros(4, bool)
+    marked = np.zeros(4, bool)
+    n_reps = 1_000_000
+    results = np.zeros((n_reps, 4), int)
+    for i in range(n_reps):
+        _random_inheritance_Hamilton_Kerr(genotypes, parent, tau, lambda_, marked, 2)
+        results[i] = genotypes[2]
+    # check for allelic bias in first parent
+    unique, counts = np.unique(results[:, 0], return_counts=True)
+    assert set(unique) == set(genotypes[0])  # all alleles present
+    np.testing.assert_allclose(1 / 4, counts / counts.sum(), atol=0.001)  # no bias
+    assert np.all(results[:, 0] != results[:, 1])  # no duplicates
+    # check for allelic bias in second parent (lambda > 0)
+    unique, counts = np.unique(results[:, 2], return_counts=True)
+    assert set(unique) == {4, 5}  # all alleles present
+    np.testing.assert_allclose(1 / 2, counts / counts.sum(), atol=0.001)  # no bias
+    observed_lambda = np.mean(results[:, 2] == results[:, 3])
+    np.testing.assert_allclose(observed_lambda, 0.25, atol=0.001)  # lambda working
 
 
-@pytest.mark.parametrize(
-    "genotype, ploidy, tau",
-    [
-        ([0, 1, 2], 4, 2),
-        ([0, 0, 1, 1, 1], 4, 2),
-        ([0, 1, 2, -2], 2, 1),
-        ([0, 1, -2, -2], 3, 1),
-    ],
-)
-def test_random_gamete_Hamilton_Kerr__raise_on_ploidy(genotype, ploidy, tau):
-    genotype = np.array(genotype)
+def test_random_inheritance_Hamilton_Kerr__padding():
+    seed_numba(0)
+    genotypes = np.array(
+        [
+            [0, 1, 2, 3],
+            [-1, -1, -1, -1],
+        ]
+    )
+    parent = np.array(
+        [
+            [-1, -1],
+            [-1, 0],  # half-clone
+        ]
+    )
+    tau = np.array(
+        [
+            [2, 2],
+            [0, 2],  # half-clone
+        ],
+        dtype=np.uint64,
+    )
+    lambda_ = np.array(
+        [
+            [0.0, 0.0],
+            [0.0, 0.0],
+        ]
+    )
+    marked = np.zeros(4, bool)
+    _random_inheritance_Hamilton_Kerr(genotypes, parent, tau, lambda_, marked, 1)
+    assert np.all(genotypes[1, 0:2] >= 0)
+    assert np.all(genotypes[1, 2:] == -2)  # correctly padded
+
+
+def test_random_inheritance_Hamilton_Kerr__raise_on_ploidy():
+    seed_numba(0)
+    genotypes = np.array(
+        [
+            [0, 1, 2, 3],
+            [4, -2, 6, -2],
+            [-1, -1, -1, -1],
+        ]
+    )
+    parent = np.array(
+        [
+            [-1, -1],
+            [-1, -1],
+            [0, 1],
+        ]
+    )
+    tau = np.array(
+        [
+            [2, 2],
+            [2, 2],
+            [2, 2],
+        ],
+        dtype=np.uint64,
+    )
+    lambda_ = np.array(
+        [
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 0.25],
+        ]
+    )
+    marked = np.zeros(4, bool)
     with pytest.raises(
-        ValueError, match="Genotype ploidy does not match number of alleles"
+        ValueError, match="Genotype ploidy does not match number of alleles."
     ):
-        _random_gamete_Hamilton_Kerr(genotype, ploidy, tau, 0.0)
+        _random_inheritance_Hamilton_Kerr(genotypes, parent, tau, lambda_, marked, 1)
 
 
-@pytest.mark.parametrize(
-    "genotype, ploidy, tau",
-    [
-        ([0, 1], 2, 3),
-        ([0, 1, -2, -2], 2, 3),
-    ],
-)
-def test_random_gamete_Hamilton_Kerr__raise_on_large_tau(genotype, ploidy, tau):
-    genotype = np.array(genotype)
+def test_random_inheritance_Hamilton_Kerr__raise_on_large_tau():
+    seed_numba(0)
+    genotypes = np.array(
+        [
+            [0, 1, 2, 3],
+            [4, 5, -2, -2],
+            [-1, -1, -1, -1],
+        ]
+    )
+    parent = np.array(
+        [
+            [-1, -1],
+            [-1, -1],
+            [0, 1],
+        ]
+    )
+    tau = np.array(
+        [
+            [2, 2],
+            [1, 1],  # diploid
+            [1, 3],
+        ],
+        dtype=np.uint64,
+    )
+    lambda_ = np.array(
+        [
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 0.0],
+        ]
+    )
+    marked = np.zeros(4, bool)
     with pytest.raises(
-        NotImplementedError, match="Gamete tau cannot exceed parental ploidy"
+        NotImplementedError, match="Gamete tau cannot exceed parental ploidy."
     ):
-        _random_gamete_Hamilton_Kerr(genotype, ploidy, tau, 0.0)
+        _random_inheritance_Hamilton_Kerr(genotypes, parent, tau, lambda_, marked, 2)
 
 
-@pytest.mark.parametrize(
-    "genotype, ploidy, tau, lambda_",
-    [
-        ([0, 1], 2, 1, 0.1),
-        ([0, 1, 1, 1], 4, 3, 0.1),
-    ],
-)
-def test_random_gamete_Hamilton_Kerr__raise_on_non_zero_lambda(
-    genotype, ploidy, tau, lambda_
-):
-    genotype = np.array(genotype)
+def test_random_inheritance_Hamilton_Kerr__raise_on_non_zero_lambda():
+    genotypes = np.array(
+        [
+            [0, 1, 2, 3, 4, 5],
+            [6, 7, 8, 9, 10, 11],
+            [-1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -2, -2],  # tetraploid
+        ]
+    )
+    parent = np.array(
+        [
+            [-1, -1],
+            [-1, -1],
+            [0, 1],
+            [0, 1],
+        ]
+    )
+    tau = np.array(
+        [
+            [3, 3],
+            [3, 3],
+            [3, 3],
+            [3, 1],  # tetraploid
+        ],
+        dtype=np.uint64,
+    )
+    lambda_ = np.array(
+        [
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 0.1],
+            [0.0, 0.1],
+        ]
+    )
+    marked = np.zeros(6, bool)
     with pytest.raises(
-        NotImplementedError, match="Non-zero lambda is only implemented for tau = 2"
+        NotImplementedError, match="Non-zero lambda is only implemented for tau = 2."
     ):
-        _random_gamete_Hamilton_Kerr(genotype, ploidy, tau, lambda_)
+        _random_inheritance_Hamilton_Kerr(genotypes, parent, tau, lambda_, marked, 2)
+    with pytest.raises(
+        NotImplementedError, match="Non-zero lambda is only implemented for tau = 2."
+    ):
+        _random_inheritance_Hamilton_Kerr(genotypes, parent, tau, lambda_, marked, 3)
+
+
+def test_random_inheritance_Hamilton_Kerr__on_raise_half_founder():
+    seed_numba(0)
+    genotypes = np.array(
+        [
+            [0, 1, 2, 3],
+            [4, 5, 6, 7],
+        ]
+    )
+    parent = np.array(
+        [
+            [-1, -1],
+            [-1, 0],  # half-founder
+        ]
+    )
+    tau = np.array(
+        [
+            [2, 2],
+            [2, 2],
+        ],
+        dtype=np.uint64,
+    )
+    lambda_ = np.array(
+        [
+            [0.0, 0.0],
+            [0.0, 0.0],
+        ]
+    )
+    marked = np.zeros(4, bool)
+    with pytest.raises(ValueError, match="Pedigree contains half-founders."):
+        _random_inheritance_Hamilton_Kerr(genotypes, parent, tau, lambda_, marked, 1)
 
 
 @pytest.mark.parametrize("permute", [False, True])
