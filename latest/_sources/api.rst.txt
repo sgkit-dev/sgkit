@@ -162,6 +162,7 @@ Miscellaneous
    maximal_independent_set
    pairwise_distance
 
+
 Utilities
 =========
 
@@ -179,6 +180,7 @@ Utilities
    invert_relationship_matrix
    parent_indices
    pedigree_sel
+   simulate_genedrop
    simulate_genotype_call_dataset
    window_by_genome
    window_by_interval

@@ -578,6 +578,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.invert_relationship_matrix.html">sgkit.invert_relationship_matrix</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.parent_indices.html">sgkit.parent_indices</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.pedigree_sel.html">sgkit.pedigree_sel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sgkit.simulate_genedrop.html">sgkit.simulate_genedrop</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html">sgkit.simulate_genotype_call_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.window_by_genome.html">sgkit.window_by_genome</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.window_by_interval.html">sgkit.window_by_interval</a></li>
@@ -1076,19 +1077,22 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.pedigree_sel.html#sgkit.pedigree_sel" title="sgkit.pedigree_sel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pedigree_sel</span></code></a>(ds, *, samples[, ...])</p></td>
 <td><p>Return a new dataset with each array indexed along the 'samples' dimension using a subset of samples and the optional inclusion of their relatives.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset" title="sgkit.simulate_genotype_call_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_genotype_call_dataset</span></code></a>(n_variant, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.simulate_genedrop.html#sgkit.simulate_genedrop" title="sgkit.simulate_genedrop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_genedrop</span></code></a>(ds, *[, method, ...])</p></td>
+<td><p>Generate progeny genotypes via a gene-drop simulation (MacCluer et al. 1986 [1]).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset" title="sgkit.simulate_genotype_call_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_genotype_call_dataset</span></code></a>(n_variant, ...)</p></td>
 <td><p>Simulate genotype calls and variant/sample data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.window_by_genome.html#sgkit.window_by_genome" title="sgkit.window_by_genome"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_genome</span></code></a>(ds, *[, merge])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.window_by_genome.html#sgkit.window_by_genome" title="sgkit.window_by_genome"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_genome</span></code></a>(ds, *[, merge])</p></td>
 <td><p>Add a window spanning the whole genome to a dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.window_by_interval.html#sgkit.window_by_interval" title="sgkit.window_by_interval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_interval</span></code></a>(ds, *[, variant_contig, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.window_by_interval.html#sgkit.window_by_interval" title="sgkit.window_by_interval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_interval</span></code></a>(ds, *[, variant_contig, ...])</p></td>
 <td><p>Add window information to a dataset, using arbitrary intervals.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_position</span></code></a>(ds, *, size[, step, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_position</span></code></a>(ds, *, size[, step, ...])</p></td>
 <td><p>Add window information to a dataset, measured by distance along the genome.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_variant</span></code></a>(ds, *, size[, step, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window_by_variant</span></code></a>(ds, *, size[, step, ...])</p></td>
 <td><p>Add window information to a dataset, measured by number of variants.</p></td>
 </tr>
 </tbody>
