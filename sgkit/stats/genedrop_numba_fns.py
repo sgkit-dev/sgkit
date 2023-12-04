@@ -5,6 +5,11 @@ from sgkit.typing import ArrayLike
 
 from .pedigree import _compress_hamilton_kerr_parameters, topological_argsort
 
+# NOTE: The use of `np.random.seed()` within numba compiled functions should not
+# affect numpy RNG. The numba implementation is thread safe (since version 0.28.0)
+# and each thread/process will produce an independent stream of random numbers.
+# See https://numba.pydata.org/numba-doc/dev/reference/numpysupported.html#random.
+
 
 @numba_guvectorize(  # type: ignore
     [
