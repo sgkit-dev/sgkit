@@ -387,5 +387,5 @@ on a ``Dataset`` should work regardless of the underlying array backend.
 
 See `Parallel computing with Dask in Xarray <http://xarray.pydata.org/en/stable/dask.html#parallel-computing-with-dask>`_
 for more examples and information, as well as the Dask tutorials on
-`delayed array execution <https://tutorial.dask.org/03_array.html#dask.array-contains-these-algorithms>`_ and
-`lazy execution in Dask graphs <https://tutorial.dask.org/01x_lazy.html>`_.
+`delayed array execution <https://tutorial.dask.org/02_array.html#Blocked-Algorithms-in-a-nutshell>`_ and
+`lazy execution in Dask graphs <https://tutorial.dask.org/01_dataframe.html#Lazy-Evaluation>`_.
