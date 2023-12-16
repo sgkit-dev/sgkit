@@ -16,6 +16,7 @@ import os
 import sys
 from pathlib import Path
 
+from datetime import datetime
 import dask.dataframe
 import xarray
 from sphinx.util import logging
@@ -33,7 +34,7 @@ import sgkit  # noqa: F401 isort:skip
 # -- Project information -----------------------------------------------------
 
 project = "sgkit"
-copyright = "2020, sgkit developers"
+copyright = "{}, sgkit developers".format(datetime.utcnow().year)
 author = "sgkit developers"
 
 
