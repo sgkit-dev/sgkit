@@ -750,7 +750,7 @@ minor allele frequency or anything else that is not identical for all variants.<
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing genotype dosages. Must already be windowed with <a class="reference internal" href="sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_position()</span></code></a> or <a class="reference internal" href="sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_variant()</span></code></a>.</p>
+<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.12.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing genotype dosages. Must already be windowed with <a class="reference internal" href="sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_position()</span></code></a> or <a class="reference internal" href="sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_variant()</span></code></a>.</p>
 </dd>
 <dt><strong>dosage</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_dosage'</span></code>)</span></dt></dt><dd><p>Name of genetic dosage variable.
 Defined by <a class="reference internal" href="sgkit.variables.call_dosage_spec.html#sgkit.variables.call_dosage_spec" title="sgkit.variables.call_dosage_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_dosage_spec</span></code></a>.</p>
@@ -766,7 +766,7 @@ Defined by <a class="reference internal" href="sgkit.variables.variant_score_spe
 </dl>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.12.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A dataset where the variants in linkage disequilibrium have been removed.</p>
@@ -779,7 +779,7 @@ Defined by <a class="reference internal" href="sgkit.variables.variant_score_spe
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;variants&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;variants&quot;</span><span class="p">]</span>
 <span class="go">10</span>
 </pre></div>
 </div>
@@ -792,7 +792,7 @@ Defined by <a class="reference internal" href="sgkit.variables.variant_score_spe
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pruned_ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">ld_prune</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pruned_ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;variants&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pruned_ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;variants&quot;</span><span class="p">]</span>
 <span class="go">6</span>
 </pre></div>
 </div>

@@ -619,7 +619,7 @@ for small input files, or where the cost of conversion is small. The <code class
 are more appropriate for large datasets, since the expensive conversion step need only be
 paid once.</p>
 <p>After converting a file to Zarr format, it can be loaded with sgkit’s <a class="reference internal" href="generated/sgkit.load_dataset.html#sgkit.load_dataset" title="sgkit.load_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.load_dataset()</span></code></a>.
-This is like Xarray’s <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.open_zarr.html#xarray.open_zarr" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">xarray.open_zarr()</span></code></a> function, with some useful defaults applied for you.</p>
+This is like Xarray’s <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.open_zarr.html#xarray.open_zarr" title="(in xarray v2023.12.1.dev0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">xarray.open_zarr()</span></code></a> function, with some useful defaults applied for you.</p>
 <p>Similarly, the function <a class="reference internal" href="generated/sgkit.save_dataset.html#sgkit.save_dataset" title="sgkit.save_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.save_dataset()</span></code></a> can be used to save the dataset in Zarr format.
 This can be used to save a newly-loaded dataset, or a dataset with new variables that are the
 result of running genetic methods on the data, so it can be loaded again later.</p>
@@ -629,15 +629,15 @@ which makes opening the dataset faster.</p>
 <section id="bgen">
 <h3><a class="toc-backref" href="#id8">BGEN</a><a class="headerlink" href="#bgen" title="Permalink to this headline">#</a></h3>
 <p>The <a class="reference internal" href="generated/sgkit.io.bgen.read_bgen.html#sgkit.io.bgen.read_bgen" title="sgkit.io.bgen.read_bgen"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.bgen.read_bgen()</span></code></a> function loads a single BGEN dataset as Dask
-arrays within an <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a> from a <code class="docutils literal notranslate"><span class="pre">bgen</span></code> file.</p>
+arrays within an <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.12.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a> from a <code class="docutils literal notranslate"><span class="pre">bgen</span></code> file.</p>
 <p>The <a class="reference internal" href="generated/sgkit.io.bgen.bgen_to_zarr.html#sgkit.io.bgen.bgen_to_zarr" title="sgkit.io.bgen.bgen_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.bgen.bgen_to_zarr()</span></code></a> function converts a <code class="docutils literal notranslate"><span class="pre">bgen</span></code> file to Zarr
 files stored in sgkit’s Xarray data representation, which can then be opened
-as a <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
+as a <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.12.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
 </section>
 <section id="plink">
 <h3><a class="toc-backref" href="#id9">PLINK</a><a class="headerlink" href="#plink" title="Permalink to this headline">#</a></h3>
 <p>The <a class="reference internal" href="generated/sgkit.io.plink.read_plink.html#sgkit.io.plink.read_plink" title="sgkit.io.plink.read_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.read_plink()</span></code></a> function loads a single PLINK dataset as Dask
-arrays within an <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a> from <code class="docutils literal notranslate"><span class="pre">bed</span></code>, <code class="docutils literal notranslate"><span class="pre">bim</span></code>, and <code class="docutils literal notranslate"><span class="pre">fam</span></code> files.</p>
+arrays within an <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.12.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a> from <code class="docutils literal notranslate"><span class="pre">bed</span></code>, <code class="docutils literal notranslate"><span class="pre">bim</span></code>, and <code class="docutils literal notranslate"><span class="pre">fam</span></code> files.</p>
 <p>The <a class="reference internal" href="generated/sgkit.io.plink.write_plink.html#sgkit.io.plink.write_plink" title="sgkit.io.plink.write_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.write_plink()</span></code></a> and <a class="reference internal" href="generated/sgkit.io.plink.zarr_to_plink.html#sgkit.io.plink.zarr_to_plink" title="sgkit.io.plink.zarr_to_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.zarr_to_plink()</span></code></a>
 functions convert sgkit’s Xarray data representation to PLINK.</p>
 </section>
@@ -645,7 +645,7 @@ functions convert sgkit’s Xarray data representation to PLINK.</p>
 <h3><a class="toc-backref" href="#id10">VCF</a><a class="headerlink" href="#vcf" title="Permalink to this headline">#</a></h3>
 <p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function converts one or more VCF files to
 Zarr files stored in sgkit’s Xarray data representation, which can then be opened
-as a <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
+as a <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.12.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
 <p>The <a class="reference internal" href="generated/sgkit.io.vcf.write_vcf.html#sgkit.io.vcf.write_vcf" title="sgkit.io.vcf.write_vcf"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.write_vcf()</span></code></a> and <a class="reference internal" href="generated/sgkit.io.vcf.zarr_to_vcf.html#sgkit.io.vcf.zarr_to_vcf" title="sgkit.io.vcf.zarr_to_vcf"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.zarr_to_vcf()</span></code></a> functions
 convert sgkit’s Xarray data representation to VCF.</p>
 <p>See <a class="reference internal" href="vcf.html#vcf"><span class="std std-ref">Reading VCF</span></a> for installation instructions, and details on using VCF in sgkit.</p>
@@ -1063,8 +1063,8 @@ value to the dask <code class="docutils literal notranslate"><span class="pre">C
 <span class="gp">   ....: </span>    <span class="n">ac</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 <span class="gp">   ....: </span>
 
-<span class="go">[                                        ] | 0% Completed | 176.22 us</span>
-<span class="go">[########################################] | 100% Completed | 100.39 ms</span>
+<span class="go">[                                        ] | 0% Completed | 473.88 us</span>
+<span class="go">[########################################] | 100% Completed | 100.72 ms</span>
 
 <span class="gp">In [39]: </span><span class="n">ac</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 <span class="gh">Out[39]: </span>

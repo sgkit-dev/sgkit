@@ -751,7 +751,7 @@ improve the accuracy of estimated breeding values with low-density markers.</p><
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing call genotype dosages.</p>
+<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.12.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing call genotype dosages.</p>
 </dd>
 <dt><strong>call_dosage</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'call_dosage'</span></code>)</span></dt></dt><dd><p>Input variable name holding call_dosage as defined by
 <a class="reference internal" href="sgkit.variables.call_dosage_spec.html#sgkit.variables.call_dosage_spec" title="sgkit.variables.call_dosage_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_dosage_spec</span></code></a>.</p>
@@ -782,7 +782,7 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
 </dl>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.12.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.stat_genomic_relationship_spec.html#sgkit.variables.stat_genomic_relationship_spec" title="sgkit.variables.stat_genomic_relationship_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.stat_genomic_relationship_spec</span></code></a>
@@ -824,7 +824,7 @@ match those found using the default settings in rrBLUP [5].</p>
 <span class="go">           [1, 0, 0],</span>
 <span class="go">           [1, 1, 2]], dtype=uint8)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># use sample population frequency as ancestral frequency</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_frequency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">call_dosage</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;ploidy&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_frequency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">call_dosage</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;ploidy&quot;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">genomic_relationship</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">ancestral_frequency</span><span class="o">=</span><span class="s2">&quot;sample_frequency&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">stat_genomic_relationship</span><span class="o">.</span><span class="n">values</span> 
 <span class="go">    array([[ 0.93617021, -0.21276596, -0.72340426],</span>
@@ -856,7 +856,7 @@ match those found using the default settings in rrBLUP [5].</p>
 <span class="go">       [ 2.,  2.,  0.,  0.]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_frequency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">call_dosage</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">True</span>
-<span class="gp">... </span><span class="p">)</span> <span class="o">/</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;ploidy&quot;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span> <span class="o">/</span> <span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;ploidy&quot;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">genomic_relationship</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">ds</span><span class="p">,</span> <span class="n">ancestral_frequency</span><span class="o">=</span><span class="s2">&quot;sample_frequency&quot;</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">True</span>
 <span class="gp">... </span><span class="p">)</span>
@@ -897,7 +897,7 @@ match those found using the default settings in rrBLUP [5].</p>
 <span class="go">       [2.        , 2.        , 0.        , 0.        ]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_frequency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">call_dosage</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">True</span>
-<span class="gp">... </span><span class="p">)</span> <span class="o">/</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;ploidy&quot;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span> <span class="o">/</span> <span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;ploidy&quot;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">genomic_relationship</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">ds</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">call_dosage</span><span class="o">=</span><span class="s2">&quot;call_dosage_imputed&quot;</span><span class="p">,</span>

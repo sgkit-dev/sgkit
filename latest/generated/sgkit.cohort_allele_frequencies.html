@@ -743,7 +743,7 @@ document.write(`
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing genotype calls.</p>
+<dt><strong>ds</strong> <span class="classifier"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.12.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></span></dt></dt><dd><p>Dataset containing genotype calls.</p>
 </dd>
 <dt><strong>cohort_allele_count</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Hashable" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a> (default: <code class="docutils literal notranslate"><span class="pre">'cohort_allele_count'</span></code>)</span></dt></dt><dd><p>Input variable name holding cohort_allele_count as defined by
 <a class="reference internal" href="sgkit.variables.cohort_allele_count_spec.html#sgkit.variables.cohort_allele_count_spec" title="sgkit.variables.cohort_allele_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.cohort_allele_count_spec</span></code></a>.
@@ -758,7 +758,7 @@ See <a class="reference internal" href="../user_guide.html#dataset-merge"><span 
 </dl>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.11.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2023.12.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A dataset containing <a class="reference internal" href="sgkit.variables.cohort_allele_frequency_spec.html#sgkit.variables.cohort_allele_frequency_spec" title="sgkit.variables.cohort_allele_frequency_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.cohort_allele_frequency_spec</span></code></a>
@@ -774,7 +774,7 @@ corresponding to the frequency of non-missing occurrences of each allele.</p>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Divide samples into two cohorts</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_cohort&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sample_cohort&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;samples&quot;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">display_genotypes</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span> 
 <span class="go">samples    S0   S1   S2   S3</span>
 <span class="go">variants</span>
