@@ -69,7 +69,7 @@ def diversity(
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
 
     >>> # Divide samples into two cohorts
-    >>> sample_cohort = np.repeat([0, 1], ds.dims["samples"] // 2)
+    >>> sample_cohort = np.repeat([0, 1], ds.sizes["samples"] // 2)
     >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
 
     >>> sg.diversity(ds)["stat_diversity"].values # doctest: +NORMALIZE_WHITESPACE
@@ -180,7 +180,7 @@ def divergence(
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
 
     >>> # Divide samples into two cohorts
-    >>> sample_cohort = np.repeat([0, 1], ds.dims["samples"] // 2)
+    >>> sample_cohort = np.repeat([0, 1], ds.sizes["samples"] // 2)
     >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
 
     >>> sg.divergence(ds)["stat_divergence"].values # doctest: +NORMALIZE_WHITESPACE
@@ -216,8 +216,8 @@ def divergence(
     variables.validate(ds, {cohort_allele_count: variables.cohort_allele_count_spec})
     ac = ds[cohort_allele_count]
 
-    n_variants = ds.dims["variants"]
-    n_cohorts = ds.dims["cohorts"]
+    n_variants = ds.sizes["variants"]
+    n_cohorts = ds.sizes["cohorts"]
     ac = da.asarray(ac)
     shape = (ac.chunks[0], n_cohorts, n_cohorts)  # type: ignore[index]
     d = da.map_blocks(_divergence, ac, chunks=shape, dtype=np.float64)
@@ -308,7 +308,7 @@ def Fst(
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
 
     >>> # Divide samples into two cohorts
-    >>> sample_cohort = np.repeat([0, 1], ds.dims["samples"] // 2)
+    >>> sample_cohort = np.repeat([0, 1], ds.sizes["samples"] // 2)
     >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
 
     >>> sg.Fst(ds)["stat_Fst"].values # doctest: +NORMALIZE_WHITESPACE
@@ -349,7 +349,7 @@ def Fst(
     )
     variables.validate(ds, {stat_divergence: variables.stat_divergence_spec})
 
-    n_cohorts = ds.dims["cohorts"]
+    n_cohorts = ds.sizes["cohorts"]
     gs = da.asarray(ds.stat_divergence)
     shape = (gs.chunks[0], n_cohorts, n_cohorts)
     fst = da.map_blocks(known_estimators[estimator], gs, chunks=shape, dtype=np.float64)
@@ -413,7 +413,7 @@ def Tajimas_D(
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
 
     >>> # Divide samples into two cohorts
-    >>> sample_cohort = np.repeat([0, 1], ds.dims["samples"] // 2)
+    >>> sample_cohort = np.repeat([0, 1], ds.sizes["samples"] // 2)
     >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
 
     >>> sg.Tajimas_D(ds)["stat_Tajimas_D"].values # doctest: +NORMALIZE_WHITESPACE
@@ -565,7 +565,7 @@ def pbs(
 
     >>> # Divide samples into three named cohorts
     >>> n_cohorts = 3
-    >>> sample_cohort = np.repeat(range(n_cohorts), ds.dims["samples"] // n_cohorts)
+    >>> sample_cohort = np.repeat(range(n_cohorts), ds.sizes["samples"] // n_cohorts)
     >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
     >>> cohort_names = [f"co_{i}" for i in range(n_cohorts)]
     >>> ds = ds.assign_coords({"cohorts_0": cohort_names, "cohorts_1": cohort_names, "cohorts_2": cohort_names})
@@ -584,8 +584,8 @@ def pbs(
     fst = fst.clip(min=0, max=(1 - np.finfo(float).epsneg))
 
     t = -np.log(1 - fst)
-    n_cohorts = ds.dims["cohorts"]
-    n_windows = ds.dims["windows"]
+    n_cohorts = ds.sizes["cohorts"]
+    n_windows = ds.sizes["windows"]
     assert_array_shape(t, n_windows, n_cohorts, n_cohorts)
 
     # calculate PBS triples
@@ -719,7 +719,7 @@ def Garud_H(
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
 
     >>> # Divide samples into two cohorts
-    >>> sample_cohort = np.repeat([0, 1], ds.dims["samples"] // 2)
+    >>> sample_cohort = np.repeat([0, 1], ds.sizes["samples"] // 2)
     >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
 
     >>> # Divide into windows of size three (variants)
@@ -740,7 +740,7 @@ def Garud_H(
         [0.33333333, 0.33333333]])
     """
 
-    if ds.dims["ploidy"] != 2:
+    if ds.sizes["ploidy"] != 2:
         raise NotImplementedError("Garud H only implemented for diploid genotypes")
 
     if not has_windows(ds):
@@ -843,7 +843,7 @@ def observed_heterozygosity(
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
 
     >>> # Divide samples into two cohorts
-    >>> sample_cohort = np.repeat([0, 1], ds.dims["samples"] // 2)
+    >>> sample_cohort = np.repeat([0, 1], ds.sizes["samples"] // 2)
     >>> ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
 
     >>> sg.observed_heterozygosity(ds)["stat_observed_heterozygosity"].values # doctest: +NORMALIZE_WHITESPACE

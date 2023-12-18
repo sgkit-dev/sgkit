@@ -210,7 +210,7 @@ def gwas_linear_regression(
 
     if len(covariates) == 0:
         if add_intercept:
-            X = da.ones((ds.dims["samples"], 1), dtype=np.float32)
+            X = da.ones((ds.sizes["samples"], 1), dtype=np.float32)
         else:
             raise ValueError("add_intercept must be True if no covariates specified")
     else:

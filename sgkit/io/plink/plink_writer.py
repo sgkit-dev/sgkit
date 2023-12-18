@@ -90,9 +90,9 @@ def write_plink(
         raise ValueError(
             "Either `path` or all 3 of `{bed,bim,fam}_path` must be specified but not both"
         )
-    if "ploidy" in ds.dims and ds.dims["ploidy"] != 2:
+    if "ploidy" in ds.sizes and ds.sizes["ploidy"] != 2:
         raise ValueError("write_plink only works for diploid genotypes")
-    if "alleles" in ds.dims and ds.dims["alleles"] != 2:
+    if "alleles" in ds.sizes and ds.sizes["alleles"] != 2:
         raise ValueError("write_plink only works for biallelic genotypes")
 
     if path:

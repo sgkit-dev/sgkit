@@ -486,8 +486,8 @@ def rechunk_bgen(
     if isinstance(output, Path):
         output = str(output)
 
-    chunk_length = min(chunk_length, ds.dims["variants"])
-    chunk_width = min(chunk_width, ds.dims["samples"])
+    chunk_length = min(chunk_length, ds.sizes["variants"])
+    chunk_width = min(chunk_width, ds.sizes["samples"])
 
     if pack:
         ds = pack_variables(ds)

@@ -176,7 +176,7 @@ def genomic_relationship(
                [1, 0, 0],
                [1, 1, 2]], dtype=uint8)
     >>> # use sample population frequency as ancestral frequency
-    >>> ds["sample_frequency"] = ds.call_dosage.mean(dim="samples") / ds.dims["ploidy"]
+    >>> ds["sample_frequency"] = ds.call_dosage.mean(dim="samples") / ds.sizes["ploidy"]
     >>> ds = sg.genomic_relationship(ds, ancestral_frequency="sample_frequency")
     >>> ds.stat_genomic_relationship.values # doctest: +NORMALIZE_WHITESPACE
         array([[ 0.93617021, -0.21276596, -0.72340426],
@@ -208,7 +208,7 @@ def genomic_relationship(
            [ 2.,  2.,  0.,  0.]])
     >>> ds["sample_frequency"] = ds.call_dosage.mean(
     ...     dim="samples", skipna=True
-    ... ) / ds.dims["ploidy"]
+    ... ) / ds.sizes["ploidy"]
     >>> ds = sg.genomic_relationship(
     ...     ds, ancestral_frequency="sample_frequency", skipna=True
     ... )
@@ -249,7 +249,7 @@ def genomic_relationship(
            [2.        , 2.        , 0.        , 0.        ]])
     >>> ds["sample_frequency"] = ds.call_dosage.mean(
     ...     dim="samples", skipna=True
-    ... ) / ds.dims["ploidy"]
+    ... ) / ds.sizes["ploidy"]
     >>> ds = sg.genomic_relationship(
     ...     ds,
     ...     call_dosage="call_dosage_imputed",
@@ -293,7 +293,7 @@ def genomic_relationship(
 
     estimator = estimator or EST_VAN_RADEN
     # TODO: raise on mixed ploidy
-    ploidy = ploidy or ds.dims.get("ploidy")
+    ploidy = ploidy or ds.sizes.get("ploidy")
     if ploidy is None:
         raise ValueError("Ploidy must be specified when the ploidy dimension is absent")
     dosage = da.array(ds[call_dosage].data)

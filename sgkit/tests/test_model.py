@@ -37,10 +37,10 @@ def test_create_genotype_call_dataset():
         variant_id=variant_id,
     )
 
-    assert DIM_VARIANT in ds.dims
-    assert DIM_SAMPLE in ds.dims
-    assert DIM_PLOIDY in ds.dims
-    assert DIM_ALLELE in ds.dims
+    assert DIM_VARIANT in ds.sizes
+    assert DIM_SAMPLE in ds.sizes
+    assert DIM_PLOIDY in ds.sizes
+    assert DIM_ALLELE in ds.sizes
 
     assert ds.attrs["source"] == f"sgkit-{__version__}"
     assert_array_equal(ds["contig_id"], variant_contig_names)
@@ -91,8 +91,8 @@ def test_create_genotype_dosage_dataset():
         variant_id=variant_id,
     )
 
-    assert DIM_VARIANT in ds.dims
-    assert DIM_SAMPLE in ds.dims
+    assert DIM_VARIANT in ds.sizes
+    assert DIM_SAMPLE in ds.sizes
 
     assert_array_equal(ds["contig_id"], variant_contig_names)
     assert_array_equal(ds["variant_contig"], variant_contig)
