@@ -163,4 +163,4 @@ def _col_shape_sum(ds: Dataset) -> int:
 
 
 def _rename_dim(ds: Dataset, prefix: str, name: str) -> Dataset:
-    return ds.rename_dims({d: name for d in ds.dims if str(d).startswith(prefix)})
+    return ds.rename_dims({d: name for d in ds.sizes if str(d).startswith(prefix)})

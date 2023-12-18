@@ -42,7 +42,7 @@ def simulate_dataset(
     ds = simulate_genotype_call_dataset(n_variant, n_sample, seed=0)
     if n_cohort:
         ac = simulate_cohort_genotypes(
-            ds.dims["variants"], ds.dims["samples"], n_cohort
+            ds.sizes["variants"], ds.sizes["samples"], n_cohort
         )
         ds["call_alternate_allele_count"] = xr.DataArray(
             ac, dims=("variants", "samples")

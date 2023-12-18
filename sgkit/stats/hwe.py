@@ -201,7 +201,7 @@ def hardy_weinberg_test(
         “A Note on Exact Tests of Hardy-Weinberg Equilibrium.” American Journal of
         Human Genetics 76 (5): 887–93.
     """
-    ploidy = ploidy or ds.dims.get("ploidy")
+    ploidy = ploidy or ds.sizes.get("ploidy")
     if not ploidy:
         raise ValueError(
             "`ploidy` parameter must be set when not present as dataset dimension."
@@ -209,7 +209,7 @@ def hardy_weinberg_test(
     if ploidy != 2:
         raise NotImplementedError("HWE test only implemented for diploid genotypes")
 
-    alleles = alleles or ds.dims.get("alleles")
+    alleles = alleles or ds.sizes.get("alleles")
     if not alleles:
         raise ValueError(
             "`alleles` parameter must be set when not present as dataset dimension."

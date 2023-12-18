@@ -304,7 +304,7 @@ def test_count_cohort_alleles__chunked(chunks):
     rs = np.random.RandomState(0)
     calls = rs.randint(0, 1, size=(50, 10, 2))
     ds = get_dataset(calls)
-    sample_cohort = np.repeat([0, 1], ds.dims["samples"] // 2)
+    sample_cohort = np.repeat([0, 1], ds.sizes["samples"] // 2)
     ds["sample_cohort"] = xr.DataArray(sample_cohort, dims="samples")
     ac1 = count_cohort_alleles(ds)
     ds["call_genotype"] = ds["call_genotype"].chunk(chunks=chunks)

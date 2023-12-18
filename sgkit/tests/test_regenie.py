@@ -239,7 +239,7 @@ def check_stage_3_results(
         join="outer",
     )
     assert df.notnull().all().all()
-    assert len(df) == ds.dims["variants"] * df_trait.shape[1]
+    assert len(df) == ds.sizes["variants"] * df_trait.shape[1]
     np.testing.assert_allclose(df["beta_sgkit"], df["beta_glow"], atol=1e-14)
     np.testing.assert_allclose(df["p_value_sgkit"], df["p_value_glow"], atol=1e-14)
 
@@ -349,14 +349,14 @@ def test_regenie__32bit_float(ds):
 
 def test_regenie__custom_variant_block_size(ds):
     vbs = (50, 25, 25)
-    assert sum(vbs) == ds.dims["variants"]
+    assert sum(vbs) == ds.sizes["variants"]
     res = regenie_sim(ds=ds, variant_block_size=vbs)
     assert res["regenie_base_prediction"].sizes["blocks"] == 3
 
 
 def test_regenie__raise_on_bad_variant_block_size(ds):
     vbs = {50, 30, 20}  # Unordered collections not valid
-    assert sum(vbs) == ds.dims["variants"]
+    assert sum(vbs) == ds.sizes["variants"]
     with pytest.raises(
         ValueError, match="Variant block size type .* must be tuple or int"
     ):
@@ -380,7 +380,7 @@ def test_regenie__raise_on_unequal_samples():
 def test_regenie__block_size_1(ds):
     # Choose block sizes so that one variant and sample block contains
     # only one element to ensure that no unwanted squeezing occurs
-    vbs, sbs = ds.dims["variants"] - 1, ds.dims["samples"] - 1
+    vbs, sbs = ds.sizes["variants"] - 1, ds.sizes["samples"] - 1
     res = regenie_sim(ds=ds, variant_block_size=vbs, sample_block_size=sbs)
     assert res["regenie_base_prediction"].sizes["blocks"] == 2
 

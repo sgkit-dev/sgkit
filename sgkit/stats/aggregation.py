@@ -75,7 +75,7 @@ def count_call_alleles(
     from .aggregation_numba_fns import count_alleles
 
     variables.validate(ds, {call_genotype: variables.call_genotype_spec})
-    n_alleles = ds.dims["alleles"]
+    n_alleles = ds.sizes["alleles"]
     G = da.asarray(ds[call_genotype])
     shape = (G.chunks[0], G.chunks[1], n_alleles)
     # use numpy array to avoid dask task dependencies between chunks
@@ -170,8 +170,8 @@ def count_variant_alleles(
         from .aggregation_numba_fns import count_alleles
 
         variables.validate(ds, {call_genotype: variables.call_genotype_spec})
-        n_alleles = ds.dims["alleles"]
-        n_variant = ds.dims["variants"]
+        n_alleles = ds.sizes["alleles"]
+        n_variant = ds.sizes["variants"]
         G = da.asarray(ds[call_genotype]).reshape((n_variant, -1))
         shape = (G.chunks[0], n_alleles)
         # use uint64 dummy array to return uin64 counts array
@@ -227,7 +227,7 @@ def count_cohort_alleles(
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
 
     >>> # Divide samples into two cohorts
-    >>> ds["sample_cohort"] = xr.DataArray(np.repeat([0, 1], ds.dims["samples"] // 2), dims="samples")
+    >>> ds["sample_cohort"] = xr.DataArray(np.repeat([0, 1], ds.sizes["samples"] // 2), dims="samples")
     >>> sg.display_genotypes(ds) # doctest: +NORMALIZE_WHITESPACE
     samples    S0   S1   S2   S3
     variants
@@ -364,8 +364,8 @@ def count_variant_genotypes(
     mixed_ploidy = ds[call_genotype].attrs.get("mixed_ploidy", False)
     if mixed_ploidy:
         raise ValueError("Mixed-ploidy dataset")
-    ploidy = ds.dims["ploidy"]
-    n_alleles = ds.dims["alleles"]
+    ploidy = ds.sizes["ploidy"]
+    n_alleles = ds.sizes["alleles"]
     n_genotypes = _comb_with_replacement(n_alleles, ploidy)
     G = da.asarray(ds[call_genotype].data)
     N = np.empty(n_genotypes, np.uint64)
@@ -432,8 +432,8 @@ def genotype_coords(
     """
     from .conversion_numba_fns import _comb_with_replacement, _index_as_genotype
 
-    n_alleles = ds.dims["alleles"]
-    ploidy = ds.dims["ploidy"]
+    n_alleles = ds.sizes["alleles"]
+    ploidy = ds.sizes["ploidy"]
     n_genotypes = _comb_with_replacement(n_alleles, ploidy)
     max_chars = len(str(n_alleles - 1))
     # dummy variable for ploidy dim also specifies output dtype
@@ -553,7 +553,7 @@ def cohort_allele_frequencies(
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=5, n_sample=4)
 
     >>> # Divide samples into two cohorts
-    >>> ds["sample_cohort"] = xr.DataArray(np.repeat([0, 1], ds.dims["samples"] // 2), dims="samples")
+    >>> ds["sample_cohort"] = xr.DataArray(np.repeat([0, 1], ds.sizes["samples"] // 2), dims="samples")
     >>> sg.display_genotypes(ds) # doctest: +NORMALIZE_WHITESPACE
     samples    S0   S1   S2   S3
     variants

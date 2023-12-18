@@ -147,7 +147,7 @@ def write_vcf(
 
         print(vcf_header, end="", file=output)
 
-        if input.dims["variants"] == 0:
+        if input.sizes["variants"] == 0:
             return
 
         header_info_fields = _info_fields(vcf_header)
@@ -174,8 +174,8 @@ def dataset_chunk_to_vcf(
 
     ds = ds.load()  # load dataset chunk into memory
 
-    n_variants = ds.dims["variants"]  # number of variants in this chunk
-    n_samples = ds.dims["samples"]  # number of samples in whole dataset
+    n_variants = ds.sizes["variants"]  # number of variants in this chunk
+    n_samples = ds.sizes["samples"]  # number of samples in whole dataset
 
     # fixed fields
 

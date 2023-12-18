@@ -456,7 +456,7 @@ def ld_prune(
     >>> import numpy as np
     >>> import sgkit as sg
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=10, n_sample=4)
-    >>> ds.dims["variants"]
+    >>> ds.sizes["variants"]
     10
 
     >>> # Calculate dosage
@@ -466,7 +466,7 @@ def ld_prune(
     >>> ds = sg.window_by_variant(ds, size=5)
 
     >>> pruned_ds = sg.ld_prune(ds)
-    >>> pruned_ds.dims["variants"]
+    >>> pruned_ds.sizes["variants"]
     6
     """
     ldm = ld_matrix(ds, dosage=dosage, threshold=threshold, variant_score=variant_score)

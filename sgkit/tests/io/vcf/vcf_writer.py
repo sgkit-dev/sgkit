@@ -140,7 +140,7 @@ def zarr_to_vcf(
     contigs = ds.attrs["contigs"]
     filters = ds.attrs["filters"]
 
-    n_samples = ds.dims["samples"]
+    n_samples = ds.sizes["samples"]
 
     with open(output, mode="w") as out:
         vcf_writer = VcfWriter(out, header_str)
@@ -148,7 +148,7 @@ def zarr_to_vcf(
         info_fields = _info_fields(header_str)
         format_fields = _format_fields(header_str)
 
-        for i in range(ds.dims["variants"]):
+        for i in range(ds.sizes["variants"]):
             chrom = ds.variant_contig[i].values.item()
             pos = ds.variant_position[i].values.item()
             id = ds.variant_id[i].values.item()

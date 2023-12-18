@@ -128,9 +128,9 @@ def pc_relate(
     """
     if maf <= 0.0 or maf >= 1.0:
         raise ValueError("MAF must be between (0.0, 1.0)")
-    if "ploidy" in ds.dims and ds.dims["ploidy"] != 2:
+    if "ploidy" in ds.sizes and ds.sizes["ploidy"] != 2:
         raise ValueError("PC Relate only works for diploid genotypes")
-    if "alleles" in ds.dims and ds.dims["alleles"] != 2:
+    if "alleles" in ds.sizes and ds.sizes["alleles"] != 2:
         raise ValueError("PC Relate only works for biallelic genotypes")
     variables.validate(
         ds,

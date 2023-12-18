@@ -1678,4 +1678,4 @@ def test_vcf_to_zarr__no_samples(shared_datadir, tmp_path):
     ds = xr.open_zarr(output)
     assert_array_equal(ds["sample_id"], [])
     assert_array_equal(ds["contig_id"], ["1"])
-    assert ds.dims["variants"] == 973
+    assert ds.sizes["variants"] == 973

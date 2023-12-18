@@ -125,7 +125,7 @@ def truncate(ds: xr.Dataset, max_sizes: Mapping[Hashable, int]) -> xr.Dataset:
     """
     sel = dict()
     for dim, size in max_sizes.items():
-        if ds.dims[dim] <= size:
+        if ds.sizes[dim] <= size:
             # No truncation required
             pass
         else:
@@ -194,7 +194,7 @@ def display_genotypes(
         ds_calls = set_index_if_unique(ds_calls, "variants", variant_index)
     # convert call genotypes to strings
     calls = ds_calls["call_genotype"].values
-    max_chars = max(2, len(str(ds.dims["alleles"] - 1)))
+    max_chars = max(2, len(str(ds.sizes["alleles"] - 1)))
     if "call_genotype_phased" in ds_calls:
         phased = ds_calls["call_genotype_phased"].values
     else:

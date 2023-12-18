@@ -277,7 +277,7 @@ def test_Fst__Hudson(sample_size):
     ts = simulate_ts(sample_size)
     ds = ts_to_dataset(ts)
     ds, subsets = add_cohorts(ds, ts, n_cohorts)
-    n_variants = ds.dims["variants"]
+    n_variants = ds.sizes["variants"]
     ds = window_by_variant(ds, size=n_variants)  # single window
     ds = Fst(ds, estimator="Hudson")
     fst = ds.stat_Fst.sel(cohorts_0="co_0", cohorts_1="co_1").values
@@ -299,7 +299,7 @@ def test_Fst__Nei(sample_size, n_cohorts):
     ts = simulate_ts(sample_size)
     ds = ts_to_dataset(ts)
     ds, subsets = add_cohorts(ds, ts, n_cohorts)
-    n_variants = ds.dims["variants"]
+    n_variants = ds.sizes["variants"]
     ds = window_by_variant(ds, size=n_variants)  # single window
     ds = Fst(ds, estimator="Nei")
     fst = ds.stat_Fst.values
@@ -370,7 +370,7 @@ def test_Tajimas_D(sample_size):
     ts = simulate_ts(sample_size)
     ds = ts_to_dataset(ts)
     ds, subsets = add_cohorts(ds, ts, cohort_key_names=None)
-    n_variants = ds.dims["variants"]
+    n_variants = ds.sizes["variants"]
     ds = window_by_variant(ds, size=n_variants)  # single window
     ds = Tajimas_D(ds)
     d = ds.stat_Tajimas_D.compute()
@@ -400,7 +400,7 @@ def test_pbs(sample_size, n_cohorts):
     ds, subsets = add_cohorts(
         ds, ts, n_cohorts, cohort_key_names=["cohorts_0", "cohorts_1", "cohorts_2"]
     )
-    n_variants = ds.dims["variants"]
+    n_variants = ds.sizes["variants"]
     ds = window_by_variant(ds, size=n_variants)  # single window
 
     ds = pbs(ds)

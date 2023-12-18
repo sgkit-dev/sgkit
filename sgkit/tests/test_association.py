@@ -152,7 +152,7 @@ def _sm_statistics(
     for v in [c for c in list(ds.keys()) if c.startswith("covar_")]:
         X_list.append(ds[v].values)
     if add_intercept:
-        X_list.append(np.ones(ds.dims["samples"]))
+        X_list.append(np.ones(ds.sizes["samples"]))
     X = np.stack(X_list).T
     y = ds[f"trait_{i}"].values
 
@@ -164,7 +164,7 @@ def _get_statistics(
 ) -> Tuple[DataFrame, DataFrame]:
     df_pred: List[Dict[str, Any]] = []
     df_true: List[Dict[str, Any]] = []
-    for i in range(ds.dims["variants"]):
+    for i in range(ds.sizes["variants"]):
         dsr = gwas_linear_regression(
             ds,
             dosage="dosage",
@@ -193,7 +193,7 @@ def test_gwas_linear_regression__validate_statistics(ds):
         # Validate results at a higher level, looking only for recapitulation
         # of more obvious inferences based on how the data was simulated
         np.testing.assert_allclose(dfp["beta"], ds.attrs["beta"], atol=1e-3)
-        mid_idx = ds.dims["variants"] // 2
+        mid_idx = ds.sizes["variants"] // 2
         assert np.all(dfp["p_value"].iloc[:mid_idx] > 0.05)
         assert np.all(dfp["p_value"].iloc[mid_idx:] < 0.05)
 
@@ -207,7 +207,7 @@ def test_gwas_linear_regression__validate_statistics(ds):
     validate(dfp, dft)
 
     dfp, dft = _get_statistics(
-        ds.assign(covar_3=("samples", np.ones(ds.dims["samples"]))),
+        ds.assign(covar_3=("samples", np.ones(ds.sizes["samples"]))),
         covariates=["covar_0", "covar_1", "covar_2", "covar_3"],
         add_intercept=False,
     )
@@ -232,7 +232,7 @@ def test_gwas_linear_regression__variable_shapes(ds, chunks):
     res = gwas_linear_regression(
         ds, dosage="dosage", covariates="covar_0", traits="trait_0", merge=False
     )
-    shape = (ds.dims["variants"], 1)
+    shape = (ds.sizes["variants"], 1)
     for v in res:
         assert res[v].data.shape == shape
         assert res[v].data.compute().shape == shape

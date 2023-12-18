@@ -1049,7 +1049,7 @@ def pedigree_kinship(
                 )
     if method == "diploid":
         # check ploidy dimension and assume diploid if it's absent
-        if ds.dims.get("ploidy", 2) != 2:
+        if ds.sizes.get("ploidy", 2) != 2:
             raise ValueError("Dataset is not diploid")
         if founder_kinship is None:
             func = da.gufunc(
@@ -1552,9 +1552,9 @@ def pedigree_inbreeding(
     parent = da.asarray(ds[parent].data, chunks=ds[parent].shape)
     if method == "diploid":
         # check ploidy dimension and assume diploid if it's absent
-        if ds.dims.get("ploidy", 2) != 2:
+        if ds.sizes.get("ploidy", 2) != 2:
             raise ValueError("Dataset is not diploid")
-        if ds.dims["parents"] != 2:
+        if ds.sizes["parents"] != 2:
             raise ValueError("The parents dimension must be length 2")
         tau = da.ones_like(parent, int)
         lambda_ = da.zeros_like(parent, float)
@@ -1893,9 +1893,9 @@ def pedigree_inverse_kinship(
     parent = ds[parent].data
     if method == "diploid":
         # check ploidy dimension and assume diploid if it's absent
-        if ds.dims.get("ploidy", 2) != 2:
+        if ds.sizes.get("ploidy", 2) != 2:
             raise ValueError("Dataset is not diploid")
-        if ds.dims["parents"] != 2:
+        if ds.sizes["parents"] != 2:
             raise ValueError("The parents dimension must be length 2")
         tau = da.ones_like(parent, int)
         lambda_ = da.zeros_like(parent, float)
@@ -2128,9 +2128,9 @@ def pedigree_sel(
         idx |= (depth >= 0) & (depth <= descendant_depth)
     keep = ds.samples.values[idx]
     selection = {"samples": keep}
-    if sel_samples_0 and ("samples_0" in ds.dims):
+    if sel_samples_0 and ("samples_0" in ds.sizes):
         selection["samples_0"] = keep
-    if sel_samples_1 and ("samples_1" in ds.dims):
+    if sel_samples_1 and ("samples_1" in ds.sizes):
         selection["samples_1"] = keep
     new_ds = ds.sel(selection)
     if update_parent_id:
@@ -2241,7 +2241,7 @@ def pedigree_contribution(
     parent = da.asarray(ds[parent].data, chunks=ds[parent].shape)
     n_sample, n_parent = parent.shape
     if method == "even":
-        if bool(ds.dims.get("ploidy", 2) % 2):
+        if bool(ds.sizes.get("ploidy", 2) % 2):
             raise ValueError("The 'even' method requires an even-ploidy dataset")
         if n_parent != 2:
             raise ValueError(
