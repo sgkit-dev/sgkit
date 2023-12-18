@@ -522,7 +522,7 @@ def test_pedigree_kinship__Hamilton_Kerr_compress_parent_dimension(
     ds1["parent"] = dims, parent
     ds1["stat_Hamilton_Kerr_tau"] = dims, tau
     ds1["stat_Hamilton_Kerr_lambda"] = dims, lambda_
-    ds1["founder_kinship"] = ["founders", "founders"], founder_kinship
+    ds1["founder_kinship"] = ["founders_1", "founders_2"], founder_kinship
     ds1["founder_indices"] = ["founders"], founder_indices
     # test case with parents dim length > 2
     parent, tau, lambda_ = widen_parent_arrays(
@@ -532,9 +532,9 @@ def test_pedigree_kinship__Hamilton_Kerr_compress_parent_dimension(
     ds2["parent"] = dims, parent
     ds2["stat_Hamilton_Kerr_tau"] = dims, tau
     ds2["stat_Hamilton_Kerr_lambda"] = dims, lambda_
-    ds2["founder_kinship"] = ["founders", "founders"], founder_kinship
+    ds2["founder_kinship"] = ["founders_1", "founders_2"], founder_kinship
     ds2["founder_indices"] = ["founders"], founder_indices
-    assert (ds1.dims["parents"], ds2.dims["parents"]) == (2, n_parent)
+    assert (ds1.sizes["parents"], ds2.sizes["parents"]) == (2, n_parent)
     # collect method arguments
     kwargs = dict(method="Hamilton-Kerr", allow_half_founders=n_half_founder > 0)
     if use_founder_kinship:
@@ -619,7 +619,7 @@ def test_pedigree_kinship__raise_on_half_founder(method, initial_kinship, parent
         ds["stat_Hamilton_Kerr_tau"] = xr.ones_like(ds["parent_id"], dtype=np.uint8)
         ds["stat_Hamilton_Kerr_lambda"] = xr.zeros_like(ds["parent_id"], dtype=float)
     if initial_kinship:
-        ds["founder_kinship"] = ["founders", "founders"], [[0.5, 0.0], [0.0, 0.5]]
+        ds["founder_kinship"] = ["founders_1", "founders_2"], [[0.5, 0.0], [0.0, 0.5]]
         ds["founder_indices"] = ["founders"], [0, 1]
         kwargs = dict(
             founder_kinship="founder_kinship", founder_indices="founder_indices"
@@ -641,7 +641,7 @@ def test_pedigree_kinship__diploid_raise_on_parent_dimension(use_founder_kinship
         ["S2", "S3", "."],
     ]
     if use_founder_kinship:
-        ds["founder_kinship"] = ["founders", "founders"], [[0.5, 0.0], [0.0, 0.5]]
+        ds["founder_kinship"] = ["founders_1", "founders_2"], [[0.5, 0.0], [0.0, 0.5]]
         ds["founder_indices"] = ["founders"], [0, 1]
         kwargs = dict(
             founder_kinship="founder_kinship", founder_indices="founder_indices"
@@ -753,7 +753,7 @@ def test_pedigree_kinship__projection(
     known_founder_kinship = ds_full.stat_pedigree_kinship.values[
         unknown_founder_idx, :
     ][:, unknown_founder_idx]
-    ds_known["founder_kinship"] = ["founders", "founders"], known_founder_kinship
+    ds_known["founder_kinship"] = ["founders_1", "founders_2"], known_founder_kinship
     with pytest.warns(DeprecationWarning):
         actual = sg.pedigree_kinship(
             ds_known,
@@ -867,7 +867,7 @@ def test_pedigree_kinship__raise_on_founder_variable_shape():
         ["S1", "S2"],
         ["S2", "S3"],
     ]
-    ds["founder_kinship"] = ["founders", "founders"], [[0.5, 0.1], [0.1, 0.5]]
+    ds["founder_kinship"] = ["founders_1", "founders_2"], [[0.5, 0.1], [0.1, 0.5]]
     ds["founder_indices"] = ["founders2"], [0, 1, 2]
     with pytest.raises(
         ValueError,
@@ -887,7 +887,9 @@ def test_pedigree_kinship__raise_too_many_founders():
         ["S1", "S2"],
         ["S2", "S3"],
     ]
-    ds["founder_kinship"] = ["founders", "founders"], np.random.rand(36).reshape(6, 6)
+    ds["founder_kinship"] = ["founders_1", "founders_2"], np.random.rand(36).reshape(
+        6, 6
+    )
     ds["founder_indices"] = ["founders"], np.arange(6)
     with pytest.raises(
         ValueError, match="The number of founders exceeds the total number of samples"
@@ -1035,7 +1037,7 @@ def test_pedigree_inbreeding__Hamilton_Kerr_compress_parent_dimension(
     ds2["parent"] = dims, parent
     ds2["stat_Hamilton_Kerr_tau"] = dims, tau
     ds2["stat_Hamilton_Kerr_lambda"] = dims, lambda_
-    assert (ds1.dims["parents"], ds2.dims["parents"]) == (2, n_parent)
+    assert (ds1.sizes["parents"], ds2.sizes["parents"]) == (2, n_parent)
     expect = pedigree_inbreeding(
         ds1, method="Hamilton-Kerr", allow_half_founders=n_half_founder > 0
     ).stat_pedigree_inbreeding
@@ -1249,7 +1251,7 @@ def test_pedigree_inverse_kinship__Hamilton_Kerr_compress_parent_dimension(
     ds2["parent"] = dims, parent
     ds2["stat_Hamilton_Kerr_tau"] = dims, tau
     ds2["stat_Hamilton_Kerr_lambda"] = dims, lambda_
-    assert (ds1.dims["parents"], ds2.dims["parents"]) == (2, n_parent)
+    assert (ds1.sizes["parents"], ds2.sizes["parents"]) == (2, n_parent)
     expect = pedigree_inverse_kinship(
         ds1, method="Hamilton-Kerr", allow_half_founders=n_half_founder > 0
     ).stat_pedigree_inverse_kinship

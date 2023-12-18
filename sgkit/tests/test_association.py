@@ -340,7 +340,7 @@ def test_regenie_loco_regression(ndarray_type: str, covariate: bool) -> None:
                 )
             )
         else:
-            ds = ds.assign(sample_covariates=(("empty", "empty"), da.zeros((0, 0))))
+            ds = ds.assign(sample_covariates=(("empty_1", "empty_2"), da.zeros((0, 0))))
 
         ds = ds.assign(
             sample_traits=(("samples", "traits"), da.from_array(df_trait.to_numpy()))
