@@ -34,7 +34,7 @@ import sgkit  # noqa: F401 isort:skip
 # -- Project information -----------------------------------------------------
 
 project = "sgkit"
-copyright = "{}, sgkit developers".format(datetime.utcnow().year)
+copyright = "2020--{}, sgkit developers".format(datetime.utcnow().year)
 author = "sgkit developers"
 
 
