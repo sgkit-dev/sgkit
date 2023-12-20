@@ -571,8 +571,8 @@ def vcf_to_zarr_sequential(
 
             if first_variants_chunk:
                 # limit chunk width to actual number of samples seen in first chunk
-                if ds.dims["samples"] > 0:
-                    chunk_width = min(chunk_width, ds.dims["samples"])
+                if ds.sizes["samples"] > 0:
+                    chunk_width = min(chunk_width, ds.sizes["samples"])
 
                 # ensure that booleans are not stored as int8 by xarray https://github.com/pydata/xarray/issues/4386
                 for var in ds.data_vars:

@@ -306,7 +306,7 @@ def _window_per_contig(
     *args: Any,
     **kwargs: Any,
 ) -> Dataset:
-    n_variants = ds.dims["variants"]
+    n_variants = ds.sizes["variants"]
     n_contigs = num_contigs(ds)
     contig_ids = np.arange(n_contigs)
     variant_contig = ds["variant_contig"]
@@ -397,7 +397,7 @@ def window_by_genome(
             ),
             window_stop: (
                 "windows",
-                np.array([ds.dims["variants"]], dtype=np.int64),
+                np.array([ds.sizes["variants"]], dtype=np.int64),
             ),
         }
     )

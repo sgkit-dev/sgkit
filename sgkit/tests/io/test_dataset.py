@@ -58,7 +58,7 @@ def test_save_unequal_chunks_error():
         save_dataset(ds, {".zarray": ""})
 
     # Make the dataset have unequal chunk sizes across all dimensions
-    ds = ds.chunk({dim: (1, 3, 5, 1) for dim in ds.dims})
+    ds = ds.chunk({dim: (1, 3, 5, 1) for dim in ds.sizes})
 
     # Check we get the sgkit error message
     with pytest.raises(
@@ -67,7 +67,7 @@ def test_save_unequal_chunks_error():
         save_dataset(ds, {})
 
     # xarray gives a different error message when there are two chunks, so check that too
-    ds = ds.chunk({dim: (4, 6) for dim in ds.dims})
+    ds = ds.chunk({dim: (4, 6) for dim in ds.sizes})
     with pytest.raises(
         ValueError, match="Zarr requires uniform chunk sizes. Use the `auto_rechunk`"
     ):
@@ -80,7 +80,7 @@ def test_save_auto_rechunk():
         n_variant=10, n_sample=10, n_ploidy=10, n_allele=10, n_contig=10
     )
     # Make the dataset have unequal chunk sizes across all dimensions
-    ds = ds.chunk({dim: (1, 3, 5, 1) for dim in ds.dims})
+    ds = ds.chunk({dim: (1, 3, 5, 1) for dim in ds.sizes})
 
     # Default is to not rechunk
     with pytest.raises(
@@ -100,7 +100,7 @@ def test_save_auto_rechunk():
 
     # An equal chunked ds retains its original chunking
     ds = simulate_genotype_call_dataset(n_variant=10, n_sample=10)
-    ds = ds.chunk({dim: 5 for dim in ds.dims})
+    ds = ds.chunk({dim: 5 for dim in ds.sizes})
     store2 = {}
     save_dataset(ds, store2, auto_rechunk=True)
     ds_loaded = load_dataset(store2)

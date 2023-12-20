@@ -100,7 +100,7 @@ def convert_call_to_index(
         raise ValueError("Mixed-ploidy dataset")
     G = da.asarray(ds[call_genotype].data)
     shape = G.chunks[0:2]
-    if ds.dims.get("alleles") == 2:  # default to general case
+    if ds.sizes.get("alleles") == 2:  # default to general case
         X = da.map_blocks(
             biallelic_genotype_call_index,
             G,
@@ -169,10 +169,10 @@ def convert_probability_to_call(
     variables.validate(
         ds, {call_genotype_probability: variables.call_genotype_probability_spec}
     )
-    if ds.dims["genotypes"] != 3:
+    if ds.sizes["genotypes"] != 3:
         raise NotImplementedError(
             f"Hard call conversion only supported for diploid, biallelic genotypes; "
-            f"num genotypes in provided probabilities array = {ds.dims['genotypes']}."
+            f"num genotypes in provided probabilities array = {ds.sizes['genotypes']}."
         )
     GP = da.asarray(ds[call_genotype_probability])
     # Remove chunking in genotypes dimension, if present

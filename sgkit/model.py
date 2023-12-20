@@ -169,8 +169,8 @@ def create_genotype_dosage_dataset(
 
 def num_contigs(ds: xr.Dataset) -> ArrayLike:
     """Return the number of contigs in a dataset."""
-    if DIM_CONTIG in ds.dims:
-        return ds.dims[DIM_CONTIG]
+    if DIM_CONTIG in ds.sizes:
+        return ds.sizes[DIM_CONTIG]
     else:
         return len(ds.attrs["contigs"])
 

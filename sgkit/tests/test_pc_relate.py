@@ -163,5 +163,5 @@ def test_pc_relate__parent_child_relationship() -> None:
         .value_counts()
     )
     assert cts["parent/child"] == len(sample_groups["child"]) * 2
-    assert cts["self"] == ds.dims["samples"]
+    assert cts["self"] == ds.sizes["samples"]
     assert cts["unclassified"] == 0

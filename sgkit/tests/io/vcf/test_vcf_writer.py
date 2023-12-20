@@ -201,13 +201,13 @@ def test_write_vcf__add_drop_fields(shared_datadir, tmp_path, generate_header):
     ds["variant_AD"] = (
         ["variants", "alleles"],
         np.random.randint(
-            50, size=(ds.dims["variants"], ds.dims["alleles"]), dtype=np.int32
+            50, size=(ds.sizes["variants"], ds.sizes["alleles"]), dtype=np.int32
         ),
     )
     ds["call_DS"] = (
         ["variants", "samples", "alt_alleles"],
         np.random.random(
-            (ds.dims["variants"], ds.dims["samples"], ds.dims["alleles"] - 1)
+            (ds.sizes["variants"], ds.sizes["samples"], ds.sizes["alleles"] - 1)
         ).astype(np.float32),
     )
 
@@ -251,7 +251,7 @@ def test_write_vcf__from_non_vcf_source(tmp_path):
     ds["variant_AD"] = (
         ["variants", "alleles"],
         np.random.randint(
-            50, size=(ds.dims["variants"], ds.dims["alleles"]), dtype=np.int32
+            50, size=(ds.sizes["variants"], ds.sizes["alleles"]), dtype=np.int32
         ),
     )
 

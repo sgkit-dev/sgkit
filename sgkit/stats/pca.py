@@ -30,11 +30,11 @@ def pca_est(
 ) -> BaseEstimator:
     """Create PCA estimator"""
     if ploidy is None:
-        if "ploidy" not in ds.dims:
+        if "ploidy" not in ds.sizes:
             raise ValueError(
                 "`ploidy` must be specified explicitly when not present in dataset dimensions"
             )
-        ploidy = ds.dims["ploidy"]
+        ploidy = ds.sizes["ploidy"]
     scaler = scaler or "patterson"
     if isinstance(scaler, str):
         if scaler != "patterson":

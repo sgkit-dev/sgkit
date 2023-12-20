@@ -290,5 +290,5 @@ def test_bgen_to_zarr(shared_datadir, tmp_path, region):
         else region[k].stop - region[k].start
         for k in EXPECTED_DIMS
     }
-    actual_dims = {k: v for k, v in ds.dims.items() if k in expected_dims}
+    actual_dims = {k: v for k, v in ds.sizes.items() if k in expected_dims}
     assert actual_dims == expected_dims

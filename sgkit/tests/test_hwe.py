@@ -107,7 +107,7 @@ def ds_eq():
     ds = simulate_genotype_call_dataset(n_variant=50, n_sample=1000)
     gt_dist = (0.25, 0.5, 0.25)
     ds["call_genotype"] = simulate_genotype_calls(
-        ds.dims["variants"], ds.dims["samples"], p=gt_dist
+        ds.sizes["variants"], ds.sizes["samples"], p=gt_dist
     )
     return ds
 
@@ -118,7 +118,7 @@ def ds_neq():
     ds = simulate_genotype_call_dataset(n_variant=50, n_sample=1000)
     gt_dist = (0.9, 0.05, 0.05)
     ds["call_genotype"] = simulate_genotype_calls(
-        ds.dims["variants"], ds.dims["samples"], p=gt_dist
+        ds.sizes["variants"], ds.sizes["samples"], p=gt_dist
     )
     return ds
 
