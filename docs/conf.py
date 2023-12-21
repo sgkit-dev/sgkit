@@ -14,9 +14,9 @@ import logging as pylogging
 #
 import os
 import sys
+from datetime import datetime
 from pathlib import Path
 
-from datetime import datetime
 import dask.dataframe
 import xarray
 from sphinx.util import logging
