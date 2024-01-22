@@ -62,6 +62,15 @@ Call :py:func:`display_genotypes`:
 
     sg.display_genotypes(ds, max_variants=10)
 
+Get the reference allele?
+----------------------
+
+The specification for [VCFs stored in Zarr](https://github.com/pystatgen/vcf-zarr-spec/blob/main/vcf_zarr_spec.md)
+places the REF allele as the first allele in the ``variant_allele`` array. For example, the following will print out all the REF alleles
+
+.. ipython:: python
+
+    ds.variant_allele[:,0].values
 
 Subset the variables?
 ---------------------
