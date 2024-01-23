@@ -1,9 +1,3 @@
-# Experimental sequential multithreaded version of VCF to sgkit zarr
-# conversion. This is a minimal standalone version, forming the basis
-# of the version in sgkit.
-#
-# This is entirely untested, and only keeping here as a useful reference.
-# DO NOT USE!
 import concurrent.futures
 import contextlib
 import dataclasses
@@ -19,6 +13,8 @@ import numcodecs
 import numpy as np
 import tqdm
 import zarr
+
+from sgkit.io.vcf.vcf_reader import VcfFieldHandler, _normalize_fields
 
 numcodecs.blosc.use_threads = False
 
@@ -221,6 +217,23 @@ def scan_vcfs(paths):
             if fields != vcf_fields:
                 raise ValueError("Incompatible VCF chunks")
         record = next(vcf)
+
+        fields = _normalize_fields(
+            vcf, ["FORMAT/GT", "FORMAT/GQ", "FORMAT/DP", "INFO/AA", "INFO/DP"]
+        )
+        field_handlers = [
+            VcfFieldHandler.for_field(
+                vcf,
+                field,
+                chunk_length=0,
+                ploidy=2,
+                mixed_ploidy=False,
+                truncate_calls=False,
+                max_alt_alleles=4,
+                field_def={},
+            )
+            for field in fields
+        ]
         chunks.append(
             # Requires cyvcf2>=0.30.27
             VcfChunk(path=path, num_records=vcf.num_records, first_position=record.POS)
