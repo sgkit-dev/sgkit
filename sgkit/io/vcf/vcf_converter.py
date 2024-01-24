@@ -58,6 +58,7 @@ def async_flush_array(executor, np_buffer, zarr_array, offset):
     Flush the specified chunk aligned buffer to the specified zarr array.
     """
     assert zarr_array.shape[1:] == np_buffer.shape[1:]
+    # print("sync", zarr_array, np_buffer)
 
     if len(np_buffer.shape) == 1:
         futures = [executor.submit(sync_flush_array, np_buffer, zarr_array, offset)]
@@ -95,7 +96,7 @@ class BufferedArray:
     def __init__(self, array, fill_value):
         self.array = array
         dims = list(array.shape)
-        dims[0] = array.chunks[0]
+        dims[0] = min(array.chunks[0], array.shape[0])
         self.buff = np.full(dims, fill_value, dtype=array.dtype)
         self.fill_value = fill_value
 
@@ -232,7 +233,7 @@ def write_partition(
                 progress_counter.value += 1
 
         # Flush the last chunk
-        flush_buffers(futures, stop=j)
+        flush_buffers(futures, start=chunk_start, stop=j)
 
     # Send the alleles list back to the main process.
     partition.alleles = alleles
