@@ -4,7 +4,9 @@ import dataclasses
 import multiprocessing
 import queue
 import threading
+import pathlib
 import time
+import pickle
 from typing import Any
 
 import cyvcf2
@@ -13,7 +15,7 @@ import numpy as np
 import tqdm
 import zarr
 
-# from sgkit.io.vcf.vcf_reader import VcfFieldHandler, _normalize_fields
+from .vcf_reader import VcfFieldHandler, _normalize_fields
 from sgkit.io.utils import FLOAT32_MISSING
 from sgkit.utils import smallest_numpy_int_dtype
 
@@ -104,8 +106,24 @@ class BufferedArray:
         self.buff = np.full_like(self.buff, self.fill_value)
 
 
+def flush_info_buffers(zarr_path, infos, partition_index, chunk_index):
+    for key, buff in infos.items():
+        dest_file = (
+            zarr_path / "tmp" / f"INFO_{key}" / f"{partition_index}.{chunk_index}"
+        )
+        with open(dest_file, "wb") as f:
+            pickle.dump(buff, f)
+            buff = []
+
+
 def write_partition(
-    vcf_fields, zarr_path, partition, max_num_alleles, *, first_chunk_lock, last_chunk_lock
+    vcf_metadata,
+    zarr_path,
+    partition,
+    max_num_alleles,
+    *,
+    first_chunk_lock,
+    last_chunk_lock,
 ):
     # print(f"process {os.getpid()} starting")
     vcf = cyvcf2.VCF(partition.path)
@@ -135,6 +153,8 @@ def write_partition(
         gt_phased,
         gt_mask,
     ]
+
+    buffered_infos = {info.name: [] for info in vcf_metadata.info_fields}
 
     chunk_length = pos.buff.shape[0]
 
@@ -169,8 +189,8 @@ def write_partition(
 
         return futures
 
-    contig_name_map = {name: j for j, name in enumerate(vcf_fields.contig_names)}
-    filter_map = {filter_id: j for j, filter_id in enumerate(vcf_fields.filters)}
+    contig_name_map = {name: j for j, name in enumerate(vcf_metadata.contig_names)}
+    filter_map = {filter_id: j for j, filter_id in enumerate(vcf_metadata.filters)}
 
     gt_min = -1  # TODO make this -2 if mixed_ploidy
     gt_max = max_num_alleles - 1
@@ -180,6 +200,7 @@ def write_partition(
     alleles = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
         j = offset % chunk_length
+        chunk_index = 0
         chunk_start = j
         futures = []
 
@@ -219,6 +240,20 @@ def write_partition(
             # in a list and return to the main thread for later processing.
             alleles.append([variant.REF] + variant.ALT)
 
+            # TODO this basically works, but we will need some specialised handlers
+            # to make sure that the data gets written in a way thats compatible with
+            # turning the concatenated values into numpy arrays at the end.
+            # Fixed length values should be put into arrays here like before,
+            # that's perhaps the next thing to do.
+            for key, buff in buffered_infos.items():
+                try:
+                    val = variant.INFO[key]
+                    if key == "AC":
+                        print(variant.POS, variant.ALT, val)
+                except KeyError:
+                    val = -1
+                buff.append(val)
+
             j += 1
             if j == chunk_length:
                 futures = flush_buffers(futures, start=chunk_start)
@@ -226,6 +261,10 @@ def write_partition(
                 offset += chunk_length - chunk_start
                 chunk_start = 0
                 assert offset % chunk_length == 0
+                flush_info_buffers(
+                    zarr_path, buffered_infos, partition.index, chunk_index
+                )
+                chunk_index += 1
 
             with progress_counter.get_lock():
                 # TODO reduce IPC here by incrementing less often?
@@ -234,9 +273,11 @@ def write_partition(
 
         # Flush the last chunk
         flush_buffers(futures, start=chunk_start, stop=j)
+        flush_info_buffers(zarr_path, buffered_infos, partition.index, chunk_index)
 
     # Send the alleles list back to the main process.
     partition.alleles = alleles
+    partition.num_chunks = chunk_index + 1
     return partition
 
 
@@ -247,39 +288,39 @@ class VcfPartition:
     first_position: int
     start_offset: int = 0
     alleles: list = None
+    index: int = -1
+    num_chunks: int = -1
 
 
 @dataclasses.dataclass
-class VcfFields:
+class VcfFieldDefinition:
+    name: str
+    vcf_number: str
+    vcf_type: str
+    description: str
+
+    def __init__(self, definition):
+        self.name = definition["ID"]
+        self.vcf_number = definition["Number"]
+        self.vcf_type = definition["Type"]
+        self.description = definition["Description"].strip('"')
+
+
+@dataclasses.dataclass
+class VcfMetadata:
     samples: list
     contig_names: list
     filters: list
+    info_fields: list
+    format_fields: list
     contig_lengths: list = None
-    # field_handlers: list
 
 
 def scan_vcfs(paths, show_progress):
-    chunks = []
-    vcf_fields = None
+    partitions = []
+    vcf_metadata = None
     for path in tqdm.tqdm(paths, desc="Scan ", disable=not show_progress):
         vcf = cyvcf2.VCF(path)
-        # Hack
-        # field_names = _normalize_fields(
-        #     vcf, ["FORMAT/GQ", "FORMAT/DP", "INFO/AA", "INFO/DP"]
-        # )
-        # field_handlers = [
-        #     VcfFieldHandler.for_field(
-        #         vcf,
-        #         field_name,
-        #         chunk_length=0,
-        #         ploidy=2,
-        #         mixed_ploidy=False,
-        #         truncate_calls=False,
-        #         max_alt_alleles=4,
-        #         field_def={},
-        #     )
-        #     for field_name in field_names
-        # ]
 
         filters = [
             h["ID"]
@@ -291,22 +332,34 @@ def scan_vcfs(paths, show_progress):
             filters.remove("PASS")
             filters.insert(0, "PASS")
 
-        fields = VcfFields(
-            samples=vcf.samples, contig_names=vcf.seqnames, filters=filters
+        info_fields = []
+        format_fields = []
+        for h in vcf.header_iter():
+            if h["HeaderType"] == "INFO":
+                info_fields.append(VcfFieldDefinition(h))
+            if h["HeaderType"] == "FORMAT":
+                format_fields.append(VcfFieldDefinition(h))
+
+        metadata = VcfMetadata(
+            samples=vcf.samples,
+            contig_names=vcf.seqnames,
+            filters=filters,
+            info_fields=info_fields,
+            format_fields=format_fields,
         )
         try:
-            fields.contig_lengths = vcf.seqlens
+            metadata.contig_lengths = vcf.seqlens
         except AttributeError:
             pass
 
-        if vcf_fields is None:
-            vcf_fields = fields
+        if vcf_metadata is None:
+            vcf_metadata = metadata
         else:
-            if fields != vcf_fields:
+            if metadata != vcf_metadata:
                 raise ValueError("Incompatible VCF chunks")
         record = next(vcf)
 
-        chunks.append(
+        partitions.append(
             # Requires cyvcf2>=0.30.27
             VcfPartition(
                 path=path,
@@ -315,18 +368,19 @@ def scan_vcfs(paths, show_progress):
             )
         )
 
-    # Assuming these are all on the same contig for now.
-    chunks.sort(key=lambda x: x.first_position)
+    partitions.sort(key=lambda x: x.first_position)
     offset = 0
-    for chunk in chunks:
-        chunk.start_offset = offset
-        offset += chunk.num_records
-    return vcf_fields, chunks
+    for index, partition in enumerate(partitions):
+        partition.start_offset = offset
+        partition.index = index
+        offset += partition.num_records
+    return vcf_metadata, partitions
 
 
-def create_zarr(path, vcf_fields, partitions, *, chunk_length, chunk_width,
-        max_num_alleles):
-    sample_id = np.array(vcf_fields.samples, dtype="O")
+def create_zarr(
+    path, vcf_metadata, partitions, *, chunk_length, chunk_width, max_num_alleles
+):
+    sample_id = np.array(vcf_metadata.samples, dtype="O")
     n = sample_id.shape[0]
     m = sum(partition.num_records for partition in partitions)
 
@@ -336,10 +390,10 @@ def create_zarr(path, vcf_fields, partitions, *, chunk_length, chunk_width,
         cname="zstd", clevel=7, shuffle=numcodecs.Blosc.AUTOSHUFFLE
     )
 
-    root.attrs["filters"] = vcf_fields.filters
+    root.attrs["filters"] = vcf_metadata.filters
     a = root.array(
         "filter_id",
-        vcf_fields.filters,
+        vcf_metadata.filters,
         dtype="str",
         compressor=compressor,
     )
@@ -356,16 +410,16 @@ def create_zarr(path, vcf_fields, partitions, *, chunk_length, chunk_width,
 
     a = root.array(
         "contig_id",
-        vcf_fields.contig_names,
+        vcf_metadata.contig_names,
         dtype="str",
         compressor=compressor,
     )
     a.attrs["_ARRAY_DIMENSIONS"] = ["contigs"]
 
-    if vcf_fields.contig_lengths is not None:
+    if vcf_metadata.contig_lengths is not None:
         a = root.array(
             "contig_length",
-            vcf_fields.contig_lengths,
+            vcf_metadata.contig_lengths,
             dtype=np.int64,
             compressor=compressor,
         )
@@ -375,7 +429,7 @@ def create_zarr(path, vcf_fields, partitions, *, chunk_length, chunk_width,
         "variant_contig",
         shape=(m),
         chunks=(chunk_length),
-        dtype=smallest_numpy_int_dtype(len(vcf_fields.contig_names)),
+        dtype=smallest_numpy_int_dtype(len(vcf_metadata.contig_names)),
         compressor=compressor,
     )
     a.attrs["_ARRAY_DIMENSIONS"] = ["variants"]
@@ -418,7 +472,7 @@ def create_zarr(path, vcf_fields, partitions, *, chunk_length, chunk_width,
 
     a = root.empty(
         "variant_filter",
-        shape=(m, len(vcf_fields.filters)),
+        shape=(m, len(vcf_metadata.filters)),
         chunks=(chunk_length),
         dtype=bool,
         compressor=compressor,
@@ -452,27 +506,16 @@ def create_zarr(path, vcf_fields, partitions, *, chunk_length, chunk_width,
     )
     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "samples"]
 
-    # for handler in vcf_fields.field_handlers:
-    #     if handler.dims == ["variants"]:
-    #         shape = m,
-    #         chunks = chunk_length,
-    #     elif handler.dims == ["variants", "samples"]:
-    #         shape = m, n
-    #         chunks = chunk_length, chunk_width
-    #     else:
-    #         raise ValueError("Not handled")
+    # Create temporary storage for unsized fields
+    tmp_dir = path / "tmp"
+    tmp_dir.mkdir()
 
-    #     root.empty(
-    #         handler.variable_name,
-    #         shape=shape,
-    #         chunks=chunks,
-    #         dtype=handler.array.dtype,
-    #         compressor=compressor,
-
-    # )
+    for info_field in vcf_metadata.info_fields:
+        field_dir = tmp_dir / f"INFO_{info_field.name}"
+        field_dir.mkdir()
 
 
-def finalise_zarr(path, partitions, chunk_length, max_num_alleles):
+def finalise_zarr(path, vcf_metadata, partitions, chunk_length, max_num_alleles):
     m = sum(partition.num_records for partition in partitions)
 
     alleles = []
@@ -504,6 +547,23 @@ def finalise_zarr(path, partitions, chunk_length, max_num_alleles):
     )
     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "alleles"]
 
+    tmp_dir = path / "tmp"
+    for info_field in vcf_metadata.info_fields:
+        field_dir = tmp_dir / f"INFO_{info_field.name}"
+        data = []
+        for partition in partitions:
+            for chunk in range(partition.num_chunks):
+                filename = field_dir / f"{partition.index}.{chunk}"
+                with open(filename, "rb") as f:
+                    data.extend(pickle.load(f))
+
+        print(info_field, ":", data[:10])
+        try:
+            np_array = np.array(data)
+            print("\t", np_array)
+        except ValueError as e:
+            print("\terror", e)
+
     zarr.consolidate_metadata(path)
 
 
@@ -523,13 +583,19 @@ def init_workers(counter):
 
 
 def convert_vcf(
-    vcfs, out_path, *, chunk_length=None, chunk_width=None,
+    vcfs,
+    out_path,
+    *,
+    chunk_length=None,
+    chunk_width=None,
     max_alt_alleles=None,
-    show_progress=False
+    show_progress=False,
 ):
+    out_path = pathlib.Path(out_path)
+
     # TODO add a try-except here for KeyboardInterrupt which will kill
     # various things and clean-up.
-    vcf_fields, partitions = scan_vcfs(vcfs, show_progress=show_progress)
+    vcf_metadata, partitions = scan_vcfs(vcfs, show_progress=show_progress)
 
     # TODO choose chunks
     if chunk_width is None:
@@ -546,7 +612,7 @@ def convert_vcf(
     # on success.
     create_zarr(
         out_path,
-        vcf_fields,
+        vcf_metadata,
         partitions,
         chunk_width=chunk_width,
         chunk_length=chunk_length,
@@ -576,7 +642,7 @@ def convert_vcf(
                 futures.append(
                     executor.submit(
                         write_partition,
-                        vcf_fields,
+                        vcf_metadata,
                         out_path,
                         part,
                         max_num_alleles,
@@ -594,4 +660,6 @@ def convert_vcf(
     assert progress_counter.value == total_variants
 
     completed_partitions.sort(key=lambda x: x.first_position)
-    finalise_zarr(out_path, completed_partitions, chunk_length, max_num_alleles)
+    finalise_zarr(
+        out_path, vcf_metadata, completed_partitions, chunk_length, max_num_alleles
+    )
