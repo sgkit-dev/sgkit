@@ -89,8 +89,19 @@ def async_flush_2d_array(executor, np_buffer, zarr_array, offset):
 
 @dataclasses.dataclass
 class BufferedArray:
-    np_buffer: Any
-    zarr_array: Any
+    array: Any
+    buff: Any
+    fill_value: Any
+
+    def __init__(self, array, fill_value):
+        self.array = array
+        dims = list(array.shape)
+        dims[0] = array.chunks[0]
+        self.buff = np.full(dims, fill_value, dtype=array.dtype)
+        self.fill_value = fill_value
+
+    def swap_buffers(self):
+        self.buff = np.full_like(self.buff, self.fill_value)
 
 
 def write_partition(
@@ -103,30 +114,21 @@ def write_partition(
     store = zarr.DirectoryStore(zarr_path)
     root = zarr.group(store=store)
 
-    contig_array = root["variant_contig"]
-    pos_array = root["variant_position"]
-    qual_array = root["variant_quality"]
-    gt_array = root["call_genotype"]
-    gt_phased_array = root["call_genotype_phased"]
-
-    chunk_length = gt_array.chunks[0]
-    n = gt_array.shape[1]
-
-    # TODO generalise this so we're allocating the buffer and the array
-    # at the same time.
-    contig_buffer = np.zeros((chunk_length), dtype=contig_array.dtype)
-    pos_buffer = np.zeros((chunk_length), dtype=np.int32)
-    qual_buffer = np.zeros((chunk_length), dtype=np.float32)
-    gt_buffer = np.zeros((chunk_length, n, 2), dtype=np.int8)
-    gt_phased_buffer = np.zeros((chunk_length, n), dtype=bool)
+    contig = BufferedArray(root["variant_contig"], -1)
+    pos = BufferedArray(root["variant_position"], -1)
+    qual = BufferedArray(root["variant_quality"], FLOAT32_MISSING)
+    gt = BufferedArray(root["call_genotype"], -1)
+    gt_phased = BufferedArray(root["call_genotype_phased"], 0)
 
     buffered_arrays = [
-        BufferedArray(contig_buffer, contig_array),
-        BufferedArray(pos_buffer, pos_array),
-        BufferedArray(qual_buffer, qual_array),
-        BufferedArray(gt_buffer, gt_array),
-        BufferedArray(gt_phased_buffer, gt_phased_array),
+        contig,
+        pos,
+        qual,
+        gt,
+        gt_phased,
     ]
+
+    chunk_length = pos.buff.shape[0]
 
     def flush_buffers(futures, start=0, stop=chunk_length):
         # Make sure previous futures have completed
@@ -146,19 +148,16 @@ def write_partition(
                     # For simplicity here we synchrously flush buffers for these
                     # non-aligned chunks, rather than try to pass the requisite locks
                     # to the (common-case) async flush path
-                    sync_flush_array(ba.np_buffer[start:stop], ba.zarr_array, offset)
-                    ba.np_buffer[:] = 0
+                    sync_flush_array(ba.buff[start:stop], ba.array, offset)
         else:
             for ba in buffered_arrays:
-                futures.extend(
-                    async_flush_array(
-                        executor, ba.np_buffer[start:stop], ba.zarr_array, offset
-                    )
-                )
-                # This is important - we need to allocate a new buffer so that
-                # we can be writing to the new one while the old one is being flushed
-                # in the background.
-                ba.np_buffer = np.zeros_like(ba.np_buffer)
+                futures.extend(async_flush_array(executor, ba.buff, ba.array, offset))
+
+        # This is important - we need to allocate a new buffer so that
+        # we can be writing to the new one while the old one is being flushed
+        # in the background.
+        for ba in buffered_arrays:
+            ba.swap_buffers()
 
         return futures
 
@@ -175,25 +174,24 @@ def write_partition(
         # TODO this is the wrong approach here, we need to keep
         # access to the decode thread so that we can kill it
         # appropriately when an error occurs.
-        for variant in ThreadedGenerator(vcf, queue_maxsize=200):
+        # for variant in ThreadedGenerator(vcf, queue_maxsize=200):
+        for variant in vcf:
             # Translate this record into numpy buffers. There is some compute
             # done here, but it's not releasing the GIL, so may not be worth
             # moving to threads.
             try:
-                contig_buffer[j] = contig_name_map[variant.CHROM]
+                contig.buff[j] = contig_name_map[variant.CHROM]
             except KeyError:
                 raise ValueError(
                     f"Contig '{variant.CHROM}' is not defined in the header."
                 )
-
-            pos_buffer[j] = variant.POS
-            qual_buffer[j] = (
-                variant.QUAL if variant.QUAL is not None else FLOAT32_MISSING
-            )
-            gt = variant.genotype.array()
-            assert gt.shape[1] == 3
-            gt_buffer[j] = gt[:, :-1]
-            gt_phased_buffer[j] = gt[:, -1]
+            pos.buff[j] = variant.POS
+            if variant.QUAL is not None:
+                qual.buff[j] = variant.QUAL
+            vcf_gt = variant.genotype.array()
+            assert vcf_gt.shape[1] == 3
+            gt.buff[j] = vcf_gt[:, :-1]
+            gt_phased.buff[j] = vcf_gt[:, -1]
 
             # Alleles are treated separately. Store the alleles for each site
             # in a list and return to the main thread for later processing.
@@ -401,9 +399,6 @@ def finalise_zarr(path, partitions):
         "variant_alleles", variant_allele_array, dtype="str", compressor=compressor
     )
     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "alleles"]
-    print(a)
-
-    # print(all_alleles)
 
     zarr.consolidate_metadata(path)
 
@@ -446,7 +441,7 @@ def main(vcfs, out_path):
     bar_process.start()
 
     with concurrent.futures.ProcessPoolExecutor(
-        max_workers=16, initializer=init_workers, initargs=(progress_counter,)
+        max_workers=1, initializer=init_workers, initargs=(progress_counter,)
     ) as executor:
         with multiprocessing.Manager() as manager:
             locks = [manager.Lock() for _ in range(len(partitions) + 1)]
@@ -482,9 +477,6 @@ def main(vcfs, out_path):
     print(ds.sample_id.values)
     print(ds.variant_contig.values)
     print(ds.variant_position.values)
-    print("PROBLEM!! Why are lots of these 0?")
-    print(np.sum(ds.variant_position.values == 0))
-    print(ds.variant_alleles.values)
 
 
 if __name__ == "__main__":
