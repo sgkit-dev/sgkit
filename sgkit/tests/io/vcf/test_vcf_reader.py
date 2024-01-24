@@ -24,6 +24,7 @@ from sgkit.io.vcf.vcf_reader import (
     merge_zarr_array_sizes,
     zarr_array_sizes,
 )
+from sgkit.io.vcf.vcf_converter import convert_vcf
 from sgkit.model import get_contigs, get_filters, num_contigs
 from sgkit.tests.io.test_dataset import assert_identical
 
@@ -38,21 +39,30 @@ from .utils import path_for_test
     "is_path",
     [True, False],
 )
-@pytest.mark.parametrize("to_zarr", [True, False])
+@pytest.mark.parametrize("method", ["to_zarr", "convert", "load"])
 @pytest.mark.filterwarnings("ignore::xarray.coding.variables.SerializationWarning")
 def test_vcf_to_zarr__small_vcf(
-    shared_datadir, is_path, read_chunk_length, tmp_path, to_zarr
+    shared_datadir, is_path, read_chunk_length, tmp_path, method,
 ):
     path = path_for_test(shared_datadir, "sample.vcf.gz", is_path)
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
-    if to_zarr:
+    if method == "to_zarr":
         vcf_to_zarr(
             path,
             output,
             chunk_length=5,
             chunk_width=2,
             read_chunk_length=read_chunk_length,
+        )
+        ds = xr.open_zarr(output)
+
+    elif method == "convert":
+        convert_vcf(
+            [path],
+            output,
+            chunk_length=5,
+            chunk_width=2,
         )
         ds = xr.open_zarr(output)
     else:
@@ -84,7 +94,7 @@ def test_vcf_to_zarr__small_vcf(
     assert ds["variant_allele"].chunks[0][0] == 5
     assert ds["variant_allele"].dtype == "O"
     assert_array_equal(
-        ds["variant_id"],
+        ds["variant_id"].values.tolist(),
         [".", ".", "rs6054257", ".", "rs6040355", ".", "microsat1", ".", "rsTest"],
     )
     assert ds["variant_id"].chunks[0][0] == 5

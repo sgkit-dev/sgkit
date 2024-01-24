@@ -115,16 +115,22 @@ def write_partition(
 
     contig = BufferedArray(root["variant_contig"], -1)
     pos = BufferedArray(root["variant_position"], -1)
+    vid = BufferedArray(root["variant_id"], ".")
+    vid_mask = BufferedArray(root["variant_id_mask"], True)
     qual = BufferedArray(root["variant_quality"], FLOAT32_MISSING)
     gt = BufferedArray(root["call_genotype"], -1)
     gt_phased = BufferedArray(root["call_genotype_phased"], 0)
+    gt_mask = BufferedArray(root["call_genotype_mask"], 0)
 
     buffered_arrays = [
         contig,
         pos,
+        vid,
+        vid_mask,
         qual,
         gt,
         gt_phased,
+        gt_mask,
     ]
 
     chunk_length = pos.buff.shape[0]
@@ -162,6 +168,9 @@ def write_partition(
 
     contig_name_map = {name: j for j, name in enumerate(vcf_fields.contig_names)}
 
+    gt_min = -1  # TODO make this -2 if mixed_ploidy
+    gt_max = 7  # TODO based on dtype
+
     # Flushing out the chunks takes less time than reading in here in the
     # main thread, so no real point in using lots of threads.
     alleles = []
@@ -187,10 +196,14 @@ def write_partition(
             pos.buff[j] = variant.POS
             if variant.QUAL is not None:
                 qual.buff[j] = variant.QUAL
+            if variant.ID is not None:
+                vid.buff[j] = variant.ID
+                vid_mask.buff[j] = False
             vcf_gt = variant.genotype.array()
             assert vcf_gt.shape[1] == 3
-            gt.buff[j] = vcf_gt[:, :-1]
+            gt.buff[j] = np.clip(vcf_gt[:, :-1], gt_min, gt_max)
             gt_phased.buff[j] = vcf_gt[:, -1]
+            gt_mask.buff[j] = gt.buff[j] < 0
 
             # Alleles are treated separately. Store the alleles for each site
             # in a list and return to the main thread for later processing.
@@ -281,10 +294,7 @@ def scan_vcfs(paths, show_progress):
     return vcf_fields, chunks
 
 
-def create_zarr(path, vcf_fields, partitions):
-    chunk_width = 10000
-    chunk_length = 2000
-
+def create_zarr(path, vcf_fields, partitions, *, chunk_length, chunk_width):
     sample_id = np.array(vcf_fields.samples, dtype="O")
     n = sample_id.shape[0]
     m = sum(partition.num_records for partition in partitions)
@@ -294,11 +304,17 @@ def create_zarr(path, vcf_fields, partitions):
     compressor = numcodecs.Blosc(
         cname="zstd", clevel=7, shuffle=numcodecs.Blosc.AUTOSHUFFLE
     )
-    a = root.array("sample_id", sample_id, dtype="str", compressor=compressor)
+    a = root.array(
+        "sample_id",
+        sample_id,
+        chunks=(chunk_width,),
+        dtype="str",
+        compressor=compressor,
+    )
     a.attrs["_ARRAY_DIMENSIONS"] = ["samples"]
 
     a = root.array(
-        "variant_contig_names",
+        "contig_id",
         vcf_fields.contig_names,
         dtype="str",
         compressor=compressor,
@@ -324,6 +340,24 @@ def create_zarr(path, vcf_fields, partitions):
     a.attrs["_ARRAY_DIMENSIONS"] = ["variants"]
 
     a = root.empty(
+        "variant_id",
+        shape=(m),
+        chunks=(chunk_length),
+        dtype="str",
+        compressor=compressor,
+    )
+    a.attrs["_ARRAY_DIMENSIONS"] = ["variants"]
+
+    a = root.empty(
+        "variant_id_mask",
+        shape=(m),
+        chunks=(chunk_length),
+        dtype=bool,
+        compressor=compressor,
+    )
+    a.attrs["_ARRAY_DIMENSIONS"] = ["variants"]
+
+    a = root.empty(
         "variant_quality",
         shape=(m),
         chunks=(chunk_length),
@@ -341,7 +375,14 @@ def create_zarr(path, vcf_fields, partitions):
     )
     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "samples", "ploidy"]
 
-    # TODO add call_genotype_mask. What's the point of it, though?
+    a = root.empty(
+        "call_genotype_mask",
+        shape=(m, n, 2),
+        chunks=(chunk_length, chunk_width),
+        dtype=bool,
+        compressor=compressor,
+    )
+    a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "samples", "ploidy"]
 
     a = root.empty(
         "call_genotype_phased",
@@ -372,7 +413,7 @@ def create_zarr(path, vcf_fields, partitions):
     # )
 
 
-def finalise_zarr(path, partitions):
+def finalise_zarr(path, partitions, chunk_length):
     m = sum(partition.num_records for partition in partitions)
 
     alleles = []
@@ -395,7 +436,11 @@ def finalise_zarr(path, partitions):
         cname="zstd", clevel=7, shuffle=numcodecs.Blosc.AUTOSHUFFLE
     )
     a = root.array(
-        "variant_alleles", variant_allele_array, dtype="str", compressor=compressor
+        "variant_allele",
+        variant_allele_array,
+        chunks=(chunk_length,),
+        dtype="str",
+        compressor=compressor,
     )
     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "alleles"]
 
@@ -417,13 +462,28 @@ def init_workers(counter):
     progress_counter = counter
 
 
-def convert(vcfs, out_path, show_progress=False):
+def convert_vcf(
+    vcfs, out_path, *, chunk_length=None, chunk_width=None, show_progress=False
+):
     # TODO add a try-except here for KeyboardInterrupt which will kill
     # various things and clean-up.
     vcf_fields, partitions = scan_vcfs(vcfs, show_progress=show_progress)
+
+    # TODO choose chunks
+    if chunk_width is None:
+        chunk_width = 10000
+    if chunk_length is None:
+        chunk_length = 2000
+
     # TODO write the Zarr to a temporary name, only renaming at the end
     # on success.
-    create_zarr(out_path, vcf_fields, partitions)
+    create_zarr(
+        out_path,
+        vcf_fields,
+        partitions,
+        chunk_width=chunk_width,
+        chunk_length=chunk_length,
+    )
 
     total_variants = sum(partition.num_records for partition in partitions)
     global progress_counter
@@ -455,14 +515,14 @@ def convert(vcfs, out_path, show_progress=False):
                         last_chunk_lock=locks[j + 1],
                     )
                 )
-            completed = []
+            completed_partitions = []
             for future in concurrent.futures.as_completed(futures):
                 exception = future.exception()
                 if exception is not None:
                     raise exception
-                completed.append(future.result())
+                completed_partitions.append(future.result())
 
     assert progress_counter.value == total_variants
 
-    completed.sort(key=lambda x: x.first_position)
-    finalise_zarr(out_path, completed)
+    completed_partitions.sort(key=lambda x: x.first_position)
+    finalise_zarr(out_path, completed_partitions, chunk_length)
