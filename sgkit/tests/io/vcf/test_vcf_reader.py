@@ -42,7 +42,11 @@ from .utils import path_for_test
 @pytest.mark.parametrize("method", ["to_zarr", "convert", "load"])
 @pytest.mark.filterwarnings("ignore::xarray.coding.variables.SerializationWarning")
 def test_vcf_to_zarr__small_vcf(
-    shared_datadir, is_path, read_chunk_length, tmp_path, method,
+    shared_datadir,
+    is_path,
+    read_chunk_length,
+    tmp_path,
+    method,
 ):
     path = path_for_test(shared_datadir, "sample.vcf.gz", is_path)
     output = tmp_path.joinpath("vcf.zarr").as_posix()
@@ -68,6 +72,21 @@ def test_vcf_to_zarr__small_vcf(
     else:
         ds = read_vcf(path, chunk_length=5, chunk_width=2)
 
+    assert_array_equal(ds["filter_id"], ["PASS", "s50", "q10"])
+    assert_array_equal(
+        ds["variant_filter"],
+        [
+            [False, False, False],
+            [False, False, False],
+            [True, False, False],
+            [False, False, True],
+            [True, False, False],
+            [True, False, False],
+            [True, False, False],
+            [False, False, False],
+            [True, False, False],
+        ],
+    )
     assert_array_equal(ds["contig_id"], ["19", "20", "X"])
     assert "contig_length" not in ds
     assert_array_equal(ds["variant_contig"], [0, 0, 1, 1, 1, 1, 1, 1, 2])
@@ -1689,3 +1708,30 @@ def test_vcf_to_zarr__no_samples(shared_datadir, tmp_path):
     assert_array_equal(ds["sample_id"], [])
     assert_array_equal(ds["contig_id"], ["1"])
     assert ds.sizes["variants"] == 973
+
+
+@pytest.mark.parametrize(
+    "vcf_name",
+    [
+        "1000G.phase3.broad.withGenotypes.chr20.10100000.vcf.gz",
+        "CEUTrio.20.21.gatk3.4.csi.g.vcf.bgz",
+        "CEUTrio.20.21.gatk3.4.g.bcf",
+        "CEUTrio.20.21.gatk3.4.g.vcf.bgz",
+        "CEUTrio.20.gatk3.4.g.vcf.bgz",
+        "CEUTrio.21.gatk3.4.g.vcf.bgz",
+        "NA12878.prod.chr20snippet.g.vcf.gz",
+        "sample_multiple_filters.vcf.gz",
+        "sample.vcf.gz",
+        "allele_overflow.vcf.gz",
+    ],
+)
+def test_compare_vcf_to_zarr_convert(shared_datadir, tmp_path, vcf_name):
+    max_alt_alleles = 200
+    vcf_path = path_for_test(shared_datadir, vcf_name)
+    zarr1_path = tmp_path.joinpath("vcf1.zarr").as_posix()
+    vcf_to_zarr(vcf_path, zarr1_path, max_alt_alleles=max_alt_alleles)
+    zarr2_path = tmp_path.joinpath("vcf2.zarr").as_posix()
+    convert_vcf([vcf_path], zarr2_path, max_alt_alleles=max_alt_alleles)
+    ds1 = load_dataset(zarr1_path)
+    ds2 = load_dataset(zarr2_path)
+    xr.testing.assert_equal(ds1, ds2)
