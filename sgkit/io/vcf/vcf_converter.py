@@ -18,6 +18,7 @@ import zarr
 
 from .vcf_reader import VcfFieldHandler, _vcf_type_to_numpy
 from sgkit.io.utils import FLOAT32_MISSING, str_is_int
+
 # from sgkit.io.utils import INT_FILL, concatenate_and_rechunk, str_is_int
 from sgkit.utils import smallest_numpy_int_dtype
 
@@ -134,9 +135,6 @@ def write_partition(
     store = zarr.DirectoryStore(zarr_path)
     root = zarr.group(store=store)
 
-    fixed_info_fields = [
-        field for field in vcf_metadata.info_fields if field.dimension is not None]
-
     contig = BufferedArray(root["variant_contig"], -1)
     pos = BufferedArray(root["variant_position"], -1)
     vid = BufferedArray(root["variant_id"], ".")
@@ -165,6 +163,13 @@ def write_partition(
             ba = BufferedArray(root[field.variable_name], field.missing_value)
             buffered_arrays.append(ba)
             fixed_info_fields.append((field, ba))
+
+    fixed_format_fields = []
+    for field in vcf_metadata.format_fields:
+        if field.dimension is not None:
+            ba = BufferedArray(root[field.variable_name], field.missing_value)
+            buffered_arrays.append(ba)
+            fixed_format_fields.append((field, ba))
 
     # buffered_infos = {info.name: [] for info in vcf_metadata.info_fields}
     buffered_infos = {}
@@ -258,6 +263,12 @@ def write_partition(
                     buffered_array.buff[j] = variant.INFO[field.name]
                 except KeyError:
                     pass
+            for field, buffered_array in fixed_format_fields:
+                val = variant.format(field.name)
+                try:
+                    buffered_array.buff[j] = val.T
+                except KeyError:
+                    pass
 
             # TODO this basically works, but we will need some specialised handlers
             # to make sure that the data gets written in a way thats compatible with
@@ -336,9 +347,10 @@ class VcfFieldDefinition:
         if str_is_int(vcf_number):
             dimension = int(vcf_number)
         dtype, missing_value, fill_value = _vcf_type_to_numpy(
-                vcf_type, "FIXME", definition["ID"])
+            vcf_type, "FIXME", definition["ID"]
+        )
         if dtype == "O":
-            dtype= "str"
+            dtype = "str"
         if dtype.startswith("f"):
             missing_value = float(missing_value)
             fill_value = float(fill_value)
@@ -346,14 +358,15 @@ class VcfFieldDefinition:
             category=category,
             name=name,
             variable_name=variable_name,
-            vcf_number = vcf_number,
-            vcf_type = vcf_type,
-            description = definition["Description"].strip('"'),
-            dimension = dimension,
-            dtype = dtype,
+            vcf_number=vcf_number,
+            vcf_type=vcf_type,
+            description=definition["Description"].strip('"'),
+            dimension=dimension,
+            dtype=dtype,
             missing_value=missing_value,
             fill_value=fill_value,
         )
+
 
 @dataclasses.dataclass
 class VcfMetadata:
@@ -366,6 +379,10 @@ class VcfMetadata:
     @property
     def info_fields(self):
         return [field for field in self.fields if field.category == "INFO"]
+
+    @property
+    def format_fields(self):
+        return [field for field in self.fields if field.category == "FORMAT"]
 
 
 def scan_vcfs(paths, show_progress):
@@ -387,13 +404,15 @@ def scan_vcfs(paths, show_progress):
         fields = []
         for h in vcf.header_iter():
             if h["HeaderType"] in ["INFO", "FORMAT"]:
-                fields.append(VcfFieldDefinition.from_header(h))
+                # Only keep optional format fields, GT is a special case.
+                if h["ID"] != "GT":
+                    fields.append(VcfFieldDefinition.from_header(h))
 
         metadata = VcfMetadata(
             samples=vcf.samples,
             contig_names=vcf.seqnames,
             filters=filters,
-            fields=fields
+            fields=fields,
         )
         try:
             metadata.contig_lengths = vcf.seqlens
@@ -558,27 +577,48 @@ def create_zarr(
     tmp_dir = path / "tmp"
     tmp_dir.mkdir()
 
-    for info_field in vcf_metadata.info_fields:
-        if info_field.dimension is not None:
+    for field in vcf_metadata.info_fields:
+        if field.dimension is not None:
             # Fixed field, allocated an array
-            # print(info_field)
+            # print(field)
             shape = m
-            if info_field.dimension > 1:
+            if field.dimension > 1:
                 shape = (m, dimension)
-            # TODO add comment for description
             a = root.empty(
-                info_field.variable_name,
+                field.variable_name,
                 shape=shape,
                 chunks=(chunk_length),
-                dtype=info_field.dtype,
+                dtype=field.dtype,
                 compressor=compressor,
             )
             a.attrs["_ARRAY_DIMENSIONS"] = ["variants"]
             # print(a)
 
         else:
-            # print(info_field)
-            field_dir = tmp_dir / f"INFO_{info_field.name}"
+            # print(field)
+            field_dir = tmp_dir / f"INFO_{field.name}"
+            field_dir.mkdir()
+
+    for field in vcf_metadata.format_fields:
+        if field.dimension is not None:
+            # Fixed field, allocated an array
+            print(field)
+            shape = m, n
+            if field.dimension > 1:
+                shape = (m, n, dimension)
+            a = root.empty(
+                field.variable_name,
+                shape=shape,
+                chunks=(chunk_length, chunk_width),
+                dtype=field.dtype,
+                compressor=compressor,
+            )
+            a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "samples"]
+            print(a)
+
+        else:
+            print()
+            field_dir = tmp_dir / f"FORMAT_{field.name}"
             field_dir.mkdir()
 
 

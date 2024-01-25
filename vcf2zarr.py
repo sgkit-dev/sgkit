@@ -9,9 +9,10 @@ from sgkit import load_dataset
 def main(vcfs, out_path):
     convert_vcf(vcfs, out_path, show_progress=True)
 
-    # ds = load_dataset(out_path)
-    # print(ds)
-    # print(ds.variant_ReadPosRankSum.values)
+    ds = load_dataset(out_path)
+    print(ds)
+    print(ds.variant_ReadPosRankSum.values)
+    print(ds.call_GQ.values)
 
 if __name__ == "__main__":
     main()
