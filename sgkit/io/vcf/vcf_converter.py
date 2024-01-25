@@ -7,6 +7,7 @@ import threading
 import pathlib
 import time
 import pickle
+import json
 from typing import Any
 
 import cyvcf2
@@ -15,8 +16,9 @@ import numpy as np
 import tqdm
 import zarr
 
-from .vcf_reader import VcfFieldHandler, _normalize_fields
-from sgkit.io.utils import FLOAT32_MISSING
+from .vcf_reader import VcfFieldHandler, _vcf_type_to_numpy
+from sgkit.io.utils import FLOAT32_MISSING, str_is_int
+# from sgkit.io.utils import INT_FILL, concatenate_and_rechunk, str_is_int
 from sgkit.utils import smallest_numpy_int_dtype
 
 numcodecs.blosc.use_threads = False
@@ -132,6 +134,9 @@ def write_partition(
     store = zarr.DirectoryStore(zarr_path)
     root = zarr.group(store=store)
 
+    fixed_info_fields = [
+        field for field in vcf_metadata.info_fields if field.dimension is not None]
+
     contig = BufferedArray(root["variant_contig"], -1)
     pos = BufferedArray(root["variant_position"], -1)
     vid = BufferedArray(root["variant_id"], ".")
@@ -154,7 +159,15 @@ def write_partition(
         gt_mask,
     ]
 
-    buffered_infos = {info.name: [] for info in vcf_metadata.info_fields}
+    fixed_info_fields = []
+    for field in vcf_metadata.info_fields:
+        if field.dimension is not None:
+            ba = BufferedArray(root[field.variable_name], field.missing_value)
+            buffered_arrays.append(ba)
+            fixed_info_fields.append((field, ba))
+
+    # buffered_infos = {info.name: [] for info in vcf_metadata.info_fields}
+    buffered_infos = {}
 
     chunk_length = pos.buff.shape[0]
 
@@ -240,6 +253,12 @@ def write_partition(
             # in a list and return to the main thread for later processing.
             alleles.append([variant.REF] + variant.ALT)
 
+            for field, buffered_array in fixed_info_fields:
+                try:
+                    buffered_array.buff[j] = variant.INFO[field.name]
+                except KeyError:
+                    pass
+
             # TODO this basically works, but we will need some specialised handlers
             # to make sure that the data gets written in a way thats compatible with
             # turning the concatenated values into numpy arrays at the end.
@@ -294,26 +313,59 @@ class VcfPartition:
 
 @dataclasses.dataclass
 class VcfFieldDefinition:
+    category: str
     name: str
     vcf_number: str
     vcf_type: str
     description: str
+    variable_name: str
+    dimension: Any
+    dtype: str
+    missing_value: Any
+    fill_value: Any
 
-    def __init__(self, definition):
-        self.name = definition["ID"]
-        self.vcf_number = definition["Number"]
-        self.vcf_type = definition["Type"]
-        self.description = definition["Description"].strip('"')
-
+    @staticmethod
+    def from_header(definition):
+        category = definition["HeaderType"]
+        name = definition["ID"]
+        prefix = "call" if category == "FORMAT" else "variant"
+        variable_name = f"{prefix}_{name}"
+        vcf_number = definition["Number"]
+        vcf_type = definition["Type"]
+        dimension = None
+        if str_is_int(vcf_number):
+            dimension = int(vcf_number)
+        dtype, missing_value, fill_value = _vcf_type_to_numpy(
+                vcf_type, "FIXME", definition["ID"])
+        if dtype == "O":
+            dtype= "str"
+        if dtype.startswith("f"):
+            missing_value = float(missing_value)
+            fill_value = float(fill_value)
+        return VcfFieldDefinition(
+            category=category,
+            name=name,
+            variable_name=variable_name,
+            vcf_number = vcf_number,
+            vcf_type = vcf_type,
+            description = definition["Description"].strip('"'),
+            dimension = dimension,
+            dtype = dtype,
+            missing_value=missing_value,
+            fill_value=fill_value,
+        )
 
 @dataclasses.dataclass
 class VcfMetadata:
     samples: list
     contig_names: list
     filters: list
-    info_fields: list
-    format_fields: list
+    fields: list
     contig_lengths: list = None
+
+    @property
+    def info_fields(self):
+        return [field for field in self.fields if field.category == "INFO"]
 
 
 def scan_vcfs(paths, show_progress):
@@ -332,20 +384,16 @@ def scan_vcfs(paths, show_progress):
             filters.remove("PASS")
             filters.insert(0, "PASS")
 
-        info_fields = []
-        format_fields = []
+        fields = []
         for h in vcf.header_iter():
-            if h["HeaderType"] == "INFO":
-                info_fields.append(VcfFieldDefinition(h))
-            if h["HeaderType"] == "FORMAT":
-                format_fields.append(VcfFieldDefinition(h))
+            if h["HeaderType"] in ["INFO", "FORMAT"]:
+                fields.append(VcfFieldDefinition.from_header(h))
 
         metadata = VcfMetadata(
             samples=vcf.samples,
             contig_names=vcf.seqnames,
             filters=filters,
-            info_fields=info_fields,
-            format_fields=format_fields,
+            fields=fields
         )
         try:
             metadata.contig_lengths = vcf.seqlens
@@ -511,8 +559,27 @@ def create_zarr(
     tmp_dir.mkdir()
 
     for info_field in vcf_metadata.info_fields:
-        field_dir = tmp_dir / f"INFO_{info_field.name}"
-        field_dir.mkdir()
+        if info_field.dimension is not None:
+            # Fixed field, allocated an array
+            # print(info_field)
+            shape = m
+            if info_field.dimension > 1:
+                shape = (m, dimension)
+            # TODO add comment for description
+            a = root.empty(
+                info_field.variable_name,
+                shape=shape,
+                chunks=(chunk_length),
+                dtype=info_field.dtype,
+                compressor=compressor,
+            )
+            a.attrs["_ARRAY_DIMENSIONS"] = ["variants"]
+            # print(a)
+
+        else:
+            # print(info_field)
+            field_dir = tmp_dir / f"INFO_{info_field.name}"
+            field_dir.mkdir()
 
 
 def finalise_zarr(path, vcf_metadata, partitions, chunk_length, max_num_alleles):
@@ -548,21 +615,21 @@ def finalise_zarr(path, vcf_metadata, partitions, chunk_length, max_num_alleles)
     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "alleles"]
 
     tmp_dir = path / "tmp"
-    for info_field in vcf_metadata.info_fields:
-        field_dir = tmp_dir / f"INFO_{info_field.name}"
-        data = []
-        for partition in partitions:
-            for chunk in range(partition.num_chunks):
-                filename = field_dir / f"{partition.index}.{chunk}"
-                with open(filename, "rb") as f:
-                    data.extend(pickle.load(f))
+    # for info_field in vcf_metadata.info_fields:
+    #     field_dir = tmp_dir / f"INFO_{info_field.name}"
+    #     data = []
+    #     for partition in partitions:
+    #         for chunk in range(partition.num_chunks):
+    #             filename = field_dir / f"{partition.index}.{chunk}"
+    #             with open(filename, "rb") as f:
+    #                 data.extend(pickle.load(f))
 
-        print(info_field, ":", data[:10])
-        try:
-            np_array = np.array(data)
-            print("\t", np_array)
-        except ValueError as e:
-            print("\terror", e)
+    #     print(info_field, ":", data[:10])
+    #     try:
+    #         np_array = np.array(data)
+    #         print("\t", np_array)
+    #     except ValueError as e:
+    #         print("\terror", e)
 
     zarr.consolidate_metadata(path)
 
@@ -596,6 +663,14 @@ def convert_vcf(
     # TODO add a try-except here for KeyboardInterrupt which will kill
     # various things and clean-up.
     vcf_metadata, partitions = scan_vcfs(vcfs, show_progress=show_progress)
+
+    # TODO add support for writing out the vcf_metadata to file so that
+    # it can be tweaked later.
+    # We want to add support for doing these steps independently as an
+    # interative tweaking process, so that users can get feedback on
+    # what fields are being stored and how much space they might take.
+
+    # print(json.dumps(dataclasses.asdict(vcf_metadata), indent=4))
 
     # TODO choose chunks
     if chunk_width is None:
