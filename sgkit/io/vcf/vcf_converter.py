@@ -160,14 +160,14 @@ def write_partition(
     fixed_info_fields = []
     for field in vcf_metadata.info_fields:
         if field.dimension is not None:
-            ba = BufferedArray(root[field.variable_name], field.missing_value)
+            ba = BufferedArray(root[field.variable_name], field.fill_value)
             buffered_arrays.append(ba)
             fixed_info_fields.append((field, ba))
 
     fixed_format_fields = []
     for field in vcf_metadata.format_fields:
         if field.dimension is not None:
-            ba = BufferedArray(root[field.variable_name], field.missing_value)
+            ba = BufferedArray(root[field.variable_name], field.fill_value)
             buffered_arrays.append(ba)
             fixed_format_fields.append((field, ba))
 
@@ -264,11 +264,21 @@ def write_partition(
                 except KeyError:
                     pass
             for field, buffered_array in fixed_format_fields:
-                val = variant.format(field.name)
+                # NOTE not sure the semantics is correct here
+                val = None
                 try:
-                    buffered_array.buff[j] = val.T
+                    val = variant.format(field.name)
                 except KeyError:
                     pass
+                if val is not None:
+                    # Quick hack - cyvcf2's missing value is different
+                    if field.vcf_type == "Integer":
+                        val[val == -2147483648] = -1
+                    # print("row = ", j)
+                    # print(field)
+                    # print(buffered_array)
+                    # print(type(val), val)
+                    buffered_array.buff[j] = val.reshape(buffered_array.buff.shape[1:])
 
             # TODO this basically works, but we will need some specialised handlers
             # to make sure that the data gets written in a way thats compatible with
@@ -330,6 +340,7 @@ class VcfFieldDefinition:
     vcf_type: str
     description: str
     variable_name: str
+    # TODO rename. This is the extra dimension
     dimension: Any
     dtype: str
     missing_value: Any
@@ -582,8 +593,10 @@ def create_zarr(
             # Fixed field, allocated an array
             # print(field)
             shape = m
+            dimensions = ["variants"]
             if field.dimension > 1:
-                shape = (m, dimension)
+                shape = (m, field.dimension)
+                dimensions.append(field.name)
             a = root.empty(
                 field.variable_name,
                 shape=shape,
@@ -591,7 +604,7 @@ def create_zarr(
                 dtype=field.dtype,
                 compressor=compressor,
             )
-            a.attrs["_ARRAY_DIMENSIONS"] = ["variants"]
+            a.attrs["_ARRAY_DIMENSIONS"] = dimensions
             # print(a)
 
         else:
@@ -602,10 +615,12 @@ def create_zarr(
     for field in vcf_metadata.format_fields:
         if field.dimension is not None:
             # Fixed field, allocated an array
-            print(field)
+            # print(field)
             shape = m, n
+            dimensions = ["variants", "samples"]
             if field.dimension > 1:
-                shape = (m, n, dimension)
+                shape = (m, n, field.dimension)
+                dimensions.append(field.name)
             a = root.empty(
                 field.variable_name,
                 shape=shape,
@@ -613,11 +628,11 @@ def create_zarr(
                 dtype=field.dtype,
                 compressor=compressor,
             )
-            a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "samples"]
-            print(a)
+            a.attrs["_ARRAY_DIMENSIONS"] = dimensions
+            # print(a)
 
         else:
-            print()
+            # print()
             field_dir = tmp_dir / f"FORMAT_{field.name}"
             field_dir.mkdir()
 

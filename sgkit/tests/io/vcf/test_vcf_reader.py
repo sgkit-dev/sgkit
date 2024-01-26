@@ -50,7 +50,16 @@ def test_vcf_to_zarr__small_vcf(
 ):
     path = path_for_test(shared_datadir, "sample.vcf.gz", is_path)
     output = tmp_path.joinpath("vcf.zarr").as_posix()
-
+    fields = [
+        "INFO/NS",
+        "INFO/AN",
+        "INFO/AA",
+        "INFO/DB",
+        "FORMAT/GT",
+        "FORMAT/DP",
+        "FORMAT/HQ",
+    ]
+    field_defs = {"FORMAT/HQ": {"dimension": "ploidy"}}
     if method == "to_zarr":
         vcf_to_zarr(
             path,
@@ -58,6 +67,8 @@ def test_vcf_to_zarr__small_vcf(
             chunk_length=5,
             chunk_width=2,
             read_chunk_length=read_chunk_length,
+            fields=fields,
+            field_defs=field_defs,
         )
         ds = xr.open_zarr(output)
 
@@ -70,7 +81,9 @@ def test_vcf_to_zarr__small_vcf(
         )
         ds = xr.open_zarr(output)
     else:
-        ds = read_vcf(path, chunk_length=5, chunk_width=2)
+        ds = read_vcf(
+            path, chunk_length=5, chunk_width=2, fields=fields, field_defs=field_defs
+        )
 
     assert_array_equal(ds["filter_id"], ["PASS", "s50", "q10"])
     assert_array_equal(
@@ -91,11 +104,57 @@ def test_vcf_to_zarr__small_vcf(
     assert "contig_length" not in ds
     assert_array_equal(ds["variant_contig"], [0, 0, 1, 1, 1, 1, 1, 1, 2])
     assert ds["variant_contig"].chunks[0][0] == 5
+
     assert_array_equal(
         ds["variant_position"],
         [111, 112, 14370, 17330, 1110696, 1230237, 1234567, 1235237, 10],
     )
     assert ds["variant_position"].chunks[0][0] == 5
+
+    assert_array_equal(
+        ds["variant_NS"],
+        [-2, -2, 3, 3, 2, 3, 3, -2, -2],
+    )
+    assert ds["variant_NS"].chunks[0][0] == 5
+
+    assert_array_equal(
+        ds["variant_AN"],
+        [-2, -2, -2, -2, -2, -2, 6, -2, -2],
+    )
+    assert ds["variant_AN"].chunks[0][0] == 5
+
+    assert_array_equal(
+        ds["variant_AA"],
+        [
+            "",
+            "",
+            "",
+            "",
+            "T",
+            "T",
+            "G",
+            "",
+            "",
+        ],
+    )
+    assert ds["variant_AN"].chunks[0][0] == 5
+
+    assert_array_equal(
+        ds["variant_DB"],
+        [
+            False,
+            False,
+            True,
+            False,
+            True,
+            False,
+            False,
+            False,
+            False,
+        ],
+    )
+    assert ds["variant_AN"].chunks[0][0] == 5
+
     assert_array_equal(
         ds["variant_allele"].values.tolist(),
         [
@@ -155,18 +214,42 @@ def test_vcf_to_zarr__small_vcf(
         ],
         dtype=bool,
     )
+    call_DP = [
+        [-2, -2, -2],
+        [-2, -2, -2],
+        [1, 8, 5],
+        [3, 5, 3],
+        [6, 0, 4],
+        [-1, 4, 2],
+        [4, 2, 3],
+        [-2, -2, -2],
+        [-2, -2, -2],
+    ]
+    call_HQ = [
+        [[10, 15], [10, 10], [3, 3]],
+        [[10, 10], [10, 10], [3, 3]],
+        [[51, 51], [51, 51], [-1, -1]],
+        [[58, 50], [65, 3], [-1, -1]],
+        [[23, 27], [18, 2], [-1, -1]],
+        [[56, 60], [51, 51], [-1, -1]],
+        [[-2, -2], [-2, -2], [-2, -2]],
+        [[-2, -2], [-2, -2], [-2, -2]],
+        [[-2, -2], [-2, -2], [-2, -2]],
+    ]
+
+    # print(np.array2string(ds["call_HQ"].values, separator=","))
+
     assert_array_equal(ds["call_genotype"], call_genotype)
-    assert ds["call_genotype"].chunks[0][0] == 5
-    assert ds["call_genotype"].chunks[1][0] == 2
-    assert ds["call_genotype"].chunks[2][0] == 2
     assert_array_equal(ds["call_genotype_mask"], call_genotype < 0)
-    assert ds["call_genotype_mask"].chunks[0][0] == 5
-    assert ds["call_genotype_mask"].chunks[1][0] == 2
-    assert ds["call_genotype_mask"].chunks[2][0] == 2
     assert_array_equal(ds["call_genotype_phased"], call_genotype_phased)
-    assert ds["call_genotype_mask"].chunks[0][0] == 5
-    assert ds["call_genotype_mask"].chunks[1][0] == 2
-    assert ds["call_genotype_mask"].chunks[2][0] == 2
+    assert_array_equal(ds["call_DP"], call_DP)
+    assert_array_equal(ds["call_HQ"], call_HQ)
+
+    for name in ["call_genotype", "call_genotype_mask", "call_HQ"]:
+        assert ds[name].chunks == ((5, 4), (2, 1), (2,))
+
+    for name in ["call_genotype_phased", "call_DP"]:
+        assert ds[name].chunks == ((5, 4), (2, 1))
 
     # save and load again to test https://github.com/pydata/xarray/issues/3476
     path2 = tmp_path / "ds2.zarr"
@@ -1732,6 +1815,8 @@ def test_compare_vcf_to_zarr_convert(shared_datadir, tmp_path, vcf_name):
     vcf_to_zarr(vcf_path, zarr1_path, max_alt_alleles=max_alt_alleles)
     zarr2_path = tmp_path.joinpath("vcf2.zarr").as_posix()
     convert_vcf([vcf_path], zarr2_path, max_alt_alleles=max_alt_alleles)
+    # convert reads all variables by default.
     ds1 = load_dataset(zarr1_path)
+    base_vars = list(ds1)
     ds2 = load_dataset(zarr2_path)
-    xr.testing.assert_equal(ds1, ds2)
+    xr.testing.assert_equal(ds1, ds2[base_vars])
