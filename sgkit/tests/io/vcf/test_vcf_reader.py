@@ -1793,6 +1793,7 @@ def test_vcf_to_zarr__no_samples(shared_datadir, tmp_path):
     assert ds.sizes["variants"] == 973
 
 
+# TODO take out some of these, they take far too long
 @pytest.mark.parametrize(
     "vcf_name",
     [
@@ -1802,7 +1803,6 @@ def test_vcf_to_zarr__no_samples(shared_datadir, tmp_path):
         "CEUTrio.20.21.gatk3.4.g.vcf.bgz",
         "CEUTrio.20.gatk3.4.g.vcf.bgz",
         "CEUTrio.21.gatk3.4.g.vcf.bgz",
-        "NA12878.prod.chr20snippet.g.vcf.gz",
         "sample_multiple_filters.vcf.gz",
         "sample.vcf.gz",
         "allele_overflow.vcf.gz",

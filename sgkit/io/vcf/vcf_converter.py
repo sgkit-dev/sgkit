@@ -7,7 +7,6 @@ import threading
 import pathlib
 import time
 import pickle
-import json
 from typing import Any
 
 import cyvcf2
@@ -16,8 +15,22 @@ import numpy as np
 import tqdm
 import zarr
 
-from .vcf_reader import VcfFieldHandler, _vcf_type_to_numpy
-from sgkit.io.utils import FLOAT32_MISSING, str_is_int
+from .vcf_reader import _vcf_type_to_numpy
+
+# from sgkit.io.utils import FLOAT32_MISSING, str_is_int
+from sgkit.io.utils import (
+    CHAR_FILL,
+    CHAR_MISSING,
+    FLOAT32_FILL,
+    FLOAT32_MISSING,
+    INT_FILL,
+    INT_MISSING,
+    STR_FILL,
+    STR_MISSING,
+    str_is_int,
+)
+
+# from sgkit.io.vcf import partition_into_regions
 
 # from sgkit.io.utils import INT_FILL, concatenate_and_rechunk, str_is_int
 from sgkit.utils import smallest_numpy_int_dtype
@@ -92,18 +105,30 @@ def async_flush_2d_array(executor, np_buffer, zarr_array, offset):
     return futures
 
 
+_dtype_to_fill = {
+    "|b1": False,
+    "|i1": INT_FILL,
+    "<i2": INT_FILL,
+    "<i4": INT_FILL,
+    "<f4": FLOAT32_FILL,
+    "|O": STR_FILL,
+}
+
+
 @dataclasses.dataclass
 class BufferedArray:
     array: Any
     buff: Any
     fill_value: Any
 
-    def __init__(self, array, fill_value):
+    def __init__(self, array, fill_value=None):
         self.array = array
         dims = list(array.shape)
         dims[0] = min(array.chunks[0], array.shape[0])
-        self.buff = np.full(dims, fill_value, dtype=array.dtype)
         self.fill_value = fill_value
+        if fill_value is None:
+            self.fill_value = _dtype_to_fill[array.dtype.str]
+        self.buff = np.full(dims, self.fill_value, dtype=array.dtype)
 
     def swap_buffers(self):
         self.buff = np.full_like(self.buff, self.fill_value)
@@ -135,15 +160,17 @@ def write_partition(
     store = zarr.DirectoryStore(zarr_path)
     root = zarr.group(store=store)
 
-    contig = BufferedArray(root["variant_contig"], -1)
-    pos = BufferedArray(root["variant_position"], -1)
-    vid = BufferedArray(root["variant_id"], ".")
-    vid_mask = BufferedArray(root["variant_id_mask"], True)
-    qual = BufferedArray(root["variant_quality"], FLOAT32_MISSING)
-    filt = BufferedArray(root["variant_filter"], False)
-    gt = BufferedArray(root["call_genotype"], -1)
-    gt_phased = BufferedArray(root["call_genotype_phased"], 0)
-    gt_mask = BufferedArray(root["call_genotype_mask"], 0)
+    contig = BufferedArray(root["variant_contig"])
+    pos = BufferedArray(root["variant_position"])
+    # TODO is this consistent with other fields? "." means missing where
+    # we're replacing with '' elsewhere
+    vid = BufferedArray(root["variant_id"], fill_value=".")
+    vid_mask = BufferedArray(root["variant_id_mask"], fill_value=True)
+    qual = BufferedArray(root["variant_quality"])
+    filt = BufferedArray(root["variant_filter"])
+    gt = BufferedArray(root["call_genotype"])
+    gt_phased = BufferedArray(root["call_genotype_phased"])
+    gt_mask = BufferedArray(root["call_genotype_mask"])
 
     buffered_arrays = [
         contig,
@@ -160,14 +187,14 @@ def write_partition(
     fixed_info_fields = []
     for field in vcf_metadata.info_fields:
         if field.dimension is not None:
-            ba = BufferedArray(root[field.variable_name], field.fill_value)
+            ba = BufferedArray(root[field.variable_name])
             buffered_arrays.append(ba)
             fixed_info_fields.append((field, ba))
 
     fixed_format_fields = []
     for field in vcf_metadata.format_fields:
         if field.dimension is not None:
-            ba = BufferedArray(root[field.variable_name], field.fill_value)
+            ba = BufferedArray(root[field.variable_name])
             buffered_arrays.append(ba)
             fixed_format_fields.append((field, ba))
 
@@ -225,8 +252,8 @@ def write_partition(
         # TODO this is the wrong approach here, we need to keep
         # access to the decode thread so that we can kill it
         # appropriately when an error occurs.
-        # for variant in ThreadedGenerator(vcf, queue_maxsize=200):
-        for variant in vcf:
+        for variant in ThreadedGenerator(vcf, queue_maxsize=200):
+            # for variant in vcf:
             # Translate this record into numpy buffers. There is some compute
             # done here, but it's not releasing the GIL, so may not be worth
             # moving to threads.
@@ -343,8 +370,6 @@ class VcfFieldDefinition:
     # TODO rename. This is the extra dimension
     dimension: Any
     dtype: str
-    missing_value: Any
-    fill_value: Any
 
     @staticmethod
     def from_header(definition):
@@ -362,9 +387,6 @@ class VcfFieldDefinition:
         )
         if dtype == "O":
             dtype = "str"
-        if dtype.startswith("f"):
-            missing_value = float(missing_value)
-            fill_value = float(fill_value)
         return VcfFieldDefinition(
             category=category,
             name=name,
@@ -374,8 +396,6 @@ class VcfFieldDefinition:
             description=definition["Description"].strip('"'),
             dimension=dimension,
             dtype=dtype,
-            missing_value=missing_value,
-            fill_value=fill_value,
         )
 
 
@@ -394,6 +414,22 @@ class VcfMetadata:
     @property
     def format_fields(self):
         return [field for field in self.fields if field.category == "FORMAT"]
+
+    def asdict(self):
+        return dataclasses.asdict(self)
+
+    @staticmethod
+    def fromdict(d):
+        fields = [VcfFieldDefinition(**fd) for fd in d["fields"]]
+        d = d.copy()
+        d["fields"] = fields
+        return VcfMetadata(**d)
+
+
+@dataclasses.dataclass
+class ConversionSpecification:
+    vcf_metadata: VcfMetadata
+    partitions: list
 
 
 def scan_vcfs(paths, show_progress):
@@ -452,7 +488,7 @@ def scan_vcfs(paths, show_progress):
         partition.start_offset = offset
         partition.index = index
         offset += partition.num_records
-    return vcf_metadata, partitions
+    return ConversionSpecification(vcf_metadata, partitions)
 
 
 def create_zarr(
@@ -669,7 +705,7 @@ def finalise_zarr(path, vcf_metadata, partitions, chunk_length, max_num_alleles)
     )
     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "alleles"]
 
-    tmp_dir = path / "tmp"
+    # tmp_dir = path / "tmp"
     # for info_field in vcf_metadata.info_fields:
     #     field_dir = tmp_dir / f"INFO_{info_field.name}"
     #     data = []
@@ -717,7 +753,7 @@ def convert_vcf(
 
     # TODO add a try-except here for KeyboardInterrupt which will kill
     # various things and clean-up.
-    vcf_metadata, partitions = scan_vcfs(vcfs, show_progress=show_progress)
+    spec = scan_vcfs(vcfs, show_progress=show_progress)
 
     # TODO add support for writing out the vcf_metadata to file so that
     # it can be tweaked later.
@@ -742,14 +778,14 @@ def convert_vcf(
     # on success.
     create_zarr(
         out_path,
-        vcf_metadata,
-        partitions,
+        spec.vcf_metadata,
+        spec.partitions,
         chunk_width=chunk_width,
         chunk_length=chunk_length,
         max_num_alleles=max_num_alleles,
     )
 
-    total_variants = sum(partition.num_records for partition in partitions)
+    total_variants = sum(partition.num_records for partition in spec.partitions)
     global progress_counter
     progress_counter = multiprocessing.Value("i", 0)
 
@@ -766,13 +802,13 @@ def convert_vcf(
         max_workers=1, initializer=init_workers, initargs=(progress_counter,)
     ) as executor:
         with multiprocessing.Manager() as manager:
-            locks = [manager.Lock() for _ in range(len(partitions) + 1)]
+            locks = [manager.Lock() for _ in range(len(spec.partitions) + 1)]
             futures = []
-            for j, part in enumerate(partitions):
+            for j, part in enumerate(spec.partitions):
                 futures.append(
                     executor.submit(
                         write_partition,
-                        vcf_metadata,
+                        spec.vcf_metadata,
                         out_path,
                         part,
                         max_num_alleles,
@@ -791,5 +827,5 @@ def convert_vcf(
 
     completed_partitions.sort(key=lambda x: x.first_position)
     finalise_zarr(
-        out_path, vcf_metadata, completed_partitions, chunk_length, max_num_alleles
+        out_path, spec.vcf_metadata, completed_partitions, chunk_length, max_num_alleles
     )
