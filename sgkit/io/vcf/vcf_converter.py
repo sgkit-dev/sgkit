@@ -134,14 +134,28 @@ class BufferedArray:
         self.buff = np.full_like(self.buff, self.fill_value)
 
 
-def flush_info_buffers(zarr_path, infos, partition_index, chunk_index):
-    for key, buff in infos.items():
+@dataclasses.dataclass
+class BufferedUnsizedField:
+    variable_name: str
+    buff: list = dataclasses.field(default_factory=list)
+
+    def swap_buffers(self):
+        self.buff = []
+
+    def sync_flush(self, zarr_path, partition_index, chunk_index):
         dest_file = (
-            zarr_path / "tmp" / f"INFO_{key}" / f"{partition_index}.{chunk_index}"
+            zarr_path / "tmp" / self.variable_name / f"{partition_index}.{chunk_index}"
         )
         with open(dest_file, "wb") as f:
-            pickle.dump(buff, f)
-            buff = []
+            pickle.dump(self.buff, f)
+
+
+def flush_futures(futures):
+    # Make sure previous futures have completed
+    for future in concurrent.futures.as_completed(futures):
+        exception = future.exception()
+        if exception is not None:
+            raise exception
 
 
 def write_partition(
@@ -168,6 +182,7 @@ def write_partition(
     vid_mask = BufferedArray(root["variant_id_mask"], fill_value=True)
     qual = BufferedArray(root["variant_quality"])
     filt = BufferedArray(root["variant_filter"])
+    # TODO check if arrays exists
     gt = BufferedArray(root["call_genotype"])
     gt_phased = BufferedArray(root["call_genotype_phased"])
     gt_mask = BufferedArray(root["call_genotype_mask"])
@@ -183,14 +198,12 @@ def write_partition(
         gt_phased,
         gt_mask,
     ]
-
     fixed_info_fields = []
     for field in vcf_metadata.info_fields:
         if field.dimension is not None:
             ba = BufferedArray(root[field.variable_name])
             buffered_arrays.append(ba)
             fixed_info_fields.append((field, ba))
-
     fixed_format_fields = []
     for field in vcf_metadata.format_fields:
         if field.dimension is not None:
@@ -198,18 +211,14 @@ def write_partition(
             buffered_arrays.append(ba)
             fixed_format_fields.append((field, ba))
 
-    # buffered_infos = {info.name: [] for info in vcf_metadata.info_fields}
-    buffered_infos = {}
+    # The unbound fields. These are buffered in Python lists and stored
+    # in pickled chunks for later analysis
+    allele = BufferedUnsizedField("variant_allele")
+    buffered_unsized_fields = [allele]
 
     chunk_length = pos.buff.shape[0]
 
-    def flush_buffers(futures, start=0, stop=chunk_length):
-        # Make sure previous futures have completed
-        for future in concurrent.futures.as_completed(futures):
-            exception = future.exception()
-            if exception is not None:
-                raise exception
-
+    def flush_fixed_buffers(start=0, stop=chunk_length):
         futures = []
         if start != 0 or stop != chunk_length:
             with contextlib.ExitStack() as stack:
@@ -234,6 +243,11 @@ def write_partition(
 
         return futures
 
+    def flush_unsized_buffers(chunk_index):
+        for buf in buffered_unsized_fields:
+            buf.sync_flush(zarr_path, partition.index, chunk_index)
+            buf.swap_buffers()
+
     contig_name_map = {name: j for j, name in enumerate(vcf_metadata.contig_names)}
     filter_map = {filter_id: j for j, filter_id in enumerate(vcf_metadata.filters)}
 
@@ -242,7 +256,6 @@ def write_partition(
 
     # Flushing out the chunks takes less time than reading in here in the
     # main thread, so no real point in using lots of threads.
-    alleles = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
         j = offset % chunk_length
         chunk_index = 0
@@ -281,10 +294,6 @@ def write_partition(
             gt_phased.buff[j] = vcf_gt[:, -1]
             gt_mask.buff[j] = gt.buff[j] < 0
 
-            # Alleles are treated separately. Store the alleles for each site
-            # in a list and return to the main thread for later processing.
-            alleles.append([variant.REF] + variant.ALT)
-
             for field, buffered_array in fixed_info_fields:
                 try:
                     buffered_array.buff[j] = variant.INFO[field.name]
@@ -301,36 +310,22 @@ def write_partition(
                     # Quick hack - cyvcf2's missing value is different
                     if field.vcf_type == "Integer":
                         val[val == -2147483648] = -1
-                    # print("row = ", j)
-                    # print(field)
-                    # print(buffered_array)
-                    # print(type(val), val)
                     buffered_array.buff[j] = val.reshape(buffered_array.buff.shape[1:])
 
-            # TODO this basically works, but we will need some specialised handlers
-            # to make sure that the data gets written in a way thats compatible with
-            # turning the concatenated values into numpy arrays at the end.
-            # Fixed length values should be put into arrays here like before,
-            # that's perhaps the next thing to do.
-            for key, buff in buffered_infos.items():
-                try:
-                    val = variant.INFO[key]
-                    if key == "AC":
-                        print(variant.POS, variant.ALT, val)
-                except KeyError:
-                    val = -1
-                buff.append(val)
+            allele.buff.append([variant.REF] + variant.ALT)
 
             j += 1
             if j == chunk_length:
-                futures = flush_buffers(futures, start=chunk_start)
+                flush_futures(futures)
+                futures = flush_fixed_buffers(start=chunk_start)
+                flush_unsized_buffers(chunk_index)
+                # flush_info_buffers(
+                #     zarr_path, buffered_infos, partition.index, chunk_index
+                # )
                 j = 0
                 offset += chunk_length - chunk_start
                 chunk_start = 0
                 assert offset % chunk_length == 0
-                flush_info_buffers(
-                    zarr_path, buffered_infos, partition.index, chunk_index
-                )
                 chunk_index += 1
 
             with progress_counter.get_lock():
@@ -339,11 +334,13 @@ def write_partition(
                 progress_counter.value += 1
 
         # Flush the last chunk
-        flush_buffers(futures, start=chunk_start, stop=j)
-        flush_info_buffers(zarr_path, buffered_infos, partition.index, chunk_index)
+        flush_futures(futures)
+        futures = flush_fixed_buffers(start=chunk_start, stop=j)
+        flush_unsized_buffers(chunk_index)
 
-    # Send the alleles list back to the main process.
-    partition.alleles = alleles
+        # Wait for the last batch of futures to complete
+        flush_futures(futures)
+
     partition.num_chunks = chunk_index + 1
     return partition
 
@@ -354,7 +351,6 @@ class VcfPartition:
     num_records: int
     first_position: int
     start_offset: int = 0
-    alleles: list = None
     index: int = -1
     num_chunks: int = -1
 
@@ -624,6 +620,10 @@ def create_zarr(
     tmp_dir = path / "tmp"
     tmp_dir.mkdir()
 
+    # print(field)
+    field_dir = tmp_dir / "variant_allele"
+    field_dir.mkdir()
+
     for field in vcf_metadata.info_fields:
         if field.dimension is not None:
             # Fixed field, allocated an array
@@ -673,32 +673,38 @@ def create_zarr(
             field_dir.mkdir()
 
 
-def finalise_zarr(path, vcf_metadata, partitions, chunk_length, max_num_alleles):
-    m = sum(partition.num_records for partition in partitions)
+def join_partitioned_lists(field_dir, partitions):
+    data = []
+    for partition in partitions:
+        for chunk in range(partition.num_chunks):
+            filename = field_dir / f"{partition.index}.{chunk}"
+            with open(filename, "rb") as f:
+                data.extend(pickle.load(f))
+    return data
 
-    alleles = []
-    for part in partitions:
-        alleles.extend(part.alleles)
 
-    # TODO raise a warning here if this isn't met.
-    # max_num_alleles = 0
-    # for row in alleles:
-    #     max_num_alleles = max(max_num_alleles, len(row))
-
-    variant_alleles = np.full((m, max_num_alleles), "", dtype="O")
-    for j, row in enumerate(alleles):
-        variant_alleles[j, : len(row)] = row
-
-    variant_allele_array = np.array(variant_alleles, dtype="O")
-
+def finalise_zarr(path, vcf_metadata, partitions, chunk_length):
     store = zarr.DirectoryStore(path)
     root = zarr.group(store=store, overwrite=False)
     compressor = numcodecs.Blosc(
         cname="zstd", clevel=7, shuffle=numcodecs.Blosc.AUTOSHUFFLE
     )
+    tmp_dir = path / "tmp"
+    m = sum(partition.num_records for partition in partitions)
+
+    py_alleles = join_partitioned_lists(tmp_dir / "variant_allele", partitions)
+    assert len(py_alleles) == m
+    max_num_alleles = 0
+    for row in py_alleles:
+        max_num_alleles = max(max_num_alleles, len(row))
+
+    variant_allele = np.full((m, max_num_alleles), "", dtype="O")
+    for j, row in enumerate(py_alleles):
+        variant_allele[j, : len(row)] = row
+
     a = root.array(
         "variant_allele",
-        variant_allele_array,
+        variant_allele,
         chunks=(chunk_length,),
         dtype="str",
         compressor=compressor,
@@ -772,6 +778,7 @@ def convert_vcf(
     if max_alt_alleles is None:
         max_alt_alleles = 3
 
+    # TODO This is currently only used to determine sizeof gt array
     max_num_alleles = max_alt_alleles + 1
 
     # TODO write the Zarr to a temporary name, only renaming at the end
@@ -826,6 +833,4 @@ def convert_vcf(
     assert progress_counter.value == total_variants
 
     completed_partitions.sort(key=lambda x: x.first_position)
-    finalise_zarr(
-        out_path, spec.vcf_metadata, completed_partitions, chunk_length, max_num_alleles
-    )
+    finalise_zarr(out_path, spec.vcf_metadata, completed_partitions, chunk_length)
