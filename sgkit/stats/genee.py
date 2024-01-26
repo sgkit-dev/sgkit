@@ -18,7 +18,7 @@ def genee(ds: Dataset, ld: ArrayLike, *, reg_covar: float = 0.000001) -> DataFra
     ds
         Dataset containing beta values (OLS betas or regularized betas).
     ld
-        2D array of LD values.
+        Dense 2D array corresponding to the LD matrix.
     reg_covar
         Non-negative regularization added to the diagonal of covariance.
         Passed to scikit-learn ``GaussianMixture``.
