@@ -9,10 +9,10 @@ import pytest
 import xarray as xr
 import zarr
 from numcodecs import Blosc, Delta, FixedScaleOffset, PackBits, VLenUTF8
-from numpy.testing import assert_allclose, assert_array_equal
+from numpy.testing import assert_allclose, assert_array_equal, assert_array_almost_equal
 
 from sgkit import load_dataset, save_dataset
-from sgkit.io.utils import FLOAT32_FILL, INT_FILL, INT_MISSING
+from sgkit.io.utils import FLOAT32_FILL, FLOAT32_MISSING, INT_FILL, INT_MISSING
 from sgkit.io.vcf import (
     MaxAltAllelesExceededWarning,
     partition_into_regions,
@@ -55,15 +55,22 @@ def test_vcf_to_zarr__small_vcf(
         "INFO/AN",
         "INFO/AA",
         "INFO/DB",
+        "INFO/AC",
+        "INFO/AF",
         "FORMAT/GT",
         "FORMAT/DP",
         "FORMAT/HQ",
     ]
-    field_defs = {"FORMAT/HQ": {"dimension": "ploidy"}}
+    field_defs = {
+        "FORMAT/HQ": {"dimension": "ploidy"},
+        "INFO/AF": {"Number": "2", "dimension": "AF"},
+        "INFO/AC": {"Number": "2", "dimension": "AC"},
+    }
     if method == "to_zarr":
         vcf_to_zarr(
             path,
             output,
+            max_alt_alleles=3,
             chunk_length=5,
             chunk_width=2,
             read_chunk_length=read_chunk_length,
@@ -154,6 +161,30 @@ def test_vcf_to_zarr__small_vcf(
         ],
     )
     assert ds["variant_AN"].chunks[0][0] == 5
+
+    variant_AF = np.full((9, 2), FLOAT32_MISSING, dtype=np.float32)
+    variant_AF[2, 0] = 0.5
+    variant_AF[3, 0] = 0.017
+    variant_AF[4, 0] = 0.333
+    variant_AF[4, 1] = 0.667
+    assert_array_almost_equal(ds["variant_AF"], variant_AF, 3)
+    assert ds["variant_AF"].chunks[0][0] == 5
+
+    assert_array_equal(
+        ds["variant_AC"],
+        [
+            [-2, -2],
+            [-2, -2],
+            [-2, -2],
+            [-2, -2],
+            [-2, -2],
+            [-2, -2],
+            [3, 1],
+            [-2, -2],
+            [-2, -2],
+        ],
+    )
+    assert ds["variant_AC"].chunks[0][0] == 5
 
     assert_array_equal(
         ds["variant_allele"].values.tolist(),
@@ -1809,14 +1840,18 @@ def test_vcf_to_zarr__no_samples(shared_datadir, tmp_path):
     ],
 )
 def test_compare_vcf_to_zarr_convert(shared_datadir, tmp_path, vcf_name):
-    max_alt_alleles = 200
     vcf_path = path_for_test(shared_datadir, vcf_name)
     zarr1_path = tmp_path.joinpath("vcf1.zarr").as_posix()
-    vcf_to_zarr(vcf_path, zarr1_path, max_alt_alleles=max_alt_alleles)
     zarr2_path = tmp_path.joinpath("vcf2.zarr").as_posix()
-    convert_vcf([vcf_path], zarr2_path, max_alt_alleles=max_alt_alleles)
-    # convert reads all variables by default.
+
+    # Convert gets the actual number of alleles by default, so use this as the
+    # input for
+    convert_vcf([vcf_path], zarr2_path)
+    ds2 = load_dataset(zarr2_path)
+    vcf_to_zarr(vcf_path, zarr1_path, max_alt_alleles=ds2.variant_allele.shape[1] - 1)
     ds1 = load_dataset(zarr1_path)
+
+    # convert reads all variables by default.
     base_vars = list(ds1)
     ds2 = load_dataset(zarr2_path)
     xr.testing.assert_equal(ds1, ds2[base_vars])

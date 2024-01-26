@@ -142,12 +142,17 @@ class BufferedUnsizedField:
     def swap_buffers(self):
         self.buff = []
 
-    def sync_flush(self, zarr_path, partition_index, chunk_index):
-        dest_file = (
-            zarr_path / "tmp" / self.variable_name / f"{partition_index}.{chunk_index}"
-        )
-        with open(dest_file, "wb") as f:
-            pickle.dump(self.buff, f)
+
+def sync_flush_unsized_buffer(buff, file_path):
+    with open(file_path, "wb") as f:
+        pickle.dump(buff, f)
+
+
+def async_flush_unsized_buffer(
+    executor, buff, zarr_path, variable_name, partition_index, chunk_index
+):
+    dest_file = zarr_path / "tmp" / variable_name / f"{partition_index}.{chunk_index}"
+    return [executor.submit(sync_flush_unsized_buffer, buff, dest_file)]
 
 
 def flush_futures(futures):
@@ -198,23 +203,30 @@ def write_partition(
         gt_phased,
         gt_mask,
     ]
+
+    # The unbound fields. These are buffered in Python lists and stored
+    # in pickled chunks for later analysis
+    allele = BufferedUnsizedField("variant_allele")
+    buffered_unsized_fields = [allele]
+
+    unsized_info_fields = []
     fixed_info_fields = []
     for field in vcf_metadata.info_fields:
         if field.dimension is not None:
             ba = BufferedArray(root[field.variable_name])
             buffered_arrays.append(ba)
             fixed_info_fields.append((field, ba))
+        else:
+            buf = BufferedUnsizedField(field.variable_name)
+            buffered_unsized_fields.append(buf)
+            unsized_info_fields.append((field, buf))
+
     fixed_format_fields = []
     for field in vcf_metadata.format_fields:
         if field.dimension is not None:
             ba = BufferedArray(root[field.variable_name])
             buffered_arrays.append(ba)
             fixed_format_fields.append((field, ba))
-
-    # The unbound fields. These are buffered in Python lists and stored
-    # in pickled chunks for later analysis
-    allele = BufferedUnsizedField("variant_allele")
-    buffered_unsized_fields = [allele]
 
     chunk_length = pos.buff.shape[0]
 
@@ -244,9 +256,20 @@ def write_partition(
         return futures
 
     def flush_unsized_buffers(chunk_index):
+        futures = []
         for buf in buffered_unsized_fields:
-            buf.sync_flush(zarr_path, partition.index, chunk_index)
+            futures.extend(
+                async_flush_unsized_buffer(
+                    executor,
+                    buf.buff,
+                    zarr_path,
+                    buf.variable_name,
+                    partition.index,
+                    chunk_index,
+                )
+            )
             buf.swap_buffers()
+        return futures
 
     contig_name_map = {name: j for j, name in enumerate(vcf_metadata.contig_names)}
     filter_map = {filter_id: j for j, filter_id in enumerate(vcf_metadata.filters)}
@@ -299,6 +322,16 @@ def write_partition(
                     buffered_array.buff[j] = variant.INFO[field.name]
                 except KeyError:
                     pass
+            for field, buffered_unsized_field in unsized_info_fields:
+                val = tuple()
+                try:
+                    val = variant.INFO[field.name]
+                except KeyError:
+                    pass
+                if not isinstance(val, tuple):
+                    val = (val,)
+                buffered_unsized_field.buff.append(val)
+
             for field, buffered_array in fixed_format_fields:
                 # NOTE not sure the semantics is correct here
                 val = None
@@ -318,10 +351,7 @@ def write_partition(
             if j == chunk_length:
                 flush_futures(futures)
                 futures = flush_fixed_buffers(start=chunk_start)
-                flush_unsized_buffers(chunk_index)
-                # flush_info_buffers(
-                #     zarr_path, buffered_infos, partition.index, chunk_index
-                # )
+                futures.extend(flush_unsized_buffers(chunk_index))
                 j = 0
                 offset += chunk_length - chunk_start
                 chunk_start = 0
@@ -336,7 +366,7 @@ def write_partition(
         # Flush the last chunk
         flush_futures(futures)
         futures = flush_fixed_buffers(start=chunk_start, stop=j)
-        flush_unsized_buffers(chunk_index)
+        futures.extend(flush_unsized_buffers(chunk_index))
 
         # Wait for the last batch of futures to complete
         flush_futures(futures)
@@ -645,7 +675,7 @@ def create_zarr(
 
         else:
             # print(field)
-            field_dir = tmp_dir / f"INFO_{field.name}"
+            field_dir = tmp_dir / field.variable_name
             field_dir.mkdir()
 
     for field in vcf_metadata.format_fields:
@@ -711,22 +741,35 @@ def finalise_zarr(path, vcf_metadata, partitions, chunk_length):
     )
     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "alleles"]
 
-    # tmp_dir = path / "tmp"
-    # for info_field in vcf_metadata.info_fields:
-    #     field_dir = tmp_dir / f"INFO_{info_field.name}"
-    #     data = []
-    #     for partition in partitions:
-    #         for chunk in range(partition.num_chunks):
-    #             filename = field_dir / f"{partition.index}.{chunk}"
-    #             with open(filename, "rb") as f:
-    #                 data.extend(pickle.load(f))
+    for field in vcf_metadata.info_fields:
+        if field.dimension is None:
+            print("Write", field.variable_name)
+            py_array = join_partitioned_lists(tmp_dir / field.variable_name, partitions)
+            # if field.vcf_number == ".":
+            max_len = 0
+            for row in py_array:
+                max_len = max(max_len, len(row))
+            shape = (m, max_len)
+            a = root.empty(
+                field.variable_name,
+                shape=shape,
+                chunks=(chunk_length),
+                dtype=field.dtype,
+                compressor=compressor,
+            )
+            a.attrs["_ARRAY_DIMENSIONS"] = ["variants", field.name]
+            # print(a)
+            np_array = np.full(
+                (m, max_len), _dtype_to_fill[a.dtype.str], dtype=field.dtype
+            )
+            for j, row in enumerate(py_array):
+                np_array[j, : len(row)] = row
+            a[:] = np_array
 
-    #     print(info_field, ":", data[:10])
-    #     try:
-    #         np_array = np.array(data)
-    #         print("\t", np_array)
-    #     except ValueError as e:
-    #         print("\terror", e)
+            # print(field)
+            # print(np_array)
+            # np_array = np.array(py_array, dtype=field.dtype)
+            # print(np_array)
 
     zarr.consolidate_metadata(path)
 
