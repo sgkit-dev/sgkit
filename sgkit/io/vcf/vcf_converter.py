@@ -19,14 +19,14 @@ from .vcf_reader import _vcf_type_to_numpy
 
 # from sgkit.io.utils import FLOAT32_MISSING, str_is_int
 from sgkit.io.utils import (
-    CHAR_FILL,
-    CHAR_MISSING,
+    # CHAR_FILL,
+    # CHAR_MISSING,
     FLOAT32_FILL,
-    FLOAT32_MISSING,
+    # FLOAT32_MISSING,
     INT_FILL,
-    INT_MISSING,
+    # INT_MISSING,
     STR_FILL,
-    STR_MISSING,
+    # STR_MISSING,
     str_is_int,
 )
 
@@ -149,10 +149,10 @@ def sync_flush_unsized_buffer(buff, file_path):
 
 
 def async_flush_unsized_buffer(
-    executor, buff, zarr_path, variable_name, partition_index, chunk_index
+    executor, buf, zarr_path, partition_index, chunk_index
 ):
-    dest_file = zarr_path / "tmp" / variable_name / f"{partition_index}.{chunk_index}"
-    return [executor.submit(sync_flush_unsized_buffer, buff, dest_file)]
+    dest_file = zarr_path / "tmp" / buf.variable_name / f"{partition_index}.{chunk_index}"
+    return [executor.submit(sync_flush_unsized_buffer, buf.buff, dest_file)]
 
 
 def flush_futures(futures):
@@ -212,7 +212,7 @@ def write_partition(
     unsized_info_fields = []
     fixed_info_fields = []
     for field in vcf_metadata.info_fields:
-        if field.dimension is not None:
+        if field.is_fixed_size:
             ba = BufferedArray(root[field.variable_name])
             buffered_arrays.append(ba)
             fixed_info_fields.append((field, ba))
@@ -222,11 +222,16 @@ def write_partition(
             unsized_info_fields.append((field, buf))
 
     fixed_format_fields = []
+    unsized_format_fields = []
     for field in vcf_metadata.format_fields:
-        if field.dimension is not None:
+        if field.is_fixed_size:
             ba = BufferedArray(root[field.variable_name])
             buffered_arrays.append(ba)
             fixed_format_fields.append((field, ba))
+        else:
+            buf = BufferedUnsizedField(field.variable_name)
+            buffered_unsized_fields.append(buf)
+            unsized_format_fields.append((field, buf))
 
     chunk_length = pos.buff.shape[0]
 
@@ -261,9 +266,8 @@ def write_partition(
             futures.extend(
                 async_flush_unsized_buffer(
                     executor,
-                    buf.buff,
+                    buf,
                     zarr_path,
-                    buf.variable_name,
                     partition.index,
                     chunk_index,
                 )
@@ -285,11 +289,11 @@ def write_partition(
         chunk_start = j
         futures = []
 
-        # TODO this is the wrong approach here, we need to keep
-        # access to the decode thread so that we can kill it
-        # appropriately when an error occurs.
+        # FIXME this ThreadedGenerator leads to a deadlock when an exception
+        # occurs within this main loop. Needs to be refactored to  be more
+        # robust.
         for variant in ThreadedGenerator(vcf, queue_maxsize=200):
-            # for variant in vcf:
+        # for variant in vcf:
             # Translate this record into numpy buffers. There is some compute
             # done here, but it's not releasing the GIL, so may not be worth
             # moving to threads.
@@ -344,6 +348,14 @@ def write_partition(
                     if field.vcf_type == "Integer":
                         val[val == -2147483648] = -1
                     buffered_array.buff[j] = val.reshape(buffered_array.buff.shape[1:])
+
+            for field, buffered_unsized_field in unsized_format_fields:
+                val = None
+                try:
+                    val = variant.format(field.name)
+                except KeyError:
+                    pass
+                buffered_unsized_field.buff.append(val)
 
             allele.buff.append([variant.REF] + variant.ALT)
 
@@ -423,6 +435,10 @@ class VcfFieldDefinition:
             dimension=dimension,
             dtype=dtype,
         )
+
+    @property
+    def is_fixed_size(self):
+        return self.dimension is not None
 
 
 @dataclasses.dataclass
@@ -654,52 +670,28 @@ def create_zarr(
     field_dir = tmp_dir / "variant_allele"
     field_dir.mkdir()
 
-    for field in vcf_metadata.info_fields:
-        if field.dimension is not None:
-            # Fixed field, allocated an array
-            # print(field)
-            shape = m
+    for field in vcf_metadata.fields:
+        if field.is_fixed_size:
+            shape = [m]
+            chunks = [chunk_length]
             dimensions = ["variants"]
+            if field.category == "FORMAT":
+                shape.append(n)
+                chunks.append(chunk_width)
+                dimensions.append("samples")
             if field.dimension > 1:
-                shape = (m, field.dimension)
+                shape.append(field.dimension)
                 dimensions.append(field.name)
             a = root.empty(
                 field.variable_name,
                 shape=shape,
-                chunks=(chunk_length),
+                chunks=chunks,
                 dtype=field.dtype,
                 compressor=compressor,
             )
             a.attrs["_ARRAY_DIMENSIONS"] = dimensions
-            # print(a)
-
         else:
-            # print(field)
             field_dir = tmp_dir / field.variable_name
-            field_dir.mkdir()
-
-    for field in vcf_metadata.format_fields:
-        if field.dimension is not None:
-            # Fixed field, allocated an array
-            # print(field)
-            shape = m, n
-            dimensions = ["variants", "samples"]
-            if field.dimension > 1:
-                shape = (m, n, field.dimension)
-                dimensions.append(field.name)
-            a = root.empty(
-                field.variable_name,
-                shape=shape,
-                chunks=(chunk_length, chunk_width),
-                dtype=field.dtype,
-                compressor=compressor,
-            )
-            a.attrs["_ARRAY_DIMENSIONS"] = dimensions
-            # print(a)
-
-        else:
-            # print()
-            field_dir = tmp_dir / f"FORMAT_{field.name}"
             field_dir.mkdir()
 
 
@@ -713,7 +705,7 @@ def join_partitioned_lists(field_dir, partitions):
     return data
 
 
-def finalise_zarr(path, vcf_metadata, partitions, chunk_length):
+def finalise_zarr(path, vcf_metadata, partitions, chunk_length, chunk_width):
     store = zarr.DirectoryStore(path)
     root = zarr.group(store=store, overwrite=False)
     compressor = numcodecs.Blosc(
@@ -721,6 +713,7 @@ def finalise_zarr(path, vcf_metadata, partitions, chunk_length):
     )
     tmp_dir = path / "tmp"
     m = sum(partition.num_records for partition in partitions)
+    n = len(vcf_metadata.samples)
 
     py_alleles = join_partitioned_lists(tmp_dir / "variant_allele", partitions)
     assert len(py_alleles) == m
@@ -742,8 +735,8 @@ def finalise_zarr(path, vcf_metadata, partitions, chunk_length):
     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "alleles"]
 
     for field in vcf_metadata.info_fields:
-        if field.dimension is None:
-            print("Write", field.variable_name)
+        if not field.is_fixed_size:
+            # print("Write", field.variable_name)
             py_array = join_partitioned_lists(tmp_dir / field.variable_name, partitions)
             # if field.vcf_number == ".":
             max_len = 0
@@ -770,6 +763,38 @@ def finalise_zarr(path, vcf_metadata, partitions, chunk_length):
             # print(np_array)
             # np_array = np.array(py_array, dtype=field.dtype)
             # print(np_array)
+
+    import datetime
+    for field in vcf_metadata.format_fields:
+        if not field.is_fixed_size:
+            print("Write", field.variable_name, field.vcf_number, datetime.datetime.now())
+            py_array = join_partitioned_lists(tmp_dir / field.variable_name, partitions)
+            # print(py_array[0])
+            # if field.vcf_number == ".":
+            max_len = 0
+            for row in py_array:
+                if row is not None:
+                    max_len = max(max_len, row.shape[1])
+            shape = (m, n, max_len)
+            # print(shape)
+            a = root.empty(
+                field.variable_name,
+                shape=shape,
+                chunks=(chunk_length, chunk_width),
+                dtype=field.dtype,
+                compressor=compressor,
+            )
+            a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "samples", field.name]
+            # print(a)
+            np_array = np.full(
+                (m, n, max_len), _dtype_to_fill[a.dtype.str], dtype=field.dtype
+            )
+            for j, row in enumerate(py_array):
+                # print(row.shape)
+                # break
+                np_array[j, :, :row.shape[-1]] = row
+            a[:] = np_array
+
 
     zarr.consolidate_metadata(path)
 
@@ -840,13 +865,15 @@ def convert_vcf(
     progress_counter = multiprocessing.Value("i", 0)
 
     # start update progress bar process
-    # daemon= parameter is set to True so this process won't block us upon exit
-    # TODO move to thread, no need for proc
+    bar_thread = None
     if show_progress:
-        bar_process = multiprocessing.Process(
-            target=update_bar, args=(progress_counter, total_variants), name="progress"
+        bar_thread = threading.Thread(
+            target=update_bar,
+            args=(progress_counter, total_variants),
+            name="progress",
+            daemon=True,
         )  # , daemon=True)
-        bar_process.start()
+        bar_thread.start()
 
     with concurrent.futures.ProcessPoolExecutor(
         max_workers=1, initializer=init_workers, initargs=(progress_counter,)
@@ -874,6 +901,12 @@ def convert_vcf(
                 completed_partitions.append(future.result())
 
     assert progress_counter.value == total_variants
+    if bar_thread is not None:
+        bar_thread.join()
 
+    # NOTE - we don't need to actually use the return value of the partition
+    # anymore, we can compute everything from first principles
     completed_partitions.sort(key=lambda x: x.first_position)
-    finalise_zarr(out_path, spec.vcf_metadata, completed_partitions, chunk_length)
+    finalise_zarr(
+        out_path, spec.vcf_metadata, completed_partitions, chunk_length, chunk_width
+    )
