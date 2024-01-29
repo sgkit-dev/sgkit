@@ -10,6 +10,7 @@ import pickle
 import sys
 import shutil
 import gzip
+import json
 from typing import Any
 
 import cyvcf2
@@ -68,6 +69,7 @@ class ThreadedGenerator:
             yield value
 
         self._thread.join()
+
 
 def flush_futures(futures):
     # Make sure previous futures have completed
@@ -182,6 +184,7 @@ def columnarise_vcf(vcf_path, out_path, column_buffer_mb=10):
 
     for buff in buffers:
         buff.flush()
+
 
 def sync_flush_array(np_buffer, zarr_array, offset):
     zarr_array[offset : offset + np_buffer.shape[0]] = np_buffer
@@ -574,9 +577,6 @@ class VcfMetadata:
     def format_fields(self):
         return [field for field in self.fields if field.category == "FORMAT"]
 
-    def asdict(self):
-        return dataclasses.asdict(self)
-
     @staticmethod
     def fromdict(d):
         fields = [VcfFieldDefinition(**fd) for fd in d["fields"]]
@@ -589,8 +589,16 @@ class VcfMetadata:
 class ConversionSpecification:
     vcf_metadata: VcfMetadata
     partitions: list
-    chunk_length: int = -1
-    chunk_width: int = -1
+
+    def asdict(self):
+        return dataclasses.asdict(self)
+
+    @staticmethod
+    def fromdict(d):
+        return ConversionSpecification(
+            VcfMetadata.fromdict(d["vcf_metadata"]),
+            [VcfPartition(**dp) for dp in d["partitions"]],
+        )
 
 
 def scan_vcfs(paths, show_progress):
@@ -978,51 +986,6 @@ def init_workers(counter):
     progress_counter = counter
 
 
-def first_convert_pass(out_path, spec, *, show_progress=False):
-    total_variants = sum(partition.num_records for partition in spec.partitions)
-    global progress_counter
-    progress_counter = multiprocessing.Value("i", 0)
-
-    # start update progress bar process
-    bar_thread = None
-    if show_progress:
-        bar_thread = threading.Thread(
-            target=update_bar,
-            args=(progress_counter, total_variants),
-            name="progress",
-            daemon=True,
-        )  # , daemon=True)
-        bar_thread.start()
-
-    with concurrent.futures.ProcessPoolExecutor(
-        max_workers=1, initializer=init_workers, initargs=(progress_counter,)
-    ) as executor:
-        with multiprocessing.Manager() as manager:
-            locks = [manager.Lock() for _ in range(len(spec.partitions) + 1)]
-            futures = []
-            for j, part in enumerate(spec.partitions):
-                futures.append(
-                    executor.submit(
-                        write_partition,
-                        spec.vcf_metadata,
-                        out_path,
-                        part,
-                        first_chunk_lock=locks[j],
-                        last_chunk_lock=locks[j + 1],
-                    )
-                )
-            completed_partitions = []
-            for future in concurrent.futures.as_completed(futures):
-                exception = future.exception()
-                if exception is not None:
-                    raise exception
-                completed_partitions.append(future.result())
-
-    assert progress_counter.value == total_variants
-    if bar_thread is not None:
-        bar_thread.join()
-
-
 def columnarise(
     vcfs,
     out_path,
@@ -1067,7 +1030,48 @@ def columnarise(
     if bar_thread is not None:
         bar_thread.join()
 
-    return
+    with open(out_path / "spec.json", "w") as f:
+        json.dump(spec.asdict(), f, indent=4)
+
+
+class ColumnarisedVcf:
+    def __init__(self, path):
+        self.path = path
+        with open(path / "spec.json") as f:
+            d = json.load(f)
+        self.spec = ConversionSpecification.fromdict(d)
+        self.num_partitions = len(self.spec.partitions)
+        self.num_records = sum(part.num_records for part in self.spec.partitions)
+
+    def iter_chunks(self, name):
+        for j in range(self.num_partitions):
+            partition_dir = self.path / f"partition_{j}" / name
+            num_chunks = len(list(partition_dir.iterdir()))
+            for k in range(num_chunks):
+                chunk_file = partition_dir / f"{k}"
+                # print("load", chunk_file)
+                with open(chunk_file, "rb") as f:
+                    chunk = pickle.load(f)
+                    yield chunk
+
+    def values(self, name):
+        """
+        Return the full column as a python list.
+        """
+        ret = []
+        for chunk in self.iter_chunks(name):
+            ret.extend(chunk)
+        return ret
+
+
+def encode_zarr(columnarised_path, out_path, *, show_progress=False):
+    cv = ColumnarisedVcf(pathlib.Path(columnarised_path))
+    pos = np.array(cv.values("POS"), dtype=np.int32)
+    chrom = np.array(cv.values("CHROM"))
+    qual = np.array(cv.values("QUAL"))
+    print(pos)
+    print(chrom)
+    print(qual)
 
 
 def convert_vcf(
@@ -1086,37 +1090,6 @@ def convert_vcf(
 
     out_path = pathlib.Path(out_path)
     # columnarise_vcf(vcfs[0], out_path)
-
-    # start update progress bar process
-    bar_thread = None
-    if show_progress:
-        bar_thread = threading.Thread(
-            target=update_bar,
-            args=(progress_counter, total_variants),
-            name="progress",
-            daemon=True,
-        )  # , daemon=True)
-        bar_thread.start()
-
-    with concurrent.futures.ProcessPoolExecutor(
-        max_workers=1, initializer=init_workers, initargs=(progress_counter,)
-    ) as executor:
-        with multiprocessing.Manager() as manager:
-            locks = [manager.Lock() for _ in range(len(spec.partitions) + 1)]
-            futures = []
-            for j, partition in enumerate(spec.partitions):
-                futures.append(
-                    executor.submit(
-                        columnarise_vcf, partition.path, out_path / f"partition_{j}"
-                    )
-                )
-            flush_futures(futures)
-
-    assert progress_counter.value == total_variants
-    if bar_thread is not None:
-        bar_thread.join()
-
-    return
 
     # TODO add a try-except here for KeyboardInterrupt which will kill
     # various things and clean-up.

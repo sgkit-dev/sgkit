@@ -25,6 +25,12 @@ def scan(vcfs):
 def columnarise(vcfs, out_path):
     cnv.columnarise(vcfs, out_path, show_progress=True)
 
+@click.command
+@click.argument("columnarised", type=click.Path())
+@click.argument("zarr", type=click.Path())
+def encode(columnarised, zarr):
+    cnv.encode_zarr(columnarised, zarr, show_progress=True)
+
 
 @click.command
 @click.argument("vcfs", nargs=-1, required=True)
@@ -45,6 +51,7 @@ def cli():
 cli.add_command(convert)
 cli.add_command(scan)
 cli.add_command(columnarise)
+cli.add_command(encode)
 
 if __name__ == "__main__":
     cli()
