@@ -262,7 +262,7 @@ def _stage_1(G: Array, X: Array, Y: Array, alphas: Optional[NDArray] = None) -> 
     these predictions, a technique commonly referred to as stacking.
 
     For more details, see the level 0 regression model described in step 1
-    of [Mbatchou et al. 2020](https://www.biorxiv.org/content/10.1101/2020.06.19.162354v2).
+    of [Mbatchou et al. (2021) Nat Genet](https://doi.org/10.1038/s41588-021-00870-7).
     """
     assert G.ndim == 2
     assert X.ndim == 2
@@ -799,9 +799,11 @@ def regenie(
         Defaults to 10 sample blocks split roughly across all possible
         samples or the number of samples, if that number is < 10.
     alphas
-        List of alpha values to use for regularization, by default None.
+        List of ridge parameter values to use for regularization, by default None.
         If not provided, these will be set automatically based on
-        datasize and apriori heritability assumptions.
+        datasize and apriori heritability assumptions. See the description of
+        level 0 ridge regressions in the Supporting Information of [1] for more
+        details.
     add_intercept
         Whether or not to add intercept to covariates, by default True.
     normalize
