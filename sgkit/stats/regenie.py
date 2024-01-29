@@ -870,9 +870,9 @@ def regenie(
 
     References
     ----------
-    [1] - Mbatchou, J., L. Barnard, J. Backman, and A. Marcketta. 2020.
-    “Computationally Efficient Whole Genome Regression for Quantitative and Binary
-    Traits.” bioRxiv. https://www.biorxiv.org/content/10.1101/2020.06.19.162354v2.abstract.
+    [1] - Mbatchou, J., Barnard, L., Backman, J. et al. Computationally efficient
+    whole-genome regression for quantitative and binary traits.
+    Nat Genet 53, 1097–1103 (2021). https://doi.org/10.1038/s41588-021-00870-7
 
     [2] - https://glow.readthedocs.io/en/latest/tertiary/whole-genome-regression.html
     """
