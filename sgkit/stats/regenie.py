@@ -766,7 +766,7 @@ def regenie(
     tests. These estimates are subtracted from trait values and
     sampling statistics (p-values, standard errors, etc.) are evaluated
     against the residuals. See the REGENIE preprint [1] for more details.
-    For a simpler technical overview, see [2] for a detailed description
+    For a technical overview, see [2, 3] for a detailed description
     of the individual stages and separate regression models involved.
 
     Parameters
@@ -875,6 +875,8 @@ def regenie(
     Nat Genet 53, 1097–1103 (2021). https://doi.org/10.1038/s41588-021-00870-7
 
     [2] - https://glow.readthedocs.io/en/latest/tertiary/whole-genome-regression.html
+
+    [3] - https://rgcgithub.github.io/regenie/overview/
     """
     if isinstance(covariates, Hashable):
         covariates = [covariates]
