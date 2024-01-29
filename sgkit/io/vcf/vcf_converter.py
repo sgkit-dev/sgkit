@@ -7,6 +7,9 @@ import threading
 import pathlib
 import time
 import pickle
+import sys
+import shutil
+import gzip
 from typing import Any
 
 import cyvcf2
@@ -66,6 +69,119 @@ class ThreadedGenerator:
 
         self._thread.join()
 
+def flush_futures(futures):
+    # Make sure previous futures have completed
+    for future in concurrent.futures.as_completed(futures):
+        exception = future.exception()
+        if exception is not None:
+            raise exception
+
+
+# TODO better name
+class BufferedList:
+    def __init__(self, dest_dir, max_buffered_mb=1):
+        self.dest_dir = dest_dir
+        self.buffer = []
+        self.buffered_bytes = 0
+        self.max_buffered_bytes = max_buffered_mb * 2**20
+        assert self.max_buffered_bytes > 0
+        self.chunk_index = 0
+        self.dest_dir.mkdir(exist_ok=True)
+
+    def append(self, val):
+        self.buffer.append(val)
+        val_bytes = sys.getsizeof(val)
+        self.buffered_bytes += val_bytes
+        if self.buffered_bytes >= self.max_buffered_bytes:
+            self.flush()
+
+    def flush(self):
+        # TODO we could do this flush in a background thread to speed
+        # things up a bit.
+        dest_file = self.dest_dir / f"{self.chunk_index}"
+
+        # print("Flushing", dest_file, len(self.buffer), self.buffered_bytes)
+        # Using gzip here makes throughput drop through the floor. We'd definitely
+        # want to be doing this with background encode threads if we were
+        # doing it with compression.
+        # with gzip.open(dest_file, "wb") as f:
+        with open(dest_file, "wb") as f:
+            pickle.dump(self.buffer, f)
+        self.chunk_index += 1
+        self.buffer = []
+        self.buffered_bytes = 0
+
+
+def columnarise_vcf(vcf_path, out_path, column_buffer_mb=10):
+    if out_path.exists():
+        shutil.rmtree(out_path)
+    out_path.mkdir(exist_ok=True, parents=True)
+    for category in "FORMAT", "INFO":
+        path = out_path / category
+        path.mkdir(exist_ok=True)
+
+    vcf = cyvcf2.VCF(vcf_path)
+
+    contig = BufferedList(out_path / "CHROM", column_buffer_mb)
+    pos = BufferedList(out_path / "POS", column_buffer_mb)
+    qual = BufferedList(out_path / "QUAL", column_buffer_mb)
+    vid = BufferedList(out_path / "ID", column_buffer_mb)
+    filters = BufferedList(out_path / "FILTERS", column_buffer_mb)
+    ref = BufferedList(out_path / "REF", column_buffer_mb)
+    alt = BufferedList(out_path / "ALT", column_buffer_mb)
+    gt = BufferedList(out_path / "FORMAT" / "GT", column_buffer_mb)
+
+    info_fields = []
+    format_fields = []
+    buffers = [contig, pos, qual, vid, filters, ref, alt, gt]
+
+    for h in vcf.header_iter():
+        header_type = h["HeaderType"]
+        if header_type in ["INFO", "FORMAT"]:
+            name = h["ID"]
+            if name == "GT":
+                # Need to special-case GT because the output of
+                # variant.format("GT") is text.
+                continue
+            buff = BufferedList(out_path / header_type / name, column_buffer_mb)
+            buffers.append(buff)
+            if header_type == "INFO":
+                info_fields.append((name, buff))
+            else:
+                format_fields.append((name, buff))
+
+    # for variant in vcf:
+    for variant in ThreadedGenerator(vcf, queue_maxsize=200):
+        contig.append(variant.CHROM)
+        pos.append(variant.POS)
+        qual.append(variant.QUAL)
+        vid.append(variant.ID)
+        filters.append(variant.FILTERS)
+        ref.append(variant.REF)
+        alt.append(variant.ALT)
+        gt.append(variant.genotype.array())
+
+        for name, buff in info_fields:
+            val = None
+            try:
+                val = variant.INFO[name]
+            except KeyError:
+                pass
+            buff.append(val)
+
+        for name, buff in format_fields:
+            val = None
+            try:
+                val = variant.format(name)
+            except KeyError:
+                pass
+            buff.append(val)
+
+        with progress_counter.get_lock():
+            progress_counter.value += 1
+
+    for buff in buffers:
+        buff.flush()
 
 def sync_flush_array(np_buffer, zarr_array, offset):
     zarr_array[offset : offset + np_buffer.shape[0]] = np_buffer
@@ -148,26 +264,17 @@ def sync_flush_unsized_buffer(buff, file_path):
         pickle.dump(buff, f)
 
 
-def async_flush_unsized_buffer(
-    executor, buf, zarr_path, partition_index, chunk_index
-):
-    dest_file = zarr_path / "tmp" / buf.variable_name / f"{partition_index}.{chunk_index}"
+def async_flush_unsized_buffer(executor, buf, zarr_path, partition_index, chunk_index):
+    dest_file = (
+        zarr_path / "tmp" / buf.variable_name / f"{partition_index}.{chunk_index}"
+    )
     return [executor.submit(sync_flush_unsized_buffer, buf.buff, dest_file)]
-
-
-def flush_futures(futures):
-    # Make sure previous futures have completed
-    for future in concurrent.futures.as_completed(futures):
-        exception = future.exception()
-        if exception is not None:
-            raise exception
 
 
 def write_partition(
     vcf_metadata,
     zarr_path,
     partition,
-    max_num_alleles,
     *,
     first_chunk_lock,
     last_chunk_lock,
@@ -233,7 +340,9 @@ def write_partition(
             buffered_unsized_fields.append(buf)
             unsized_format_fields.append((field, buf))
 
-    chunk_length = pos.buff.shape[0]
+    chunk_length = gt.buff.shape[0]
+    chunk_width = gt.buff.shape[1]
+    n = gt.array.shape[1]
 
     def flush_fixed_buffers(start=0, stop=chunk_length):
         futures = []
@@ -279,7 +388,7 @@ def write_partition(
     filter_map = {filter_id: j for j, filter_id in enumerate(vcf_metadata.filters)}
 
     gt_min = -1  # TODO make this -2 if mixed_ploidy
-    gt_max = max_num_alleles - 1
+    # gt_max = max_num_alleles - 1
 
     # Flushing out the chunks takes less time than reading in here in the
     # main thread, so no real point in using lots of threads.
@@ -292,8 +401,8 @@ def write_partition(
         # FIXME this ThreadedGenerator leads to a deadlock when an exception
         # occurs within this main loop. Needs to be refactored to  be more
         # robust.
-        for variant in ThreadedGenerator(vcf, queue_maxsize=200):
-        # for variant in vcf:
+        # for variant in ThreadedGenerator(vcf, queue_maxsize=200):
+        for variant in vcf:
             # Translate this record into numpy buffers. There is some compute
             # done here, but it's not releasing the GIL, so may not be worth
             # moving to threads.
@@ -317,7 +426,9 @@ def write_partition(
 
             vcf_gt = variant.genotype.array()
             assert vcf_gt.shape[1] == 3
-            gt.buff[j] = np.clip(vcf_gt[:, :-1], gt_min, gt_max)
+            # TODO should just do this in the second pass
+            # FIXME add a max to the clip, if we pre-clip
+            gt.buff[j] = np.clip(vcf_gt[:, :-1], gt_min, 1000)
             gt_phased.buff[j] = vcf_gt[:, -1]
             gt_mask.buff[j] = gt.buff[j] < 0
 
@@ -349,12 +460,19 @@ def write_partition(
                         val[val == -2147483648] = -1
                     buffered_array.buff[j] = val.reshape(buffered_array.buff.shape[1:])
 
+            # FIXME refactor this to share the code path with the fixed_format
+            # fields. We probably want to define a method update_buffer(index, val)
             for field, buffered_unsized_field in unsized_format_fields:
                 val = None
                 try:
                     val = variant.format(field.name)
                 except KeyError:
                     pass
+                if val is not None:
+                    # Quick hack - cyvcf2's missing value is different
+                    if field.vcf_type == "Integer":
+                        val[val == -2147483648] = -1
+                    assert val.shape[0] == n
                 buffered_unsized_field.buff.append(val)
 
             allele.buff.append([variant.REF] + variant.ALT)
@@ -378,13 +496,13 @@ def write_partition(
         # Flush the last chunk
         flush_futures(futures)
         futures = flush_fixed_buffers(start=chunk_start, stop=j)
+        # Note that we may flush empty files here when the chunk size
+        # is aligned with the partition size. This is currently harmless
+        # but is something to watch out for.
         futures.extend(flush_unsized_buffers(chunk_index))
 
         # Wait for the last batch of futures to complete
         flush_futures(futures)
-
-    partition.num_chunks = chunk_index + 1
-    return partition
 
 
 @dataclasses.dataclass
@@ -394,7 +512,6 @@ class VcfPartition:
     first_position: int
     start_offset: int = 0
     index: int = -1
-    num_chunks: int = -1
 
 
 @dataclasses.dataclass
@@ -472,6 +589,8 @@ class VcfMetadata:
 class ConversionSpecification:
     vcf_metadata: VcfMetadata
     partitions: list
+    chunk_length: int = -1
+    chunk_width: int = -1
 
 
 def scan_vcfs(paths, show_progress):
@@ -705,17 +824,68 @@ def join_partitioned_lists(field_dir, partitions):
     return data
 
 
-def finalise_zarr(path, vcf_metadata, partitions, chunk_length, chunk_width):
+def scan_2d_chunks(field_dir, partitions):
+    """
+    Return the maximum size of the 3rd dimension in the chunks and the
+    maximum value seen.
+    """
+    max_size = 0
+    max_val = None
+    for partition in partitions:
+        for chunk in range(partition.num_chunks):
+            filename = field_dir / f"{partition.index}.{chunk}"
+            with open(filename, "rb") as f:
+                data = pickle.load(f)
+                for row in data:
+                    max_size = max(max_size, row.shape[1])
+                    row_max = np.max(row)
+                    if max_val is None:
+                        max_val = row_max
+                    else:
+                        max_val = max(max_val, row_max)
+    return max_size, max_val
+
+
+def encode_pickle_chunked_array(array, field_dir, partitions):
+    ba = BufferedArray(array)
+    chunk_length = array.chunks[0]
+
+    j = 0
+    assert partitions[0].start_offset == 0
+    offset = 0
+
+    for partition in partitions:
+        for chunk in range(partition.num_chunks):
+            filename = field_dir / f"{partition.index}.{chunk}"
+            with open(filename, "rb") as f:
+                data = pickle.load(f)
+                for row in data:
+                    # FIXME
+                    # print(row.shape)
+                    # print(row)
+                    # ba.buff[j] = row.reshape(ba.buff.shape[1:])
+                    # buffered_array.buff[j] = val.reshape(buffered_array.buff.shape[1:])
+                    j += 1
+                    if j % chunk_length == 0:
+                        sync_flush_array(ba.buff, ba.array, offset)
+
+                        offset += chunk_length
+                        j = 0
+
+    sync_flush_array(ba.buff[:j], ba.array, offset)
+
+
+def finalise_zarr(path, spec, chunk_length, chunk_width):
     store = zarr.DirectoryStore(path)
     root = zarr.group(store=store, overwrite=False)
     compressor = numcodecs.Blosc(
         cname="zstd", clevel=7, shuffle=numcodecs.Blosc.AUTOSHUFFLE
     )
     tmp_dir = path / "tmp"
-    m = sum(partition.num_records for partition in partitions)
-    n = len(vcf_metadata.samples)
+    m = sum(partition.num_records for partition in spec.partitions)
+    n = len(spec.vcf_metadata.samples)
 
-    py_alleles = join_partitioned_lists(tmp_dir / "variant_allele", partitions)
+    py_alleles = join_partitioned_lists(tmp_dir / "variant_allele", spec.partitions)
     assert len(py_alleles) == m
     max_num_alleles = 0
     for row in py_alleles:
@@ -765,42 +935,36 @@ def finalise_zarr(path, vcf_metadata, partitions, chunk_length, chunk_width):
             # print(np_array)
 
     import datetime
+
     for field in vcf_metadata.format_fields:
         if not field.is_fixed_size:
-            print("Write", field.variable_name, field.vcf_number, datetime.datetime.now())
-            py_array = join_partitioned_lists(tmp_dir / field.variable_name, partitions)
-            # print(py_array[0])
-            # if field.vcf_number == ".":
-            max_len = 0
-            for row in py_array:
-                if row is not None:
-                    max_len = max(max_len, row.shape[1])
-            shape = (m, n, max_len)
+            print(
+                "Write", field.variable_name, field.vcf_number, datetime.datetime.now()
+            )
+            # py_array = join_partitioned_lists(tmp_dir / field.variable_name, partitions)
+            field_dir = tmp_dir / field.variable_name
+            dim3, max_value = scan_2d_chunks(field_dir, partitions)
+            shape = (m, n, dim3)
             # print(shape)
+            # print("max_value ", max_value)
+            dtype = field.dtype
+            if field.vcf_type == "Integer":
+                dtype = smallest_numpy_int_dtype(max_value)
             a = root.empty(
                 field.variable_name,
                 shape=shape,
                 chunks=(chunk_length, chunk_width),
-                dtype=field.dtype,
+                dtype=dtype,
                 compressor=compressor,
             )
             a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "samples", field.name]
-            # print(a)
-            np_array = np.full(
-                (m, n, max_len), _dtype_to_fill[a.dtype.str], dtype=field.dtype
-            )
-            for j, row in enumerate(py_array):
-                # print(row.shape)
-                # break
-                np_array[j, :, :row.shape[-1]] = row
-            a[:] = np_array
-
+            encode_pickle_chunked_array(a, field_dir, partitions)
 
     zarr.consolidate_metadata(path)
 
 
-def update_bar(progress_counter, num_variants):
-    pbar = tqdm.tqdm(total=num_variants, desc="Write")
+def update_bar(progress_counter, num_variants, title):
+    pbar = tqdm.tqdm(total=num_variants, desc=title)
 
     while (total := progress_counter.value) < num_variants:
         inc = total - pbar.n
@@ -814,6 +978,98 @@ def init_workers(counter):
     progress_counter = counter
 
 
+def first_convert_pass(out_path, spec, *, show_progress=False):
+    total_variants = sum(partition.num_records for partition in spec.partitions)
+    global progress_counter
+    progress_counter = multiprocessing.Value("i", 0)
+
+    # start update progress bar process
+    bar_thread = None
+    if show_progress:
+        bar_thread = threading.Thread(
+            target=update_bar,
+            args=(progress_counter, total_variants),
+            name="progress",
+            daemon=True,
+        )  # , daemon=True)
+        bar_thread.start()
+
+    with concurrent.futures.ProcessPoolExecutor(
+        max_workers=1, initializer=init_workers, initargs=(progress_counter,)
+    ) as executor:
+        with multiprocessing.Manager() as manager:
+            locks = [manager.Lock() for _ in range(len(spec.partitions) + 1)]
+            futures = []
+            for j, part in enumerate(spec.partitions):
+                futures.append(
+                    executor.submit(
+                        write_partition,
+                        spec.vcf_metadata,
+                        out_path,
+                        part,
+                        first_chunk_lock=locks[j],
+                        last_chunk_lock=locks[j + 1],
+                    )
+                )
+            completed_partitions = []
+            for future in concurrent.futures.as_completed(futures):
+                exception = future.exception()
+                if exception is not None:
+                    raise exception
+                completed_partitions.append(future.result())
+
+    assert progress_counter.value == total_variants
+    if bar_thread is not None:
+        bar_thread.join()
+
+
+def columnarise(
+    vcfs,
+    out_path,
+    *,
+    worker_processes=1,
+    show_progress=False,
+):
+    spec = scan_vcfs(vcfs, show_progress=show_progress)
+    total_variants = sum(partition.num_records for partition in spec.partitions)
+
+    global progress_counter
+    progress_counter = multiprocessing.Value("i", 0)
+
+    out_path = pathlib.Path(out_path)
+
+    # start update progress bar process
+    bar_thread = None
+    if show_progress:
+        bar_thread = threading.Thread(
+            target=update_bar,
+            args=(progress_counter, total_variants, "Explode"),
+            name="progress",
+            daemon=True,
+        )  # , daemon=True)
+        bar_thread.start()
+
+    with concurrent.futures.ProcessPoolExecutor(
+        max_workers=worker_processes,
+        initializer=init_workers,
+        initargs=(progress_counter,),
+    ) as executor:
+        futures = []
+        for j, partition in enumerate(spec.partitions):
+            futures.append(
+                executor.submit(
+                    columnarise_vcf, partition.path, out_path / f"partition_{j}"
+                )
+            )
+        flush_futures(futures)
+
+    assert progress_counter.value == total_variants
+    if bar_thread is not None:
+        bar_thread.join()
+
+    return
+
+
 def convert_vcf(
     vcfs,
     out_path,
@@ -823,7 +1079,44 @@ def convert_vcf(
     max_alt_alleles=None,
     show_progress=False,
 ):
+    spec = scan_vcfs(vcfs, show_progress=show_progress)
+    total_variants = sum(partition.num_records for partition in spec.partitions)
+    global progress_counter
+    progress_counter = multiprocessing.Value("i", 0)
+
     out_path = pathlib.Path(out_path)
+    # columnarise_vcf(vcfs[0], out_path)
+
+    # start update progress bar process
+    bar_thread = None
+    if show_progress:
+        bar_thread = threading.Thread(
+            target=update_bar,
+            args=(progress_counter, total_variants),
+            name="progress",
+            daemon=True,
+        )  # , daemon=True)
+        bar_thread.start()
+
+    with concurrent.futures.ProcessPoolExecutor(
+        max_workers=1, initializer=init_workers, initargs=(progress_counter,)
+    ) as executor:
+        with multiprocessing.Manager() as manager:
+            locks = [manager.Lock() for _ in range(len(spec.partitions) + 1)]
+            futures = []
+            for j, partition in enumerate(spec.partitions):
+                futures.append(
+                    executor.submit(
+                        columnarise_vcf, partition.path, out_path / f"partition_{j}"
+                    )
+                )
+            flush_futures(futures)
+
+    assert progress_counter.value == total_variants
+    if bar_thread is not None:
+        bar_thread.join()
+
+    return
 
     # TODO add a try-except here for KeyboardInterrupt which will kill
     # various things and clean-up.
@@ -860,53 +1153,54 @@ def convert_vcf(
         max_num_alleles=max_num_alleles,
     )
 
-    total_variants = sum(partition.num_records for partition in spec.partitions)
-    global progress_counter
-    progress_counter = multiprocessing.Value("i", 0)
+    first_convert_pass(out_path, spec, show_progress=show_progress)
 
-    # start update progress bar process
-    bar_thread = None
-    if show_progress:
-        bar_thread = threading.Thread(
-            target=update_bar,
-            args=(progress_counter, total_variants),
-            name="progress",
-            daemon=True,
-        )  # , daemon=True)
-        bar_thread.start()
+    # total_variants = sum(partition.num_records for partition in spec.partitions)
+    # global progress_counter
+    # progress_counter = multiprocessing.Value("i", 0)
 
-    with concurrent.futures.ProcessPoolExecutor(
-        max_workers=1, initializer=init_workers, initargs=(progress_counter,)
-    ) as executor:
-        with multiprocessing.Manager() as manager:
-            locks = [manager.Lock() for _ in range(len(spec.partitions) + 1)]
-            futures = []
-            for j, part in enumerate(spec.partitions):
-                futures.append(
-                    executor.submit(
-                        write_partition,
-                        spec.vcf_metadata,
-                        out_path,
-                        part,
-                        max_num_alleles,
-                        first_chunk_lock=locks[j],
-                        last_chunk_lock=locks[j + 1],
-                    )
-                )
-            completed_partitions = []
-            for future in concurrent.futures.as_completed(futures):
-                exception = future.exception()
-                if exception is not None:
-                    raise exception
-                completed_partitions.append(future.result())
+    # # start update progress bar process
+    # bar_thread = None
+    # if show_progress:
+    #     bar_thread = threading.Thread(
+    #         target=update_bar,
+    #         args=(progress_counter, total_variants),
+    #         name="progress",
+    #         daemon=True,
+    #     )  # , daemon=True)
+    #     bar_thread.start()
 
-    assert progress_counter.value == total_variants
-    if bar_thread is not None:
-        bar_thread.join()
+    # with concurrent.futures.ProcessPoolExecutor(
+    #     max_workers=1, initializer=init_workers, initargs=(progress_counter,)
+    # ) as executor:
+    #     with multiprocessing.Manager() as manager:
+    #         locks = [manager.Lock() for _ in range(len(spec.partitions) + 1)]
+    #         futures = []
+    #         for j, part in enumerate(spec.partitions):
+    #             futures.append(
+    #                 executor.submit(
+    #                     write_partition,
+    #                     spec.vcf_metadata,
+    #                     out_path,
+    #                     part,
+    #                     max_num_alleles,
+    #                     first_chunk_lock=locks[j],
+    #                     last_chunk_lock=locks[j + 1],
+    #                 )
+    #             )
+    #         completed_partitions = []
+    #         for future in concurrent.futures.as_completed(futures):
+    #             exception = future.exception()
+    #             if exception is not None:
+    #                 raise exception
+    #             completed_partitions.append(future.result())
+
+    # assert progress_counter.value == total_variants
+    # if bar_thread is not None:
+    #     bar_thread.join()
 
     # NOTE - we don't need to actually use the return value of the partition
     # anymore, we can compute everything from first principles
-    completed_partitions.sort(key=lambda x: x.first_position)
-    finalise_zarr(
-        out_path, spec.vcf_metadata, completed_partitions, chunk_length, chunk_width
-    )
+    # finalise_zarr(
+    #     out_path, spec, chunk_length, chunk_width
+    # )

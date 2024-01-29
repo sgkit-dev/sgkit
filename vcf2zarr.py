@@ -19,6 +19,12 @@ def scan(vcfs):
     # spec2 = cnv.VcfMetadata.fromdict(yaml.load(converted))
     # print(spec2)
 
+@click.command
+@click.argument("vcfs", nargs=-1, required=True)
+@click.argument("out_path", type=click.Path())
+def columnarise(vcfs, out_path):
+    cnv.columnarise(vcfs, out_path, show_progress=True)
+
 
 @click.command
 @click.argument("vcfs", nargs=-1, required=True)
@@ -38,6 +44,7 @@ def cli():
 
 cli.add_command(convert)
 cli.add_command(scan)
+cli.add_command(columnarise)
 
 if __name__ == "__main__":
     cli()
