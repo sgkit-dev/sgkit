@@ -55,11 +55,12 @@ class BufferedList:
     A list of items that we flush to files of approximately fixed size.
     """
 
-    def __init__(self, dest_dir, executor, future_to_path, max_buffered_mb=1):
+    def __init__(self, dest_dir, executor, future_to_path, chunk_size=1):
         self.dest_dir = dest_dir
         self.buffer = []
         self.buffered_bytes = 0
-        self.max_buffered_bytes = max_buffered_mb * 2**20
+        # chunk_size is in megabytes
+        self.max_buffered_bytes = chunk_size * 2**20
         assert self.max_buffered_bytes > 0
         self.chunk_index = 0
         self.dest_dir.mkdir(exist_ok=True)
@@ -95,7 +96,7 @@ class BufferedList:
             self.buffered_bytes = 0
 
 
-def columnarise_vcf(vcf_path, out_path, *, flush_threads=4, column_buffer_mb=10):
+def columnarise_vcf(vcf_path, out_path, *, flush_threads=4, column_chunk_size=16):
     if out_path.exists():
         shutil.rmtree(out_path)
 
@@ -120,7 +121,7 @@ def columnarise_vcf(vcf_path, out_path, *, flush_threads=4, column_buffer_mb=10)
     with cf.ThreadPoolExecutor(max_workers=flush_threads) as executor:
 
         def make_col(col_path):
-            return BufferedList(col_path, executor, future_to_path, column_buffer_mb)
+            return BufferedList(col_path, executor, future_to_path, column_chunk_size)
 
         contig = make_col(out_path / "CHROM")
         pos = make_col(out_path / "POS")
@@ -990,6 +991,7 @@ def columnarise(
     vcfs,
     out_path,
     *,
+    column_chunk_size=16,
     worker_processes=1,
     show_progress=False,
 ):
@@ -1021,7 +1023,10 @@ def columnarise(
         for j, partition in enumerate(spec.partitions):
             futures.append(
                 executor.submit(
-                    columnarise_vcf, partition.path, out_path / f"partition_{j}"
+                    columnarise_vcf,
+                    partition.path,
+                    out_path / f"partition_{j}",
+                    column_chunk_size=column_chunk_size,
                 )
             )
         flush_futures(futures)
