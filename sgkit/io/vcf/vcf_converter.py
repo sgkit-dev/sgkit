@@ -1,4 +1,4 @@
-import concurrent.futures
+import concurrent.futures as cf
 import contextlib
 import dataclasses
 import multiprocessing
@@ -9,7 +9,6 @@ import time
 import pickle
 import sys
 import shutil
-import gzip
 import json
 from typing import Any
 
@@ -42,38 +41,9 @@ from sgkit.utils import smallest_numpy_int_dtype
 numcodecs.blosc.use_threads = False
 
 
-# based on https://gist.github.com/everilae/9697228
-# Needs refactoring to allow for graceful handing of
-# errors in the main thread, and in the decode thread.
-class ThreadedGenerator:
-    def __init__(self, iterator, queue_maxsize=0, daemon=False):
-        self._iterator = iterator
-        self._sentinel = object()
-        self._queue = queue.Queue(maxsize=queue_maxsize)
-        self._thread = threading.Thread(name="generator_thread", target=self._run)
-        self._thread.daemon = daemon
-
-    def _run(self):
-        # TODO check whether this correctly handles errors in the decode
-        # thread.
-        try:
-            for value in self._iterator:
-                self._queue.put(value)
-
-        finally:
-            self._queue.put(self._sentinel)
-
-    def __iter__(self):
-        self._thread.start()
-        for value in iter(self._queue.get, self._sentinel):
-            yield value
-
-        self._thread.join()
-
-
 def flush_futures(futures):
     # Make sure previous futures have completed
-    for future in concurrent.futures.as_completed(futures):
+    for future in cf.as_completed(futures):
         exception = future.exception()
         if exception is not None:
             raise exception
@@ -81,7 +51,11 @@ def flush_futures(futures):
 
 # TODO better name
 class BufferedList:
-    def __init__(self, dest_dir, max_buffered_mb=1):
+    """
+    A list of items that we flush to files of approximately fixed size.
+    """
+
+    def __init__(self, dest_dir, executor, future_to_path, max_buffered_mb=1):
         self.dest_dir = dest_dir
         self.buffer = []
         self.buffered_bytes = 0
@@ -89,6 +63,9 @@ class BufferedList:
         assert self.max_buffered_bytes > 0
         self.chunk_index = 0
         self.dest_dir.mkdir(exist_ok=True)
+        self.executor = executor
+        self.future_to_path = future_to_path
+        self.compressor = numcodecs.Blosc(cname="zstd", clevel=7)
 
     def append(self, val):
         self.buffer.append(val)
@@ -97,26 +74,31 @@ class BufferedList:
         if self.buffered_bytes >= self.max_buffered_bytes:
             self.flush()
 
+    def enqueue_write_chunk(self, path, data):
+        def work():
+            pkl = pickle.dumps(data)
+            # NOTE assuming that reusing the same compressor instance
+            # from multiple threads is OK!
+            compressed = self.compressor.encode(pkl)
+            with open(path, "wb") as f:
+                f.write(compressed)
+
+        future = self.executor.submit(work)
+        self.future_to_path[future] = path
+
     def flush(self):
-        # TODO we could do this flush in a background thread to speed
-        # things up a bit.
-        dest_file = self.dest_dir / f"{self.chunk_index}"
-
-        # print("Flushing", dest_file, len(self.buffer), self.buffered_bytes)
-        # Using gzip here makes throughput drop through the floor. We'd definitely
-        # want to be doing this with background encode threads if we were
-        # doing it with compression.
-        # with gzip.open(dest_file, "wb") as f:
-        with open(dest_file, "wb") as f:
-            pickle.dump(self.buffer, f)
-        self.chunk_index += 1
-        self.buffer = []
-        self.buffered_bytes = 0
+        if len(self.buffer) > 0:
+            dest_file = self.dest_dir / f"{self.chunk_index}"
+            self.enqueue_write_chunk(dest_file, self.buffer)
+            self.chunk_index += 1
+            self.buffer = []
+            self.buffered_bytes = 0
 
 
-def columnarise_vcf(vcf_path, out_path, column_buffer_mb=10):
+def columnarise_vcf(vcf_path, out_path, *, flush_threads=4, column_buffer_mb=10):
     if out_path.exists():
         shutil.rmtree(out_path)
+
     out_path.mkdir(exist_ok=True, parents=True)
     for category in "FORMAT", "INFO":
         path = out_path / category
@@ -124,66 +106,84 @@ def columnarise_vcf(vcf_path, out_path, column_buffer_mb=10):
 
     vcf = cyvcf2.VCF(vcf_path)
 
-    contig = BufferedList(out_path / "CHROM", column_buffer_mb)
-    pos = BufferedList(out_path / "POS", column_buffer_mb)
-    qual = BufferedList(out_path / "QUAL", column_buffer_mb)
-    vid = BufferedList(out_path / "ID", column_buffer_mb)
-    filters = BufferedList(out_path / "FILTERS", column_buffer_mb)
-    ref = BufferedList(out_path / "REF", column_buffer_mb)
-    alt = BufferedList(out_path / "ALT", column_buffer_mb)
-    gt = BufferedList(out_path / "FORMAT" / "GT", column_buffer_mb)
+    future_to_path = {}
 
-    info_fields = []
-    format_fields = []
-    buffers = [contig, pos, qual, vid, filters, ref, alt, gt]
+    def service_futures(max_waiting=2 * flush_threads):
+        while len(future_to_path) > max_waiting:
+            futures_done, _ = cf.wait(future_to_path, return_when=cf.FIRST_COMPLETED)
+            for future in futures_done:
+                exception = future.exception()
+                if exception is not None:
+                    raise exception
+                future_to_path.pop(future)
 
-    for h in vcf.header_iter():
-        header_type = h["HeaderType"]
-        if header_type in ["INFO", "FORMAT"]:
-            name = h["ID"]
-            if name == "GT":
-                # Need to special-case GT because the output of
-                # variant.format("GT") is text.
-                continue
-            buff = BufferedList(out_path / header_type / name, column_buffer_mb)
-            buffers.append(buff)
-            if header_type == "INFO":
-                info_fields.append((name, buff))
-            else:
-                format_fields.append((name, buff))
+    with cf.ThreadPoolExecutor(max_workers=flush_threads) as executor:
 
-    # for variant in vcf:
-    for variant in ThreadedGenerator(vcf, queue_maxsize=200):
-        contig.append(variant.CHROM)
-        pos.append(variant.POS)
-        qual.append(variant.QUAL)
-        vid.append(variant.ID)
-        filters.append(variant.FILTERS)
-        ref.append(variant.REF)
-        alt.append(variant.ALT)
-        gt.append(variant.genotype.array())
+        def make_col(col_path):
+            return BufferedList(col_path, executor, future_to_path, column_buffer_mb)
 
-        for name, buff in info_fields:
-            val = None
-            try:
-                val = variant.INFO[name]
-            except KeyError:
-                pass
-            buff.append(val)
+        contig = make_col(out_path / "CHROM")
+        pos = make_col(out_path / "POS")
+        qual = make_col(out_path / "QUAL")
+        vid = make_col(out_path / "ID")
+        filters = make_col(out_path / "FILTERS")
+        ref = make_col(out_path / "REF")
+        alt = make_col(out_path / "ALT")
+        gt = make_col(out_path / "FORMAT" / "GT")
 
-        for name, buff in format_fields:
-            val = None
-            try:
-                val = variant.format(name)
-            except KeyError:
-                pass
-            buff.append(val)
+        info_fields = []
+        format_fields = []
+        columns = [contig, pos, qual, vid, filters, ref, alt, gt]
 
-        with progress_counter.get_lock():
-            progress_counter.value += 1
+        for h in vcf.header_iter():
+            header_type = h["HeaderType"]
+            if header_type in ["INFO", "FORMAT"]:
+                name = h["ID"]
+                if name == "GT":
+                    # Need to special-case GT because the output of
+                    # variant.format("GT") is text.
+                    continue
+                col = make_col(out_path / header_type / name)
+                columns.append(col)
+                if header_type == "INFO":
+                    info_fields.append((name, col))
+                else:
+                    format_fields.append((name, col))
 
-    for buff in buffers:
-        buff.flush()
+        for variant in vcf:
+            contig.append(variant.CHROM)
+            pos.append(variant.POS)
+            qual.append(variant.QUAL)
+            vid.append(variant.ID)
+            filters.append(variant.FILTERS)
+            ref.append(variant.REF)
+            alt.append(variant.ALT)
+            gt.append(variant.genotype.array())
+
+            for name, buff in info_fields:
+                val = None
+                try:
+                    val = variant.INFO[name]
+                except KeyError:
+                    pass
+                buff.append(val)
+
+            for name, buff in format_fields:
+                val = None
+                try:
+                    val = variant.format(name)
+                except KeyError:
+                    pass
+                buff.append(val)
+
+            service_futures()
+
+            with progress_counter.get_lock():
+                progress_counter.value += 1
+
+        for col in columns:
+            buff.flush()
+        service_futures(0)
 
 
 def sync_flush_array(np_buffer, zarr_array, offset):
@@ -1012,7 +1012,7 @@ def columnarise(
         )  # , daemon=True)
         bar_thread.start()
 
-    with concurrent.futures.ProcessPoolExecutor(
+    with cf.ProcessPoolExecutor(
         max_workers=worker_processes,
         initializer=init_workers,
         initargs=(progress_counter,),
