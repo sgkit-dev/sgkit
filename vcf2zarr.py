@@ -22,8 +22,9 @@ def scan(vcfs):
 @click.command
 @click.argument("vcfs", nargs=-1, required=True)
 @click.argument("out_path", type=click.Path())
-def columnarise(vcfs, out_path):
-    cnv.columnarise(vcfs, out_path, show_progress=True)
+@click.option("-w", "--worker-processes", type=int, default=1)
+def columnarise(vcfs, out_path, worker_processes):
+    cnv.columnarise(vcfs, out_path, worker_processes=worker_processes, show_progress=True)
 
 @click.command
 @click.argument("columnarised", type=click.Path())

@@ -182,7 +182,7 @@ def columnarise_vcf(vcf_path, out_path, *, flush_threads=4, column_buffer_mb=10)
                 progress_counter.value += 1
 
         for col in columns:
-            buff.flush()
+            col.flush()
         service_futures(0)
 
 
