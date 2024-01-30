@@ -49,24 +49,41 @@ def flush_futures(futures):
             raise exception
 
 
-# TODO better name
-class BufferedList:
-    """
-    A list of items that we flush to files of approximately fixed size.
-    """
+class PickleChunkedColumn:
+    def __init__(self, directory):
+        self.directory = directory
+        self.compressor = numcodecs.Blosc(cname="zstd", clevel=7)
 
-    def __init__(self, dest_dir, executor, future_to_path, chunk_size=1):
-        self.dest_dir = dest_dir
+    def write_chunk(self, partition_index, chunk_index, data):
+        path = self.directory / f"p{partition_index}" / f"c{chunk_index}"
+        print("Write chunk", path)
+        pkl = pickle.dumps(data)
+        # NOTE assuming that reusing the same compressor instance
+        # from multiple threads is OK!
+        compressed = self.compressor.encode(pkl)
+        with open(path, "wb") as f:
+            f.write(compressed)
+
+    def read_chunk(self, partition_index, chunk_index):
+        path = self.directory / f"p{partition_index}" / f"c{chunk_index}"
+        with open(path, "rb") as f:
+            pkl = self.compressor.decode(f.read())
+        return pickle.loads(data)
+
+
+class PickleChunkedColumnWriteBuffer:
+    def __init__(self, column, partition_index, executor, futures, chunk_size=1):
+        self.column = column
         self.buffer = []
         self.buffered_bytes = 0
         # chunk_size is in megabytes
         self.max_buffered_bytes = chunk_size * 2**20
         assert self.max_buffered_bytes > 0
+        self.partition_index = partition_index
         self.chunk_index = 0
-        self.dest_dir.mkdir(exist_ok=True)
+        self.column.directory.mkdir(exist_ok=True)
         self.executor = executor
-        self.future_to_path = future_to_path
-        self.compressor = numcodecs.Blosc(cname="zstd", clevel=7)
+        self.futures = futures
 
     def append(self, val):
         self.buffer.append(val)
@@ -75,116 +92,243 @@ class BufferedList:
         if self.buffered_bytes >= self.max_buffered_bytes:
             self.flush()
 
-    def enqueue_write_chunk(self, path, data):
-        def work():
-            pkl = pickle.dumps(data)
-            # NOTE assuming that reusing the same compressor instance
-            # from multiple threads is OK!
-            compressed = self.compressor.encode(pkl)
-            with open(path, "wb") as f:
-                f.write(compressed)
-
-        future = self.executor.submit(work)
-        self.future_to_path[future] = path
-
     def flush(self):
         if len(self.buffer) > 0:
-            dest_file = self.dest_dir / f"{self.chunk_index}"
-            self.enqueue_write_chunk(dest_file, self.buffer)
+            future = self.executor.submit(
+                self.column.write_chunk,
+                self.partition_index,
+                self.chunk_index,
+                self.buffer,
+            )
+            self.futures.add(future)
+
             self.chunk_index += 1
             self.buffer = []
             self.buffered_bytes = 0
 
 
-def columnarise_vcf(vcf_path, out_path, *, flush_threads=4, column_chunk_size=16):
-    if out_path.exists():
-        shutil.rmtree(out_path)
+class PickleChunkedVcf:
+    def __init__(self, path, metadata):
+        self.path = path
+        self.metadata = metadata
 
-    out_path.mkdir(exist_ok=True, parents=True)
-    for category in "FORMAT", "INFO":
-        path = out_path / category
-        path.mkdir(exist_ok=True)
+    @property
+    def num_partitions(self):
+        return len(self.metadata.partitions)
 
-    vcf = cyvcf2.VCF(vcf_path)
+    def mkdirs(self):
+        self.path.mkdir()
+        fixed_cols = ["CHROM", "POS", "QUAL", "ID", "FILTERS", "REF", "ALT"]
+        field_paths = [self.path / col for col in fixed_cols]
+        info_path = self.path / "INFO"
+        info_path.mkdir()
+        for field in self.metadata.info_fields:
+            field_paths.append(info_path / field.name)
+        format_path = self.path / "FORMAT"
+        format_path.mkdir()
+        for field in self.metadata.format_fields:
+            field_paths.append(format_path / field.name)
 
-    future_to_path = {}
+        for field_path in field_paths:
+            field_path.mkdir()
+            for j in range(self.num_partitions):
+                part_path = field_path / f"p{j}"
+                part_path.mkdir()
 
-    def service_futures(max_waiting=2 * flush_threads):
-        while len(future_to_path) > max_waiting:
-            futures_done, _ = cf.wait(future_to_path, return_when=cf.FIRST_COMPLETED)
-            for future in futures_done:
-                exception = future.exception()
-                if exception is not None:
-                    raise exception
-                future_to_path.pop(future)
+    @staticmethod
+    def load(path):
+        with open(path / "metadata.json") as f:
+            metadata = VcfMetadata.fromdict(json.load(f))
+        return PickleChunkedVcf(path, metadata)
 
-    with cf.ThreadPoolExecutor(max_workers=flush_threads) as executor:
+    @staticmethod
+    def convert(
+        vcfs, out_path, *, column_chunk_size=16, worker_processes=1, show_progress=False
+    ):
+        out_path = pathlib.Path(out_path)
+        vcf_metadata = scan_vcfs(vcfs, show_progress=show_progress)
+        pcvcf = PickleChunkedVcf(out_path, vcf_metadata)
+        pcvcf.mkdirs()
 
-        def make_col(col_path):
-            return BufferedList(col_path, executor, future_to_path, column_chunk_size)
+        total_variants = sum(
+            partition.num_records for partition in vcf_metadata.partitions
+        )
 
-        contig = make_col(out_path / "CHROM")
-        pos = make_col(out_path / "POS")
-        qual = make_col(out_path / "QUAL")
-        vid = make_col(out_path / "ID")
-        filters = make_col(out_path / "FILTERS")
-        ref = make_col(out_path / "REF")
-        alt = make_col(out_path / "ALT")
-        gt = make_col(out_path / "FORMAT" / "GT")
+        global progress_counter
+        progress_counter = multiprocessing.Value("i", 0)
 
-        info_fields = []
-        format_fields = []
-        columns = [contig, pos, qual, vid, filters, ref, alt, gt]
+        # start update progress bar process
+        bar_thread = None
+        if show_progress:
+            bar_thread = threading.Thread(
+                target=update_bar,
+                args=(progress_counter, total_variants, "Explode"),
+                name="progress",
+                daemon=True,
+            )  # , daemon=True)
+            bar_thread.start()
 
-        for h in vcf.header_iter():
-            header_type = h["HeaderType"]
-            if header_type in ["INFO", "FORMAT"]:
-                name = h["ID"]
-                if name == "GT":
-                    # Need to special-case GT because the output of
-                    # variant.format("GT") is text.
-                    continue
-                col = make_col(out_path / header_type / name)
-                columns.append(col)
-                if header_type == "INFO":
-                    info_fields.append((name, col))
-                else:
-                    format_fields.append((name, col))
+        with cf.ProcessPoolExecutor(
+            max_workers=worker_processes,
+            initializer=init_workers,
+            initargs=(progress_counter,),
+        ) as executor:
+            futures = []
+            for j, partition in enumerate(vcf_metadata.partitions):
+                futures.append(
+                    executor.submit(
+                        PickleChunkedVcf.convert_partition,
+                        partition.path,
+                        j,
+                        out_path,
+                        column_chunk_size=column_chunk_size,
+                    )
+                )
+            flush_futures(futures)
 
-        for variant in vcf:
-            contig.append(variant.CHROM)
-            pos.append(variant.POS)
-            qual.append(variant.QUAL)
-            vid.append(variant.ID)
-            filters.append(variant.FILTERS)
-            ref.append(variant.REF)
-            alt.append(variant.ALT)
-            gt.append(variant.genotype.array())
+        assert progress_counter.value == total_variants
+        if bar_thread is not None:
+            bar_thread.join()
 
-            for name, buff in info_fields:
-                val = None
-                try:
-                    val = variant.INFO[name]
-                except KeyError:
-                    pass
-                buff.append(val)
+        with open(out_path / "metadata.json", "w") as f:
+            json.dump(vcf_metadata.asdict(), f, indent=4)
 
-            for name, buff in format_fields:
-                val = None
-                try:
-                    val = variant.format(name)
-                except KeyError:
-                    pass
-                buff.append(val)
+    @staticmethod
+    def convert_partition(
+        vcf_path, partition_index, out_path, *, flush_threads=4, column_chunk_size=16
+    ):
+        vcf = cyvcf2.VCF(vcf_path)
+        futures = set()
 
-            service_futures()
+        def service_futures(max_waiting=2 * flush_threads):
+            while len(futures) > max_waiting:
+                futures_done, _ = cf.wait(futures, return_when=cf.FIRST_COMPLETED)
+                for future in futures_done:
+                    exception = future.exception()
+                    if exception is not None:
+                        raise exception
+                    futures.remove(future)
 
-            with progress_counter.get_lock():
-                progress_counter.value += 1
+        with cf.ThreadPoolExecutor(max_workers=flush_threads) as executor:
 
-        for col in columns:
-            col.flush()
-        service_futures(0)
+            def make_col(col_path):
+                column = PickleChunkedColumn(col_path)
+                return PickleChunkedColumnWriteBuffer(
+                    column, partition_index, executor, futures, column_chunk_size
+                )
+
+            contig = make_col(out_path / "CHROM")
+            pos = make_col(out_path / "POS")
+            qual = make_col(out_path / "QUAL")
+            vid = make_col(out_path / "ID")
+            filters = make_col(out_path / "FILTERS")
+            ref = make_col(out_path / "REF")
+            alt = make_col(out_path / "ALT")
+            gt = None
+
+            info_fields = []
+            format_fields = []
+            columns = [contig, pos, qual, vid, filters, ref, alt]
+
+            for h in vcf.header_iter():
+                header_type = h["HeaderType"]
+                if header_type in ["INFO", "FORMAT"]:
+                    name = h["ID"]
+                    col = make_col(out_path / header_type / name)
+                    columns.append(col)
+                    if header_type == "INFO":
+                        info_fields.append((name, col))
+                    else:
+                        # Need to special-case GT because the output of
+                        # variant.format("GT") is text.
+                        if name == "GT":
+                            gt = col
+                        else:
+                            format_fields.append((name, col))
+
+            for variant in vcf:
+                contig.append(variant.CHROM)
+                pos.append(variant.POS)
+                qual.append(variant.QUAL)
+                vid.append(variant.ID)
+                filters.append(variant.FILTERS)
+                ref.append(variant.REF)
+                alt.append(variant.ALT)
+                if gt is not None:
+                    gt.append(variant.genotype.array())
+
+                for name, buff in info_fields:
+                    val = None
+                    try:
+                        val = variant.INFO[name]
+                    except KeyError:
+                        pass
+                    buff.append(val)
+
+                for name, buff in format_fields:
+                    val = None
+                    try:
+                        val = variant.format(name)
+                    except KeyError:
+                        pass
+                    buff.append(val)
+
+                service_futures()
+
+                with progress_counter.get_lock():
+                    progress_counter.value += 1
+
+            for col in columns:
+                col.flush()
+            service_futures(0)
+
+
+# class ColumnarisedVcf:
+#     def __init__(self, path):
+#         self.path = path
+#         with open(path / "spec.json") as f:
+#             d = json.load(f)
+#         self.spec = ConversionSpecification.fromdict(d)
+#         self.num_partitions = len(self.spec.partitions)
+#         self.num_records = sum(part.num_records for part in self.spec.partitions)
+
+#     def iter_chunks(self, name):
+#         for j in range(self.num_partitions):
+#             partition_dir = self.path / f"partition_{j}" / name
+#             num_chunks = len(list(partition_dir.iterdir()))
+#             for k in range(num_chunks):
+#                 chunk_file = partition_dir / f"{k}"
+#                 # print("load", chunk_file)
+#                 with open(chunk_file, "rb") as f:
+#                     chunk = pickle.load(f)
+#                     yield chunk
+#     def values(self, name):
+#         """
+#         Return the full column as a python list.
+#         """
+#         ret = []
+#         for chunk in self.iter_chunks(name):
+#             ret.extend(chunk)
+#         return ret
+
+
+def encode_zarr(
+    columnarised_path,
+    out_path,
+    *,
+    chunk_width=None,
+    chunk_length=None,
+    show_progress=False,
+):
+    pcv = PickleChunkedVcf(pathlib.Path(columnarised_path))
+    print(pcv)
+    # cv = ColumnarisedVcf(pathlib.Path(columnarised_path))
+    # pos = np.array(cv.values("POS"), dtype=np.int32)
+    # chrom = np.array(cv.values("CHROM"))
+    # qual = np.array(cv.values("QUAL"))
+    # print(pos)
+    # print(chrom)
+    # print(qual)
 
 
 def sync_flush_array(np_buffer, zarr_array, offset):
@@ -514,8 +658,6 @@ class VcfPartition:
     path: str
     num_records: int
     first_position: int
-    start_offset: int = 0
-    index: int = -1
 
 
 @dataclasses.dataclass
@@ -569,6 +711,7 @@ class VcfMetadata:
     filters: list
     fields: list
     contig_lengths: list = None
+    partitions: list = None
 
     @property
     def info_fields(self):
@@ -581,25 +724,14 @@ class VcfMetadata:
     @staticmethod
     def fromdict(d):
         fields = [VcfFieldDefinition(**fd) for fd in d["fields"]]
+        partitions = [VcfPartition(**pd) for pd in d["partitions"]]
         d = d.copy()
         d["fields"] = fields
+        d["partitions"] = partitions
         return VcfMetadata(**d)
-
-
-@dataclasses.dataclass
-class ConversionSpecification:
-    vcf_metadata: VcfMetadata
-    partitions: list
 
     def asdict(self):
         return dataclasses.asdict(self)
-
-    @staticmethod
-    def fromdict(d):
-        return ConversionSpecification(
-            VcfMetadata.fromdict(d["vcf_metadata"]),
-            [VcfPartition(**dp) for dp in d["partitions"]],
-        )
 
 
 def scan_vcfs(paths, show_progress):
@@ -621,9 +753,7 @@ def scan_vcfs(paths, show_progress):
         fields = []
         for h in vcf.header_iter():
             if h["HeaderType"] in ["INFO", "FORMAT"]:
-                # Only keep optional format fields, GT is a special case.
-                if h["ID"] != "GT":
-                    fields.append(VcfFieldDefinition.from_header(h))
+                fields.append(VcfFieldDefinition.from_header(h))
 
         metadata = VcfMetadata(
             samples=vcf.samples,
@@ -651,14 +781,9 @@ def scan_vcfs(paths, show_progress):
                 first_position=(record.CHROM, record.POS),
             )
         )
-
     partitions.sort(key=lambda x: x.first_position)
-    offset = 0
-    for index, partition in enumerate(partitions):
-        partition.start_offset = offset
-        partition.index = index
-        offset += partition.num_records
-    return ConversionSpecification(vcf_metadata, partitions)
+    vcf_metadata.partitions = partitions
+    return vcf_metadata
 
 
 def create_zarr(
@@ -995,88 +1120,17 @@ def columnarise(
     worker_processes=1,
     show_progress=False,
 ):
-    spec = scan_vcfs(vcfs, show_progress=show_progress)
-    total_variants = sum(partition.num_records for partition in spec.partitions)
-
-    global progress_counter
-    progress_counter = multiprocessing.Value("i", 0)
-
     out_path = pathlib.Path(out_path)
+    if out_path.exists():
+        shutil.rmtree(out_path)
 
-    # start update progress bar process
-    bar_thread = None
-    if show_progress:
-        bar_thread = threading.Thread(
-            target=update_bar,
-            args=(progress_counter, total_variants, "Explode"),
-            name="progress",
-            daemon=True,
-        )  # , daemon=True)
-        bar_thread.start()
-
-    with cf.ProcessPoolExecutor(
-        max_workers=worker_processes,
-        initializer=init_workers,
-        initargs=(progress_counter,),
-    ) as executor:
-        futures = []
-        for j, partition in enumerate(spec.partitions):
-            futures.append(
-                executor.submit(
-                    columnarise_vcf,
-                    partition.path,
-                    out_path / f"partition_{j}",
-                    column_chunk_size=column_chunk_size,
-                )
-            )
-        flush_futures(futures)
-
-    assert progress_counter.value == total_variants
-    if bar_thread is not None:
-        bar_thread.join()
-
-    with open(out_path / "spec.json", "w") as f:
-        json.dump(spec.asdict(), f, indent=4)
-
-
-class ColumnarisedVcf:
-    def __init__(self, path):
-        self.path = path
-        with open(path / "spec.json") as f:
-            d = json.load(f)
-        self.spec = ConversionSpecification.fromdict(d)
-        self.num_partitions = len(self.spec.partitions)
-        self.num_records = sum(part.num_records for part in self.spec.partitions)
-
-    def iter_chunks(self, name):
-        for j in range(self.num_partitions):
-            partition_dir = self.path / f"partition_{j}" / name
-            num_chunks = len(list(partition_dir.iterdir()))
-            for k in range(num_chunks):
-                chunk_file = partition_dir / f"{k}"
-                # print("load", chunk_file)
-                with open(chunk_file, "rb") as f:
-                    chunk = pickle.load(f)
-                    yield chunk
-
-    def values(self, name):
-        """
-        Return the full column as a python list.
-        """
-        ret = []
-        for chunk in self.iter_chunks(name):
-            ret.extend(chunk)
-        return ret
-
-
-def encode_zarr(columnarised_path, out_path, *, show_progress=False):
-    cv = ColumnarisedVcf(pathlib.Path(columnarised_path))
-    pos = np.array(cv.values("POS"), dtype=np.int32)
-    chrom = np.array(cv.values("CHROM"))
-    qual = np.array(cv.values("QUAL"))
-    print(pos)
-    print(chrom)
-    print(qual)
+    PickleChunkedVcf.convert(
+        vcfs,
+        out_path,
+        column_chunk_size=column_chunk_size,
+        worker_processes=worker_processes,
+        show_progress=show_progress,
+    )
 
 
 def convert_vcf(

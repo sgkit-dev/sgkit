@@ -3,8 +3,10 @@ import json
 import click
 import yaml
 
-import  sgkit.io.vcf.vcf_converter as cnv
+import sgkit.io.vcf.vcf_converter as cnv
+
 # from sgkit import load_dataset
+
 
 @click.command
 @click.argument("vcfs", nargs=-1, required=True)
@@ -19,20 +21,44 @@ def scan(vcfs):
     # spec2 = cnv.VcfMetadata.fromdict(yaml.load(converted))
     # print(spec2)
 
+
 @click.command
 @click.argument("vcfs", nargs=-1, required=True)
 @click.argument("out_path", type=click.Path())
-@click.option("-w", "--worker-processes", type=int, default=1)
+@click.option("-p", "--worker-processes", type=int, default=1)
 @click.option("-c", "--column-chunk-size", type=int, default=16)
 def columnarise(vcfs, out_path, worker_processes, column_chunk_size):
-    cnv.columnarise(vcfs, out_path, worker_processes=worker_processes,
-            column_chunk_size=column_chunk_size,show_progress=True)
+    cnv.columnarise(
+        vcfs,
+        out_path,
+        worker_processes=worker_processes,
+        column_chunk_size=column_chunk_size,
+        show_progress=True,
+    )
+
+
+@click.command
+@click.argument("columnarised", type=click.Path())
+@click.option("-w", "--chunk-width", type=int, default=None)
+@click.option("-l", "--chunk-length", type=int, default=None)
+def predict(columnarised, chunk_width, chunk_length):
+    pass
+    # cnv.encode_zarr(columnarised, zarr, show_progress=True)
+
 
 @click.command
 @click.argument("columnarised", type=click.Path())
 @click.argument("zarr", type=click.Path())
-def encode(columnarised, zarr):
-    cnv.encode_zarr(columnarised, zarr, show_progress=True)
+@click.option("-w", "--chunk-width", type=int, default=None)
+@click.option("-l", "--chunk-length", type=int, default=None)
+def to_zarr(columnarised, zarr, chunk_width, chunk_length):
+    cnv.encode_zarr(
+        columnarised,
+        zarr,
+        chunk_width=chunk_width,
+        chunk_length=chunk_length,
+        show_progress=True,
+    )
 
 
 @click.command
@@ -46,6 +72,7 @@ def convert(vcfs, out_path):
     # print(ds.variant_ReadPosRankSum.values)
     # print(ds.call_GQ.values)
 
+
 @click.group()
 def cli():
     pass
@@ -54,7 +81,8 @@ def cli():
 cli.add_command(convert)
 cli.add_command(scan)
 cli.add_command(columnarise)
-cli.add_command(encode)
+cli.add_command(predict)
+cli.add_command(to_zarr)
 
 if __name__ == "__main__":
     cli()
