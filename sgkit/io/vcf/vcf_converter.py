@@ -3,6 +3,7 @@ import contextlib
 import dataclasses
 import multiprocessing
 import queue
+import functools
 import threading
 import pathlib
 import time
@@ -10,6 +11,7 @@ import pickle
 import sys
 import shutil
 import json
+import collections
 from typing import Any
 
 import cyvcf2
@@ -49,22 +51,185 @@ def flush_futures(futures):
             raise exception
 
 
-class PickleChunkedColumn:
-    def __init__(self, path):
-        self.path = path
-        self.compressor = numcodecs.Blosc(cname="zstd", clevel=7)
-        self.num_partitions = None
-        self._num_chunks = None
+@dataclasses.dataclass
+class VcfFieldDefinition:
+    category: str
+    name: str
+    vcf_number: str
+    vcf_type: str
+    description: str
+
+    @staticmethod
+    def from_header(definition):
+        category = definition["HeaderType"]
+        name = definition["ID"]
+        prefix = "call" if category == "FORMAT" else "variant"
+        variable_name = f"{prefix}_{name}"
+        vcf_number = definition["Number"]
+        vcf_type = definition["Type"]
+        return VcfFieldDefinition(
+            category=category,
+            name=name,
+            vcf_number=vcf_number,
+            vcf_type=vcf_type,
+            description=definition["Description"].strip('"'),
+        )
 
     @property
-    def num_chunks(self):
-        if self._num_chunks is None:
-            self._num_chunks = len(list(self.path.iterdir()))
-        return self._num_chunks
+    def full_name(self):
+        if self.category == "fixed":
+            return self.name
+        return f"{self.category}/{self.name}"
+
+
+@dataclasses.dataclass
+class VcfMetadata:
+    samples: list
+    contig_names: list
+    filters: list
+    fields: list
+    contig_lengths: list = None
+    partitions: list = None
+
+    @property
+    def fixed_fields(self):
+        return [field for field in self.fields if field.category == "fixed"]
+
+    @property
+    def info_fields(self):
+        return [field for field in self.fields if field.category == "INFO"]
+
+    @property
+    def format_fields(self):
+        return [field for field in self.fields if field.category == "FORMAT"]
+
+    @staticmethod
+    def fromdict(d):
+        fields = [VcfFieldDefinition(**fd) for fd in d["fields"]]
+        partitions = [VcfPartition(**pd) for pd in d["partitions"]]
+        d = d.copy()
+        d["fields"] = fields
+        d["partitions"] = partitions
+        return VcfMetadata(**d)
+
+    def asdict(self):
+        return dataclasses.asdict(self)
+
+
+def fixed_vcf_field_definitions():
+    def make_field_def(name, vcf_type, vcf_number):
+        return VcfFieldDefinition(
+            category="fixed",
+            name=name,
+            vcf_type=vcf_type,
+            vcf_number=vcf_number,
+            description="TODO",
+        )
+
+    fields = [
+        make_field_def("CHROM", "String", "1"),
+        make_field_def("POS", "Integer", "1"),
+        make_field_def("QUAL", "Float", "1"),
+        make_field_def("ID", "String", "."),
+        make_field_def("FILTERS", "String", "."),
+        make_field_def("REF", "String", "1"),
+        make_field_def("ALT", "String", "."),
+    ]
+    return fields
+
+
+def scan_vcfs(paths, show_progress):
+    partitions = []
+    vcf_metadata = None
+    for path in tqdm.tqdm(paths, desc="Scan ", disable=not show_progress):
+        vcf = cyvcf2.VCF(path)
+
+        filters = [
+            h["ID"]
+            for h in vcf.header_iter()
+            if h["HeaderType"] == "FILTER" and isinstance(h["ID"], str)
+        ]
+        # Ensure PASS is the first filter if present
+        if "PASS" in filters:
+            filters.remove("PASS")
+            filters.insert(0, "PASS")
+
+        fields = fixed_vcf_field_definitions()
+        for h in vcf.header_iter():
+            if h["HeaderType"] in ["INFO", "FORMAT"]:
+                field = VcfFieldDefinition.from_header(h)
+                if field.name == "GT":
+                    field.vcf_type = "Integer"
+                    field.vcf_number = "."
+                fields.append(field)
+
+        metadata = VcfMetadata(
+            samples=vcf.samples,
+            contig_names=vcf.seqnames,
+            filters=filters,
+            fields=fields,
+        )
+        try:
+            metadata.contig_lengths = vcf.seqlens
+        except AttributeError:
+            pass
+
+        if vcf_metadata is None:
+            vcf_metadata = metadata
+        else:
+            if metadata != vcf_metadata:
+                raise ValueError("Incompatible VCF chunks")
+        record = next(vcf)
+
+        partitions.append(
+            # Requires cyvcf2>=0.30.27
+            VcfPartition(
+                vcf_path=path,
+                num_records=vcf.num_records,
+                first_position=(record.CHROM, record.POS),
+            )
+        )
+    partitions.sort(key=lambda x: x.first_position)
+    vcf_metadata.partitions = partitions
+    return vcf_metadata
+
+
+@dataclasses.dataclass
+class NumericColumnBounds:
+    min_value: Any
+    max_value: Any
+    max_second_dimension: int
+    num_missing: int
+
+
+class PickleChunkedVcfField:
+    def __init__(self, vcf_field, base_path):
+        self.vcf_field = vcf_field
+        if vcf_field.category == "fixed":
+            self.path = base_path / vcf_field.name
+        else:
+            self.path = base_path / vcf_field.category / vcf_field.name
+
+        self.compressor = numcodecs.Blosc(cname="zstd", clevel=7)
+        # TODO have a clearer way of defining this state between
+        # read and write mode.
+        self.num_partitions = None
+        self.num_records = None
+        self.partition_num_chunks = {}
+
+    def num_chunks(self, partition_index):
+        if partition_index not in self.partition_num_chunks:
+            partition_path = self.path / f"p{partition_index}"
+            n = len(list(partition_path.iterdir()))
+            self.partition_num_chunks[partition_index] = n
+        return self.partition_num_chunks[partition_index]
+
+    def is_numeric(self):
+        return self.vcf_field.vcf_type in ("Integer", "Float")
 
     def __repr__(self):
         # TODO add class name
-        return repr({"path": str(self.path), "num_chunks": self.num_chunks})
+        return repr({"path": str(self.path)})
 
     def write_chunk(self, partition_index, chunk_index, data):
         path = self.path / f"p{partition_index}" / f"c{chunk_index}"
@@ -82,12 +247,47 @@ class PickleChunkedColumn:
         return pickle.loads(pkl)
 
     def iter_values(self):
+        num_records = 0
         for partition_index in range(self.num_partitions):
-            for chunk_index in range(self.num_chunks):
-                yield from self.read_chunk(partition_index, chunk_index)
+            for chunk_index in range(self.num_chunks(partition_index)):
+                chunk = self.read_chunk(partition_index, chunk_index)
+                for record in chunk:
+                    yield record
+                    num_records += 1
+        if num_records != self.num_records:
+            raise ValueError(
+                f"Corruption detected: incorrect number of records in {str(self.path)}."
+            )
+
+    def get_bounds(self):
+        filter_missing_int = False
+        if self.vcf_field.vcf_type == "Integer":
+            filter_missing_int = True
+            # cyvcf2 represents missing Integer values as the minimum
+            # int32 value and fill as minimum int32 value + 1
+            sentinel = np.iinfo(np.int32).min + 1
+
+        min_value = np.inf
+        max_value = -np.inf
+        max_second_dimension = 0
+        num_missing = 0
+        for value in self.iter_values():
+            if value is not None:
+                value = np.array(value)
+                if filter_missing_int:
+                    value[value <= sentinel] = 0
+                max_value = max(max_value, np.max(value))
+                min_value = min(min_value, np.min(value))
+                assert len(value.shape) <= 2
+                if len(value.shape) == 2:
+                    max_second_dimension = max(max_second_dimension, value.shape[1])
+            else:
+                num_missing += 1
+        return NumericColumnBounds(min_value, max_value, max_second_dimension, num_missing)
 
 
-class PickleChunkedColumnWriteBuffer:
+
+class PickleChunkedWriteBuffer:
     def __init__(self, column, partition_index, executor, futures, chunk_size=1):
         self.column = column
         self.buffer = []
@@ -128,40 +328,23 @@ class PickleChunkedVcf:
         self.metadata = metadata
 
         self.columns = {}
-        fixed_cols = ["CHROM", "POS", "QUAL", "ID", "FILTERS", "REF", "ALT"]
-        for col in fixed_cols:
-            self.columns[col] = PickleChunkedColumn(self.path / col)
-        info_path = self.path / "INFO"
-        for field in self.metadata.info_fields:
-            self.columns[f"INFO/{field.name}"] = PickleChunkedColumn(
-                info_path / field.name
-            )
-        format_path = self.path / "FORMAT"
-        for field in self.metadata.format_fields:
-            self.columns[f"FORMAT/{field.name}"] = PickleChunkedColumn(
-                format_path / field.name
-            )
+        for field in self.metadata.fields:
+            self.columns[field.full_name] = PickleChunkedVcfField(field, path)
 
         for col in self.columns.values():
             col.num_partitions = self.num_partitions
+            col.num_records = self.num_records
 
-    @property
+    @functools.cached_property
     def num_partitions(self):
         return len(self.metadata.partitions)
 
+    @functools.cached_property
+    def num_records(self):
+        return sum(partition.num_records for partition in self.metadata.partitions)
+
     def mkdirs(self):
         self.path.mkdir()
-        # fixed_cols = ["CHROM", "POS", "QUAL", "ID", "FILTERS", "REF", "ALT"]
-        # field_paths = [self.path / col for col in fixed_cols]
-        # info_path = self.path / "INFO"
-        # info_path.mkdir()
-        # for field in self.metadata.info_fields:
-        #     field_paths.append(info_path / field.name)
-        # format_path = self.path / "FORMAT"
-        # format_path.mkdir()
-        # for field in self.metadata.format_fields:
-        #     field_paths.append(format_path / field.name)
-
         for col in self.columns.values():
             col.path.mkdir(parents=True)
             for j in range(self.num_partitions):
@@ -211,7 +394,7 @@ class PickleChunkedVcf:
                 futures.append(
                     executor.submit(
                         PickleChunkedVcf.convert_partition,
-                        partition.path,
+                        vcf_metadata,
                         j,
                         out_path,
                         column_chunk_size=column_chunk_size,
@@ -228,9 +411,15 @@ class PickleChunkedVcf:
 
     @staticmethod
     def convert_partition(
-        vcf_path, partition_index, out_path, *, flush_threads=4, column_chunk_size=16
+        vcf_metadata,
+        partition_index,
+        out_path,
+        *,
+        flush_threads=4,
+        column_chunk_size=16,
     ):
-        vcf = cyvcf2.VCF(vcf_path)
+        partition = vcf_metadata.partitions[partition_index]
+        vcf = cyvcf2.VCF(partition.vcf_path)
         futures = set()
 
         def service_futures(max_waiting=2 * flush_threads):
@@ -243,41 +432,30 @@ class PickleChunkedVcf:
                     futures.remove(future)
 
         with cf.ThreadPoolExecutor(max_workers=flush_threads) as executor:
-
-            def make_col(col_path):
-                column = PickleChunkedColumn(col_path)
-                return PickleChunkedColumnWriteBuffer(
-                    column, partition_index, executor, futures, column_chunk_size
-                )
-
-            contig = make_col(out_path / "CHROM")
-            pos = make_col(out_path / "POS")
-            qual = make_col(out_path / "QUAL")
-            vid = make_col(out_path / "ID")
-            filters = make_col(out_path / "FILTERS")
-            ref = make_col(out_path / "REF")
-            alt = make_col(out_path / "ALT")
-            gt = None
-
+            columns = {}
             info_fields = []
             format_fields = []
-            columns = [contig, pos, qual, vid, filters, ref, alt]
+            for field in vcf_metadata.fields:
+                column = PickleChunkedVcfField(field, out_path)
+                write_buffer = PickleChunkedWriteBuffer(
+                    column, partition_index, executor, futures, column_chunk_size
+                )
+                columns[field.full_name] = write_buffer
 
-            for h in vcf.header_iter():
-                header_type = h["HeaderType"]
-                if header_type in ["INFO", "FORMAT"]:
-                    name = h["ID"]
-                    col = make_col(out_path / header_type / name)
-                    columns.append(col)
-                    if header_type == "INFO":
-                        info_fields.append((name, col))
-                    else:
-                        # Need to special-case GT because the output of
-                        # variant.format("GT") is text.
-                        if name == "GT":
-                            gt = col
-                        else:
-                            format_fields.append((name, col))
+                if field.category == "INFO":
+                    info_fields.append((field.name, write_buffer))
+                elif field.category == "FORMAT":
+                    if field.name != "GT":
+                        format_fields.append((field.name, write_buffer))
+
+            contig = columns["CHROM"]
+            pos = columns["POS"]
+            qual = columns["QUAL"]
+            vid = columns["ID"]
+            filters = columns["FILTERS"]
+            ref = columns["REF"]
+            alt = columns["ALT"]
+            gt = columns.get("FORMAT/GT", None)
 
             for variant in vcf:
                 contig.append(variant.CHROM)
@@ -311,9 +489,83 @@ class PickleChunkedVcf:
                 with progress_counter.get_lock():
                     progress_counter.value += 1
 
-            for col in columns:
+            for col in columns.values():
                 col.flush()
             service_futures(0)
+
+
+@dataclasses.dataclass
+class ZarrArrayDefinition:
+    name: str
+    dtype: str
+    shape: tuple
+
+    @staticmethod
+    def from_numeric_column(col, bounds):
+        if col.vcf_field.vcf_type == "Integer":
+            dtype = None
+            for a_dtype in ("i1", "i2", "i4"):
+                info = np.iinfo(a_dtype)
+                if info.min <= bounds.min_value and bounds.max_value <= info.max:
+                    dtype = a_dtype
+                    break
+            else:
+                raise ValueError("Value too something")
+        else:
+            dtype = "f4"
+        shape = []
+        if bounds.max_second_dimension > 1:
+            shape.append(bounds.max_second_dimension)
+
+        return ZarrArrayDefinition("", dtype, shape)
+
+
+
+@dataclasses.dataclass
+class ColumnConversionSpec:
+    vcf_field: VcfFieldDefinition
+    zarr_array: ZarrArrayDefinition
+
+
+@dataclasses.dataclass
+class ConversionSpec:
+    columns: list
+
+
+def plan_conversion(columnarised_path, out_file):
+    pcv = PickleChunkedVcf.load(pathlib.Path(columnarised_path))
+    # extract
+    convert_columns = {name: col for name, col in pcv.columns.items()
+            if name not in ["REF", "ALT"]}
+    out = []
+    for name, col in convert_columns.items():
+        prefix = ""
+        if col.vcf_field.category == "INFO":
+            prefix = "variant_"
+        elif col.vcf_field.category == "FORMAT":
+            prefix = "call_"
+        else:
+            continue
+        array_name = prefix + col.vcf_field.name
+        # print(name, col)
+        if col.is_numeric():
+            bounds = col.get_bounds()
+            # print(bounds)
+            zarr_definition = ZarrArrayDefinition.from_numeric_column(col, bounds)
+            zarr_definition.shape = [pcv.num_records] + zarr_definition.shape
+            zarr_definition.name = array_name
+            # print(zarr_definition)
+            out.append(ColumnConversionSpec(
+                col.vcf_field, zarr_definition))
+
+    spec = ConversionSpec(out)
+    print(json.dumps(dataclasses.asdict(spec), indent=4))
+
+
+
+
+print("plan")
+
 
 
 def encode_zarr(
@@ -325,14 +577,31 @@ def encode_zarr(
     show_progress=False,
 ):
     pcv = PickleChunkedVcf.load(pathlib.Path(columnarised_path))
-    print(pcv)
-    pos = pcv.columns["POS"]
-    print(pos)
-    print(np.array(list(pos.iter_values())))
 
-    gt = pcv.columns["FORMAT/GT"]
-    print(gt)
-    print(np.array(list(gt.iter_values())))
+    # d =  pcv.columns["CHROM"].get_counts()
+    # print(d)
+
+    # d=  pcv.columns["FILTERS"].get_counts()
+    # print(d)
+            # ref = columns["REF"]
+            # alt = columns["ALT"]
+
+    # # print(pcv.columns["FORMAT/AD"].get_bounds())
+    # with cf.ProcessPoolExecutor(max_workers=8) as executor:
+
+    #     future_to_col = {}
+
+    #     for col in pcv.columns.values():
+    #         if col.is_numeric():
+    #             print("dispatch", col)
+    #             future = executor.submit(col.get_bounds)
+    #             future_to_col[future] = col
+    #             # print(col)
+    #             # print(col.get_bounds())
+    #     for future in cf.as_completed(future_to_col):
+    #         col = future_to_col[future]
+    #         bounds = future.result()
+    #         print(col, bounds)
 
 
 def sync_flush_array(np_buffer, zarr_array, offset):
@@ -659,135 +928,10 @@ def write_partition(
 
 @dataclasses.dataclass
 class VcfPartition:
-    path: str
+    vcf_path: str
     num_records: int
     first_position: int
 
-
-@dataclasses.dataclass
-class VcfFieldDefinition:
-    category: str
-    name: str
-    vcf_number: str
-    vcf_type: str
-    description: str
-    variable_name: str
-    # TODO rename. This is the extra dimension
-    dimension: Any
-    dtype: str
-
-    @staticmethod
-    def from_header(definition):
-        category = definition["HeaderType"]
-        name = definition["ID"]
-        prefix = "call" if category == "FORMAT" else "variant"
-        variable_name = f"{prefix}_{name}"
-        vcf_number = definition["Number"]
-        vcf_type = definition["Type"]
-        dimension = None
-        if str_is_int(vcf_number):
-            dimension = int(vcf_number)
-        dtype, missing_value, fill_value = _vcf_type_to_numpy(
-            vcf_type, "FIXME", definition["ID"]
-        )
-        if dtype == "O":
-            dtype = "str"
-        return VcfFieldDefinition(
-            category=category,
-            name=name,
-            variable_name=variable_name,
-            vcf_number=vcf_number,
-            vcf_type=vcf_type,
-            description=definition["Description"].strip('"'),
-            dimension=dimension,
-            dtype=dtype,
-        )
-
-    @property
-    def is_fixed_size(self):
-        return self.dimension is not None
-
-
-@dataclasses.dataclass
-class VcfMetadata:
-    samples: list
-    contig_names: list
-    filters: list
-    fields: list
-    contig_lengths: list = None
-    partitions: list = None
-
-    @property
-    def info_fields(self):
-        return [field for field in self.fields if field.category == "INFO"]
-
-    @property
-    def format_fields(self):
-        return [field for field in self.fields if field.category == "FORMAT"]
-
-    @staticmethod
-    def fromdict(d):
-        fields = [VcfFieldDefinition(**fd) for fd in d["fields"]]
-        partitions = [VcfPartition(**pd) for pd in d["partitions"]]
-        d = d.copy()
-        d["fields"] = fields
-        d["partitions"] = partitions
-        return VcfMetadata(**d)
-
-    def asdict(self):
-        return dataclasses.asdict(self)
-
-
-def scan_vcfs(paths, show_progress):
-    partitions = []
-    vcf_metadata = None
-    for path in tqdm.tqdm(paths, desc="Scan ", disable=not show_progress):
-        vcf = cyvcf2.VCF(path)
-
-        filters = [
-            h["ID"]
-            for h in vcf.header_iter()
-            if h["HeaderType"] == "FILTER" and isinstance(h["ID"], str)
-        ]
-        # Ensure PASS is the first filter if present
-        if "PASS" in filters:
-            filters.remove("PASS")
-            filters.insert(0, "PASS")
-
-        fields = []
-        for h in vcf.header_iter():
-            if h["HeaderType"] in ["INFO", "FORMAT"]:
-                fields.append(VcfFieldDefinition.from_header(h))
-
-        metadata = VcfMetadata(
-            samples=vcf.samples,
-            contig_names=vcf.seqnames,
-            filters=filters,
-            fields=fields,
-        )
-        try:
-            metadata.contig_lengths = vcf.seqlens
-        except AttributeError:
-            pass
-
-        if vcf_metadata is None:
-            vcf_metadata = metadata
-        else:
-            if metadata != vcf_metadata:
-                raise ValueError("Incompatible VCF chunks")
-        record = next(vcf)
-
-        partitions.append(
-            # Requires cyvcf2>=0.30.27
-            VcfPartition(
-                path=path,
-                num_records=vcf.num_records,
-                first_position=(record.CHROM, record.POS),
-            )
-        )
-    partitions.sort(key=lambda x: x.first_position)
-    vcf_metadata.partitions = partitions
-    return vcf_metadata
 
 
 def create_zarr(

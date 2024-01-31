@@ -39,11 +39,9 @@ def columnarise(vcfs, out_path, worker_processes, column_chunk_size):
 
 @click.command
 @click.argument("columnarised", type=click.Path())
-@click.option("-w", "--chunk-width", type=int, default=None)
-@click.option("-l", "--chunk-length", type=int, default=None)
-def predict(columnarised, chunk_width, chunk_length):
-    pass
-    # cnv.encode_zarr(columnarised, zarr, show_progress=True)
+@click.argument("specfile")
+def plan(columnarised, specfile):
+    cnv.plan_conversion(columnarised, specfile)
 
 
 @click.command
@@ -81,7 +79,8 @@ def cli():
 cli.add_command(convert)
 cli.add_command(scan)
 cli.add_command(columnarise)
-cli.add_command(predict)
+cli.add_command(plan)
+# cli.add_command(predict)
 cli.add_command(to_zarr)
 
 if __name__ == "__main__":
