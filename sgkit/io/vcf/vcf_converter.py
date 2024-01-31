@@ -12,6 +12,7 @@ import sys
 import shutil
 import json
 import collections
+import math
 from typing import Any
 
 import cyvcf2
@@ -52,12 +53,38 @@ def flush_futures(futures):
 
 
 @dataclasses.dataclass
-class VcfFieldDefinition:
+class VcfFieldSummary:
+    num_chunks: int = 0
+    compressed_size: int = 0
+    uncompressed_size: int = 0
+    max_number: int = 0  # Corresponds to VCF Number field, depends on context
+
+    def update(self, other):
+        self.num_chunks += other.num_chunks
+        self.compressed_size += other.compressed_size
+        self.uncompressed_size = other.uncompressed_size
+        self.max_number = max(self.max_number, other.max_number)
+
+
+@dataclasses.dataclass
+class NumericVcfFieldSummary(VcfFieldSummary):
+    max_value: Any = -math.inf
+    min_value: Any = math.inf
+
+    def update(self, other):
+        super().update(other)
+        self.min_value = min(self.min_value, other.min_value)
+        self.max_value = max(self.max_value, other.max_value)
+
+
+@dataclasses.dataclass
+class VcfField:
     category: str
     name: str
     vcf_number: str
     vcf_type: str
     description: str
+    summary: VcfFieldSummary
 
     @staticmethod
     def from_header(definition):
@@ -67,12 +94,17 @@ class VcfFieldDefinition:
         variable_name = f"{prefix}_{name}"
         vcf_number = definition["Number"]
         vcf_type = definition["Type"]
-        return VcfFieldDefinition(
+        if vcf_type in ["Integer", "Float"]:
+            summary = NumericVcfFieldSummary()
+        else:
+            summary = VcfFieldSummary()
+        return VcfField(
             category=category,
             name=name,
             vcf_number=vcf_number,
             vcf_type=vcf_type,
             description=definition["Description"].strip('"'),
+            summary=summary,
         )
 
     @property
@@ -105,7 +137,7 @@ class VcfMetadata:
 
     @staticmethod
     def fromdict(d):
-        fields = [VcfFieldDefinition(**fd) for fd in d["fields"]]
+        fields = [VcfField(**fd) for fd in d["fields"]]
         partitions = [VcfPartition(**pd) for pd in d["partitions"]]
         d = d.copy()
         d["fields"] = fields
@@ -117,23 +149,24 @@ class VcfMetadata:
 
 
 def fixed_vcf_field_definitions():
-    def make_field_def(name, vcf_type, vcf_number):
-        return VcfFieldDefinition(
+    def make_field_def(name, vcf_type, vcf_number, summary_class):
+        return VcfField(
             category="fixed",
             name=name,
             vcf_type=vcf_type,
             vcf_number=vcf_number,
             description="TODO",
+            summary=summary_class(),
         )
 
     fields = [
-        make_field_def("CHROM", "String", "1"),
-        make_field_def("POS", "Integer", "1"),
-        make_field_def("QUAL", "Float", "1"),
-        make_field_def("ID", "String", "."),
-        make_field_def("FILTERS", "String", "."),
-        make_field_def("REF", "String", "1"),
-        make_field_def("ALT", "String", "."),
+        make_field_def("CHROM", "String", "1", VcfFieldSummary),
+        make_field_def("POS", "Integer", "1", NumericVcfFieldSummary),
+        make_field_def("QUAL", "Float", "1", NumericVcfFieldSummary),
+        make_field_def("ID", "String", ".", VcfFieldSummary),
+        make_field_def("FILTERS", "String", ".", VcfFieldSummary),
+        make_field_def("REF", "String", "1", VcfFieldSummary),
+        make_field_def("ALT", "String", ".", VcfFieldSummary),
     ]
     return fields
 
@@ -157,10 +190,11 @@ def scan_vcfs(paths, show_progress):
         fields = fixed_vcf_field_definitions()
         for h in vcf.header_iter():
             if h["HeaderType"] in ["INFO", "FORMAT"]:
-                field = VcfFieldDefinition.from_header(h)
+                field = VcfField.from_header(h)
                 if field.name == "GT":
                     field.vcf_type = "Integer"
                     field.vcf_number = "."
+                    field.summary = NumericVcfFieldSummary()
                 fields.append(field)
 
         metadata = VcfMetadata(
@@ -196,10 +230,64 @@ def scan_vcfs(paths, show_progress):
 
 @dataclasses.dataclass
 class NumericColumnBounds:
-    min_value: Any
-    max_value: Any
-    max_second_dimension: int
-    num_missing: int
+    # HACK!! - need
+    min_value: Any = 10**20
+    max_value: Any = -(10**20)
+    max_second_dimension: int = 0
+    num_missing: int = 0
+
+    def asdict(self):
+        d = dataclasses.asdict(self)
+        d["max_value"] = int(d["max_value"])
+        d["min_value"] = int(d["min_value"])
+        return d
+
+
+class IntegerColumnBounds(NumericColumnBounds):
+    def update(self, value):
+        sentinel = np.iinfo(np.int32).min + 1
+        if value is not None:
+            value = np.array(value)
+            value[value <= sentinel] = 0
+            self.max_value = max(self.max_value, np.max(value))
+            self.min_value = min(self.min_value, np.min(value))
+            assert len(value.shape) <= 2
+            if len(value.shape) == 2:
+                self.max_second_dimension = max(
+                    self.max_second_dimension, value.shape[1]
+                )
+        else:
+            self.num_missing += 1
+
+
+class FloatColumnBounds(NumericColumnBounds):
+    def update(self, value):
+        if value is not None:
+            value = np.array(value)
+            self.max_value = max(self.max_value, np.max(value))
+            self.min_value = min(self.min_value, np.min(value))
+            assert len(value.shape) <= 2
+            if len(value.shape) == 2:
+                self.max_second_dimension = max(
+                    self.max_second_dimension, value.shape[1]
+                )
+        else:
+            self.num_missing += 1
+
+
+@dataclasses.dataclass
+class StringColumnBounds:
+    max_length: int = 0
+
+    def update(self, value):
+        # pass
+        if value is not None:
+            if isinstance(value, list):
+                self.max_length = max(self.max_length, len(value))
+
+    def asdict(self):
+        d = dataclasses.asdict(self)
+        return d
 
 
 class PickleChunkedVcfField:
@@ -239,6 +327,11 @@ class PickleChunkedVcfField:
         compressed = self.compressor.encode(pkl)
         with open(path, "wb") as f:
             f.write(compressed)
+
+        # Update the summary
+        self.vcf_field.summary.num_chunks += 1
+        self.vcf_field.summary.compressed_size += len(compressed)
+        self.vcf_field.summary.uncompressed_size += len(pkl)
 
     def read_chunk(self, partition_index, chunk_index):
         path = self.path / f"p{partition_index}" / f"c{chunk_index}"
@@ -283,8 +376,70 @@ class PickleChunkedVcfField:
                     max_second_dimension = max(max_second_dimension, value.shape[1])
             else:
                 num_missing += 1
-        return NumericColumnBounds(min_value, max_value, max_second_dimension, num_missing)
+        return NumericColumnBounds(
+            min_value, max_value, max_second_dimension, num_missing
+        )
 
+
+def update_bounds_format_float(summary, value):
+    summary.max_value = float(max(summary.max_value, np.max(value)))
+    summary.min_value = float(min(summary.min_value, np.min(value)))
+    number = 0
+    if len(value.shape) > 1:
+        number = value.shape[1]
+    summary.max_number = max(summary.max_number, number)
+
+
+def update_bounds_float(summary, value):
+    # print("update bounds float", summary, value)
+    value = np.array(value)
+    # FIXME quick hack to work around inexplicable missing values
+    if value.dtype.str == "O":
+        return
+    summary.max_value = float(max(summary.max_value, np.max(value)))
+    summary.min_value = float(min(summary.min_value, np.min(value)))
+    number = 0
+    if len(value.shape) > 0:
+        number = value.shape[0]
+    summary.max_number = max(summary.max_number, number)
+
+
+# TODO Merge these format and non-format functions if
+# perf isn't a bottleneck
+def update_bounds_integer(summary, value):
+    # print("update bounds int", summary, value)
+    value = np.array(value)
+    sentinel = np.iinfo(np.int32).min + 1
+    value[value <= sentinel] = 0
+    summary.max_value = int(max(summary.max_value, np.max(value)))
+    summary.min_value = int(min(summary.min_value, np.min(value)))
+    number = 0
+    if len(value.shape) == 1:
+        number = value.shape[0]
+    summary.max_number = max(summary.max_number, number)
+
+
+def update_bounds_format_integer(summary, value):
+    # print("update bounds int", summary, value)
+    value = np.array(value)
+    sentinel = np.iinfo(np.int32).min + 1
+    value[value <= sentinel] = 0
+    # Converting to int here for annoying json reasons.
+    # will all ne
+    summary.max_value = int(max(summary.max_value, np.max(value)))
+    summary.min_value = int(min(summary.min_value, np.min(value)))
+    number = 0
+    if len(value.shape) == 2:
+        number = value.shape[1]
+    summary.max_number = max(summary.max_number, number)
+
+
+def update_bounds_string(summary, value):
+    if isinstance(value, str):
+        number = 0
+    else:
+        number = len(value)
+    summary.max_number = max(summary.max_number, number)
 
 
 class PickleChunkedWriteBuffer:
@@ -299,9 +454,31 @@ class PickleChunkedWriteBuffer:
         self.chunk_index = 0
         self.executor = executor
         self.futures = futures
+        self._summary_bounds_update = None
+        vcf_type = column.vcf_field.vcf_type
+        if column.vcf_field.category == "FORMAT":
+            if vcf_type == "Float":
+                self._summary_bounds_update = update_bounds_format_float
+            elif vcf_type == "Integer":
+                self._summary_bounds_update = update_bounds_format_integer
+        else:
+            if vcf_type == "Float":
+                self._summary_bounds_update = update_bounds_float
+            elif vcf_type == "Integer":
+                self._summary_bounds_update = update_bounds_integer
+            elif vcf_type == "String":
+                self._summary_bounds_update = update_bounds_string
+
+    def _update_bounds(self, value):
+        if value is not None:
+            summary = self.column.vcf_field.summary
+            # print("update", summary, value)
+            if self._summary_bounds_update is not None:
+                self._summary_bounds_update(summary, value)
 
     def append(self, val):
         self.buffer.append(val)
+        self._update_bounds(val)
         val_bytes = sys.getsizeof(val)
         self.buffered_bytes += val_bytes
         if self.buffered_bytes >= self.max_buffered_bytes:
@@ -400,11 +577,21 @@ class PickleChunkedVcf:
                         column_chunk_size=column_chunk_size,
                     )
                 )
-            flush_futures(futures)
+            partition_summaries = [
+                future.result() for future in cf.as_completed(futures)
+            ]
 
         assert progress_counter.value == total_variants
         if bar_thread is not None:
             bar_thread.join()
+
+        for field in vcf_metadata.fields:
+            for summary in partition_summaries:
+                # print(field.name, summary[field.full_name])
+                field.summary.update(summary[field.full_name])
+
+        # partition_stats.sort(key=lambda p: p.index)
+        # print(parition_stats)
 
         with open(out_path / "metadata.json", "w") as f:
             json.dump(vcf_metadata.asdict(), f, indent=4)
@@ -433,6 +620,7 @@ class PickleChunkedVcf:
 
         with cf.ThreadPoolExecutor(max_workers=flush_threads) as executor:
             columns = {}
+            summaries = {}
             info_fields = []
             format_fields = []
             for field in vcf_metadata.fields:
@@ -441,6 +629,7 @@ class PickleChunkedVcf:
                     column, partition_index, executor, futures, column_chunk_size
                 )
                 columns[field.full_name] = write_buffer
+                summaries[field.full_name] = field.summary
 
                 if field.category == "INFO":
                     info_fields.append((field.name, write_buffer))
@@ -493,6 +682,8 @@ class PickleChunkedVcf:
                 col.flush()
             service_futures(0)
 
+            return summaries
+
 
 @dataclasses.dataclass
 class ZarrArrayDefinition:
@@ -520,23 +711,23 @@ class ZarrArrayDefinition:
         return ZarrArrayDefinition("", dtype, shape)
 
 
+# @dataclasses.dataclass
+# class ColumnConversionSpec:
+#     vcf_field: VcfFieldDefinition
+#     zarr_array: ZarrArrayDefinition
 
-@dataclasses.dataclass
-class ColumnConversionSpec:
-    vcf_field: VcfFieldDefinition
-    zarr_array: ZarrArrayDefinition
 
-
-@dataclasses.dataclass
-class ConversionSpec:
-    columns: list
+# @dataclasses.dataclass
+# class ConversionSpec:
+#     columns: list
 
 
 def plan_conversion(columnarised_path, out_file):
     pcv = PickleChunkedVcf.load(pathlib.Path(columnarised_path))
     # extract
-    convert_columns = {name: col for name, col in pcv.columns.items()
-            if name not in ["REF", "ALT"]}
+    convert_columns = {
+        name: col for name, col in pcv.columns.items() if name not in ["REF", "ALT"]
+    }
     out = []
     for name, col in convert_columns.items():
         prefix = ""
@@ -555,17 +746,10 @@ def plan_conversion(columnarised_path, out_file):
             zarr_definition.shape = [pcv.num_records] + zarr_definition.shape
             zarr_definition.name = array_name
             # print(zarr_definition)
-            out.append(ColumnConversionSpec(
-                col.vcf_field, zarr_definition))
+            out.append(ColumnConversionSpec(col.vcf_field, zarr_definition))
 
     spec = ConversionSpec(out)
     print(json.dumps(dataclasses.asdict(spec), indent=4))
-
-
-
-
-print("plan")
-
 
 
 def encode_zarr(
@@ -583,8 +767,8 @@ def encode_zarr(
 
     # d=  pcv.columns["FILTERS"].get_counts()
     # print(d)
-            # ref = columns["REF"]
-            # alt = columns["ALT"]
+    # ref = columns["REF"]
+    # alt = columns["ALT"]
 
     # # print(pcv.columns["FORMAT/AD"].get_bounds())
     # with cf.ProcessPoolExecutor(max_workers=8) as executor:
@@ -931,7 +1115,6 @@ class VcfPartition:
     vcf_path: str
     num_records: int
     first_position: int
-
 
 
 def create_zarr(
