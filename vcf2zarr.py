@@ -48,22 +48,32 @@ def summarise(columnarised):
 
 @click.command
 @click.argument("columnarised", type=click.Path())
-@click.argument("specfile")
-def plan(columnarised, specfile):
-    cnv.plan_conversion(columnarised, specfile)
+@click.argument("specfile", type=click.Path())
+def genspec(columnarised, specfile):
+    pcvcf = cnv.PickleChunkedVcf.load(columnarised)
+    spec = cnv.ZarrConversionSpec.generate(pcvcf)
+    with open(specfile, "w") as f:
+        json.dump(spec.asdict(), f, indent=4)
+
 
 
 @click.command
 @click.argument("columnarised", type=click.Path())
-@click.argument("zarr", type=click.Path())
-@click.option("-w", "--chunk-width", type=int, default=None)
-@click.option("-l", "--chunk-length", type=int, default=None)
-def to_zarr(columnarised, zarr, chunk_width, chunk_length):
-    cnv.encode_zarr(
-        columnarised,
-        zarr,
-        chunk_width=chunk_width,
-        chunk_length=chunk_length,
+@click.argument("zarr_path", type=click.Path())
+@click.option("-s", "--conversion-spec", default=None)
+def to_zarr(columnarised, zarr_path, conversion_spec):
+    pcvcf = cnv.PickleChunkedVcf.load(columnarised)
+    if conversion_spec is None:
+        spec = cnv.ZarrConversionSpec.generate(pcvcf)
+    else:
+        with open(conversion_spec, "r") as f:
+            d = json.load(f)
+            spec = cnv.ZarrConversionSpec.fromdict(d)
+
+    cnv.SgvcfZarr.convert(
+        pcvcf,
+        zarr_path,
+        conversion_spec=spec,
         show_progress=True,
     )
 
@@ -85,11 +95,12 @@ def cli():
     pass
 
 
-cli.add_command(convert)
-cli.add_command(scan)
+# cli.add_command(convert)
+# cli.add_command(scan)
 cli.add_command(explode)
 cli.add_command(summarise)
-cli.add_command(plan)
+cli.add_command(genspec)
+# cli.add_command(plan)
 # cli.add_command(predict)
 cli.add_command(to_zarr)
 
