@@ -15,6 +15,7 @@ import collections
 import math
 from typing import Any
 
+import humanize
 import cyvcf2
 import numcodecs
 import numpy as np
@@ -58,23 +59,20 @@ class VcfFieldSummary:
     compressed_size: int = 0
     uncompressed_size: int = 0
     max_number: int = 0  # Corresponds to VCF Number field, depends on context
+    # Only defined for numeric fields
+    max_value: Any = -math.inf
+    min_value: Any = math.inf
 
     def update(self, other):
         self.num_chunks += other.num_chunks
         self.compressed_size += other.compressed_size
         self.uncompressed_size = other.uncompressed_size
         self.max_number = max(self.max_number, other.max_number)
-
-
-@dataclasses.dataclass
-class NumericVcfFieldSummary(VcfFieldSummary):
-    max_value: Any = -math.inf
-    min_value: Any = math.inf
-
-    def update(self, other):
-        super().update(other)
         self.min_value = min(self.min_value, other.min_value)
         self.max_value = max(self.max_value, other.max_value)
+
+    def asdict(self):
+        return dataclasses.asdict(self)
 
 
 @dataclasses.dataclass
@@ -94,18 +92,20 @@ class VcfField:
         variable_name = f"{prefix}_{name}"
         vcf_number = definition["Number"]
         vcf_type = definition["Type"]
-        if vcf_type in ["Integer", "Float"]:
-            summary = NumericVcfFieldSummary()
-        else:
-            summary = VcfFieldSummary()
         return VcfField(
             category=category,
             name=name,
             vcf_number=vcf_number,
             vcf_type=vcf_type,
             description=definition["Description"].strip('"'),
-            summary=summary,
+            summary=VcfFieldSummary(),
         )
+
+    @staticmethod
+    def fromdict(d):
+        f = VcfField(**d)
+        f.summary = VcfFieldSummary(**d["summary"])
+        return f
 
     @property
     def full_name(self):
@@ -137,7 +137,7 @@ class VcfMetadata:
 
     @staticmethod
     def fromdict(d):
-        fields = [VcfField(**fd) for fd in d["fields"]]
+        fields = [VcfField.fromdict(fd) for fd in d["fields"]]
         partitions = [VcfPartition(**pd) for pd in d["partitions"]]
         d = d.copy()
         d["fields"] = fields
@@ -149,24 +149,24 @@ class VcfMetadata:
 
 
 def fixed_vcf_field_definitions():
-    def make_field_def(name, vcf_type, vcf_number, summary_class):
+    def make_field_def(name, vcf_type, vcf_number):
         return VcfField(
             category="fixed",
             name=name,
             vcf_type=vcf_type,
             vcf_number=vcf_number,
             description="",
-            summary=summary_class(),
+            summary=VcfFieldSummary(),
         )
 
     fields = [
-        make_field_def("CHROM", "String", "1", VcfFieldSummary),
-        make_field_def("POS", "Integer", "1", NumericVcfFieldSummary),
-        make_field_def("QUAL", "Float", "1", NumericVcfFieldSummary),
-        make_field_def("ID", "String", ".", VcfFieldSummary),
-        make_field_def("FILTERS", "String", ".", VcfFieldSummary),
-        make_field_def("REF", "String", "1", VcfFieldSummary),
-        make_field_def("ALT", "String", ".", VcfFieldSummary),
+        make_field_def("CHROM", "String", "1"),
+        make_field_def("POS", "Integer", "1"),
+        make_field_def("QUAL", "Float", "1"),
+        make_field_def("ID", "String", "."),
+        make_field_def("FILTERS", "String", "."),
+        make_field_def("REF", "String", "1"),
+        make_field_def("ALT", "String", "."),
     ]
     return fields
 
@@ -194,7 +194,6 @@ def scan_vcfs(paths, show_progress):
                 if field.name == "GT":
                     field.vcf_type = "Integer"
                     field.vcf_number = "."
-                    field.summary = NumericVcfFieldSummary()
                 fields.append(field)
 
         metadata = VcfMetadata(
@@ -226,68 +225,6 @@ def scan_vcfs(paths, show_progress):
     partitions.sort(key=lambda x: x.first_position)
     vcf_metadata.partitions = partitions
     return vcf_metadata
-
-
-@dataclasses.dataclass
-class NumericColumnBounds:
-    # HACK!! - need
-    min_value: Any = 10**20
-    max_value: Any = -(10**20)
-    max_second_dimension: int = 0
-    num_missing: int = 0
-
-    def asdict(self):
-        d = dataclasses.asdict(self)
-        d["max_value"] = int(d["max_value"])
-        d["min_value"] = int(d["min_value"])
-        return d
-
-
-class IntegerColumnBounds(NumericColumnBounds):
-    def update(self, value):
-        sentinel = np.iinfo(np.int32).min + 1
-        if value is not None:
-            value = np.array(value)
-            value[value <= sentinel] = 0
-            self.max_value = max(self.max_value, np.max(value))
-            self.min_value = min(self.min_value, np.min(value))
-            assert len(value.shape) <= 2
-            if len(value.shape) == 2:
-                self.max_second_dimension = max(
-                    self.max_second_dimension, value.shape[1]
-                )
-        else:
-            self.num_missing += 1
-
-
-class FloatColumnBounds(NumericColumnBounds):
-    def update(self, value):
-        if value is not None:
-            value = np.array(value)
-            self.max_value = max(self.max_value, np.max(value))
-            self.min_value = min(self.min_value, np.min(value))
-            assert len(value.shape) <= 2
-            if len(value.shape) == 2:
-                self.max_second_dimension = max(
-                    self.max_second_dimension, value.shape[1]
-                )
-        else:
-            self.num_missing += 1
-
-
-@dataclasses.dataclass
-class StringColumnBounds:
-    max_length: int = 0
-
-    def update(self, value):
-        # pass
-        if value is not None:
-            if isinstance(value, list):
-                self.max_length = max(self.max_length, len(value))
-
-    def asdict(self):
-        d = dataclasses.asdict(self)
-        return d
 
 
 class PickleChunkedVcfField:
@@ -490,6 +427,33 @@ class PickleChunkedVcf:
             col.num_partitions = self.num_partitions
             col.num_records = self.num_records
 
+    def summary_table(self):
+        def display_number(x):
+            ret = "n/a"
+            if math.isfinite(x):
+                ret = f"{x: 0.2g}"
+            return ret
+
+        def display_size(n):
+            return humanize.naturalsize(n, binary=True)
+
+        data = []
+        for name, col in self.columns.items():
+            summary = col.vcf_field.summary
+            d = {
+                "name": name,
+                "type": col.vcf_field.vcf_type,
+                "chunks": summary.num_chunks,
+                "size": display_size(summary.uncompressed_size),
+                "compressed": display_size(summary.compressed_size),
+                "max_n": summary.max_number,
+                "min_val": display_number(summary.min_value),
+                "max_val": display_number(summary.max_value),
+            }
+
+            data.append(d)
+        return data
+
     @functools.cached_property
     def num_partitions(self):
         return len(self.metadata.partitions)
@@ -508,6 +472,7 @@ class PickleChunkedVcf:
 
     @staticmethod
     def load(path):
+        path = pathlib.Path(path)
         with open(path / "metadata.json") as f:
             metadata = VcfMetadata.fromdict(json.load(f))
         return PickleChunkedVcf(path, metadata)
@@ -569,6 +534,7 @@ class PickleChunkedVcf:
 
         with open(out_path / "metadata.json", "w") as f:
             json.dump(vcf_metadata.asdict(), f, indent=4)
+        return pcvcf
 
     @staticmethod
     def convert_partition(
@@ -1417,7 +1383,7 @@ def init_workers(counter):
     progress_counter = counter
 
 
-def columnarise(
+def explode(
     vcfs,
     out_path,
     *,
@@ -1429,7 +1395,7 @@ def columnarise(
     if out_path.exists():
         shutil.rmtree(out_path)
 
-    PickleChunkedVcf.convert(
+    return PickleChunkedVcf.convert(
         vcfs,
         out_path,
         column_chunk_size=column_chunk_size,

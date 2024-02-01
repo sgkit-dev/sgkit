@@ -2,6 +2,7 @@ import json
 
 import click
 import yaml
+import tabulate
 
 import sgkit.io.vcf.vcf_converter as cnv
 
@@ -28,13 +29,21 @@ def scan(vcfs):
 @click.option("-p", "--worker-processes", type=int, default=1)
 @click.option("-c", "--column-chunk-size", type=int, default=16)
 def explode(vcfs, out_path, worker_processes, column_chunk_size):
-    cnv.columnarise(
+    cnv.explode(
         vcfs,
         out_path,
         worker_processes=worker_processes,
         column_chunk_size=column_chunk_size,
         show_progress=True,
     )
+
+
+@click.command
+@click.argument("columnarised", type=click.Path())
+def summarise(columnarised):
+    pcvcf = cnv.PickleChunkedVcf.load(columnarised)
+    data = pcvcf.summary_table()
+    print(tabulate.tabulate(data, headers="keys"))
 
 
 @click.command
@@ -79,6 +88,7 @@ def cli():
 cli.add_command(convert)
 cli.add_command(scan)
 cli.add_command(explode)
+cli.add_command(summarise)
 cli.add_command(plan)
 # cli.add_command(predict)
 cli.add_command(to_zarr)
