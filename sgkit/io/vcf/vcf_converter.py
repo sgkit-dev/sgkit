@@ -155,7 +155,7 @@ def fixed_vcf_field_definitions():
             name=name,
             vcf_type=vcf_type,
             vcf_number=vcf_number,
-            description="TODO",
+            description="",
             summary=summary_class(),
         )
 
@@ -381,57 +381,33 @@ class PickleChunkedVcfField:
         )
 
 
-def update_bounds_format_float(summary, value):
+def update_bounds_float(summary, value, number_dim):
+    value = np.array(value, dtype=np.float32, copy=False)
+    # Map back to python types to avoid JSON issues later. Could
+    # be done more efficiently at the end.
     summary.max_value = float(max(summary.max_value, np.max(value)))
     summary.min_value = float(min(summary.min_value, np.min(value)))
     number = 0
-    if len(value.shape) > 1:
-        number = value.shape[1]
+    assert len(value.shape) <= number_dim + 1
+    if len(value.shape) == number_dim + 1:
+        number = value.shape[number_dim]
     summary.max_number = max(summary.max_number, number)
 
 
-def update_bounds_float(summary, value):
-    # print("update bounds float", summary, value)
-    value = np.array(value)
-    # FIXME quick hack to work around inexplicable missing values
-    if value.dtype.str == "O":
-        return
-    summary.max_value = float(max(summary.max_value, np.max(value)))
-    summary.min_value = float(min(summary.min_value, np.min(value)))
-    number = 0
-    if len(value.shape) > 0:
-        number = value.shape[0]
-    summary.max_number = max(summary.max_number, number)
+MIN_INT_VALUE = np.iinfo(np.int32).min + 2
 
 
-# TODO Merge these format and non-format functions if
-# perf isn't a bottleneck
-def update_bounds_integer(summary, value):
+def update_bounds_integer(summary, value, number_dim):
     # print("update bounds int", summary, value)
-    value = np.array(value)
-    sentinel = np.iinfo(np.int32).min + 1
-    value[value <= sentinel] = 0
+    value = np.array(value, dtype=np.int32, copy=False)
+    # Mask out missing and fill values
+    value[value < MIN_INT_VALUE] = 0
     summary.max_value = int(max(summary.max_value, np.max(value)))
     summary.min_value = int(min(summary.min_value, np.min(value)))
     number = 0
-    if len(value.shape) == 1:
-        number = value.shape[0]
-    summary.max_number = max(summary.max_number, number)
-
-
-def update_bounds_format_integer(summary, value):
-    # print("update bounds int", summary, value)
-    value = np.array(value)
-    sentinel = np.iinfo(np.int32).min + 1
-    value[value <= sentinel] = 0
-    # Converting to int here for annoying json reasons.
-    # will all ne
-    summary.max_value = int(max(summary.max_value, np.max(value)))
-    summary.min_value = int(min(summary.min_value, np.min(value)))
-    number = 0
-    if len(value.shape) == 2:
-        number = value.shape[1]
-    summary.max_number = max(summary.max_number, number)
+    assert len(value.shape) <= number_dim + 1
+    if len(value.shape) == number_dim + 1:
+        number = value.shape[number_dim]
 
 
 def update_bounds_string(summary, value):
@@ -456,23 +432,25 @@ class PickleChunkedWriteBuffer:
         self.futures = futures
         self._summary_bounds_update = None
         vcf_type = column.vcf_field.vcf_type
+        number_dim = 0
         if column.vcf_field.category == "FORMAT":
-            if vcf_type == "Float":
-                self._summary_bounds_update = update_bounds_format_float
-            elif vcf_type == "Integer":
-                self._summary_bounds_update = update_bounds_format_integer
-        else:
-            if vcf_type == "Float":
-                self._summary_bounds_update = update_bounds_float
-            elif vcf_type == "Integer":
-                self._summary_bounds_update = update_bounds_integer
-            elif vcf_type == "String":
-                self._summary_bounds_update = update_bounds_string
+            number_dim = 1
+            assert vcf_type != "String"
+        if vcf_type == "Float":
+            self._summary_bounds_update = functools.partial(
+                update_bounds_float, number_dim=number_dim
+            )
+        elif vcf_type == "Integer":
+            self._summary_bounds_update = functools.partial(
+                update_bounds_integer, number_dim=number_dim
+            )
+        elif vcf_type == "String":
+            self._summary_bounds_update = update_bounds_string
 
     def _update_bounds(self, value):
         if value is not None:
             summary = self.column.vcf_field.summary
-            # print("update", summary, value)
+            # print("update", self.column.vcf_field.full_name, value)
             if self._summary_bounds_update is not None:
                 self._summary_bounds_update(summary, value)
 
@@ -587,11 +565,7 @@ class PickleChunkedVcf:
 
         for field in vcf_metadata.fields:
             for summary in partition_summaries:
-                # print(field.name, summary[field.full_name])
                 field.summary.update(summary[field.full_name])
-
-        # partition_stats.sort(key=lambda p: p.index)
-        # print(parition_stats)
 
         with open(out_path / "metadata.json", "w") as f:
             json.dump(vcf_metadata.asdict(), f, indent=4)

@@ -27,7 +27,7 @@ def scan(vcfs):
 @click.argument("out_path", type=click.Path())
 @click.option("-p", "--worker-processes", type=int, default=1)
 @click.option("-c", "--column-chunk-size", type=int, default=16)
-def columnarise(vcfs, out_path, worker_processes, column_chunk_size):
+def explode(vcfs, out_path, worker_processes, column_chunk_size):
     cnv.columnarise(
         vcfs,
         out_path,
@@ -78,7 +78,7 @@ def cli():
 
 cli.add_command(convert)
 cli.add_command(scan)
-cli.add_command(columnarise)
+cli.add_command(explode)
 cli.add_command(plan)
 # cli.add_command(predict)
 cli.add_command(to_zarr)
