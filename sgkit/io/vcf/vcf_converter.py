@@ -184,6 +184,8 @@ class VcfMetadata:
 
 def fixed_vcf_field_definitions():
     def make_field_def(name, vcf_type, vcf_number):
+        for col in pcvcf.columns.values():
+            print(col)
         return VcfField(
             category="fixed",
             name=name,
@@ -415,15 +417,17 @@ class PickleChunkedVcfField:
         path = self.path / f"p{partition_index}" / f"c{chunk_index}"
         with open(path, "rb") as f:
             pkl = self.compressor.decode(f.read())
-        return pickle.loads(pkl)
+        return pickle.loads(pkl), len(pkl)
 
-    def iter_values(self):
+    def iter_values_bytes(self):
         num_records = 0
+        bytes_read = 0
         for partition_index in range(self.num_partitions):
             for chunk_index in range(self.num_chunks(partition_index)):
-                chunk = self.read_chunk(partition_index, chunk_index)
+                chunk, chunk_bytes = self.read_chunk(partition_index, chunk_index)
+                bytes_read += chunk_bytes
                 for record in chunk:
-                    yield record
+                    yield record, bytes_read
                     num_records += 1
         if num_records != self.num_records:
             raise ValueError(
@@ -605,6 +609,14 @@ class PickleChunkedVcf:
         return data
 
     @functools.cached_property
+    def total_uncompressed_bytes(self):
+        total = 0
+        for col in self.columns.values():
+            summary = col.vcf_field.summary
+            total += summary.uncompressed_size
+        return total
+
+    @functools.cached_property
     def num_records(self):
         return sum(partition.num_records for partition in self.metadata.partitions)
 
@@ -780,7 +792,10 @@ class PickleChunkedVcf:
 
 
 def update_bar(progress_counter, num_variants, title):
-    pbar = tqdm.tqdm(total=num_variants, desc=title)
+    # FIXME this is broken for variants
+    pbar = tqdm.tqdm(
+        total=num_variants, desc=title, unit_scale=True, unit="b", smoothing=0.1
+    )
 
     while (total := progress_counter.value) < num_variants:
         inc = total - pbar.n
@@ -875,19 +890,15 @@ class ZarrConversionSpec:
 class BufferedArray:
     array: Any
     buff: Any
-    fill_value: Any
 
-    def __init__(self, array, fill_value=None):
+    def __init__(self, array):
         self.array = array
         dims = list(array.shape)
         dims[0] = min(array.chunks[0], array.shape[0])
-        self.fill_value = fill_value
-        if fill_value is None:
-            self.fill_value = _dtype_to_fill[array.dtype.str]
-        self.buff = np.full(dims, self.fill_value, dtype=array.dtype)
+        self.buff = np.zeros(dims, dtype=array.dtype)
 
     def swap_buffers(self):
-        self.buff = np.full_like(self.buff, self.fill_value)
+        self.buff = np.zeros_like(self.buff)
 
 
 class SgvcfZarr:
@@ -1022,12 +1033,8 @@ class SgvcfZarr:
             futures = []
             chunk_start = 0
             j = 0
-            iterator = tqdm.tqdm(
-                source_col.iter_values(),
-                total=num_variants,
-                desc=source_col.vcf_field.full_name,
-            )
-            for value in iterator:
+            last_bytes_read = 0
+            for value, bytes_read in source_col.iter_values_bytes():
                 sanitiser(ba.buff, j, value)
                 j += 1
                 if j == chunk_length:
@@ -1038,6 +1045,13 @@ class SgvcfZarr:
                     ba.swap_buffers()
                     j = 0
                     chunk_start += chunk_length
+                if last_bytes_read != bytes_read:
+                    # print("Bytes read", bytes_read, "inc", bytes_read - last_bytes_read)
+                    with progress_counter.get_lock():
+                        # print("progress = ", progress_counter.value)
+                        progress_counter.value += bytes_read - last_bytes_read
+                    last_bytes_read = bytes_read
+
             if j != 0:
                 flush_futures(futures)
                 futures.extend(
@@ -1048,32 +1062,39 @@ class SgvcfZarr:
     def convert(pcvcf, path, conversion_spec, show_progress=False):
         sgvcf = SgvcfZarr(path)
         sgvcf.create_arrays(pcvcf, conversion_spec)
-        for column in conversion_spec.columns[::-1]:
-            # TODO change this variable to array_name or something, this is
-            # getting very confusing.
-            # print(column.name)
-            # if column.name == "call_GQ":
-            # if column.name == "variant_position":
 
-            if "GT" in column.name:
-                continue
+        global progress_counter
+        progress_counter = multiprocessing.Value("Q", 0)
 
-            # FIXME we seem to be calling FORMAT/PID as a String type not integer
-            # for some reason. Need to dig in. Looks like the GIL starts hitting
-            # when we have large string columns.
-            # if column.dtype == "bool":
-            # if column.dtype.startswith("s"):
-            sgvcf.encode_column(pcvcf, column)
+        # start update progress bar process
+        bar_thread = None
+        # show_progress = False
+        if show_progress:
+            bar_thread = threading.Thread(
+                target=update_bar,
+                args=(progress_counter, pcvcf.total_uncompressed_bytes, "Encode"),
+                name="progress",
+                daemon=True,
+            )  # , daemon=True)
+            bar_thread.start()
 
-            # if "variant_POSITIVE_TRAIN_SITE" in column.name:
-            #     sgvcf.encode_column(pcvcf, column)
+        with cf.ProcessPoolExecutor(
+            max_workers=16,
+            initializer=init_workers,
+            initargs=(progress_counter,),
+        ) as executor:
+            futures = []
+            for column in conversion_spec.columns[:]:
+                # TODO change this variable to array_name or something, this is
+                # getting very confusing.
+                # print(column.name)
 
-            # if "AB" not in column.name and "GT" not in column.name:
-            #     try:
-            #         sgvcf.encode_column(pcvcf, column)
-            #     except Exception as e:
-            #         print("ERROR", e)
-            #         # break
+                if "GT" in column.name:
+                    continue
+
+                future = executor.submit(sgvcf.encode_column, pcvcf, column)
+                futures.append(future)
+            flush_futures(futures)
 
 
 def sync_flush_array(np_buffer, zarr_array, offset):
@@ -1112,250 +1133,6 @@ def async_flush_2d_array(executor, np_buffer, zarr_array, offset):
         start = stop
 
     return futures
-
-
-_dtype_to_fill = {
-    "|b1": False,
-    "|i1": INT_FILL,
-    "<i2": INT_FILL,
-    "<i4": INT_FILL,
-    "<f4": FLOAT32_FILL,
-    "|O": STR_FILL,
-}
-
-
-# def write_partition(
-#     vcf_metadata,
-#     zarr_path,
-#     partition,
-#     *,
-#     first_chunk_lock,
-#     last_chunk_lock,
-# ):
-#     # print(f"process {os.getpid()} starting")
-#     vcf = cyvcf2.VCF(partition.path)
-#     offset = partition.start_offset
-
-#     store = zarr.DirectoryStore(zarr_path)
-#     root = zarr.group(store=store)
-
-#     contig = BufferedArray(root["variant_contig"])
-#     pos = BufferedArray(root["variant_position"])
-#     # TODO is this consistent with other fields? "." means missing where
-#     # we're replacing with '' elsewhere
-#     vid = BufferedArray(root["variant_id"], fill_value=".")
-#     vid_mask = BufferedArray(root["variant_id_mask"], fill_value=True)
-#     qual = BufferedArray(root["variant_quality"])
-#     filt = BufferedArray(root["variant_filter"])
-#     # TODO check if arrays exists
-#     gt = BufferedArray(root["call_genotype"])
-#     gt_phased = BufferedArray(root["call_genotype_phased"])
-#     gt_mask = BufferedArray(root["call_genotype_mask"])
-
-#     buffered_arrays = [
-#         contig,
-#         pos,
-#         vid,
-#         vid_mask,
-#         qual,
-#         filt,
-#         gt,
-#         gt_phased,
-#         gt_mask,
-#     ]
-
-#     # The unbound fields. These are buffered in Python lists and stored
-#     # in pickled chunks for later analysis
-#     allele = BufferedUnsizedField("variant_allele")
-#     buffered_unsized_fields = [allele]
-
-#     unsized_info_fields = []
-#     fixed_info_fields = []
-#     for field in vcf_metadata.info_fields:
-#         if field.is_fixed_size:
-#             ba = BufferedArray(root[field.variable_name])
-#             buffered_arrays.append(ba)
-#             fixed_info_fields.append((field, ba))
-#         else:
-#             buf = BufferedUnsizedField(field.variable_name)
-#             buffered_unsized_fields.append(buf)
-#             unsized_info_fields.append((field, buf))
-
-#     fixed_format_fields = []
-#     unsized_format_fields = []
-#     for field in vcf_metadata.format_fields:
-#         if field.is_fixed_size:
-#             ba = BufferedArray(root[field.variable_name])
-#             buffered_arrays.append(ba)
-#             fixed_format_fields.append((field, ba))
-#         else:
-#             buf = BufferedUnsizedField(field.variable_name)
-#             buffered_unsized_fields.append(buf)
-#             unsized_format_fields.append((field, buf))
-
-#     chunk_length = gt.buff.shape[0]
-#     chunk_width = gt.buff.shape[1]
-#     n = gt.array.shape[1]
-
-#     def flush_fixed_buffers(start=0, stop=chunk_length):
-#         futures = []
-#         if start != 0 or stop != chunk_length:
-#             with contextlib.ExitStack() as stack:
-#                 if start != 0:
-#                     stack.enter_context(first_chunk_lock)
-#                 if stop != chunk_length:
-#                     stack.enter_context(last_chunk_lock)
-#                 for ba in buffered_arrays:
-#                     # For simplicity here we synchrously flush buffers for these
-#                     # non-aligned chunks, rather than try to pass the requisite locks
-#                     # to the (common-case) async flush path
-#                     sync_flush_array(ba.buff[start:stop], ba.array, offset)
-#         else:
-#             for ba in buffered_arrays:
-#                 futures.extend(async_flush_array(executor, ba.buff, ba.array, offset))
-
-#         # This is important - we need to allocate a new buffer so that
-#         # we can be writing to the new one while the old one is being flushed
-#         # in the background.
-#         for ba in buffered_arrays:
-#             ba.swap_buffers()
-
-#         return futures
-
-#     def flush_unsized_buffers(chunk_index):
-#         futures = []
-#         for buf in buffered_unsized_fields:
-#             futures.extend(
-#                 async_flush_unsized_buffer(
-#                     executor,
-#                     buf,
-#                     zarr_path,
-#                     partition.index,
-#                     chunk_index,
-#                 )
-#             )
-#             buf.swap_buffers()
-#         return futures
-
-#     contig_name_map = {name: j for j, name in enumerate(vcf_metadata.contig_names)}
-#     filter_map = {filter_id: j for j, filter_id in enumerate(vcf_metadata.filters)}
-
-#     gt_min = -1  # TODO make this -2 if mixed_ploidy
-#     # gt_max = max_num_alleles - 1
-
-#     # Flushing out the chunks takes less time than reading in here in the
-#     # main thread, so no real point in using lots of threads.
-#     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-#         j = offset % chunk_length
-#         chunk_index = 0
-#         chunk_start = j
-#         futures = []
-
-#         # FIXME this ThreadedGenerator leads to a deadlock when an exception
-#         # occurs within this main loop. Needs to be refactored to  be more
-#         # robust.
-#         # for variant in ThreadedGenerator(vcf, queue_maxsize=200):
-#         for variant in vcf:
-#             # Translate this record into numpy buffers. There is some compute
-#             # done here, but it's not releasing the GIL, so may not be worth
-#             # moving to threads.
-#             try:
-#                 contig.buff[j] = contig_name_map[variant.CHROM]
-#             except KeyError:
-#                 raise ValueError(
-#                     f"Contig '{variant.CHROM}' is not defined in the header."
-#                 )
-#             pos.buff[j] = variant.POS
-#             if variant.QUAL is not None:
-#                 qual.buff[j] = variant.QUAL
-#             if variant.ID is not None:
-#                 vid.buff[j] = variant.ID
-#                 vid_mask.buff[j] = False
-#             try:
-#                 for f in variant.FILTERS:
-#                     filt.buff[j, filter_map[f]] = True
-#             except IndexError:
-#                 raise ValueError(f"Filter '{f}' is not defined in the header.")
-
-#             vcf_gt = variant.genotype.array()
-#             assert vcf_gt.shape[1] == 3
-#             # TODO should just do this in the second pass
-#             # FIXME add a max to the clip, if we pre-clip
-#             gt.buff[j] = np.clip(vcf_gt[:, :-1], gt_min, 1000)
-#             gt_phased.buff[j] = vcf_gt[:, -1]
-#             gt_mask.buff[j] = gt.buff[j] < 0
-
-#             for field, buffered_array in fixed_info_fields:
-#                 try:
-#                     buffered_array.buff[j] = variant.INFO[field.name]
-#                 except KeyError:
-#                     pass
-#             for field, buffered_unsized_field in unsized_info_fields:
-#                 val = tuple()
-#                 try:
-#                     val = variant.INFO[field.name]
-#                 except KeyError:
-#                     pass
-#                 if not isinstance(val, tuple):
-#                     val = (val,)
-#                 buffered_unsized_field.buff.append(val)
-
-#             for field, buffered_array in fixed_format_fields:
-#                 # NOTE not sure the semantics is correct here
-#                 val = None
-#                 try:
-#                     val = variant.format(field.name)
-#                 except KeyError:
-#                     pass
-#                 if val is not None:
-#                     # Quick hack - cyvcf2's missing value is different
-#                     if field.vcf_type == "Integer":
-#                         val[val == -2147483648] = -1
-#                     buffered_array.buff[j] = val.reshape(buffered_array.buff.shape[1:])
-
-#             # FIXME refactor this to share the code path with the fixed_format
-#             # fields. We probably want to define a method update_buffer(index, val)
-#             for field, buffered_unsized_field in unsized_format_fields:
-#                 val = None
-#                 try:
-#                     val = variant.format(field.name)
-#                 except KeyError:
-#                     pass
-#                 if val is not None:
-#                     # Quick hack - cyvcf2's missing value is different
-#                     if field.vcf_type == "Integer":
-#                         val[val == -2147483648] = -1
-#                     assert val.shape[0] == n
-#                 buffered_unsized_field.buff.append(val)
-
-#             allele.buff.append([variant.REF] + variant.ALT)
-
-#             j += 1
-#             if j == chunk_length:
-#                 flush_futures(futures)
-#                 futures = flush_fixed_buffers(start=chunk_start)
-#                 futures.extend(flush_unsized_buffers(chunk_index))
-#                 j = 0
-#                 offset += chunk_length - chunk_start
-#                 chunk_start = 0
-#                 assert offset % chunk_length == 0
-#                 chunk_index += 1
-
-#             with progress_counter.get_lock():
-#                 # TODO reduce IPC here by incrementing less often?
-#                 # Might not be worth the hassle
-#                 progress_counter.value += 1
-
-#         # Flush the last chunk
-#         flush_futures(futures)
-#         futures = flush_fixed_buffers(start=chunk_start, stop=j)
-#         # Note that we may flush empty files here when the chunk size
-#         # is aligned with the partition size. This is currently harmless
-#         # but is something to watch out for.
-#         futures.extend(flush_unsized_buffers(chunk_index))
-
-#         # Wait for the last batch of futures to complete
-#         flush_futures(futures)
 
 
 # def create_zarr(
@@ -1520,67 +1297,6 @@ _dtype_to_fill = {
 #             field_dir.mkdir()
 
 
-# def join_partitioned_lists(field_dir, partitions):
-#     data = []
-#     for partition in partitions:
-#         for chunk in range(partition.num_chunks):
-#             filename = field_dir / f"{partition.index}.{chunk}"
-#             with open(filename, "rb") as f:
-#                 data.extend(pickle.load(f))
-#     return data
-
-
-# def scan_2d_chunks(field_dir, partitions):
-#     """
-#     Return the maximum size of the 3rd dimension in the chunks and the
-#     maximum value seen.
-#     """
-#     max_size = 0
-#     max_val = None
-#     for partition in partitions:
-#         for chunk in range(partition.num_chunks):
-#             filename = field_dir / f"{partition.index}.{chunk}"
-#             with open(filename, "rb") as f:
-#                 data = pickle.load(f)
-#                 for row in data:
-#                     max_size = max(max_size, row.shape[1])
-#                     row_max = np.max(row)
-#                     if max_val is None:
-#                         max_val = row_max
-#                     else:
-#                         max_val = max(max_val, row_max)
-#     return max_size, max_val
-
-
-# def encode_pickle_chunked_array(array, field_dir, partitions):
-#     ba = BufferedArray(array)
-#     chunk_length = array.chunks[0]
-
-#     j = 0
-#     assert partitions[0].start_offset == 0
-#     offset = 0
-
-#     for partition in partitions:
-#         for chunk in range(partition.num_chunks):
-#             filename = field_dir / f"{partition.index}.{chunk}"
-#             with open(filename, "rb") as f:
-#                 data = pickle.load(f)
-#                 for row in data:
-#                     # FIXME
-#                     # print(row.shape)
-#                     # print(row)
-#                     # ba.buff[j] = row.reshape(ba.buff.shape[1:])
-#                     # buffered_array.buff[j] = val.reshape(buffered_array.buff.shape[1:])
-#                     j += 1
-#                     if j % chunk_length == 0:
-#                         sync_flush_array(ba.buff, ba.array, offset)
-
-#                         offset += chunk_length
-#                         j = 0
-
-#     sync_flush_array(ba.buff[:j], ba.array, offset)
-
-
 # def finalise_zarr(path, spec, chunk_length, chunk_width):
 #     store = zarr.DirectoryStore(path)
 #     root = zarr.group(store=store, overwrite=False)
@@ -1667,108 +1383,3 @@ _dtype_to_fill = {
 #             encode_pickle_chunked_array(a, field_dir, partitions)
 
 #     zarr.consolidate_metadata(path)
-
-
-# def convert_vcf(
-#     vcfs,
-#     out_path,
-#     *,
-#     chunk_length=None,
-#     chunk_width=None,
-#     max_alt_alleles=None,
-#     show_progress=False,
-# ):
-#     spec = scan_vcfs(vcfs, show_progress=show_progress)
-#     total_variants = sum(partition.num_records for partition in spec.partitions)
-#     global progress_counter
-#     progress_counter = multiprocessing.Value("i", 0)
-
-#     out_path = pathlib.Path(out_path)
-#     # columnarise_vcf(vcfs[0], out_path)
-
-#     # TODO add a try-except here for KeyboardInterrupt which will kill
-#     # various things and clean-up.
-#     spec = scan_vcfs(vcfs, show_progress=show_progress)
-
-#     # TODO add support for writing out the vcf_metadata to file so that
-#     # it can be tweaked later.
-#     # We want to add support for doing these steps independently as an
-#     # interative tweaking process, so that users can get feedback on
-#     # what fields are being stored and how much space they might take.
-
-#     # print(json.dumps(dataclasses.asdict(vcf_metadata), indent=4))
-
-#     # TODO choose chunks
-#     if chunk_width is None:
-#         chunk_width = 10000
-#     if chunk_length is None:
-#         chunk_length = 2000
-
-#     if max_alt_alleles is None:
-#         max_alt_alleles = 3
-
-#     # TODO This is currently only used to determine sizeof gt array
-#     max_num_alleles = max_alt_alleles + 1
-
-#     # TODO write the Zarr to a temporary name, only renaming at the end
-#     # on success.
-#     create_zarr(
-#         out_path,
-#         spec.vcf_metadata,
-#         spec.partitions,
-#         chunk_width=chunk_width,
-#         chunk_length=chunk_length,
-#         max_num_alleles=max_num_alleles,
-#     )
-
-#     first_convert_pass(out_path, spec, show_progress=show_progress)
-
-#     # total_variants = sum(partition.num_records for partition in spec.partitions)
-#     # global progress_counter
-#     # progress_counter = multiprocessing.Value("i", 0)
-
-#     # # start update progress bar process
-#     # bar_thread = None
-#     # if show_progress:
-#     #     bar_thread = threading.Thread(
-#     #         target=update_bar,
-#     #         args=(progress_counter, total_variants),
-#     #         name="progress",
-#     #         daemon=True,
-#     #     )  # , daemon=True)
-#     #     bar_thread.start()
-
-#     # with concurrent.futures.ProcessPoolExecutor(
-#     #     max_workers=1, initializer=init_workers, initargs=(progress_counter,)
-#     # ) as executor:
-#     #     with multiprocessing.Manager() as manager:
-#     #         locks = [manager.Lock() for _ in range(len(spec.partitions) + 1)]
-#     #         futures = []
-#     #         for j, part in enumerate(spec.partitions):
-#     #             futures.append(
-#     #                 executor.submit(
-#     #                     write_partition,
-#     #                     spec.vcf_metadata,
-#     #                     out_path,
-#     #                     part,
-#     #                     max_num_alleles,
-#     #                     first_chunk_lock=locks[j],
-#     #                     last_chunk_lock=locks[j + 1],
-#     #                 )
-#     #             )
-#     #         completed_partitions = []
-#     #         for future in concurrent.futures.as_completed(futures):
-#     #             exception = future.exception()
-#     #             if exception is not None:
-#     #                 raise exception
-#     #             completed_partitions.append(future.result())
-
-#     # assert progress_counter.value == total_variants
-#     # if bar_thread is not None:
-#     #     bar_thread.join()
-
-#     # NOTE - we don't need to actually use the return value of the partition
-#     # anymore, we can compute everything from first principles
-#     # finalise_zarr(
-#     #     out_path, spec, chunk_length, chunk_width
-#     # )
