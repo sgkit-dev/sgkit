@@ -48,12 +48,13 @@ def summarise(columnarised):
 
 @click.command
 @click.argument("columnarised", type=click.Path())
-@click.argument("specfile", type=click.Path())
-def genspec(columnarised, specfile):
+# @click.argument("specfile", type=click.Path())
+def genspec(columnarised):
     pcvcf = cnv.PickleChunkedVcf.load(columnarised)
     spec = cnv.ZarrConversionSpec.generate(pcvcf)
-    with open(specfile, "w") as f:
-        json.dump(spec.asdict(), f, indent=4)
+    # with open(specfile, "w") as f:
+    stream = click.get_text_stream("stdout")
+    json.dump(spec.asdict(), stream, indent=4)
 
 
 
