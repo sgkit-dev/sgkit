@@ -1,0 +1,46 @@
+name: Check docs
+
+on:
+  push:
+  pull_request:
+  schedule:
+    # Run at the end of every day
+    - cron: "0 0 * * *"
+
+jobs:
+  build:
+    # Scheduled runs only on the origin org
+    if: (github.event_name == 'schedule' && github.repository_owner == 'pystatgen') || (github.event_name != 'schedule')
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt update -y
+        sudo apt install graphviz  # Needed for documentation
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt -r requirements-dev.txt -r requirements-doc.txt
+    - name: Run pre-commit
+      uses: pre-commit/action@v2.0.0
+    - name: Check for Sphinx doc warnings
+      run: |
+        cd docs
+        make html SPHINXOPTS="-W --keep-going -n"
+    - uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: gwas_tutorial
+        path: /home/runner/work/sgkit/sgkit/docs/_build/html/reports/examples/gwas_tutorial.err.log
+    - uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: relatedness_tutorial
+        path: /home/runner/work/sgkit/sgkit/docs/_build/html/reports/examples/relatedness_tutorial.err.log
