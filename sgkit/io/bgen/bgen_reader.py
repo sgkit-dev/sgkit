@@ -476,10 +476,12 @@ def rechunk_bgen(
 
     Warnings
     --------
+
     This functional is only applicable to diploid, bi-allelic BGEN datasets.
 
     Returns
     -------
+
     Dataset
         The rechunked dataset.
     """
@@ -589,10 +591,12 @@ def bgen_to_zarr(
 
     Warnings
     --------
+
     This functional is only applicable to diploid, bi-allelic BGEN datasets.
 
     Returns
     -------
+
     Dataset
         The rechunked dataset.
     """
