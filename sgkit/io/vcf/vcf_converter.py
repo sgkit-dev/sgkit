@@ -1,8 +1,6 @@
 import concurrent.futures as cf
-import contextlib
 import dataclasses
 import multiprocessing
-import queue
 import functools
 import threading
 import pathlib
@@ -11,7 +9,6 @@ import pickle
 import sys
 import shutil
 import json
-import collections
 import math
 from typing import Any
 
@@ -22,7 +19,6 @@ import numpy as np
 import tqdm
 import zarr
 
-from .vcf_reader import _vcf_type_to_numpy
 
 # from sgkit.io.utils import FLOAT32_MISSING, str_is_int
 from sgkit.io.utils import (
@@ -30,17 +26,17 @@ from sgkit.io.utils import (
     # CHAR_MISSING,
     FLOAT32_FILL,
     FLOAT32_MISSING,
-    INT_FILL,
-    INT_MISSING,
-    STR_FILL,
+    # INT_FILL,
+    # INT_MISSING,
+    # STR_FILL,
     # STR_MISSING,
-    str_is_int,
+    # str_is_int,
 )
 
 # from sgkit.io.vcf import partition_into_regions
 
 # from sgkit.io.utils import INT_FILL, concatenate_and_rechunk, str_is_int
-from sgkit.utils import smallest_numpy_int_dtype
+# from sgkit.utils import smallest_numpy_int_dtype
 
 numcodecs.blosc.use_threads = False
 
@@ -88,8 +84,6 @@ class VcfField:
     def from_header(definition):
         category = definition["HeaderType"]
         name = definition["ID"]
-        prefix = "call" if category == "FORMAT" else "variant"
-        variable_name = f"{prefix}_{name}"
         vcf_number = definition["Number"]
         vcf_type = definition["Type"]
         return VcfField(
@@ -184,8 +178,6 @@ class VcfMetadata:
 
 def fixed_vcf_field_definitions():
     def make_field_def(name, vcf_type, vcf_number):
-        for col in pcvcf.columns.values():
-            print(col)
         return VcfField(
             category="fixed",
             name=name,
@@ -526,7 +518,6 @@ class PickleChunkedWriteBuffer:
         number_dim = 0
         if column.vcf_field.category == "FORMAT":
             number_dim = 1
-            assert vcf_type != "String"
         if vcf_type == "Float":
             self._summary_bounds_update = functools.partial(
                 update_bounds_float, number_dim=number_dim
@@ -664,7 +655,7 @@ class PickleChunkedVcf:
         if show_progress:
             bar_thread = threading.Thread(
                 target=update_bar,
-                args=(progress_counter, total_variants, "Explode"),
+                args=(progress_counter, total_variants, "Explode", "vars"),
                 name="progress",
                 daemon=True,
             )  # , daemon=True)
@@ -791,14 +782,13 @@ class PickleChunkedVcf:
             return summaries
 
 
-def update_bar(progress_counter, num_variants, title):
-    # FIXME this is broken for variants
+def update_bar(progress_counter, total, title, units):
     pbar = tqdm.tqdm(
-        total=num_variants, desc=title, unit_scale=True, unit="b", smoothing=0.1
+        total=total, desc=title, unit_scale=True, unit=units, smoothing=0.1
     )
 
-    while (total := progress_counter.value) < num_variants:
-        inc = total - pbar.n
+    while (current := progress_counter.value) < total:
+        inc = current - pbar.n
         pbar.update(inc)
         time.sleep(0.1)
     pbar.close()
@@ -909,7 +899,7 @@ class SgvcfZarr:
     def create_arrays(self, pcvcf, spec):
         store = zarr.DirectoryStore(self.path)
         num_variants = pcvcf.num_records
-        num_samplesa = pcvcf.num_samples
+        # num_samplesa = pcvcf.num_samples
 
         self.root = zarr.group(store=store, overwrite=True)
         compressor = numcodecs.Blosc(
@@ -1027,7 +1017,7 @@ class SgvcfZarr:
         ba = BufferedArray(array)
         sanitiser = source_col.sanitiser_factory(ba.buff.shape)
         chunk_length = array.chunks[0]
-        num_variants = array.shape[0]
+        # num_variants = array.shape[0]
 
         with cf.ThreadPoolExecutor(max_workers=4) as executor:
             futures = []
@@ -1072,7 +1062,7 @@ class SgvcfZarr:
         if show_progress:
             bar_thread = threading.Thread(
                 target=update_bar,
-                args=(progress_counter, pcvcf.total_uncompressed_bytes, "Encode"),
+                args=(progress_counter, pcvcf.total_uncompressed_bytes, "Encode", "b"),
                 name="progress",
                 daemon=True,
             )  # , daemon=True)
