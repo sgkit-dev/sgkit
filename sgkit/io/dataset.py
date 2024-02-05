@@ -105,6 +105,7 @@ def load_dataset(
 
     Returns
     -------
+
     Dataset
         The dataset loaded from the Zarr store or file system.
     """
