@@ -1,6 +1,6 @@
 myst_nb
 pydata-sphinx-theme
-sphinx>4,<=4.2.0
+sphinx==6.2.1
 sphinx_autodoc_typehints>=1.14.0
 scanpydoc
 ipython
