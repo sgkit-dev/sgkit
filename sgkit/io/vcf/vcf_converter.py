@@ -107,6 +107,9 @@ class VcfField:
             return self.name
         return f"{self.category}/{self.name}"
 
+    # TODO add method here to choose a good set compressor and
+    # filters default here for this field.
+
     def smallest_dtype(self):
         """
         Returns the smallest dtype suitable for this field based
@@ -822,17 +825,27 @@ def explode(
 
 @dataclasses.dataclass
 class ZarrColumnSpec:
-    vcf_field: str
+    # TODO change to "variable_name"
     name: str
     dtype: str
     shape: tuple
+    chunks: tuple
+    dimensions: list
+    description: str
+    vcf_field: str
+    compressor: dict
+    # TODO add filters
 
 
 @dataclasses.dataclass
 class ZarrConversionSpec:
-    chunk_width: int
-    chunk_length: int
-    columns: list
+    # chunk_width: int
+    # chunk_length: int
+    dimensions: list
+    samples: list
+    contigs: list
+    filters: list
+    variables: list
 
     def asdict(self):
         return dataclasses.asdict(self)
@@ -847,32 +860,136 @@ class ZarrConversionSpec:
     def generate(pcvcf):
         m = pcvcf.num_records
         n = pcvcf.num_samples
-        colspecs = []
+        # FIXME
+        chunk_width = 1000
+        chunk_length = 10_000
+        dimensions = ["variants", "samples", "ploidy"]
+
+        compressor = numcodecs.Blosc(
+            cname="zstd", clevel=7, shuffle=numcodecs.Blosc.AUTOSHUFFLE
+        ).get_config()
+
+        def fixed_field_spec(name, dtype, vcf_field=None):
+            return ZarrColumnSpec(
+                vcf_field=vcf_field,
+                name=name,
+                dtype=dtype,
+                shape=[m],
+                description="",
+                dimensions=["variants"],
+                chunks=[chunk_length],
+                compressor=compressor,
+            )
+
+        # # FIXME get dtype from lookup table
+        colspecs = [
+            fixed_field_spec(
+                name="variant_contig",
+                dtype="i2",  # FIXME
+            ),
+            fixed_field_spec(
+                vcf_field="POS",
+                name="variant_position",
+                dtype="i4",
+            ),
+            fixed_field_spec(
+                vcf_field=None,
+                name="variant_id",
+                dtype="str",
+            ),
+            fixed_field_spec(
+                vcf_field=None,
+                name="variant_id_mask",
+                dtype="str",
+            ),
+            fixed_field_spec(
+                vcf_field="QUAL",
+                name="variant_quality",
+                dtype="f4",
+            ),
+        ]
+        gt_field = None
         for field in pcvcf.metadata.fields:
             if field.category == "fixed":
                 continue
+            if field.name == "GT":
+                gt_field = field
+                continue
             shape = [m]
             prefix = "variant_"
+            dimensions = ["variants"]
+            chunks = [chunk_width]
             if field.category == "FORMAT":
                 prefix = "call_"
                 shape.append(n)
+                chunks.append(chunk_length),
+                dimensions.append("samples")
             if field.summary.max_number > 1:
                 shape.append(field.summary.max_number)
-                if field.name == "GT":
-                    # GT is a special case because we pull phasing last value
-                    shape[2] -= 1
+                dimensions.append(field.name)
             variable_name = prefix + field.name
             colspec = ZarrColumnSpec(
                 vcf_field=field.full_name,
                 name=variable_name,
                 dtype=field.smallest_dtype(),
                 shape=shape,
+                chunks=chunks,
+                dimensions=dimensions,
+                description=field.description,
+                compressor=compressor,
             )
             colspecs.append(colspec)
-        # Arbitrary defaults here, we'll want to do something much more
-        # sophisticated I'd imagine.
+
+        if gt_field is not None:
+            ploidy = gt_field.summary.max_number - 1
+            shape = [m, n]
+            chunks = [chunk_length, chunk_width]
+            dimensions = ["variants", "samples"]
+
+            colspecs.append(
+                ZarrColumnSpec(
+                    vcf_field=None,
+                    name="call_genotype_phased",
+                    dtype="bool",
+                    shape=shape,
+                    chunks=chunks,
+                    dimensions=dimensions,
+                    description="",
+                    compressor=compressor,
+                )
+            )
+            dimensions += ["ploidy"]
+            colspecs.append(
+                ZarrColumnSpec(
+                    vcf_field=None,
+                    name="call_genotype",
+                    dtype=gt_field.smallest_dtype(),
+                    shape=shape,
+                    chunks=chunks,
+                    dimensions=dimensions,
+                    description="",
+                    compressor=compressor,
+                )
+            )
+            colspecs.append(
+                ZarrColumnSpec(
+                    vcf_field=None,
+                    name="call_genotype_mask",
+                    dtype="bool",
+                    shape=shape,
+                    chunks=chunks,
+                    dimensions=dimensions,
+                    description="",
+                    compressor=compressor,
+                )
+            )
+
         return ZarrConversionSpec(
-            columns=colspecs, chunk_width=1000, chunk_length=10_000
+            variables=colspecs,
+            dimensions=dimensions,
+            samples=pcvcf.metadata.samples,
+            contigs=pcvcf.metadata.contig_names,
+            filters=pcvcf.metadata.filters,
         )
 
 
@@ -896,10 +1013,21 @@ class SgvcfZarr:
         self.path = pathlib.Path(path)
         self.root = None
 
+    def create_array(self, variable):
+        print("CREATE", variable)
+        a = self.root.empty(
+            variable.name,
+            shape=variable.shape,
+            chunks=variable.chunks,
+            dtype=variable.dtype,
+            compressor=numcodecs.get_codec(variable.compressor),
+        )
+        a.attrs["_ARRAY_DIMENSIONS"] = variable.dimensions
+
     def create_arrays(self, pcvcf, spec):
         store = zarr.DirectoryStore(self.path)
         num_variants = pcvcf.num_records
-        # num_samplesa = pcvcf.num_samples
+        # num_samples = pcvcf.num_samples
 
         self.root = zarr.group(store=store, overwrite=True)
         compressor = numcodecs.Blosc(
@@ -918,6 +1046,7 @@ class SgvcfZarr:
             return a
 
         self.root.attrs["filters"] = pcvcf.metadata.filters
+        # TODO move these declarations into the spec
         full_array("filter_id", pcvcf.metadata.filters, ["filters"], dtype="str")
         full_array("contig_id", pcvcf.metadata.contig_names, ["configs"], dtype="str")
         full_array(
@@ -925,34 +1054,34 @@ class SgvcfZarr:
             pcvcf.metadata.samples,
             ["samples"],
             dtype="str",
-            chunks=[spec.chunk_width],
+            # Add chunks when moving to spec
         )
 
-        if pcvcf.metadata.contig_lengths is not None:
-            full_array(
-                "contig_length",
-                pcvcf.metadata.contig_lengths,
-                ["configs"],
-                dtype=np.int64,
-            )
+        # if pcvcf.metadata.contig_lengths is not None:
+        #     full_array(
+        #         "contig_length",
+        #         pcvcf.metadata.contig_lengths,
+        #         ["configs"],
+        #         dtype=np.int64,
+        #     )
 
-        def empty_fixed_field_array(name, dtype, shape=None):
-            a = self.root.empty(
-                name,
-                shape=(num_variants,),
-                dtype=dtype,
-                chunks=(spec.chunk_length,),
-                compressor=compressor,
-            )
-            a.attrs["_ARRAY_DIMENSIONS"] = ["variants"]
-            return a
+        # def empty_fixed_field_array(name, dtype, shape=None):
+        #     a = self.root.empty(
+        #         name,
+        #         shape=(num_variants,),
+        #         dtype=dtype,
+        #         chunks=(spec.chunk_length,),
+        #         compressor=compressor,
+        #     )
+        #     a.attrs["_ARRAY_DIMENSIONS"] = ["variants"]
+        #     return a
 
         # FIXME get dtype from lookup table
-        empty_fixed_field_array("variant_contig", np.int16)
-        empty_fixed_field_array("variant_position", np.int32)
-        empty_fixed_field_array("variant_id", "str")
-        empty_fixed_field_array("variant_id_mask", bool)
-        empty_fixed_field_array("variant_quality", np.float32)
+        # empty_fixed_field_array("variant_contig", np.int16)
+        # empty_fixed_field_array("variant_position", np.int32)
+        # empty_fixed_field_array("variant_id", "str")
+        # empty_fixed_field_array("variant_id_mask", bool)
+        # empty_fixed_field_array("variant_quality", np.float32)
         # TODO FILTER
         # empty_fixed_field_array("variant_filter",
         #         shape=(m, len(vcf_metadata.filters)),
@@ -961,55 +1090,6 @@ class SgvcfZarr:
         #         compressor=compressor,
         #     )
         #     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "filters"]
-
-        #     a = root.empty(
-        #         "call_genotype",
-        #         shape=(m, n, 2),
-        #         chunks=(chunk_length, chunk_width),
-        #         dtype=smallest_numpy_int_dtype(max_num_alleles),
-        #         compressor=compressor,
-        #     )
-        #     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "samples", "ploidy"]
-
-        #     a = root.empty(
-        #         "call_genotype_mask",
-        #         shape=(m, n, 2),
-        #         chunks=(chunk_length, chunk_width),
-        #         dtype=bool,
-        #         compressor=compressor,
-        #     )
-        #     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "samples", "ploidy"]
-
-        #     a = root.empty(
-        #         "call_genotype_phased",
-        #         shape=(m, n),
-        #         chunks=(chunk_length, chunk_width),
-        #         dtype=bool,
-        #         compressor=compressor,
-        #     )
-        #     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "samples"]
-
-        for column in spec.columns:
-            if column.name == "call_GT":
-                # FIXME this shouldn't be in here.
-                continue
-            chunks = [spec.chunk_length]
-            dimensions = ["variants"]
-            if len(column.shape) > 1:
-                # TODO this should all be in the column spec
-                chunks.append(spec.chunk_width)
-                dimensions.append(["variants", "samples"])
-            if len(column.shape) > 2:
-                dimensions.append(["variants", "samples", column.vcf_field])
-            a = self.root.empty(
-                column.name,
-                shape=column.shape,
-                chunks=chunks,
-                dtype=column.dtype,
-                compressor=compressor,
-            )
-            a.attrs["_ARRAY_DIMENSIONS"] = dimensions
-            # print(a)
 
     def encode_column(self, pcvcf, column):
         source_col = pcvcf.columns[column.vcf_field]
@@ -1053,6 +1133,9 @@ class SgvcfZarr:
         sgvcf = SgvcfZarr(path)
         sgvcf.create_arrays(pcvcf, conversion_spec)
 
+        for variable in conversion_spec.variables[:]:
+            sgvcf.create_array(variable)
+
         global progress_counter
         progress_counter = multiprocessing.Value("Q", 0)
 
@@ -1074,16 +1157,17 @@ class SgvcfZarr:
             initargs=(progress_counter,),
         ) as executor:
             futures = []
-            for column in conversion_spec.columns[:]:
+            for variable in conversion_spec.variables[:]:
                 # TODO change this variable to array_name or something, this is
                 # getting very confusing.
                 # print(column.name)
 
-                if "GT" in column.name:
-                    continue
-
-                future = executor.submit(sgvcf.encode_column, pcvcf, column)
-                futures.append(future)
+                # if "GT" in column.name:
+                #     continue
+                if variable.vcf_field is not None:
+                    print("Encode", variable.name)
+                    future = executor.submit(sgvcf.encode_column, pcvcf, variable)
+                    futures.append(future)
             flush_futures(futures)
 
 
