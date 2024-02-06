@@ -27,8 +27,8 @@ from sgkit.io.utils import (
     # CHAR_MISSING,
     FLOAT32_FILL,
     FLOAT32_MISSING,
-    # INT_FILL,
-    # INT_MISSING,
+    INT_FILL,
+    INT_MISSING,
     # STR_FILL,
     # STR_MISSING,
     # str_is_int,
@@ -253,7 +253,7 @@ def scan_vcfs(paths, show_progress):
         partitions.append(
             # Requires cyvcf2>=0.30.27
             VcfPartition(
-                vcf_path=path,
+                vcf_path=str(path),
                 num_records=vcf.num_records,
                 first_position=(record.CHROM, record.POS),
             )
@@ -280,9 +280,11 @@ def sanitise_value_float_scalar(buff, j, value):
 def sanitise_value_int_scalar(buff, j, value):
     x = value
     if value is None:
-        x = -1
-    # TODO check for missing values as well
-    buff[j] = x
+        # print("MISSING", INT_MISSING, INT_FILL)
+        x = [INT_MISSING]
+    else:
+        x = sanitise_int_array([value], ndmin=1, dtype=np.int32)
+    buff[j] = x[0]
 
 
 def sanitise_value_string_scalar(buff, j, value):
@@ -865,12 +867,14 @@ class ZarrConversionSpec:
         return ret
 
     @staticmethod
-    def generate(pcvcf):
+    def generate(pcvcf, chunk_length=None, chunk_width=None):
         m = pcvcf.num_records
         n = pcvcf.num_samples
         # FIXME
-        chunk_width = 1000
-        chunk_length = 10_000
+        if chunk_width is None:
+            chunk_width = 1000
+        if chunk_length is None:
+            chunk_length = 10_000
 
         compressor = default_compressor.get_config()
 
@@ -905,7 +909,7 @@ class ZarrConversionSpec:
                 dimensions=["variants", "filters"],
             ),
             fixed_field_spec(
-                name="variant_alleles",
+                name="variant_allele",
                 dtype="str",
                 shape=[m, max_alleles],
                 dimensions=["variants", "alleles"],
@@ -923,7 +927,7 @@ class ZarrConversionSpec:
             fixed_field_spec(
                 vcf_field=None,
                 name="variant_id_mask",
-                dtype="str",
+                dtype="bool",
             ),
             fixed_field_spec(
                 vcf_field="QUAL",
@@ -942,11 +946,11 @@ class ZarrConversionSpec:
             shape = [m]
             prefix = "variant_"
             dimensions = ["variants"]
-            chunks = [chunk_width]
+            chunks = [chunk_length]
             if field.category == "FORMAT":
                 prefix = "call_"
                 shape.append(n)
-                chunks.append(chunk_length),
+                chunks.append(chunk_width),
                 dimensions.append("samples")
             if field.summary.max_number > 1:
                 shape.append(field.summary.max_number)
@@ -977,7 +981,7 @@ class ZarrConversionSpec:
                     dtype="bool",
                     shape=list(shape),
                     chunks=list(chunks),
-                    dimensions=dimensions,
+                    dimensions=list(dimensions),
                     description="",
                     compressor=compressor,
                 )
@@ -989,9 +993,9 @@ class ZarrConversionSpec:
                     vcf_field=None,
                     name="call_genotype",
                     dtype=gt_field.smallest_dtype(),
-                    shape=shape,
-                    chunks=chunks,
-                    dimensions=dimensions,
+                    shape=list(shape),
+                    chunks=list(chunks),
+                    dimensions=list(dimensions),
                     description="",
                     compressor=compressor,
                 )
@@ -1001,9 +1005,9 @@ class ZarrConversionSpec:
                     vcf_field=None,
                     name="call_genotype_mask",
                     dtype="bool",
-                    shape=shape,
-                    chunks=chunks,
-                    dimensions=dimensions,
+                    shape=list(shape),
+                    chunks=list(chunks),
+                    dimensions=list(dimensions),
                     description="",
                     compressor=compressor,
                 )
@@ -1104,7 +1108,9 @@ class SgvcfZarr:
             for value, bytes_read in source_col.iter_values_bytes():
                 sanitise_value_int_2d(gt.buff, j, value[:, :-1])
                 sanitise_value_int_1d(gt_phased.buff, j, value[:, -1])
-                # TODO set mask from buff[j]
+                # FIXME set gt-mask
+                # gt_mask.buff[j: len(value) - 1] =
+
 
                 j += 1
                 if j == chunk_length:
@@ -1134,7 +1140,7 @@ class SgvcfZarr:
         alt_col = pcvcf.columns["ALT"]
         ref_values = ref_col.values()
         alt_values = alt_col.values()
-        allele_array = self.root["variant_alleles"]
+        allele_array = self.root["variant_allele"]
 
         # We could do this chunk-by-chunk, but it doesn't seem worth the bother.
         alleles = np.full(allele_array.shape, "", dtype="O")
@@ -1161,7 +1167,7 @@ class SgvcfZarr:
 
     def encode_contig(self, pcvcf, contig_names):
         array = self.root.array(
-            "variant_contig_names",
+            "contig_id",
             contig_names,
             dtype="str",
             compressor=default_compressor,
@@ -1188,6 +1194,8 @@ class SgvcfZarr:
                 # TODO add advice about adding it to the spec
                 raise ValueError(f"Contig '{contig}' was not defined in the header.")
 
+        array[:] = buff
+
         with progress_counter.get_lock():
             progress_counter.value += col.vcf_field.summary.uncompressed_size
 
@@ -1206,7 +1214,6 @@ class SgvcfZarr:
         buff = np.zeros_like(array)
 
         lookup = {v: j for j, v in enumerate(filter_names)}
-
         for j, filters in enumerate(col.values()):
             try:
                 for f in filters:
@@ -1214,8 +1221,31 @@ class SgvcfZarr:
             except IndexError:
                 raise ValueError(f"Filter '{f}' was not defined in the header.")
 
+        array[:] = buff
+
         with progress_counter.get_lock():
             progress_counter.value += col.vcf_field.summary.uncompressed_size
+
+    def encode_id(self, pcvcf):
+        col = pcvcf.columns["ID"]
+        id_array = self.root["variant_id"]
+        id_mask_array = self.root["variant_id_mask"]
+        id_buff = np.full_like(id_array, '')
+        id_mask_buff = np.zeros_like(id_mask_array)
+
+        for j, value in enumerate(col.values()):
+            if value is not None:
+                id_buff[j] = value
+            else:
+                id_buff[j] = "." # TODO is this correct??
+                id_mask_buff[j] = True
+
+        id_array[:] = id_buff
+        id_mask_array[:] = id_mask_buff
+
+        with progress_counter.get_lock():
+            progress_counter.value += col.vcf_field.summary.uncompressed_size
+
 
     @staticmethod
     def convert(
@@ -1256,6 +1286,7 @@ class SgvcfZarr:
                     conversion_spec.chunk_width,
                 ),
                 executor.submit(sgvcf.encode_alleles, pcvcf),
+                executor.submit(sgvcf.encode_id, pcvcf),
                 executor.submit(sgvcf.encode_contig, pcvcf, conversion_spec.contig_id),
                 executor.submit(sgvcf.encode_filters, pcvcf, conversion_spec.filter_id),
             ]
@@ -1319,7 +1350,15 @@ def async_flush_2d_array(executor, np_buffer, zarr_array, offset):
     return futures
 
 
-def convert_vcf(vcfs, out_path, worker_processes=1, show_progress=False):
+def convert_vcf(
+    vcfs,
+    out_path,
+    *,
+    chunk_length=None,
+    chunk_width=None,
+    worker_processes=1,
+    show_progress=False,
+):
     with tempfile.TemporaryDirectory() as intermediate_form_dir:
         explode(
             vcfs,
@@ -1329,7 +1368,9 @@ def convert_vcf(vcfs, out_path, worker_processes=1, show_progress=False):
         )
 
         pcvcf = PickleChunkedVcf.load(intermediate_form_dir)
-        spec = ZarrConversionSpec.generate(pcvcf)
+        spec = ZarrConversionSpec.generate(
+            pcvcf, chunk_length=chunk_length, chunk_width=chunk_width
+        )
         SgvcfZarr.convert(
             pcvcf,
             out_path,
