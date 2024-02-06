@@ -85,25 +85,17 @@ def to_zarr(columnarised, zarr_path, conversion_spec):
 def convert(vcfs, out_path):
     cnv.convert_vcf(vcfs, out_path, show_progress=True)
 
-    # ds = load_dataset(out_path)
-    # print(ds)
-    # print(ds.variant_ReadPosRankSum.values)
-    # print(ds.call_GQ.values)
-
 
 @click.group()
 def cli():
     pass
 
 
-# cli.add_command(convert)
-# cli.add_command(scan)
 cli.add_command(explode)
 cli.add_command(summarise)
 cli.add_command(genspec)
-# cli.add_command(plan)
-# cli.add_command(predict)
 cli.add_command(to_zarr)
+cli.add_command(convert)
 
 if __name__ == "__main__":
     cli()

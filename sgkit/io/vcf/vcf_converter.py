@@ -10,6 +10,7 @@ import sys
 import shutil
 import json
 import math
+import tempfile
 from typing import Any
 
 import humanize
@@ -39,6 +40,10 @@ from sgkit.io.utils import (
 # from sgkit.utils import smallest_numpy_int_dtype
 
 numcodecs.blosc.use_threads = False
+
+default_compressor = numcodecs.Blosc(
+    cname="zstd", clevel=7, shuffle=numcodecs.Blosc.AUTOSHUFFLE
+)
 
 
 def flush_futures(futures):
@@ -429,6 +434,9 @@ class PickleChunkedVcfField:
                 f"Corruption detected: incorrect number of records in {str(self.path)}."
             )
 
+    def values(self):
+        return [record for record, _ in self.iter_values_bytes()]
+
     def sanitiser_factory(self, shape):
         """
         Return a function that sanitised values from this column
@@ -661,7 +669,7 @@ class PickleChunkedVcf:
                 args=(progress_counter, total_variants, "Explode", "vars"),
                 name="progress",
                 daemon=True,
-            )  # , daemon=True)
+            )
             bar_thread.start()
 
         with cf.ProcessPoolExecutor(
@@ -839,12 +847,12 @@ class ZarrColumnSpec:
 
 @dataclasses.dataclass
 class ZarrConversionSpec:
-    # chunk_width: int
-    # chunk_length: int
+    chunk_width: int
+    chunk_length: int
     dimensions: list
-    samples: list
-    contigs: list
-    filters: list
+    sample_id: list
+    contig_id: list
+    filter_id: list
     variables: list
 
     def asdict(self):
@@ -863,29 +871,44 @@ class ZarrConversionSpec:
         # FIXME
         chunk_width = 1000
         chunk_length = 10_000
-        dimensions = ["variants", "samples", "ploidy"]
 
-        compressor = numcodecs.Blosc(
-            cname="zstd", clevel=7, shuffle=numcodecs.Blosc.AUTOSHUFFLE
-        ).get_config()
+        compressor = default_compressor.get_config()
 
-        def fixed_field_spec(name, dtype, vcf_field=None):
+        def fixed_field_spec(
+            name, dtype, vcf_field=None, shape=(m,), dimensions=("variants",)
+        ):
             return ZarrColumnSpec(
                 vcf_field=vcf_field,
                 name=name,
                 dtype=dtype,
-                shape=[m],
+                shape=shape,
                 description="",
-                dimensions=["variants"],
+                dimensions=dimensions,
                 chunks=[chunk_length],
                 compressor=compressor,
             )
+
+        # FIXME
+        max_alleles = 4
+        num_filters = len(pcvcf.metadata.filters)
 
         # # FIXME get dtype from lookup table
         colspecs = [
             fixed_field_spec(
                 name="variant_contig",
                 dtype="i2",  # FIXME
+            ),
+            fixed_field_spec(
+                name="variant_filter",
+                dtype="bool",
+                shape=(m, num_filters),
+                dimensions=["variants", "filters"],
+            ),
+            fixed_field_spec(
+                name="variant_alleles",
+                dtype="str",
+                shape=[m, max_alleles],
+                dimensions=["variants", "alleles"],
             ),
             fixed_field_spec(
                 vcf_field="POS",
@@ -908,14 +931,6 @@ class ZarrConversionSpec:
                 dtype="f4",
             ),
         ]
-        # TODO FILTERS and alleles
-        # empty_fixed_field_array("variant_filter",
-        #         shape=(m, len(vcf_metadata.filters)),
-        #         chunks=(chunk_length),
-        #         dtype=bool,
-        #         compressor=compressor,
-        #     )
-        #     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "filters"]
 
         gt_field = None
         for field in pcvcf.metadata.fields:
@@ -995,11 +1010,13 @@ class ZarrConversionSpec:
             )
 
         return ZarrConversionSpec(
+            chunk_width=chunk_width,
+            chunk_length=chunk_length,
             variables=colspecs,
-            dimensions=dimensions,
-            samples=pcvcf.metadata.samples,
-            contigs=pcvcf.metadata.contig_names,
-            filters=pcvcf.metadata.filters,
+            dimensions=["variants", "samples", "ploidy", "alleles", "filters"],
+            sample_id=pcvcf.metadata.samples,
+            contig_id=pcvcf.metadata.contig_names,
+            filter_id=pcvcf.metadata.filters,
         )
 
 
@@ -1033,47 +1050,6 @@ class SgvcfZarr:
             compressor=numcodecs.get_codec(variable.compressor),
         )
         a.attrs["_ARRAY_DIMENSIONS"] = variable.dimensions
-
-    def create_arrays(self, pcvcf, spec):
-        store = zarr.DirectoryStore(self.path)
-        num_variants = pcvcf.num_records
-        # num_samples = pcvcf.num_samples
-
-        self.root = zarr.group(store=store, overwrite=True)
-        compressor = numcodecs.Blosc(
-            cname="zstd", clevel=7, shuffle=numcodecs.Blosc.AUTOSHUFFLE
-        )
-
-        def full_array(name, data, dimensions, *, dtype=None, chunks=None):
-            a = self.root.array(
-                name,
-                data,
-                dtype=dtype,
-                chunks=chunks,
-                compressor=compressor,
-            )
-            a.attrs["_ARRAY_DIMENSIONS"] = dimensions
-            return a
-
-        self.root.attrs["filters"] = pcvcf.metadata.filters
-        # TODO move these declarations into the spec
-        full_array("filter_id", pcvcf.metadata.filters, ["filters"], dtype="str")
-        full_array("contig_id", pcvcf.metadata.contig_names, ["configs"], dtype="str")
-        full_array(
-            "sample_id",
-            pcvcf.metadata.samples,
-            ["samples"],
-            dtype="str",
-            # Add chunks when moving to spec
-        )
-
-        # if pcvcf.metadata.contig_lengths is not None:
-        #     full_array(
-        #         "contig_length",
-        #         pcvcf.metadata.contig_lengths,
-        #         ["configs"],
-        #         dtype=np.int64,
-        #     )
 
     def encode_column(self, pcvcf, column):
         source_col = pcvcf.columns[column.vcf_field]
@@ -1153,10 +1129,102 @@ class SgvcfZarr:
                     )
             flush_futures(futures)
 
+    def encode_alleles(self, pcvcf):
+        ref_col = pcvcf.columns["REF"]
+        alt_col = pcvcf.columns["ALT"]
+        ref_values = ref_col.values()
+        alt_values = alt_col.values()
+        allele_array = self.root["variant_alleles"]
+
+        # We could do this chunk-by-chunk, but it doesn't seem worth the bother.
+        alleles = np.full(allele_array.shape, "", dtype="O")
+        for j, (ref, alt) in enumerate(zip(ref_values, alt_values)):
+            alleles[j, 0] = ref
+            alleles[j, 1 : 1 + len(alt)] = alt
+        allele_array[:] = alleles
+
+        with progress_counter.get_lock():
+            for col in [ref_col, alt_col]:
+                progress_counter.value += col.vcf_field.summary.uncompressed_size
+
+    def encode_samples(self, pcvcf, sample_id, chunk_width):
+        if not np.array_equal(sample_id, pcvcf.metadata.samples):
+            raise ValueError("Subsetting or reordering samples not supported currently")
+        array = self.root.array(
+            "sample_id",
+            sample_id,
+            dtype="str",
+            compressor=default_compressor,
+            chunks=(chunk_width,),
+        )
+        array.attrs["_ARRAY_DIMENSIONS"] = ["samples"]
+
+    def encode_contig(self, pcvcf, contig_names):
+        array = self.root.array(
+            "variant_contig_names",
+            contig_names,
+            dtype="str",
+            compressor=default_compressor,
+        )
+        array.attrs["_ARRAY_DIMENSIONS"] = ["contig"]
+
+        # TODO add contig_lengths
+        # if pcvcf.metadata.contig_lengths is not None:
+        #     full_array(
+        #         "contig_length",
+        #         pcvcf.metadata.contig_lengths,
+        #         ["configs"],
+        #         dtype=np.int64,
+        #     )
+
+        col = pcvcf.columns["CHROM"]
+        array = self.root["variant_contig"]
+        buff = np.zeros_like(array)
+        lookup = {v: j for j, v in enumerate(contig_names)}
+        for j, contig in enumerate(col.values()):
+            try:
+                buff[j] = lookup[contig]
+            except KeyError:
+                # TODO add advice about adding it to the spec
+                raise ValueError(f"Contig '{contig}' was not defined in the header.")
+
+        with progress_counter.get_lock():
+            progress_counter.value += col.vcf_field.summary.uncompressed_size
+
+    def encode_filters(self, pcvcf, filter_names):
+        self.root.attrs["filters"] = filter_names
+        array = self.root.array(
+            "filter_id",
+            filter_names,
+            dtype="str",
+            compressor=default_compressor,
+        )
+        array.attrs["_ARRAY_DIMENSIONS"] = ["filters"]
+
+        col = pcvcf.columns["FILTERS"]
+        array = self.root["variant_filter"]
+        buff = np.zeros_like(array)
+
+        lookup = {v: j for j, v in enumerate(filter_names)}
+
+        for j, filters in enumerate(col.values()):
+            try:
+                for f in filters:
+                    buff[j, lookup[f]] = True
+            except IndexError:
+                raise ValueError(f"Filter '{f}' was not defined in the header.")
+
+        with progress_counter.get_lock():
+            progress_counter.value += col.vcf_field.summary.uncompressed_size
+
     @staticmethod
-    def convert(pcvcf, path, conversion_spec, show_progress=False):
+    def convert(
+        pcvcf, path, conversion_spec, *, worker_processes=1, show_progress=False
+    ):
+        store = zarr.DirectoryStore(path)
+        # FIXME
         sgvcf = SgvcfZarr(path)
-        sgvcf.create_arrays(pcvcf, conversion_spec)
+        sgvcf.root = zarr.group(store=store, overwrite=True)
 
         for variable in conversion_spec.variables[:]:
             sgvcf.create_array(variable)
@@ -1166,40 +1234,51 @@ class SgvcfZarr:
 
         # start update progress bar process
         bar_thread = None
-        # show_progress = False
         if show_progress:
             bar_thread = threading.Thread(
                 target=update_bar,
                 args=(progress_counter, pcvcf.total_uncompressed_bytes, "Encode", "b"),
                 name="progress",
                 daemon=True,
-            )  # , daemon=True)
+            )
             bar_thread.start()
 
         with cf.ProcessPoolExecutor(
-            max_workers=16,
+            max_workers=worker_processes,
             initializer=init_workers,
             initargs=(progress_counter,),
         ) as executor:
-            futures = []
-
-            special_cases = {}
+            futures = [
+                executor.submit(
+                    sgvcf.encode_samples,
+                    pcvcf,
+                    conversion_spec.sample_id,
+                    conversion_spec.chunk_width,
+                ),
+                executor.submit(sgvcf.encode_alleles, pcvcf),
+                executor.submit(sgvcf.encode_contig, pcvcf, conversion_spec.contig_id),
+                executor.submit(sgvcf.encode_filters, pcvcf, conversion_spec.filter_id),
+            ]
+            has_gt = False
             for variable in conversion_spec.variables[:]:
-                # TODO change this variable to array_name or something, this is
-                # getting very confusing.
-
                 if variable.vcf_field is not None:
                     # print("Encode", variable.name)
                     future = executor.submit(sgvcf.encode_column, pcvcf, variable)
                     futures.append(future)
                 else:
-                    special_cases[variable.name] = variable
-
-            if "call_genotype" in special_cases:
+                    if variable.name == "call_genotype":
+                        has_gt = True
+            if has_gt:
                 # TODO add mixed ploidy
                 futures.append(executor.submit(sgvcf.encode_genotypes, pcvcf))
 
             flush_futures(futures)
+
+        zarr.consolidate_metadata(path)
+        # FIXME can't join the bar_thread because we never get to the correct
+        # number of bytes
+        # if bar_thread is not None:
+        #     bar_thread.join()
 
 
 def sync_flush_array(np_buffer, zarr_array, offset):
@@ -1240,89 +1319,21 @@ def async_flush_2d_array(executor, np_buffer, zarr_array, offset):
     return futures
 
 
-# def finalise_zarr(path, spec, chunk_length, chunk_width):
-#     store = zarr.DirectoryStore(path)
-#     root = zarr.group(store=store, overwrite=False)
-#     compressor = numcodecs.Blosc(
-#         cname="zstd", clevel=7, shuffle=numcodecs.Blosc.AUTOSHUFFLE
-#     )
-#     tmp_dir = path / "tmp"
-#     m = sum(partition.num_records for partition in spec.partitions)
-#     n = len(spec.vcf_metadata.samples)
+def convert_vcf(vcfs, out_path, worker_processes=1, show_progress=False):
+    with tempfile.TemporaryDirectory() as intermediate_form_dir:
+        explode(
+            vcfs,
+            intermediate_form_dir,
+            worker_processes=worker_processes,
+            show_progress=show_progress,
+        )
 
-#     py_alleles = join_partitioned_lists(tmp_dir / "variant_allele", spec.partitions)
-#     assert len(py_alleles) == m
-#     max_num_alleles = 0
-#     for row in py_alleles:
-#         max_num_alleles = max(max_num_alleles, len(row))
-
-#     variant_allele = np.full((m, max_num_alleles), "", dtype="O")
-#     for j, row in enumerate(py_alleles):
-#         variant_allele[j, : len(row)] = row
-
-#     a = root.array(
-#         "variant_allele",
-#         variant_allele,
-#         chunks=(chunk_length,),
-#         dtype="str",
-#         compressor=compressor,
-#     )
-#     a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "alleles"]
-
-#     for field in vcf_metadata.info_fields:
-#         if not field.is_fixed_size:
-#             # print("Write", field.variable_name)
-#             py_array = join_partitioned_lists(tmp_dir / field.variable_name, partitions)
-#             # if field.vcf_number == ".":
-#             max_len = 0
-#             for row in py_array:
-#                 max_len = max(max_len, len(row))
-#             shape = (m, max_len)
-#             a = root.empty(
-#                 field.variable_name,
-#                 shape=shape,
-#                 chunks=(chunk_length),
-#                 dtype=field.dtype,
-#                 compressor=compressor,
-#             )
-#             a.attrs["_ARRAY_DIMENSIONS"] = ["variants", field.name]
-#             # print(a)
-#             np_array = np.full(
-#                 (m, max_len), _dtype_to_fill[a.dtype.str], dtype=field.dtype
-#             )
-#             for j, row in enumerate(py_array):
-#                 np_array[j, : len(row)] = row
-#             a[:] = np_array
-
-#             # print(field)
-#             # print(np_array)
-#             # np_array = np.array(py_array, dtype=field.dtype)
-#             # print(np_array)
-
-#     import datetime
-
-#     for field in vcf_metadata.format_fields:
-#         if not field.is_fixed_size:
-#             print(
-#                 "Write", field.variable_name, field.vcf_number, datetime.datetime.now()
-#             )
-#             # py_array = join_partitioned_lists(tmp_dir / field.variable_name, partitions)
-#             field_dir = tmp_dir / field.variable_name
-#             dim3, max_value = scan_2d_chunks(field_dir, partitions)
-#             shape = (m, n, dim3)
-#             # print(shape)
-#             # print("max_value ", max_value)
-#             dtype = field.dtype
-#             if field.vcf_type == "Integer":
-#                 dtype = smallest_numpy_int_dtype(max_value)
-#             a = root.empty(
-#                 field.variable_name,
-#                 shape=shape,
-#                 chunks=(chunk_length, chunk_width),
-#                 dtype=dtype,
-#                 compressor=compressor,
-#             )
-#             a.attrs["_ARRAY_DIMENSIONS"] = ["variants", "samples", field.name]
-#             encode_pickle_chunked_array(a, field_dir, partitions)
-
-#     zarr.consolidate_metadata(path)
+        pcvcf = PickleChunkedVcf.load(intermediate_form_dir)
+        spec = ZarrConversionSpec.generate(pcvcf)
+        SgvcfZarr.convert(
+            pcvcf,
+            out_path,
+            conversion_spec=spec,
+            worker_processes=worker_processes,
+            show_progress=show_progress,
+        )
