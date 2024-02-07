@@ -92,9 +92,6 @@ def test_vcf_to_zarr__small_vcf(
             path, chunk_length=5, chunk_width=2, fields=fields, field_defs=field_defs
         )
 
-    print(ds)
-    print(ds.variant_NS)
-
     assert_array_equal(ds["filter_id"], ["PASS", "s50", "q10"])
     assert_array_equal(
         ds["variant_filter"],
@@ -132,10 +129,6 @@ def test_vcf_to_zarr__small_vcf(
     )
     assert ds["variant_NS"].chunks[0][0] == 5
 
-    # assert_array_equal(
-    #     ds["variant_AN"],
-    #     [-2, -2, -2, -2, -2, -2, 6, -2, -2],
-    # )
     assert_array_equal(
         ds["variant_AN"],
         [-1, -1, -1, -1, -1, -1, 6, -1, -1],
@@ -277,19 +270,19 @@ def test_vcf_to_zarr__small_vcf(
         [[58, 50], [65, 3], [-1, -1]],
         [[23, 27], [18, 2], [-1, -1]],
         [[56, 60], [51, 51], [-1, -1]],
-        [[-2, -2], [-2, -2], [-2, -2]],
-        [[-2, -2], [-2, -2], [-2, -2]],
-        [[-2, -2], [-2, -2], [-2, -2]],
+        [[-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1]],
     ]
 
-    # print(np.array2string(ds["call_genotype_mask"].values, separator=","))
+    # print(np.array2string(ds["call_HQ"].values, separator=","))
+    # print(np.array2string(ds["call_genotype"].values < 0, separator=","))
 
     assert_array_equal(ds["call_genotype"], call_genotype)
-    print("FIXME")
-    # assert_array_equal(ds["call_genotype_mask"], call_genotype < 0)
+    assert_array_equal(ds["call_genotype_mask"], call_genotype < 0)
     assert_array_equal(ds["call_genotype_phased"], call_genotype_phased)
-    # assert_array_equal(ds["call_DP"], call_DP)
-    # assert_array_equal(ds["call_HQ"], call_HQ)
+    assert_array_equal(ds["call_DP"], call_DP)
+    assert_array_equal(ds["call_HQ"], call_HQ)
 
     for name in ["call_genotype", "call_genotype_mask", "call_HQ"]:
         assert ds[name].chunks == ((5, 4), (2, 1), (2,))

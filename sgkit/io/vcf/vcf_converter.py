@@ -349,11 +349,11 @@ def sanitise_value_float_2d(buff, j, value):
 
 
 def sanitise_int_array(value, ndmin, dtype):
-    value = np.array(value, ndmin=ndmin, dtype=dtype, copy=False)
-    # FIXME
-    value[value == (MIN_INT_VALUE - 2)] = -1
-    value[value == (MIN_INT_VALUE - 1)] = -2
-    return value
+    value = np.array(value, ndmin=ndmin, copy=False)
+    value[value == VCF_INT_MISSING] = -1
+    value[value == VCF_INT_FILL] = -2
+    # TODO watch out for clipping here!
+    return value.astype(dtype)
 
 
 def sanitise_value_int_1d(buff, j, value):
@@ -396,9 +396,6 @@ class PickleChunkedVcfField:
             n = len(list(partition_path.iterdir()))
             self.partition_num_chunks[partition_index] = n
         return self.partition_num_chunks[partition_index]
-
-    def is_numeric(self):
-        return self.vcf_field.vcf_type in ("Integer", "Float")
 
     def __repr__(self):
         # TODO add class name
@@ -474,9 +471,6 @@ class PickleChunkedVcfField:
             else:
                 return sanitise_value_string_2d
 
-            print(shape)
-
-        # return ret
 
 
 def update_bounds_float(summary, value, number_dim):
@@ -493,15 +487,17 @@ def update_bounds_float(summary, value, number_dim):
 
 
 MIN_INT_VALUE = np.iinfo(np.int32).min + 2
+VCF_INT_MISSING = np.iinfo(np.int32).min
+VCF_INT_FILL = np.iinfo(np.int32).min + 1
 
 
 def update_bounds_integer(summary, value, number_dim):
     # print("update bounds int", summary, value)
     value = np.array(value, dtype=np.int32, copy=False)
     # Mask out missing and fill values
-    value[value < MIN_INT_VALUE] = 0
-    summary.max_value = int(max(summary.max_value, np.max(value)))
-    summary.min_value = int(min(summary.min_value, np.min(value)))
+    a = value[value >= MIN_INT_VALUE]
+    summary.max_value = int(max(summary.max_value, np.max(a)))
+    summary.min_value = int(min(summary.min_value, np.min(a)))
     number = 0
     assert len(value.shape) <= number_dim + 1
     if len(value.shape) == number_dim + 1:
@@ -857,6 +853,7 @@ class ZarrConversionSpec:
     dimensions: list
     sample_id: list
     contig_id: list
+    contig_length: list
     filter_id: list
     variables: list
 
@@ -895,8 +892,8 @@ class ZarrConversionSpec:
                 compressor=compressor,
             )
 
-        # FIXME
-        max_alleles = 4
+        alt_col = pcvcf.columns["ALT"]
+        max_alleles = alt_col.vcf_field.summary.max_number + 1
         num_filters = len(pcvcf.metadata.filters)
 
         # # FIXME get dtype from lookup table
@@ -1023,6 +1020,7 @@ class ZarrConversionSpec:
             dimensions=["variants", "samples", "ploidy", "alleles", "filters"],
             sample_id=pcvcf.metadata.samples,
             contig_id=pcvcf.metadata.contig_names,
+            contig_length=pcvcf.metadata.contig_lengths,
             filter_id=pcvcf.metadata.filters,
         )
 
@@ -1064,7 +1062,6 @@ class SgvcfZarr:
         ba = BufferedArray(array)
         sanitiser = source_col.sanitiser_factory(ba.buff.shape)
         chunk_length = array.chunks[0]
-        # num_variants = array.shape[0]
 
         with cf.ThreadPoolExecutor(max_workers=4) as executor:
             futures = []
@@ -1111,8 +1108,9 @@ class SgvcfZarr:
             for value, bytes_read in source_col.iter_values_bytes():
                 sanitise_value_int_2d(gt.buff, j, value[:, :-1])
                 sanitise_value_int_1d(gt_phased.buff, j, value[:, -1])
-                # FIXME set gt-mask
-                # gt_mask.buff[j: len(value) - 1] =
+                # TODO check is this the correct semantics when we are padding
+                # with mixed ploidies?
+                gt_mask.buff[j] = gt.buff[j] < 0
 
                 j += 1
                 if j == chunk_length:
@@ -1167,23 +1165,22 @@ class SgvcfZarr:
         )
         array.attrs["_ARRAY_DIMENSIONS"] = ["samples"]
 
-    def encode_contig(self, pcvcf, contig_names):
+    def encode_contig(self, pcvcf, contig_names, contig_lengths):
         array = self.root.array(
             "contig_id",
             contig_names,
             dtype="str",
             compressor=default_compressor,
         )
-        array.attrs["_ARRAY_DIMENSIONS"] = ["contig"]
+        array.attrs["_ARRAY_DIMENSIONS"] = ["contigs"]
 
-        # TODO add contig_lengths
-        # if pcvcf.metadata.contig_lengths is not None:
-        #     full_array(
-        #         "contig_length",
-        #         pcvcf.metadata.contig_lengths,
-        #         ["configs"],
-        #         dtype=np.int64,
-        #     )
+        if contig_lengths is not None:
+            array = self.root.array(
+                "contig_length",
+                contig_lengths,
+                dtype=np.int64,
+            )
+            array.attrs["_ARRAY_DIMENSIONS"] = ["contigs"]
 
         col = pcvcf.columns["CHROM"]
         array = self.root["variant_contig"]
@@ -1288,7 +1285,8 @@ class SgvcfZarr:
                 ),
                 executor.submit(sgvcf.encode_alleles, pcvcf),
                 executor.submit(sgvcf.encode_id, pcvcf),
-                executor.submit(sgvcf.encode_contig, pcvcf, conversion_spec.contig_id),
+                executor.submit(sgvcf.encode_contig, pcvcf, conversion_spec.contig_id,
+                    conversion_spec.contig_length),
                 executor.submit(sgvcf.encode_filters, pcvcf, conversion_spec.filter_id),
             ]
             has_gt = False
