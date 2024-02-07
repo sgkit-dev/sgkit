@@ -57,7 +57,6 @@ def genspec(columnarised):
     json.dump(spec.asdict(), stream, indent=4)
 
 
-
 @click.command
 @click.argument("columnarised", type=click.Path())
 @click.argument("zarr_path", type=click.Path())
@@ -86,6 +85,23 @@ def convert(vcfs, out_path):
     cnv.convert_vcf(vcfs, out_path, show_progress=True)
 
 
+@click.command
+@click.argument("plink", type=click.Path())
+@click.argument("out_path", type=click.Path())
+@click.option("-p", "--worker-processes", type=int, default=1)
+@click.option("--chunk-width", type=int, default=None)
+@click.option("--chunk-length", type=int, default=None)
+def convert_plink(plink, out_path, worker_processes, chunk_width, chunk_length):
+    cnv.convert_plink(
+        plink,
+        out_path,
+        show_progress=True,
+        worker_processes=worker_processes,
+        chunk_width=chunk_width,
+        chunk_length=chunk_length,
+    )
+
+
 @click.group()
 def cli():
     pass
@@ -96,6 +112,7 @@ cli.add_command(summarise)
 cli.add_command(genspec)
 cli.add_command(to_zarr)
 cli.add_command(convert)
+cli.add_command(convert_plink)
 
 if __name__ == "__main__":
     cli()
