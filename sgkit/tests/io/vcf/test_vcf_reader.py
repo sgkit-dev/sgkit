@@ -1856,10 +1856,12 @@ def test_compare_vcf_to_zarr_convert(shared_datadir, tmp_path, vcf_name):
     # input for
     convert_vcf([vcf_path], zarr2_path)
     ds2 = load_dataset(zarr2_path)
-    vcf_to_zarr(vcf_path, zarr1_path, max_alt_alleles=ds2.variant_allele.shape[1] - 1)
+    vcf_to_zarr(vcf_path, zarr1_path, mixed_ploidy=True, max_alt_alleles=ds2.variant_allele.shape[1] - 1)
     ds1 = load_dataset(zarr1_path)
 
     # convert reads all variables by default.
     base_vars = list(ds1)
     ds2 = load_dataset(zarr2_path)
+    # print(ds1.call_genotype.values)
+    # print(ds2.call_genotype.values)
     xr.testing.assert_equal(ds1, ds2[base_vars])

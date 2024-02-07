@@ -138,10 +138,11 @@ class VcfField:
             ret = "bool"
         else:
             assert self.vcf_type == "String"
-            if s.max_number == 0:
-                ret = "str"
-            else:
-                ret = "O"
+            ret = "str"
+            # if s.max_number == 0:
+            #     ret = "str"
+            # else:
+            #     ret = "O"
         # print("smallest dtype", self.name, self.vcf_type,":", ret)
         return ret
 
