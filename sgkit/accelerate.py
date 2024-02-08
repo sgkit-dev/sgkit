@@ -3,7 +3,7 @@ from typing import Callable
 
 from numba import guvectorize, jit
 
-_DISABLE_CACHE = os.environ.get("SGKIT_DISABLE_NUMBA_CACHE", "0")
+_DISABLE_CACHE = os.environ.get("SGKIT_DISABLE_NUMBA_CACHE", "1")
 
 try:
     CACHE_NUMBA = {"0": True, "1": False}[_DISABLE_CACHE]
