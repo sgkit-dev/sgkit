@@ -9,10 +9,18 @@ import pytest
 import xarray as xr
 import zarr
 from numcodecs import Blosc, Delta, FixedScaleOffset, PackBits, VLenUTF8
-from numpy.testing import assert_allclose, assert_array_equal
+from numpy.testing import assert_allclose, assert_array_almost_equal, assert_array_equal
 
 from sgkit import load_dataset, save_dataset
-from sgkit.io.utils import FLOAT32_FILL, INT_FILL, INT_MISSING
+from sgkit.io.utils import (
+    FLOAT32_FILL,
+    FLOAT32_MISSING,
+    FLOAT32_MISSING_AS_INT32,
+    INT_FILL,
+    INT_MISSING,
+    STR_FILL,
+    STR_MISSING,
+)
 from sgkit.io.vcf import (
     MaxAltAllelesExceededWarning,
     partition_into_regions,
@@ -46,46 +54,170 @@ def test_vcf_to_zarr__small_vcf(
     path = path_for_test(shared_datadir, "sample.vcf.gz", is_path)
     output = tmp_path.joinpath("vcf.zarr").as_posix()
 
+    fields = [
+        "INFO/NS",
+        "INFO/AN",
+        "INFO/AA",
+        "INFO/DB",
+        "INFO/AC",
+        "INFO/AF",
+        "FORMAT/GT",
+        "FORMAT/DP",
+        "FORMAT/HQ",
+    ]
+    field_defs = {
+        "FORMAT/HQ": {"dimension": "ploidy"},
+        "INFO/AF": {"Number": "2", "dimension": "AF"},
+        "INFO/AC": {"Number": "2", "dimension": "AC"},
+    }
     if to_zarr:
         vcf_to_zarr(
             path,
             output,
+            max_alt_alleles=3,
             chunk_length=5,
             chunk_width=2,
             read_chunk_length=read_chunk_length,
+            fields=fields,
+            field_defs=field_defs,
         )
         ds = xr.open_zarr(output)
     else:
-        ds = read_vcf(path, chunk_length=5, chunk_width=2)
+        ds = read_vcf(
+            path, chunk_length=5, chunk_width=2, fields=fields, field_defs=field_defs
+        )
 
+    assert_array_equal(ds["filter_id"], ["PASS", "s50", "q10"])
+    assert_array_equal(
+        ds["variant_filter"],
+        [
+            [False, False, False],
+            [False, False, False],
+            [True, False, False],
+            [False, False, True],
+            [True, False, False],
+            [True, False, False],
+            [True, False, False],
+            [False, False, False],
+            [True, False, False],
+        ],
+    )
     assert_array_equal(ds["contig_id"], ["19", "20", "X"])
     assert "contig_length" not in ds
     assert_array_equal(ds["variant_contig"], [0, 0, 1, 1, 1, 1, 1, 1, 2])
     assert ds["variant_contig"].chunks[0][0] == 5
+
     assert_array_equal(
         ds["variant_position"],
         [111, 112, 14370, 17330, 1110696, 1230237, 1234567, 1235237, 10],
     )
     assert ds["variant_position"].chunks[0][0] == 5
+
+    im = INT_MISSING
+    fm = FLOAT32_MISSING
+    ff = FLOAT32_FILL
+    sm = STR_MISSING
+    sf = STR_FILL
+
+    assert_array_equal(
+        ds["variant_NS"],
+        [im, im, 3, 3, 2, 3, 3, im, im],
+    )
+    assert ds["variant_NS"].chunks[0][0] == 5
+
+    assert_array_equal(
+        ds["variant_AN"],
+        [im, im, im, im, im, im, 6, im, im],
+    )
+    assert ds["variant_AN"].chunks[0][0] == 5
+
+    assert_array_equal(
+        ds["variant_AA"],
+        [
+            sm,
+            sm,
+            sm,
+            sm,
+            "T",
+            "T",
+            "G",
+            sm,
+            sm,
+        ],
+    )
+    assert ds["variant_AN"].chunks[0][0] == 5
+
+    assert_array_equal(
+        ds["variant_DB"],
+        [
+            False,
+            False,
+            True,
+            False,
+            True,
+            False,
+            False,
+            False,
+            False,
+        ],
+    )
+    assert ds["variant_AN"].chunks[0][0] == 5
+
+    variant_AF = np.array(
+        [
+            [fm, fm],
+            [fm, fm],
+            [0.5, ff],
+            [0.017, ff],
+            [0.333, 0.667],
+            [fm, fm],
+            [fm, fm],
+            [fm, fm],
+            [fm, fm],
+        ],
+        dtype=np.float32,
+    )
+    values = ds["variant_AF"].values
+    assert_array_almost_equal(values, variant_AF, 3)
+    nans = np.isnan(variant_AF)
+    assert_array_equal(variant_AF.view(np.int32)[nans], values.view(np.int32)[nans])
+    assert ds["variant_AF"].chunks[0][0] == 5
+
+    assert_array_equal(
+        ds["variant_AC"],
+        [
+            [im, im],
+            [im, im],
+            [im, im],
+            [im, im],
+            [im, im],
+            [im, im],
+            [3, 1],
+            [im, im],
+            [im, im],
+        ],
+    )
+    assert ds["variant_AC"].chunks[0][0] == 5
+
     assert_array_equal(
         ds["variant_allele"].values.tolist(),
         [
-            ["A", "C", "", ""],
-            ["A", "G", "", ""],
-            ["G", "A", "", ""],
-            ["T", "A", "", ""],
-            ["A", "G", "T", ""],
-            ["T", "", "", ""],
-            ["G", "GA", "GAC", ""],
-            ["T", "", "", ""],
+            ["A", "C", sf, sf],
+            ["A", "G", sf, sf],
+            ["G", "A", sf, sf],
+            ["T", "A", sf, sf],
+            ["A", "G", "T", sf],
+            ["T", sf, sf, sf],
+            ["G", "GA", "GAC", sf],
+            ["T", sf, sf, sf],
             ["AC", "A", "ATG", "C"],
         ],
     )
     assert ds["variant_allele"].chunks[0][0] == 5
     assert ds["variant_allele"].dtype == "O"
     assert_array_equal(
-        ds["variant_id"],
-        [".", ".", "rs6054257", ".", "rs6040355", ".", "microsat1", ".", "rsTest"],
+        ds["variant_id"].values.tolist(),
+        [sm, sm, "rs6054257", sm, "rs6040355", sm, "microsat1", sm, "rsTest"],
     )
     assert ds["variant_id"].chunks[0][0] == 5
     assert ds["variant_id"].dtype == "O"
@@ -106,9 +238,9 @@ def test_vcf_to_zarr__small_vcf(
             [[0, 0], [0, 1], [0, 0]],
             [[1, 2], [2, 1], [2, 2]],
             [[0, 0], [0, 0], [0, 0]],
-            [[0, 1], [0, 2], [-1, -1]],
-            [[0, 0], [0, 0], [-1, -1]],
-            [[0, -1], [0, 1], [0, 2]],
+            [[0, 1], [0, 2], [im, im]],
+            [[0, 0], [0, 0], [im, im]],
+            [[0, im], [0, 1], [0, 2]],
         ],
         dtype="i1",
     )
@@ -126,18 +258,40 @@ def test_vcf_to_zarr__small_vcf(
         ],
         dtype=bool,
     )
+    call_DP = [
+        [im, im, im],
+        [im, im, im],
+        [1, 8, 5],
+        [3, 5, 3],
+        [6, 0, 4],
+        [im, 4, 2],
+        [4, 2, 3],
+        [im, im, im],
+        [im, im, im],
+    ]
+    call_HQ = [
+        [[10, 15], [10, 10], [3, 3]],
+        [[10, 10], [10, 10], [3, 3]],
+        [[51, 51], [51, 51], [im, im]],
+        [[58, 50], [65, 3], [im, im]],
+        [[23, 27], [18, 2], [im, im]],
+        [[56, 60], [51, 51], [im, im]],
+        [[im, im], [im, im], [im, im]],
+        [[im, im], [im, im], [im, im]],
+        [[im, im], [im, im], [im, im]],
+    ]
+
     assert_array_equal(ds["call_genotype"], call_genotype)
-    assert ds["call_genotype"].chunks[0][0] == 5
-    assert ds["call_genotype"].chunks[1][0] == 2
-    assert ds["call_genotype"].chunks[2][0] == 2
     assert_array_equal(ds["call_genotype_mask"], call_genotype < 0)
-    assert ds["call_genotype_mask"].chunks[0][0] == 5
-    assert ds["call_genotype_mask"].chunks[1][0] == 2
-    assert ds["call_genotype_mask"].chunks[2][0] == 2
     assert_array_equal(ds["call_genotype_phased"], call_genotype_phased)
-    assert ds["call_genotype_mask"].chunks[0][0] == 5
-    assert ds["call_genotype_mask"].chunks[1][0] == 2
-    assert ds["call_genotype_mask"].chunks[2][0] == 2
+    assert_array_equal(ds["call_DP"], call_DP)
+    assert_array_equal(ds["call_HQ"], call_HQ)
+
+    for name in ["call_genotype", "call_genotype_mask", "call_HQ"]:
+        assert ds[name].chunks == ((5, 4), (2, 1), (2,))
+
+    for name in ["call_genotype_phased", "call_DP"]:
+        assert ds[name].chunks == ((5, 4), (2, 1))
 
     # save and load again to test https://github.com/pydata/xarray/issues/3476
     path2 = tmp_path / "ds2.zarr"
@@ -892,13 +1046,19 @@ def test_vcf_to_zarr__fields(shared_datadir, tmp_path):
     )
     ds = xr.open_zarr(output)
 
-    missing, fill = INT_MISSING, INT_FILL
-    assert_array_equal(ds["variant_DP"], [fill, fill, 14, 11, 10, 13, 9, fill, fill])
+    imissing = INT_MISSING
+    assert_array_equal(
+        ds["variant_DP"], [imissing, imissing, 14, 11, 10, 13, 9, imissing, imissing]
+    )
     assert ds["variant_DP"].attrs["comment"] == "Total Depth"
 
+    smissing = STR_MISSING
     assert_array_equal(
         ds["variant_AA"],
-        np.array(["", "", "", "", "T", "T", "G", "", ""], dtype="O"),
+        np.array(
+            [smissing, smissing, smissing, smissing, "T", "T", "G", smissing, smissing],
+            dtype="O",
+        ),
     )
     assert ds["variant_AA"].attrs["comment"] == "Ancestral Allele"
 
@@ -909,15 +1069,15 @@ def test_vcf_to_zarr__fields(shared_datadir, tmp_path):
 
     dp = np.array(
         [
-            [fill, fill, fill],
-            [fill, fill, fill],
+            [imissing, imissing, imissing],
+            [imissing, imissing, imissing],
             [1, 8, 5],
             [3, 5, 3],
             [6, 0, 4],
-            [missing, 4, 2],
+            [imissing, 4, 2],
             [4, 2, 3],
-            [fill, fill, fill],
-            [fill, fill, fill],
+            [imissing, imissing, imissing],
+            [imissing, imissing, imissing],
         ],
         dtype="i4",
     )
@@ -945,29 +1105,32 @@ def test_vcf_to_zarr__parallel_with_fields(shared_datadir, tmp_path):
     ds = ds.set_index(variants=("variant_contig", "variant_position")).sel(
         variants=slice((0, 10001661), (0, 10001670))
     )
-
+    sfill = STR_FILL
+    smissing = STR_MISSING
     # check strings have not been truncated after concat_zarrs
     assert_array_equal(
         ds["variant_allele"],
         np.array(
             [
-                ["T", "C", "<NON_REF>", ""],
-                ["T", "<NON_REF>", "", ""],
-                ["T", "G", "<NON_REF>", ""],
+                ["T", "C", "<NON_REF>", sfill],
+                ["T", "<NON_REF>", sfill, sfill],
+                ["T", "G", "<NON_REF>", sfill],
             ],
             dtype="O",
         ),
     )
 
     # convert floats to ints to check nan type
-    fill = FLOAT32_FILL
+    fmissing = FLOAT32_MISSING
     assert_allclose(
         ds["variant_MQ"].values.view("i4"),
-        np.array([58.33, fill, 57.45], dtype="f4").view("i4"),
+        np.array([58.33, fmissing, 57.45], dtype="f4").view("i4"),
     )
     assert ds["variant_MQ"].attrs["comment"] == "RMS Mapping Quality"
 
-    assert_array_equal(ds["call_PGT"], np.array([["0|1"], [""], ["0|1"]], dtype="O"))
+    assert_array_equal(
+        ds["call_PGT"], np.array([["0|1"], [smissing], ["0|1"]], dtype="O")
+    )
     assert (
         ds["call_PGT"].attrs["comment"]
         == "Physical phasing haplotype information, describing how the alternate alleles are phased in relation to one another"
@@ -986,8 +1149,10 @@ def test_vcf_to_zarr__field_defs(shared_datadir, tmp_path):
     )
     ds = xr.open_zarr(output)
 
-    fill = INT_FILL
-    assert_array_equal(ds["variant_DP"], [fill, fill, 14, 11, 10, 13, 9, fill, fill])
+    imissing = INT_MISSING
+    assert_array_equal(
+        ds["variant_DP"], [imissing, imissing, 14, 11, 10, 13, 9, imissing, imissing]
+    )
     assert ds["variant_DP"].attrs["comment"] == "Combined depth across samples"
 
     vcf_to_zarr(
@@ -998,7 +1163,9 @@ def test_vcf_to_zarr__field_defs(shared_datadir, tmp_path):
     )
     ds = xr.open_zarr(output)
 
-    assert_array_equal(ds["variant_DP"], [fill, fill, 14, 11, 10, 13, 9, fill, fill])
+    assert_array_equal(
+        ds["variant_DP"], [imissing, imissing, 14, 11, 10, 13, 9, imissing, imissing]
+    )
     assert "comment" not in ds["variant_DP"].attrs
 
 
@@ -1016,19 +1183,19 @@ def test_vcf_to_zarr__field_number_A(shared_datadir, tmp_path):
     )
     ds = xr.open_zarr(output)
 
-    fill = INT_FILL
+    imissing = INT_MISSING
     assert_array_equal(
         ds["variant_AC"],
         [
-            [fill, fill],
-            [fill, fill],
-            [fill, fill],
-            [fill, fill],
-            [fill, fill],
-            [fill, fill],
+            [imissing, imissing],
+            [imissing, imissing],
+            [imissing, imissing],
+            [imissing, imissing],
+            [imissing, imissing],
+            [imissing, imissing],
             [3, 1],
-            [fill, fill],
-            [fill, fill],
+            [imissing, imissing],
+            [imissing, imissing],
         ],
     )
     assert (
@@ -1055,13 +1222,14 @@ def test_vcf_to_zarr__field_number_R(shared_datadir, tmp_path):
         variants=slice(10002764, 10002793)
     )
 
-    fill = INT_FILL
+    ifill = INT_FILL
+    imissing = INT_MISSING
     ad = np.array(
         [
-            [[40, 14, 0, fill]],
-            [[fill, fill, fill, fill]],
+            [[40, 14, 0, ifill]],
+            [[imissing, imissing, imissing, imissing]],
             [[65, 8, 5, 0]],
-            [[fill, fill, fill, fill]],
+            [[imissing, imissing, imissing, imissing]],
         ],
     )
     assert_array_equal(ds["call_AD"], ad)
@@ -1140,7 +1308,7 @@ def test_vcf_to_zarr__field_number_fixed(shared_datadir, tmp_path):
     )
     ds = xr.open_zarr(output)
 
-    missing, fill = INT_MISSING, INT_FILL
+    missing = INT_MISSING
     assert_array_equal(
         ds["call_HQ"],
         [
@@ -1150,9 +1318,9 @@ def test_vcf_to_zarr__field_number_fixed(shared_datadir, tmp_path):
             [[58, 50], [65, 3], [missing, missing]],
             [[23, 27], [18, 2], [missing, missing]],
             [[56, 60], [51, 51], [missing, missing]],
-            [[fill, fill], [fill, fill], [fill, fill]],
-            [[fill, fill], [fill, fill], [fill, fill]],
-            [[fill, fill], [fill, fill], [fill, fill]],
+            [[missing, missing], [missing, missing], [missing, missing]],
+            [[missing, missing], [missing, missing], [missing, missing]],
+            [[missing, missing], [missing, missing], [missing, missing]],
         ],
     )
     assert ds["call_HQ"].dims == ("variants", "samples", "FORMAT_HQ_dim")
@@ -1560,7 +1728,7 @@ def test_spec(shared_datadir, tmp_path):
     )
     assert (
         group["variant_quality"][:].view(np.int32)[7]
-        == np.array([0x7F800001], dtype=np.int32).item()
+        == np.array([FLOAT32_MISSING_AS_INT32], dtype=np.int32).item()
     )  # missing nan
     assert_array_equal(
         group["variant_filter"],
@@ -1579,21 +1747,21 @@ def test_spec(shared_datadir, tmp_path):
 
     assert_array_equal(
         group["variant_NS"],
-        [INT_FILL, INT_FILL, 3, 3, 2, 3, 3, INT_FILL, INT_FILL],
+        [INT_MISSING, INT_MISSING, 3, 3, 2, 3, 3, INT_MISSING, INT_MISSING],
     )
 
     assert_array_equal(
         group["call_DP"],
         [
-            [INT_FILL, INT_FILL, INT_FILL],
-            [INT_FILL, INT_FILL, INT_FILL],
+            [INT_MISSING, INT_MISSING, INT_MISSING],
+            [INT_MISSING, INT_MISSING, INT_MISSING],
             [1, 8, 5],
             [3, 5, 3],
             [6, 0, 4],
             [INT_MISSING, 4, 2],
             [4, 2, 3],
-            [INT_FILL, INT_FILL, INT_FILL],
-            [INT_FILL, INT_FILL, INT_FILL],
+            [INT_MISSING, INT_MISSING, INT_MISSING],
+            [INT_MISSING, INT_MISSING, INT_MISSING],
         ],
     )
     assert_array_equal(
