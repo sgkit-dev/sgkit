@@ -36,8 +36,16 @@ Improvements
 - Improve performance of :func:`variant_stats` and :func:`sample_stats` functions.
   (:user:`timothymillar`, :pr:`1119`, :issue:`1116`)
 
-.. Bug fixes
-.. ~~~~~~~~~
+Bug fixes
+~~~~~~~~~
+
+- Fix error in missing data handling for VCF. Missing values for most
+  fields were marked as the corresponding "fill" value. For example, missing
+  string values were stored as the empty string (string fill value) rather
+  than "." (string missing value). Similarly for integer fields, missing
+  values were stored as -2 (int fill) rather than -1 (int missing)
+  (:user:`jeromekelleher`, :pr:`1190`, :issue:`1192`).
+
 
 .. Documentation
 .. ~~~~~~~~~~~~~
@@ -106,7 +114,7 @@ Deprecations
   parameter now expects a full sized kinship matrix in which non-founder values are
   ignored.
   (:user:`timothymillar`, :pr:`1075`, :issue:`1061`)
-  
+
 Improvements
 ~~~~~~~~~~~~
 
@@ -190,9 +198,9 @@ Breaking changes
   (:user:`timothymillar`, :pr:`995`, :issue:`875`)
 - The ``genotype_count`` variable has been removed in favour of
   :data:`sgkit.variables.variant_genotype_count_spec` which follows VCF ordering
-  (i.e., homozygous reference, heterozygous, homozygous alternate for biallelic, 
+  (i.e., homozygous reference, heterozygous, homozygous alternate for biallelic,
   diploid genotypes).
-  :func:`hardy_weinberg_test` now defaults to using 
+  :func:`hardy_weinberg_test` now defaults to using
   :data:`sgkit.variables.variant_genotype_count_spec` for the ``genotype_count``
   parameter. (:user:`timothymillar`, :issue:`911`, :pr:`1002`)
 

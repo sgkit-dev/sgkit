@@ -304,7 +304,7 @@ class InfoAndFormatFieldHandler(VcfFieldHandler):
                             val if val is not None else self.missing_value
                         )
             else:
-                self.array[i] = self.fill_value
+                self.array[i] = self.missing_value
         elif self.category == "FORMAT":
             val = variant.format(self.key)
             if val is not None:
@@ -327,7 +327,7 @@ class InfoAndFormatFieldHandler(VcfFieldHandler):
                         a = a[..., : self.array.shape[-1]]  # trim to fit
                         self.array[i, ..., : a.shape[-1]] = a
             else:
-                self.array[i] = self.fill_value
+                self.array[i] = self.missing_value
 
     def truncate_array(self, length: int) -> None:
         self.array = self.array[:length]
