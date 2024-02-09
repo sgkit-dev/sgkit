@@ -15,16 +15,17 @@ For more information on using sgkit, see the [documentation](https://pystatgen.g
 
 [//]: # (numfocus-fiscal-sponsor-attribution)
 
-The sgkit project uses a [custom governance model](./GOVERNANCE.md) 
-and is fiscally sponsored by [NumFOCUS](https://numfocus.org/). Consider making 
-a [tax-deductible donation](https://numfocus.org/donate-to-sgkit) to help the project 
+The sgkit project uses a [custom governance model](./GOVERNANCE.md)
+and is fiscally sponsored by [NumFOCUS](https://numfocus.org/). Consider making
+a [tax-deductible donation](https://numfocus.org/donate-to-sgkit) to help the project
 pay for developer time, professional services, travel, workshops, and a variety of other needs.
 
 <div align="center">
   <a href="https://numfocus.org/donate-to-sgkit">
-    <img height="60px" 
-         src="https://raw.githubusercontent.com/numfocus/templates/master/images/numfocus-logo.png" 
+    <img height="60px"
+         src="https://raw.githubusercontent.com/numfocus/templates/master/images/numfocus-logo.png"
          align="center">
   </a>
 </div>
 <br>
+
