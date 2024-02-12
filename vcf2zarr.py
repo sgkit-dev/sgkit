@@ -27,7 +27,7 @@ def scan(vcfs):
 @click.argument("vcfs", nargs=-1, required=True)
 @click.argument("out_path", type=click.Path())
 @click.option("-p", "--worker-processes", type=int, default=1)
-@click.option("-c", "--column-chunk-size", type=int, default=16)
+@click.option("-c", "--column-chunk-size", type=int, default=64)
 def explode(vcfs, out_path, worker_processes, column_chunk_size):
     cnv.explode(
         vcfs,
@@ -81,8 +81,9 @@ def to_zarr(columnarised, zarr_path, conversion_spec):
 @click.command
 @click.argument("vcfs", nargs=-1, required=True)
 @click.argument("out_path", type=click.Path())
-def convert(vcfs, out_path):
-    cnv.convert_vcf(vcfs, out_path, show_progress=True)
+@click.option("-p", "--worker-processes", type=int, default=1)
+def convert(vcfs, out_path, worker_processes):
+    cnv.convert_vcf(vcfs, out_path, show_progress=True, worker_processes=worker_processes)
 
 @click.command
 @click.argument("vcfs", nargs=-1, required=True)
