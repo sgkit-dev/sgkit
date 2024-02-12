@@ -118,11 +118,6 @@ def test_vcf_to_zarr__small_vcf(
     )
     assert ds["variant_position"].chunks[0][0] == 5
 
-    # TODO report bug in lib code, we're mixing up FILL and MISSING HERE
-    # assert_array_equal(
-    #     ds["variant_NS"],
-    #     [-2, -2, 3, 3, 2, 3, 3, -2, -2],
-    # )
     assert_array_equal(
         ds["variant_NS"],
         [-1, -1, 3, 3, 2, 3, 3, -1, -1],
@@ -138,15 +133,15 @@ def test_vcf_to_zarr__small_vcf(
     assert_array_equal(
         ds["variant_AA"],
         [
-            "",
-            "",
-            "",
-            "",
+            ".",
+            ".",
+            ".",
+            ".",
             "T",
             "T",
             "G",
-            "",
-            "",
+            ".",
+            ".",
         ],
     )
     assert ds["variant_AN"].chunks[0][0] == 5
@@ -1856,7 +1851,12 @@ def test_compare_vcf_to_zarr_convert(shared_datadir, tmp_path, vcf_name):
     # input for
     convert_vcf([vcf_path], zarr2_path)
     ds2 = load_dataset(zarr2_path)
-    vcf_to_zarr(vcf_path, zarr1_path, mixed_ploidy=True, max_alt_alleles=ds2.variant_allele.shape[1] - 1)
+    vcf_to_zarr(
+        vcf_path,
+        zarr1_path,
+        mixed_ploidy=True,
+        max_alt_alleles=ds2.variant_allele.shape[1] - 1,
+    )
     ds1 = load_dataset(zarr1_path)
 
     # convert reads all variables by default.

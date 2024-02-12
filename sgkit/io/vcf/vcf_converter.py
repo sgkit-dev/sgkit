@@ -17,6 +17,7 @@ import humanize
 import cyvcf2
 import numcodecs
 import numpy as np
+import numpy.testing as nt
 import tqdm
 import zarr
 
@@ -294,14 +295,14 @@ def sanitise_value_int_scalar(buff, j, value):
 def sanitise_value_string_scalar(buff, j, value):
     x = value
     if value is None:
-        x = ""
+        x = "."
     # TODO check for missing values as well
     buff[j] = x
 
 
 def sanitise_value_string_1d(buff, j, value):
     if value is None:
-        buff[j] = ""
+        buff[j] = "."
     else:
         value = np.array(value, ndmin=1, dtype=buff.dtype, copy=False)
         value = drop_empty_second_dim(value)
@@ -312,7 +313,7 @@ def sanitise_value_string_1d(buff, j, value):
 
 def sanitise_value_string_2d(buff, j, value):
     if value is None:
-        buff[j] = ""
+        buff[j] = "."
     else:
         value = np.array(value, ndmin=1, dtype=buff.dtype, copy=False)
         value = drop_empty_second_dim(value)
@@ -471,7 +472,6 @@ class PickleChunkedVcfField:
                 return sanitise_value_string_1d
             else:
                 return sanitise_value_string_2d
-
 
 
 def update_bounds_float(summary, value, number_dim):
@@ -1286,8 +1286,12 @@ class SgvcfZarr:
                 ),
                 executor.submit(sgvcf.encode_alleles, pcvcf),
                 executor.submit(sgvcf.encode_id, pcvcf),
-                executor.submit(sgvcf.encode_contig, pcvcf, conversion_spec.contig_id,
-                    conversion_spec.contig_length),
+                executor.submit(
+                    sgvcf.encode_contig,
+                    pcvcf,
+                    conversion_spec.contig_id,
+                    conversion_spec.contig_length,
+                ),
                 executor.submit(sgvcf.encode_filters, pcvcf, conversion_spec.filter_id),
             ]
             has_gt = False
@@ -1422,6 +1426,86 @@ def encode_bed_partition_genotypes(bed_path, zarr_path, start_variant, end_varia
                 ba.swap_buffers()
             start = stop
         flush_futures(futures)
+
+
+def validate(vcf_path, zarr_path, show_progress):
+    store = zarr.DirectoryStore(zarr_path)
+
+    root = zarr.group(store=store)
+    pos = root["variant_position"][:]
+    allele = root["variant_allele"][:]
+    chrom = root["contig_id"][:][root["variant_contig"][:]]
+    vid = root["variant_id"][:]
+    call_genotype = iter(root["call_genotype"])
+
+    format_fields = {}
+    vcf = cyvcf2.VCF(vcf_path)
+    for colname in root.keys():
+        if colname.startswith("call") and not colname.startswith("call_genotype"):
+            vcf_name = colname.split("_", 1)[1]
+            vcf_type = None
+            for h in vcf.header_iter():
+                if h["HeaderType"] == "FORMAT" and h["ID"] == vcf_name:
+                    vcf_type = h["Type"]
+            assert vcf_type is not None
+            format_fields[vcf_name] = vcf_type, iter(root[colname])
+
+    first_pos = next(vcf).POS
+    start_index = np.searchsorted(pos, first_pos)
+    assert pos[start_index] == first_pos
+    vcf = cyvcf2.VCF(vcf_path)
+    iterator = tqdm.tqdm(vcf, total=vcf.num_records)
+    for j, row in enumerate(iterator, start_index):
+        assert chrom[j] == row.CHROM
+        assert pos[j] == row.POS
+        assert vid[j] == ("." if row.ID is None else row.ID)
+        assert allele[j, 0] == row.REF
+        k = len(row.ALT)
+        nt.assert_array_equal(allele[j, 1 : k + 1], row.ALT),
+        assert np.all(allele[j, k + 1 :] == "")
+        # TODO FILTERS
+
+        gt = row.genotype.array()
+        gt_zarr = next(call_genotype)
+        gt_vcf = gt[:, :-1]
+        # NOTE weirdly cyvcf2 seems to remap genotypes automatically
+        # into the same missing/pad encoding that sgkit uses.
+        # if np.any(gt_zarr < 0):
+        #     print("MISSING")
+        #     print(gt_zarr)
+        #     print(gt_vcf)
+        nt.assert_array_equal(gt_zarr, gt_vcf)
+
+        for name, (vcf_type, zarr_iter) in format_fields.items():
+            vcf_val = None
+            try:
+                vcf_val = row.format(name)
+            except KeyError:
+                pass
+            zarr_val = next(zarr_iter)
+            if vcf_val is None:
+                if vcf_type == "Integer":
+                    assert np.all(zarr_val == -1)
+                elif vcf_type == "String":
+                    assert np.all(zarr_val == ".")
+                else:
+                    assert False
+            else:
+                assert vcf_val.shape[0] == zarr_val.shape[0]
+                if vcf_type == "Integer":
+                    assert len(vcf_val.shape) == 2
+                    vcf_val[vcf_val == VCF_INT_MISSING] = -1
+                    vcf_val[vcf_val == VCF_INT_FILL] = -2
+                    if vcf_val.shape[1] == 1:
+                        nt.assert_array_equal(vcf_val[:, 0], zarr_val)
+                    else:
+                        k = vcf_val.shape[1]
+                        nt.assert_array_equal(vcf_val, zarr_val[:, :k])
+                        assert np.all(zarr_val[:, k:] == -2)
+                elif vcf_type == "Float":
+                    print(name)
+                    print(vcf_val)
+                    print(zarr_val)
 
 
 def convert_plink(

@@ -84,6 +84,12 @@ def to_zarr(columnarised, zarr_path, conversion_spec):
 def convert(vcfs, out_path):
     cnv.convert_vcf(vcfs, out_path, show_progress=True)
 
+@click.command
+@click.argument("vcfs", nargs=-1, required=True)
+@click.argument("out_path", type=click.Path())
+def validate(vcfs, out_path):
+    cnv.validate(vcfs[0], out_path, show_progress=True)
+
 
 @click.command
 @click.argument("plink", type=click.Path())
@@ -112,6 +118,7 @@ cli.add_command(summarise)
 cli.add_command(genspec)
 cli.add_command(to_zarr)
 cli.add_command(convert)
+cli.add_command(validate)
 cli.add_command(convert_plink)
 
 if __name__ == "__main__":
