@@ -24,7 +24,7 @@ from sgkit.io.vcf.vcf_reader import (
     merge_zarr_array_sizes,
     zarr_array_sizes,
 )
-from sgkit.io.vcf.vcf_converter import convert_vcf
+from sgkit.io.vcf.vcf_converter import convert_vcf, validate
 from sgkit.model import get_contigs, get_filters, num_contigs
 from sgkit.tests.io.test_dataset import assert_identical
 
@@ -1865,3 +1865,27 @@ def test_compare_vcf_to_zarr_convert(shared_datadir, tmp_path, vcf_name):
     # print(ds1.call_genotype.values)
     # print(ds2.call_genotype.values)
     xr.testing.assert_equal(ds1, ds2[base_vars])
+
+
+@pytest.mark.parametrize(
+    "vcf_name",
+    [
+        "1000G.phase3.broad.withGenotypes.chr20.10100000.vcf.gz",
+        "CEUTrio.20.21.gatk3.4.csi.g.vcf.bgz",
+        "CEUTrio.20.21.gatk3.4.g.bcf",
+        "CEUTrio.20.21.gatk3.4.g.vcf.bgz",
+        "CEUTrio.20.gatk3.4.g.vcf.bgz",
+        "CEUTrio.21.gatk3.4.g.vcf.bgz",
+        "sample_multiple_filters.vcf.gz",
+        "sample.vcf.gz",
+        "allele_overflow.vcf.gz",
+    ],
+)
+def test_validate_vcf(shared_datadir, tmp_path, vcf_name):
+    vcf_path = path_for_test(shared_datadir, vcf_name)
+    zarr_path = os.path.join("tmp/converted/", vcf_name, ".vcf.zarr")
+    # zarr_path = tmp_path.joinpath("vcf.zarr").as_posix()
+    print("converting", zarr_path)
+    convert_vcf([vcf_path], zarr_path)
+    # validate([vcf_path], zarr_path)
+

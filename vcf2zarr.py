@@ -61,7 +61,8 @@ def genspec(columnarised):
 @click.argument("columnarised", type=click.Path())
 @click.argument("zarr_path", type=click.Path())
 @click.option("-s", "--conversion-spec", default=None)
-def to_zarr(columnarised, zarr_path, conversion_spec):
+@click.option("-p", "--worker-processes", type=int, default=1)
+def to_zarr(columnarised, zarr_path, conversion_spec, worker_processes):
     pcvcf = cnv.PickleChunkedVcf.load(columnarised)
     if conversion_spec is None:
         spec = cnv.ZarrConversionSpec.generate(pcvcf)
@@ -74,6 +75,7 @@ def to_zarr(columnarised, zarr_path, conversion_spec):
         pcvcf,
         zarr_path,
         conversion_spec=spec,
+        worker_processes=worker_processes,
         show_progress=True,
     )
 
