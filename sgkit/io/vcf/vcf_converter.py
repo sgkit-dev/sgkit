@@ -78,6 +78,9 @@ def assert_prefix_integer_equal_2d(vcf_val, zarr_val):
         assert np.all(zarr_val[:, k:] == -2)
 
 
+# FIXME these are sort-of working. It's not clear that we're
+# handling the different dimensions and padded etc correctly.
+# Will need to hand-craft from examples to test
 def assert_prefix_float_equal_1d(vcf_val, zarr_val):
     v = np.array(vcf_val, dtype=np.float32, ndmin=1)
     vi = v.view(np.int32)
@@ -93,19 +96,22 @@ def assert_prefix_float_equal_1d(vcf_val, zarr_val):
 
 def assert_prefix_float_equal_2d(vcf_val, zarr_val):
     assert len(vcf_val.shape) == 2
-    v = np.array(vcf_val, dtype=np.float32, ndmin=1)
+    if vcf_val.shape[1] == 1:
+        vcf_val = vcf_val[:, 0]
+    v = np.array(vcf_val, dtype=np.float32, ndmin=2)
     vi = v.view(np.int32)
-    z = np.array(zarr_val, dtype=np.float32, ndmin=1)
+    z = np.array(zarr_val, dtype=np.float32, ndmin=2)
     zi = z.view(np.int32)
-    assert np.sum(zi == FLOAT32_MISSING_AS_INT32) == 0
+    assert np.all((zi == FLOAT32_MISSING_AS_INT32) == (vi == FLOAT32_MISSING_AS_INT32))
+    assert np.all((zi == FLOAT32_FILL_AS_INT32) == (vi == FLOAT32_FILL_AS_INT32))
+    # print(vcf_val, zarr_val)
+    # assert np.sum(zi == FLOAT32_MISSING_AS_INT32) == 0
     k = v.shape[0]
-    print("k", k)
+    # print("k", k)
     assert np.all(zi[k:] == FLOAT32_FILL_AS_INT32)
     # assert np.where(zi[:k] == FLOAT32_FILL_AS_INT32)
     nt.assert_array_almost_equal(v, z[:k])
     # nt.assert_array_equal(v, z[:k])
-
-    # pass
 
 
 # TODO rename to wait_and_check_futures
