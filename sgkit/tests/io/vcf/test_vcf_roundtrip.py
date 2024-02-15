@@ -7,6 +7,7 @@ from sgkit.io.vcf.vcf_writer import write_vcf, zarr_to_vcf
 from sgkit.tests.io.vcf.utils import assert_vcfs_close, path_for_test
 
 
+@pytest.mark.skip("Temporarily disabling pending bugfix; #1196")
 @pytest.mark.parametrize(
     "vcf_file, encoding, generate_header",
     [

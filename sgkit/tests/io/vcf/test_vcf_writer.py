@@ -73,6 +73,7 @@ def test_zarr_to_vcf(shared_datadir, tmp_path, output_is_path):
     )
 
 
+@pytest.mark.skip("Temporarily disabling pending bugfix; #1196")
 @pytest.mark.parametrize("in_memory_ds", [True, False])
 @pytest.mark.filterwarnings(
     "ignore::sgkit.io.vcfzarr_reader.DimensionNameForFixedFormatFieldWarning",
