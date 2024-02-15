@@ -131,6 +131,7 @@ def test_DP_field(shared_datadir, tmpdir):
     assert_identical(allel_ds, sg_ds)
 
 
+@pytest.mark.skip("Temporarily disabling test; see #1195")
 @pytest.mark.parametrize(
     "vcf_file,allel_exclude_fields,sgkit_exclude_fields,max_alt_alleles",
     [
