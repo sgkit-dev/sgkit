@@ -70,15 +70,15 @@ class Field:
             n = generate_number(self.vcf_number, alt_alleles)
             data = generate_data(self.vcf_type, n)
             val = ",".join([str(x) for x in data])
+            assert val != "."
             yield f"{val}"
             for i in range(n):
                 data_str = [str(x) for x in data]
                 data_str[i] = "."  # missing
                 val = ",".join(data_str)
-                yield f"{val}"
+                yield f"{val}" if val != "." else None
             if n > 1:
-                val = ",".join(["."] * n)  # all missing
-                yield f"{val}"
+                yield None  # all missing
 
 
 def generate_header(info_fields, format_fields, vcf_samples):
@@ -154,7 +154,9 @@ def generate_vcf(output, seed=42):
                 pos = pos + 1
                 ref = alleles[0]
                 alt = alleles[1:]
-                info = {info_field.name: val}
+                info = {}
+                if val is not None:
+                    info = {info_field.name: val}
                 samples: List[Dict[str, Any]] = [{}] * len(vcf_samples)
 
                 variant = VcfVariant(

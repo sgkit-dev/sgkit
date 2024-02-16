@@ -31,9 +31,7 @@ from sgkit.tests.io.vcf.utils import assert_vcfs_close, path_for_test
             },
             True,
         ),
-        # Temporarily disabling this all_fields test while resolving missing data issue
-        # https://github.com/pystatgen/sgkit/issues/1197
-        # ("all_fields.vcf", None, True),
+        ("all_fields.vcf", None, True),
         ("CEUTrio.20.21.gatk3.4.g.vcf.bgz", None, True),
         # don't generate header to avoid https://github.com/pydata/xarray/issues/7328
         ("Homo_sapiens_assembly38.headerOnly.vcf.gz", None, False),
