@@ -131,15 +131,23 @@ def test_DP_field(shared_datadir, tmpdir):
     assert_identical(allel_ds, sg_ds)
 
 
-@pytest.mark.skip("Temporarily disabling test; see #1195")
 @pytest.mark.parametrize(
     "vcf_file,allel_exclude_fields,sgkit_exclude_fields,max_alt_alleles",
     [
-        ("sample.vcf.gz", None, None, 3),
+        # Excluding AA here because of pad-vs-missing data in sckit-allel strings
+        # https://github.com/pystatgen/sgkit/issues/1195
+        ("sample.vcf.gz", ["AA"], ["INFO/AA"], 3),
         ("mixed.vcf.gz", None, None, 3),
         # exclude PL since it has Number=G, which is not yet supported
+        # Excluding PGT and PID here because of pad-vs-missing data in sckit-allel strings
+        # https://github.com/pystatgen/sgkit/issues/1195
         # increase max_alt_alleles since scikit-allel does not truncate genotype calls
-        ("CEUTrio.20.21.gatk3.4.g.vcf.bgz", ["calldata/PL"], ["FORMAT/PL"], 7),
+        (
+            "CEUTrio.20.21.gatk3.4.g.vcf.bgz",
+            ["calldata/PL", "calldata/PGT", "calldata/PID"],
+            ["FORMAT/PL", "FORMAT/PGT", "FORMAT/PID"],
+            7,
+        ),
     ],
 )
 @pytest.mark.filterwarnings(
