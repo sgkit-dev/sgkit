@@ -278,17 +278,11 @@ class InfoAndFormatFieldHandler(VcfFieldHandler):
 
     def add_variant(self, i: int, variant: Any) -> None:
         if self.category == "INFO":
-            try:
-                val = variant.INFO[self.key]
-                present = True
-            except KeyError:
-                present, val = False, None
-
-            if present:
+            val = variant.INFO.get(self.key, None)
+            self.array[i] = self.missing_value
+            if val is not None:
                 assert self.array.ndim in (1, 2)
                 if self.array.ndim == 1:
-                    if val is None:
-                        val = self.missing_value
                     self.array[i] = val
                 elif self.array.ndim == 2:
                     self.array[i] = self.fill_value
@@ -300,11 +294,8 @@ class InfoAndFormatFieldHandler(VcfFieldHandler):
                                 v if v is not None else self.missing_value
                             )
                     except TypeError:  # val is a scalar
-                        self.array[i, 0] = (
-                            val if val is not None else self.missing_value
-                        )
-            else:
-                self.array[i] = self.missing_value
+                        self.array[i, 0] = val
+
         elif self.category == "FORMAT":
             val = variant.format(self.key)
             if val is not None:
