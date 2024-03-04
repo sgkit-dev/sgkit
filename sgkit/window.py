@@ -70,23 +70,23 @@ def window_by_variant(
     >>> # Contiguous windows, each with the same number of variants (3)
     >>> # except for the last window of each contig
     >>> sg.window_by_variant(ds, size=3, merge=False)
-    <xarray.Dataset>
+    <xarray.Dataset> Size: 96B
     Dimensions:        (windows: 4)
     Dimensions without coordinates: windows
     Data variables:
-        window_contig  (windows) int64 0 0 1 1
-        window_start   (windows) int64 0 3 5 8
-        window_stop    (windows) int64 3 5 8 10
+        window_contig  (windows) int64 32B 0 0 1 1
+        window_start   (windows) int64 32B 0 3 5 8
+        window_stop    (windows) int64 32B 3 5 8 10
 
     >>> # Overlapping windows
     >>> sg.window_by_variant(ds, size=3, step=2, merge=False)
-    <xarray.Dataset>
+    <xarray.Dataset> Size: 144B
     Dimensions:        (windows: 6)
     Dimensions without coordinates: windows
     Data variables:
-        window_contig  (windows) int64 0 0 0 1 1 1
-        window_start   (windows) int64 0 2 4 5 7 9
-        window_stop    (windows) int64 3 5 5 8 10 10
+        window_contig  (windows) int64 48B 0 0 0 1 1 1
+        window_start   (windows) int64 48B 0 2 4 5 7 9
+        window_stop    (windows) int64 48B 3 5 5 8 10 10
     """
     step = step or size
     return _window_per_contig(ds, variant_contig, merge, _get_windows, size, step)
@@ -170,13 +170,13 @@ def window_by_position(
     >>> # and using offset to start windows at 1
     >>> ds_w1 = sg.window_by_position(ds, size=10, offset=1, merge=False)
     >>> ds_w1
-    <xarray.Dataset>
+    <xarray.Dataset> Size: 192B
     Dimensions:        (windows: 8)
     Dimensions without coordinates: windows
     Data variables:
-        window_contig  (windows) int64 0 0 1 1 1 1 1 1
-        window_start   (windows) int64 0 4 5 6 6 8 9 9
-        window_stop    (windows) int64 4 5 6 6 8 9 9 10
+        window_contig  (windows) int64 64B 0 0 1 1 1 1 1 1
+        window_start   (windows) int64 64B 0 4 5 6 6 8 9 9
+        window_stop    (windows) int64 64B 4 5 6 6 8 9 9 10
     >>> [ds.variant_position.values[i:j] for i, j in zip(ds_w1.window_start.values, ds_w1.window_stop.values) if i != j] # doctest: +NORMALIZE_WHITESPACE
     [array([1, 4, 6, 8]),
      array([12]),
@@ -189,13 +189,13 @@ def window_by_position(
     >>> # each 10 base pairs in size. Also known as "locus windows".
     >>> ds_w2 = sg.window_by_position(ds, size=10, offset=-5, window_start_position="variant_position", merge=False)
     >>> ds_w2
-    <xarray.Dataset>
+    <xarray.Dataset> Size: 240B
     Dimensions:        (windows: 10)
     Dimensions without coordinates: windows
     Data variables:
-        window_contig  (windows) int64 0 0 0 0 0 1 1 1 1 1
-        window_start   (windows) int64 0 0 0 1 3 5 6 6 8 9
-        window_stop    (windows) int64 2 4 4 5 5 6 8 8 9 10
+        window_contig  (windows) int64 80B 0 0 0 0 0 1 1 1 1 1
+        window_start   (windows) int64 80B 0 0 0 1 3 5 6 6 8 9
+        window_stop    (windows) int64 80B 2 4 4 5 5 6 8 8 9 10
     >>> [ds.variant_position.values[i:j] for i, j in zip(ds_w2.window_start.values, ds_w2.window_stop.values)] # doctest: +NORMALIZE_WHITESPACE
     [array([1, 4]),
      array([1, 4, 6, 8]),
@@ -382,12 +382,12 @@ def window_by_genome(
     >>> import sgkit as sg
     >>> ds = sg.simulate_genotype_call_dataset(n_variant=10, n_sample=2, n_contig=2)
     >>> sg.window_by_genome(ds, merge=False)
-    <xarray.Dataset>
+    <xarray.Dataset> Size: 16B
     Dimensions:       (windows: 1)
     Dimensions without coordinates: windows
     Data variables:
-        window_start  (windows) int64 0
-        window_stop   (windows) int64 10
+        window_start  (windows) int64 8B 0
+        window_stop   (windows) int64 8B 10
     """
     new_ds = create_dataset(
         {
