@@ -2,9 +2,9 @@ queue_rules:
   - name: default
     conditions:
       - base=main
-      - status-success=build (3.8)
       - status-success=build (3.9)
       - status-success=build (3.10)
+      - status-success=build (3.11)
       - status-success=win_build (3.9)
       - approved-reviews-by=@pystatgen/committers
       - "#approved-reviews-by>=1"
@@ -14,9 +14,9 @@ pull_request_rules:
   - name: automatic merge
     conditions:
       - base=main
-      - status-success=build (3.8)
       - status-success=build (3.9)
       - status-success=build (3.10)
+      - status-success=build (3.11)
       - status-success=win_build (3.9)
       - approved-reviews-by=@pystatgen/committers
       - "#approved-reviews-by>=1"
