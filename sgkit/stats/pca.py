@@ -256,16 +256,16 @@ def pca(
     ...     .pipe(sg.pca, n_components=2, merge=False)
     ... )
     >>> ds.compute() # doctest: +NORMALIZE_WHITESPACE
-    <xarray.Dataset>
+    <xarray.Dataset> Size: 3kB
     Dimensions:                              (samples: 150, components: 2,
                                               variants: 100)
     Dimensions without coordinates: samples, components, variants
     Data variables:
-        sample_pca_projection                (samples, components) float32 0.0103...
-        sample_pca_component                 (variants, components) float32 0.096...
-        sample_pca_explained_variance        (components) float32 44.24 23.49
-        sample_pca_explained_variance_ratio  (components) float32 0.1915 0.1017
-        sample_pca_loading                   (variants, components) float32 0.639...
+        sample_pca_projection                (samples, components) float32 1kB 0....
+        sample_pca_component                 (variants, components) float32 800B ...
+        sample_pca_explained_variance        (components) float32 8B 44.24 23.49
+        sample_pca_explained_variance_ratio  (components) float32 8B 0.1915 0.1017
+        sample_pca_loading                   (variants, components) float32 800B ...
 
     >>> # Visualize first two PCs
     >>> ax = (
