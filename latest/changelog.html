@@ -579,6 +579,17 @@ document.write(`
 (<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1119">PR 1119</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/1116">GH 1116</a>)</p></li>
 </ul>
 </section>
+<section id="bug-fixes">
+<h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Fix error in missing data handling for VCF. Missing values for most
+fields were marked as the corresponding “fill” value. For example, missing
+string values were stored as the empty string (string fill value) rather
+than “.” (string missing value). Similarly for integer fields, missing
+values were stored as -2 (int fill) rather than -1 (int missing)
+(<a class="reference external" href="https://github.com/jeromekelleher">jeromekelleher</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1190">PR 1190</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/1192">GH 1192</a>).</p></li>
+</ul>
+</section>
 </section>
 <section id="may-2023">
 <span id="changelog-0-7-0"></span><h2>0.7.0 (2 May 2023)<a class="headerlink" href="#may-2023" title="Permalink to this heading">#</a></h2>
@@ -647,8 +658,8 @@ with number of samples.
 (<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1039">PR 1039</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/939">GH 939</a>)</p></li>
 </ul>
 </section>
-<section id="bug-fixes">
-<h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this heading">#</a></h3>
+<section id="id3">
+<h3>Bug fixes<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">vcf_to_zarrs</span></code> was outputting zarr files with <code class="docutils literal notranslate"><span class="pre">temp_chunk_length</span></code> sized chunks. This has now been fixed
 so that the chunks are <code class="docutils literal notranslate"><span class="pre">chunk_length</span></code> sized.
@@ -662,8 +673,8 @@ so that the chunks are <code class="docutils literal notranslate"><span class="p
 </section>
 <section id="february-2023">
 <span id="changelog-0-6-0"></span><h2>0.6.0 (1 February 2023)<a class="headerlink" href="#february-2023" title="Permalink to this heading">#</a></h2>
-<section id="id3">
-<h3>New Features<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
+<section id="id4">
+<h3>New Features<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add support for Python 3.10.
 (<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/813">PR 813</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/801">GH 801</a>)</p></li>
@@ -697,8 +708,8 @@ genotype.
 (<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/911">GH 911</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1002">PR 1002</a>)</p></li>
 </ul>
 </section>
-<section id="id4">
-<h3>Breaking changes<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
+<section id="id5">
+<h3>Breaking changes<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Remove support for Python 3.7.
 (<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/927">PR 927</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/802">GH 802</a>)</p></li>
@@ -721,8 +732,8 @@ diploid genotypes).
 parameter. (<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/911">GH 911</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/1002">PR 1002</a>)</p></li>
 </ul>
 </section>
-<section id="id5">
-<h3>Improvements<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
+<section id="id6">
+<h3>Improvements<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Improvements to VCF parsing performance.
 (<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/933">PR 933</a>)</p></li>
@@ -736,8 +747,8 @@ parameter. (<a class="reference external" href="https://github.com/timothymillar
 (<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/978">PR 978</a>)</p></li>
 </ul>
 </section>
-<section id="id6">
-<h3>Bug fixes<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
+<section id="id7">
+<h3>Bug fixes<a class="headerlink" href="#id7" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Allow chunking in the samples dimension for <a class="reference internal" href="generated/sgkit.identity_by_state.html#sgkit.identity_by_state" title="sgkit.identity_by_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">identity_by_state()</span></code></a>.
 (<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/pull/837">PR 837</a>, <a class="reference external" href="https://github.com/pystatgen/sgkit/issues/836">GH 836</a>)</p></li>
@@ -798,6 +809,7 @@ parameter. (<a class="reference external" href="https://github.com/timothymillar
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unreleased">0.8.0 (unreleased)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new-features">New Features</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-fixes">Bug fixes</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#may-2023">0.7.0 (2 May 2023)</a><ul class="nav section-nav flex-column">
@@ -805,14 +817,14 @@ parameter. (<a class="reference external" href="https://github.com/timothymillar
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#breaking-changes">Breaking changes</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deprecations">Deprecations</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Improvements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-fixes">Bug fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Bug fixes</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#february-2023">0.6.0 (1 February 2023)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">New Features</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Breaking changes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Improvements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Bug fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">New Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Breaking changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Bug fixes</a></li>
 </ul>
 </li>
 </ul>
