@@ -11,6 +11,7 @@ from sgkit.io.utils import (
     FLOAT32_MISSING_AS_INT32,
     INT_FILL,
     INT_MISSING,
+    STR_MISSING,
 )
 
 COLON = ord(":")
@@ -316,7 +317,8 @@ def vcf_values_to_byte_buf_size(a):
     elif a.dtype == np.float32:
         # values + separators
         return a.size * FLOAT32_BUF_SIZE + a.size
-    elif a.dtype.kind == "S":
+    elif a.dtype.kind == "U":
+        # NOTE! Assuming UTF-8 here?
         # values + separators
         return a.size * a.dtype.itemsize + a.size
     else:
@@ -502,8 +504,8 @@ def create_mask(arr):
         return np.all(arr == INT_MISSING, axis=axis)
     elif arr.dtype == np.float32:
         return np.all(arr.view("i4") == FLOAT32_MISSING_AS_INT32, axis=axis)
-    elif arr.dtype.kind == "S":
-        return np.all(arr == STR_MISSING_BYTE, axis=axis)
+    elif arr.dtype.kind == "U":
+        return np.all(arr == STR_MISSING, axis=axis)
     else:
         raise ValueError(f"Unsupported dtype: {arr.dtype}")
 
