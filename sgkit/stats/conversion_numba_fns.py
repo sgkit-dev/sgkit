@@ -64,7 +64,7 @@ def _convert_probability_to_call(
 
 
 @numba_jit(nogil=True)
-def _biallelic_genotype_index(genotype: ArrayLike) -> int:
+def _biallelic_genotype_index(genotype: ArrayLike) -> int:  # pragma: no cover
     index = 0
     for i in range(len(genotype)):
         a = genotype[i]
@@ -115,7 +115,7 @@ def _count_biallelic_genotypes(
 # implementation from github.com/PlantandFoodResearch/MCHap
 # TODO: replace with math.comb when supported by numba
 @numba_jit(nogil=True)
-def _comb(n: int, k: int) -> int:
+def _comb(n: int, k: int) -> int:  # pragma: no cover
     if k > n:
         return 0
     r = 1
@@ -135,7 +135,7 @@ _COMB_REP_LOOKUP[0, 0] = 0  # special case
 
 
 @numba_jit(nogil=True)
-def _comb_with_replacement(n: int, k: int) -> int:
+def _comb_with_replacement(n: int, k: int) -> int:  # pragma: no cover
     if (n < _COMB_REP_LOOKUP.shape[0]) and (k < _COMB_REP_LOOKUP.shape[1]):
         return _COMB_REP_LOOKUP[n, k]
     n = n + k - 1
@@ -143,7 +143,7 @@ def _comb_with_replacement(n: int, k: int) -> int:
 
 
 @numba_jit(nogil=True)
-def _sorted_genotype_index(genotype: ArrayLike) -> int:
+def _sorted_genotype_index(genotype: ArrayLike) -> int:  # pragma: no cover
     # Warning: genotype alleles must be sorted in ascending order!
     if genotype[0] < 0:
         if genotype[0] < -1:

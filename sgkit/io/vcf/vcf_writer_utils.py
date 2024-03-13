@@ -36,7 +36,7 @@ STR_FILL_BYTE = b""
 
 
 @numba_jit(boundscheck=True)
-def itoa(buf, p, value):
+def itoa(buf, p, value):  # pragma: no cover
     """Convert an int32 value to its decimal representation.
 
     Parameters
@@ -97,7 +97,7 @@ def itoa(buf, p, value):
 
 
 @numba_jit(boundscheck=True)
-def ftoa(buf, p, value):
+def ftoa(buf, p, value):  # pragma: no cover
     """Convert a float32 value to its decimal representation, with up to 3 decimal places.
 
     Parameters
@@ -146,7 +146,7 @@ def ftoa(buf, p, value):
 
 
 @numba_jit(boundscheck=True)
-def copy(buf, p, value):
+def copy(buf, p, value):  # pragma: no cover
     """Copy the values from one array to another.
 
     Parameters
@@ -176,7 +176,7 @@ def byte_buf_to_str(a):
 @numba_jit(boundscheck=True)
 def vcf_fixed_to_byte_buf(
     buf, p, i, contigs, chrom, pos, id, alleles, qual, filters, filter_
-):
+):  # pragma: no cover
     # CHROM
     contig = contigs[chrom[i]]
     p = copy(buf, p, contig)
@@ -324,7 +324,7 @@ def vcf_values_to_byte_buf_size(a):
 
 
 @numba_jit(boundscheck=True)
-def vcf_ints_to_byte_buf(buf, p, a, indexes, separator=-1):
+def vcf_ints_to_byte_buf(buf, p, a, indexes, separator=-1):  # pragma: no cover
     n = 0  # total number of strings
     if a.ndim == 1:
         for i in range(a.shape[0]):
@@ -367,7 +367,7 @@ def vcf_ints_to_byte_buf(buf, p, a, indexes, separator=-1):
 
 
 @numba_jit(boundscheck=True)
-def vcf_floats_to_byte_buf(buf, p, a, indexes, separator=-1):
+def vcf_floats_to_byte_buf(buf, p, a, indexes, separator=-1):  # pragma: no cover
     n = 0  # total number of strings
     ai = a.view(np.int32)
     if a.ndim == 1:
@@ -411,7 +411,7 @@ def vcf_floats_to_byte_buf(buf, p, a, indexes, separator=-1):
 
 
 @numba_jit(boundscheck=True)
-def vcf_strings_to_byte_buf(buf, p, a, indexes, separator=-1):
+def vcf_strings_to_byte_buf(buf, p, a, indexes, separator=-1):  # pragma: no cover
     n = 0  # total number of strings
     if a.ndim == 1:
         for i in range(a.shape[0]):
@@ -456,7 +456,7 @@ def vcf_strings_to_byte_buf(buf, p, a, indexes, separator=-1):
 @numba_jit(boundscheck=True)
 def vcf_genotypes_to_byte_buf(
     buf, p, call_genotype, call_genotype_phased, indexes, separator=-1
-):
+):  # pragma: no cover
     n = 0
     for i in range(call_genotype.shape[0]):
         indexes[n] = p
@@ -509,7 +509,9 @@ def create_mask(arr):
 
 
 @numba_jit(boundscheck=True)
-def vcf_info_to_byte_buf(buf, p, j, indexes, mask, info_prefixes, *arrays):
+def vcf_info_to_byte_buf(
+    buf, p, j, indexes, mask, info_prefixes, *arrays
+):  # pragma: no cover
     if len(arrays) == 0 or np.all(mask[:, j]):
         buf[p] = DOT
         p += 1
@@ -548,7 +550,9 @@ def vcf_info_to_byte_buf_size(info_prefixes, *arrays):
 
 
 @numba_jit(boundscheck=True)
-def vcf_format_names_to_byte_buf(buf, p, i, format_mask, format_names):
+def vcf_format_names_to_byte_buf(
+    buf, p, i, format_mask, format_names
+):  # pragma: no cover
     buf[p] = TAB
     p += 1
     if len(format_names) == 0 or np.all(format_mask[:, i]):
@@ -578,7 +582,7 @@ def vcf_format_names_to_byte_buf_size(format_names):
 
 
 @numba_jit(boundscheck=True)
-def vcf_format_missing_to_byte_buf(buf, p, n_samples):
+def vcf_format_missing_to_byte_buf(buf, p, n_samples):  # pragma: no cover
     for _ in range(n_samples):
         buf[p] = DOT
         p += 1
@@ -589,7 +593,9 @@ def vcf_format_missing_to_byte_buf(buf, p, n_samples):
 
 
 @numba_jit(boundscheck=True)
-def interleave(buf, p, indexes, mask, separator, group_separator, *arrays):
+def interleave(
+    buf, p, indexes, mask, separator, group_separator, *arrays
+):  # pragma: no cover
     """Interleave byte buffers into groups.
 
     Each array must contain the same number of entries - this is the number of groups

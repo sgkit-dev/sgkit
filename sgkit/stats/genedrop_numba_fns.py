@@ -61,7 +61,7 @@ def _random_inheritance_Hamilton_Kerr(
     lambda_: ArrayLike,
     marked: ArrayLike,
     i: int,
-):
+):  # pragma: no cover
     _, n_parent = parent.shape
     _, max_ploidy = genotypes.shape
     next_allele = 0
