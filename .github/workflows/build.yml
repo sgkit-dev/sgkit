@@ -28,18 +28,14 @@ jobs:
         pip install -r requirements.txt -r requirements-dev.txt
     - name: Run pre-commit
       uses: pre-commit/action@v2.0.0
-    - name: Test with pytest
+    - name: Test with pytest (numba jit disabled)
       env:
-        # Enable cache to workaround build problems
-        # https://github.com/pystatgen/sgkit/issues/1194
-        SGKIT_DISABLE_NUMBA_CACHE: 0
-      run: |
-        pytest -v
-    - name: Test with pytest and coverage (numba jit disabled)
-      env:
-        # See above ^
-        SGKIT_DISABLE_NUMBA_CACHE: 0
         NUMBA_DISABLE_JIT: 1
+      run: |
+        # avoid guvectorized functions #1194
+        pytest -v sgkit/tests/test_pedigree.py
+        pytest -v sgkit/tests/io/vcf/test_vcf_writer_utils.py
+    - name: Test with pytest and coverage
       run: |
         pytest -v --cov=sgkit --cov-report=term-missing
     - name: Upload coverage to Codecov
