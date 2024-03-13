@@ -111,7 +111,7 @@ def parent_indices(
 
 
 @numba_jit(nogil=True)
-def topological_argsort(parent: ArrayLike) -> ArrayLike:
+def topological_argsort(parent: ArrayLike) -> ArrayLike:  # pragma: no cover
     """Find a topological ordering of samples within a pedigree such
     that no individual occurs before its parents.
 
@@ -175,7 +175,7 @@ def topological_argsort(parent: ArrayLike) -> ArrayLike:
 
 
 @numba_jit
-def _is_pedigree_sorted(parent: ArrayLike) -> bool:
+def _is_pedigree_sorted(parent: ArrayLike) -> bool:  # pragma: no cover
     n_samples, n_parents = parent.shape
     for i in range(n_samples):
         for j in range(n_parents):
@@ -186,7 +186,9 @@ def _is_pedigree_sorted(parent: ArrayLike) -> bool:
 
 
 @numba_jit
-def _raise_on_half_founder(parent: ArrayLike, tau: ArrayLike = None) -> None:
+def _raise_on_half_founder(
+    parent: ArrayLike, tau: ArrayLike = None
+) -> None:  # pragma: no cover
     for i in range(len(parent)):
         p = parent[i, 0]
         q = parent[i, 1]
@@ -203,7 +205,9 @@ def _raise_on_half_founder(parent: ArrayLike, tau: ArrayLike = None) -> None:
 
 
 @numba_jit
-def _insert_diploid_self_kinship(kinship: ArrayLike, parent: ArrayLike, i: int) -> None:
+def _insert_diploid_self_kinship(
+    kinship: ArrayLike, parent: ArrayLike, i: int
+) -> None:  # pragma: no cover
     # self kinship of i with parents p and q
     p = parent[i, 0]
     q = parent[i, 1]
@@ -216,7 +220,7 @@ def _insert_diploid_self_kinship(kinship: ArrayLike, parent: ArrayLike, i: int) 
 @numba_jit
 def _insert_diploid_pair_kinship(
     kinship: ArrayLike, parent: ArrayLike, i: int, j: int
-) -> None:
+) -> None:  # pragma: no cover
     # kinship of i with j where j < i and i has parents p and q
     p = parent[i, 0]
     q = parent[i, 1]
@@ -230,7 +234,7 @@ def _insert_diploid_pair_kinship(
 @numba_jit
 def kinship_diploid(
     parent: ArrayLike, allow_half_founders: bool = False, dtype: type = np.float64
-) -> ArrayLike:
+) -> ArrayLike:  # pragma: no cover
     """Calculate pairwise expected kinship from a pedigree assuming all
     individuals are diploids.
 
@@ -291,7 +295,7 @@ def kinship_diploid(
 
 
 @numba_jit
-def _identify_founders_diploid(parent: ArrayLike) -> ArrayLike:
+def _identify_founders_diploid(parent: ArrayLike) -> ArrayLike:  # pragma: no cover
     n = len(parent)
     out = np.zeros(n, dtype=np.bool_)
     for i in range(n):
@@ -305,7 +309,7 @@ def project_kinship_diploid(
     initial: ArrayLike,
     parent: ArrayLike,
     allow_half_founders: bool = False,
-) -> ArrayLike:
+) -> ArrayLike:  # pragma: no cover
     """Project founder kinships along a pedigree to their decedents assuming
     all individuals are diploid.
 
@@ -372,7 +376,9 @@ def project_kinship_diploid(
 
 
 @numba_jit
-def _inbreeding_as_self_kinship(inbreeding: float, ploidy: int) -> float:
+def _inbreeding_as_self_kinship(
+    inbreeding: float, ploidy: int
+) -> float:  # pragma: no cover
     """Calculate self-kinship of an individual."""
     return (1 + (ploidy - 1) * inbreeding) / ploidy
 
@@ -380,7 +386,7 @@ def _inbreeding_as_self_kinship(inbreeding: float, ploidy: int) -> float:
 @numba_jit
 def _hamilton_kerr_inbreeding_founder(
     lambda_p: float, lambda_q: float, ploidy_i: int
-) -> float:
+) -> float:  # pragma: no cover
     """Calculate inbreeding coefficient of a founder i where p and q
     are the unrecorded parents of i.
     """
@@ -400,7 +406,7 @@ def _hamilton_kerr_inbreeding_non_founder(
     ploidy_q: int,
     kinship_qq: float,
     kinship_pq: float,
-) -> float:
+) -> float:  # pragma: no cover
     """Calculate the inbreeding coefficient of a non founder
     individual i with parents p and q.
     """
@@ -427,7 +433,7 @@ def _hamilton_kerr_inbreeding_half_founder(
     kinship_pp: float,
     tau_q: int,
     lambda_q: float,
-) -> float:
+) -> float:  # pragma: no cover
     """Calculate the inbreeding coefficient of a half-founder i
     with known parent p and unknown parent q.
 
@@ -456,7 +462,7 @@ def _hamilton_kerr_inbreeding_half_founder(
 @numba_jit
 def _insert_hamilton_kerr_self_kinship(
     kinship: ArrayLike, parent: ArrayLike, tau: ArrayLike, lambda_: ArrayLike, i: int
-) -> None:
+) -> None:  # pragma: no cover
     p = parent[i, 0]
     q = parent[i, 1]
     tau_p = tau[i, 0]
@@ -509,7 +515,7 @@ def _hamilton_kerr_pair_kinship(
     tau_q: int,
     kinship_pj: float,
     kinship_qj: float,
-) -> float:
+) -> float:  # pragma: no cover
     ploidy_i = tau_p + tau_q
     return (tau_p / ploidy_i) * kinship_pj + (tau_q / ploidy_i) * kinship_qj
 
@@ -517,7 +523,7 @@ def _hamilton_kerr_pair_kinship(
 @numba_jit
 def _insert_hamilton_kerr_pair_kinship(
     kinship: ArrayLike, parent: ArrayLike, tau: ArrayLike, i: int, j: int
-) -> None:
+) -> None:  # pragma: no cover
     p = parent[i, 0]
     q = parent[i, 1]
     tau_p = tau[i, 0]
@@ -532,7 +538,7 @@ def _insert_hamilton_kerr_pair_kinship(
 @numba_jit
 def _compress_hamilton_kerr_parameters(
     parent: ArrayLike, tau: ArrayLike, lambda_: ArrayLike
-) -> Tuple[ArrayLike, ArrayLike, ArrayLike]:
+) -> Tuple[ArrayLike, ArrayLike, ArrayLike]:  # pragma: no cover
     """Compress arrays use in Hamilton-Kerr methods to have only two columns.
 
     The Hamilton-Kerr methods are defined such that each individual may
@@ -590,7 +596,7 @@ def kinship_Hamilton_Kerr(
     lambda_: ArrayLike,
     allow_half_founders: bool = False,
     dtype: type = np.float64,
-) -> ArrayLike:
+) -> ArrayLike:  # pragma: no cover
     """Calculate pairwise expected kinship from a pedigree with variable ploidy.
 
     Parameters
@@ -655,7 +661,9 @@ def kinship_Hamilton_Kerr(
 
 
 @numba_jit
-def _identify_founders_Hamilton_Kerr(parent: ArrayLike, tau: ArrayLike) -> ArrayLike:
+def _identify_founders_Hamilton_Kerr(
+    parent: ArrayLike, tau: ArrayLike
+) -> ArrayLike:  # pragma: no cover
     n, p = parent.shape
     out = np.zeros(n, dtype=np.bool_)
     for i in range(n):
@@ -672,7 +680,7 @@ def project_kinship_Hamilton_Kerr(
     tau: ArrayLike,
     lambda_: ArrayLike,
     allow_half_founders: bool = False,
-) -> ArrayLike:
+) -> ArrayLike:  # pragma: no cover
     """Project founder kinships along a pedigree to their decedents within
     an autopolyploid or mixed-ploidy pedigree.
 
@@ -1115,7 +1123,9 @@ def pedigree_kinship(
 
 
 @numba_jit
-def _position_sort_pair(x: int, y: int, position: ArrayLike) -> tuple:
+def _position_sort_pair(
+    x: int, y: int, position: ArrayLike
+) -> tuple:  # pragma: no cover
     if x < 0:
         return (x, y)
     elif y < 0:
@@ -1132,7 +1142,7 @@ def inbreeding_Hamilton_Kerr(
     tau: ArrayLike,
     lambda_: ArrayLike,
     allow_half_founders: bool = False,
-) -> Tuple[ArrayLike, ArrayLike]:
+) -> Tuple[ArrayLike, ArrayLike]:  # pragma: no cover
     """Calculate expected inbreeding coefficients from a pedigree with variable ploidy.
 
     Parameters
@@ -1584,7 +1594,7 @@ def _update_inverse_kinship(
     i: int,
     tau: ArrayLike,
     return_relationship=False,
-) -> None:
+) -> None:  # pragma: no cover
     p, q = parent[i]
     tau_p, tau_q = tau[i, 0], tau[i, 1]
     # weighted contribution of each parent
@@ -1645,7 +1655,7 @@ def inverse_kinship_Hamilton_Kerr(
     self_kinship: ArrayLike,
     parent_kinship: ArrayLike,
     return_relationship=False,
-) -> ArrayLike:
+) -> ArrayLike:  # pragma: no cover
     """Compute the inverse of the kinship matrix from pedigree structure.
 
     Parameters
@@ -1948,7 +1958,7 @@ def _ancestor_depth(
     initial: ArrayLike,
     parent: ArrayLike,
     order: ArrayLike,
-) -> ArrayLike:
+) -> ArrayLike:  # pragma: no cover
     depth = initial - 1
     n_samples, n_parents = parent.shape
     # reverse view of order
@@ -1973,7 +1983,7 @@ def _descendent_depth(
     initial: ArrayLike,
     parent: ArrayLike,
     order: ArrayLike,
-) -> ArrayLike:
+) -> ArrayLike:  # pragma: no cover
     depth = initial - 1
     n_samples, n_parents = parent.shape
     for idx in range(n_samples):
