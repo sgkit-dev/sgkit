@@ -1,7 +1,7 @@
 FROM rstudio/r-base:4.0-focal
 
 # Note: We freeze versions because we want point in time validation
-#       See: https://github.com/pystatgen/sgkit/pull/228
+#       See: https://github.com/sgkit-dev/sgkit/pull/228
 
 RUN apt-get update \
  && apt-get install python3 python3-pip git pkg-config -y \

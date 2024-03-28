@@ -322,7 +322,7 @@ def pca(
 
 
 def count_call_alternate_alleles(ds: Dataset, merge: bool = True) -> Dataset:
-    # TODO: Add to public API (https://github.com/pystatgen/sgkit/issues/282)
+    # TODO: Add to public API (https://github.com/sgkit-dev/sgkit/issues/282)
     AC = count_call_alleles(ds)["call_allele_count"]
     AC = AC[..., 1:].sum(dim="alleles").astype("int16")
     AC = AC.where(~ds.call_genotype_mask.any(dim="ploidy"), AC.dtype.type(-1))

@@ -66,8 +66,8 @@ myst_enable_extensions = [
 ]
 
 extlinks = {
-    "issue": ("https://github.com/pystatgen/sgkit/issues/%s", "GH %s"),
-    "pr": ("https://github.com/pystatgen/sgkit/pull/%s", "PR %s"),
+    "issue": ("https://github.com/sgkit-dev/sgkit/issues/%s", "GH %s"),
+    "pr": ("https://github.com/sgkit-dev/sgkit/pull/%s", "PR %s"),
     "user": ("https://github.com/%s", "%s"),
 }
 
@@ -96,7 +96,7 @@ templates_path = ["_templates"]
 
 html_context = dict(
     display_github=False,  # Integrate GitHub
-    github_user="pystatgen",  # Username
+    github_user="sgkit-dev",  # Username
     github_repo="sgkit",  # Repo name
     github_version="main",  # Version
     conf_py_path="/docs/",  # Path in the checkout to the docs root
@@ -142,7 +142,7 @@ html_theme = "pydata_sphinx_theme"
 
 # https://pydata-sphinx-theme.readthedocs.io/en/latest/user_guide/configuring.html
 html_theme_options = {
-    "github_url": "https://github.com/pystatgen/sgkit",
+    "github_url": "https://github.com/sgkit-dev/sgkit",
     "logo": {
         "image_light": "sgkit_trnsprnt.png",
         "image_dark": "sgkit_blue_trnsprnt.png",

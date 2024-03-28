@@ -113,7 +113,7 @@ def test_pc_relate__values_within_range() -> None:
 
 
 def test_pc_relate__parent_child_relationship() -> None:
-    # Eric's source: https://github.com/pystatgen/sgkit/pull/228#discussion_r487436876
+    # Eric's source: https://github.com/sgkit-dev/sgkit/pull/228#discussion_r487436876
 
     # Create a dataset that is 2/3 founders and 1/3 progeny
     seed = 1

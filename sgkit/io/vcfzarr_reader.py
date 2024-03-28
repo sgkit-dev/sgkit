@@ -53,7 +53,7 @@ def read_scikit_allel_vcfzarr(
     from a Zarr file created using scikit-allel's ``vcf_to_zarr`` function.
 
     This allows conversion from scikit-allel's Zarr format to sgkit's
-    `VCF Zarr <https://github.com/pystatgen/vcf-zarr-spec>`_ format.
+    `VCF Zarr <https://github.com/sgkit-dev/vcf-zarr-spec>`_ format.
 
     Since ``vcf_to_zarr`` does not preserve phasing information, there is no
     :data:`sgkit.variables.call_genotype_phased_spec` variable in the resulting dataset.
@@ -339,7 +339,7 @@ def concat_zarrs_optimized(
     # copy variables that are to be rechunked
     # NOTE: that this uses _to_zarr function defined here that is needed to avoid
     # race conditions between writing the array contents and its metadata
-    # see https://github.com/pystatgen/sgkit/pull/486
+    # see https://github.com/sgkit-dev/sgkit/pull/486
     for var in vars_to_rechunk:
         dtype = None
         if fix_strings and var in {"variant_id", "variant_allele"}:

@@ -135,12 +135,12 @@ def test_DP_field(shared_datadir, tmpdir):
     "vcf_file,allel_exclude_fields,sgkit_exclude_fields,max_alt_alleles",
     [
         # Excluding AA here because of pad-vs-missing data in sckit-allel strings
-        # https://github.com/pystatgen/sgkit/issues/1195
+        # https://github.com/sgkit-dev/sgkit/issues/1195
         ("sample.vcf.gz", ["AA"], ["INFO/AA"], 3),
         ("mixed.vcf.gz", None, None, 3),
         # exclude PL since it has Number=G, which is not yet supported
         # Excluding PGT and PID here because of pad-vs-missing data in sckit-allel strings
-        # https://github.com/pystatgen/sgkit/issues/1195
+        # https://github.com/sgkit-dev/sgkit/issues/1195
         # increase max_alt_alleles since scikit-allel does not truncate genotype calls
         (
             "CEUTrio.20.21.gatk3.4.g.vcf.bgz",

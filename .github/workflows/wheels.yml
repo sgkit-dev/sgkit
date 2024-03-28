@@ -13,7 +13,7 @@ on:
 jobs:
   build:
     # This workflow only runs on the origin org
-    if: github.repository_owner == 'pystatgen'
+    if: github.repository_owner == 'sgkit-dev'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -40,7 +40,7 @@ jobs:
 
   unix-test:
     # This workflow only runs on the origin org
-    if: github.repository_owner == 'pystatgen'
+    if: github.repository_owner == 'sgkit-dev'
     needs: ['build']
     strategy:
       matrix:
@@ -72,7 +72,7 @@ jobs:
   # Windows doesn't support vcf
   windows-test:
     # This workflow only runs on the origin org
-    if: github.repository_owner == 'pystatgen'
+    if: github.repository_owner == 'sgkit-dev'
     runs-on: windows-latest
     needs: ['build']
     strategy:
@@ -100,7 +100,7 @@ jobs:
           python sgkit-copy/.github/scripts/test_sgkit_plink.py
 
   pypi-upload:
-    if: github.repository_owner == 'pystatgen'
+    if: github.repository_owner == 'sgkit-dev'
     runs-on: ubuntu-latest
     needs: ['unix-test', 'windows-test']
     steps:

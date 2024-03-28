@@ -20,7 +20,7 @@ def run(dataset: str, dataset_dir="data/dataset"):
     zarr_path = dataset_dir / dataset / "genotypes.zarr.zip"
     ds = read_plink(path=plink_path, bim_sep="\t", fam_sep="\t")
     # Pre-compute string lengths until this is done:
-    # https://github.com/pystatgen/sgkit-plink/issues/12
+    # https://github.com/sgkit-dev/sgkit-plink/issues/12
     ds = ds.compute()
     logger.info(f"Loaded dataset {dataset}:")
     logger.info("\n" + str(ds))

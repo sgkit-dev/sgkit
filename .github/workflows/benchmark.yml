@@ -7,14 +7,14 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-  BENCHMARKS_REPO: pystatgen/sgkit-benchmarks-asv
+  BENCHMARKS_REPO: sgkit-dev/sgkit-benchmarks-asv
   ASV_CONFIG: benchmarks/asv.conf.json
   MACHINE_NAME: github-actions  # to identify github actions machine as hostname changes everytime
 
 jobs:
   build:
     # This workflow only runs on the origin org
-    if: github.repository_owner == 'pystatgen'
+    if: github.repository_owner == 'sgkit-dev'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -62,7 +62,7 @@ jobs:
         run: |
           cd ~/$BENCHMARKS_REPO
           git add .
-          git config --global user.email "project@pystatgen.org"
+          git config --global user.email "project@sgkit-dev.org"
           git config --global user.name "sgkit benchmark bot"
           git commit -m "Update benchmarks"
           git push origin main

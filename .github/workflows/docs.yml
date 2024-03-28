@@ -28,7 +28,7 @@ jobs:
         make html SPHINXOPTS="-W --keep-going -n"
     - name: Commit documentation changes to gh-pages branch
       run: |
-        git clone https://github.com/pystatgen/sgkit.git --branch gh-pages --single-branch gh-pages
+        git clone https://github.com/sgkit-dev/sgkit.git --branch gh-pages --single-branch gh-pages
         mkdir -p gh-pages/latest
         cp -r docs/_build/html/* gh-pages/latest
         cd gh-pages

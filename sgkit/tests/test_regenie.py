@@ -322,7 +322,7 @@ def test_regenie__glow_comparison(ndarray_type: str, datadir: Path) -> None:
         check_simulation_result(datadir, config, run, xp)
 
 
-@pytest.mark.xfail(reason="See https://github.com/pystatgen/sgkit/issues/456")
+@pytest.mark.xfail(reason="See https://github.com/sgkit-dev/sgkit/issues/456")
 def test_regenie__no_loco_with_one_contig():
     # LOCO is not possible with a single contig
     ds = simulate_regression_dataset(

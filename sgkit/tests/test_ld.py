@@ -158,7 +158,7 @@ PHASES_NO_SHRINK = (Phase.explicit, Phase.reuse, Phase.generate, Phase.target)
 @settings(max_examples=50, deadline=None, phases=PHASES_NO_SHRINK)
 @example(args=(np.array([[1, 1], [1, 1]], dtype="uint8"), 1, 1, 0.0, -1))
 @pytest.mark.skip(
-    reason="Hypothesis generates failures that need investigation: https://github.com/pystatgen/sgkit/issues/864"
+    reason="Hypothesis generates failures that need investigation: https://github.com/sgkit-dev/sgkit/issues/864"
 )
 def test_vs_skallel(args):
     x, size, step, threshold, chunks = args

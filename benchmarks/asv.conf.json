@@ -7,7 +7,7 @@
     "project": "sgkit",
 
     // The project's homepage
-    "project_url": "https://pystatgen.github.io/sgkit/",
+    "project_url": "https://sgkit-dev.github.io/sgkit/",
 
     // The URL or local path of the source code repository for the
     // project being benchmarked
@@ -55,7 +55,7 @@
     //"install_timeout": 600,
 
     // the base URL to show a commit for the project.
-     "show_commit_url": "http://github.com/pystatgen/sgkit/commit/",
+     "show_commit_url": "http://github.com/sgkit-dev/sgkit/commit/",
 
     // The Pythons you'd like to test against.  If not provided, defaults
     // to the current version of Python used to run `asv`.

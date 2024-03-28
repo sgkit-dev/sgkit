@@ -217,7 +217,7 @@ Merge can be used to rename output variables too.
     ds.merge(sg.count_variant_alleles(ds, merge=False).rename(variant_allele_count="my_variant_allele_count"))
 
 Note that there is a limitation where intermediate variables (``call_allele_count`` in this case)
-are not returned if ``merge=False``. See https://github.com/pystatgen/sgkit/issues/405.
+are not returned if ``merge=False``. See https://github.com/sgkit-dev/sgkit/issues/405.
 
 .. _python_interop:
 

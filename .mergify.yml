@@ -6,7 +6,7 @@ queue_rules:
       - status-success=build (3.10)
       - status-success=build (3.11)
       - status-success=win_build (3.9)
-      - approved-reviews-by=@pystatgen/committers
+      - approved-reviews-by=@sgkit-dev/committers
       - "#approved-reviews-by>=1"
       - label=auto-merge
 
@@ -18,7 +18,7 @@ pull_request_rules:
       - status-success=build (3.10)
       - status-success=build (3.11)
       - status-success=win_build (3.9)
-      - approved-reviews-by=@pystatgen/committers
+      - approved-reviews-by=@sgkit-dev/committers
       - "#approved-reviews-by>=1"
       - label=auto-merge
     actions:

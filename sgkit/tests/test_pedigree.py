@@ -1322,7 +1322,7 @@ def test_pedigree_inverse_kinship__raise_on_half_founder():
 
 @pytest.mark.skipif(
     sys.version_info >= (3, 11),
-    reason="Fails on Python 3.11, due to Numba error, see https://github.com/pystatgen/sgkit/pull/1080",
+    reason="Fails on Python 3.11, due to Numba error, see https://github.com/sgkit-dev/sgkit/pull/1080",
 )
 def test_pedigree_inverse_kinship__raise_on_singular_kinship_matrix():
     ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=4, n_ploidy=4, seed=1)

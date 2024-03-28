@@ -225,7 +225,7 @@ def test_max_str_len__invalid_dtype():
         max_str_len(np.array([1]))
 
 
-# track failure in https://github.com/pystatgen/sgkit/issues/890
+# track failure in https://github.com/sgkit-dev/sgkit/issues/890
 def test_max_str_len__dask_failure():
     pytest.importorskip("dask", minversion="2022.8")
     with pytest.raises(Exception):
