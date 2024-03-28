@@ -62,7 +62,7 @@ jobs:
         run: |
           cd ~/$BENCHMARKS_REPO
           git add .
-          git config --global user.email "project@sgkit-dev.org"
+          git config --global user.email "project@sgkit.dev"
           git config --global user.name "sgkit benchmark bot"
           git commit -m "Update benchmarks"
           git push origin main
