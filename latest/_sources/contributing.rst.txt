@@ -31,20 +31,20 @@ Conversation about *sgkit* happens in the following places:
 Discussions on GitHub Discussions (and previously the forum) tend to be about higher-level themes, and statistical genetics in
 general. Coding details should be discussed on GitHub issues and pull requests.
 
-.. _`GitHub Issue Tracker`: https://github.com/pystatgen/sgkit/issues
-.. _`GitHub Discussions`: https://github.com/pystatgen/sgkit/discussions
-.. _`Python for Statistical Genetics forum`: https://discourse.pystatgen.org/
+.. _`GitHub Issue Tracker`: https://github.com/sgkit-dev/sgkit/issues
+.. _`GitHub Discussions`: https://github.com/sgkit-dev/sgkit/discussions
+.. _`Python for Statistical Genetics forum`: https://discourse.sgkit-dev.org/
 
 
 Code repositories
 -----------------
 
 Code and documentation for *sgkit* is maintained in a few git repositories hosted on the
-GitHub ``pystatgen`` organization, https://github.com/pystatgen.  This includes the primary
+GitHub ``sgkit-dev`` organization, https://github.com/sgkit-dev.  This includes the primary
 repository and several other repositories for different components.  A
 non-exhaustive list follows:
 
-*  https://github.com/pystatgen/sgkit: The main code repository containing the
+*  https://github.com/sgkit-dev/sgkit: The main code repository containing the
    data representations (in Xarray), algorithms, and most documentation
 
 Git and GitHub can be challenging at first.  Fortunately good materials exist
@@ -65,7 +65,7 @@ then check out the `"good first issue" label`_, which contains issues that are g
 for starting developers.  Generally, familiarity with Python, NumPy, and
 some parallel computing (Dask) are assumed.
 
-.. _`"good first issue" label`: https://github.com/pystatgen/sgkit/labels/good%20first%20issue
+.. _`"good first issue" label`: https://github.com/sgkit-dev/sgkit/labels/good%20first%20issue
 
 Before starting work, make sure there is an issue covering the feature or bug you
 plan to produce a pull request for. Assign the issue to yourself to indicate that
@@ -77,7 +77,7 @@ Development environment
 Download code
 ~~~~~~~~~~~~~
 
-Make a fork of the main `sgkit repository <https://github.com/pystatgen/sgkit>`_ and
+Make a fork of the main `sgkit repository <https://github.com/sgkit-dev/sgkit>`_ and
 clone the fork::
 
    git clone https://github.com/<your-github-username>/sgkit
@@ -243,7 +243,7 @@ dependency, or add a new one, then don't forget to change both files. We try to 
 After a release, the release manager will update the corresponding dependencies in the
 `conda-forge feedstock <https://github.com/conda-forge/sgkit-feedstock>`_.
 
-There is a `GitHub Action <https://github.com/pystatgen/sgkit/actions/workflows/upstream.yml>`_ that runs every night
+There is a `GitHub Action <https://github.com/sgkit-dev/sgkit/actions/workflows/upstream.yml>`_ that runs every night
 against the main branches of our key upstream dependencies. This is useful for finding any breaking changes that would
 affect *sgkit*, so we can report or try to fix the problem before the upstream library is released.
 
@@ -253,7 +253,7 @@ Build dependencies are listed in ``requirements-dev.txt`` and ``requirements-doc
 Contributing to documentation
 -----------------------------
 
-*sgkit* uses Sphinx_ for documentation, hosted at https://pystatgen.github.io/sgkit/.
+*sgkit* uses Sphinx_ for documentation, hosted at https://sgkit-dev.github.io/sgkit/.
 Documentation is maintained in the RestructuredText markup language (``.rst``
 files) in ``docs``.  The documentation consists both of prose
 and API documentation.
@@ -288,8 +288,8 @@ configuration file. The benchmarks should be written in the ``benchmarks/``
 directory. For more information on different types of benchmarks have a look
 at the ``asv`` documentation here: https://asv.readthedocs.io/en/stable/writing_benchmarks.html#writing-benchmarks
 
-The results of benchmarks are uploaded to benchmarks repository: https://github.com/pystatgen/sgkit-benchmarks-asv
-via Github Actions. They can be seen on the static site here: https://pystatgen.github.io/sgkit-benchmarks-asv
+The results of benchmarks are uploaded to benchmarks repository: https://github.com/sgkit-dev/sgkit-benchmarks-asv
+via Github Actions. They can be seen on the static site here: https://sgkit-dev.github.io/sgkit-benchmarks-asv
 
 You can run the benchmark suite locally with::
 
@@ -341,7 +341,7 @@ Pull requests will be reviewed by a project maintainer. All changes to *sgkit* r
 approval by at least one maintainer.
 
 We use `mergify <https://mergify.io/>`_ to automate PR flow. A project
-`committer <https://github.com/orgs/pystatgen/teams/committers>`_ (reviewer) can decide
+`committer <https://github.com/orgs/sgkit-dev/teams/committers>`_ (reviewer) can decide
 to automatically merge a PR by labeling it with ``auto-merge``, and then when the PR gets
 at least one approval from a committer and a clean build it will get merged automatically.
 
@@ -357,22 +357,22 @@ Dataset subclassing
 Debates on whether or not we should use Xarray objects directly or
 put them behind a layer of encapsulation:
 
-- https://github.com/pystatgen/sgkit/pull/16#issuecomment-657725092
-- https://github.com/pystatgen/sgkit/pull/78#issuecomment-669878845
+- https://github.com/sgkit-dev/sgkit/pull/16#issuecomment-657725092
+- https://github.com/sgkit-dev/sgkit/pull/78#issuecomment-669878845
 
 Dataset API typing
 ~~~~~~~~~~~~~~~~~~
 
 Discussions around bringing stricter array type enforcement into the API:
 
-- https://github.com/pystatgen/sgkit/issues/43
-- https://github.com/pystatgen/sgkit/pull/124
-- https://github.com/pystatgen/sgkit/pull/276
+- https://github.com/sgkit-dev/sgkit/issues/43
+- https://github.com/sgkit-dev/sgkit/pull/124
+- https://github.com/sgkit-dev/sgkit/pull/276
 
 Dataset variables
 ~~~~~~~~~~~~~~~~~
 
-Naming conventions for variables: https://github.com/pystatgen/sgkit/issues/295
+Naming conventions for variables: https://github.com/sgkit-dev/sgkit/issues/295
 
 Delayed invariant checks
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -380,25 +380,25 @@ Delayed invariant checks
 Discussions on how to run sanity checks on arrays efficiently and why those checks would be
 useful if they were possible (they are not possible currently w/ Dask):
 
-- https://github.com/pystatgen/sgkit/issues/61
+- https://github.com/sgkit-dev/sgkit/issues/61
 - https://github.com/dask/dask/issues/97
 
 Mixed ploidy
 ~~~~~~~~~~~~
 
-Proposal for handling mixed ploidy: https://github.com/pystatgen/sgkit/issues/243
+Proposal for handling mixed ploidy: https://github.com/sgkit-dev/sgkit/issues/243
 
 Numba guvectorize usage
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Learning how to use ``guvectorize`` effectively:
 
-- https://github.com/pystatgen/sgkit/pull/114
-- https://github.com/pystatgen/sgkit/pull/348
+- https://github.com/sgkit-dev/sgkit/pull/114
+- https://github.com/sgkit-dev/sgkit/pull/348
 
 API namespace
 ~~~~~~~~~~~~~
 
 Sgkit controls API namespace via init files. To accommodate for mypy and docstrings
 we include both imports and ``__all__`` declaration. More on this decision in the issue:
-https://github.com/pystatgen/sgkit/issues/251
+https://github.com/sgkit-dev/sgkit/issues/251

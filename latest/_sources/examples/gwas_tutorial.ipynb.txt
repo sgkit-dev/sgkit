@@ -13,7 +13,7 @@
    "id": "written-product",
    "metadata": {},
    "source": [
-    "This notebook is an [sgkit](https://pystatgen.github.io/sgkit) port of Hail's [GWAS Tutorial](https://nbviewer.jupyter.org/github/tomwhite/sgkit/blob/86753e814c6d56982b6950ec3de727f3b1bfad7d/docs/examples/01-genome-wide-association-study.ipynb), which demonstrates how to run a genome-wide SNP association test. Readers are encouraged to read the Hail tutorial alongside this one for more background, and to see the motivation behind some of the steps.\n",
+    "This notebook is an [sgkit](https://sgkit-dev.github.io/sgkit) port of Hail's [GWAS Tutorial](https://nbviewer.jupyter.org/github/tomwhite/sgkit/blob/86753e814c6d56982b6950ec3de727f3b1bfad7d/docs/examples/01-genome-wide-association-study.ipynb), which demonstrates how to run a genome-wide SNP association test. Readers are encouraged to read the Hail tutorial alongside this one for more background, and to see the motivation behind some of the steps.\n",
     "\n",
     "_Note that some of the results do not exactly match the output from Hail. Also, since sgkit is still a 0.x release, its API is still subject to non-backwards compatible changes._"
    ]
@@ -97,7 +97,7 @@
    "id": "elementary-college",
    "metadata": {},
    "source": [
-    "Next, [convert it to Zarr](https://pystatgen.github.io/sgkit/latest/user_guide.html#converting-genetic-data-to-zarr), stored on the local filesystem in a directory called _1kg.zarr_."
+    "Next, [convert it to Zarr](https://sgkit-dev.github.io/sgkit/latest/user_guide.html#converting-genetic-data-to-zarr), stored on the local filesystem in a directory called _1kg.zarr_."
    ]
   },
   {
@@ -3536,7 +3536,7 @@
    "source": [
     "QC is the process of filtering out poor quality data before running an analysis. This is usually an iterative process.\n",
     "\n",
-    "The [`sample_stats`](https://pystatgen.github.io/sgkit/latest/generated/sgkit.sample_stats.html) function in sgkit computes a collection of useful metrics for each sample and stores them in new variables. (The Hail equivalent is `sample_qc`.)\n",
+    "The [`sample_stats`](https://sgkit-dev.github.io/sgkit/latest/generated/sgkit.sample_stats.html) function in sgkit computes a collection of useful metrics for each sample and stores them in new variables. (The Hail equivalent is `sample_qc`.)\n",
     "\n",
     "Here's the dataset _before_ running `sample_stats`."
    ]
@@ -5878,7 +5878,7 @@
     "sample_dp_mean = dp.mean(dim=\"variants\")\n",
     "sample_dp_mean.attrs[\"long_name\"] = \"Mean Sample DP\"\n",
     "ds[\"sample_dp_mean\"] = sample_dp_mean # add new data array to dataset\n",
-    "# Following does not work with recent versions of xarray, see https://github.com/pystatgen/sgkit/issues/934\n",
+    "# Following does not work with recent versions of xarray, see https://github.com/sgkit-dev/sgkit/issues/934\n",
     "#ds.plot.scatter(x=\"sample_dp_mean\", y=\"sample_call_rate\", size=8, s=10);"
    ]
   },
@@ -5988,7 +5988,7 @@
    "id": "banner-structure",
    "metadata": {},
    "source": [
-    "Variant QC is similar. This time we use the [`variant_stats`](https://pystatgen.github.io/sgkit/latest/generated/sgkit.variant_stats.html) function, but we won't do any filtering on these variables."
+    "Variant QC is similar. This time we use the [`variant_stats`](https://sgkit-dev.github.io/sgkit/latest/generated/sgkit.variant_stats.html) function, but we won't do any filtering on these variables."
    ]
   },
   {
@@ -13117,7 +13117,7 @@
     "ds_pca[\"sample_pca_projection_0\"] = ds_pca.sample_pca_projection[:,0]\n",
     "ds_pca[\"sample_pca_projection_1\"] = ds_pca.sample_pca_projection[:,1]\n",
     "ds_pca[\"sample_pca_projection_2\"] = ds_pca.sample_pca_projection[:,2]\n",
-    "# Following does not work with recent versions of xarray, see https://github.com/pystatgen/sgkit/issues/934\n",
+    "# Following does not work with recent versions of xarray, see https://github.com/sgkit-dev/sgkit/issues/934\n",
     "#ds_pca.plot.scatter(x=\"sample_pca_projection_0\", y=\"sample_pca_projection_1\", hue=\"SuperPopulation\", size=8, s=10);"
    ]
   },

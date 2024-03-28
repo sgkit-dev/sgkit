@@ -300,7 +300,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/pystatgen/sgkit" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/sgkit-dev/sgkit" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -485,7 +485,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/pystatgen/sgkit" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/sgkit-dev/sgkit" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -604,10 +604,10 @@ This page provides resources on how best to contribute.</p>
 <h2><a class="toc-backref" href="#id1" role="doc-backlink">Discussion forums</a><a class="headerlink" href="#discussion-forums" title="Permalink to this heading">#</a></h2>
 <p>Conversation about <em>sgkit</em> happens in the following places:</p>
 <ol class="arabic simple">
-<li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/issues">GitHub Issue Tracker</a>: for discussions around new features or bugs</p></li>
-<li><p><a class="reference external" href="https://github.com/pystatgen/sgkit/discussions">GitHub Discussions</a>: for general discussions, and questions like “how do I do X”,
+<li><p><a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues">GitHub Issue Tracker</a>: for discussions around new features or bugs</p></li>
+<li><p><a class="reference external" href="https://github.com/sgkit-dev/sgkit/discussions">GitHub Discussions</a>: for general discussions, and questions like “how do I do X”,
 or “what’s the best way to do Y”?</p></li>
-<li><p><a class="reference external" href="https://discourse.pystatgen.org/">Python for Statistical Genetics forum</a>: for general discussion (deprecated)</p></li>
+<li><p><a class="reference external" href="https://discourse.sgkit-dev.org/">Python for Statistical Genetics forum</a>: for general discussion (deprecated)</p></li>
 </ol>
 <p>Discussions on GitHub Discussions (and previously the forum) tend to be about higher-level themes, and statistical genetics in
 general. Coding details should be discussed on GitHub issues and pull requests.</p>
@@ -615,11 +615,11 @@ general. Coding details should be discussed on GitHub issues and pull requests.<
 <section id="code-repositories">
 <h2><a class="toc-backref" href="#id2" role="doc-backlink">Code repositories</a><a class="headerlink" href="#code-repositories" title="Permalink to this heading">#</a></h2>
 <p>Code and documentation for <em>sgkit</em> is maintained in a few git repositories hosted on the
-GitHub <code class="docutils literal notranslate"><span class="pre">pystatgen</span></code> organization, <a class="github reference external" href="https://github.com/pystatgen">pystatgen</a>.  This includes the primary
+GitHub <code class="docutils literal notranslate"><span class="pre">sgkit-dev</span></code> organization, <a class="github reference external" href="https://github.com/sgkit-dev">sgkit-dev</a>.  This includes the primary
 repository and several other repositories for different components.  A
 non-exhaustive list follows:</p>
 <ul class="simple">
-<li><p><a class="github reference external" href="https://github.com/pystatgen/sgkit">pystatgen/sgkit</a>: The main code repository containing the
+<li><p><a class="github reference external" href="https://github.com/sgkit-dev/sgkit">sgkit-dev/sgkit</a>: The main code repository containing the
 data representations (in Xarray), algorithms, and most documentation</p></li>
 </ul>
 <p>Git and GitHub can be challenging at first.  Fortunately good materials exist
@@ -630,10 +630,10 @@ Pandas’ documentation and links on this subject at
 <section id="issues">
 <h2><a class="toc-backref" href="#id3" role="doc-backlink">Issues</a><a class="headerlink" href="#issues" title="Permalink to this heading">#</a></h2>
 <p>The community discusses and tracks known bugs and potential features in the
-<a class="reference external" href="https://github.com/pystatgen/sgkit/issues">GitHub Issue Tracker</a>.  If you have a new idea or have identified a bug, then
+<a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues">GitHub Issue Tracker</a>.  If you have a new idea or have identified a bug, then
 you should raise it there to start public discussion.</p>
 <p>If you are looking for an introductory issue to get started with development,
-then check out the <a class="reference external" href="https://github.com/pystatgen/sgkit/labels/good%20first%20issue">“good first issue” label</a>, which contains issues that are good
+then check out the <a class="reference external" href="https://github.com/sgkit-dev/sgkit/labels/good%20first%20issue">“good first issue” label</a>, which contains issues that are good
 for starting developers.  Generally, familiarity with Python, NumPy, and
 some parallel computing (Dask) are assumed.</p>
 <p>Before starting work, make sure there is an issue covering the feature or bug you
@@ -644,7 +644,7 @@ you are working on it. In the PR make sure to mention/link the related issue(s).
 <h2><a class="toc-backref" href="#id4" role="doc-backlink">Development environment</a><a class="headerlink" href="#development-environment" title="Permalink to this heading">#</a></h2>
 <section id="download-code">
 <h3><a class="toc-backref" href="#id5" role="doc-backlink">Download code</a><a class="headerlink" href="#download-code" title="Permalink to this heading">#</a></h3>
-<p>Make a fork of the main <a class="reference external" href="https://github.com/pystatgen/sgkit">sgkit repository</a> and
+<p>Make a fork of the main <a class="reference external" href="https://github.com/sgkit-dev/sgkit">sgkit repository</a> and
 clone the fork:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/&lt;</span><span class="n">your</span><span class="o">-</span><span class="n">github</span><span class="o">-</span><span class="n">username</span><span class="o">&gt;/</span><span class="n">sgkit</span>
 </pre></div>
@@ -773,7 +773,7 @@ dependency, or add a new one, then don’t forget to change both files. We try t
 (to exclude particular version numbers) to a minimum, but sometimes this is unavoidable due to bugs or conflicts.</p>
 <p>After a release, the release manager will update the corresponding dependencies in the
 <a class="reference external" href="https://github.com/conda-forge/sgkit-feedstock">conda-forge feedstock</a>.</p>
-<p>There is a <a class="reference external" href="https://github.com/pystatgen/sgkit/actions/workflows/upstream.yml">GitHub Action</a> that runs every night
+<p>There is a <a class="reference external" href="https://github.com/sgkit-dev/sgkit/actions/workflows/upstream.yml">GitHub Action</a> that runs every night
 against the main branches of our key upstream dependencies. This is useful for finding any breaking changes that would
 affect <em>sgkit</em>, so we can report or try to fix the problem before the upstream library is released.</p>
 <p>Build dependencies are listed in <code class="docutils literal notranslate"><span class="pre">requirements-dev.txt</span></code> and <code class="docutils literal notranslate"><span class="pre">requirements-doc.txt</span></code>.</p>
@@ -781,7 +781,7 @@ affect <em>sgkit</em>, so we can report or try to fix the problem before the ups
 </section>
 <section id="contributing-to-documentation">
 <h2><a class="toc-backref" href="#id15" role="doc-backlink">Contributing to documentation</a><a class="headerlink" href="#contributing-to-documentation" title="Permalink to this heading">#</a></h2>
-<p><em>sgkit</em> uses <a class="reference external" href="https://www.sphinx-doc.org/">Sphinx</a> for documentation, hosted at <a class="reference external" href="https://pystatgen.github.io/sgkit/">https://pystatgen.github.io/sgkit/</a>.
+<p><em>sgkit</em> uses <a class="reference external" href="https://www.sphinx-doc.org/">Sphinx</a> for documentation, hosted at <a class="reference external" href="https://sgkit-dev.github.io/sgkit/">https://sgkit-dev.github.io/sgkit/</a>.
 Documentation is maintained in the RestructuredText markup language (<code class="docutils literal notranslate"><span class="pre">.rst</span></code>
 files) in <code class="docutils literal notranslate"><span class="pre">docs</span></code>.  The documentation consists both of prose
 and API documentation.</p>
@@ -809,8 +809,8 @@ recipe for the same is defined in the <code class="docutils literal notranslate"
 configuration file. The benchmarks should be written in the <code class="docutils literal notranslate"><span class="pre">benchmarks/</span></code>
 directory. For more information on different types of benchmarks have a look
 at the <code class="docutils literal notranslate"><span class="pre">asv</span></code> documentation here: <a class="reference external" href="https://asv.readthedocs.io/en/stable/writing_benchmarks.html#writing-benchmarks">https://asv.readthedocs.io/en/stable/writing_benchmarks.html#writing-benchmarks</a></p>
-<p>The results of benchmarks are uploaded to benchmarks repository: <a class="github reference external" href="https://github.com/pystatgen/sgkit-benchmarks-asv">pystatgen/sgkit-benchmarks-asv</a>
-via Github Actions. They can be seen on the static site here: <a class="reference external" href="https://pystatgen.github.io/sgkit-benchmarks-asv">https://pystatgen.github.io/sgkit-benchmarks-asv</a></p>
+<p>The results of benchmarks are uploaded to benchmarks repository: <a class="github reference external" href="https://github.com/sgkit-dev/sgkit-benchmarks-asv">sgkit-dev/sgkit-benchmarks-asv</a>
+via Github Actions. They can be seen on the static site here: <a class="reference external" href="https://sgkit-dev.github.io/sgkit-benchmarks-asv">https://sgkit-dev.github.io/sgkit-benchmarks-asv</a></p>
 <p>You can run the benchmark suite locally with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">asv</span> <span class="n">run</span> <span class="o">--</span><span class="n">config</span> <span class="n">benchmarks</span><span class="o">/</span><span class="n">asv</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
@@ -856,7 +856,7 @@ of salt.</p>
 <p>Pull requests will be reviewed by a project maintainer. All changes to <em>sgkit</em> require
 approval by at least one maintainer.</p>
 <p>We use <a class="reference external" href="https://mergify.io/">mergify</a> to automate PR flow. A project
-<a class="reference external" href="https://github.com/orgs/pystatgen/teams/committers">committer</a> (reviewer) can decide
+<a class="reference external" href="https://github.com/orgs/sgkit-dev/teams/committers">committer</a> (reviewer) can decide
 to automatically merge a PR by labeling it with <code class="docutils literal notranslate"><span class="pre">auto-merge</span></code>, and then when the PR gets
 at least one approval from a committer and a clean build it will get merged automatically.</p>
 </section>
@@ -869,49 +869,49 @@ history behind the design choices that have been made within the project so far.
 <p>Debates on whether or not we should use Xarray objects directly or
 put them behind a layer of encapsulation:</p>
 <ul class="simple">
-<li><p><a class="github reference external" href="https://github.com/pystatgen/sgkit/pull/16#issuecomment-657725092">pystatgen/sgkit#16</a></p></li>
-<li><p><a class="github reference external" href="https://github.com/pystatgen/sgkit/pull/78#issuecomment-669878845">pystatgen/sgkit#78</a></p></li>
+<li><p><a class="github reference external" href="https://github.com/sgkit-dev/sgkit/pull/16#issuecomment-657725092">sgkit-dev/sgkit#16</a></p></li>
+<li><p><a class="github reference external" href="https://github.com/sgkit-dev/sgkit/pull/78#issuecomment-669878845">sgkit-dev/sgkit#78</a></p></li>
 </ul>
 </section>
 <section id="dataset-api-typing">
 <h3><a class="toc-backref" href="#id20" role="doc-backlink">Dataset API typing</a><a class="headerlink" href="#dataset-api-typing" title="Permalink to this heading">#</a></h3>
 <p>Discussions around bringing stricter array type enforcement into the API:</p>
 <ul class="simple">
-<li><p><a class="github reference external" href="https://github.com/pystatgen/sgkit/issues/43">pystatgen/sgkit#43</a></p></li>
-<li><p><a class="github reference external" href="https://github.com/pystatgen/sgkit/pull/124">pystatgen/sgkit#124</a></p></li>
-<li><p><a class="github reference external" href="https://github.com/pystatgen/sgkit/pull/276">pystatgen/sgkit#276</a></p></li>
+<li><p><a class="github reference external" href="https://github.com/sgkit-dev/sgkit/issues/43">sgkit-dev/sgkit#43</a></p></li>
+<li><p><a class="github reference external" href="https://github.com/sgkit-dev/sgkit/pull/124">sgkit-dev/sgkit#124</a></p></li>
+<li><p><a class="github reference external" href="https://github.com/sgkit-dev/sgkit/pull/276">sgkit-dev/sgkit#276</a></p></li>
 </ul>
 </section>
 <section id="dataset-variables">
 <h3><a class="toc-backref" href="#id21" role="doc-backlink">Dataset variables</a><a class="headerlink" href="#dataset-variables" title="Permalink to this heading">#</a></h3>
-<p>Naming conventions for variables: <a class="github reference external" href="https://github.com/pystatgen/sgkit/issues/295">pystatgen/sgkit#295</a></p>
+<p>Naming conventions for variables: <a class="github reference external" href="https://github.com/sgkit-dev/sgkit/issues/295">sgkit-dev/sgkit#295</a></p>
 </section>
 <section id="delayed-invariant-checks">
 <h3><a class="toc-backref" href="#id22" role="doc-backlink">Delayed invariant checks</a><a class="headerlink" href="#delayed-invariant-checks" title="Permalink to this heading">#</a></h3>
 <p>Discussions on how to run sanity checks on arrays efficiently and why those checks would be
 useful if they were possible (they are not possible currently w/ Dask):</p>
 <ul class="simple">
-<li><p><a class="github reference external" href="https://github.com/pystatgen/sgkit/issues/61">pystatgen/sgkit#61</a></p></li>
+<li><p><a class="github reference external" href="https://github.com/sgkit-dev/sgkit/issues/61">sgkit-dev/sgkit#61</a></p></li>
 <li><p><a class="github reference external" href="https://github.com/dask/dask/issues/97">dask/dask#97</a></p></li>
 </ul>
 </section>
 <section id="mixed-ploidy">
 <h3><a class="toc-backref" href="#id23" role="doc-backlink">Mixed ploidy</a><a class="headerlink" href="#mixed-ploidy" title="Permalink to this heading">#</a></h3>
-<p>Proposal for handling mixed ploidy: <a class="github reference external" href="https://github.com/pystatgen/sgkit/issues/243">pystatgen/sgkit#243</a></p>
+<p>Proposal for handling mixed ploidy: <a class="github reference external" href="https://github.com/sgkit-dev/sgkit/issues/243">sgkit-dev/sgkit#243</a></p>
 </section>
 <section id="numba-guvectorize-usage">
 <h3><a class="toc-backref" href="#id24" role="doc-backlink">Numba guvectorize usage</a><a class="headerlink" href="#numba-guvectorize-usage" title="Permalink to this heading">#</a></h3>
 <p>Learning how to use <code class="docutils literal notranslate"><span class="pre">guvectorize</span></code> effectively:</p>
 <ul class="simple">
-<li><p><a class="github reference external" href="https://github.com/pystatgen/sgkit/pull/114">pystatgen/sgkit#114</a></p></li>
-<li><p><a class="github reference external" href="https://github.com/pystatgen/sgkit/pull/348">pystatgen/sgkit#348</a></p></li>
+<li><p><a class="github reference external" href="https://github.com/sgkit-dev/sgkit/pull/114">sgkit-dev/sgkit#114</a></p></li>
+<li><p><a class="github reference external" href="https://github.com/sgkit-dev/sgkit/pull/348">sgkit-dev/sgkit#348</a></p></li>
 </ul>
 </section>
 <section id="api-namespace">
 <h3><a class="toc-backref" href="#id25" role="doc-backlink">API namespace</a><a class="headerlink" href="#api-namespace" title="Permalink to this heading">#</a></h3>
 <p>Sgkit controls API namespace via init files. To accommodate for mypy and docstrings
 we include both imports and <code class="docutils literal notranslate"><span class="pre">__all__</span></code> declaration. More on this decision in the issue:
-<a class="github reference external" href="https://github.com/pystatgen/sgkit/issues/251">pystatgen/sgkit#251</a></p>
+<a class="github reference external" href="https://github.com/sgkit-dev/sgkit/issues/251">sgkit-dev/sgkit#251</a></p>
 </section>
 </section>
 </section>

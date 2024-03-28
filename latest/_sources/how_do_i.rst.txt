@@ -87,7 +87,7 @@ Set an index on the dataset, then call :meth:`xarray.Dataset.sel`:
 
     ds.set_index(variants=("variant_contig", "variant_position")).sel(variants=(0, slice(2, 4)))
 
-An API to make this easier is under discussion. Please add your requirements to https://github.com/pystatgen/sgkit/pull/658.
+An API to make this easier is under discussion. Please add your requirements to https://github.com/sgkit-dev/sgkit/pull/658.
 
 Get the list of samples?
 ------------------------
