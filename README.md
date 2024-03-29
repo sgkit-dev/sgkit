@@ -11,7 +11,7 @@ Sgkit is a Python package that provides a variety of analytical genetics methods
 general-purpose frameworks such as [Xarray](http://xarray.pydata.org/en/stable/), [Pandas](https://pandas.pydata.org/docs/),
 [Dask](https://docs.dask.org/en/latest/) and [Zarr](https://zarr.readthedocs.io/en/stable/).
 
-For more information on using sgkit, see the [documentation](https://sgkit-dev.github.io/sgkit/latest/).
+For more information on using sgkit, see the [documentation](https://sgkit-dev.github.io/sgkit/).
 
 [//]: # (numfocus-fiscal-sponsor-attribution)
 
