@@ -5,7 +5,7 @@ Changelog
 
 .. _changelog.0.8.0:
 
-0.8.0 (unreleased)
+0.8.0 (1 May 2024)
 -----------------------
 
 New Features
@@ -43,12 +43,27 @@ Bug fixes
   fields were marked as the corresponding "fill" value. For example, missing
   string values were stored as the empty string (string fill value) rather
   than "." (string missing value). Similarly for integer fields, missing
-  values were stored as -2 (int fill) rather than -1 (int missing)
-  (:user:`jeromekelleher`, :pr:`1190`, :issue:`1192`).
+  values were stored as -2 (int fill) rather than -1 (int missing).
+  (:user:`jeromekelleher`, :pr:`1190`, :issue:`1192`)
+- Change `max_str_len` utility function to return a Python int rather than
+  an array scalar.
+  (:user:`tomwhite`, :pr:`1086`, :issue:`1085`)
+- Turn off numba cache by default.
+  (:user:`jeromekelleher`, :pr:`1191`, :issue:`1156`)
+- Fix xarray repr in doctests.
+  (:user:`tomwhite`, :pr:`1205`, :issue:`1204`)
+- Avoid disabling jit on guvectorised functions.
+  (:user:`timothymillar`, :pr:`1199`, :issue:`1194`)
 
+Documentation
+~~~~~~~~~~~~~
 
-.. Documentation
-.. ~~~~~~~~~~~~~
+- Add tutorial on relationship matrices.
+  (:user:`timothymillar`, :pr:`1072`, :issue:`956`)
+- Add pairwise_distance to docs.
+  (:user:`benjeffery`, :pr:`1145`, :issue:`1142`)
+- Format matrix in pairwise docs.
+  (:user:`benjeffery`, :pr:`1148`, :issue:`1147`)
 
 .. _changelog.0.7.0:
 
