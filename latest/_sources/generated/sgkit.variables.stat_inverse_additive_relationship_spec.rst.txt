@@ -1,6 +1,0 @@
-﻿sgkit.variables.stat\_inverse\_additive\_relationship\_spec
-===========================================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: stat_inverse_additive_relationship_spec

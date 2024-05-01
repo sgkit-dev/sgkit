@@ -1,6 +1,0 @@
-﻿sgkit.pedigree\_inverse\_relationship
-=====================================
-
-.. currentmodule:: sgkit
-
-.. autofunction:: pedigree_inverse_relationship

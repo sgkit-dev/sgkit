@@ -1,6 +1,0 @@
-﻿sgkit.variables.genotype\_count\_spec
-=====================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: genotype_count_spec

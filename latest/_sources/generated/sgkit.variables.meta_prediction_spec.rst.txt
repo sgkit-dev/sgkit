@@ -1,6 +1,0 @@
-﻿sgkit.variables.meta\_prediction\_spec
-======================================
-
-.. currentmodule:: sgkit.variables
-
-.. autodata:: meta_prediction_spec

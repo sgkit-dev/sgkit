@@ -1,6 +1,6 @@
-﻿sgkit.Garud\_h
+﻿sgkit.Garud\_H
 ==============
 
 .. currentmodule:: sgkit
 
-.. autofunction:: Garud_h
+.. autofunction:: Garud_H

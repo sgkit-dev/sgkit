@@ -1,6 +1,0 @@
-﻿sgkit.read\_vcfzarr
-===================
-
-.. currentmodule:: sgkit
-
-.. autofunction:: read_vcfzarr

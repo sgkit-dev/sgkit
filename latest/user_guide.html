@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>User Guide &#8212; sgkit  documentation</title>
   
@@ -19,15 +19,15 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
   
-  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/typehints.css" />
@@ -36,19 +36,17 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
-        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
     <script defer="defer" src="_static/docsearch.sbt.js"></script>
@@ -56,12 +54,33 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Reading VCF" href="vcf.html" />
-    <link rel="prev" title="Getting Started" href="getting_started.html" />
-
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-
-
+  <meta name="docsearch:language" content="None"/>  
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
 
   </head>
   
@@ -70,15 +89,7 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
-
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   
   <input type="checkbox"
           class="sidebar-toggle"
@@ -113,17 +124,15 @@
 </form></div>
   </div>
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
   </label>
   
-  
-  <div class="col-lg-3 navbar-header-items__start">
+  <div class="navbar-header-items__start">
     
       <div class="navbar-item">
-
   
 
 <a class="navbar-brand logo" href="index.html">
@@ -131,26 +140,31 @@
   
   
   
-  
     
     
       
     
     
-    <img src="_static/sgkit_trnsprnt.png" class="logo__image only-light" alt="sgkit  documentation - Home"/>
-    <script>document.write(`<img src="_static/sgkit_blue_trnsprnt.png" class="logo__image only-dark" alt="sgkit  documentation - Home"/>`);</script>
+    <img src="_static/sgkit_trnsprnt.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="_static/sgkit_blue_trnsprnt.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
     
   </div>
   
+  
   <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
-        <div class="navbar-item">
-<nav class="navbar-nav">
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
@@ -187,48 +201,48 @@
                       </a>
                     </li>
                 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     More
                 </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
+                <div class="dropdown-menu">
                     
                     <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="how_do_i.html">
+                      <a class="nav-link nav-internal" href="how_do_i.html">
                         How do I …
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="contributing.html">
+                      <a class="nav-link nav-internal" href="contributing.html">
                         Contributing to sgkit
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="about.html">
+                      <a class="nav-link nav-internal" href="about.html">
                         About
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="news.html">
+                      <a class="nav-link nav-internal" href="news.html">
                         News
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="changelog.html">
+                      <a class="nav-link nav-internal" href="changelog.html">
                         Changelog
                       </a>
                     </li>
                 
-                </ul>
-            </li>
+                </div>
+            </div>
             
   </ul>
 </nav></div>
@@ -240,16 +254,13 @@
       
         <div class="navbar-item navbar-persistent--container">
           
-
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+  </button>
+`);
+</script>
         </div>
       
       
@@ -257,34 +268,24 @@
 <script>
 document.write(`
   <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-2"
-      type="button"
-      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-2"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      latest  <!-- this text may get changed later by javascript -->
       <span class="caret"></span>
     </button>
-    <div id="pst-version-switcher-list-2"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-2">
-      <!-- dropdown will be populated by javascript on page load -->
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
     </div>
   </div>
 `);
 </script></div>
       
         <div class="navbar-item">
-
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
   </button>
 `);
 </script></div>
@@ -300,8 +301,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/sgkit-dev/sgkit" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitHub</span></a>
+          <a href="https://github.com/sgkit-dev/sgkit" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
 </ul></div>
       
@@ -311,35 +312,29 @@ document.write(`
   
   
     <div class="navbar-persistent--mobile">
-
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+  </button>
+`);
+</script>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
       <span class="fa-solid fa-outdent"></span>
     </label>
   
 </div>
 
-    </header>
+    </nav>
   
-
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      
-      
-      <div class="bd-sidebar-primary bd-sidebar">
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -348,8 +343,13 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
-<nav class="navbar-nav">
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
@@ -386,48 +386,48 @@ document.write(`
                       </a>
                     </li>
                 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     More
                 </button>
-                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                <div class="dropdown-menu">
                     
                     <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="how_do_i.html">
+                      <a class="nav-link nav-internal" href="how_do_i.html">
                         How do I …
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="contributing.html">
+                      <a class="nav-link nav-internal" href="contributing.html">
                         Contributing to sgkit
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="about.html">
+                      <a class="nav-link nav-internal" href="about.html">
                         About
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="news.html">
+                      <a class="nav-link nav-internal" href="news.html">
                         News
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="changelog.html">
+                      <a class="nav-link nav-internal" href="changelog.html">
                         Changelog
                       </a>
                     </li>
                 
-                </ul>
-            </li>
+                </div>
+            </div>
             
   </ul>
 </nav></div>
@@ -442,34 +442,24 @@ document.write(`
 <script>
 document.write(`
   <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-3"
-      type="button"
-      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-3"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      latest  <!-- this text may get changed later by javascript -->
       <span class="caret"></span>
     </button>
-    <div id="pst-version-switcher-list-3"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-3">
-      <!-- dropdown will be populated by javascript on page load -->
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
     </div>
   </div>
 `);
 </script></div>
         
           <div class="navbar-item">
-
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
   </button>
 `);
 </script></div>
@@ -485,23 +475,14 @@ document.write(`
           
           
           
-          <a href="https://github.com/sgkit-dev/sgkit" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitHub</span></a>
+          <a href="https://github.com/sgkit-dev/sgkit" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
 </ul></div>
         
       </div>
     
   </div>
-  
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"></div>
-</nav></div>
-    </div>
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
@@ -527,8 +508,8 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
-  <ul class="bd-breadcrumbs">
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="index.html" class="nav-link" aria-label="Home">
@@ -550,11 +531,10 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article">
-                  
-<section id="user-guide">
-<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this heading">#</a></h1>
-<nav class="contents local" id="table-of-contents">
+                <article class="bd-article" role="main">
+                   <section id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">#</a></h1>
+<div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of contents:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#reading-and-writing-genetic-data" id="id5">Reading and writing genetic data</a></p>
@@ -596,11 +576,11 @@ document.write(`
 </ul>
 </li>
 </ul>
-</nav>
+</div>
 <section id="reading-and-writing-genetic-data">
-<span id="id1"></span><h2><a class="toc-backref" href="#id5" role="doc-backlink">Reading and writing genetic data</a><a class="headerlink" href="#reading-and-writing-genetic-data" title="Permalink to this heading">#</a></h2>
+<span id="id1"></span><h2><a class="toc-backref" href="#id5">Reading and writing genetic data</a><a class="headerlink" href="#reading-and-writing-genetic-data" title="Permalink to this headline">#</a></h2>
 <section id="installation">
-<span id="id2"></span><h3><a class="toc-backref" href="#id6" role="doc-backlink">Installation</a><a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h3>
+<span id="id2"></span><h3><a class="toc-backref" href="#id6">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">#</a></h3>
 <p>Sgkit can read standard genetic file formats, including VCF, PLINK, and BGEN. It can also export
 to VCF.</p>
 <p>If sgkit has been installed using conda, support for reading BGEN and PLINK is included, but
@@ -626,7 +606,7 @@ as an “extra” feature using pip, as follows.</p>
 </div>
 </section>
 <section id="converting-genetic-data-to-zarr">
-<h3><a class="toc-backref" href="#id7" role="doc-backlink">Converting genetic data to Zarr</a><a class="headerlink" href="#converting-genetic-data-to-zarr" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id7">Converting genetic data to Zarr</a><a class="headerlink" href="#converting-genetic-data-to-zarr" title="Permalink to this headline">#</a></h3>
 <p>There are broadly two ways of loading genetic file format <code class="docutils literal notranslate"><span class="pre">X</span></code> for use in sgkit:</p>
 <ol class="arabic simple">
 <li><p>a <code class="docutils literal notranslate"><span class="pre">read_X</span></code> function to read the file directly</p></li>
@@ -647,7 +627,7 @@ result of running genetic methods on the data, so it can be loaded again later.<
 which makes opening the dataset faster.</p>
 </section>
 <section id="bgen">
-<h3><a class="toc-backref" href="#id8" role="doc-backlink">BGEN</a><a class="headerlink" href="#bgen" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id8">BGEN</a><a class="headerlink" href="#bgen" title="Permalink to this headline">#</a></h3>
 <p>The <a class="reference internal" href="generated/sgkit.io.bgen.read_bgen.html#sgkit.io.bgen.read_bgen" title="sgkit.io.bgen.read_bgen"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.bgen.read_bgen()</span></code></a> function loads a single BGEN dataset as Dask
 arrays within an <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2024.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a> from a <code class="docutils literal notranslate"><span class="pre">bgen</span></code> file.</p>
 <p>The <a class="reference internal" href="generated/sgkit.io.bgen.bgen_to_zarr.html#sgkit.io.bgen.bgen_to_zarr" title="sgkit.io.bgen.bgen_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.bgen.bgen_to_zarr()</span></code></a> function converts a <code class="docutils literal notranslate"><span class="pre">bgen</span></code> file to Zarr
@@ -655,14 +635,14 @@ files stored in sgkit’s Xarray data representation, which can then be opened
 as a <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2024.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
 </section>
 <section id="plink">
-<h3><a class="toc-backref" href="#id9" role="doc-backlink">PLINK</a><a class="headerlink" href="#plink" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id9">PLINK</a><a class="headerlink" href="#plink" title="Permalink to this headline">#</a></h3>
 <p>The <a class="reference internal" href="generated/sgkit.io.plink.read_plink.html#sgkit.io.plink.read_plink" title="sgkit.io.plink.read_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.read_plink()</span></code></a> function loads a single PLINK dataset as Dask
 arrays within an <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2024.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a> from <code class="docutils literal notranslate"><span class="pre">bed</span></code>, <code class="docutils literal notranslate"><span class="pre">bim</span></code>, and <code class="docutils literal notranslate"><span class="pre">fam</span></code> files.</p>
 <p>The <a class="reference internal" href="generated/sgkit.io.plink.write_plink.html#sgkit.io.plink.write_plink" title="sgkit.io.plink.write_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.write_plink()</span></code></a> and <a class="reference internal" href="generated/sgkit.io.plink.zarr_to_plink.html#sgkit.io.plink.zarr_to_plink" title="sgkit.io.plink.zarr_to_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.zarr_to_plink()</span></code></a>
 functions convert sgkit’s Xarray data representation to PLINK.</p>
 </section>
 <section id="vcf">
-<h3><a class="toc-backref" href="#id10" role="doc-backlink">VCF</a><a class="headerlink" href="#vcf" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id10">VCF</a><a class="headerlink" href="#vcf" title="Permalink to this headline">#</a></h3>
 <p>The <a class="reference internal" href="generated/sgkit.io.vcf.vcf_to_zarr.html#sgkit.io.vcf.vcf_to_zarr" title="sgkit.io.vcf.vcf_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr()</span></code></a> function converts one or more VCF files to
 Zarr files stored in sgkit’s Xarray data representation, which can then be opened
 as a <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2024.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
@@ -671,14 +651,14 @@ convert sgkit’s Xarray data representation to VCF.</p>
 <p>See <a class="reference internal" href="vcf.html#vcf"><span class="std std-ref">Reading VCF</span></a> for installation instructions, and details on using VCF in sgkit.</p>
 </section>
 <section id="working-with-cloud-native-data">
-<h3><a class="toc-backref" href="#id11" role="doc-backlink">Working with cloud-native data</a><a class="headerlink" href="#working-with-cloud-native-data" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id11">Working with cloud-native data</a><a class="headerlink" href="#working-with-cloud-native-data" title="Permalink to this headline">#</a></h3>
 <p>TODO: Show how to read/write Zarr (and VCF?) data in cloud storage</p>
 </section>
 </section>
 <section id="datasets">
-<h2><a class="toc-backref" href="#id12" role="doc-backlink">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id12">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">#</a></h2>
 <section id="genetic-variables">
-<span id="id3"></span><h3><a class="toc-backref" href="#id13" role="doc-backlink">Genetic variables</a><a class="headerlink" href="#genetic-variables" title="Permalink to this heading">#</a></h3>
+<span id="id3"></span><h3><a class="toc-backref" href="#id13">Genetic variables</a><a class="headerlink" href="#genetic-variables" title="Permalink to this headline">#</a></h3>
 <p>Most <a class="reference internal" href="getting_started.html#genetic-methods"><span class="std std-ref">Genetic methods</span></a> in sgkit operate on a few variables in an Xarray dataset. Variables have
 default names, so you can usually just pass in the dataset, but it’s also possible to use different
 variable names.</p>
@@ -698,7 +678,7 @@ variable names.</p>
 <span class="go">    call_genotype   (variants, samples, ploidy) int8 10kB 0 0 1 0 1 ... 0 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  [&#39;0&#39;]</span>
-<span class="go">    source:   sgkit-unknown</span>
+<span class="go">    source:   sgkit-0.7.1.dev19+g2b08b315</span>
 
 <span class="go"># Use the default variable (call_genotype)</span>
 <span class="gp">In [5]: </span><span class="n">sg</span><span class="o">.</span><span class="n">count_call_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">call_allele_count</span>
@@ -744,7 +724,7 @@ call <a class="reference internal" href="generated/sgkit.count_call_alleles.html
 <span class="go">    my_call_genotype      (variants, samples, ploidy) int8 10kB 0 0 1 ... 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  [&#39;0&#39;]</span>
-<span class="go">    source:   sgkit-unknown</span>
+<span class="go">    source:   sgkit-0.7.1.dev19+g2b08b315</span>
 </pre></div>
 </div>
 <p>If however a non-default variable name is used and it doesn’t exist in the dataset, then the
@@ -756,7 +736,7 @@ to have created the variable in that case.</p>
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">call_allele_count</span><span class="o">=</span><span class="s2">&quot;my_call_allele_count&quot;</span><span class="p">)</span>
 
-<span class="nn">File ~/work/sgkit/sgkit/sgkit/stats/aggregation.py:164,</span> in <span class="ni">count_variant_alleles</span><span class="nt">(ds, call_genotype, call_allele_count, using, merge)</span>
+<span class="nn">File ~/workspace/sgkit/sgkit/stats/aggregation.py:164,</span> in <span class="ni">count_variant_alleles</span><span class="nt">(ds, call_genotype, call_allele_count, using, merge)</span>
 <span class="g g-Whitespace">    </span><span class="mi">104</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;Compute allele count from per-sample allele counts, or genotype calls.</span>
 <span class="g g-Whitespace">    </span><span class="mi">105</span><span class="sd"> </span>
 <span class="g g-Whitespace">    </span><span class="mi">106</span><span class="sd"> Parameters</span>
@@ -770,7 +750,7 @@ to have created the variable in that case.</p>
 <span class="g g-Whitespace">    </span><span class="mi">167</span>     <span class="n">variables</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">{</span><span class="n">call_allele_count</span><span class="p">:</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count_spec</span><span class="p">})</span>
 <span class="g g-Whitespace">    </span><span class="mi">168</span>     <span class="n">AC</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">call_allele_count</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span>
 
-<span class="nn">File ~/work/sgkit/sgkit/sgkit/utils.py:279,</span> in <span class="ni">define_variable_if_absent</span><span class="nt">(ds, default_variable_name, variable_name, func, **kwargs)</span>
+<span class="nn">File ~/workspace/sgkit/sgkit/utils.py:279,</span> in <span class="ni">define_variable_if_absent</span><span class="nt">(ds, default_variable_name, variable_name, func, **kwargs)</span>
 <span class="g g-Whitespace">    </span><span class="mi">277</span>     <span class="k">return</span> <span class="n">ds</span>
 <span class="g g-Whitespace">    </span><span class="mi">278</span> <span class="k">if</span> <span class="n">variable_name</span> <span class="o">!=</span> <span class="n">default_variable_name</span><span class="p">:</span>
 <span class="ne">--&gt; </span><span class="mi">279</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -785,7 +765,7 @@ to have created the variable in that case.</p>
 since it can’t be computed from other data.</p>
 </section>
 <section id="dataset-merge-behavior">
-<span id="dataset-merge"></span><h3><a class="toc-backref" href="#id14" role="doc-backlink">Dataset merge behavior</a><a class="headerlink" href="#dataset-merge-behavior" title="Permalink to this heading">#</a></h3>
+<span id="dataset-merge"></span><h3><a class="toc-backref" href="#id14">Dataset merge behavior</a><a class="headerlink" href="#dataset-merge-behavior" title="Permalink to this headline">#</a></h3>
 <p>Generally, method functions in sgkit compute some new variables based on the
 input dataset, then return a new output dataset that consists of the input
 dataset plus the new computed variables. The input dataset is unchanged.</p>
@@ -811,7 +791,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">    call_genotype   (variants, samples, ploidy) int8 10kB 0 0 1 0 1 ... 0 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  [&#39;0&#39;]</span>
-<span class="go">    source:   sgkit-unknown</span>
+<span class="go">    source:   sgkit-0.7.1.dev19+g2b08b315</span>
 
 <span class="go"># By default, new variables are merged into a copy of the provided dataset</span>
 <span class="gp">In [14]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
@@ -828,7 +808,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">    call_genotype         (variants, samples, ploidy) int8 10kB 0 0 1 ... 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  [&#39;0&#39;]</span>
-<span class="go">    source:   sgkit-unknown</span>
+<span class="go">    source:   sgkit-0.7.1.dev19+g2b08b315</span>
 
 <span class="go"># If an existing variable would be re-defined, a warning is thrown</span>
 <span class="gp">In [16]: </span><span class="kn">import</span> <span class="nn">warnings</span>
@@ -863,7 +843,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">    call_genotype         (variants, samples, ploidy) int8 10kB 0 0 1 ... 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  [&#39;0&#39;]</span>
-<span class="go">    source:   sgkit-unknown</span>
+<span class="go">    source:   sgkit-0.7.1.dev19+g2b08b315</span>
 </pre></div>
 </div>
 <p>Merge can be used to rename output variables too.</p>
@@ -884,14 +864,14 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">    my_variant_allele_count  (variants, alleles) uint64 2kB dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  [&#39;0&#39;]</span>
-<span class="go">    source:   sgkit-unknown</span>
+<span class="go">    source:   sgkit-0.7.1.dev19+g2b08b315</span>
 </pre></div>
 </div>
 <p>Note that there is a limitation where intermediate variables (<code class="docutils literal notranslate"><span class="pre">call_allele_count</span></code> in this case)
 are not returned if <code class="docutils literal notranslate"><span class="pre">merge=False</span></code>. See <a class="github reference external" href="https://github.com/sgkit-dev/sgkit/issues/405">sgkit-dev/sgkit#405</a>.</p>
 </section>
 <section id="interop-with-other-python-libraries">
-<span id="python-interop"></span><h3><a class="toc-backref" href="#id15" role="doc-backlink">Interop with other Python libraries</a><a class="headerlink" href="#interop-with-other-python-libraries" title="Permalink to this heading">#</a></h3>
+<span id="python-interop"></span><h3><a class="toc-backref" href="#id15">Interop with other Python libraries</a><a class="headerlink" href="#interop-with-other-python-libraries" title="Permalink to this headline">#</a></h3>
 <p>It’s usually easier to pass genetic data between Python libraries as simple NumPy arrays,
 rather than saving them in files. In sgkit, any data variable can be computed and extracted
 as a NumPy array using the <code class="docutils literal notranslate"><span class="pre">.values</span></code> property.</p>
@@ -940,19 +920,19 @@ will be converted to a <code class="docutils literal notranslate"><span class="p
 </div>
 </section>
 <section id="custom-naming-conventions">
-<h3><a class="toc-backref" href="#id16" role="doc-backlink">Custom naming conventions</a><a class="headerlink" href="#custom-naming-conventions" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id16">Custom naming conventions</a><a class="headerlink" href="#custom-naming-conventions" title="Permalink to this headline">#</a></h3>
 <p>TODO: Show to use a custom naming convention via Xarray renaming features.</p>
 </section>
 <section id="adding-custom-data-to-a-dataset">
-<h3><a class="toc-backref" href="#id17" role="doc-backlink">Adding custom data to a Dataset</a><a class="headerlink" href="#adding-custom-data-to-a-dataset" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id17">Adding custom data to a Dataset</a><a class="headerlink" href="#adding-custom-data-to-a-dataset" title="Permalink to this headline">#</a></h3>
 <p>TODO:  Show how something like sample metadata can be joined to an existing Xarray dataset. Also briefly explain
 indexing and uniqueness within Xarray/Pandas, since this is critical for understanding joins.</p>
 </section>
 </section>
 <section id="methods">
-<h2><a class="toc-backref" href="#id18" role="doc-backlink">Methods</a><a class="headerlink" href="#methods" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id18">Methods</a><a class="headerlink" href="#methods" title="Permalink to this headline">#</a></h2>
 <section id="custom-computations">
-<span id="id4"></span><h3><a class="toc-backref" href="#id19" role="doc-backlink">Custom Computations</a><a class="headerlink" href="#custom-computations" title="Permalink to this heading">#</a></h3>
+<span id="id4"></span><h3><a class="toc-backref" href="#id19">Custom Computations</a><a class="headerlink" href="#custom-computations" title="Permalink to this headline">#</a></h3>
 <p>TODO: Finish explaining how Numba works and how users might apply it</p>
 <p>Here is an example that demonstrates an alt allele count:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [29]: </span><span class="kn">import</span> <span class="nn">numba</span>
@@ -982,14 +962,14 @@ indexing and uniqueness within Xarray/Pandas, since this is critical for underst
 </div>
 </section>
 <section id="pca">
-<h3><a class="toc-backref" href="#id20" role="doc-backlink">PCA</a><a class="headerlink" href="#pca" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id20">PCA</a><a class="headerlink" href="#pca" title="Permalink to this headline">#</a></h3>
 <p>TODO: Describe the upstream tools for PCA (i.e. those in dask-ml/scikit-learn)</p>
 </section>
 </section>
 <section id="deployment">
-<h2><a class="toc-backref" href="#id21" role="doc-backlink">Deployment</a><a class="headerlink" href="#deployment" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id21">Deployment</a><a class="headerlink" href="#deployment" title="Permalink to this headline">#</a></h2>
 <section id="deploying-sgkit-on-a-cluster">
-<h3><a class="toc-backref" href="#id22" role="doc-backlink">Deploying sgkit on a cluster</a><a class="headerlink" href="#deploying-sgkit-on-a-cluster" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id22">Deploying sgkit on a cluster</a><a class="headerlink" href="#deploying-sgkit-on-a-cluster" title="Permalink to this headline">#</a></h3>
 <p>For parallelism sgkit uses <a class="reference external" href="https://dask.org/">Dask</a> to distribute work across workers.
 These workers can either be local processes or remote processes running on a cluster.
 By default, dask creates a local cluster with one worker thread per CPU core on the machine.
@@ -1063,14 +1043,14 @@ value to the dask <code class="docutils literal notranslate"><span class="pre">C
 </div>
 </section>
 <section id="using-gpus">
-<h3><a class="toc-backref" href="#id23" role="doc-backlink">Using GPUs</a><a class="headerlink" href="#using-gpus" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id23">Using GPUs</a><a class="headerlink" href="#using-gpus" title="Permalink to this headline">#</a></h3>
 <p>TODO: Show CuPy examples</p>
 </section>
 </section>
 <section id="troubleshooting">
-<h2><a class="toc-backref" href="#id24" role="doc-backlink">Troubleshooting</a><a class="headerlink" href="#troubleshooting" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id24">Troubleshooting</a><a class="headerlink" href="#troubleshooting" title="Permalink to this headline">#</a></h2>
 <section id="monitoring-operations">
-<h3><a class="toc-backref" href="#id25" role="doc-backlink">Monitoring operations</a><a class="headerlink" href="#monitoring-operations" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id25">Monitoring operations</a><a class="headerlink" href="#monitoring-operations" title="Permalink to this headline">#</a></h3>
 <p>The simplest way to monitor operations when running sgkit on a single host is to use <a class="reference external" href="https://docs.dask.org/en/latest/diagnostics-local.html">Dask local diagnostics</a>.</p>
 <p>As an example, this code shows how to track the progress of a single sgkit function:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [35]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
@@ -1083,8 +1063,8 @@ value to the dask <code class="docutils literal notranslate"><span class="pre">C
 <span class="gp">   ....: </span>    <span class="n">ac</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 <span class="gp">   ....: </span>
 
-<span class="go">[                                        ] | 0% Completed | 448.90 us</span>
-<span class="go">[########################################] | 100% Completed | 100.68 ms</span>
+<span class="go">[                                        ] | 0% Completed | 168.79 us</span>
+<span class="go">[########################################] | 100% Completed | 105.27 ms</span>
 
 <span class="gp">In [39]: </span><span class="n">ac</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 <span class="gh">Out[39]: </span>
@@ -1105,7 +1085,7 @@ commonly used local diagnostics.</p>
 <p>For similar monitoring in a distributed cluster, see <a class="reference external" href="https://docs.dask.org/en/latest/diagnostics-distributed.html">Dask distributed diagnostics</a>.</p>
 </section>
 <section id="visualizing-computations">
-<h3><a class="toc-backref" href="#id26" role="doc-backlink">Visualizing computations</a><a class="headerlink" href="#visualizing-computations" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id26">Visualizing computations</a><a class="headerlink" href="#visualizing-computations" title="Permalink to this headline">#</a></h3>
 <p>Dask allows you to <a class="reference external" href="https://docs.dask.org/en/latest/graphviz.html">visualize the task graph</a> of a computation
 before running it, which can be handy when trying to understand where the bottlenecks are.</p>
 <p>In most cases the number of tasks is too large to visualize, so it’s useful to restrict
@@ -1137,7 +1117,7 @@ the graph just a few chunks, as shown in this example.</p>
 <p>Task order number is shown in circular boxes, colored from red to yellow.</p>
 </section>
 <section id="disabling-the-numba-cache">
-<h3><a class="toc-backref" href="#id27" role="doc-backlink">Disabling the Numba cache</a><a class="headerlink" href="#disabling-the-numba-cache" title="Permalink to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id27">Disabling the Numba cache</a><a class="headerlink" href="#disabling-the-numba-cache" title="Permalink to this headline">#</a></h3>
 <p>Internally, sgkit uses the <a class="reference external" href="https://numba.pydata.org/">Numba JIT compiler</a> to accelerate some methods.
 These methods will be compiled the first time that they are used following a new installation.
 The compiled methods are automatically cached so that recompilation is not required in future sessions.
@@ -1157,19 +1137,19 @@ Refer to the <a class="reference external" href="https://numba.readthedocs.io/en
 </section>
 </section>
 
-<div class="section ablog__blog_comments">
-  
-  
+<div class="section">
+   
 </div>
 
                 </article>
               
               
               
-              
-              
-                <footer class="prev-next-footer">
+                <footer class="bd-footer-article">
                   
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="getting_started.html"
@@ -1189,7 +1169,10 @@ Refer to the <a class="reference external" href="https://numba.readthedocs.io/en
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
+</div></div>
+  
 </div>
+
                 </footer>
               
             </div>
@@ -1198,14 +1181,11 @@ Refer to the <a class="reference external" href="https://numba.readthedocs.io/en
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-
   <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
+  <div class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+  <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reading-and-writing-genetic-data">Reading and writing genetic data</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
@@ -1244,7 +1224,6 @@ Refer to the <a class="reference external" href="https://numba.readthedocs.io/en
   </nav></div>
 
   <div class="sidebar-secondary-item">
-
   <div class="tocsection sourcelink">
     <a href="_sources/user_guide.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
@@ -1265,8 +1244,8 @@ Refer to the <a class="reference external" href="https://numba.readthedocs.io/en
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1274,7 +1253,6 @@ Refer to the <a class="reference external" href="https://numba.readthedocs.io/en
     <div class="footer-items__start">
       
         <div class="footer-item">
-
   <p class="copyright">
     
       © Copyright 2020, sgkit developers.
@@ -1284,9 +1262,8 @@ Refer to the <a class="reference external" href="https://numba.readthedocs.io/en
 </div>
       
         <div class="footer-item">
-
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
     <br/>
   </p>
 </div>
@@ -1294,12 +1271,10 @@ Refer to the <a class="reference external" href="https://numba.readthedocs.io/en
     </div>
   
   
-  
     <div class="footer-items__end">
       
-        <div class="footer-item">
-<p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
 </p></div>
       
     </div>

@@ -1,6 +1,0 @@
-﻿sgkit.inverse\_additive\_relationships
-======================================
-
-.. currentmodule:: sgkit
-
-.. autofunction:: inverse_additive_relationships
