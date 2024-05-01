@@ -44,7 +44,8 @@ jobs:
     needs: ['build']
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        # don't use macos-latest as it uses M1 which doesn't work
+        os: [ubuntu-latest, macos-12]
         python-version: ["3.9", "3.10", "3.11"]
     runs-on: ${{ matrix.os }}
     steps:
