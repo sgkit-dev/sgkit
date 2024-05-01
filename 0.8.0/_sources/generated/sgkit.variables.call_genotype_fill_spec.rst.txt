@@ -1,0 +1,6 @@
+﻿sgkit.variables.call\_genotype\_fill\_spec
+==========================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: call_genotype_fill_spec

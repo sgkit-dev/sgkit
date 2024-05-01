@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_identity\_by\_state\_spec
+===============================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_identity_by_state_spec

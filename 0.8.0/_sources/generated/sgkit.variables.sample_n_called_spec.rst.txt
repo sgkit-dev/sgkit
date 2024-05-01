@@ -1,0 +1,6 @@
+﻿sgkit.variables.sample\_n\_called\_spec
+=======================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: sample_n_called_spec

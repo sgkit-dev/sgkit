@@ -1,0 +1,6 @@
+﻿sgkit.variables.variant\_allele\_frequency\_spec
+================================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: variant_allele_frequency_spec

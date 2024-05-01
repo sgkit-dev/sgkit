@@ -1,0 +1,6 @@
+﻿sgkit.variables.call\_genotype\_index\_spec
+===========================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: call_genotype_index_spec

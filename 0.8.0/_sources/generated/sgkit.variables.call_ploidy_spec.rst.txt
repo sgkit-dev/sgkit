@@ -1,0 +1,6 @@
+﻿sgkit.variables.call\_ploidy\_spec
+==================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: call_ploidy_spec

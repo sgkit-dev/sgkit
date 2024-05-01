@@ -1,0 +1,6 @@
+﻿sgkit.variables.sample\_pca\_component\_spec
+============================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: sample_pca_component_spec

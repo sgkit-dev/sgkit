@@ -1,0 +1,6 @@
+﻿sgkit.pedigree\_inverse\_kinship
+================================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: pedigree_inverse_kinship

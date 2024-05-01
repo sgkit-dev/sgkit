@@ -1,0 +1,6 @@
+﻿sgkit.variables.variant\_n\_non\_ref\_spec
+==========================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: variant_n_non_ref_spec

@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_Hamilton\_Kerr\_tau\_spec
+===============================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_Hamilton_Kerr_tau_spec

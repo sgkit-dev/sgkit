@@ -1,0 +1,6 @@
+﻿sgkit.variables.variant\_n\_called\_spec
+========================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: variant_n_called_spec

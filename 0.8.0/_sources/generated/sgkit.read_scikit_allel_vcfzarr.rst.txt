@@ -1,0 +1,6 @@
+﻿sgkit.read\_scikit\_allel\_vcfzarr
+==================================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: read_scikit_allel_vcfzarr

@@ -1,0 +1,6 @@
+﻿sgkit.variables.sample\_ploidy\_spec
+====================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: sample_ploidy_spec

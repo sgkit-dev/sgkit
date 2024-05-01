@@ -1,0 +1,6 @@
+﻿sgkit.variables.cohort\_allele\_count\_spec
+===========================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: cohort_allele_count_spec

@@ -1,0 +1,6 @@
+﻿sgkit.pairwise\_distance
+========================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: pairwise_distance
