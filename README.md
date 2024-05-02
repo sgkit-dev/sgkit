@@ -1,4 +1,4 @@
-# sgkit: Statistical genetics toolkit in Python
+# sgkit: Scalable genetics toolkit in Python
 [![Build status](https://github.com/sgkit-dev/sgkit/workflows/Build/badge.svg?branch=main)](https://github.com/sgkit-dev/sgkit/actions?query=workflow%3A%22Build%22+branch%3Amain)
 [![Windows build status](https://github.com/sgkit-dev/sgkit/workflows/Windows/badge.svg?branch=main)](https://github.com/sgkit-dev/sgkit/actions?query=workflow%3A%22Windows%22+branch%3Amain)
 [![Documentation status](https://github.com/sgkit-dev/sgkit/workflows/Docs/badge.svg?branch=main)](https://sgkit-dev.github.io/sgkit/)
