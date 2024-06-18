@@ -167,7 +167,7 @@ def genedrop_Hamilton_Kerr(
     n_sample, _ = parent.shape
     _, max_ploidy = genotypes.shape
     order = topological_argsort(parent)
-    marked = np.zeros(max_ploidy, dtype=np.bool8)
+    marked = np.zeros(max_ploidy, dtype=np.bool_)
     np.random.seed(seed)
     for idx in range(n_sample):
         i = order[idx]
