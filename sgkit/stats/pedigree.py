@@ -412,16 +412,22 @@ def _hamilton_kerr_inbreeding_non_founder(
     """
     pat = (
         tau_p
-        * (tau_p - 1)
-        * (lambda_p + (1 - lambda_p) * ((ploidy_p * kinship_pp - 1) / (ploidy_p - 1)))
+        * (tau_p - 1.0)
+        * (
+            lambda_p
+            + (1.0 - lambda_p) * ((ploidy_p * kinship_pp - 1.0) / (ploidy_p - 1.0))
+        )
     )
     mat = (
         tau_q
-        * (tau_q - 1)
-        * (lambda_q + (1 - lambda_q) * ((ploidy_q * kinship_qq - 1) / (ploidy_q - 1)))
+        * (tau_q - 1.0)
+        * (
+            lambda_q
+            + (1.0 - lambda_q) * ((ploidy_q * kinship_qq - 1.0) / (ploidy_q - 1.0))
+        )
     )
-    num = pat + mat + 2 * tau_p * tau_q * kinship_pq
-    denom = tau_p * (tau_p - 1) + tau_q * (tau_q - 1) + 2 * tau_p * tau_q
+    num = pat + mat + 2.0 * tau_p * tau_q * kinship_pq
+    denom = tau_p * (tau_p - 1.0) + tau_q * (tau_q - 1.0) + 2.0 * tau_p * tau_q
     return num / denom
 
 
