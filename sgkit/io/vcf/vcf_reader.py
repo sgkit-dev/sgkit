@@ -18,6 +18,7 @@ from typing import (
 )
 
 import dask
+import distributed
 import fsspec
 import numpy as np
 import xarray as xr
@@ -679,6 +680,10 @@ def vcf_to_zarrs(
 ) -> Sequence[str]:
     """Convert VCF files to multiple Zarr on-disk stores, one per region.
 
+    Note that the dask dashboard progress bar will not show
+    work being completed, but rather the number of tasks left to be done will slowly drop to
+    zero. This is a limitation in dask, see https://github.com/dask/dask/issues/10654
+
     Parameters
     ----------
     input
@@ -756,8 +761,14 @@ def vcf_to_zarrs(
 
     output_storage_options = output_storage_options or {}
 
-    tasks = []
+    futures = []
     parts = []
+    try:
+        client = distributed.get_client()
+    except ValueError:
+        # If no global client, create a new one
+        client = distributed.Client()
+
     for input, input_region_list in zip_input_and_regions(input, regions):
         filename = url_filename(str(input))
         if input_region_list is None:
@@ -767,7 +778,8 @@ def vcf_to_zarrs(
             part_url = build_url(str(output), f"{filename}/part-{r}.zarr")
             output_part = fsspec.get_mapper(part_url, **output_storage_options)
             parts.append(part_url)
-            task = dask.delayed(vcf_to_zarr_sequential)(
+            future = client.submit(
+                vcf_to_zarr_sequential,
                 input,
                 output=output_part,
                 region=region,
@@ -784,8 +796,13 @@ def vcf_to_zarrs(
                 exclude_fields=exclude_fields,
                 field_defs=field_defs,
             )
-            tasks.append(task)
-    dask.compute(*tasks)
+            futures.append(future)
+    # To prevent dask re-doing a completed future when a worker dies, we cancel the futures
+    # as they complete, this sadly also means that no completed tasks are shown in the dask
+    # progress bar.
+    for future in distributed.as_completed(futures):
+        future.result()
+        client.cancel(future)
     return parts
 
 
@@ -866,6 +883,10 @@ def vcf_to_zarr(
 
     For more control over these two steps, consider using :func:`vcf_to_zarrs` followed by
     :func:`concat_zarrs`.
+
+    Note that for the first parsing step the dask dashboard progress bar will not show
+    work being completed, but rather the number of tasks left to be done will slowly drop to
+    zero. This is a limitation in dask, see https://github.com/dask/dask/issues/10654
 
     Parameters
     ----------
