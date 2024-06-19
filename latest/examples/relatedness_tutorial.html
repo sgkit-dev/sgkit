@@ -15,19 +15,19 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/typehints.css" />
@@ -36,9 +36,9 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -47,7 +47,7 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/relatedness_tutorial';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.3';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
@@ -72,27 +72,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -114,12 +110,17 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class="col-lg-3 navbar-header-items__start">
@@ -155,80 +156,80 @@
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../getting_started.html">
-                        Getting Started
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting Started
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../user_guide.html">
-                        User Guide
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../vcf.html">
-                        Reading VCF
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="index.html">
-                        Examples
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../api.html">
-                        API reference
-                      </a>
-                    </li>
-                
-            <li class="nav-item dropdown">
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../vcf.html">
+    Reading VCF
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown pst-header-nav-item">
                 <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="../how_do_i.html">
-                        How do I …
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link dropdown-item nav-internal" href="../how_do_i.html">
+    How do I …
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
-                        Contributing to sgkit
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="../about.html">
-                        About
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
+    Contributing to sgkit
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="../news.html">
-                        News
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="../changelog.html">
-                        Changelog
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link dropdown-item nav-internal" href="../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link dropdown-item nav-internal" href="../news.html">
+    News
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link dropdown-item nav-internal" href="../changelog.html">
+    Changelog
+  </a>
+</li>
+
                 </ul>
             </li>
             
@@ -327,9 +328,9 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+    <button class="sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
@@ -350,89 +351,84 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
+          
+          
+            <div class="navbar-item">
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../getting_started.html">
-                        Getting Started
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting Started
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../user_guide.html">
-                        User Guide
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../vcf.html">
-                        Reading VCF
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="index.html">
-                        Examples
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../api.html">
-                        API reference
-                      </a>
-                    </li>
-                
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
-                    More
-                </button>
-                <ul id="pst-nav-more-links-2" class="dropdown-menu">
-                    
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="../how_do_i.html">
-                        How do I …
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../vcf.html">
+    Reading VCF
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
-                        Contributing to sgkit
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="../about.html">
-                        About
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Examples
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="../news.html">
-                        News
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="../changelog.html">
-                        Changelog
-                      </a>
-                    </li>
-                
-                </ul>
-            </li>
-            
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../how_do_i.html">
+    How do I …
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing to sgkit
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../news.html">
+    News
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../changelog.html">
+    Changelog
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -518,13 +514,13 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
@@ -533,7 +529,7 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -1154,17 +1150,17 @@ array([[&#x27;.&#x27;, &#x27;.&#x27;],
        [&#x27;5129&#x27;, &#x27;6472&#x27;]], dtype=object)
 Coordinates:
   * samples  (samples) object 52kB &#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; &#x27;4&#x27; ... &#x27;6471&#x27; &#x27;6472&#x27; &#x27;6473&#x27;
-  * parents  (parents) object 16B &#x27;SIRE&#x27; &#x27;DAM&#x27;</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>samples</span>: 6473</li><li><span class='xr-has-index'>parents</span>: 2</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-f1c2c96c-1f65-4028-97f7-a184fad9a454' class='xr-array-in' type='checkbox' checked><label for='section-f1c2c96c-1f65-4028-97f7-a184fad9a454' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>&#x27;.&#x27; &#x27;.&#x27; &#x27;.&#x27; &#x27;.&#x27; &#x27;.&#x27; &#x27;.&#x27; ... &#x27;4279&#x27; &#x27;6465&#x27; &#x27;6466&#x27; &#x27;1129&#x27; &#x27;5129&#x27; &#x27;6472&#x27;</span></div><div class='xr-array-data'><pre>array([[&#x27;.&#x27;, &#x27;.&#x27;],
+  * parents  (parents) object 16B &#x27;SIRE&#x27; &#x27;DAM&#x27;</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>samples</span>: 6473</li><li><span class='xr-has-index'>parents</span>: 2</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-76c1f4b0-ba72-470f-b3f5-b721910ba161' class='xr-array-in' type='checkbox' checked><label for='section-76c1f4b0-ba72-470f-b3f5-b721910ba161' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>&#x27;.&#x27; &#x27;.&#x27; &#x27;.&#x27; &#x27;.&#x27; &#x27;.&#x27; &#x27;.&#x27; ... &#x27;4279&#x27; &#x27;6465&#x27; &#x27;6466&#x27; &#x27;1129&#x27; &#x27;5129&#x27; &#x27;6472&#x27;</span></div><div class='xr-array-data'><pre>array([[&#x27;.&#x27;, &#x27;.&#x27;],
        [&#x27;.&#x27;, &#x27;.&#x27;],
        [&#x27;.&#x27;, &#x27;.&#x27;],
        ...,
        [&#x27;4279&#x27;, &#x27;6465&#x27;],
        [&#x27;6466&#x27;, &#x27;1129&#x27;],
-       [&#x27;5129&#x27;, &#x27;6472&#x27;]], dtype=object)</pre></div></div></li><li class='xr-section-item'><input id='section-06d99f9f-d640-4de4-ba0c-48b31cb1fb8a' class='xr-section-summary-in' type='checkbox'  checked><label for='section-06d99f9f-d640-4de4-ba0c-48b31cb1fb8a' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>samples</span></div><div class='xr-var-dims'>(samples)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;6472&#x27; &#x27;6473&#x27;</div><input id='attrs-41abd984-8d00-4e08-b999-d7b9bb383d81' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-41abd984-8d00-4e08-b999-d7b9bb383d81' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-78f49601-d368-441e-91ac-d86b9d816628' class='xr-var-data-in' type='checkbox'><label for='data-78f49601-d368-441e-91ac-d86b9d816628' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;6471&#x27;, &#x27;6472&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>parents</span></div><div class='xr-var-dims'>(parents)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;SIRE&#x27; &#x27;DAM&#x27;</div><input id='attrs-71aa15db-0867-4155-880a-a8de7129d469' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-71aa15db-0867-4155-880a-a8de7129d469' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-bc2f4fb2-1e4e-43d0-b2ce-ff40b0a52eeb' class='xr-var-data-in' type='checkbox'><label for='data-bc2f4fb2-1e4e-43d0-b2ce-ff40b0a52eeb' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;SIRE&#x27;, &#x27;DAM&#x27;], dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-779d3a1d-dc9f-4ad1-a1b5-4e3f940b805d' class='xr-section-summary-in' type='checkbox'  ><label for='section-779d3a1d-dc9f-4ad1-a1b5-4e3f940b805d' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>samples</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-214929f3-9aa1-4838-88fe-6cf86aa46544' class='xr-index-data-in' type='checkbox'/><label for='index-214929f3-9aa1-4838-88fe-6cf86aa46544' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;, &#x27;6&#x27;, &#x27;7&#x27;, &#x27;8&#x27;, &#x27;9&#x27;, &#x27;10&#x27;,
+       [&#x27;5129&#x27;, &#x27;6472&#x27;]], dtype=object)</pre></div></div></li><li class='xr-section-item'><input id='section-6215c89e-cfa9-4ad4-a74d-34c535b5a1e3' class='xr-section-summary-in' type='checkbox'  checked><label for='section-6215c89e-cfa9-4ad4-a74d-34c535b5a1e3' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>samples</span></div><div class='xr-var-dims'>(samples)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;6472&#x27; &#x27;6473&#x27;</div><input id='attrs-4ff7baf1-68e6-4848-998a-07b5f1f6ea9a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4ff7baf1-68e6-4848-998a-07b5f1f6ea9a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-58031dfb-285f-41d7-a1bd-fc0d2a3d48d1' class='xr-var-data-in' type='checkbox'><label for='data-58031dfb-285f-41d7-a1bd-fc0d2a3d48d1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;6471&#x27;, &#x27;6472&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>parents</span></div><div class='xr-var-dims'>(parents)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;SIRE&#x27; &#x27;DAM&#x27;</div><input id='attrs-1b6ab853-42c2-4514-8a68-45d47710acaa' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1b6ab853-42c2-4514-8a68-45d47710acaa' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-143ba2b8-d4c2-41a1-b3b1-9364f16206f4' class='xr-var-data-in' type='checkbox'><label for='data-143ba2b8-d4c2-41a1-b3b1-9364f16206f4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;SIRE&#x27;, &#x27;DAM&#x27;], dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-eb4d21b0-7433-486d-ae23-04dd501e143e' class='xr-section-summary-in' type='checkbox'  ><label for='section-eb4d21b0-7433-486d-ae23-04dd501e143e' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>samples</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-36e24cd7-0918-4c37-b17b-915892ec8f97' class='xr-index-data-in' type='checkbox'/><label for='index-36e24cd7-0918-4c37-b17b-915892ec8f97' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;, &#x27;6&#x27;, &#x27;7&#x27;, &#x27;8&#x27;, &#x27;9&#x27;, &#x27;10&#x27;,
        ...
        &#x27;6464&#x27;, &#x27;6465&#x27;, &#x27;6466&#x27;, &#x27;6467&#x27;, &#x27;6468&#x27;, &#x27;6469&#x27;, &#x27;6470&#x27;, &#x27;6471&#x27;, &#x27;6472&#x27;,
        &#x27;6473&#x27;],
-      dtype=&#x27;object&#x27;, name=&#x27;samples&#x27;, length=6473))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>parents</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-651b6669-033e-41b3-8709-4b751c7785d3' class='xr-index-data-in' type='checkbox'/><label for='index-651b6669-033e-41b3-8709-4b751c7785d3' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;SIRE&#x27;, &#x27;DAM&#x27;], dtype=&#x27;object&#x27;, name=&#x27;parents&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-bf5b8a13-20aa-449e-99f6-30a34988af3a' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-bf5b8a13-20aa-449e-99f6-30a34988af3a' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
+      dtype=&#x27;object&#x27;, name=&#x27;samples&#x27;, length=6473))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>parents</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-3bdf4b13-2e75-44a5-8f1b-229ae9eea354' class='xr-index-data-in' type='checkbox'/><label for='index-3bdf4b13-2e75-44a5-8f1b-229ae9eea354' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;SIRE&#x27;, &#x27;DAM&#x27;], dtype=&#x27;object&#x27;, name=&#x27;parents&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-b32b82b6-4703-40c5-8a55-8a2c0956728e' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-b32b82b6-4703-40c5-8a55-8a2c0956728e' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
 </div>
 <p>Note that the index column of the pedigree dataframe (containing the sample IDs) has been translated to <em>coordinates</em> for the “samples” dimension of the data array.
 Likewise, the column names have been used as coordinates of the “parents” dimension.</p>
@@ -1552,17 +1548,17 @@ Coordinates:
   * parents    (parents) object 16B &#x27;SIRE&#x27; &#x27;DAM&#x27;
 Data variables:
     sample_id  (samples) object 52kB &#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; &#x27;4&#x27; ... &#x27;6471&#x27; &#x27;6472&#x27; &#x27;6473&#x27;
-    parent_id  (samples, parents) object 104kB &#x27;.&#x27; &#x27;.&#x27; &#x27;.&#x27; ... &#x27;5129&#x27; &#x27;6472&#x27;</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-d26e2932-e182-4530-8081-426bd3037136' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-d26e2932-e182-4530-8081-426bd3037136' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>samples</span>: 6473</li><li><span class='xr-has-index'>parents</span>: 2</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-05ee7a63-aa78-4051-bb26-7906e9c25aa6' class='xr-section-summary-in' type='checkbox'  checked><label for='section-05ee7a63-aa78-4051-bb26-7906e9c25aa6' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>samples</span></div><div class='xr-var-dims'>(samples)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;6472&#x27; &#x27;6473&#x27;</div><input id='attrs-2e1eca27-4850-4403-aa68-ca1123774c81' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2e1eca27-4850-4403-aa68-ca1123774c81' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8312fcf7-b08d-45e1-bcb9-0d7cd9a13a78' class='xr-var-data-in' type='checkbox'><label for='data-8312fcf7-b08d-45e1-bcb9-0d7cd9a13a78' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;6471&#x27;, &#x27;6472&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>parents</span></div><div class='xr-var-dims'>(parents)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;SIRE&#x27; &#x27;DAM&#x27;</div><input id='attrs-7028e7c3-249c-4199-b3ee-1c3ed2eb3111' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7028e7c3-249c-4199-b3ee-1c3ed2eb3111' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ea4d822a-39f3-443c-8907-54cd82c70a0b' class='xr-var-data-in' type='checkbox'><label for='data-ea4d822a-39f3-443c-8907-54cd82c70a0b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;SIRE&#x27;, &#x27;DAM&#x27;], dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-d0a7993f-7c63-4427-8ca6-802fbc220e62' class='xr-section-summary-in' type='checkbox'  checked><label for='section-d0a7993f-7c63-4427-8ca6-802fbc220e62' class='xr-section-summary' >Data variables: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>sample_id</span></div><div class='xr-var-dims'>(samples)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;6472&#x27; &#x27;6473&#x27;</div><input id='attrs-b2ca0eaf-fdb0-4420-b9c0-b522206fe2d5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b2ca0eaf-fdb0-4420-b9c0-b522206fe2d5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5e725926-26c7-4d7f-b157-0612251f36ed' class='xr-var-data-in' type='checkbox'><label for='data-5e725926-26c7-4d7f-b157-0612251f36ed' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;6471&#x27;, &#x27;6472&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>parent_id</span></div><div class='xr-var-dims'>(samples, parents)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;.&#x27; &#x27;.&#x27; &#x27;.&#x27; ... &#x27;5129&#x27; &#x27;6472&#x27;</div><input id='attrs-3ff42f71-f612-4ae3-824a-2a648717022a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3ff42f71-f612-4ae3-824a-2a648717022a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-aa6a7db1-8baa-4a72-8073-bf840e91aa62' class='xr-var-data-in' type='checkbox'><label for='data-aa6a7db1-8baa-4a72-8073-bf840e91aa62' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[&#x27;.&#x27;, &#x27;.&#x27;],
+    parent_id  (samples, parents) object 104kB &#x27;.&#x27; &#x27;.&#x27; &#x27;.&#x27; ... &#x27;5129&#x27; &#x27;6472&#x27;</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-36792021-477f-4ca2-9c87-45d68a338ab7' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-36792021-477f-4ca2-9c87-45d68a338ab7' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>samples</span>: 6473</li><li><span class='xr-has-index'>parents</span>: 2</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-72076554-eaa9-4feb-a46c-3bb66ab633fc' class='xr-section-summary-in' type='checkbox'  checked><label for='section-72076554-eaa9-4feb-a46c-3bb66ab633fc' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>samples</span></div><div class='xr-var-dims'>(samples)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;6472&#x27; &#x27;6473&#x27;</div><input id='attrs-8359ed42-e652-4550-8e86-8bcca8e64c26' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8359ed42-e652-4550-8e86-8bcca8e64c26' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8feb21eb-4590-488d-a217-1ef13d4e46c2' class='xr-var-data-in' type='checkbox'><label for='data-8feb21eb-4590-488d-a217-1ef13d4e46c2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;6471&#x27;, &#x27;6472&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>parents</span></div><div class='xr-var-dims'>(parents)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;SIRE&#x27; &#x27;DAM&#x27;</div><input id='attrs-e0431004-7213-459b-84e7-d6b53df71711' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e0431004-7213-459b-84e7-d6b53df71711' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3fc02ee5-1661-4f94-aa6f-0a69ca73ea15' class='xr-var-data-in' type='checkbox'><label for='data-3fc02ee5-1661-4f94-aa6f-0a69ca73ea15' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;SIRE&#x27;, &#x27;DAM&#x27;], dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-1813a729-274e-40b8-8df6-498bbd770692' class='xr-section-summary-in' type='checkbox'  checked><label for='section-1813a729-274e-40b8-8df6-498bbd770692' class='xr-section-summary' >Data variables: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>sample_id</span></div><div class='xr-var-dims'>(samples)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;6472&#x27; &#x27;6473&#x27;</div><input id='attrs-a5d9af95-1223-4393-9b5f-9e3fb2e37f20' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a5d9af95-1223-4393-9b5f-9e3fb2e37f20' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cbeb8d48-bc12-42d2-85d9-9fa9ec98d8bc' class='xr-var-data-in' type='checkbox'><label for='data-cbeb8d48-bc12-42d2-85d9-9fa9ec98d8bc' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;6471&#x27;, &#x27;6472&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>parent_id</span></div><div class='xr-var-dims'>(samples, parents)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;.&#x27; &#x27;.&#x27; &#x27;.&#x27; ... &#x27;5129&#x27; &#x27;6472&#x27;</div><input id='attrs-6a4176fb-dfaf-40b2-b849-48b3687cc2ca' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-6a4176fb-dfaf-40b2-b849-48b3687cc2ca' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7d8a85a8-65b5-434f-a863-48d593dded68' class='xr-var-data-in' type='checkbox'><label for='data-7d8a85a8-65b5-434f-a863-48d593dded68' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[&#x27;.&#x27;, &#x27;.&#x27;],
        [&#x27;.&#x27;, &#x27;.&#x27;],
        [&#x27;.&#x27;, &#x27;.&#x27;],
        ...,
        [&#x27;4279&#x27;, &#x27;6465&#x27;],
        [&#x27;6466&#x27;, &#x27;1129&#x27;],
-       [&#x27;5129&#x27;, &#x27;6472&#x27;]], dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-c4320816-781d-4ebf-9647-a3d2f6a084a7' class='xr-section-summary-in' type='checkbox'  ><label for='section-c4320816-781d-4ebf-9647-a3d2f6a084a7' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>samples</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-58e3dba6-2516-45d4-b78b-c0e5a1975860' class='xr-index-data-in' type='checkbox'/><label for='index-58e3dba6-2516-45d4-b78b-c0e5a1975860' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;, &#x27;6&#x27;, &#x27;7&#x27;, &#x27;8&#x27;, &#x27;9&#x27;, &#x27;10&#x27;,
+       [&#x27;5129&#x27;, &#x27;6472&#x27;]], dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-d8363663-5c92-4b9b-a35b-1850c74860d9' class='xr-section-summary-in' type='checkbox'  ><label for='section-d8363663-5c92-4b9b-a35b-1850c74860d9' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>samples</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-7f0085b5-9541-4207-b63f-bef3b16e3108' class='xr-index-data-in' type='checkbox'/><label for='index-7f0085b5-9541-4207-b63f-bef3b16e3108' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;, &#x27;6&#x27;, &#x27;7&#x27;, &#x27;8&#x27;, &#x27;9&#x27;, &#x27;10&#x27;,
        ...
        &#x27;6464&#x27;, &#x27;6465&#x27;, &#x27;6466&#x27;, &#x27;6467&#x27;, &#x27;6468&#x27;, &#x27;6469&#x27;, &#x27;6470&#x27;, &#x27;6471&#x27;, &#x27;6472&#x27;,
        &#x27;6473&#x27;],
-      dtype=&#x27;object&#x27;, name=&#x27;samples&#x27;, length=6473))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>parents</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-680d67e5-8d7f-4af7-b4ff-c71eb538fed1' class='xr-index-data-in' type='checkbox'/><label for='index-680d67e5-8d7f-4af7-b4ff-c71eb538fed1' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;SIRE&#x27;, &#x27;DAM&#x27;], dtype=&#x27;object&#x27;, name=&#x27;parents&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-a7847bce-fb27-472a-bf32-aa57c9a91270' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-a7847bce-fb27-472a-bf32-aa57c9a91270' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
+      dtype=&#x27;object&#x27;, name=&#x27;samples&#x27;, length=6473))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>parents</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-dd8e582c-dd85-4a0c-bdaf-86899554900e' class='xr-index-data-in' type='checkbox'/><label for='index-dd8e582c-dd85-4a0c-bdaf-86899554900e' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;SIRE&#x27;, &#x27;DAM&#x27;], dtype=&#x27;object&#x27;, name=&#x27;parents&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-ee2682d0-2d60-4cf0-a4e7-55511cfc7de2' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-ee2682d0-2d60-4cf0-a4e7-55511cfc7de2' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
 </div>
 </section>
 <section id="working-with-pedigree-data">
@@ -1956,17 +1952,17 @@ Coordinates:
   * samples  (samples) object 52kB &#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; &#x27;4&#x27; ... &#x27;6471&#x27; &#x27;6472&#x27; &#x27;6473&#x27;
   * parents  (parents) object 16B &#x27;SIRE&#x27; &#x27;DAM&#x27;
 Attributes:
-    comment:  Indices of parent samples with negative values indicating unkno...</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'parent'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>samples</span>: 6473</li><li><span class='xr-has-index'>parents</span>: 2</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-e229b179-ee4a-49c2-85e9-18bb5a1a5c35' class='xr-array-in' type='checkbox' checked><label for='section-e229b179-ee4a-49c2-85e9-18bb5a1a5c35' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>-1 -1 -1 -1 -1 -1 -1 -1 -1 ... 6463 3674 4278 6464 6465 1128 5128 6471</span></div><div class='xr-array-data'><pre>array([[  -1,   -1],
+    comment:  Indices of parent samples with negative values indicating unkno...</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'parent'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>samples</span>: 6473</li><li><span class='xr-has-index'>parents</span>: 2</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-c536a159-0b49-4501-ad6e-045b68b27477' class='xr-array-in' type='checkbox' checked><label for='section-c536a159-0b49-4501-ad6e-045b68b27477' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>-1 -1 -1 -1 -1 -1 -1 -1 -1 ... 6463 3674 4278 6464 6465 1128 5128 6471</span></div><div class='xr-array-data'><pre>array([[  -1,   -1],
        [  -1,   -1],
        [  -1,   -1],
        ...,
        [4278, 6464],
        [6465, 1128],
-       [5128, 6471]])</pre></div></div></li><li class='xr-section-item'><input id='section-27326530-f5b3-4548-9725-d2a2e7971a94' class='xr-section-summary-in' type='checkbox'  checked><label for='section-27326530-f5b3-4548-9725-d2a2e7971a94' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>samples</span></div><div class='xr-var-dims'>(samples)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;6472&#x27; &#x27;6473&#x27;</div><input id='attrs-16dad2e7-ca65-43db-808d-05565d12a70c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-16dad2e7-ca65-43db-808d-05565d12a70c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f506f702-8486-4d72-bf9b-bf3ca1ad13ad' class='xr-var-data-in' type='checkbox'><label for='data-f506f702-8486-4d72-bf9b-bf3ca1ad13ad' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;6471&#x27;, &#x27;6472&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>parents</span></div><div class='xr-var-dims'>(parents)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;SIRE&#x27; &#x27;DAM&#x27;</div><input id='attrs-93754177-cdc5-4a2b-8e29-9e5014382b46' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-93754177-cdc5-4a2b-8e29-9e5014382b46' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-eb8eec53-49a4-491d-896a-7f3a798f8628' class='xr-var-data-in' type='checkbox'><label for='data-eb8eec53-49a4-491d-896a-7f3a798f8628' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;SIRE&#x27;, &#x27;DAM&#x27;], dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-a164df93-ad8e-4954-b72c-3f8e5c6cf135' class='xr-section-summary-in' type='checkbox'  ><label for='section-a164df93-ad8e-4954-b72c-3f8e5c6cf135' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>samples</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-71eec6a2-2b1c-48e7-9eb8-80c876dab4e0' class='xr-index-data-in' type='checkbox'/><label for='index-71eec6a2-2b1c-48e7-9eb8-80c876dab4e0' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;, &#x27;6&#x27;, &#x27;7&#x27;, &#x27;8&#x27;, &#x27;9&#x27;, &#x27;10&#x27;,
+       [5128, 6471]])</pre></div></div></li><li class='xr-section-item'><input id='section-6d3178e3-df58-4f4c-8ea8-7e144c3a63fa' class='xr-section-summary-in' type='checkbox'  checked><label for='section-6d3178e3-df58-4f4c-8ea8-7e144c3a63fa' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>samples</span></div><div class='xr-var-dims'>(samples)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;6472&#x27; &#x27;6473&#x27;</div><input id='attrs-a7970e90-9cfe-486f-a105-99972c3a3ab2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a7970e90-9cfe-486f-a105-99972c3a3ab2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9f0afe04-b341-41dc-93b0-db4534fb15cd' class='xr-var-data-in' type='checkbox'><label for='data-9f0afe04-b341-41dc-93b0-db4534fb15cd' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;6471&#x27;, &#x27;6472&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>parents</span></div><div class='xr-var-dims'>(parents)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;SIRE&#x27; &#x27;DAM&#x27;</div><input id='attrs-d55ba93b-f519-4e01-becb-cc29d44567a3' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d55ba93b-f519-4e01-becb-cc29d44567a3' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-aca4e822-71cb-49a7-82d9-2e6bbb3f63a6' class='xr-var-data-in' type='checkbox'><label for='data-aca4e822-71cb-49a7-82d9-2e6bbb3f63a6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;SIRE&#x27;, &#x27;DAM&#x27;], dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-9d97a16c-6a9e-4a94-8d57-b7f9d670ac1b' class='xr-section-summary-in' type='checkbox'  ><label for='section-9d97a16c-6a9e-4a94-8d57-b7f9d670ac1b' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>samples</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-934032fd-8aa5-4981-a8d2-2237fbc6f713' class='xr-index-data-in' type='checkbox'/><label for='index-934032fd-8aa5-4981-a8d2-2237fbc6f713' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;, &#x27;6&#x27;, &#x27;7&#x27;, &#x27;8&#x27;, &#x27;9&#x27;, &#x27;10&#x27;,
        ...
        &#x27;6464&#x27;, &#x27;6465&#x27;, &#x27;6466&#x27;, &#x27;6467&#x27;, &#x27;6468&#x27;, &#x27;6469&#x27;, &#x27;6470&#x27;, &#x27;6471&#x27;, &#x27;6472&#x27;,
        &#x27;6473&#x27;],
-      dtype=&#x27;object&#x27;, name=&#x27;samples&#x27;, length=6473))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>parents</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-b1415191-d9ea-42b5-b340-261e228e8acb' class='xr-index-data-in' type='checkbox'/><label for='index-b1415191-d9ea-42b5-b340-261e228e8acb' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;SIRE&#x27;, &#x27;DAM&#x27;], dtype=&#x27;object&#x27;, name=&#x27;parents&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-4b295a80-6d4f-4a3d-b4ff-ab5dadd0df22' class='xr-section-summary-in' type='checkbox'  checked><label for='section-4b295a80-6d4f-4a3d-b4ff-ab5dadd0df22' class='xr-section-summary' >Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>comment :</span></dt><dd>Indices of parent samples with negative values indicating unknown parents.</dd></dl></div></li></ul></div></div></div></div>
+      dtype=&#x27;object&#x27;, name=&#x27;samples&#x27;, length=6473))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>parents</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-93f53e63-783a-4abf-ae55-78508de86f36' class='xr-index-data-in' type='checkbox'/><label for='index-93f53e63-783a-4abf-ae55-78508de86f36' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;SIRE&#x27;, &#x27;DAM&#x27;], dtype=&#x27;object&#x27;, name=&#x27;parents&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-6ad5ba7c-9062-408a-a798-c78451cafd9a' class='xr-section-summary-in' type='checkbox'  checked><label for='section-6ad5ba7c-9062-408a-a798-c78451cafd9a' class='xr-section-summary' >Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>comment :</span></dt><dd>Indices of parent samples with negative values indicating unknown parents.</dd></dl></div></li></ul></div></div></div></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">parent_id</span></code> matrix serves as a robust record of the pedigree structure which preserves the structure of a pedigree if the dataset is subset or reordered.
 The <code class="docutils literal notranslate"><span class="pre">parent</span></code> matrix contains integer indices of the parent samples within the dataset allowing for fast numerical calculations.
@@ -2364,7 +2360,7 @@ dl.xr-attrs {
 dask.array&lt;mul, shape=(6473, 6473), dtype=float64, chunksize=(6473, 6473), chunktype=numpy.ndarray&gt;
 Dimensions without coordinates: samples_0, samples_1
 Attributes:
-    comment:  Relationship matrix derived from pedigree structure.</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'stat_pedigree_relationship'</div><ul class='xr-dim-list'><li><span>samples_0</span>: 6473</li><li><span>samples_1</span>: 6473</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-268d20b4-fad4-417f-8e9f-e70edd041258' class='xr-array-in' type='checkbox' checked><label for='section-268d20b4-fad4-417f-8e9f-e70edd041258' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>dask.array&lt;chunksize=(6473, 6473), meta=np.ndarray&gt;</span></div><div class='xr-array-data'><table>
+    comment:  Relationship matrix derived from pedigree structure.</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'stat_pedigree_relationship'</div><ul class='xr-dim-list'><li><span>samples_0</span>: 6473</li><li><span>samples_1</span>: 6473</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-11ca95ef-7397-4dbf-a7a7-77bc417dc40a' class='xr-array-in' type='checkbox' checked><label for='section-11ca95ef-7397-4dbf-a7a7-77bc417dc40a' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>dask.array&lt;chunksize=(6473, 6473), meta=np.ndarray&gt;</span></div><div class='xr-array-data'><table>
     <tr>
         <td>
             <table style="border-collapse: collapse;">
@@ -2419,7 +2415,7 @@ Attributes:
 </svg>
         </td>
     </tr>
-</table></div></div></li><li class='xr-section-item'><input id='section-96fee6dc-33be-4467-895b-b1847cc86d1f' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-96fee6dc-33be-4467-895b-b1847cc86d1f' class='xr-section-summary'  title='Expand/collapse section'>Coordinates: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-f132e765-da39-4aa1-9ff8-818181eade51' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-f132e765-da39-4aa1-9ff8-818181eade51' class='xr-section-summary'  title='Expand/collapse section'>Indexes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-13b9a4b8-f28e-4c1c-ba9d-bb25a3ada67f' class='xr-section-summary-in' type='checkbox'  checked><label for='section-13b9a4b8-f28e-4c1c-ba9d-bb25a3ada67f' class='xr-section-summary' >Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>comment :</span></dt><dd>Relationship matrix derived from pedigree structure.</dd></dl></div></li></ul></div></div></div></div>
+</table></div></div></li><li class='xr-section-item'><input id='section-95814029-2314-4d10-a366-c349c7f5fb40' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-95814029-2314-4d10-a366-c349c7f5fb40' class='xr-section-summary'  title='Expand/collapse section'>Coordinates: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-7ce56948-22d1-4e7f-82da-897a0ae57551' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-7ce56948-22d1-4e7f-82da-897a0ae57551' class='xr-section-summary'  title='Expand/collapse section'>Indexes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-2454a9a1-a924-49d1-9a19-bf7738cc401c' class='xr-section-summary-in' type='checkbox'  checked><label for='section-2454a9a1-a924-49d1-9a19-bf7738cc401c' class='xr-section-summary' >Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>comment :</span></dt><dd>Relationship matrix derived from pedigree structure.</dd></dl></div></li></ul></div></div></div></div>
 </div>
 <p>Note that the dimensions of the matrices are called <code class="docutils literal notranslate"><span class="pre">samples_0</span></code> and <code class="docutils literal notranslate"><span class="pre">samples_1</span></code> to avoid using a single dimension twice in an xarray DataArray.
 Unfortunately, this means that the coordinates of the <code class="docutils literal notranslate"><span class="pre">samples</span></code> array have not been propagated to the new dimensions.
@@ -2824,7 +2820,7 @@ Coordinates:
   * samples_0  (samples_0) object 52kB &#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; &#x27;4&#x27; ... &#x27;6471&#x27; &#x27;6472&#x27; &#x27;6473&#x27;
   * samples_1  (samples_1) object 52kB &#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; &#x27;4&#x27; ... &#x27;6471&#x27; &#x27;6472&#x27; &#x27;6473&#x27;
 Attributes:
-    comment:  Relationship matrix derived from pedigree structure.</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'stat_pedigree_relationship'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>samples_0</span>: 6473</li><li><span class='xr-has-index'>samples_1</span>: 6473</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-b2b6b361-8782-491b-889e-edd60eec4c97' class='xr-array-in' type='checkbox' checked><label for='section-b2b6b361-8782-491b-889e-edd60eec4c97' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 0.0 0.0 0.0 0.0 0.0 ... 0.008972 0.02167 0.01508 0.5325 1.032</span></div><div class='xr-array-data'><pre>array([[1.        , 0.        , 0.        , ..., 0.015625  , 0.        ,
+    comment:  Relationship matrix derived from pedigree structure.</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'stat_pedigree_relationship'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>samples_0</span>: 6473</li><li><span class='xr-has-index'>samples_1</span>: 6473</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-6eadd3b1-4f9e-4100-9b9f-8f533d93ce02' class='xr-array-in' type='checkbox' checked><label for='section-6eadd3b1-4f9e-4100-9b9f-8f533d93ce02' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 0.0 0.0 0.0 0.0 0.0 ... 0.008972 0.02167 0.01508 0.5325 1.032</span></div><div class='xr-array-data'><pre>array([[1.        , 0.        , 0.        , ..., 0.015625  , 0.        ,
         0.        ],
        [0.        , 1.        , 0.        , ..., 0.        , 0.        ,
         0.        ],
@@ -2836,15 +2832,15 @@ Attributes:
        [0.        , 0.        , 0.        , ..., 0.01885986, 1.        ,
         0.5324707 ],
        [0.        , 0.        , 0.        , ..., 0.01507568, 0.5324707 ,
-        1.0324707 ]])</pre></div></div></li><li class='xr-section-item'><input id='section-b040ec38-7d23-4a92-9188-840ea0c08490' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b040ec38-7d23-4a92-9188-840ea0c08490' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>samples_0</span></div><div class='xr-var-dims'>(samples_0)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;6472&#x27; &#x27;6473&#x27;</div><input id='attrs-9b05dcbb-2052-424a-a23c-5516bb5948d9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9b05dcbb-2052-424a-a23c-5516bb5948d9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e0c8bc06-d730-47b6-8a10-c2f7a07e3916' class='xr-var-data-in' type='checkbox'><label for='data-e0c8bc06-d730-47b6-8a10-c2f7a07e3916' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;6471&#x27;, &#x27;6472&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>samples_1</span></div><div class='xr-var-dims'>(samples_1)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;6472&#x27; &#x27;6473&#x27;</div><input id='attrs-01ea34c8-efc2-4796-aa0e-00d9e37d1a69' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-01ea34c8-efc2-4796-aa0e-00d9e37d1a69' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-fca41aa5-a232-4141-988b-8b0ab921b1b8' class='xr-var-data-in' type='checkbox'><label for='data-fca41aa5-a232-4141-988b-8b0ab921b1b8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;6471&#x27;, &#x27;6472&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-292ed8fc-ea9f-41f4-ba46-666be6149a38' class='xr-section-summary-in' type='checkbox'  ><label for='section-292ed8fc-ea9f-41f4-ba46-666be6149a38' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>samples_0</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-5724f80d-b20b-43f1-be7e-44ddd36022f8' class='xr-index-data-in' type='checkbox'/><label for='index-5724f80d-b20b-43f1-be7e-44ddd36022f8' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;, &#x27;6&#x27;, &#x27;7&#x27;, &#x27;8&#x27;, &#x27;9&#x27;, &#x27;10&#x27;,
+        1.0324707 ]])</pre></div></div></li><li class='xr-section-item'><input id='section-b5d8f4de-66b6-4a41-818b-70c75973e5ec' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b5d8f4de-66b6-4a41-818b-70c75973e5ec' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>samples_0</span></div><div class='xr-var-dims'>(samples_0)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;6472&#x27; &#x27;6473&#x27;</div><input id='attrs-fa80454a-27e5-42f0-b2ac-8938a2b82fde' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-fa80454a-27e5-42f0-b2ac-8938a2b82fde' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6dedf1d2-8594-4e7a-aeff-74af0e641dc2' class='xr-var-data-in' type='checkbox'><label for='data-6dedf1d2-8594-4e7a-aeff-74af0e641dc2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;6471&#x27;, &#x27;6472&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>samples_1</span></div><div class='xr-var-dims'>(samples_1)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;6472&#x27; &#x27;6473&#x27;</div><input id='attrs-346d9e2e-26be-4027-a6b3-27a6e6a9e0f6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-346d9e2e-26be-4027-a6b3-27a6e6a9e0f6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b08093d2-be37-46f6-ad33-ff2ed98dcfef' class='xr-var-data-in' type='checkbox'><label for='data-b08093d2-be37-46f6-ad33-ff2ed98dcfef' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;6471&#x27;, &#x27;6472&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-df1f766e-6fe5-4aa9-a439-6b607922bd7d' class='xr-section-summary-in' type='checkbox'  ><label for='section-df1f766e-6fe5-4aa9-a439-6b607922bd7d' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>samples_0</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-6b329b3f-b2d4-4973-900f-9a739fc66bfa' class='xr-index-data-in' type='checkbox'/><label for='index-6b329b3f-b2d4-4973-900f-9a739fc66bfa' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;, &#x27;6&#x27;, &#x27;7&#x27;, &#x27;8&#x27;, &#x27;9&#x27;, &#x27;10&#x27;,
        ...
        &#x27;6464&#x27;, &#x27;6465&#x27;, &#x27;6466&#x27;, &#x27;6467&#x27;, &#x27;6468&#x27;, &#x27;6469&#x27;, &#x27;6470&#x27;, &#x27;6471&#x27;, &#x27;6472&#x27;,
        &#x27;6473&#x27;],
-      dtype=&#x27;object&#x27;, name=&#x27;samples_0&#x27;, length=6473))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>samples_1</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-6fc10e3a-db9d-48f7-a598-6e8a1aed8ea8' class='xr-index-data-in' type='checkbox'/><label for='index-6fc10e3a-db9d-48f7-a598-6e8a1aed8ea8' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;, &#x27;6&#x27;, &#x27;7&#x27;, &#x27;8&#x27;, &#x27;9&#x27;, &#x27;10&#x27;,
+      dtype=&#x27;object&#x27;, name=&#x27;samples_0&#x27;, length=6473))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>samples_1</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-7f591226-1dd6-43c7-bf82-f02f2a5b5c0d' class='xr-index-data-in' type='checkbox'/><label for='index-7f591226-1dd6-43c7-bf82-f02f2a5b5c0d' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;, &#x27;6&#x27;, &#x27;7&#x27;, &#x27;8&#x27;, &#x27;9&#x27;, &#x27;10&#x27;,
        ...
        &#x27;6464&#x27;, &#x27;6465&#x27;, &#x27;6466&#x27;, &#x27;6467&#x27;, &#x27;6468&#x27;, &#x27;6469&#x27;, &#x27;6470&#x27;, &#x27;6471&#x27;, &#x27;6472&#x27;,
        &#x27;6473&#x27;],
-      dtype=&#x27;object&#x27;, name=&#x27;samples_1&#x27;, length=6473))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-bec3c252-d813-4f7d-a48c-ef88ae320bc9' class='xr-section-summary-in' type='checkbox'  checked><label for='section-bec3c252-d813-4f7d-a48c-ef88ae320bc9' class='xr-section-summary' >Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>comment :</span></dt><dd>Relationship matrix derived from pedigree structure.</dd></dl></div></li></ul></div></div></div></div>
+      dtype=&#x27;object&#x27;, name=&#x27;samples_1&#x27;, length=6473))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-0a6e3b0d-57b6-41f9-a870-064dfd4c1b1b' class='xr-section-summary-in' type='checkbox'  checked><label for='section-0a6e3b0d-57b6-41f9-a870-064dfd4c1b1b' class='xr-section-summary' >Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>comment :</span></dt><dd>Relationship matrix derived from pedigree structure.</dd></dl></div></li></ul></div></div></div></div>
 </div>
 <p>We can plot the relationship using matplotlib.</p>
 <div class="cell docutils container">
@@ -2855,7 +2851,7 @@ Attributes:
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/a88072e53339ea8b3c733fb89ee4b343c49887195c3b71fb93d0f89ef15b165f.png" src="../_images/a88072e53339ea8b3c733fb89ee4b343c49887195c3b71fb93d0f89ef15b165f.png" />
+<img alt="../_images/eff0f970df2e5e7cc29c4fe3f7c9346a16b77b848753b86142e68a67df68e0e5.png" src="../_images/eff0f970df2e5e7cc29c4fe3f7c9346a16b77b848753b86142e68a67df68e0e5.png" />
 </div>
 </div>
 </section>
@@ -3455,20 +3451,20 @@ array([[1., 0., 2., ..., 0., 1., 0.],
        [2., 1., 1., ..., 0., 2., 0.]])
 Coordinates:
   * variants  (variants) object 8kB &#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; &#x27;4&#x27; ... &#x27;997&#x27; &#x27;998&#x27; &#x27;999&#x27; &#x27;1000&#x27;
-  * samples   (samples) object 28kB &#x27;584&#x27; &#x27;585&#x27; &#x27;587&#x27; ... &#x27;6470&#x27; &#x27;6471&#x27; &#x27;6473&#x27;</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>variants</span>: 1000</li><li><span class='xr-has-index'>samples</span>: 3534</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-58176b77-0836-4fa1-9835-6cf8ac03e5f1' class='xr-array-in' type='checkbox' checked><label for='section-58176b77-0836-4fa1-9835-6cf8ac03e5f1' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 0.0 2.0 1.0 0.0 1.0 0.0 1.0 ... 1.0 2.0 2.0 1.0 0.0 0.0 2.0 0.0</span></div><div class='xr-array-data'><pre>array([[1., 0., 2., ..., 0., 1., 0.],
+  * samples   (samples) object 28kB &#x27;584&#x27; &#x27;585&#x27; &#x27;587&#x27; ... &#x27;6470&#x27; &#x27;6471&#x27; &#x27;6473&#x27;</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>variants</span>: 1000</li><li><span class='xr-has-index'>samples</span>: 3534</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-8aac0cd9-24b1-4b70-9c69-fefa3f89e5c5' class='xr-array-in' type='checkbox' checked><label for='section-8aac0cd9-24b1-4b70-9c69-fefa3f89e5c5' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 0.0 2.0 1.0 0.0 1.0 0.0 1.0 ... 1.0 2.0 2.0 1.0 0.0 0.0 2.0 0.0</span></div><div class='xr-array-data'><pre>array([[1., 0., 2., ..., 0., 1., 0.],
        [1., 2., 2., ..., 1., 1., 2.],
        [1., 1., 0., ..., 1., 2., 2.],
        ...,
        [2., 0., 1., ..., 0., 0., 0.],
        [2., 2., 2., ..., 2., 2., 2.],
-       [2., 1., 1., ..., 0., 2., 0.]])</pre></div></div></li><li class='xr-section-item'><input id='section-ab361b89-5893-4957-b783-362b24f6ff9a' class='xr-section-summary-in' type='checkbox'  checked><label for='section-ab361b89-5893-4957-b783-362b24f6ff9a' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>variants</span></div><div class='xr-var-dims'>(variants)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;998&#x27; &#x27;999&#x27; &#x27;1000&#x27;</div><input id='attrs-40cd42c6-89eb-4397-8d33-38d343292210' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-40cd42c6-89eb-4397-8d33-38d343292210' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b77e4275-b6c0-45f9-9833-0317623dc098' class='xr-var-data-in' type='checkbox'><label for='data-b77e4275-b6c0-45f9-9833-0317623dc098' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;998&#x27;, &#x27;999&#x27;, &#x27;1000&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>samples</span></div><div class='xr-var-dims'>(samples)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;584&#x27; &#x27;585&#x27; &#x27;587&#x27; ... &#x27;6471&#x27; &#x27;6473&#x27;</div><input id='attrs-8cd542ea-44f4-41f5-8d51-849c1a0bf493' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8cd542ea-44f4-41f5-8d51-849c1a0bf493' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-1dadf53b-1999-4539-be56-c4a97eb81e4f' class='xr-var-data-in' type='checkbox'><label for='data-1dadf53b-1999-4539-be56-c4a97eb81e4f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;584&#x27;, &#x27;585&#x27;, &#x27;587&#x27;, ..., &#x27;6470&#x27;, &#x27;6471&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-e0abeb21-2619-4543-bc74-d5aebf793ec6' class='xr-section-summary-in' type='checkbox'  ><label for='section-e0abeb21-2619-4543-bc74-d5aebf793ec6' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>variants</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-b1eac88a-a45e-46a0-8a10-45619038f066' class='xr-index-data-in' type='checkbox'/><label for='index-b1eac88a-a45e-46a0-8a10-45619038f066' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;, &#x27;6&#x27;, &#x27;7&#x27;, &#x27;8&#x27;, &#x27;9&#x27;, &#x27;10&#x27;,
+       [2., 1., 1., ..., 0., 2., 0.]])</pre></div></div></li><li class='xr-section-item'><input id='section-3c17cb53-23de-4751-843f-ba0c33bdbc30' class='xr-section-summary-in' type='checkbox'  checked><label for='section-3c17cb53-23de-4751-843f-ba0c33bdbc30' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>variants</span></div><div class='xr-var-dims'>(variants)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;998&#x27; &#x27;999&#x27; &#x27;1000&#x27;</div><input id='attrs-3442855a-bfe6-40d4-ab8d-cfb078dce38a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3442855a-bfe6-40d4-ab8d-cfb078dce38a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3638ee99-2eca-458e-a7c1-92bc5d334efd' class='xr-var-data-in' type='checkbox'><label for='data-3638ee99-2eca-458e-a7c1-92bc5d334efd' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;998&#x27;, &#x27;999&#x27;, &#x27;1000&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>samples</span></div><div class='xr-var-dims'>(samples)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;584&#x27; &#x27;585&#x27; &#x27;587&#x27; ... &#x27;6471&#x27; &#x27;6473&#x27;</div><input id='attrs-0494ae7e-f684-4cf0-895a-7029aaddc91d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-0494ae7e-f684-4cf0-895a-7029aaddc91d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8a3f4f62-74e3-43d9-91c3-4a4269e948c2' class='xr-var-data-in' type='checkbox'><label for='data-8a3f4f62-74e3-43d9-91c3-4a4269e948c2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;584&#x27;, &#x27;585&#x27;, &#x27;587&#x27;, ..., &#x27;6470&#x27;, &#x27;6471&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-db8f7c06-e05b-4cf2-ae74-3e5f6b23758f' class='xr-section-summary-in' type='checkbox'  ><label for='section-db8f7c06-e05b-4cf2-ae74-3e5f6b23758f' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>variants</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-d1de8470-b8a2-44d0-8c24-46f18708f163' class='xr-index-data-in' type='checkbox'/><label for='index-d1de8470-b8a2-44d0-8c24-46f18708f163' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;, &#x27;6&#x27;, &#x27;7&#x27;, &#x27;8&#x27;, &#x27;9&#x27;, &#x27;10&#x27;,
        ...
        &#x27;991&#x27;, &#x27;992&#x27;, &#x27;993&#x27;, &#x27;994&#x27;, &#x27;995&#x27;, &#x27;996&#x27;, &#x27;997&#x27;, &#x27;998&#x27;, &#x27;999&#x27;, &#x27;1000&#x27;],
-      dtype=&#x27;object&#x27;, name=&#x27;variants&#x27;, length=1000))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>samples</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-21a84691-a9d9-4a00-8b48-4343f7cbbfab' class='xr-index-data-in' type='checkbox'/><label for='index-21a84691-a9d9-4a00-8b48-4343f7cbbfab' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;584&#x27;, &#x27;585&#x27;, &#x27;587&#x27;, &#x27;588&#x27;, &#x27;589&#x27;, &#x27;590&#x27;, &#x27;591&#x27;, &#x27;592&#x27;, &#x27;593&#x27;, &#x27;594&#x27;,
+      dtype=&#x27;object&#x27;, name=&#x27;variants&#x27;, length=1000))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>samples</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-ca9abe38-dc3f-4a4f-8281-fc827eca3a2e' class='xr-index-data-in' type='checkbox'/><label for='index-ca9abe38-dc3f-4a4f-8281-fc827eca3a2e' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;584&#x27;, &#x27;585&#x27;, &#x27;587&#x27;, &#x27;588&#x27;, &#x27;589&#x27;, &#x27;590&#x27;, &#x27;591&#x27;, &#x27;592&#x27;, &#x27;593&#x27;, &#x27;594&#x27;,
        ...
        &#x27;6463&#x27;, &#x27;6464&#x27;, &#x27;6465&#x27;, &#x27;6466&#x27;, &#x27;6467&#x27;, &#x27;6468&#x27;, &#x27;6469&#x27;, &#x27;6470&#x27;, &#x27;6471&#x27;,
        &#x27;6473&#x27;],
-      dtype=&#x27;object&#x27;, name=&#x27;samples&#x27;, length=3534))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-903932b2-2e46-4bbe-b1ef-bb608a82306c' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-903932b2-2e46-4bbe-b1ef-bb608a82306c' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
+      dtype=&#x27;object&#x27;, name=&#x27;samples&#x27;, length=3534))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-6a7b6b06-7a3a-41c2-b365-3dbde8ffae3e' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-6a7b6b06-7a3a-41c2-b365-3dbde8ffae3e' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
 </div>
 <p>Next we create a dataset containing the <code class="docutils literal notranslate"><span class="pre">call_dosage</span></code> and <code class="docutils literal notranslate"><span class="pre">sample_id</span></code> variables.</p>
 <div class="cell docutils container">
@@ -3851,20 +3847,20 @@ Coordinates:
   * variants     (variants) object 8kB &#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; &#x27;4&#x27; ... &#x27;998&#x27; &#x27;999&#x27; &#x27;1000&#x27;
 Data variables:
     sample_id    (samples) object 28kB &#x27;584&#x27; &#x27;585&#x27; &#x27;587&#x27; ... &#x27;6471&#x27; &#x27;6473&#x27;
-    call_dosage  (variants, samples) float64 28MB 1.0 0.0 2.0 ... 0.0 2.0 0.0</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-0f280e4d-d281-4238-a968-864dec6bccd4' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-0f280e4d-d281-4238-a968-864dec6bccd4' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>samples</span>: 3534</li><li><span class='xr-has-index'>variants</span>: 1000</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-ddde6524-3ed3-4bcd-8c90-984d6a49566c' class='xr-section-summary-in' type='checkbox'  checked><label for='section-ddde6524-3ed3-4bcd-8c90-984d6a49566c' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>samples</span></div><div class='xr-var-dims'>(samples)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;584&#x27; &#x27;585&#x27; &#x27;587&#x27; ... &#x27;6471&#x27; &#x27;6473&#x27;</div><input id='attrs-2380ecdb-9ef3-4ec3-964a-1f9eb02ae318' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2380ecdb-9ef3-4ec3-964a-1f9eb02ae318' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-be2ddf21-83aa-42fe-a150-fab63156482d' class='xr-var-data-in' type='checkbox'><label for='data-be2ddf21-83aa-42fe-a150-fab63156482d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;584&#x27;, &#x27;585&#x27;, &#x27;587&#x27;, ..., &#x27;6470&#x27;, &#x27;6471&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>variants</span></div><div class='xr-var-dims'>(variants)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;998&#x27; &#x27;999&#x27; &#x27;1000&#x27;</div><input id='attrs-41bc2052-013a-4997-8539-188dc4d4c6fe' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-41bc2052-013a-4997-8539-188dc4d4c6fe' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-318c3dce-97a9-4938-83a1-6d7c194f07a2' class='xr-var-data-in' type='checkbox'><label for='data-318c3dce-97a9-4938-83a1-6d7c194f07a2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;998&#x27;, &#x27;999&#x27;, &#x27;1000&#x27;], dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-adcf2a85-fca1-4567-ad56-920f114eda1f' class='xr-section-summary-in' type='checkbox'  checked><label for='section-adcf2a85-fca1-4567-ad56-920f114eda1f' class='xr-section-summary' >Data variables: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>sample_id</span></div><div class='xr-var-dims'>(samples)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;584&#x27; &#x27;585&#x27; &#x27;587&#x27; ... &#x27;6471&#x27; &#x27;6473&#x27;</div><input id='attrs-8cc83f84-3c27-4785-b81a-1c8ab9177b8e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8cc83f84-3c27-4785-b81a-1c8ab9177b8e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d5a4f18f-eabc-469f-8540-1be719c963a4' class='xr-var-data-in' type='checkbox'><label for='data-d5a4f18f-eabc-469f-8540-1be719c963a4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;584&#x27;, &#x27;585&#x27;, &#x27;587&#x27;, ..., &#x27;6470&#x27;, &#x27;6471&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>call_dosage</span></div><div class='xr-var-dims'>(variants, samples)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.0 0.0 2.0 1.0 ... 0.0 0.0 2.0 0.0</div><input id='attrs-d87e7581-591a-48b6-97af-5caa9e24130a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d87e7581-591a-48b6-97af-5caa9e24130a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0f3f385b-8c04-4b9e-bfa7-c1eb6772e849' class='xr-var-data-in' type='checkbox'><label for='data-0f3f385b-8c04-4b9e-bfa7-c1eb6772e849' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[1., 0., 2., ..., 0., 1., 0.],
+    call_dosage  (variants, samples) float64 28MB 1.0 0.0 2.0 ... 0.0 2.0 0.0</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-938fc317-0f91-465e-82f5-08f612245a12' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-938fc317-0f91-465e-82f5-08f612245a12' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>samples</span>: 3534</li><li><span class='xr-has-index'>variants</span>: 1000</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-3ba70e45-f1a3-4d63-96e5-99f9554c66b9' class='xr-section-summary-in' type='checkbox'  checked><label for='section-3ba70e45-f1a3-4d63-96e5-99f9554c66b9' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>samples</span></div><div class='xr-var-dims'>(samples)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;584&#x27; &#x27;585&#x27; &#x27;587&#x27; ... &#x27;6471&#x27; &#x27;6473&#x27;</div><input id='attrs-4dd8c482-2dbe-4412-8118-d55adc34f985' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4dd8c482-2dbe-4412-8118-d55adc34f985' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6274cf3d-b594-4752-bfcc-7da305b59a60' class='xr-var-data-in' type='checkbox'><label for='data-6274cf3d-b594-4752-bfcc-7da305b59a60' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;584&#x27;, &#x27;585&#x27;, &#x27;587&#x27;, ..., &#x27;6470&#x27;, &#x27;6471&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>variants</span></div><div class='xr-var-dims'>(variants)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;1&#x27; &#x27;2&#x27; &#x27;3&#x27; ... &#x27;998&#x27; &#x27;999&#x27; &#x27;1000&#x27;</div><input id='attrs-9d6f7a4c-e1e0-4e3f-8466-6086473655c6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9d6f7a4c-e1e0-4e3f-8466-6086473655c6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6dfd02e4-9939-451a-b6dd-da6b488c8d3a' class='xr-var-data-in' type='checkbox'><label for='data-6dfd02e4-9939-451a-b6dd-da6b488c8d3a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, ..., &#x27;998&#x27;, &#x27;999&#x27;, &#x27;1000&#x27;], dtype=object)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-66d35786-bec8-4ae5-bf48-f22d287010de' class='xr-section-summary-in' type='checkbox'  checked><label for='section-66d35786-bec8-4ae5-bf48-f22d287010de' class='xr-section-summary' >Data variables: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>sample_id</span></div><div class='xr-var-dims'>(samples)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>&#x27;584&#x27; &#x27;585&#x27; &#x27;587&#x27; ... &#x27;6471&#x27; &#x27;6473&#x27;</div><input id='attrs-3b17fb56-3901-4bec-bd36-777438e62ade' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3b17fb56-3901-4bec-bd36-777438e62ade' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a777e4f1-2d81-4a1a-ba9b-2089b067e368' class='xr-var-data-in' type='checkbox'><label for='data-a777e4f1-2d81-4a1a-ba9b-2089b067e368' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;584&#x27;, &#x27;585&#x27;, &#x27;587&#x27;, ..., &#x27;6470&#x27;, &#x27;6471&#x27;, &#x27;6473&#x27;], dtype=object)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>call_dosage</span></div><div class='xr-var-dims'>(variants, samples)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.0 0.0 2.0 1.0 ... 0.0 0.0 2.0 0.0</div><input id='attrs-8ba29391-6e76-4a43-bb3c-a29e89fdca32' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8ba29391-6e76-4a43-bb3c-a29e89fdca32' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-638b7c7c-49c0-45ce-9bb2-1b1ec452c7e5' class='xr-var-data-in' type='checkbox'><label for='data-638b7c7c-49c0-45ce-9bb2-1b1ec452c7e5' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[1., 0., 2., ..., 0., 1., 0.],
        [1., 2., 2., ..., 1., 1., 2.],
        [1., 1., 0., ..., 1., 2., 2.],
        ...,
        [2., 0., 1., ..., 0., 0., 0.],
        [2., 2., 2., ..., 2., 2., 2.],
-       [2., 1., 1., ..., 0., 2., 0.]])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-7d914b23-a31a-4d30-a027-37a00267b4a0' class='xr-section-summary-in' type='checkbox'  ><label for='section-7d914b23-a31a-4d30-a027-37a00267b4a0' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>samples</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-7b169668-dad6-4a2d-839a-03ed5218bb0c' class='xr-index-data-in' type='checkbox'/><label for='index-7b169668-dad6-4a2d-839a-03ed5218bb0c' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;584&#x27;, &#x27;585&#x27;, &#x27;587&#x27;, &#x27;588&#x27;, &#x27;589&#x27;, &#x27;590&#x27;, &#x27;591&#x27;, &#x27;592&#x27;, &#x27;593&#x27;, &#x27;594&#x27;,
+       [2., 1., 1., ..., 0., 2., 0.]])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-f13abb96-6944-48a6-86c1-d0b6b563aca3' class='xr-section-summary-in' type='checkbox'  ><label for='section-f13abb96-6944-48a6-86c1-d0b6b563aca3' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>samples</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-4c22cdb3-8e3e-4416-8013-7414cd08f306' class='xr-index-data-in' type='checkbox'/><label for='index-4c22cdb3-8e3e-4416-8013-7414cd08f306' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;584&#x27;, &#x27;585&#x27;, &#x27;587&#x27;, &#x27;588&#x27;, &#x27;589&#x27;, &#x27;590&#x27;, &#x27;591&#x27;, &#x27;592&#x27;, &#x27;593&#x27;, &#x27;594&#x27;,
        ...
        &#x27;6463&#x27;, &#x27;6464&#x27;, &#x27;6465&#x27;, &#x27;6466&#x27;, &#x27;6467&#x27;, &#x27;6468&#x27;, &#x27;6469&#x27;, &#x27;6470&#x27;, &#x27;6471&#x27;,
        &#x27;6473&#x27;],
-      dtype=&#x27;object&#x27;, name=&#x27;samples&#x27;, length=3534))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>variants</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-235f5d44-1cd1-441e-bfca-74f0ae56f7ed' class='xr-index-data-in' type='checkbox'/><label for='index-235f5d44-1cd1-441e-bfca-74f0ae56f7ed' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;, &#x27;6&#x27;, &#x27;7&#x27;, &#x27;8&#x27;, &#x27;9&#x27;, &#x27;10&#x27;,
+      dtype=&#x27;object&#x27;, name=&#x27;samples&#x27;, length=3534))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>variants</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-8a40b856-354a-4f0f-b87d-7fd42a7a7030' class='xr-index-data-in' type='checkbox'/><label for='index-8a40b856-354a-4f0f-b87d-7fd42a7a7030' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;, &#x27;5&#x27;, &#x27;6&#x27;, &#x27;7&#x27;, &#x27;8&#x27;, &#x27;9&#x27;, &#x27;10&#x27;,
        ...
        &#x27;991&#x27;, &#x27;992&#x27;, &#x27;993&#x27;, &#x27;994&#x27;, &#x27;995&#x27;, &#x27;996&#x27;, &#x27;997&#x27;, &#x27;998&#x27;, &#x27;999&#x27;, &#x27;1000&#x27;],
-      dtype=&#x27;object&#x27;, name=&#x27;variants&#x27;, length=1000))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-e54986be-5672-43df-9d6e-50db4c5d0322' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-e54986be-5672-43df-9d6e-50db4c5d0322' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
+      dtype=&#x27;object&#x27;, name=&#x27;variants&#x27;, length=1000))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-d3a54241-5c8e-4e82-a61b-8013e67736d1' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-d3a54241-5c8e-4e82-a61b-8013e67736d1' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
 </div>
 </section>
 <section id="the-vanraden-grm">
@@ -3916,7 +3912,7 @@ However, we will rename this matrix to <code class="docutils literal notranslate
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/37adf6f550789c190940de77335777bf1fbe027587ba9be23d316d31f90f06fc.png" src="../_images/37adf6f550789c190940de77335777bf1fbe027587ba9be23d316d31f90f06fc.png" />
+<img alt="../_images/d19032015d5c7e1378ade3cfc973403ea6eee91690c4be1df0684be724341cfd.png" src="../_images/d19032015d5c7e1378ade3cfc973403ea6eee91690c4be1df0684be724341cfd.png" />
 </div>
 </div>
 <p>How do the genomic estimates compare to the pedigree estimates?
@@ -3946,11 +3942,11 @@ Xarrays <code class="docutils literal notranslate"><span class="pre">merge</span
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2965/892134664.py:1: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2967/892134664.py:1: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
   tril_idx = np.tril_indices(gen.dims[&quot;samples&quot;])
 </pre></div>
 </div>
-<img alt="../_images/95fdaa42bea32cdecf51b9847407c611d5becc862ce25b0ca4b2340d51ece621.png" src="../_images/95fdaa42bea32cdecf51b9847407c611d5becc862ce25b0ca4b2340d51ece621.png" />
+<img alt="../_images/f6dfd8cfe9aa2fdc11f29d113ee0b84a8bd0241b37ade753ced3f00c614f315d.png" src="../_images/f6dfd8cfe9aa2fdc11f29d113ee0b84a8bd0241b37ade753ced3f00c614f315d.png" />
 </div>
 </div>
 </section>
@@ -4030,7 +4026,7 @@ First, we need to merge in the pedigree kinship estimates (<span class="math not
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/6c6a13254815700fa26fc6cb29c6d02364121adb22ffdf388f43fbe49dcf0519.png" src="../_images/6c6a13254815700fa26fc6cb29c6d02364121adb22ffdf388f43fbe49dcf0519.png" />
+<img alt="../_images/be9b8278f15f6d41439f2a41996f9a3ac518c3f3e7622602034e669a64bb47b5.png" src="../_images/be9b8278f15f6d41439f2a41996f9a3ac518c3f3e7622602034e669a64bb47b5.png" />
 </div>
 </div>
 <p>The new genomic estimate appears to be more consistent with the pedigree based estimate</p>
@@ -4050,11 +4046,11 @@ First, we need to merge in the pedigree kinship estimates (<span class="math not
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2965/3477141311.py:1: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2967/3477141311.py:1: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
   tril_idx = np.tril_indices(gen.dims[&quot;samples&quot;])
 </pre></div>
 </div>
-<img alt="../_images/06acd7d1e58082f4335c3c8f74e6add437fc424a09708f30a93d14ab3212dd65.png" src="../_images/06acd7d1e58082f4335c3c8f74e6add437fc424a09708f30a93d14ab3212dd65.png" />
+<img alt="../_images/0f36ceb3a6524470408d43eaffe287963dbdb13f3ebf0916790c1123a0f34649.png" src="../_images/0f36ceb3a6524470408d43eaffe287963dbdb13f3ebf0916790c1123a0f34649.png" />
 </div>
 </div>
 </section>
@@ -4103,7 +4099,7 @@ Therefore, we first convert the <code class="docutils literal notranslate"><span
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/7eaca329b4b6b8dafd49c2883acd8048734ea576292f61f2b347df128f069bf7.png" src="../_images/7eaca329b4b6b8dafd49c2883acd8048734ea576292f61f2b347df128f069bf7.png" />
+<img alt="../_images/6c0731a0a400a34bc0c1cce7386071f2e64ed8267b6c63e9f2e788aa4de4830a.png" src="../_images/6c0731a0a400a34bc0c1cce7386071f2e64ed8267b6c63e9f2e788aa4de4830a.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -4122,11 +4118,11 @@ Therefore, we first convert the <code class="docutils literal notranslate"><span
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2965/70656024.py:1: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2967/70656024.py:1: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
   tril_idx = np.tril_indices(gen.dims[&quot;samples&quot;])
 </pre></div>
 </div>
-<img alt="../_images/1072041c77fd31b7f75c4632cec9a5f8df6587cfd6ae5fcf214a829e0b320d29.png" src="../_images/1072041c77fd31b7f75c4632cec9a5f8df6587cfd6ae5fcf214a829e0b320d29.png" />
+<img alt="../_images/630151960d24fb8718ed15315b9782062d21df702aff0c2857f8f5d1a7e13c8c.png" src="../_images/630151960d24fb8718ed15315b9782062d21df702aff0c2857f8f5d1a7e13c8c.png" />
 </div>
 </div>
 </section>
@@ -4159,7 +4155,7 @@ nan_{12} &amp; G
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/f24680dcf009114e24414211d64ede7cc239e7da6e05f8c94e91fedecc0dfbdc.png" src="../_images/f24680dcf009114e24414211d64ede7cc239e7da6e05f8c94e91fedecc0dfbdc.png" />
+<img alt="../_images/93762b09b7f550bf7c5b9548ecc6d3c9bfb2b9c85334b65308d3263aa15b8cae.png" src="../_images/93762b09b7f550bf7c5b9548ecc6d3c9bfb2b9c85334b65308d3263aa15b8cae.png" />
 </div>
 </div>
 <p>This is much messier than the matrix notation!
@@ -4221,7 +4217,7 @@ H_{12} &amp; G
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/bf1618141a3dad0cf548c2a09a1988934207e81669ab797b3667c57e01f45c4f.png" src="../_images/bf1618141a3dad0cf548c2a09a1988934207e81669ab797b3667c57e01f45c4f.png" />
+<img alt="../_images/627e8775c480a30379ea508012f50da4b5e2fbf50cbcb78425daff46de99176c.png" src="../_images/627e8775c480a30379ea508012f50da4b5e2fbf50cbcb78425daff46de99176c.png" />
 </div>
 </div>
 <p>We can verify that <span class="math notranslate nohighlight">\(H_{22}\)</span> = <span class="math notranslate nohighlight">\(G\)</span> using the indices of the genomic samples.</p>
@@ -4260,7 +4256,7 @@ on the structure of <span class="math notranslate nohighlight">\(H\)</span> in t
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -4334,8 +4330,8 @@ on the structure of <span class="math notranslate nohighlight">\(H\)</span> in t
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -4368,7 +4364,7 @@ on the structure of <span class="math notranslate nohighlight">\(H\)</span> in t
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.3.
 </p></div>
       
     </div>
