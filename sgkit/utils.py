@@ -362,6 +362,8 @@ def split_array_chunks(n: int, blocks: int) -> Tuple[int, ...]:
     if blocks <= 0:
         raise ValueError(f"Number of blocks ({blocks}) must be >= 0")
     n_div, n_mod = np.divmod(n, blocks)
+    n_div = int(n_div)
+    n_mod = int(n_mod)
     chunks = n_mod * (n_div + 1,) + (blocks - n_mod) * (n_div,)
     return chunks  # type: ignore[no-any-return]
 
