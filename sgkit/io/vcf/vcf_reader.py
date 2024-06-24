@@ -679,6 +679,9 @@ def vcf_to_zarrs(
 ) -> Sequence[str]:
     """Convert VCF files to multiple Zarr on-disk stores, one per region.
 
+    .. deprecated:: 0.9.0
+       Functions for reading VCF are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ package.
+
     Parameters
     ----------
     input
@@ -754,6 +757,12 @@ def vcf_to_zarrs(
     A list of URLs to the Zarr outputs.
     """
 
+    warnings.warn(
+        "Functions for reading VCF are deprecated, please use the bio2zarr package.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
     output_storage_options = output_storage_options or {}
 
     tasks = []
@@ -798,6 +807,9 @@ def concat_zarrs(
 ) -> None:
     """Concatenate multiple Zarr stores into a single Zarr store.
 
+    .. deprecated:: 0.9.0
+       Functions for reading VCF are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ package.
+
     The Zarr stores are concatenated and rechunked to produce a single combined store.
 
     Parameters
@@ -813,6 +825,12 @@ def concat_zarrs(
        The length of the variant dimension chunks in the output Zarr store. If not specified,
        the chunk length of the first input Zarr store is used.
     """
+
+    warnings.warn(
+        "Functions for reading VCF are deprecated, please use the bio2zarr package.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     vars_to_rechunk = []
     vars_to_copy = []
@@ -855,6 +873,9 @@ def vcf_to_zarr(
     retain_temp_files: Optional[bool] = None,
 ) -> None:
     """Convert VCF files to a single Zarr on-disk store.
+
+    .. deprecated:: 0.9.0
+       Functions for reading VCF are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ package.
 
     By default, the conversion is carried out in parallel, by writing the output for each
     part to a separate, intermediate Zarr store in ``tempdir``. Then, in a second step
@@ -955,6 +976,12 @@ def vcf_to_zarr(
         so for large VCF files this can be slow.
     """
 
+    warnings.warn(
+        "Functions for reading VCF are deprecated, please use the bio2zarr package.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
     if temp_chunk_length is not None:
         if chunk_length % temp_chunk_length != 0:
             raise ValueError(
@@ -1039,6 +1066,9 @@ def read_vcf(
 ) -> xr.Dataset:
     """Read VCF dataset.
 
+    .. deprecated:: 0.9.0
+       Functions for reading VCF are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ package.
+
     A convenience for :func:`vcf_to_zarr` followed by :func:`sgkit.load_dataset`.
     Note that the output Zarr store in ``tempdir`` is not deleted after this function
     returns, so must be deleted manually by the user.
@@ -1119,6 +1149,12 @@ def read_vcf(
 
     """
 
+    warnings.warn(
+        "Functions for reading VCF are deprecated, please use the bio2zarr package.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
     # Need to retain zarr file backing the returned dataset
     with temporary_directory(
         prefix="read_vcf_",
@@ -1166,6 +1202,9 @@ def zarr_array_sizes(
 ) -> Dict[str, Any]:
     """Make a pass through a VCF/BCF file to determine sizes for storage in Zarr.
 
+    .. deprecated:: 0.9.0
+       Functions for reading VCF are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ package.
+
     By default, the input is processed in parts in parallel. However, if the input
     is a single file, ``target_part_size`` is None, and ``regions`` is None,
     then the operation will be carried out sequentially.
@@ -1187,6 +1226,12 @@ def zarr_array_sizes(
         sequence of region strings. Takes priority over ``target_part_size`` if both
         are not None.
     """
+
+    warnings.warn(
+        "Functions for reading VCF are deprecated, please use the bio2zarr package.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     return process_vcfs(
         input,
