@@ -1,3 +1,4 @@
+import warnings
 from typing import Any, Dict, Optional, Sequence, Union
 
 import dask
@@ -78,6 +79,9 @@ def partition_into_regions(
     """
     Calculate genomic region strings to partition a compressed VCF or BCF file into roughly equal parts.
 
+    .. deprecated:: 0.9.0
+       Functions for reading VCF are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ package.
+
     A ``.tbi`` or ``.csi`` file is used to find BGZF boundaries in the compressed VCF file, which are then
     used to divide the file into parts.
 
@@ -118,6 +122,13 @@ def partition_into_regions(
     ValueError
         If either of ``num_parts`` or ``target_part_size`` is not a positive integer.
     """
+
+    warnings.warn(
+        "Functions for reading VCF are deprecated, please use the bio2zarr package.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
     if num_parts is None and target_part_size is None:
         raise ValueError("One of num_parts or target_part_size must be specified")
 

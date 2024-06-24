@@ -35,6 +35,9 @@ PLINK
 VCF (reading)
 -------------
 
+.. deprecated:: 0.9.0
+   Functions for reading VCF are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ package.
+
 .. currentmodule:: sgkit.io.vcf
 .. autosummary::
    :toctree: generated/

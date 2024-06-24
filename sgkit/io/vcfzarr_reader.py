@@ -49,6 +49,9 @@ def read_scikit_allel_vcfzarr(
 ) -> xr.Dataset:
     """Read a VCF Zarr file created using scikit-allel.
 
+    .. deprecated:: 0.9.0
+       Functions for reading VCF are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ package.
+
     Loads VCF variant, sample, and genotype data as Dask arrays within a Dataset
     from a Zarr file created using scikit-allel's ``vcf_to_zarr`` function.
 
@@ -89,6 +92,12 @@ def read_scikit_allel_vcfzarr(
     - :data:`sgkit.variables.call_genotype_spec` (variants, samples, ploidy)
     - :data:`sgkit.variables.call_genotype_mask_spec` (variants, samples, ploidy)
     """
+
+    warnings.warn(
+        "Functions for reading VCF are deprecated, please use the bio2zarr package.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     vcfzarr = zarr.open_group(str(path), mode="r")
 
