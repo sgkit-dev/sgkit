@@ -1,12 +1,9 @@
 from typing import Optional
 
-import allel
-import dask.array as da
 import numpy as np
 import numpy.testing as npt
 import pytest
 from dask.dataframe import DataFrame
-from hypothesis import Phase, example, given, settings
 from hypothesis import strategies as st
 from hypothesis.extra.numpy import arrays
 
@@ -27,40 +24,27 @@ def test_rogers_huff_r_between():
     gnb = np.array([[0, 1, 2]])
     npt.assert_allclose(rogers_huff_r_between(gna[0], gnb[0]), 1.0, rtol=1e-06)
     npt.assert_allclose(rogers_huff_r2_between(gna[0], gnb[0]), 1.0, rtol=1e-06)
-    npt.assert_allclose(
-        allel.rogers_huff_r_between(gna, gnb),
-        rogers_huff_r_between(gna[0], gnb[0]),
-        rtol=1e-06,
-    )
 
     gna = np.array([[0, 1, 2]])
     gnb = np.array([[2, 1, 0]])
     npt.assert_allclose(rogers_huff_r_between(gna[0], gnb[0]), -1.0, rtol=1e-06)
     npt.assert_allclose(rogers_huff_r2_between(gna[0], gnb[0]), 1.0, rtol=1e-06)
-    npt.assert_allclose(
-        allel.rogers_huff_r_between(gna, gnb),
-        rogers_huff_r_between(gna[0], gnb[0]),
-        rtol=1e-06,
-    )
 
     gna = np.array([[0, 0, 0]])
     gnb = np.array([[1, 1, 1]])
     assert np.isnan(rogers_huff_r_between(gna[0], gnb[0]))
     assert np.isnan(rogers_huff_r2_between(gna[0], gnb[0]))
-    assert np.isnan(allel.rogers_huff_r_between(gna, gnb))
 
     gna = np.array([[1, 1, 1]])
     gnb = np.array([[1, 1, 1]])
     assert np.isnan(rogers_huff_r_between(gna[0], gnb[0]))
     assert np.isnan(rogers_huff_r2_between(gna[0], gnb[0]))
-    assert np.isnan(allel.rogers_huff_r_between(gna, gnb))
 
     # a case which fails if fastmath=True is enabled for rogers_huff_r_between
     gna = np.full((1, 49), 2)
     gnb = np.full((1, 49), 2)
     assert np.isnan(rogers_huff_r_between(gna[0], gnb[0]))
     assert np.isnan(rogers_huff_r2_between(gna[0], gnb[0]))
-    assert np.isnan(allel.rogers_huff_r_between(gna, gnb))
 
 
 def ldm_df(
@@ -115,7 +99,16 @@ def test_threshold():
 
 @pytest.mark.parametrize(
     "dtype",
-    [dtype for k, v in np.sctypes.items() for dtype in v if k in ["int", "uint"]],  # type: ignore
+    [
+        np.int8,
+        np.int16,
+        np.int32,
+        np.int64,
+        np.uint8,
+        np.uint16,
+        np.uint32,
+        np.uint64,
+    ],
 )
 def test_dtypes(dtype):
     # Input matrices should work regardless of integer type
@@ -146,37 +139,6 @@ def ld_prune_args(draw):
     threshold = draw(st.floats(0, 1))
     chunks = draw(st.integers(10, window * 3)) if window > 10 else -1
     return x, window, step, threshold, chunks
-
-
-# Phases setting without shrinking for complex, conditional draws in
-# which shrinking wastes time and adds little information
-# (see https://hypothesis.readthedocs.io/en/latest/settings.html#hypothesis.settings.phases)
-PHASES_NO_SHRINK = (Phase.explicit, Phase.reuse, Phase.generate, Phase.target)
-
-
-@given(args=ld_prune_args())  # pylint: disable=no-value-for-parameter
-@settings(max_examples=50, deadline=None, phases=PHASES_NO_SHRINK)
-@example(args=(np.array([[1, 1], [1, 1]], dtype="uint8"), 1, 1, 0.0, -1))
-@pytest.mark.skip(
-    reason="Hypothesis generates failures that need investigation: https://github.com/sgkit-dev/sgkit/issues/864"
-)
-def test_vs_skallel(args):
-    x, size, step, threshold, chunks = args
-
-    ds = simulate_genotype_call_dataset(n_variant=x.shape[0], n_sample=x.shape[1])
-    ds["call_dosage"] = (["variants", "samples"], da.asarray(x).rechunk({0: chunks}))
-    ds = window_by_variant(ds, size=size, step=step)
-
-    ldm = ld_matrix(ds, threshold=threshold)
-    has_duplicates = ldm.compute().duplicated(subset=["i", "j"]).any()
-    assert not has_duplicates
-    idx_drop_ds = maximal_independent_set(ldm)
-
-    idx_drop = np.sort(idx_drop_ds.ld_prune_index_to_drop.data)
-    m = allel.locate_unlinked(x, size=size, step=step, threshold=threshold)
-    idx_drop_ska = np.sort(np.argwhere(~m).squeeze(axis=1))
-
-    npt.assert_equal(idx_drop_ska, idx_drop)
 
 
 def test_scores():
