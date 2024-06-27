@@ -1,0 +1,6 @@
+﻿sgkit.display\_pedigree
+=======================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: display_pedigree

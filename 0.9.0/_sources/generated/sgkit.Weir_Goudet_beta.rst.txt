@@ -1,0 +1,6 @@
+﻿sgkit.Weir\_Goudet\_beta
+========================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: Weir_Goudet_beta

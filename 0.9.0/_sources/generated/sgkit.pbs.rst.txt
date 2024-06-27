@@ -1,0 +1,6 @@
+﻿sgkit.pbs
+=========
+
+.. currentmodule:: sgkit
+
+.. autofunction:: pbs

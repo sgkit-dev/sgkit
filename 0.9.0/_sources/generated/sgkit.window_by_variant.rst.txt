@@ -1,0 +1,6 @@
+﻿sgkit.window\_by\_variant
+=========================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: window_by_variant

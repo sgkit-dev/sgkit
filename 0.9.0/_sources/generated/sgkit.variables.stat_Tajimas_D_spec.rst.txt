@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_Tajimas\_D\_spec
+======================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_Tajimas_D_spec

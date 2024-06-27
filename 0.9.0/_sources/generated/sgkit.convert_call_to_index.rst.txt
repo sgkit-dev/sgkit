@@ -1,0 +1,6 @@
+﻿sgkit.convert\_call\_to\_index
+==============================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: convert_call_to_index

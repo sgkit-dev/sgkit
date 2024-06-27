@@ -1,0 +1,6 @@
+﻿sgkit.sample\_stats
+===================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: sample_stats

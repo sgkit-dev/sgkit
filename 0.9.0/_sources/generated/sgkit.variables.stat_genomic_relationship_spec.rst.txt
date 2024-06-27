@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_genomic\_relationship\_spec
+=================================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_genomic_relationship_spec

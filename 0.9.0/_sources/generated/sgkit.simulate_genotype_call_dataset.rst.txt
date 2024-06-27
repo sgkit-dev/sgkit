@@ -1,0 +1,6 @@
+﻿sgkit.simulate\_genotype\_call\_dataset
+=======================================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: simulate_genotype_call_dataset

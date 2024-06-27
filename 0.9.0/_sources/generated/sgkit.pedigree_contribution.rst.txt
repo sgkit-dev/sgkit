@@ -1,0 +1,6 @@
+﻿sgkit.pedigree\_contribution
+============================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: pedigree_contribution
