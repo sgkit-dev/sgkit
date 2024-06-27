@@ -14,11 +14,20 @@ Changelog
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
 
-.. Deprecations
-.. ~~~~~~~~~~~~
+Deprecations
+~~~~~~~~~~~~
 
-.. Improvements
-.. ~~~~~~~~~~~~
+- Deprecate functions for reading VCF, in favour of `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_.
+  (:user:`tomwhite`, :pr:`1233`, :issue:`1232`)
+
+Improvements
+~~~~~~~~~~~~
+
+- Pin to Zarr < 3.
+  (:user:`tomwhite`, :pr:`1230`)
+
+- Pin numpy and cbgen to numpy < 2.
+  (:user:`timothymillar`, :pr:`1228`, :issue:`1225`)
 
 .. Bug fixes
 .. ~~~~~~~~~
