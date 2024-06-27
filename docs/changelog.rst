@@ -5,7 +5,7 @@ Changelog
 
 .. _changelog.0.9.0:
 
-0.9.0 (unreleased)
+0.9.0 (24 June 2024)
 -----------------------
 
 .. New Features
