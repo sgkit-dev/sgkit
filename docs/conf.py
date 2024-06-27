@@ -151,7 +151,7 @@ html_theme_options = {
     "icon_links": [],
     "navbar_end": ["version-switcher", "theme-switcher", "navbar-icon-links"],
     "switcher": {
-        "json_url": "_static/switcher.json",
+        "json_url": "https://sgkit-dev.github.io/sgkit/latest/_static/switcher.json",
         "version_match": version,
     },
 }
