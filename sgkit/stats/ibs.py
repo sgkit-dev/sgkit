@@ -1,6 +1,7 @@
 from typing import Hashable
 
 import dask.array as da
+from typing_extensions import Literal
 from xarray import Dataset
 
 from sgkit import variables
@@ -12,10 +13,53 @@ from sgkit.utils import (
 )
 
 
+def _ibs_of_frequencies(af, skipna=True):
+    af = da.array(af)
+    if skipna:
+        af0 = da.where(da.isnan(af), 0.0, af)
+        num = sum(m.T @ m for m in af0.transpose(2, 0, 1))
+        called = da.nansum(af, axis=-1)
+        denom = called.T @ called
+    else:
+        num = sum(m.T @ m for m in af.transpose(2, 0, 1))
+        denom = len(af)
+    return num / denom
+
+
+def _ibs_of_genotypes(gt):
+    from .ibs_numba_fns import allele_matching_block, allele_matching_diag
+
+    gt_blocks = da.array(gt).blocks
+    v_chunks, s_chunks, p_chunks = gt_blocks.shape
+    if p_chunks != 1:
+        raise ValueError(
+            "The 'matching' method does not support chunking in the ploidy dimension"
+        )
+    ibs = [[None for _ in range(s_chunks)] for _ in range(s_chunks)]
+    for x in range(s_chunks):
+        nums, denoms = zip(
+            *[allele_matching_diag(gt_blocks[v, x]) for v in range(gt_blocks.shape[0])]
+        )
+        ibs[x][x] = sum(nums) / sum(denoms)
+        for y in range(x):
+            nums, denoms = zip(
+                *[
+                    allele_matching_block(gt_blocks[v, x], gt_blocks[v, y])
+                    for v in range(v_chunks)
+                ]
+            )
+            mtx = sum(nums) / sum(denoms)
+            ibs[x][y] = mtx
+            ibs[y][x] = mtx.T
+    return da.vstack([da.hstack(row) for row in ibs])
+
+
 def identity_by_state(
     ds: Dataset,
     *,
+    call_genotype: Hashable = variables.call_genotype,
     call_allele_frequency: Hashable = variables.call_allele_frequency,
+    method: Literal["frequencies", "matching"] = "frequencies",
     skipna: bool = True,
     merge: bool = True,
 ) -> Dataset:
@@ -31,11 +75,24 @@ def identity_by_state(
     ----------
     ds
         Dataset containing call genotype alleles.
+    call_genotype
+        Input variable name holding call_genotype as defined by
+        :data:`sgkit.variables.call_allele_frequency_spec`.
+        This variable is only required for the "matching" method.
     call_allele_frequency
         Input variable name holding call_allele_frequency as defined by
         :data:`sgkit.variables.call_allele_frequency_spec`.
+        This variable is only required for the "frequencies" method.
         If the variable is not present in ``ds``, it will be computed
         using :func:`call_allele_frequencies`.
+    method
+        The method used for IBS estimation. Defaults to "frequencies"
+        which calculates IBS probabilities by matrix multiplication
+        of call allele frequencies which is more efficient when the
+        alleles dimension is small.
+        The "matching" method calculates IBS probabilities directly
+        from the call genotypes and is more efficient when the alleles
+        dimension is large.
     skipna
         If True (the default), missing (nan) allele frequencies will be
         skipped.
@@ -66,29 +123,29 @@ def identity_by_state(
            [0.5, 1. , 0.5],
            [0.5, 0.5, 0.5]])
     """
-    ds = define_variable_if_absent(
-        ds,
-        variables.call_allele_frequency,
-        call_allele_frequency,
-        call_allele_frequencies,
-    )
-    variables.validate(
-        ds, {call_allele_frequency: variables.call_allele_frequency_spec}
-    )
-    af = da.asarray(ds[call_allele_frequency])
-    if skipna:
-        af0 = da.where(da.isnan(af), 0.0, af)
-        num = sum(m.T @ m for m in af0.transpose(2, 0, 1))
-        called = da.nansum(af, axis=-1)
-        denom = called.T @ called
+    if method == "frequencies":
+        ds = define_variable_if_absent(
+            ds,
+            variables.call_allele_frequency,
+            call_allele_frequency,
+            call_allele_frequencies,
+        )
+        variables.validate(
+            ds, {call_allele_frequency: variables.call_allele_frequency_spec}
+        )
+        af = ds[call_allele_frequency]
+        ibs = _ibs_of_frequencies(af, skipna=skipna)
+    elif method == "matching":
+        variables.validate(ds, {call_genotype: variables.call_genotype_spec})
+        gt = ds[call_genotype]
+        ibs = _ibs_of_genotypes(gt)
     else:
-        num = sum(m.T @ m for m in af.transpose(2, 0, 1))
-        denom = len(af)
+        raise ValueError(f"Unknown method '{method}'.")
     new_ds = create_dataset(
         {
             variables.stat_identity_by_state: (
                 ("samples_0", "samples_1"),
-                num / denom,
+                ibs,
             )
         }
     )
