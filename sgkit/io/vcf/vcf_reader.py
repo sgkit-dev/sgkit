@@ -178,7 +178,7 @@ def _vcf_type_to_numpy(
     elif vcf_type == "Float":
         return "f4", FLOAT32_MISSING, FLOAT32_FILL
     elif vcf_type == "Character":
-        return "S1", CHAR_MISSING, CHAR_FILL
+        return "U1", CHAR_MISSING, CHAR_FILL
     elif vcf_type == "String":
         return "O", STR_MISSING, STR_FILL
     raise ValueError(
@@ -188,7 +188,7 @@ def _vcf_type_to_numpy(
 
 def _is_str_or_char(array: ArrayLike) -> bool:
     """Return True if the array is of string or character type"""
-    return array.dtype.kind in ("O", "S", "U")
+    return array.dtype.kind in ("O", "U")
 
 
 class VcfFieldHandler:
