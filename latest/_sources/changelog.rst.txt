@@ -8,8 +8,11 @@ Changelog
 0.10.0 (unreleased)
 -----------------------
 
-.. New Features
-.. ~~~~~~~~~~~~
+New Features
+~~~~~~~~~~~~
+
+- Add 'matching' method to :func:`identity_by_state` function.
+  (:user:`timothymillar`, :pr:`1229`, :issue:`1227`)
 
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
