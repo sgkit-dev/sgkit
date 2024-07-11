@@ -1,7 +1,6 @@
 from contextlib import nullcontext
 from typing import Any
 
-import allel.stats.preprocessing
 import dask
 import dask.array as da
 import numpy as np
@@ -30,6 +29,8 @@ def simulate_alternate_allele_counts(
 @pytest.mark.parametrize("shape", [(100, 50), (50, 100), (50, 50)])
 @pytest.mark.parametrize("ploidy", [2, 4])
 def test_patterson_scaler__allel_comparison(shape, ploidy):
+    allel = pytest.importorskip("allel")
+
     ac = simulate_alternate_allele_counts(*shape, ploidy=ploidy)  # type: ignore[misc]
     expected = sgkit.stats.preprocessing.PattersonScaler(ploidy=ploidy).fit_transform(
         ac

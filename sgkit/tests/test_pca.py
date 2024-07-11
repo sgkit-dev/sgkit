@@ -1,6 +1,5 @@
 from typing import Any, Optional
 
-import allel
 import dask.array as da
 import numpy as np
 import pytest
@@ -54,6 +53,7 @@ def simulate_dataset(
 
 
 def allel_pca(gn: ArrayLike, randomized: bool = False, **kwargs: Any) -> Dataset:
+    allel = pytest.importorskip("allel")
     fn = allel.randomized_pca if randomized else allel.pca
     pcs, est = fn(gn, **kwargs)
     return xr.Dataset(

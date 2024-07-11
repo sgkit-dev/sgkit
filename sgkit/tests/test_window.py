@@ -1,6 +1,5 @@
 import re
 
-import allel
 import dask.array as da
 import numpy as np
 import pandas as pd
@@ -29,6 +28,8 @@ from sgkit.window import (
 )
 @pytest.mark.parametrize("dtype", [np.int64, np.float32, np.float64])
 def test_moving_statistic_1d(length, chunks, size, step, dtype):
+    allel = pytest.importorskip("allel")
+
     values = da.from_array(np.arange(length, dtype=dtype), chunks=chunks)
 
     stat = moving_statistic(values, np.sum, size=size, step=step, dtype=values.dtype)
@@ -49,6 +50,8 @@ def test_moving_statistic_1d(length, chunks, size, step, dtype):
 )
 @pytest.mark.parametrize("dtype", [np.int64, np.float32, np.float64])
 def test_moving_statistic_2d(length, chunks, size, step, dtype):
+    allel = pytest.importorskip("allel")
+
     arr = np.arange(length * 3, dtype=dtype).reshape(length, 3)
 
     def sum_cols(x):

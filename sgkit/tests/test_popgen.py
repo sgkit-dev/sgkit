@@ -1,13 +1,11 @@
 import itertools
 
-import allel
 import dask.array as da
 import msprime  # type: ignore
 import numpy as np
 import pytest
 import tskit  # type: ignore
 import xarray as xr
-from allel import hudson_fst
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
@@ -136,6 +134,8 @@ def test_diversity(sample_size, chunks, cohort_allele_count):
 
 @pytest.mark.parametrize("sample_size", [10])
 def test_diversity__windowed(sample_size):
+    allel = pytest.importorskip("allel")
+
     ts = simulate_ts(sample_size, length=200)
     ds = ts_to_dataset(ts)
     ds, subsets = add_cohorts(ds, ts, cohort_key_names=["cohorts"])
@@ -223,6 +223,8 @@ def test_divergence__windowed(sample_size, n_cohorts, chunks):
 @pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
 @pytest.mark.xfail()  # combine with test_divergence__windowed when this is passing
 def test_divergence__windowed_scikit_allel_comparison(sample_size, n_cohorts, chunks):
+    allel = pytest.importorskip("allel")
+
     ts = simulate_ts(sample_size, length=200)
     ds = ts_to_dataset(ts, chunks)
     ds, subsets = add_cohorts(ds, ts, n_cohorts)
@@ -272,6 +274,8 @@ def test_divergence__missing_calls():
 
 @pytest.mark.parametrize("sample_size", [2, 3, 10, 100])
 def test_Fst__Hudson(sample_size):
+    allel = pytest.importorskip("allel")
+
     # scikit-allel can only calculate Fst for pairs of cohorts (populations)
     n_cohorts = 2
     ts = simulate_ts(sample_size)
@@ -285,7 +289,7 @@ def test_Fst__Hudson(sample_size):
     # scikit-allel
     ac1 = ds.cohort_allele_count.values[:, 0, :]
     ac2 = ds.cohort_allele_count.values[:, 1, :]
-    num, den = hudson_fst(ac1, ac2)
+    num, den = allel.hudson_fst(ac1, ac2)
     ska_fst = np.sum(num) / np.sum(den)
 
     np.testing.assert_allclose(fst, ska_fst)
@@ -326,6 +330,8 @@ def test_Fst__unknown_estimator():
 )
 @pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
 def test_Fst__windowed(sample_size, n_cohorts, chunks):
+    allel = pytest.importorskip("allel")
+
     ts = simulate_ts(sample_size, length=200)
     ds = ts_to_dataset(ts, chunks)
     ds, subsets = add_cohorts(ds, ts, n_cohorts)
@@ -395,6 +401,8 @@ def test_Tajimas_D_per_site(sample_size):
     [(10, 3), (20, 4)],
 )
 def test_pbs(sample_size, n_cohorts):
+    allel = pytest.importorskip("allel")
+
     ts = simulate_ts(sample_size)
     ds = ts_to_dataset(ts)
     ds, subsets = add_cohorts(
@@ -432,6 +440,8 @@ def test_pbs(sample_size, n_cohorts):
 )
 @pytest.mark.parametrize("chunks", [(-1, -1), (50, -1)])
 def test_pbs__windowed(sample_size, n_cohorts, cohorts, cohort_indexes, chunks):
+    allel = pytest.importorskip("allel")
+
     ts = simulate_ts(sample_size, length=200)
     ds = ts_to_dataset(ts, chunks)
     ds, subsets = add_cohorts(
@@ -475,6 +485,8 @@ def test_pbs__windowed(sample_size, n_cohorts, cohorts, cohort_indexes, chunks):
 def test_Garud_h(
     n_variants, n_samples, n_contigs, n_cohorts, cohorts, cohort_indexes, chunks
 ):
+    allel = pytest.importorskip("allel")
+
     ds = simulate_genotype_call_dataset(
         n_variant=n_variants, n_sample=n_samples, n_contig=n_contigs
     )
@@ -674,6 +686,8 @@ def test_observed_heterozygosity__windowed(chunks, cohorts, expectation):
 def test_observed_heterozygosity__scikit_allel_comparison(
     n_variant, n_sample, missing_pct, window_size, seed
 ):
+    allel = pytest.importorskip("allel")
+
     ds = simulate_genotype_call_dataset(
         n_variant=n_variant,
         n_sample=n_sample,
