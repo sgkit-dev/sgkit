@@ -22,7 +22,6 @@
 from pathlib import Path
 from typing import Any
 
-import allel
 import numpy as np
 import pytest
 import xarray as xr
@@ -31,6 +30,8 @@ from xarray import Dataset
 import sgkit as sg
 from sgkit.io.utils import INT_FILL, INT_MISSING
 from sgkit.io.vcf import vcf_to_zarr
+
+allel = pytest.importorskip("allel")
 
 
 def assert_identical(ds1: Dataset, ds2: Dataset) -> None:

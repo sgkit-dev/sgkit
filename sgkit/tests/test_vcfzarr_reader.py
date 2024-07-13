@@ -1,4 +1,3 @@
-import allel
 import numpy as np
 import pytest
 import xarray as xr
@@ -7,6 +6,8 @@ from numpy.testing import assert_array_equal
 
 from sgkit import read_scikit_allel_vcfzarr
 from sgkit.io.vcfzarr_reader import _ensure_2d, vcfzarr_to_zarr
+
+allel = pytest.importorskip("allel")
 
 
 def create_vcfzarr(
