@@ -712,6 +712,9 @@ def test_hash_array(n_rows, n_cols):
     _, expected_inverse, expected_counts = np.unique(
         x, axis=0, return_inverse=True, return_counts=True
     )
+    # following is needed due to https://github.com/numpy/numpy/issues/26738
+    # (workaround from https://github.com/lmcinnes/umap/issues/1138)
+    expected_inverse = expected_inverse.reshape(-1)
 
     # hash columns, then find unique column counts using the hash values
     h = hash_array(x)
