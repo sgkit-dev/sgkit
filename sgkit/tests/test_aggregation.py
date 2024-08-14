@@ -265,10 +265,12 @@ def test_count_call_alleles__chunked():
     calls = rs.randint(0, 1, size=(50, 10, 2))
     ds = get_dataset(calls)
     ac1 = count_call_alleles(ds)
-    # Coerce from numpy to multiple chunks in all dimensions
-    ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))
+    # Coerce from numpy to multiple chunks in all non-core dimensions
+    ds["call_genotype"] = ds["call_genotype"].chunk(
+        chunks={"variants": 5, "samples": 5}
+    )
     ac2 = count_call_alleles(ds)
-    assert isinstance(ac2["call_allele_count"].data, da.Array)
+    assert hasattr(ac2["call_allele_count"].data, "chunks")
     xr.testing.assert_equal(ac1, ac2)
 
 
