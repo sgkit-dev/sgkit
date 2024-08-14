@@ -76,17 +76,24 @@ def count_call_alleles(
 
     variables.validate(ds, {call_genotype: variables.call_genotype_spec})
     n_alleles = ds.sizes["alleles"]
-    G = da.asarray(ds[call_genotype])
-    shape = (G.chunks[0], G.chunks[1], n_alleles)
     # use numpy array to avoid dask task dependencies between chunks
     N = np.empty(n_alleles, dtype=np.uint8)
+    AC = xr.apply_ufunc(
+        count_alleles,
+        ds[call_genotype],
+        N,
+        input_core_dims=[["ploidy"], ["alleles"]],
+        output_core_dims=[["alleles"]],
+        exclude_dims={"ploidy"},
+        dask="parallelized",
+        dask_gufunc_kwargs=dict(allow_rechunk=False),
+        output_dtypes=np.uint8,
+    )
     new_ds = create_dataset(
         {
             variables.call_allele_count: (
                 ("variants", "samples", "alleles"),
-                da.map_blocks(
-                    count_alleles, G, N, chunks=shape, drop_axis=2, new_axis=2
-                ),
+                AC.data,
             )
         }
     )
