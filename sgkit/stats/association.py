@@ -1,10 +1,12 @@
 from dataclasses import dataclass
 from typing import Hashable, Optional, Sequence, Union
 
-import dask.array as da
 import numpy as np
-from dask.array import Array, stats
+from scipy import stats
 from xarray import Dataset, concat
+
+import sgkit.distarray as da
+from sgkit.distarray import Array
 
 from .. import variables
 from ..typing import ArrayLike
@@ -78,7 +80,7 @@ def linear_regression(
     # from projection require no extra terms in variance
     # estimate for loop covariates (columns of G), which is
     # only true when an intercept is present.
-    XLPS = (XLP**2).sum(axis=0, keepdims=True).T
+    XLPS = da.sum(XLP**2, axis=0, keepdims=True).T
     assert XLPS.shape == (n_loop_covar, 1)
     B = (XLP.T @ YP) / XLPS
     assert B.shape == (n_loop_covar, n_outcome)
@@ -86,10 +88,10 @@ def linear_regression(
     # Compute residuals for each loop covariate and outcome separately
     YR = YP[:, np.newaxis, :] - XLP[..., np.newaxis] * B[np.newaxis, ...]
     assert YR.shape == (n_obs, n_loop_covar, n_outcome)
-    RSS = (YR**2).sum(axis=0)
+    RSS = da.sum(YR**2, axis=0)
     assert RSS.shape == (n_loop_covar, n_outcome)
     # Get t-statistics for coefficient estimates
-    T = B / np.sqrt(RSS / dof / XLPS)
+    T = B / da.sqrt(RSS / dof / XLPS)
     assert T.shape == (n_loop_covar, n_outcome)
 
     # Match to p-values
@@ -102,7 +104,8 @@ def linear_regression(
         dtype="float64",
     )
     assert P.shape == (n_loop_covar, n_outcome)
-    P = np.asarray(P, like=T)
+    if hasattr(T, "__array_function__"):
+        P = np.asarray(P, like=T)
     return LinearRegressionResult(beta=B, t_value=T, p_value=P)
 
 
@@ -216,7 +219,7 @@ def gwas_linear_regression(
     else:
         X = da.asarray(concat_2d(ds[list(covariates)], dims=("samples", "covariates")))
         if add_intercept:
-            X = da.concatenate([da.ones((X.shape[0], 1), dtype=X.dtype), X], axis=1)
+            X = da.concat([da.ones((X.shape[0], 1), dtype=X.dtype), X], axis=1)
     # Note: dask qr decomp (used by lstsq) requires no chunking in one
     # dimension, and because dim 0 will be far greater than the number
     # of covariates for the large majority of use cases, chunking

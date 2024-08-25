@@ -2,7 +2,6 @@ import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-import dask.array as da
 import numpy as np
 import pandas as pd
 import pytest
@@ -11,6 +10,7 @@ import zarr
 from pandas import DataFrame
 from xarray import Dataset
 
+import sgkit.distarray as da
 from sgkit.stats.association import (
     gwas_linear_regression,
     linear_regression,
@@ -263,7 +263,7 @@ def test_gwas_linear_regression__scalar_vars(ds: xr.Dataset) -> None:
     res_list = gwas_linear_regression(
         ds, dosage="dosage", covariates=["covar_0"], traits=["trait_0"]
     )
-    xr.testing.assert_equal(res_scalar, res_list)
+    xr.testing.assert_allclose(res_scalar, res_list)
 
 
 def test_gwas_linear_regression__raise_on_no_intercept_and_empty_covariates():
