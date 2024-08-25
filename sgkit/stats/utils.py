@@ -104,7 +104,7 @@ def assert_array_shape(x: ArrayLike, *args: int) -> None:
 
 
 def map_blocks_asnumpy(x: Array) -> Array:
-    if da.utils.is_cupy_type(x._meta):  # pragma: no cover
+    if hasattr(x, "_meta") and da.utils.is_cupy_type(x._meta):  # pragma: no cover
         import cupy as cp  # type: ignore[import]
 
         x = x.map_blocks(cp.asnumpy)

@@ -14,3 +14,6 @@ else:
         if not copy and dtype == x.dtype:
             return x
         return x.astype(dtype=dtype, copy=copy)
+
+    # dask doesn't have concat required by the array API
+    concat = concatenate  # noqa: F405
