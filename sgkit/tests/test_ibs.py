@@ -1,6 +1,5 @@
 import pathlib
 
-import dask.array as da
 import numpy as np
 import pytest
 
@@ -42,13 +41,9 @@ def test_identity_by_state__diploid_biallelic(method, chunks, skipna):
         pass
     elif method == "frequencies":
         ds = count_call_alleles(ds)
-        ds["call_allele_count"] = (
-            ds.call_allele_count.dims,
-            ds.call_allele_count.data.rechunk(chunks),
-        )
+        ds["call_allele_count"] = ds["call_allele_count"].chunk(chunks)
     else:
-        gt = da.array(ds.call_genotype.data)
-        ds["call_genotype"] = ds.call_genotype.dims, gt.rechunk(chunks)
+        ds["call_genotype"] = ds["call_genotype"].chunk(chunks)
     ds = identity_by_state(ds, method=method, skipna=skipna)
     actual = ds.stat_identity_by_state.values
     expect = np.nanmean(
@@ -93,13 +88,9 @@ def test_identity_by_state__tetraploid_multiallelic(method, chunks, skipna):
     if chunks is None:
         pass
     elif method == "frequencies":
-        ds["call_allele_count"] = (
-            ds.call_allele_count.dims,
-            ds.call_allele_count.data.rechunk(chunks),
-        )
+        ds["call_allele_count"] = ds["call_allele_count"].chunk(chunks)
     else:
-        gt = da.array(ds.call_genotype.data)
-        ds["call_genotype"] = ds.call_genotype.dims, gt.rechunk(chunks)
+        ds["call_genotype"] = ds["call_genotype"].chunk(chunks)
     ds = identity_by_state(ds, method=method, skipna=skipna)
     actual = ds.stat_identity_by_state.values
     if skipna:
@@ -147,7 +138,7 @@ def test_identity_by_state__reference_implementation(ploidy, method, chunks, ski
         seed=0,
     )
     ds = call_allele_frequencies(ds)
-    ds.chunk(variants=chunks[0], samples=chunks[1], alleles=chunks[2])
+    ds = ds.chunk(variants=chunks[0], samples=chunks[1], alleles=chunks[2])
     # reference implementation
     AF = ds.call_allele_frequency.data
     if skipna:
