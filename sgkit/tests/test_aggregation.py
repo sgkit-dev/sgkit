@@ -857,6 +857,17 @@ def test_sample_stats__raise_on_mixed_ploidy():
         sample_stats(ds)
 
 
+@pytest.mark.parametrize("chunks", [(-1, -1, -1), (100, -1, -1), (100, 10, -1)])
+def test_sample_stats__chunks(chunks):
+    ds = simulate_genotype_call_dataset(
+        n_variant=1000, n_sample=30, missing_pct=0.01, seed=0
+    )
+    expect = sample_stats(ds, merge=False).compute()
+    ds["call_genotype"] = ds["call_genotype"].chunk(chunks)
+    actual = sample_stats(ds, merge=False).compute()
+    assert actual.equals(expect)
+
+
 def test_infer_call_ploidy():
     ds = get_dataset(
         [

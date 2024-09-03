@@ -803,22 +803,23 @@ def sample_stats(
     mixed_ploidy = ds[call_genotype].attrs.get("mixed_ploidy", False)
     if mixed_ploidy:
         raise ValueError("Mixed-ploidy dataset")
-    G = da.asarray(ds[call_genotype].data)
+    GT = da.asarray(ds[call_genotype].transpose("samples", "variants", "ploidy").data)
     H = xr.DataArray(
         da.map_blocks(
-            count_hom,
-            G.transpose(1, 0, 2),
+            lambda *args: count_hom(*args)[:, np.newaxis, :],
+            GT,
             np.zeros(3, np.uint64),
-            drop_axis=(1, 2),
-            new_axis=1,
+            drop_axis=2,
+            new_axis=2,
             dtype=np.int64,
-            chunks=(G.chunks[1], 3),
+            chunks=(GT.chunks[0], 1, 3),
         ),
-        dims=["samples", "categories"],
+        dims=["samples", "variants", "categories"],
     )
-    n_variant, _, _ = G.shape
+    H = H.sum(axis=1)
+    _, n_variant, _ = GT.shape
     n_called = H.sum(axis=-1)
-    call_rate = n_called / n_variant
+    call_rate = n_called.astype(float) / float(n_variant)
     n_hom_ref = H[:, 0]
     n_hom_alt = H[:, 1]
     n_het = H[:, 2]
