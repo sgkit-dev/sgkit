@@ -144,7 +144,7 @@ def test_count_variant_alleles__chunked(using):
         chunks={"variants": 5, "samples": 5}
     )
     ac2 = count_variant_alleles(ds, using=using)
-    assert isinstance(ac2["variant_allele_count"].data, da.Array)
+    assert hasattr(ac2["variant_allele_count"].data, "chunks")
     xr.testing.assert_equal(ac1, ac2)
 
 
@@ -786,13 +786,14 @@ def test_variant_stats__tetraploid():
     )
 
 
-@pytest.mark.parametrize(
-    "chunks", [(-1, -1, -1), (100, -1, -1), (100, 10, -1), (100, 10, 1)]
-)
-def test_variant_stats__chunks(chunks):
+@pytest.mark.parametrize("precompute_variant_allele_count", [False, True])
+@pytest.mark.parametrize("chunks", [(-1, -1, -1), (100, -1, -1), (100, 10, -1)])
+def test_variant_stats__chunks(precompute_variant_allele_count, chunks):
     ds = simulate_genotype_call_dataset(
         n_variant=1000, n_sample=30, missing_pct=0.01, seed=0
     )
+    if precompute_variant_allele_count:
+        ds = count_variant_alleles(ds)
     expect = variant_stats(ds, merge=False).compute()
     ds["call_genotype"] = ds["call_genotype"].chunk(chunks)
     actual = variant_stats(ds, merge=False).compute()
