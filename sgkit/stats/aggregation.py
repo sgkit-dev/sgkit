@@ -1,11 +1,11 @@
 from typing import Hashable
 
-import dask.array as da
 import numpy as np
 import xarray as xr
 from typing_extensions import Literal
 from xarray import Dataset
 
+import sgkit.distarray as da
 from sgkit import variables
 from sgkit.display import genotype_as_bytes
 from sgkit.utils import (
@@ -85,7 +85,13 @@ def count_call_alleles(
             variables.call_allele_count: (
                 ("variants", "samples", "alleles"),
                 da.map_blocks(
-                    count_alleles, G, N, chunks=shape, drop_axis=2, new_axis=2
+                    count_alleles,
+                    G,
+                    N,
+                    chunks=shape,
+                    dtype=np.uint8,
+                    drop_axis=2,
+                    new_axis=2,
                 ),
             )
         }
