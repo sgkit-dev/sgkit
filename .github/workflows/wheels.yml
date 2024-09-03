@@ -54,7 +54,7 @@ jobs:
         with:
           path: sgkit-copy
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -85,7 +85,7 @@ jobs:
         with:
           path: sgkit-copy
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -106,7 +106,7 @@ jobs:
     needs: ['unix-test', 'windows-test']
     steps:
       - name: Download all
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
       - name: Move to dist
         run: |
           mkdir dist
