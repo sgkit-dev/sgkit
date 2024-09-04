@@ -2,10 +2,10 @@ import collections
 import itertools
 from typing import Hashable, Optional, Sequence, Tuple, Union
 
-import dask.array as da
 import numpy as np
 from xarray import Dataset
 
+import sgkit.distarray as da
 from sgkit.cohorts import _cohorts_to_array
 from sgkit.stats.utils import assert_array_shape
 from sgkit.utils import (
@@ -90,14 +90,14 @@ def diversity(
     )
     variables.validate(ds, {cohort_allele_count: variables.cohort_allele_count_spec})
 
-    ac = ds[cohort_allele_count]
+    ac = ds[cohort_allele_count].astype(np.uint64)
     an = ac.sum(axis=2)
-    n_pairs = an * (an - 1) / 2
-    n_same = (ac * (ac - 1) / 2).sum(axis=2)
+    n_pairs = an * (an - 1) // 2
+    n_same = (ac * (ac - 1) // 2).sum(axis=2)
     n_diff = n_pairs - n_same
     # replace zeros to avoid divide by zero error
     n_pairs_na = n_pairs.where(n_pairs != 0)
-    pi = n_diff / n_pairs_na
+    pi = n_diff.astype(np.float64) / n_pairs_na.astype(np.float64)
 
     if has_windows(ds):
         div = window_statistic(

@@ -1,7 +1,6 @@
 import itertools
 
 import allel
-import dask.array as da
 import msprime  # type: ignore
 import numpy as np
 import pytest
@@ -11,6 +10,7 @@ from allel import hudson_fst
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
+import sgkit.distarray as da
 from sgkit import (
     Fst,
     Garud_H,
