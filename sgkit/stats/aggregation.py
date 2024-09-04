@@ -457,9 +457,8 @@ def genotype_coords(
     G = da.map_blocks(_index_as_genotype, X, K, new_axis=1, chunks=chunks)
     # allow enough room for all alleles and separators
     dtype = "|S{}".format(max_chars * ploidy + ploidy - 1)
-    S = da.map_blocks(
-        genotype_as_bytes, G, False, max_chars, drop_axis=1, dtype=dtype
-    ).astype("U")
+    S = da.map_blocks(genotype_as_bytes, G, False, max_chars, drop_axis=1, dtype=dtype)
+    S = da.astype(S, "U{}".format(max_chars * ploidy + ploidy - 1))
     new_ds = create_dataset({variables.genotype_id: ("genotypes", S)})
     ds = conditional_merge_datasets(ds, new_ds, merge)
     if assign_coords:

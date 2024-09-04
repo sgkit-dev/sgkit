@@ -1,9 +1,9 @@
 from typing import Hashable, Optional
 
-import dask.array as da
 import numpy as np
 from xarray import Dataset
 
+import sgkit.distarray as da
 from sgkit import variables
 from sgkit.accelerate import numba_jit
 from sgkit.stats.aggregation import count_variant_genotypes
