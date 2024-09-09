@@ -77,6 +77,11 @@ def count_call_alleles(
     variables.validate(ds, {call_genotype: variables.call_genotype_spec})
     n_alleles = ds.sizes["alleles"]
     G = da.asarray(ds[call_genotype])
+    if G.numblocks[2] > 1:
+        raise ValueError(
+            f"Variable {call_genotype} must have only a single chunk in the ploidy dimension. "
+            "Consider rechunking to change the size of chunks."
+        )
     shape = (G.chunks[0], G.chunks[1], n_alleles)
     # use numpy array to avoid dask task dependencies between chunks
     N = np.empty(n_alleles, dtype=np.uint8)

@@ -139,8 +139,10 @@ def test_count_variant_alleles__chunked(using):
     calls = rs.randint(0, 1, size=(50, 10, 2))
     ds = get_dataset(calls)
     ac1 = count_variant_alleles(ds, using=using)
-    # Coerce from numpy to multiple chunks in all dimensions
-    ds["call_genotype"] = ds["call_genotype"].chunk(chunks=(5, 5, 1))
+    # Coerce from numpy to multiple chunks in all non-core dimensions
+    ds["call_genotype"] = ds["call_genotype"].chunk(
+        chunks={"variants": 5, "samples": 5}
+    )
     ac2 = count_variant_alleles(ds, using=using)
     assert isinstance(ac2["variant_allele_count"].data, da.Array)
     xr.testing.assert_equal(ac1, ac2)
@@ -272,6 +274,14 @@ def test_count_call_alleles__chunked():
     ac2 = count_call_alleles(ds)
     assert hasattr(ac2["call_allele_count"].data, "chunks")
     xr.testing.assert_equal(ac1, ac2)
+
+    # Multiple chunks in core dimension should fail
+    ds["call_genotype"] = ds["call_genotype"].chunk(chunks={"ploidy": 1})
+    with pytest.raises(
+        ValueError,
+        match="Variable call_genotype must have only a single chunk in the ploidy dimension",
+    ):
+        count_call_alleles(ds)
 
 
 def test_count_cohort_alleles__multi_variant_multi_sample():
