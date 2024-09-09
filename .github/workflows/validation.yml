@@ -1,9 +1,11 @@
 name: Validation
 
 on:
-  schedule:
+  # schedule:
     # Run at the end of every day
-    - cron: "0 0 * * *"
+    # Disabled on 2024-09-02 as this has been broken for over a year, and no-one is interested
+    # in fixing it. https://github.com/sgkit-dev/sgkit/issues/1112
+    # - cron: "0 0 * * *"
   # manual trigger
   workflow_dispatch:
 
