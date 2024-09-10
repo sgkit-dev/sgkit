@@ -754,19 +754,19 @@ to have created the variable in that case.</p>
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">call_allele_count</span><span class="o">=</span><span class="s2">&quot;my_call_allele_count&quot;</span><span class="p">)</span>
 
-<span class="nn">File ~/work/sgkit/sgkit/sgkit/stats/aggregation.py:164,</span> in <span class="ni">count_variant_alleles</span><span class="nt">(ds, call_genotype, call_allele_count, using, merge)</span>
-<span class="g g-Whitespace">    </span><span class="mi">104</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;Compute allele count from per-sample allele counts, or genotype calls.</span>
-<span class="g g-Whitespace">    </span><span class="mi">105</span><span class="sd"> </span>
-<span class="g g-Whitespace">    </span><span class="mi">106</span><span class="sd"> Parameters</span>
+<span class="nn">File ~/work/sgkit/sgkit/sgkit/stats/aggregation.py:175,</span> in <span class="ni">count_variant_alleles</span><span class="nt">(ds, call_genotype, call_allele_count, using, merge)</span>
+<span class="g g-Whitespace">    </span><span class="mi">115</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;Compute allele count from per-sample allele counts, or genotype calls.</span>
+<span class="g g-Whitespace">    </span><span class="mi">116</span><span class="sd"> </span>
+<span class="g g-Whitespace">    </span><span class="mi">117</span><span class="sd"> Parameters</span>
 <span class="sd">   (...)</span>
-<span class="g g-Whitespace">    </span><span class="mi">161</span><span class="sd">        [4, 0]], dtype=uint64)</span>
-<span class="g g-Whitespace">    </span><span class="mi">162</span><span class="sd"> &quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">163</span> <span class="k">if</span> <span class="n">using</span> <span class="o">==</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">164</span>     <span class="n">ds</span> <span class="o">=</span> <span class="n">define_variable_if_absent</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">165</span>         <span class="n">ds</span><span class="p">,</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count</span><span class="p">,</span> <span class="n">call_allele_count</span><span class="p">,</span> <span class="n">count_call_alleles</span>
-<span class="g g-Whitespace">    </span><span class="mi">166</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">167</span>     <span class="n">variables</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">{</span><span class="n">call_allele_count</span><span class="p">:</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count_spec</span><span class="p">})</span>
-<span class="g g-Whitespace">    </span><span class="mi">168</span>     <span class="n">AC</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">call_allele_count</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">172</span><span class="sd">        [4, 0]], dtype=uint64)</span>
+<span class="g g-Whitespace">    </span><span class="mi">173</span><span class="sd"> &quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">174</span> <span class="k">if</span> <span class="n">using</span> <span class="o">==</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">175</span>     <span class="n">ds</span> <span class="o">=</span> <span class="n">define_variable_if_absent</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">176</span>         <span class="n">ds</span><span class="p">,</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count</span><span class="p">,</span> <span class="n">call_allele_count</span><span class="p">,</span> <span class="n">count_call_alleles</span>
+<span class="g g-Whitespace">    </span><span class="mi">177</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">178</span>     <span class="n">variables</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">{</span><span class="n">call_allele_count</span><span class="p">:</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count_spec</span><span class="p">})</span>
+<span class="g g-Whitespace">    </span><span class="mi">179</span>     <span class="n">AC</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">call_allele_count</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;samples&quot;</span><span class="p">)</span>
 
 <span class="nn">File ~/work/sgkit/sgkit/sgkit/utils.py:279,</span> in <span class="ni">define_variable_if_absent</span><span class="nt">(ds, default_variable_name, variable_name, func, **kwargs)</span>
 <span class="g g-Whitespace">    </span><span class="mi">277</span>     <span class="k">return</span> <span class="n">ds</span>
@@ -1081,8 +1081,8 @@ value to the dask <code class="docutils literal notranslate"><span class="pre">C
 <span class="gp">   ....: </span>    <span class="n">ac</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 <span class="gp">   ....: </span>
 
-<span class="go">[                                        ] | 0% Completed | 162.42 us</span>
-<span class="go">[########################################] | 100% Completed | 100.39 ms</span>
+<span class="go">[                                        ] | 0% Completed | 205.21 us</span>
+<span class="go">[########################################] | 100% Completed | 100.49 ms</span>
 
 <span class="gp">In [39]: </span><span class="n">ac</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 <span class="gh">Out[39]: </span>
