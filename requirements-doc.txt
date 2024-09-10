@@ -8,3 +8,4 @@ matplotlib
 seaborn
 ablog!=0.10.27
 pickleshare
+bio2zarr
