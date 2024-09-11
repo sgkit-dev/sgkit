@@ -34,12 +34,12 @@ jobs:
       run: |
         cd docs
         make html SPHINXOPTS="-W --keep-going -n"
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: gwas_tutorial
         path: /home/runner/work/sgkit/sgkit/docs/_build/html/reports/examples/gwas_tutorial.err.log
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: relatedness_tutorial
