@@ -8,3 +8,9 @@ if cm.array_cls.__module__.split(".")[0] == "cubed":
 else:
     # default to dask
     from dask.array import *  # noqa: F401, F403
+
+    # dask doesn't have a top-level astype required by the array API
+    def astype(x, dtype, /, *, copy=True):  # pragma: no cover
+        if not copy and dtype == x.dtype:
+            return x
+        return x.astype(dtype=dtype, copy=copy)
