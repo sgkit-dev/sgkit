@@ -14,7 +14,6 @@ bed-reader
 rechunker
 cbgen < 1.0.5; platform_system != "Windows"
 cbgen == 1.0.1; platform_system == "Windows"
-cyvcf2; platform_system != "Windows"
 bio2zarr; platform_system != "Windows"
 yarl
 matplotlib
