@@ -1,5 +1,4 @@
-# Ignore VCF files during pytest collection, so it doesn't fail if cyvcf2 isn't installed.
-collect_ignore_glob = ["benchmarks/**", "sgkit/io/vcf/*.py", ".github/scripts/*.py"]
+collect_ignore_glob = ["benchmarks/**", ".github/scripts/*.py"]
 
 
 def pytest_addoption(parser):
