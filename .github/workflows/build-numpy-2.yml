@@ -32,7 +32,6 @@ jobs:
       run: |
         # avoid guvectorized functions #1194
         pytest -v sgkit/tests/test_pedigree.py
-        pytest -v sgkit/tests/io/vcf/test_vcf_writer_utils.py
     - name: Test with pytest and coverage
       run: |
         pytest -v --cov=sgkit --cov-report=term-missing
