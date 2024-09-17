@@ -56,13 +56,9 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sgkit.convert_call_to_index" href="sgkit.convert_call_to_index.html" />
-    <link rel="prev" title="sgkit.maximal_independent_set" href="sgkit.maximal_independent_set.html" />
-
+    <link rel="prev" title="sgkit.maximal_independent_set" href="sgkit.maximal_independent_set.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-
-
-
+  <meta name="docsearch:language" content="en"/>   
   </head>
   
   
@@ -743,8 +739,7 @@ document.write(`
                 
 <div id="searchbox"></div>
                 <article class="bd-article">
-                  
-<section id="sgkit-pairwise-distance">
+                   <section id="sgkit-pairwise-distance">
 <h1>sgkit.pairwise_distance<a class="headerlink" href="#sgkit-pairwise-distance" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgkit.pairwise_distance">
@@ -781,7 +776,7 @@ for all distance metric calculations.</p>
 An array like two dimensional matrix. The rows are the
 vectors used for comparison, i.e. for pairwise distance.</p>
 </dd>
-<dt><strong>metric</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'euclidean'</span></code>, <code class="docutils literal notranslate"><span class="pre">'correlation'</span></code>] (default: <code class="docutils literal notranslate"><span class="pre">'euclidean'</span></code>)</span></dt></dt><dd><p>The distance metric to use. The distance function can be
+<dt><strong>metric</strong> <span class="classifier"><span class="annotation terse">{‘euclidean’, ‘correlation’}</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'euclidean'</span></code>, <code class="docutils literal notranslate"><span class="pre">'correlation'</span></code>]</span> (default: <code class="docutils literal notranslate"><span class="pre">'euclidean'</span></code>)</span></dt></dt><dd><p>The distance metric to use. The distance function can be
 ‘euclidean’ or ‘correlation’.</p>
 </dd>
 <dt><strong>split_every</strong> <span class="classifier"><span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p><p>Determines the depth of the recursive aggregation in the reduction
@@ -791,7 +786,7 @@ function in the reduce step of the map reduce.</p>
 also be set globally with the split_every key in dask.config.</p>
 </p>
 </dd>
-<dt><strong>device</strong> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>, <code class="docutils literal notranslate"><span class="pre">'gpu'</span></code>] (default: <code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>)</span></dt></dt><dd><p>The architecture to run the calculation on, either of “cpu” or “gpu”</p>
+<dt><strong>device</strong> <span class="classifier"><span class="annotation terse">{‘cpu’, ‘gpu’}</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>, <code class="docutils literal notranslate"><span class="pre">'gpu'</span></code>]</span> (default: <code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>)</span></dt></dt><dd><p>The architecture to run the calculation on, either of “cpu” or “gpu”</p>
 </dd>
 </dl>
 </dd>
@@ -838,8 +833,7 @@ in the input array.</p>
 </section>
 
 <div class="section ablog__blog_comments">
-  
-  
+   
 </div>
 
                 </article>

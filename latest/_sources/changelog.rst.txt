@@ -26,8 +26,11 @@ New Features
 .. Bug fixes
 .. ~~~~~~~~~
 
-.. Documentation
-.. ~~~~~~~~~~~~~
+Documentation
+~~~~~~~~~~~~~
+
+- Update GWAS tutorial to use ``vcf2zarr``.
+  (:user:`tomwhite`, :pr:`1258`, :issue:`1257`)
 
 .. _changelog.0.9.0:
 
