@@ -171,7 +171,7 @@ def num_contigs(ds: xr.Dataset) -> ArrayLike:
     """Return the number of contigs in a dataset."""
     if DIM_CONTIG in ds.sizes:
         return ds.sizes[DIM_CONTIG]
-    else:
+    else:  # pragma: no cover
         return len(ds.attrs["contigs"])
 
 
@@ -179,7 +179,7 @@ def get_contigs(ds: xr.Dataset) -> ArrayLike:
     """Return the contigs in a dataset."""
     if "contig_id" in ds:
         return ds["contig_id"].values
-    else:
+    else:  # pragma: no cover
         warnings.warn(
             "The 'contigs' VCF Zarr group attribute is deprecated and should be converted to a 'contig_id' array.",
             DeprecationWarning,
@@ -191,11 +191,11 @@ def get_filters(ds: xr.Dataset) -> Optional[ArrayLike]:
     """Return the filters in a dataset."""
     if "filter_id" in ds:
         return ds["filter_id"].values
-    elif "filters" in ds.attrs:
+    elif "filters" in ds.attrs:  # pragma: no cover
         warnings.warn(
             "The 'filters' VCF Zarr group attribute is deprecated and should be converted to a 'filter_id' array.",
             DeprecationWarning,
         )
         return np.array(ds.attrs["filters"], dtype="S")
-    else:
+    else:  # pragma: no cover
         return None
