@@ -1,6 +1,6 @@
 numpy < 2
 xarray
-dask[array] >= 2023.01.0, <= 2024.8.0
+dask[array,dataframe] >= 2023.01.0, <= 2024.8.0
 distributed >= 2023.01.0, <= 2024.8.0
 dask-ml
 scipy
