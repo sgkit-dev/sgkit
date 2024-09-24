@@ -1,0 +1,12 @@
+numpy < 2.1
+xarray
+dask[array] >= 2023.01.0, <= 2024.8.0
+distributed >= 2023.01.0, <= 2024.8.0
+dask-ml
+scipy
+typing-extensions
+numba
+zarr >= 2.10.0, != 2.11.0, != 2.11.1, != 2.11.2, < 3
+fsspec != 2021.6.*
+scikit-learn
+pandas

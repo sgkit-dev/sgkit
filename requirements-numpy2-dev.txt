@@ -1,0 +1,23 @@
+callee
+pre-commit
+pytest
+pytest-cov
+pytest-datadir
+pytest-mock
+hypothesis
+scikit-allel
+statsmodels
+msprime>=1.0
+scikit-learn
+partd
+bed-reader
+rechunker
+cbgen > 1.0.5; platform_system != "Windows"
+cbgen == 1.0.1; platform_system == "Windows"
+yarl
+matplotlib
+asv
+networkx
+aiohttp
+requests
+graphviz

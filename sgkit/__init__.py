@@ -1,4 +1,4 @@
-from pkg_resources import DistributionNotFound, get_distribution  # type: ignore[import]
+from importlib.metadata import PackageNotFoundError, version  # type: ignore[import]
 
 from .display import display_genotypes, display_pedigree
 from .distance.api import pairwise_distance
@@ -68,8 +68,8 @@ from .window import (
 )
 
 try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:  # pragma: no cover
+    __version__ = version(__name__)
+except PackageNotFoundError:  # pragma: no cover
     __version__ = "unknown"
 
 __all__ = [
