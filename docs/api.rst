@@ -32,47 +32,11 @@ PLINK
    write_plink
    zarr_to_plink
 
-VCF (reading)
+VCF
 -------------
 
-.. deprecated:: 0.9.0
-   Functions for reading VCF are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ package.
-
-.. currentmodule:: sgkit.io.vcf
-.. autosummary::
-   :toctree: generated/
-
-   read_vcf
-   vcf_to_zarr
-
-For more low-level control:
-
-.. currentmodule:: sgkit.io.vcf
-.. autosummary::
-   :toctree: generated/
-
-   partition_into_regions
-   vcf_to_zarrs
-   concat_zarrs
-   zarr_array_sizes
-
-For converting from `scikit-allel's VCF Zarr representation <https://scikit-allel.readthedocs.io/en/stable/io.html#allel.vcf_to_zarr>`_ to sgkit's Zarr representation:
-
-.. currentmodule:: sgkit
-.. autosummary::
-   :toctree: generated/
-
-   read_scikit_allel_vcfzarr
-
-VCF (writing)
--------------
-
-.. currentmodule:: sgkit.io.vcf
-.. autosummary::
-   :toctree: generated/
-
-   write_vcf
-   zarr_to_vcf
+Functions for reading and writing VCF were removed from sgkit, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_
+and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages.
 
 Dataset
 -------

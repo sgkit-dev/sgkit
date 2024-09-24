@@ -18,14 +18,10 @@ Reading and writing genetic data
 Installation
 ------------
 
-Sgkit can read standard genetic file formats, including VCF, PLINK, and BGEN. It can also export
-to VCF.
+Sgkit can read standard genetic file formats, including PLINK and BGEN. For reading VCF,
+please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ package.
 
-If sgkit has been installed using conda, support for reading BGEN and PLINK is included, but
-VCF is not because there is no Windows support for cyvcf2, the library we use for reading VCF data.
-If you are using Linux or a Mac, please install cyvcf2 using the following to enable VCF support::
-
-    $ conda install -c bioconda cyvcf2
+If sgkit has been installed using conda, support for reading BGEN and PLINK is included.
 
 If sgkit has been installed using pip, then support for reading these formats is
 not included, and requires additional dependencies, which can be installed
@@ -38,10 +34,6 @@ To install sgkit with BGEN support::
 To install sgkit with PLINK support::
 
     $ pip install 'sgkit[plink]'
-
-To install sgkit with VCF support::
-
-    $ pip install 'sgkit[vcf]'
 
 Converting genetic data to Zarr
 -------------------------------
@@ -88,22 +80,10 @@ arrays within an :class:`xarray.Dataset` from ``bed``, ``bim``, and ``fam`` file
 The :func:`sgkit.io.plink.write_plink` and :func:`sgkit.io.plink.zarr_to_plink`
 functions convert sgkit's Xarray data representation to PLINK.
 
-VCF
----
-
-The :func:`sgkit.io.vcf.vcf_to_zarr` function converts one or more VCF files to
-Zarr files stored in sgkit's Xarray data representation, which can then be opened
-as a :class:`xarray.Dataset`.
-
-The :func:`sgkit.io.vcf.write_vcf` and :func:`sgkit.io.vcf.zarr_to_vcf` functions
-convert sgkit's Xarray data representation to VCF.
-
-See :ref:`vcf` for installation instructions, and details on using VCF in sgkit.
-
 Working with cloud-native data
 ------------------------------
 
-TODO: Show how to read/write Zarr (and VCF?) data in cloud storage
+TODO: Show how to read/write Zarr data in cloud storage
 
 
 Datasets
