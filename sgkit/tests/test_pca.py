@@ -1,12 +1,12 @@
 from typing import Any, Optional
 
 import allel
-import dask.array as da
 import numpy as np
 import pytest
 import xarray as xr
 from xarray import Dataset
 
+import sgkit.distarray as da
 from sgkit.stats import pca
 from sgkit.stats.pca import count_call_alternate_alleles
 from sgkit.testing import simulate_genotype_call_dataset

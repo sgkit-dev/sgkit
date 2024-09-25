@@ -1,11 +1,11 @@
 from typing import Hashable, Optional
 
-import dask.array as da
 import numpy as np
 import xarray as xr
 from sklearn.base import BaseEstimator, TransformerMixin
 from xarray import Dataset
 
+import sgkit.distarray as da
 from sgkit import variables
 
 from ..typing import ArrayLike
