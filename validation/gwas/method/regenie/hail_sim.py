@@ -49,8 +49,8 @@ def get_plink_sim_dataset(n_variants=16, n_samples=4, n_contigs=2, seed=0):
         for s in range(n_samples):
             data.append(
                 {
-                    "v": f"{c+1}:{v+1}:A:C",
-                    "s": f"S{s+1:07d}",
+                    "v": f"{c + 1}:{v + 1}:A:C",
+                    "s": f"S{s + 1:07d}",
                     "cm": 0.1,
                     "GT": hl.Call([rs.randint(0, 2), rs.randint(0, 2)]),
                 }
