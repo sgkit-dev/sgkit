@@ -107,7 +107,7 @@ def sample_dataset(draw):
     # Split first dimension assignment into two groups and assign second
     # dimension with unique names since n cols will differ
     dims = [
-        (f"dim-0-{i%2}",) if i < n_1d else (f"dim-0-{i%2}", f"dim-1-{i}")
+        (f"dim-0-{i % 2}",) if i < n_1d else (f"dim-0-{i % 2}", f"dim-1-{i}")
         for i in range(n_arrs)
     ]
 

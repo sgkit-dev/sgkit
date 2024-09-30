@@ -490,5 +490,5 @@ def test_interleave_speed():
 
     end = time.time()
     print(f"bytes written: {bytes_written}")
-    print(f"duration: {end-start}")
-    print(f"speed: {bytes_written/(1000000*(end-start))} MB/s")
+    print(f"duration: {end - start}")
+    print(f"speed: {bytes_written / (1000000 * (end - start))} MB/s")
