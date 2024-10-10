@@ -167,13 +167,6 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../vcf.html">
-    Reading VCF
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../examples/index.html">
     Examples
   </a>
@@ -186,19 +179,19 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how_do_i.html">
+    How do I …
+  </a>
+</li>
+
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../how_do_i.html">
-    How do I …
-  </a>
-</li>
-
-
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing to sgkit
@@ -368,13 +361,6 @@ document.write(`
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../vcf.html">
-    Reading VCF
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../examples/index.html">
     Examples
   </a>
@@ -503,23 +489,6 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.plink.read_plink.html">sgkit.io.plink.read_plink</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.plink.write_plink.html">sgkit.io.plink.write_plink</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sgkit.io.plink.zarr_to_plink.html">sgkit.io.plink.zarr_to_plink</a></li>
-</ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.read_vcf.html">sgkit.io.vcf.read_vcf</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.vcf_to_zarr.html">sgkit.io.vcf.vcf_to_zarr</a></li>
-</ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.partition_into_regions.html">sgkit.io.vcf.partition_into_regions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.vcf_to_zarrs.html">sgkit.io.vcf.vcf_to_zarrs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.concat_zarrs.html">sgkit.io.vcf.concat_zarrs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.zarr_array_sizes.html">sgkit.io.vcf.zarr_array_sizes</a></li>
-</ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="sgkit.read_scikit_allel_vcfzarr.html">sgkit.read_scikit_allel_vcfzarr</a></li>
-</ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.write_vcf.html">sgkit.io.vcf.write_vcf</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sgkit.io.vcf.zarr_to_vcf.html">sgkit.io.vcf.zarr_to_vcf</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sgkit.load_dataset.html">sgkit.load_dataset</a></li>
@@ -772,21 +741,21 @@ for all distance metric calculations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>x</strong> <span class="classifier"><span class="annotation terse"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> | <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.Array.html#dask.array.Array" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.Array.html#dask.array.Array" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code></a>]</span></span></dt></dt><dd><p>[array-like, shape: (M, N)]
+<dt><strong>x</strong> <span class="classifier"><span class="annotation terse"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> | <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.Array.html#dask.array.Array" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.dask.org/en/stable/generated/dask.array.Array.html#dask.array.Array" title="(in Dask)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code></a>]</span></span></dt></dt><dd><p>[array-like, shape: (M, N)]
 An array like two dimensional matrix. The rows are the
 vectors used for comparison, i.e. for pairwise distance.</p>
 </dd>
-<dt><strong>metric</strong> <span class="classifier"><span class="annotation terse">{‘euclidean’, ‘correlation’}</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'euclidean'</span></code>, <code class="docutils literal notranslate"><span class="pre">'correlation'</span></code>]</span> (default: <code class="docutils literal notranslate"><span class="pre">'euclidean'</span></code>)</span></dt></dt><dd><p>The distance metric to use. The distance function can be
+<dt><strong>metric</strong> <span class="classifier"><span class="annotation terse">{‘euclidean’, ‘correlation’}</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'euclidean'</span></code>, <code class="docutils literal notranslate"><span class="pre">'correlation'</span></code>]</span> (default: <code class="docutils literal notranslate"><span class="pre">'euclidean'</span></code>)</span></dt></dt><dd><p>The distance metric to use. The distance function can be
 ‘euclidean’ or ‘correlation’.</p>
 </dd>
-<dt><strong>split_every</strong> <span class="classifier"><span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p><p>Determines the depth of the recursive aggregation in the reduction
+<dt><strong>split_every</strong> <span class="classifier"><span class="annotation terse"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p><p>Determines the depth of the recursive aggregation in the reduction
 step. This argument is directly passed to the call to``dask.reduction``
 function in the reduce step of the map reduce.</p>
 <p>Omit to let dask heuristically decide a good default. A default can
 also be set globally with the split_every key in dask.config.</p>
 </p>
 </dd>
-<dt><strong>device</strong> <span class="classifier"><span class="annotation terse">{‘cpu’, ‘gpu’}</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>, <code class="docutils literal notranslate"><span class="pre">'gpu'</span></code>]</span> (default: <code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>)</span></dt></dt><dd><p>The architecture to run the calculation on, either of “cpu” or “gpu”</p>
+<dt><strong>device</strong> <span class="classifier"><span class="annotation terse">{‘cpu’, ‘gpu’}</span><span class="annotation full"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>, <code class="docutils literal notranslate"><span class="pre">'gpu'</span></code>]</span> (default: <code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>)</span></dt></dt><dd><p>The architecture to run the calculation on, either of “cpu” or “gpu”</p>
 </dd>
 </dl>
 </dd>

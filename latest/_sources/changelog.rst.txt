@@ -14,8 +14,12 @@ New Features
 - Add 'matching' method to :func:`identity_by_state` function.
   (:user:`timothymillar`, :pr:`1229`, :issue:`1227`)
 
-.. Breaking changes
-.. ~~~~~~~~~~~~~~~~
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- Functions for reading and writing VCF were removed from sgkit, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_
+  and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages instead.
+  (:user:`tomwhite`, :pr:`1264`)
 
 .. Deprecations
 .. ~~~~~~~~~~~~
@@ -147,22 +151,22 @@ New Features
 - Add :func:`sgkit.convert_call_to_index` method.
   (:user:`timothymillar`, :pr:`1050`, :issue:`1048`)
 
-- Add ``read_chunk_length`` option to :func:`sgkit.io.vcf.vcf_to_zarr` and
-  :func:`sgkit.io.vcf.vcf_to_zarrs` functions. These are useful to reduce memory usage
+- Add ``read_chunk_length`` option to ``sgkit.io.vcf.vcf_to_zarr`` and
+  ``sgkit.io.vcf.vcf_to_zarrs`` functions. These are useful to reduce memory usage
   with large sample counts or a large ``chunk_length``.
   (:user:`benjeffery`, :pr:`1044`, :issue:`1042`)
 
-- Add ``retain_temp_files`` to :func:`sgkit.io.vcf.vcf_to_zarr` function.
+- Add ``retain_temp_files`` to ``sgkit.io.vcf.vcf_to_zarr`` function.
   (:user:`benjeffery`, :pr:`1046`, :issue:`1036`)
 
-- Add :func:`sgkit.io.vcf.read_vcf` convenience function.
+- Add ``sgkit.io.vcf.read_vcf`` convenience function.
   (:user:`tomwhite`, :pr:`1052`, :issue:`1004`)
 
 - Add :func:`sgkit.hybrid_relationship`, :func:`sgkit.hybrid_inverse_relationship`
   and :func:`invert_relationship_matrix` methods.
   (:user:`timothymillar`, :pr:`1053`, :issue:`993`)
 
-- Add :func:`sgkit.io.vcf.zarr_array_sizes` for determining array sizes for storage in Zarr.
+- Add ``sgkit.io.vcf.zarr_array_sizes`` for determining array sizes for storage in Zarr.
   (:user:`tomwhite`, :pr:`1073`, :issue:`734`)
 
 - Add ``skipna`` option to :func:`genomic_relationship` function.
@@ -174,7 +178,7 @@ New Features
 Breaking changes
 ~~~~~~~~~~~~~~~~
 
-- Generate VCF header by default when writing VCF using :func:`sgkit.io.vcf.write_vcf` or :func:`sgkit.io.vcf.zarr_to_vcf`.
+- Generate VCF header by default when writing VCF using ``sgkit.io.vcf.write_vcf`` or ``sgkit.io.vcf.zarr_to_vcf``.
   Previously, the dataset had to contain a ``vcf_header`` attribute.
   (:user:`tomwhite`, :pr:`1021`, :issue:`1020`)
 

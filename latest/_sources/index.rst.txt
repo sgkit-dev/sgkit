@@ -19,7 +19,6 @@ both popular Python genetics toolkits with a respective focus on population and 
 
     getting_started
     user_guide
-    vcf
     examples/index
     api
     how_do_i
