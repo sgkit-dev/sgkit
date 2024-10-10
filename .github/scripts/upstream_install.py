@@ -14,13 +14,13 @@ def install_deps() -> None:
         "--upgrade",
     )
     upstream_deps = (
-        "git+https://github.com/dask/dask.git#egg=dask[array]",
+        "git+https://github.com/dask/dask.git#egg=dask[array,dataframe]",
         "git+https://github.com/dask/distributed.git#egg=distributed",
         "git+https://github.com/dask/dask-ml.git#egg=dask-ml",
         "git+https://github.com/pandas-dev/pandas#egg=pandas",
         "git+https://github.com/pangeo-data/rechunker.git#egg=rechunker",
         "git+https://github.com/pydata/xarray.git#egg=xarray",
-        "git+https://github.com/zarr-developers/zarr-python.git#egg=zarr",
+        "git+https://github.com/zarr-developers/zarr-python.git@main#egg=zarr",
     )
     full_cmd_upstream = install_cmd + upstream_deps
     print(f"Install upstream dependencies via: {full_cmd_upstream}")
