@@ -38,14 +38,14 @@ jobs:
       with:
         path: dist
 
-  test:
+  unix-test:
     # This workflow only runs on the origin org
     if: github.repository_owner == 'sgkit-dev'
     needs: ['build']
     strategy:
       matrix:
         # don't use macos-latest as it uses M1 which doesn't work
-        os: [ubuntu-latest, macos-12, windows-latest]
+        os: [ubuntu-latest, macos-12]
         python-version: ["3.9", "3.10", "3.11"]
     runs-on: ${{ matrix.os }}
     steps:
@@ -69,11 +69,40 @@ jobs:
           python sgkit-copy/.github/scripts/test_sgkit_bgen.py
           python sgkit-copy/.github/scripts/test_sgkit_plink.py
 
+  windows-test:
+    # This workflow only runs on the origin org
+    if: github.repository_owner == 'sgkit-dev'
+    runs-on: windows-latest
+    needs: ['build']
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    steps:
+      # checkout repo to subdirectory to get access to scripts
+      - uses: actions/checkout@v2
+        with:
+          path: sgkit-copy
+      - name: Download artifacts
+        uses: actions/download-artifact@v4.1.7
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install wheel and test
+        run: |
+          python -VV
+          # Install the local wheel
+          $env:wheel = $(ls artifact/sgkit-*.whl)
+          pip install $env:wheel "$env:wheel[bgen]" "$env:wheel[plink]"
+          python sgkit-copy/.github/scripts/test_sgkit.py
+          python sgkit-copy/.github/scripts/test_sgkit_bgen.py
+          python sgkit-copy/.github/scripts/test_sgkit_plink.py
+
 
   pypi-upload:
     if: github.repository_owner == 'sgkit-dev'
     runs-on: ubuntu-latest
-    needs: ['test']
+    needs: ['unix-test', 'windows-test']
     steps:
       - name: Download all
         uses: actions/download-artifact@v4.1.7
