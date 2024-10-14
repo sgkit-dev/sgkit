@@ -2,9 +2,11 @@ name: Build GPU
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+  # Disabled on 2024-10-14 as this has been broken for over six months
+  # https://github.com/sgkit-dev/sgkit/issues/1270
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
   build:
