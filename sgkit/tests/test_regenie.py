@@ -9,7 +9,6 @@ import pandas as pd
 import pytest
 import xarray as xr
 import yaml
-import zarr
 from dask.array import Array
 from hypothesis import given, settings
 from hypothesis import strategies as st
@@ -17,6 +16,11 @@ from hypothesis.extra.numpy import arrays as st_arrays
 from hypothesis.strategies import data as st_data
 from pandas import DataFrame
 from xarray import Dataset
+
+try:
+    from zarr.storage import ZipStore  # v3
+except ImportError:  # pragma: no cover
+    from zarr import ZipStore
 
 from sgkit.stats.association import LinearRegressionResult, linear_regression
 from sgkit.stats.regenie import (
@@ -258,7 +262,7 @@ def check_simulation_result(
     result_dir = datadir / "result" / run["name"]
 
     # Load simulated data
-    with zarr.ZipStore(str(dataset_dir / "genotypes.zarr.zip"), mode="r") as store:
+    with ZipStore(str(dataset_dir / "genotypes.zarr.zip"), mode="r") as store:
         ds = xr.open_zarr(store, consolidated=False)
         df_covariate = load_covariates(dataset_dir)
         df_trait = load_traits(dataset_dir)

@@ -5,6 +5,12 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 import xarray as xr
+import zarr
+from packaging.version import Version
+
+pytestmark = pytest.mark.skipif(
+    Version(zarr.__version__).major >= 3, reason="Rechunking fails for Zarr Python 3"
+)
 
 from sgkit.io.bgen.bgen_reader import (
     GT_DATA_VARS,

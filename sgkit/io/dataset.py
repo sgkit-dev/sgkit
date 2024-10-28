@@ -1,12 +1,11 @@
-from pathlib import Path
 from typing import Any, Dict, MutableMapping, Optional, Union
 
-import fsspec
 import numcodecs
 import xarray as xr
 from xarray import Dataset
 
 from sgkit.typing import PathType
+from sgkit.utils import has_keyword
 
 
 def save_dataset(
@@ -14,6 +13,7 @@ def save_dataset(
     store: Union[PathType, MutableMapping[str, bytes]],
     storage_options: Optional[Dict[str, str]] = None,
     auto_rechunk: Optional[bool] = None,
+    zarr_format: int = 2,
     **kwargs: Any,
 ) -> None:
     """Save a dataset to Zarr storage.
@@ -35,11 +35,6 @@ def save_dataset(
     kwargs
         Additional arguments to pass to :meth:`xarray.Dataset.to_zarr`.
     """
-    if isinstance(store, str):
-        storage_options = storage_options or {}
-        store = fsspec.get_mapper(store, **storage_options)
-    elif isinstance(store, Path):
-        store = str(store)
     if auto_rechunk is None:
         auto_rechunk = False
     for v in ds:
@@ -71,7 +66,9 @@ def save_dataset(
 
     # Catch unequal chunking errors to provide a more helpful error message
     try:
-        ds.to_zarr(store, **kwargs)
+        if has_keyword(ds.to_zarr, "zarr_format"):  # from xarray v2024.10.0
+            kwargs["zarr_format"] = zarr_format
+        ds.to_zarr(store, storage_options=storage_options, **kwargs)
     except ValueError as e:
         if "Zarr requires uniform chunk sizes" in str(
             e
@@ -109,12 +106,7 @@ def load_dataset(
     Dataset
         The dataset loaded from the Zarr store or file system.
     """
-    if isinstance(store, str):
-        storage_options = storage_options or {}
-        store = fsspec.get_mapper(store, **storage_options)
-    elif isinstance(store, Path):
-        store = str(store)
-    ds: Dataset = xr.open_zarr(store, concat_characters=False, **kwargs)  # type: ignore[no-untyped-call]
+    ds: Dataset = xr.open_zarr(store, storage_options=storage_options, concat_characters=False, **kwargs)  # type: ignore[no-untyped-call]
     for v in ds:
         # Workaround for https://github.com/pydata/xarray/issues/4386
         if v.endswith("_mask"):  # type: ignore
