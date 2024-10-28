@@ -2,6 +2,8 @@
 # in a separate file here, and imported dynamically to avoid
 # initial compilation overhead.
 
+import numpy as np
+
 from sgkit.accelerate import numba_guvectorize, numba_jit
 from sgkit.typing import ArrayLike
 
@@ -102,3 +104,7 @@ def count_hom(
         index = _classify_hom(genotypes[i])
         if index >= 0:
             out[index] += 1
+
+
+def count_hom_new_axis(genotypes: ArrayLike, _: ArrayLike) -> ArrayLike:
+    return count_hom(genotypes, _)[:, np.newaxis, :]
