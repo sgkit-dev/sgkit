@@ -595,9 +595,7 @@ def pbs(
     cohorts = cohorts or list(itertools.combinations(range(n_cohorts), 3))  # type: ignore
     ct = _cohorts_to_array(cohorts, ds.indexes.get("cohorts_0", None))
 
-    p = da.map_blocks(
-        lambda t: _pbs_cohorts(t, ct), t, chunks=shape, new_axis=3, dtype=np.float64
-    )
+    p = da.map_blocks(_pbs_cohorts, t, ct, chunks=shape, new_axis=3, dtype=np.float64)
     assert_array_shape(p, n_windows, n_cohorts, n_cohorts, n_cohorts)
 
     new_ds = create_dataset(

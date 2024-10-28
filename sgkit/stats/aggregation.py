@@ -680,7 +680,7 @@ def variant_stats(
     --------
     :func:`count_variant_genotypes`
     """
-    from .aggregation_numba_fns import count_hom
+    from .aggregation_numba_fns import count_hom_new_axis
 
     variables.validate(ds, {call_genotype: variables.call_genotype_spec})
     mixed_ploidy = ds[call_genotype].attrs.get("mixed_ploidy", False)
@@ -697,7 +697,7 @@ def variant_stats(
     G = da.asarray(ds[call_genotype].data)
     H = xr.DataArray(
         da.map_blocks(
-            lambda *args: count_hom(*args)[:, np.newaxis, :],
+            count_hom_new_axis,
             G,
             np.zeros(3, np.uint64),
             drop_axis=2,
@@ -796,7 +796,7 @@ def sample_stats(
     ValueError
         If the dataset contains mixed-ploidy genotype calls.
     """
-    from .aggregation_numba_fns import count_hom
+    from .aggregation_numba_fns import count_hom_new_axis
 
     variables.validate(ds, {call_genotype: variables.call_genotype_spec})
     mixed_ploidy = ds[call_genotype].attrs.get("mixed_ploidy", False)
@@ -805,7 +805,7 @@ def sample_stats(
     GT = da.asarray(ds[call_genotype].transpose("samples", "variants", "ploidy").data)
     H = xr.DataArray(
         da.map_blocks(
-            lambda *args: count_hom(*args)[:, np.newaxis, :],
+            count_hom_new_axis,
             GT,
             np.zeros(3, np.uint64),
             drop_axis=2,
