@@ -6,9 +6,13 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-import zarr
 from pandas import DataFrame
 from xarray import Dataset
+
+try:
+    from zarr.storage import ZipStore  # v3
+except ImportError:  # pragma: no cover
+    from zarr import ZipStore
 
 import sgkit.distarray as da
 from sgkit.stats.association import (
@@ -313,12 +317,10 @@ def test_regenie_loco_regression(ndarray_type: str, covariate: bool) -> None:
 
     for ds_name in datasets:
         # Load simulated data
-        genotypes_store = zarr.ZipStore(
+        genotypes_store = ZipStore(
             str(ds_dir / ds_name / "genotypes.zarr.zip"), mode="r"
         )
-        glow_store = zarr.ZipStore(
-            str(ds_dir / ds_name / glow_offsets_filename), mode="r"
-        )
+        glow_store = ZipStore(str(ds_dir / ds_name / glow_offsets_filename), mode="r")
 
         ds = xr.open_zarr(genotypes_store, consolidated=False)
         glow_loco_predictions = xr.open_zarr(glow_store, consolidated=False)

@@ -18,6 +18,7 @@ from typing import (
 import dask
 import dask.array as da
 import dask.dataframe as dd
+import numcodecs
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -348,7 +349,7 @@ def encode_variables(
     ds: Dataset,
     chunk_length: int,
     chunk_width: int,
-    compressor: Optional[Any] = zarr.Blosc(cname="zstd", clevel=7, shuffle=2),
+    compressor: Optional[Any] = numcodecs.Blosc(cname="zstd", clevel=7, shuffle=2),
     probability_dtype: Optional[Any] = "uint8",
 ) -> Dict[Hashable, Dict[str, Any]]:
     encoding = {}
@@ -424,7 +425,7 @@ def rechunk_bgen(
     *,
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
-    compressor: Optional[Any] = zarr.Blosc(cname="zstd", clevel=7, shuffle=2),
+    compressor: Optional[Any] = numcodecs.Blosc(cname="zstd", clevel=7, shuffle=2),
     probability_dtype: Optional[DType] = "uint8",
     max_mem: str = "4GB",
     pack: bool = True,
@@ -538,7 +539,7 @@ def bgen_to_zarr(
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
     temp_chunk_length: int = 100,
-    compressor: Optional[Any] = zarr.Blosc(cname="zstd", clevel=7, shuffle=2),
+    compressor: Optional[Any] = numcodecs.Blosc(cname="zstd", clevel=7, shuffle=2),
     probability_dtype: Optional[DType] = "uint8",
     max_mem: str = "4GB",
     pack: bool = True,
