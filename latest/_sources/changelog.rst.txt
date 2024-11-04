@@ -21,6 +21,9 @@ Breaking changes
   and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages instead.
   (:user:`tomwhite`, :pr:`1264`)
 
+- Drop support for Python 3.9.
+  (:user:`tomwhite`, :pr:`1276`)
+
 .. Deprecations
 .. ~~~~~~~~~~~~
 
