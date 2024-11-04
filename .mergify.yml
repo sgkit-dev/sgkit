@@ -2,10 +2,9 @@ queue_rules:
   - name: default
     conditions:
       - base=main
-      - status-success=build (3.9)
       - status-success=build (3.10)
       - status-success=build (3.11)
-      - status-success=win_build (3.9)
+      - status-success=win_build (3.10)
       - approved-reviews-by=@sgkit-dev/committers
       - "#approved-reviews-by>=1"
       - label=auto-merge
@@ -14,10 +13,9 @@ pull_request_rules:
   - name: automatic merge
     conditions:
       - base=main
-      - status-success=build (3.9)
       - status-success=build (3.10)
       - status-success=build (3.11)
-      - status-success=win_build (3.9)
+      - status-success=win_build (3.10)
       - approved-reviews-by=@sgkit-dev/committers
       - "#approved-reviews-by>=1"
       - label=auto-merge
