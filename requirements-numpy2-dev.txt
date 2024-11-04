@@ -12,8 +12,7 @@ scikit-learn
 partd
 bed-reader
 rechunker
-cbgen > 1.0.5; platform_system != "Windows"
-cbgen == 1.0.1; platform_system == "Windows"
+cbgen > 1.0.5
 yarl
 matplotlib
 asv
