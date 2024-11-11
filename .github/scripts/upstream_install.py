@@ -14,7 +14,7 @@ def install_deps() -> None:
         "--upgrade",
     )
     upstream_deps = (
-        "git+https://github.com/dask/dask.git#egg=dask[array]",
+        "git+https://github.com/dask/dask.git#egg=dask[array,dataframe]",
         "git+https://github.com/dask/distributed.git#egg=distributed",
         "git+https://github.com/dask/dask-ml.git#egg=dask-ml",
         "git+https://github.com/pandas-dev/pandas#egg=pandas",
