@@ -701,7 +701,7 @@ sample_pca_component, sample_pca_component_spec = SgkitVariables.register_variab
         kind="f",
         __doc__="""Principal axes defined as eigenvectors for sample covariance matrix.
 In the context of SVD, these are equivalent to the right singular vectors in
-the decomposition of a (N, M) matrix., i.e. ``dask_ml.decomposition.TruncatedSVD.components_``.""",
+the decomposition of a (N, M) matrix., i.e. ``sgkit.stats.truncated_svd.TruncatedSVD.components_``.""",
     )
 )
 
@@ -715,7 +715,7 @@ the decomposition of a (N, M) matrix., i.e. ``dask_ml.decomposition.TruncatedSVD
         kind="f",
         __doc__="""Variance explained by each principal component. These values are equivalent
 to eigenvalues that result from the eigendecomposition of a (N, M) matrix,
-i.e. ``dask_ml.decomposition.TruncatedSVD.explained_variance_``.""",
+i.e. ``sgkit.stats.truncated_svd.TruncatedSVD.explained_variance_``.""",
     )
 )
 
@@ -728,7 +728,7 @@ i.e. ``dask_ml.decomposition.TruncatedSVD.explained_variance_``.""",
         dims=("components",),
         kind="f",
         __doc__="""Ratio of variance explained to total variance for each principal component,
-i.e. ``dask_ml.decomposition.TruncatedSVD.explained_variance_ratio_``.""",
+i.e. ``sgkit.stats.truncated_svd.TruncatedSVD.explained_variance_ratio_``.""",
     )
 )
 
