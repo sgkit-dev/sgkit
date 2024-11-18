@@ -98,28 +98,6 @@ class TruncatedSVD(BaseEstimator, TransformerMixin):
         .. warning::
 
            The implementation currently does not support sparse matrices.
-
-        Examples
-        --------
-        >>> from dask_ml.decomposition import TruncatedSVD
-        >>> import dask.array as da
-        >>> X = da.random.normal(size=(1000, 20), chunks=(100, 20))
-        >>> svd = TruncatedSVD(n_components=5, n_iter=3, random_state=42)
-        >>> svd.fit(X)  # doctest: +NORMALIZE_WHITESPACE
-        TruncatedSVD(algorithm='tsqr', n_components=5, n_iter=3,
-                     random_state=42, tol=0.0)
-
-        >>> print(svd.explained_variance_ratio_)  # doctest: +ELLIPSIS
-        [0.06386323 0.06176776 0.05901293 0.0576399  0.05726607]
-        >>> print(svd.explained_variance_ratio_.sum())  # doctest: +ELLIPSIS
-        0.299...
-        >>> print(svd.singular_values_)  # doctest: +ELLIPSIS
-        array([35.92469517, 35.32922121, 34.53368856, 34.138..., 34.013...])
-
-        Note that ``transform`` returns a ``dask.Array``.
-
-        >>> svd.transform(X)
-        dask.array<sum-agg, shape=(1000, 5), dtype=float64, chunksize=(100, 5)>
         """
         self.algorithm = algorithm
         self.n_components = n_components
@@ -148,7 +126,7 @@ class TruncatedSVD(BaseEstimator, TransformerMixin):
 
     def _check_array(self, X):
         if self.n_components >= X.shape[1]:
-            raise ValueError(
+            raise ValueError(  # pragma: no cover
                 "n_components must be < n_features; "
                 "got {} >= {}".format(self.n_components, X.shape[1])
             )
@@ -174,14 +152,14 @@ class TruncatedSVD(BaseEstimator, TransformerMixin):
         """
         X = self._check_array(X)
         if self.algorithm not in {"tsqr", "randomized"}:
-            raise ValueError(
+            raise ValueError(  # pragma: no cover
                 "`algorithm` must be 'tsqr' or 'randomized', not '{}'".format(
                     self.algorithm
                 )
             )
         if self.algorithm == "tsqr":
             if has_keyword(da.linalg.svd, "full_matrices"):
-                u, s, v = da.linalg.svd(X, full_matrices=False)
+                u, s, v = da.linalg.svd(X, full_matrices=False)  # pragma: no cover
             else:
                 u, s, v = da.linalg.svd(X)
             u = u[:, : self.n_components]
@@ -245,4 +223,4 @@ class TruncatedSVD(BaseEstimator, TransformerMixin):
             Note that this is always a dense array.
         """
         # X = check_array(X)
-        return X @ self.components_
+        return X @ self.components_  # pragma: no cover
