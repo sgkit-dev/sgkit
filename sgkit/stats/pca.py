@@ -219,7 +219,7 @@ def pca(
         Principal axes defined as eigenvectors for sample covariance matrix.
         In the context of SVD, these are equivalent to the right singular
         vectors in the decomposition of a (N, M) matrix,
-        i.e. ``dask_ml.decomposition.TruncatedSVD.components_``.
+        i.e. ``sgkit.stats.truncated_svd.TruncatedSVD.components_``.
     sample_pca_loading : [array-like, shape: (M, C)]
         Principal axes scaled by square root of eigenvalues.
         These values can also be interpreted as the correlation between the
@@ -227,10 +227,10 @@ def pca(
     sample_pca_explained_variance : [array-like, shape: (C,)]
         Variance explained by each principal component. These values are equivalent
         to eigenvalues that result from the eigendecomposition of a (N, M) matrix,
-        i.e. ``dask_ml.decomposition.TruncatedSVD.explained_variance_``.
+        i.e. ``sgkit.stats.truncated_svd.TruncatedSVD.explained_variance_``.
     sample_pca_explained_variance_ratio : [array-like, shape: (C,)]
         Ratio of variance explained to total variance for each principal component,
-        i.e. ``dask_ml.decomposition.TruncatedSVD.explained_variance_ratio_``.
+        i.e. ``sgkit.stats.truncated_svd.TruncatedSVD.explained_variance_ratio_``.
 
     Examples
     --------
