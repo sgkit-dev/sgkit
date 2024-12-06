@@ -92,12 +92,12 @@ def diversity(
 
     ac = ds[cohort_allele_count]
     an = ac.sum(axis=2)
-    n_pairs = an * (an - 1) / 2
-    n_same = (ac * (ac - 1) / 2).sum(axis=2)
+    n_pairs = an * (an - 1) // 2
+    n_same = (ac * (ac - 1) // 2).sum(axis=2)
     n_diff = n_pairs - n_same
     # replace zeros to avoid divide by zero error
     n_pairs_na = n_pairs.where(n_pairs != 0)
-    pi = n_diff / n_pairs_na
+    pi = n_diff.astype(np.float64) / n_pairs_na.astype(np.float64)
 
     if has_windows(ds):
         div = window_statistic(
