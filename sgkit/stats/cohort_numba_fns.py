@@ -51,6 +51,7 @@ def cohort_reduction(gufunc: Callable) -> Callable:
             x,
             cohort,
             da.empty(n, dtype=np.int8),
+            dtype=x.dtype,  # TODO: is this right? Might need to be passed in.
             chunks=chunks,
             drop_axis=replaced,
             new_axis=replaced,
