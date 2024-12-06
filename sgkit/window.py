@@ -536,10 +536,10 @@ def window_statistic(
 
     chunk_offsets = _sizes_to_start_offsets(windows_per_chunk)
 
-    def blockwise_moving_stat(x: ArrayLike, block_info: Any = None) -> ArrayLike:
-        if block_info is None or len(block_info) == 0:
+    def blockwise_moving_stat(x: ArrayLike, block_id: Any = None) -> ArrayLike:
+        if block_id is None:
             return np.array([])
-        chunk_number = block_info[0]["chunk-location"][0]
+        chunk_number = block_id[0]
         chunk_offset_start = chunk_offsets[chunk_number]
         chunk_offset_stop = chunk_offsets[chunk_number + 1]
         chunk_window_starts = rel_window_starts[chunk_offset_start:chunk_offset_stop]
@@ -559,8 +559,9 @@ def window_statistic(
         depth = {0: depth}
         # new chunks are same except in first axis
         new_chunks = tuple([tuple(windows_per_chunk)] + list(desired_chunks[1:]))  # type: ignore
-    return values.map_overlap(
+    return da.map_overlap(
         blockwise_moving_stat,
+        values,
         dtype=dtype,
         chunks=new_chunks,
         depth=depth,
