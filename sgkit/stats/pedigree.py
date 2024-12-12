@@ -4,7 +4,7 @@ from typing import Hashable, Tuple
 import dask.array as da
 import numpy as np
 import xarray as xr
-from typing_extensions import Literal
+from typing_extensions import Literal, Optional
 from xarray import Dataset
 
 from sgkit import variables
@@ -15,6 +15,11 @@ from sgkit.utils import (
     create_dataset,
     define_variable_if_absent,
 )
+
+EST_DIPLOID = "diploid"
+EST_HAMILTON_KERR = "Hamilton-Kerr"
+EST_EVEN = "even"
+EST_VARIABLE = "variable"
 
 
 def parent_indices(
@@ -174,7 +179,7 @@ def topological_argsort(parent: ArrayLike) -> ArrayLike:  # pragma: no cover
     return order[::-1]
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _is_pedigree_sorted(parent: ArrayLike) -> bool:  # pragma: no cover
     n_samples, n_parents = parent.shape
     for i in range(n_samples):
@@ -185,7 +190,7 @@ def _is_pedigree_sorted(parent: ArrayLike) -> bool:  # pragma: no cover
     return True
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _raise_on_half_founder(
     parent: ArrayLike, tau: ArrayLike = None
 ) -> None:  # pragma: no cover
@@ -204,7 +209,7 @@ def _raise_on_half_founder(
             raise ValueError("Pedigree contains half-founders")
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _insert_diploid_self_kinship(
     kinship: ArrayLike, parent: ArrayLike, i: int
 ) -> None:  # pragma: no cover
@@ -217,7 +222,7 @@ def _insert_diploid_self_kinship(
         kinship[i, i] = (1 + kinship[p, q]) / 2
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _insert_diploid_pair_kinship(
     kinship: ArrayLike, parent: ArrayLike, i: int, j: int
 ) -> None:  # pragma: no cover
@@ -231,7 +236,37 @@ def _insert_diploid_pair_kinship(
     kinship[j, i] = kinship_ij
 
 
-@numba_jit
+@numba_jit(nogil=True)
+def _kinship_diploid(
+    parent: ArrayLike,
+    out: ArrayLike,
+    allow_half_founders: bool = False,
+) -> ArrayLike:  # pragma: no cover
+    if parent.shape[1] != 2:
+        raise ValueError("The parents dimension must be length 2")
+    if not allow_half_founders:
+        _raise_on_half_founder(parent)
+    # we use a separate code path for the ordered case because
+    # indexing on the `order` array in the unordered case is a
+    # performance bottleneck
+    ordered = _is_pedigree_sorted(parent)
+    n = len(parent)
+    if ordered:
+        for i in range(n):
+            _insert_diploid_self_kinship(out, parent, i)
+            for j in range(i):
+                _insert_diploid_pair_kinship(out, parent, i, j)
+    else:
+        order = topological_argsort(parent)
+        for idx in range(n):
+            i = order[idx]
+            _insert_diploid_self_kinship(out, parent, i)
+            for jdx in range(idx):
+                j = order[jdx]
+                _insert_diploid_pair_kinship(out, parent, i, j)
+
+
+@numba_jit(nogil=True)
 def kinship_diploid(
     parent: ArrayLike, allow_half_founders: bool = False, dtype: type = np.float64
 ) -> ArrayLike:  # pragma: no cover
@@ -268,33 +303,13 @@ def kinship_diploid(
     ValueError
         If the parents dimension does not have a length of 2.
     """
-    if parent.shape[1] != 2:
-        raise ValueError("The parents dimension must be length 2")
-    if not allow_half_founders:
-        _raise_on_half_founder(parent)
     n = len(parent)
-    kinship = np.empty((n, n), dtype=dtype)
-    # we use a separate code path for the ordered case because
-    # indexing on the `order` array in the unordered case is a
-    # performance bottleneck
-    ordered = _is_pedigree_sorted(parent)
-    if ordered:
-        for i in range(n):
-            _insert_diploid_self_kinship(kinship, parent, i)
-            for j in range(i):
-                _insert_diploid_pair_kinship(kinship, parent, i, j)
-    else:
-        order = topological_argsort(parent)
-        for idx in range(n):
-            i = order[idx]
-            _insert_diploid_self_kinship(kinship, parent, i)
-            for jdx in range(idx):
-                j = order[jdx]
-                _insert_diploid_pair_kinship(kinship, parent, i, j)
-    return kinship
+    out = np.zeros((n, n), dtype=dtype)
+    _kinship_diploid(parent, out, allow_half_founders)
+    return out
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _identify_founders_diploid(parent: ArrayLike) -> ArrayLike:  # pragma: no cover
     n = len(parent)
     out = np.zeros(n, dtype=np.bool_)
@@ -304,7 +319,7 @@ def _identify_founders_diploid(parent: ArrayLike) -> ArrayLike:  # pragma: no co
     return out
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def project_kinship_diploid(
     initial: ArrayLike,
     parent: ArrayLike,
@@ -375,7 +390,7 @@ def project_kinship_diploid(
     return kinship
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _inbreeding_as_self_kinship(
     inbreeding: float, ploidy: int
 ) -> float:  # pragma: no cover
@@ -383,7 +398,7 @@ def _inbreeding_as_self_kinship(
     return (1 + (ploidy - 1) * inbreeding) / ploidy
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _hamilton_kerr_inbreeding_founder(
     lambda_p: float, lambda_q: float, ploidy_i: int
 ) -> float:  # pragma: no cover
@@ -395,7 +410,7 @@ def _hamilton_kerr_inbreeding_founder(
     return num / denom
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _hamilton_kerr_inbreeding_non_founder(
     tau_p: int,
     lambda_p: float,
@@ -431,7 +446,7 @@ def _hamilton_kerr_inbreeding_non_founder(
     return num / denom
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _hamilton_kerr_inbreeding_half_founder(
     tau_p: int,
     lambda_p: float,
@@ -465,7 +480,7 @@ def _hamilton_kerr_inbreeding_half_founder(
     )
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _insert_hamilton_kerr_self_kinship(
     kinship: ArrayLike, parent: ArrayLike, tau: ArrayLike, lambda_: ArrayLike, i: int
 ) -> None:  # pragma: no cover
@@ -515,7 +530,7 @@ def _insert_hamilton_kerr_self_kinship(
     kinship[i, i] = _inbreeding_as_self_kinship(inbreeding_i, ploidy_i)
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _hamilton_kerr_pair_kinship(
     tau_p: int,
     tau_q: int,
@@ -526,7 +541,7 @@ def _hamilton_kerr_pair_kinship(
     return (tau_p / ploidy_i) * kinship_pj + (tau_q / ploidy_i) * kinship_qj
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _insert_hamilton_kerr_pair_kinship(
     kinship: ArrayLike, parent: ArrayLike, tau: ArrayLike, i: int, j: int
 ) -> None:  # pragma: no cover
@@ -541,7 +556,7 @@ def _insert_hamilton_kerr_pair_kinship(
     kinship[j, i] = kinship_ij
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _compress_hamilton_kerr_parameters(
     parent: ArrayLike, tau: ArrayLike, lambda_: ArrayLike
 ) -> Tuple[ArrayLike, ArrayLike, ArrayLike]:  # pragma: no cover
@@ -595,7 +610,39 @@ def _compress_hamilton_kerr_parameters(
     return new_parent, new_tau, new_lambda
 
 
-@numba_jit
+@numba_jit(nogil=True)
+def _kinship_hamilton_kerr(
+    parent: ArrayLike,
+    tau: ArrayLike,
+    lambda_: ArrayLike,
+    out: ArrayLike,
+    allow_half_founders: bool = False,
+) -> ArrayLike:  # pragma: no cover
+    if parent.shape[1] != 2:
+        parent, tau, lambda_ = _compress_hamilton_kerr_parameters(parent, tau, lambda_)
+    if not allow_half_founders:
+        _raise_on_half_founder(parent, tau)
+    # we use a separate code path for the ordered case because
+    # indexing on the `order` array in the unordered case is a
+    # performance bottleneck.
+    ordered = _is_pedigree_sorted(parent)
+    n = len(parent)
+    if ordered:
+        for i in range(n):
+            _insert_hamilton_kerr_self_kinship(out, parent, tau, lambda_, i)
+            for j in range(i):
+                _insert_hamilton_kerr_pair_kinship(out, parent, tau, i, j)
+    else:
+        order = topological_argsort(parent)
+        for idx in range(n):
+            i = order[idx]
+            _insert_hamilton_kerr_self_kinship(out, parent, tau, lambda_, i)
+            for jdx in range(idx):
+                j = order[jdx]
+                _insert_hamilton_kerr_pair_kinship(out, parent, tau, i, j)
+
+
+@numba_jit(nogil=True)
 def kinship_Hamilton_Kerr(
     parent: ArrayLike,
     tau: ArrayLike,
@@ -640,33 +687,19 @@ def kinship_Hamilton_Kerr(
     ValueError
         If a sample has more than two contributing parents.
     """
-    if parent.shape[1] != 2:
-        parent, tau, lambda_ = _compress_hamilton_kerr_parameters(parent, tau, lambda_)
-    if not allow_half_founders:
-        _raise_on_half_founder(parent, tau)
     n = len(parent)
-    kinship = np.empty((n, n), dtype=dtype)
-    # we use a separate code path for the ordered case because
-    # indexing on the `order` array in the unordered case is a
-    # performance bottleneck.
-    ordered = _is_pedigree_sorted(parent)
-    if ordered:
-        for i in range(n):
-            _insert_hamilton_kerr_self_kinship(kinship, parent, tau, lambda_, i)
-            for j in range(i):
-                _insert_hamilton_kerr_pair_kinship(kinship, parent, tau, i, j)
-    else:
-        order = topological_argsort(parent)
-        for idx in range(n):
-            i = order[idx]
-            _insert_hamilton_kerr_self_kinship(kinship, parent, tau, lambda_, i)
-            for jdx in range(idx):
-                j = order[jdx]
-                _insert_hamilton_kerr_pair_kinship(kinship, parent, tau, i, j)
-    return kinship
+    out = np.zeros((n, n), dtype=dtype)
+    _kinship_hamilton_kerr(
+        parent=parent,
+        tau=tau,
+        lambda_=lambda_,
+        out=out,
+        allow_half_founders=allow_half_founders,
+    )
+    return out
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _identify_founders_Hamilton_Kerr(
     parent: ArrayLike, tau: ArrayLike
 ) -> ArrayLike:  # pragma: no cover
@@ -679,7 +712,7 @@ def _identify_founders_Hamilton_Kerr(
     return out
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def project_kinship_Hamilton_Kerr(
     initial: ArrayLike,
     parent: ArrayLike,
@@ -756,10 +789,11 @@ def project_kinship_Hamilton_Kerr(
 def pedigree_kinship(
     ds: Dataset,
     *,
-    method: Literal["diploid", "Hamilton-Kerr"] = "diploid",
+    method: Literal[EST_DIPLOID, EST_HAMILTON_KERR] = EST_DIPLOID,  # type: ignore
     parent: Hashable = variables.parent,
     stat_Hamilton_Kerr_tau: Hashable = variables.stat_Hamilton_Kerr_tau,
     stat_Hamilton_Kerr_lambda: Hashable = variables.stat_Hamilton_Kerr_lambda,
+    chunks: Optional[Hashable] = None,
     return_relationship: bool = False,
     allow_half_founders: bool = False,
     founder_kinship: Hashable = None,
@@ -790,6 +824,8 @@ def pedigree_kinship(
         Input variable name holding stat_Hamilton_Kerr_tau as defined
         by :data:`sgkit.variables.stat_Hamilton_Kerr_tau_spec`.
         This variable is only required for the "Hamilton-Kerr" method.
+    chunks
+        Optionally specify chunks for the returned matrices.
     stat_Hamilton_Kerr_lambda
         Input variable name holding stat_Hamilton_Kerr_lambda as defined
         by :data:`sgkit.variables.stat_Hamilton_Kerr_lambda_spec`.
@@ -871,6 +907,13 @@ def pedigree_kinship(
     Dimensions of :data:`sgkit.variables.stat_pedigree_kinship_spec` and
     :data:`sgkit.variables.stat_pedigree_relationship_spec` are named
     ``samples_0`` and ``samples_1``.
+
+    Note
+    ----
+    Chunked kinship computation is implemented by identifying the sub-pedigree
+    corresponding to each output chunk. An intermediate kinship matrix is then
+    calculated which includes the chunk samples and their ancestors. This can
+    be inefficient in deep pedigrees with many generations.
 
     Note
     ----
@@ -1014,7 +1057,7 @@ def pedigree_kinship(
     [2] - Jérôme Goudet, Tomas Kay and Bruce S. Weir 2018.
     "How to estimate kinship." Molecular Ecology 27: 4121-4135.
     """
-    if method not in {"diploid", "Hamilton-Kerr"}:
+    if method not in {EST_DIPLOID, EST_HAMILTON_KERR}:
         raise ValueError("Unknown method '{}'".format(method))
     ds = define_variable_if_absent(ds, variables.parent, parent, parent_indices)
     variables.validate(ds, {parent: variables.parent_spec})
@@ -1061,47 +1104,44 @@ def pedigree_kinship(
                 raise ValueError(
                     "Dimension sizes of founder_kinship should equal the number of samples"
                 )
-    if method == "diploid":
-        # check ploidy dimension and assume diploid if it's absent
+    # check ploidy dim if diploid
+    if method == EST_DIPLOID:
         if ds.sizes.get("ploidy", 2) != 2:
             raise ValueError("Dataset is not diploid")
-        if founder_kinship is None:
-            func = da.gufunc(
-                kinship_diploid, signature="(n, p) -> (n, n)", output_dtypes=float
-            )
-            kinship = func(parent, allow_half_founders=allow_half_founders)
-        else:
-            func = da.gufunc(
-                project_kinship_diploid,
-                signature="(n, n),(n, p)-> (n, n)",
-                output_dtypes=float,
-            )
-            kinship = func(
-                founder_kinship,
-                parent,
-                allow_half_founders=allow_half_founders,
-            )
-    elif method == "Hamilton-Kerr":
+    # Hamilton-Kerr params
+    if method == EST_HAMILTON_KERR:
         tau = da.asarray(
             ds[stat_Hamilton_Kerr_tau].data, ds[stat_Hamilton_Kerr_tau].shape
         )
         lambda_ = da.asarray(
             ds[stat_Hamilton_Kerr_lambda].data, ds[stat_Hamilton_Kerr_lambda].shape
         )
-        if founder_kinship is None:
+    # dispatch without chunks
+    if chunks is None:
+        if (method == EST_DIPLOID) and (founder_kinship is None):
+            signature = "(n, p) -> (n, n)"
+            func = da.gufunc(kinship_diploid, signature=signature, output_dtypes=float)
+            kinship = func(parent, allow_half_founders=allow_half_founders)
+        elif (method == EST_DIPLOID) and (founder_kinship is not None):
+            signature = "(n, n),(n, p)-> (n, n)"
             func = da.gufunc(
-                kinship_Hamilton_Kerr,
-                signature="(n, p),(n, p),(n, p) -> (n, n)",
-                output_dtypes=float,
+                project_kinship_diploid, signature=signature, output_dtypes=float
+            )
+            kinship = func(
+                founder_kinship, parent, allow_half_founders=allow_half_founders
+            )
+        elif (method == EST_HAMILTON_KERR) and (founder_kinship is None):
+            signature = "(n, p),(n, p),(n, p) -> (n, n)"
+            func = da.gufunc(
+                kinship_Hamilton_Kerr, signature=signature, output_dtypes=float
             )
             kinship = func(
                 parent, tau, lambda_, allow_half_founders=allow_half_founders
             )
-        else:
+        elif (method == EST_HAMILTON_KERR) and (founder_kinship is not None):
+            signature = "(n, n),(n, p),(n, p),(n, p)-> (n, n)"
             func = da.gufunc(
-                project_kinship_Hamilton_Kerr,
-                signature="(n, n),(n, p),(n, p),(n, p)-> (n, n)",
-                output_dtypes=float,
+                project_kinship_Hamilton_Kerr, signature=signature, output_dtypes=float
             )
             kinship = func(
                 founder_kinship,
@@ -1110,10 +1150,57 @@ def pedigree_kinship(
                 lambda_,
                 allow_half_founders=allow_half_founders,
             )
+        else:  # pragma: no cover
+            assert False
+    # dispatch with chunks
+    else:
+        dummy = da.zeros((n_samples, n_samples), chunks=chunks)
+        rows = da.arange(n_samples, chunks=dummy[:, 0].chunks)
+        cols = da.arange(n_samples, chunks=dummy[0, :].chunks)
+        if (method == EST_DIPLOID) and (founder_kinship is None):
+            from .pedigree_numba_fns import kinship_diploid_chunk
+
+            signature = kinship_diploid_chunk.ufunc.signature
+            func = da.gufunc(
+                kinship_diploid_chunk, signature=signature, output_dtypes=float
+            )
+            kinship = da.vstack(
+                [
+                    da.hstack(
+                        [func(parent, r, c, allow_half_founders) for c in cols.blocks]
+                    )
+                    for r in rows.blocks
+                ]
+            )
+        elif (method == EST_DIPLOID) and (founder_kinship is not None):
+            raise NotImplementedError("Chunking is not implemented for founder kinship")
+        elif (method == EST_HAMILTON_KERR) and (founder_kinship is None):
+            from .pedigree_numba_fns import kinship_Hamilton_Kerr_chunk
+
+            signature = kinship_Hamilton_Kerr_chunk.ufunc.signature
+            func = da.gufunc(
+                kinship_Hamilton_Kerr_chunk, signature=signature, output_dtypes=float
+            )
+            kinship = da.vstack(
+                [
+                    da.hstack(
+                        [
+                            func(parent, tau, lambda_, r, c, allow_half_founders)
+                            for c in cols.blocks
+                        ]
+                    )
+                    for r in rows.blocks
+                ]
+            )
+        elif (method == EST_HAMILTON_KERR) and (founder_kinship is not None):
+            raise NotImplementedError("Chunking is not implemented for founder kinship")
+        else:  # pragma: no cover
+            assert False
+    # new dataset
     dims = ["samples_0", "samples_1"]
     if return_relationship:
         relationship = kinship * 2
-        if method == "Hamilton-Kerr":
+        if method == EST_HAMILTON_KERR:
             ploidy = tau.sum(axis=-1)
             relationship *= np.sqrt(ploidy[None, :] / 2 * ploidy[:, None] / 2)
         arrays = {
@@ -1128,7 +1215,7 @@ def pedigree_kinship(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _position_sort_pair(
     x: int, y: int, position: ArrayLike
 ) -> tuple:  # pragma: no cover
@@ -1142,7 +1229,7 @@ def _position_sort_pair(
         return (y, x)
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def inbreeding_Hamilton_Kerr(
     parent: ArrayLike,
     tau: ArrayLike,
@@ -1392,7 +1479,7 @@ def inbreeding_Hamilton_Kerr(
 def pedigree_inbreeding(
     ds: Dataset,
     *,
-    method: Literal["diploid", "Hamilton-Kerr"] = "diploid",
+    method: Literal[EST_DIPLOID, EST_HAMILTON_KERR] = EST_DIPLOID,  # type: ignore
     parent: Hashable = variables.parent,
     stat_Hamilton_Kerr_tau: Hashable = variables.stat_Hamilton_Kerr_tau,
     stat_Hamilton_Kerr_lambda: Hashable = variables.stat_Hamilton_Kerr_lambda,
@@ -1561,12 +1648,12 @@ def pedigree_inbreeding(
     "Computation of the inverse additive relationship matrix for autopolyploid
     and multiple-ploidy populations." Theoretical and Applied Genetics 131: 851-860.
     """
-    if method not in {"diploid", "Hamilton-Kerr"}:
+    if method not in {EST_DIPLOID, EST_HAMILTON_KERR}:
         raise ValueError("Unknown method '{}'".format(method))
     ds = define_variable_if_absent(ds, variables.parent, parent, parent_indices)
     variables.validate(ds, {parent: variables.parent_spec})
     parent = da.asarray(ds[parent].data, chunks=ds[parent].shape)
-    if method == "diploid":
+    if method == EST_DIPLOID:
         # check ploidy dimension and assume diploid if it's absent
         if ds.sizes.get("ploidy", 2) != 2:
             raise ValueError("Dataset is not diploid")
@@ -1574,7 +1661,7 @@ def pedigree_inbreeding(
             raise ValueError("The parents dimension must be length 2")
         tau = da.ones_like(parent, int)
         lambda_ = da.zeros_like(parent, float)
-    elif method == "Hamilton-Kerr":
+    elif method == EST_HAMILTON_KERR:
         tau = ds[stat_Hamilton_Kerr_tau].data
         lambda_ = ds[stat_Hamilton_Kerr_lambda].data
     func = da.gufunc(
@@ -1591,7 +1678,7 @@ def pedigree_inbreeding(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def _update_inverse_kinship(
     mtx: ArrayLike,
     parent: ArrayLike,
@@ -1654,7 +1741,7 @@ def _update_inverse_kinship(
     mtx[i, i] += val_ii
 
 
-@numba_jit
+@numba_jit(nogil=True)
 def inverse_kinship_Hamilton_Kerr(
     parent: ArrayLike,
     tau: ArrayLike,
@@ -1716,7 +1803,7 @@ def inbreeding_as_self_kinship(inbreeding: ArrayLike, ploidy: ArrayLike) -> Arra
 def pedigree_inverse_kinship(
     ds: Dataset,
     *,
-    method: Literal["diploid", "Hamilton-Kerr"] = "diploid",
+    method: Literal[EST_DIPLOID, EST_HAMILTON_KERR] = EST_DIPLOID,  # type: ignore
     parent: Hashable = variables.parent,
     stat_Hamilton_Kerr_tau: Hashable = variables.stat_Hamilton_Kerr_tau,
     stat_Hamilton_Kerr_lambda: Hashable = variables.stat_Hamilton_Kerr_lambda,
@@ -1902,12 +1989,12 @@ def pedigree_inverse_kinship(
     "Computation of the inverse additive relationship matrix for autopolyploid
     and multiple-ploidy populations." Theoretical and Applied Genetics 131: 851-860.
     """
-    if method not in {"diploid", "Hamilton-Kerr"}:
+    if method not in {EST_DIPLOID, EST_HAMILTON_KERR}:
         raise ValueError("Unknown method '{}'".format(method))
     ds = define_variable_if_absent(ds, variables.parent, parent, parent_indices)
     variables.validate(ds, {parent: variables.parent_spec})
     parent = ds[parent].data
-    if method == "diploid":
+    if method == EST_DIPLOID:
         # check ploidy dimension and assume diploid if it's absent
         if ds.sizes.get("ploidy", 2) != 2:
             raise ValueError("Dataset is not diploid")
@@ -1915,7 +2002,7 @@ def pedigree_inverse_kinship(
             raise ValueError("The parents dimension must be length 2")
         tau = da.ones_like(parent, int)
         lambda_ = da.zeros_like(parent, float)
-    elif method == "Hamilton-Kerr":
+    elif method == EST_HAMILTON_KERR:
         tau = ds[stat_Hamilton_Kerr_tau].data
         lambda_ = ds[stat_Hamilton_Kerr_lambda].data
     # calculate self_kinship and parent_kinship arrays
@@ -2163,7 +2250,7 @@ def pedigree_sel(
 def pedigree_contribution(
     ds: Dataset,
     *,
-    method: Literal["even", "variable"] = "even",
+    method: Literal[EST_EVEN, EST_VARIABLE] = EST_EVEN,  # type: ignore
     chunks: Hashable = -1,
     parent: Hashable = variables.parent,
     stat_Hamilton_Kerr_tau: Hashable = variables.stat_Hamilton_Kerr_tau,
@@ -2245,7 +2332,7 @@ def pedigree_contribution(
     """
     from .pedigree_numba_fns import contribution_from, contribution_to
 
-    if method not in {"even", "variable"}:
+    if method not in {EST_EVEN, EST_VARIABLE}:
         raise ValueError("Unknown method '{}'".format(method))
     ds = define_variable_if_absent(
         ds,
@@ -2256,7 +2343,7 @@ def pedigree_contribution(
     variables.validate(ds, {parent: variables.parent_spec})
     parent = da.asarray(ds[parent].data, chunks=ds[parent].shape)
     n_sample, n_parent = parent.shape
-    if method == "even":
+    if method == EST_EVEN:
         if bool(ds.sizes.get("ploidy", 2) % 2):
             raise ValueError("The 'even' method requires an even-ploidy dataset")
         if n_parent != 2:

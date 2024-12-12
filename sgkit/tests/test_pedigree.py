@@ -246,7 +246,8 @@ def test_insert_hamilton_kerr_self_kinship__clone():
 )
 @pytest.mark.parametrize("method", ["diploid", "Hamilton-Kerr"])
 @pytest.mark.parametrize("return_relationship", [False, True])
-def test_pedigree_kinship__diploid(method, order, return_relationship):
+@pytest.mark.parametrize("chunks", [None, (5, 5), (3, 8)])
+def test_pedigree_kinship__diploid(method, order, return_relationship, chunks):
     ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=10)
     ds["parent_id"] = ["samples", "parents"], [
         [".", "."],
@@ -267,7 +268,7 @@ def test_pedigree_kinship__diploid(method, order, return_relationship):
     # reorder dataset samples and compute kinship
     ds = ds.sel(dict(samples=order))
     ds = pedigree_kinship(
-        ds, method=method, return_relationship=return_relationship
+        ds, method=method, return_relationship=return_relationship, chunks=chunks
     ).compute()
     actual = ds.stat_pedigree_kinship.values
     # standard diploid relationships
@@ -318,7 +319,8 @@ def test_pedigree_kinship__raise_on_not_diploid():
 
 
 @pytest.mark.parametrize("method", ["diploid", "Hamilton-Kerr"])
-def test_pedigree_kinship__kinship2(method):
+@pytest.mark.parametrize("chunk", [False, True])
+def test_pedigree_kinship__kinship2(method, chunk):
     # Example from R package `kinship2` computed with the code
     #
     #    df = read.csv("kinship2_pedigree.csv")
@@ -340,16 +342,20 @@ def test_pedigree_kinship__kinship2(method):
     expect_kinship = np.loadtxt(path / "test_pedigree/kinship2_kinship.txt")
     # parse dataframe into sgkit dataset
     n_sample = len(ped)
+    if chunk:
+        chunks = (n_sample // 2, n_sample // 3)
+    else:
+        chunks = None
     ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=n_sample)
     dims = ["samples", "parents"]
     ds["sample_id"] = dims[0], ped[["id"]].values.astype(int).ravel()
     ds["parent_id"] = dims, ped[["father", "mother"]].values.astype(int)
     if method == "Hamilton-Kerr":
-        ds["stat_Hamilton_Kerr_tau"] = xr.ones_like(ds["parent_id"], np.int8)
+        ds["stat_Hamilton_Kerr_tau"] = xr.ones_like(ds["parent_id"], np.uint8)
         ds["stat_Hamilton_Kerr_lambda"] = xr.zeros_like(ds["parent_id"], float)
     # compute and compare
     ds = parent_indices(ds, missing=0)  # ped sample names are 1 based
-    ds = pedigree_kinship(ds, method=method).compute()
+    ds = pedigree_kinship(ds, method=method, chunks=chunks).compute()
     np.testing.assert_array_almost_equal(ds.stat_pedigree_kinship, expect_kinship)
 
 
@@ -391,7 +397,11 @@ def load_hamilton_kerr_pedigree():
         [1, 2, 6, 5, 7, 3, 4, 0],
     ],
 )
-def test_pedigree_kinship__Hamilton_Kerr(order):
+@pytest.mark.parametrize(
+    "chunks",
+    [None, (4, 4), (4, 2)],
+)
+def test_pedigree_kinship__Hamilton_Kerr(order, chunks):
     # Example from Hamilton and Kerr 2017. The expected values were
     # calculated with their R package "polyAinv" which only  reports
     # the sparse inverse matrix. This was converted to dense kinship
@@ -418,7 +428,7 @@ def test_pedigree_kinship__Hamilton_Kerr(order):
     # reorder dataset samples and compute kinship
     ds = ds.sel(dict(samples=order))
     ds = parent_indices(ds, missing=0)  # ped sample names are 1 based
-    ds = pedigree_kinship(ds, method="Hamilton-Kerr").compute()
+    ds = pedigree_kinship(ds, method="Hamilton-Kerr", chunks=chunks).compute()
     # compare to reordered polyAinv values
     np.testing.assert_array_almost_equal(
         ds.stat_pedigree_kinship, expect_kinship[order, :][:, order]
@@ -433,7 +443,11 @@ def test_pedigree_kinship__Hamilton_Kerr(order):
         [1, 2, 6, 5, 7, 3, 4, 0],
     ],
 )
-def test_pedigree_kinship__Hamilton_Kerr_relationship(order):
+@pytest.mark.parametrize(
+    "chunks",
+    [None, (4, 4), (4, 2)],
+)
+def test_pedigree_kinship__Hamilton_Kerr_relationship(order, chunks):
     # Example from Hamilton and Kerr 2017. The expected values were
     # calculated with their R package "polyAinv" which only  reports
     # the sparse inverse matrix. This was converted to dense kinship
@@ -461,7 +475,7 @@ def test_pedigree_kinship__Hamilton_Kerr_relationship(order):
     ds = ds.sel(dict(samples=order))
     ds = parent_indices(ds, missing=0)  # ped sample names are 1 based
     ds = pedigree_kinship(
-        ds, method="Hamilton-Kerr", return_relationship=True
+        ds, method="Hamilton-Kerr", return_relationship=True, chunks=chunks
     ).compute()
     # compare to reordered polyAinv values
     np.testing.assert_array_almost_equal(
@@ -628,6 +642,33 @@ def test_pedigree_kinship__raise_on_half_founder(method, initial_kinship, parent
         kwargs = dict()
     with pytest.raises(ValueError, match="Pedigree contains half-founders"):
         pedigree_kinship(ds, method=method, **kwargs).compute()
+
+
+@pytest.mark.parametrize("method", ["diploid", "Hamilton-Kerr"])
+def test_pedigree_kinship__raise_on_chunked_founder_kinship(method):
+    ds = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=5)
+    ds["parent_id"] = ["samples", "parents"], [
+        [".", "."],
+        [".", "."],
+        ["S0", "S1"],
+        ["S1", "S2"],
+        ["S2", "S3"],
+    ]
+    ds["founder_kinship"] = ["founders_1", "founders_2"], [[0.5, 0.0], [0.0, 0.5]]
+    ds["founder_indices"] = ["founders"], [0, 1]
+    if method == "Hamilton-Kerr":
+        ds["stat_Hamilton_Kerr_tau"] = xr.ones_like(ds["parent_id"], dtype=np.uint8)
+        ds["stat_Hamilton_Kerr_lambda"] = xr.zeros_like(ds["parent_id"], dtype=float)
+    with pytest.raises(
+        NotImplementedError, match="Chunking is not implemented for founder kinship"
+    ):
+        pedigree_kinship(
+            ds,
+            method=method,
+            founder_kinship="founder_kinship",
+            founder_indices="founder_indices",
+            chunks=(2, 2),
+        )
 
 
 @pytest.mark.parametrize("use_founder_kinship", [False, True])
