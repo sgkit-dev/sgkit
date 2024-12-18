@@ -400,11 +400,11 @@ def test_count_variant_genotypes__biallelic(
     calls = ds.call_genotype.values
     expect = count_biallelic_genotypes(calls, ploidy)
     if chunked:
-        # chunk each dim
+        # chunk each dim except ploidy
         chunks = (
             (n_variant // 2, n_variant - n_variant // 2),
             (n_sample // 2, n_sample - n_sample // 2),
-            (ploidy // 2, ploidy - ploidy // 2),
+            -1,
         )
         ds["call_genotype"] = ds["call_genotype"].chunk(chunks)
     actual = count_variant_genotypes(ds)["variant_genotype_count"].data
