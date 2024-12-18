@@ -30,4 +30,4 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest -v sgkit/tests/test_{aggregation,association,hwe,pca}.py -k 'test_count_call_alleles or test_gwas_linear_regression or test_hwep or test_sample_stats or (test_count_variant_alleles and not test_count_variant_alleles__chunked[call_genotype]) or (test_variant_stats and not test_variant_stats__chunks[chunks2-False]) or (test_pca__array_backend and tsqr)' --use-cubed
+        pytest -v sgkit/tests/test_{aggregation,association,hwe,pca}.py -k 'test_count_call_alleles or test_gwas_linear_regression or test_hwep or test_popgen or test_sample_stats or (test_count_variant_alleles and not test_count_variant_alleles__chunked[call_genotype]) or (test_variant_stats and not test_variant_stats__chunks[chunks2-False]) or (test_pca__array_backend and tsqr) or test_window' --use-cubed
