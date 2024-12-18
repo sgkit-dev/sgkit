@@ -1,12 +1,12 @@
 import re
 
 import allel
-import dask.array as da
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
 
+import sgkit.distarray as da
 from sgkit import (
     simulate_genotype_call_dataset,
     window_by_interval,

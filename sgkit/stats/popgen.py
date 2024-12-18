@@ -2,10 +2,10 @@ import collections
 import itertools
 from typing import Hashable, Optional, Sequence, Tuple, Union
 
-import dask.array as da
 import numpy as np
 from xarray import Dataset
 
+import sgkit.distarray as da
 from sgkit.cohorts import _cohorts_to_array
 from sgkit.stats.utils import assert_array_shape
 from sgkit.utils import (

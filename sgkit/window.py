@@ -1,9 +1,9 @@
 from typing import Any, Callable, Hashable, Iterable, Optional, Tuple, Union
 
-import dask.array as da
 import numpy as np
 from xarray import Dataset
 
+import sgkit.distarray as da
 from sgkit import variables
 from sgkit.model import get_contigs, num_contigs
 from sgkit.utils import conditional_merge_datasets, create_dataset
