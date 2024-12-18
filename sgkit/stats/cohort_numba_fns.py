@@ -1,9 +1,9 @@
 from functools import wraps
 from typing import Callable
 
-import dask.array as da
 import numpy as np
 
+import sgkit.distarray as da
 from sgkit.accelerate import numba_guvectorize
 
 from ..typing import ArrayLike
