@@ -27,12 +27,6 @@ jobs:
         pip install -U 'numpy<2.1' -U git+https://github.com/sgkit-dev/bio2zarr.git
     # - name: Run pre-commit
     #   uses: pre-commit/action@v2.0.0
-    - name: Test with pytest (numba jit disabled)
-      env:
-        NUMBA_DISABLE_JIT: 1
-      run: |
-        # avoid guvectorized functions #1194
-        pytest -v sgkit/tests/test_pedigree.py
     - name: Test with pytest and coverage
       run: |
         pytest -v --cov=sgkit --cov-report=term-missing
