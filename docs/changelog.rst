@@ -13,6 +13,8 @@ New Features
 
 - Add 'matching' method to :func:`identity_by_state` function.
   (:user:`timothymillar`, :pr:`1229`, :issue:`1227`)
+- Add 'chunks' option to :func:`pedigree_kinship` function.
+  (:user:`timothymillar`, :pr:`1282`, :issue:`1280`)
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
