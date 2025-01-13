@@ -17,8 +17,8 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
+  <!--
+    this give us a css class that will be invisible only if js is disabled
   -->
   <noscript>
     <style>
@@ -28,8 +28,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/typehints.css" />
@@ -38,20 +38,21 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
   
   <!-- So that users can add custom icons -->
-  <script src="_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/sphinx_highlight.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'getting_started';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://sgkit-dev.github.io/sgkit/latest/_static/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
-        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
         </script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
     <script defer="defer" src="_static/docsearch.sbt.js"></script>
@@ -179,7 +180,9 @@
 </li>
 
             <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
@@ -454,9 +457,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -550,7 +558,7 @@ This is a guideline however, and a <code class="docutils literal notranslate"><s
 <a class="reference internal image-reference" href="_images/data-structures-xarray.jpg"><img alt="_images/data-structures-xarray.jpg" class="align-center" src="_images/data-structures-xarray.jpg" style="width: 600px;" /></a>
 <p>The worked examples below show how to access and visualize data like this using Xarray. They also demonstrate
 several of the sgkit conventions in place for representing common genetic quantities.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
 
 <span class="gp">In [2]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">n_contig</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
 
@@ -579,7 +587,7 @@ for a sample at a given genome coordinate and chromosome. Every sgkit variable h
 information on this specific variable and any others, see <a class="reference internal" href="user_guide.html#genetic-variables"><span class="std std-ref">Genetic variables</span></a>.</p>
 <p>Data subsets can be accessed as shown here, using the features described in
 <a class="reference external" href="http://xarray.pydata.org/en/stable/indexing.html">Indexing and Selecting Xarray Data</a>:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
 
 <span class="gp">In [5]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">n_contig</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
 
@@ -677,7 +685,7 @@ information on this specific variable and any others, see <a class="reference in
 </div>
 <p>Larger subsets of data can be visualized and/or summarized through various
 sgkit utilities as well as the Pandas/Xarray integration:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [14]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [14]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
 
 <span class="gp">In [15]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
 
@@ -760,7 +768,7 @@ sgkit utilities as well as the Pandas/Xarray integration:</p>
 available methods, see <a class="reference internal" href="api.html#api-methods"><span class="std std-ref">Methods</span></a>.</p>
 <p>In this example, the <code class="docutils literal notranslate"><span class="pre">variant_stats</span></code> method is applied to a dataset to compute a number of statistics
 across samples for each individual variant:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [23]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [23]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
 
 <span class="gp">In [24]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
 
@@ -792,7 +800,7 @@ dataset or they are returned in a separate dataset.  See <a class="reference int
 most sgkit functions and where this isn’t possible, limitations related to it are documented
 along with potential workarounds.</p>
 <p>This example demonstrates one such function where missing calls are ignored:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [26]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [26]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
 
 <span class="gp">In [27]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_ploidy</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.3</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
@@ -828,9 +836,9 @@ about compiling their own functions (see <a class="reference internal" href="use
 Using Xarray functions and the boolean mask is generally enough to accomplish most tasks, and this
 mask is often more efficient to operate on due to its high on-disk compression ratio.  This example
 shows how it can be used in the context of doing something simple like counting heterozygous calls:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [30]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [30]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
 
-<span class="gp">In [31]: </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="gp">In [31]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="gp">In [32]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_ploidy</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -904,9 +912,9 @@ by genomic position (base pairs). See the API documentation for usage and exampl
 genome, which can be used to compute whole-genome statistics.</p>
 <p>This example shows the effect of computing the diversity statistic: first with no windows defined,
 then with windows.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [40]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [40]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
 
-<span class="gp">In [41]: </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="gp">In [41]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="gp">In [42]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 
@@ -945,9 +953,9 @@ based on these groups. Groups of samples are referred to as <em>cohorts</em> in 
 a <code class="docutils literal notranslate"><span class="pre">sample_cohort</span></code> variable to group a dataset of ten samples into three cohorts. Note that first
 value is <code class="docutils literal notranslate"><span class="pre">-1</span></code>, which means the corresponding sample is not in any of the three cohorts, and
 will be ignored when computing cohort statistics.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [47]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [47]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
 
-<span class="gp">In [48]: </span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="gp">In [48]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="gp">In [49]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 
@@ -984,7 +992,7 @@ explicitly specify the cohorts when calling the function.</p>
 data tools that improves code readability and reduces the probability of introducing accidental namespace collisions.
 Sgkit functions are compatible with this idiom by default and this example shows to use it in conjunction with
 Xarray and Pandas operations in a single pipeline:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [56]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [56]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
 
 <span class="gp">In [57]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
 
@@ -1070,7 +1078,7 @@ until one of the following occurs:</p>
 <li><p>Individual dask arrays are retrieved through the <code class="docutils literal notranslate"><span class="pre">DataArray.data</span></code> attribute and forced to evaluate via <a class="reference external" href="https://distributed.dask.org/en/latest/api.html#distributed.Client.compute">Client.compute</a>, <a class="reference external" href="https://tutorial.dask.org/03_array.html#Example">dask.array.Array.compute</a> or by coercing them to another array type (e.g. using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html">np.asarray</a>)</p></li>
 </ul>
 <p>This example shows a few of these features:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [62]: </span><span class="kn">import</span> <span class="nn">sgkit</span> <span class="k">as</span> <span class="nn">sg</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [62]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
 
 <span class="gp">In [63]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
 
@@ -1196,13 +1204,13 @@ for more examples and information, as well as the Dask tutorials on
   </nav></div>
 
   <div class="sidebar-secondary-item">
-
-  <div class="tocsection sourcelink">
-    <a href="_sources/getting_started.rst.txt">
-      <i class="fa-solid fa-file-lines"></i> Show Source
-    </a>
-  </div>
-</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/getting_started.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
 
 </div></div>
               
@@ -1217,8 +1225,8 @@ for more examples and information, as well as the Dask tutorials on
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1251,7 +1259,8 @@ for more examples and information, as well as the Dask tutorials on
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>
