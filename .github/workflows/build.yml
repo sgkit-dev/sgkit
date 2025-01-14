@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        zarr: ["==3.0.0b1"]
+        zarr: [">=3"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
