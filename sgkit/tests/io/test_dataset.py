@@ -58,7 +58,7 @@ def test_save_unequal_chunks_error():
     # Normal zarr errors shouldn't be caught
     with pytest.raises(
         (FileExistsError, ValueError),
-        match="(path '' contains an array|Store already exists)",
+        match="(path '' contains an array|is not empty)",
     ):
         save_dataset(ds, {".zarray": ""})
 
