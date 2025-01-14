@@ -1369,6 +1369,29 @@
             "filters": []
         },
         {
+            "name": "variant_length",
+            "dtype": "i1",
+            "shape": [
+                10879
+            ],
+            "chunks": [
+                10000
+            ],
+            "dimensions": [
+                "variants"
+            ],
+            "description": "The length of the variant measured in bases",
+            "vcf_field": "rlen",
+            "compressor": {
+                "id": "blosc",
+                "cname": "zstd",
+                "clevel": 7,
+                "shuffle": 0,
+                "blocksize": 0
+            },
+            "filters": []
+        },
+        {
             "name": "call_AD",
             "dtype": "i1",
             "shape": [
