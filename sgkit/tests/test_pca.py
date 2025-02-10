@@ -36,7 +36,7 @@ def simulate_dataset(
     n_variant: int = 100,
     n_sample: int = 50,
     n_cohort: Optional[int] = None,
-    chunks: Any = (None, None),
+    chunks: Any = (-1, -1),
 ) -> Dataset:
     """Simulate dataset with optional population structure"""
     ds = simulate_genotype_call_dataset(n_variant, n_sample, seed=0)
@@ -48,6 +48,7 @@ def simulate_dataset(
             ac, dims=("variants", "samples")
         )
     else:
+        ds["call_genotype_mask"] = ds["call_genotype_mask"].chunk(chunks + (1,))
         ds = count_call_alternate_alleles(ds)
     ds["call_alternate_allele_count"] = ds["call_alternate_allele_count"].chunk(chunks)
     return ds
