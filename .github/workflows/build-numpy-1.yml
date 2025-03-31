@@ -1,4 +1,4 @@
-name: Build NumPy 2
+name: Build NumPy 1
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11"]
 
     steps:
     - uses: actions/checkout@v2
@@ -22,9 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements-numpy2.txt -r requirements-numpy2-dev.txt
-        # update bio2zarr for NumPy 2, see https://github.com/sgkit-dev/bio2zarr/issues/256
-        pip install -U 'numpy<2.1' -U git+https://github.com/sgkit-dev/bio2zarr.git
+        pip install -r requirements-numpy1.txt -r requirements-numpy1-dev.txt
     # - name: Run pre-commit
     #   uses: pre-commit/action@v2.0.0
     - name: Test with pytest and coverage
