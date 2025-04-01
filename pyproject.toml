@@ -1,0 +1,213 @@
+[build-system]
+requires = ["setuptools >= 41.2", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sgkit"
+authors = [{ name = "sgkit Developers", email = "project@sgkit.dev" }]
+license = { text = "Apache" }
+description = "Statistical genetics toolkit"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering",
+]
+urls = { Homepage = "https://github.com/sgkit-dev/sgkit" }
+requires-python = ">=3.10"
+dependencies = [
+  "numpy < 2.2",
+  "xarray < 2025.03.1",
+  "dask[array,dataframe] >= 2022.01.0, <= 2024.8.0",
+  "distributed >= 2022.01.0, <= 2024.8.0",
+  "scipy",
+  "zarr >= 2.10.0, != 2.11.0, != 2.11.1, != 2.11.2, < 3",
+  "numba",
+  "typing-extensions",
+  "fsspec != 2021.6.*",
+  "scikit-learn",
+  "pandas",
+  "setuptools >= 41.2",                                   # For pkg_resources
+]
+dynamic = ["version"]
+
+[project.readme]
+text = """
+**sgkit** is an open source project for analyzing and manipulating genetic
+variation data."""
+content-type = "text/x-rst"
+
+[project.optional-dependencies]
+# For plink we need dask[dataframe], we already have
+# dask[array] in install_requires, and since
+# https://github.com/pypa/pip/issues/4957, pip
+# will essentially ignore dask[dataframe] in the extras.
+# We can workaround this by either adding pip flag
+# --use-feature 2020-resolver, or installing
+# dask[dataframe] in the install_requires, or just listing
+# the 2 missing dependencies from dataframe, the way we do
+# here, when pip finally gets a resolver, this won't be
+# a problem. Here we opt for listing the 2 dependencies
+# since this is the least user invasive solution.
+plink = ["partd", "bed-reader"]
+bgen = ["rechunker", "cbgen > 1.0.5"]
+
+[tool.setuptools]
+packages = ["sgkit"]
+zip-safe = false            # https://mypy.readthedocs.io/en/latest/installed_packages.html
+include-package-data = true
+
+[tool.coverage.report]
+fail_under = 100
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules --ignore=validation --cov-fail-under=100"
+norecursedirs = [".eggs", "build", "docs"]
+filterwarnings = ["error", "ignore::DeprecationWarning"]
+
+
+[tool.isort]
+profile = "black"
+default_section = "THIRDPARTY"
+known_first_party = ["sgkit"]
+known_third_party = [
+  "allel",
+  "dask",
+  "fire",
+  "glow",
+  "hail",
+  "hypothesis",
+  "invoke",
+  "msprime",
+  "numba",
+  "numpy",
+  "pandas",
+  "pkg_resources",
+  "pyspark",
+  "pytest",
+  "setuptools",
+  "sgkit_plink",
+  "sklearn",
+  "sphinx",
+  "typing_extensions",
+  "xarray",
+  "yaml",
+  "zarr",
+]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 88
+
+[[tool.mypy.overrides]]
+module = ["callee.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["dask.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["fsspec.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["dask_ml.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["numpy.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["pandas.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["numba.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["pytest.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["statsmodels.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["hypothesis.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["zarr.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["numcodecs.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["setuptools"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["sklearn.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["cbgen.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["rechunker.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["bed_reader.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["sphinx.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["yarl.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["allel.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["networkx.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["toolz.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["scipy.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["sgkit.*"]
+allow_redefinition = true
+
+[[tool.mypy.overrides]]
+module = ["sgkit.*.tests.*"]
+disallow_untyped_calls = false
+disallow_untyped_defs = false
+disallow_untyped_decorators = false
+
+[[tool.mypy.overrides]]
+module = ["validation.*"]
+ignore_errors = true
