@@ -94,6 +94,11 @@ You can install the necessary requirements using pip::
   pip install -r requirements.txt -r requirements-dev.txt -r requirements-doc.txt
 
 
+Then install the `sgkit` in [editable mode](https://pip.pypa.io/en/stable/cli/pip_install/#editable-installs)
+
+  pip install -e .
+
+
 If you have a Nvidia GPU you will need to make sure that it is configured properly,
 as in you have cudatoolkit installed, the instructions for the same can be found on
 `nvidia docs. <https://developer.nvidia.com/cuda-toolkit>`_
