@@ -29,8 +29,11 @@ Breaking changes
 .. Deprecations
 .. ~~~~~~~~~~~~
 
-.. Improvements
-.. ~~~~~~~~~~~~
+Improvements
+~~~~~~~~~~~~
+
+- Add support for NumPy 2.
+  (:user:`tomwhite`, :pr:`1297`)
 
 .. Bug fixes
 .. ~~~~~~~~~
