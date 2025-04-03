@@ -137,7 +137,7 @@ def hardy_weinberg_test(
     genotype_count: Optional[Hashable] = variables.variant_genotype_count,
     ploidy: Optional[int] = None,
     alleles: Optional[int] = None,
-    merge: bool = True
+    merge: bool = True,
 ) -> Dataset:
     """Exact test for HWE as described in Wigginton et al. 2005 [1].
 
