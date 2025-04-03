@@ -39,7 +39,7 @@ def pc_relate(
     call_genotype: Hashable = variables.call_genotype,
     call_genotype_mask: Hashable = variables.call_genotype_mask,
     sample_pc: Hashable = variables.sample_pca_projection,
-    merge: bool = True
+    merge: bool = True,
 ) -> xr.Dataset:
     """Compute PC-Relate as described in Conomos, et al. 2016 [1].
 
