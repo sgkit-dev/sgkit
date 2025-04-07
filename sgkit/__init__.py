@@ -1,5 +1,3 @@
-from importlib.metadata import PackageNotFoundError, version  # type: ignore[import]
-
 from .display import display_genotypes, display_pedigree
 from .distance.api import pairwise_distance
 from .io.dataset import load_dataset, save_dataset
@@ -67,10 +65,13 @@ from .window import (
     window_by_variant,
 )
 
+__version__ = "unknown"
 try:
-    __version__ = version(__name__)
-except PackageNotFoundError:  # pragma: no cover
-    __version__ = "unknown"
+    from . import _version
+
+    __version__ = _version.version  # pragma: nocover
+except ImportError:  # pragma: nocover
+    pass
 
 __all__ = [
     "DIM_ALLELE",
