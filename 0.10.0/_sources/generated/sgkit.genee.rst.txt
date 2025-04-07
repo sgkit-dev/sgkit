@@ -1,0 +1,6 @@
+﻿sgkit.genee
+===========
+
+.. currentmodule:: sgkit
+
+.. autofunction:: genee

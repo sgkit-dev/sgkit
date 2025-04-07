@@ -1,0 +1,6 @@
+﻿sgkit.simulate\_genedrop
+========================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: simulate_genedrop

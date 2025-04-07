@@ -1,0 +1,6 @@
+﻿sgkit.variables.call\_genotype\_complete\_mask\_spec
+====================================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: call_genotype_complete_mask_spec

@@ -1,0 +1,6 @@
+﻿sgkit.invert\_relationship\_matrix
+==================================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: invert_relationship_matrix

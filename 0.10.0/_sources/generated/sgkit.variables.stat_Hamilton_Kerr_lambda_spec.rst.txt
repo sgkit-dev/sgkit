@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_Hamilton\_Kerr\_lambda\_spec
+==================================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_Hamilton_Kerr_lambda_spec

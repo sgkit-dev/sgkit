@@ -1,0 +1,6 @@
+﻿sgkit.variables.interval\_start\_spec
+=====================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: interval_start_spec

@@ -1,0 +1,6 @@
+﻿sgkit.individual\_heterozygosity
+================================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: individual_heterozygosity

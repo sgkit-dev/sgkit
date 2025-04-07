@@ -1,0 +1,6 @@
+﻿sgkit.hybrid\_relationship
+==========================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: hybrid_relationship

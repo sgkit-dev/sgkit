@@ -1,0 +1,6 @@
+﻿sgkit.variables.parent\_id\_spec
+================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: parent_id_spec

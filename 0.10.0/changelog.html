@@ -1,0 +1,948 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Changelog &#8212; sgkit  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/typehints.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/docsearch.sbt.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'changelog';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://sgkit-dev.github.io/sgkit/latest/_static/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script defer="defer" src="_static/docsearch.sbt.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="News" href="news.html" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="latest" />   
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/sgkit_trnsprnt.png" class="logo__image only-light" alt="sgkit  documentation - Home"/>
+    <img src="_static/sgkit_blue_trnsprnt.png" class="logo__image only-dark pst-js-only" alt="sgkit  documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="getting_started.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="how_do_i.html">
+    How do I …
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="contributing.html">
+    Contributing to sgkit
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="about.html">
+    About
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="news.html">
+    News
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="#">
+    Changelog
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/sgkit-dev/sgkit" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="getting_started.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="how_do_i.html">
+    How do I …
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing to sgkit
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="news.html">
+    News
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Changelog
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/sgkit-dev/sgkit" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Changelog</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                   <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">#</a></h1>
+<section id="april-2025">
+<span id="changelog-0-10-0"></span><h2>0.10.0 (7 April 2025)<a class="headerlink" href="#april-2025" title="Permalink to this heading">#</a></h2>
+<section id="new-features">
+<h3>New Features<a class="headerlink" href="#new-features" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Add ‘matching’ method to <a class="reference internal" href="generated/sgkit.identity_by_state.html#sgkit.identity_by_state" title="sgkit.identity_by_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">identity_by_state()</span></code></a> function.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1229">PR 1229</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1227">GH 1227</a>)</p></li>
+<li><p>Add ‘chunks’ option to <a class="reference internal" href="generated/sgkit.pedigree_kinship.html#sgkit.pedigree_kinship" title="sgkit.pedigree_kinship"><code class="xref py py-func docutils literal notranslate"><span class="pre">pedigree_kinship()</span></code></a> function.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1282">PR 1282</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1280">GH 1280</a>)</p></li>
+</ul>
+</section>
+<section id="breaking-changes">
+<h3>Breaking changes<a class="headerlink" href="#breaking-changes" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Functions for reading and writing VCF were removed from sgkit, please use the <a class="reference external" href="https://github.com/sgkit-dev/bio2zarr">bio2zarr</a>
+and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">vcztools</a> packages instead.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1264">PR 1264</a>)</p></li>
+<li><p>Drop support for Python 3.9.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1276">PR 1276</a>)</p></li>
+</ul>
+</section>
+<section id="improvements">
+<h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Add support for NumPy 2.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1297">PR 1297</a>)</p></li>
+<li><p>Run tests against Zarr Python 3.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1285">PR 1285</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1226">GH 1226</a>)</p></li>
+<li><p>Switch to pyproject.toml.
+(<a class="reference external" href="https://github.com/ianhi">ianhi</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1300">PR 1300</a>)</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h3>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Update GWAS tutorial to use <code class="docutils literal notranslate"><span class="pre">vcf2zarr</span></code>.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1258">PR 1258</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1257">GH 1257</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="june-2024">
+<span id="changelog-0-9-0"></span><h2>0.9.0 (24 June 2024)<a class="headerlink" href="#june-2024" title="Permalink to this heading">#</a></h2>
+<section id="deprecations">
+<h3>Deprecations<a class="headerlink" href="#deprecations" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Deprecate functions for reading VCF, in favour of <a class="reference external" href="https://github.com/sgkit-dev/bio2zarr">bio2zarr</a>.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1233">PR 1233</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1232">GH 1232</a>)</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Improvements<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Pin to Zarr &lt; 3.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1230">PR 1230</a>)</p></li>
+<li><p>Pin numpy and cbgen to numpy &lt; 2.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1228">PR 1228</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1225">GH 1225</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="may-2024">
+<span id="changelog-0-8-0"></span><h2>0.8.0 (1 May 2024)<a class="headerlink" href="#may-2024" title="Permalink to this heading">#</a></h2>
+<section id="id3">
+<h3>New Features<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Add <a class="reference internal" href="generated/sgkit.pedigree_contribution.html#sgkit.pedigree_contribution" title="sgkit.pedigree_contribution"><code class="xref py py-func docutils literal notranslate"><span class="pre">pedigree_contribution()</span></code></a> function.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1093">PR 1093</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/963">GH 963</a>)</p></li>
+<li><p>Add <a class="reference internal" href="generated/sgkit.pedigree_sel.html#sgkit.pedigree_sel" title="sgkit.pedigree_sel"><code class="xref py py-func docutils literal notranslate"><span class="pre">pedigree_sel()</span></code></a> function.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1087">PR 1087</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1033">GH 1033</a>)</p></li>
+<li><p>Add ‘Endelman-Jannink’ estimator to <a class="reference internal" href="generated/sgkit.genomic_relationship.html#sgkit.genomic_relationship" title="sgkit.genomic_relationship"><code class="xref py py-func docutils literal notranslate"><span class="pre">genomic_relationship()</span></code></a> function.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1100">PR 1100</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1062">GH 1062</a>)</p></li>
+<li><p>Add <a class="reference internal" href="generated/sgkit.display_pedigree.html#sgkit.display_pedigree" title="sgkit.display_pedigree"><code class="xref py py-func docutils literal notranslate"><span class="pre">display_pedigree()</span></code></a> function.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1104">PR 1104</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1097">GH 1097</a>)</p></li>
+<li><p>Add option to count variant alleles directly from call genotypes in function <a class="reference internal" href="generated/sgkit.count_variant_alleles.html#sgkit.count_variant_alleles" title="sgkit.count_variant_alleles"><code class="xref py py-func docutils literal notranslate"><span class="pre">count_variant_alleles()</span></code></a>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1119">PR 1119</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1116">GH 1116</a>)</p></li>
+<li><p>Add <a class="reference internal" href="generated/sgkit.simulate_genedrop.html#sgkit.simulate_genedrop" title="sgkit.simulate_genedrop"><code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_genedrop()</span></code></a> function.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1139">PR 1139</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1107">GH 1107</a>)</p></li>
+</ul>
+</section>
+<section id="id4">
+<h3>Improvements<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Improve performance of <a class="reference internal" href="generated/sgkit.variant_stats.html#sgkit.variant_stats" title="sgkit.variant_stats"><code class="xref py py-func docutils literal notranslate"><span class="pre">variant_stats()</span></code></a> and <a class="reference internal" href="generated/sgkit.sample_stats.html#sgkit.sample_stats" title="sgkit.sample_stats"><code class="xref py py-func docutils literal notranslate"><span class="pre">sample_stats()</span></code></a> functions.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1119">PR 1119</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1116">GH 1116</a>)</p></li>
+</ul>
+</section>
+<section id="bug-fixes">
+<h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Fix error in missing data handling for VCF. Missing values for most
+fields were marked as the corresponding “fill” value. For example, missing
+string values were stored as the empty string (string fill value) rather
+than “.” (string missing value). Similarly for integer fields, missing
+values were stored as -2 (int fill) rather than -1 (int missing).
+(<a class="reference external" href="https://github.com/jeromekelleher">jeromekelleher</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1190">PR 1190</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1192">GH 1192</a>)</p></li>
+<li><p>Change <cite>max_str_len</cite> utility function to return a Python int rather than
+an array scalar.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1086">PR 1086</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1085">GH 1085</a>)</p></li>
+<li><p>Turn off numba cache by default.
+(<a class="reference external" href="https://github.com/jeromekelleher">jeromekelleher</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1191">PR 1191</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1156">GH 1156</a>)</p></li>
+<li><p>Fix xarray repr in doctests.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1205">PR 1205</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1204">GH 1204</a>)</p></li>
+<li><p>Avoid disabling jit on guvectorised functions.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1199">PR 1199</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1194">GH 1194</a>)</p></li>
+</ul>
+</section>
+<section id="id5">
+<h3>Documentation<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Add tutorial on relationship matrices.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1072">PR 1072</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/956">GH 956</a>)</p></li>
+<li><p>Add pairwise_distance to docs.
+(<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1145">PR 1145</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1142">GH 1142</a>)</p></li>
+<li><p>Format matrix in pairwise docs.
+(<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1148">PR 1148</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1147">GH 1147</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="may-2023">
+<span id="changelog-0-7-0"></span><h2>0.7.0 (2 May 2023)<a class="headerlink" href="#may-2023" title="Permalink to this heading">#</a></h2>
+<section id="id6">
+<h3>New Features<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Add <a class="reference internal" href="generated/sgkit.io.plink.write_plink.html#sgkit.io.plink.write_plink" title="sgkit.io.plink.write_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.write_plink()</span></code></a> function.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1003">PR 1003</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/926">GH 926</a>)</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">phased</span></code> option to <a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset" title="sgkit.simulate_genotype_call_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_genotype_call_dataset()</span></code></a> function.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1022">PR 1022</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/973">GH 973</a>)</p></li>
+<li><p>Add <a class="reference internal" href="generated/sgkit.io.plink.plink_to_zarr.html#sgkit.io.plink.plink_to_zarr" title="sgkit.io.plink.plink_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.plink_to_zarr()</span></code></a> and
+<a class="reference internal" href="generated/sgkit.io.plink.zarr_to_plink.html#sgkit.io.plink.zarr_to_plink" title="sgkit.io.plink.zarr_to_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.zarr_to_plink()</span></code></a> convenience functions
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1047">PR 1047</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1004">GH 1004</a>)</p></li>
+<li><p>Add <a class="reference internal" href="generated/sgkit.convert_call_to_index.html#sgkit.convert_call_to_index" title="sgkit.convert_call_to_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.convert_call_to_index()</span></code></a> method.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1050">PR 1050</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1048">GH 1048</a>)</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">read_chunk_length</span></code> option to <code class="docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr</span></code> and
+<code class="docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarrs</span></code> functions. These are useful to reduce memory usage
+with large sample counts or a large <code class="docutils literal notranslate"><span class="pre">chunk_length</span></code>.
+(<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1044">PR 1044</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1042">GH 1042</a>)</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">retain_temp_files</span></code> to <code class="docutils literal notranslate"><span class="pre">sgkit.io.vcf.vcf_to_zarr</span></code> function.
+(<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1046">PR 1046</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1036">GH 1036</a>)</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">sgkit.io.vcf.read_vcf</span></code> convenience function.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1052">PR 1052</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1004">GH 1004</a>)</p></li>
+<li><p>Add <a class="reference internal" href="generated/sgkit.hybrid_relationship.html#sgkit.hybrid_relationship" title="sgkit.hybrid_relationship"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.hybrid_relationship()</span></code></a>, <a class="reference internal" href="generated/sgkit.hybrid_inverse_relationship.html#sgkit.hybrid_inverse_relationship" title="sgkit.hybrid_inverse_relationship"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.hybrid_inverse_relationship()</span></code></a>
+and <a class="reference internal" href="generated/sgkit.invert_relationship_matrix.html#sgkit.invert_relationship_matrix" title="sgkit.invert_relationship_matrix"><code class="xref py py-func docutils literal notranslate"><span class="pre">invert_relationship_matrix()</span></code></a> methods.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1053">PR 1053</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/993">GH 993</a>)</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">sgkit.io.vcf.zarr_array_sizes</span></code> for determining array sizes for storage in Zarr.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1073">PR 1073</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/734">GH 734</a>)</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">skipna</span></code> option to <a class="reference internal" href="generated/sgkit.genomic_relationship.html#sgkit.genomic_relationship" title="sgkit.genomic_relationship"><code class="xref py py-func docutils literal notranslate"><span class="pre">genomic_relationship()</span></code></a> function.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1078">PR 1078</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1076">GH 1076</a>)</p></li>
+<li><p>Add <cite>additional_variant_fields</cite> to <a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset" title="sgkit.simulate_genotype_call_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.simulate_genotype_call_dataset()</span></code></a> function.
+(<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1056">PR 1056</a>)</p></li>
+</ul>
+</section>
+<section id="id7">
+<h3>Breaking changes<a class="headerlink" href="#id7" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Generate VCF header by default when writing VCF using <code class="docutils literal notranslate"><span class="pre">sgkit.io.vcf.write_vcf</span></code> or <code class="docutils literal notranslate"><span class="pre">sgkit.io.vcf.zarr_to_vcf</span></code>.
+Previously, the dataset had to contain a <code class="docutils literal notranslate"><span class="pre">vcf_header</span></code> attribute.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1021">PR 1021</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1020">GH 1020</a>)</p></li>
+</ul>
+</section>
+<section id="id8">
+<h3>Deprecations<a class="headerlink" href="#id8" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Store contig names in a <code class="docutils literal notranslate"><span class="pre">contig_id</span></code> array, and filters in a <code class="docutils literal notranslate"><span class="pre">filter_id</span></code> array.
+This change duplicates the information stored in dataset attributes, which should
+now be considered deprecated, and will be removed in a future release.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1054">PR 1054</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1035">GH 1035</a>)</p></li>
+<li><p>Parameter <code class="docutils literal notranslate"><span class="pre">founder_indices</span></code> in <a class="reference internal" href="generated/sgkit.pedigree_kinship.html#sgkit.pedigree_kinship" title="sgkit.pedigree_kinship"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.pedigree_kinship()</span></code></a> is now considered
+deprecated, and will be removed in a future release. Instead, the <code class="docutils literal notranslate"><span class="pre">founder_kinship</span></code>
+parameter now expects a full sized kinship matrix in which non-founder values are
+ignored.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1075">PR 1075</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1061">GH 1061</a>)</p></li>
+</ul>
+</section>
+<section id="id9">
+<h3>Improvements<a class="headerlink" href="#id9" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Improve performance scaling of method <a class="reference internal" href="generated/sgkit.identity_by_state.html#sgkit.identity_by_state" title="sgkit.identity_by_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.identity_by_state()</span></code></a>
+with number of samples.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1028">PR 1028</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1026">GH 1026</a>)</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">skipna</span></code> option to method <a class="reference internal" href="generated/sgkit.identity_by_state.html#sgkit.identity_by_state" title="sgkit.identity_by_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.identity_by_state()</span></code></a>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1028">PR 1028</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1027">GH 1027</a>)</p></li>
+<li><p>Importing <code class="docutils literal notranslate"><span class="pre">sgkit</span></code> is now much faster due to deferred numba compilation.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1039">PR 1039</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/939">GH 939</a>)</p></li>
+</ul>
+</section>
+<section id="id10">
+<h3>Bug fixes<a class="headerlink" href="#id10" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">vcf_to_zarrs</span></code> was outputting zarr files with <code class="docutils literal notranslate"><span class="pre">temp_chunk_length</span></code> sized chunks. This has now been fixed
+so that the chunks are <code class="docutils literal notranslate"><span class="pre">chunk_length</span></code> sized.
+(<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1044">PR 1044</a>,)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vcf_to_zarrs</span></code> failed with <code class="docutils literal notranslate"><span class="pre">ZeroDivisionError</span></code> when VCFs with no samples were converted.
+(<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1069">PR 1069</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/1068">GH 1068</a>)</p></li>
+<li><p>Correct formatting of mixed-ploidy data in <a class="reference internal" href="generated/sgkit.display_genotypes.html#sgkit.display_genotypes" title="sgkit.display_genotypes"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.display_genotypes()</span></code></a>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1030">PR 1030</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/571">GH 571</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="february-2023">
+<span id="changelog-0-6-0"></span><h2>0.6.0 (1 February 2023)<a class="headerlink" href="#february-2023" title="Permalink to this heading">#</a></h2>
+<section id="id11">
+<h3>New Features<a class="headerlink" href="#id11" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Add support for Python 3.10.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/813">PR 813</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/801">GH 801</a>)</p></li>
+<li><p>Add pedigree support. This allows parent-child relationships to be
+stored in sgkit, and provides a number of new pedigree methods:
+<a class="reference internal" href="generated/sgkit.pedigree_inbreeding.html#sgkit.pedigree_inbreeding" title="sgkit.pedigree_inbreeding"><code class="xref py py-func docutils literal notranslate"><span class="pre">pedigree_inbreeding()</span></code></a>, <a class="reference internal" href="generated/sgkit.pedigree_inverse_kinship.html#sgkit.pedigree_inverse_kinship" title="sgkit.pedigree_inverse_kinship"><code class="xref py py-func docutils literal notranslate"><span class="pre">pedigree_inverse_kinship()</span></code></a>,
+and <a class="reference internal" href="generated/sgkit.pedigree_kinship.html#sgkit.pedigree_kinship" title="sgkit.pedigree_kinship"><code class="xref py py-func docutils literal notranslate"><span class="pre">pedigree_kinship()</span></code></a>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/786">GH 786</a>)</p></li>
+<li><p>Implement a function to calculate the VanRaden genomic relationship matrix,
+<a class="reference internal" href="generated/sgkit.genomic_relationship.html#sgkit.genomic_relationship" title="sgkit.genomic_relationship"><code class="xref py py-func docutils literal notranslate"><span class="pre">genomic_relationship()</span></code></a>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/903">PR 903</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/874">GH 874</a>)</p></li>
+<li><p>Generic functions for cohort sums and means.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/867">PR 867</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/730">GH 730</a>)</p></li>
+<li><p>Toggle numba caching by environment variable <code class="docutils literal notranslate"><span class="pre">SGKIT_DISABLE_NUMBA_CACHE</span></code>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/870">PR 870</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/869">GH 869</a>)</p></li>
+<li><p>Add <a class="reference internal" href="generated/sgkit.window_by_genome.html#sgkit.window_by_genome" title="sgkit.window_by_genome"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_genome()</span></code></a> for computing whole-genome statistics.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/945">PR 945</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/893">GH 893</a>)</p></li>
+<li><p>Add <a class="reference internal" href="generated/sgkit.window_by_interval.html#sgkit.window_by_interval" title="sgkit.window_by_interval"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_interval()</span></code></a> to create windows from arbitrary intervals.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/974">PR 974</a>)</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">contig_lengths</span></code> dataset attribute if found in the VCF file.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/946">PR 946</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/464">GH 464</a>)</p></li>
+<li><p>Add VCF export functions.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/953">PR 953</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/924">GH 924</a>)</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">auto_rechunk</span></code> option to <code class="docutils literal notranslate"><span class="pre">sgkit.save_dataset</span></code> to automatically rechunk
+the dataset before saving it to disk, if necessary, as zarr requires equal chunk
+sizes. (<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/988">PR 988</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/981">GH 981</a>)</p></li>
+<li><p>Implement gene-ε for gene set association analysis.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/975">PR 975</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/692">GH 692</a>)</p></li>
+<li><p>Add <a class="reference internal" href="generated/sgkit.count_variant_genotypes.html#sgkit.count_variant_genotypes" title="sgkit.count_variant_genotypes"><code class="xref py py-func docutils literal notranslate"><span class="pre">count_variant_genotypes()</span></code></a> to count the occurrence of each possible
+genotype.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/911">GH 911</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1002">PR 1002</a>)</p></li>
+</ul>
+</section>
+<section id="id12">
+<h3>Breaking changes<a class="headerlink" href="#id12" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Remove support for Python 3.7.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/927">PR 927</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/802">GH 802</a>)</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">count_a1</span></code> parameter to <a class="reference internal" href="generated/sgkit.io.plink.read_plink.html#sgkit.io.plink.read_plink" title="sgkit.io.plink.read_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.read_plink()</span></code></a> previously
+defaulted to <code class="docutils literal notranslate"><span class="pre">True</span></code> but now defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>. Furthermore, <code class="docutils literal notranslate"><span class="pre">True</span></code>
+is no longer supported since it is not clear how it should behave.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/952">PR 952</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/947">GH 947</a>)</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">dosage</span></code> variable specification has been removed and all references
+to it have been replaced with <a class="reference internal" href="generated/sgkit.variables.call_dosage_spec.html#sgkit.variables.call_dosage_spec" title="sgkit.variables.call_dosage_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.call_dosage_spec</span></code></a>
+which has been generalized to include integer encodings. Additionally,
+the default value for the <code class="docutils literal notranslate"><span class="pre">dosage</span></code> parameter in <a class="reference internal" href="generated/sgkit.ld_matrix.html#sgkit.ld_matrix" title="sgkit.ld_matrix"><code class="xref py py-func docutils literal notranslate"><span class="pre">ld_matrix()</span></code></a> and
+<a class="reference internal" href="generated/sgkit.ld_prune.html#sgkit.ld_prune" title="sgkit.ld_prune"><code class="xref py py-func docutils literal notranslate"><span class="pre">ld_prune()</span></code></a> has been changed from <code class="docutils literal notranslate"><span class="pre">'dosage'</span></code> to <code class="docutils literal notranslate"><span class="pre">'call_dosage'</span></code>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/995">PR 995</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/875">GH 875</a>)</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">genotype_count</span></code> variable has been removed in favour of
+<a class="reference internal" href="generated/sgkit.variables.variant_genotype_count_spec.html#sgkit.variables.variant_genotype_count_spec" title="sgkit.variables.variant_genotype_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_genotype_count_spec</span></code></a> which follows VCF ordering
+(i.e., homozygous reference, heterozygous, homozygous alternate for biallelic,
+diploid genotypes).
+<a class="reference internal" href="generated/sgkit.hardy_weinberg_test.html#sgkit.hardy_weinberg_test" title="sgkit.hardy_weinberg_test"><code class="xref py py-func docutils literal notranslate"><span class="pre">hardy_weinberg_test()</span></code></a> now defaults to using
+<a class="reference internal" href="generated/sgkit.variables.variant_genotype_count_spec.html#sgkit.variables.variant_genotype_count_spec" title="sgkit.variables.variant_genotype_count_spec"><code class="xref py py-data docutils literal notranslate"><span class="pre">sgkit.variables.variant_genotype_count_spec</span></code></a> for the <code class="docutils literal notranslate"><span class="pre">genotype_count</span></code>
+parameter. (<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/911">GH 911</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/1002">PR 1002</a>)</p></li>
+</ul>
+</section>
+<section id="id13">
+<h3>Improvements<a class="headerlink" href="#id13" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Improvements to VCF parsing performance.
+(<a class="reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/933">PR 933</a>)</p></li>
+<li><p>Improve default VCF compression.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/937">PR 937</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/925">GH 925</a>)</p></li>
+<li><p>Ensure chunking is not excessive in samples dimension.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/943">PR 943</a>)</p></li>
+<li><p>Add asv benchmarks for VCF performance.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/976">PR 976</a>)</p></li>
+<li><p>Add asv benchmarks for VCF compression size.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/978">PR 978</a>)</p></li>
+</ul>
+</section>
+<section id="id14">
+<h3>Bug fixes<a class="headerlink" href="#id14" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Allow chunking in the samples dimension for <a class="reference internal" href="generated/sgkit.identity_by_state.html#sgkit.identity_by_state" title="sgkit.identity_by_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">identity_by_state()</span></code></a>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/837">PR 837</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/836">GH 836</a>)</p></li>
+<li><p>Remove VLenUTF8 from filters to avoid double encoding error.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/852">PR 852</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/785">GH 785</a>)</p></li>
+<li><p>Fix numpy input for <code class="docutils literal notranslate"><span class="pre">Weir_Goudet_beta</span></code>.
+(<a class="reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/865">PR 865</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/861">GH 861</a>)</p></li>
+<li><p>Fix <code class="docutils literal notranslate"><span class="pre">get_region_start</span></code> to work with contig names that have colons and dashes.
+(<a class="reference external" href="https://github.com/d-laub">d-laub</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/883">PR 883</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/issues/882">GH 882</a>)</p></li>
+<li><p>Fixes to VCF reading and writing found by hypothesis testing.
+(<a class="reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="reference external" href="https://github.com/sgkit-dev/sgkit/pull/972">PR 972</a>)</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+<div class="section ablog__blog_comments">
+   
+</div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="news.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">News</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#april-2025">0.10.0 (7 April 2025)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new-features">New Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#breaking-changes">Breaking changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#june-2024">0.9.0 (24 June 2024)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deprecations">Deprecations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Improvements</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#may-2024">0.8.0 (1 May 2024)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">New Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-fixes">Bug fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Documentation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#may-2023">0.7.0 (2 May 2023)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">New Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Breaking changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">Deprecations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Bug fixes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#february-2023">0.6.0 (1 February 2023)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">New Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Breaking changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Bug fixes</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/changelog.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2020, sgkit developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

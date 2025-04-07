@@ -1,0 +1,6 @@
+﻿sgkit.variables.call\_allele\_frequency\_spec
+=============================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: call_allele_frequency_spec

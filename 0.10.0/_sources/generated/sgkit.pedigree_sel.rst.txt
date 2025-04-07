@@ -1,0 +1,6 @@
+﻿sgkit.pedigree\_sel
+===================
+
+.. currentmodule:: sgkit
+
+.. autofunction:: pedigree_sel

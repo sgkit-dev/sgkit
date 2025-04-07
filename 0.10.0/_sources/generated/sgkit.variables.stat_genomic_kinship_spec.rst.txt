@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_genomic\_kinship\_spec
+============================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_genomic_kinship_spec

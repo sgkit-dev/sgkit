@@ -1,0 +1,6 @@
+﻿sgkit.variables.stat\_pedigree\_inbreeding\_spec
+================================================
+
+.. currentmodule:: sgkit.variables
+
+.. autodata:: stat_pedigree_inbreeding_spec

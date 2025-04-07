@@ -1,0 +1,6 @@
+﻿sgkit.ld\_prune
+===============
+
+.. currentmodule:: sgkit
+
+.. autofunction:: ld_prune
