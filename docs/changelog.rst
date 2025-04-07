@@ -5,7 +5,7 @@ Changelog
 
 .. _changelog.0.10.0:
 
-0.10.0 (unreleased)
+0.10.0 (7 April 2025)
 -----------------------
 
 New Features
@@ -34,6 +34,12 @@ Improvements
 
 - Add support for NumPy 2.
   (:user:`tomwhite`, :pr:`1297`)
+
+- Run tests against Zarr Python 3.
+  (:user:`tomwhite`, :pr:`1285`, :issue:`1226`)
+
+- Switch to pyproject.toml.
+  (:user:`ianhi`, :pr:`1300`)
 
 .. Bug fixes
 .. ~~~~~~~~~
