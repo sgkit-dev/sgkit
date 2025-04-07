@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools >= 41.2", "setuptools_scm"]
+requires = ["setuptools >= 69", "setuptools_scm[toml] >= 8"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -62,6 +62,9 @@ bgen = ["rechunker", "cbgen > 1.0.5"]
 packages = ["sgkit"]
 zip-safe = false            # https://mypy.readthedocs.io/en/latest/installed_packages.html
 include-package-data = true
+
+[tool.setuptools_scm]
+version_file = "sgkit/_version.py"
 
 [tool.coverage.report]
 fail_under = 100
