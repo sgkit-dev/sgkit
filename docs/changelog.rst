@@ -3,6 +3,29 @@
 Changelog
 =========
 
+.. _changelog.0.11.0:
+
+0.11.0 (unreleased)
+-----------------------
+
+.. New Features
+.. ~~~~~~~~~~~~
+
+.. Breaking changes
+.. ~~~~~~~~~~~~~~~~
+
+.. Deprecations
+.. ~~~~~~~~~~~~
+
+.. Improvements
+.. ~~~~~~~~~~~~
+
+.. Bug fixes
+.. ~~~~~~~~~
+
+.. Documentation
+.. ~~~~~~~~~~~~~
+
 .. _changelog.0.10.0:
 
 0.10.0 (7 April 2025)
