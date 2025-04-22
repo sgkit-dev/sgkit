@@ -30,7 +30,7 @@ jobs:
         pip install -r requirements.txt -r requirements-dev.txt -r requirements-doc.txt
         pip install -U dask distributed  # need latest versions to successully build docs
     - name: Run pre-commit
-      uses: pre-commit/action@v2.0.0
+      uses: pre-commit/action@v3.0.1
     - name: Check for Sphinx doc warnings
       run: |
         cd docs
