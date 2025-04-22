@@ -24,7 +24,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements-numpy1.txt -r requirements-numpy1-dev.txt
     # - name: Run pre-commit
-    #   uses: pre-commit/action@v2.0.0
+    #   uses: pre-commit/action@v3.0.1
     - name: Test with pytest and coverage
       run: |
         pytest -v --cov=sgkit --cov-report=term-missing
