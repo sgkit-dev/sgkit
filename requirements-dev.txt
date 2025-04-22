@@ -13,7 +13,7 @@ partd
 bed-reader
 rechunker
 cbgen > 1.0.5
-bio2zarr @ git+https://github.com/sgkit-dev/bio2zarr.git; platform_system != "Windows"
+bio2zarr; platform_system != "Windows"
 yarl
 matplotlib
 asv
