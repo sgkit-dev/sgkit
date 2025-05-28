@@ -56,7 +56,6 @@ jobs:
       - name: Install zarr${{ matrix.zarr }}
         run: |
           python -m pip install --pre 'zarr${{ matrix.zarr }}'
-          python -m pip uninstall -y bio2zarr  # TODO: remove when bio2zarr supports Zarr Python 3
       - name: Run tests
         run: |
           pytest
