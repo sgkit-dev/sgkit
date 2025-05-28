@@ -13,7 +13,7 @@ partd
 bed-reader
 rechunker
 cbgen > 1.0.5
-bio2zarr; platform_system != "Windows"
+bio2zarr[vcf]; platform_system != "Windows"
 yarl
 matplotlib
 asv

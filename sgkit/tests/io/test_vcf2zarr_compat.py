@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 pytest.importorskip("bio2zarr")
-from bio2zarr import vcf2zarr
+from bio2zarr import vcf
 from bio2zarr.constants import (
     FLOAT32_FILL,
     FLOAT32_MISSING,
@@ -23,7 +23,7 @@ def test_vcf2zarr_compat(shared_datadir, tmp_path):
     vcf_path = shared_datadir / "sample.vcf.gz"
     vcz_path = tmp_path.joinpath("sample.vcz").as_posix()
 
-    vcf2zarr.convert(
+    vcf.convert(
         [vcf_path],
         vcz_path,
         variants_chunk_size=5,
