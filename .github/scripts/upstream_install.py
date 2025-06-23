@@ -15,7 +15,6 @@ def install_deps() -> None:
     )
     upstream_deps = (
         "git+https://github.com/dask/dask.git#egg=dask[array,dataframe]",
-        "git+https://github.com/dask/distributed.git#egg=distributed",
         "git+https://github.com/pandas-dev/pandas#egg=pandas",
         "git+https://github.com/pangeo-data/rechunker.git#egg=rechunker",
         "git+https://github.com/pydata/xarray.git#egg=xarray",
