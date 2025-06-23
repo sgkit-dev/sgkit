@@ -1,10 +1,9 @@
-from typing import Any, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 import numpy as np
 import xarray as xr
 from sklearn.base import BaseEstimator
 from sklearn.pipeline import Pipeline
-from typing_extensions import Literal
 from xarray import DataArray, Dataset
 
 import sgkit.distarray as da

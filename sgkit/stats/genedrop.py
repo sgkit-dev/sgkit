@@ -1,9 +1,8 @@
-from typing import Hashable, Optional
+from typing import Hashable, Literal, Optional
 
 import dask.array as da
 import numpy as np
 import xarray as xr
-from typing_extensions import Literal
 from xarray import Dataset
 
 from sgkit import variables

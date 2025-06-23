@@ -1,8 +1,7 @@
-from typing import Hashable
+from typing import Hashable, Literal
 
 import numpy as np
 import xarray as xr
-from typing_extensions import Literal
 from xarray import Dataset
 
 import sgkit.distarray as da
