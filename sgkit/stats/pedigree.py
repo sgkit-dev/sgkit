@@ -1,10 +1,9 @@
 import warnings
-from typing import Hashable, Tuple
+from typing import Hashable, Literal, Optional, Tuple
 
 import dask.array as da
 import numpy as np
 import xarray as xr
-from typing_extensions import Literal, Optional
 from xarray import Dataset
 
 from sgkit import variables

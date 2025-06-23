@@ -1,8 +1,8 @@
 import typing
+from typing import Literal
 
 import dask.array as da
 import numpy as np
-from typing_extensions import Literal
 
 from sgkit.typing import ArrayLike
 

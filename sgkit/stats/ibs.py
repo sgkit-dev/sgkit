@@ -1,7 +1,6 @@
-from typing import Hashable
+from typing import Hashable, Literal
 
 import dask.array as da
-from typing_extensions import Literal
 from xarray import Dataset
 
 from sgkit import variables
