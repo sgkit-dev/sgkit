@@ -1,4 +1,3 @@
-import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
@@ -24,6 +23,9 @@ from sgkit.typing import ArrayLike
 
 from .test_regenie import load_covariates, load_traits
 
+sm = pytest.importorskip("statsmodels.api")
+from statsmodels.regression.linear_model import RegressionResultsWrapper
+
 
 def _dask_cupy_to_numpy(x):
     if da.utils.is_cupy_type(x):
@@ -31,15 +33,6 @@ def _dask_cupy_to_numpy(x):
     elif hasattr(x, "_meta") and da.utils.is_cupy_type(x._meta):
         x = x.map_blocks(lambda x: x.get()).persist()
     return x
-
-
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore", DeprecationWarning)
-    # Ignore: DeprecationWarning: Using or importing the ABCs from 'collections'
-    # instead of from 'collections.abc' is deprecated since Python 3.3,
-    # and in 3.9 it will stop working
-    import statsmodels.api as sm
-    from statsmodels.regression.linear_model import RegressionResultsWrapper
 
 
 def _generate_test_data(
