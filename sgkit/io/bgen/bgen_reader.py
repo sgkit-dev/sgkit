@@ -2,6 +2,7 @@
 import logging
 import tempfile
 import time
+import warnings
 from pathlib import Path
 from typing import (
     Any,
@@ -446,6 +447,11 @@ def rechunk_bgen(
     will run inline so calls to it may be slow. The resulting Dataset is
     generated based on the final, serialized Zarr data.
 
+    .. deprecated:: 0.11.0
+       Using rechunker for rechunking in sgkit is deprecated, please use the the
+       `Xarray chunk <https://docs.xarray.dev/en/stable/generated/xarray.Dataset.chunk.html#xarray.Dataset.chunk>`_
+       function directly.
+
     Parameters
     ----------
     ds
@@ -486,6 +492,12 @@ def rechunk_bgen(
     Dataset
         The rechunked dataset.
     """
+    warnings.warn(
+        "Using rechunker for rechunking in sgkit is deprecated, please use the the Xarray 'chunk' function directly.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
     if isinstance(output, Path):
         output = str(output)
 
