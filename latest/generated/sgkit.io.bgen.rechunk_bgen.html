@@ -703,6 +703,11 @@ default <cite>clevel</cite> 7).</p>
 <p>Note that this function is not evaluated lazily. The rechunking algorithm
 will run inline so calls to it may be slow. The resulting Dataset is
 generated based on the final, serialized Zarr data.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.11.0: </span>Using rechunker for rechunking in sgkit is deprecated, please use the the
+<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.chunk.html#xarray.Dataset.chunk">Xarray chunk</a>
+function directly.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
