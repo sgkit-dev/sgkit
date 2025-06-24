@@ -1,10 +1,9 @@
 # sgkit: Scalable genetics toolkit in Python
-[![Build status](https://github.com/sgkit-dev/sgkit/workflows/Build/badge.svg?branch=main)](https://github.com/sgkit-dev/sgkit/actions?query=workflow%3A%22Build%22+branch%3Amain)
-[![Windows build status](https://github.com/sgkit-dev/sgkit/workflows/Windows/badge.svg?branch=main)](https://github.com/sgkit-dev/sgkit/actions?query=workflow%3A%22Windows%22+branch%3Amain)
-[![Documentation status](https://github.com/sgkit-dev/sgkit/workflows/Docs/badge.svg?branch=main)](https://sgkit-dev.github.io/sgkit/)
-[![Validation status](https://github.com/sgkit-dev/sgkit/workflows/Validation/badge.svg?branch=main)](https://github.com/sgkit-dev/sgkit/actions?query=workflow%3A%22Validation%22+branch%3Amain)
-[![Upstream status](https://github.com/sgkit-dev/sgkit/workflows/Upstream/badge.svg?branch=main)](https://github.com/sgkit-dev/sgkit/actions?query=workflow%3A%22Upstream%22+branch%3Amain)
-[![asv](https://img.shields.io/badge/Benchmarked%20by-asv-green.svg?style=flat)](https://sgkit-dev.github.io/sgkit-benchmarks-asv/)
+[![Build](https://github.com/sgkit-dev/sgkit/actions/workflows/build.yml/badge.svg)](https://github.com/sgkit-dev/sgkit/actions/workflows/build.yml)
+[![Windows](https://github.com/sgkit-dev/sgkit/actions/workflows/windows.yml/badge.svg)](https://github.com/sgkit-dev/sgkit/actions/workflows/windows.yml)
+[![Docs](https://github.com/sgkit-dev/sgkit/actions/workflows/docs.yml/badge.svg)](https://sgkit-dev.github.io/sgkit/)
+[![Upstream](https://github.com/sgkit-dev/sgkit/actions/workflows/upstream.yml/badge.svg)](https://github.com/sgkit-dev/sgkit/actions/workflows/upstream.yml)
+[![Benchmarks](https://github.com/sgkit-dev/sgkit/actions/workflows/benchmark.yml/badge.svg)](https://github.com/sgkit-dev/sgkit/actions/workflows/benchmark.yml)
 [![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A)](http://numfocus.org)
 
 Sgkit is a Python package that provides a variety of analytical genetics methods through the use of
