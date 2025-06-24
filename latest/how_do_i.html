@@ -532,7 +532,7 @@
 </nav>
 <section id="create-a-test-dataset">
 <h2><a class="toc-backref" href="#id2" role="doc-backlink">Create a test dataset?</a><a class="headerlink" href="#create-a-test-dataset" title="Permalink to this heading">#</a></h2>
-<p>Call <a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset" title="sgkit.simulate_genotype_call_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_genotype_call_dataset()</span></code></a> to create a test <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2025.4.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>:</p>
+<p>Call <a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset" title="sgkit.simulate_genotype_call_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_genotype_call_dataset()</span></code></a> to create a test <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2025.6.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
 
 <span class="gp">In [2]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">simulate_genotype_call_dataset</span><span class="p">(</span><span class="n">n_variant</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_sample</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">n_contig</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">missing_pct</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
@@ -541,7 +541,7 @@
 </section>
 <section id="look-at-the-dataset-summary">
 <h2><a class="toc-backref" href="#id3" role="doc-backlink">Look at the dataset summary?</a><a class="headerlink" href="#look-at-the-dataset-summary" title="Permalink to this heading">#</a></h2>
-<p>Print using the <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2025.4.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a> <code class="docutils literal notranslate"><span class="pre">repr</span></code>:</p>
+<p>Print using the <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2025.6.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a> <code class="docutils literal notranslate"><span class="pre">repr</span></code>:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [3]: </span><span class="n">ds</span>
 <span class="gh">Out[3]: </span>
 <span class="go">&lt;xarray.Dataset&gt; Size: 23kB</span>
@@ -564,7 +564,7 @@
 </section>
 <section id="get-the-values-for-a-variable-in-a-dataset">
 <h2><a class="toc-backref" href="#id4" role="doc-backlink">Get the values for a variable in a dataset?</a><a class="headerlink" href="#get-the-values-for-a-variable-in-a-dataset" title="Permalink to this heading">#</a></h2>
-<p>Call <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Variable.values.html#xarray.Variable.values" title="(in xarray v2025.4.1.dev0)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xarray.Variable.values</span></code></a>:</p>
+<p>Call <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Variable.values.html#xarray.Variable.values" title="(in xarray v2025.6.2)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xarray.Variable.values</span></code></a>:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_contig</span><span class="o">.</span><span class="n">values</span>
 <span class="gh">Out[4]: </span>
 <span class="go">array([ 0,  0,  0,  0,  0,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  3,  3,</span>
@@ -657,7 +657,7 @@
 </section>
 <section id="subset-to-a-genomic-range">
 <h2><a class="toc-backref" href="#id8" role="doc-backlink">Subset to a genomic range?</a><a class="headerlink" href="#subset-to-a-genomic-range" title="Permalink to this heading">#</a></h2>
-<p>Set an index on the dataset, then call <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.sel.html#xarray.Dataset.sel" title="(in xarray v2025.4.1.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.sel()</span></code></a>:</p>
+<p>Set an index on the dataset, then call <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.sel.html#xarray.Dataset.sel" title="(in xarray v2025.6.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.sel()</span></code></a>:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [10]: </span><span class="n">ds</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">variants</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;variant_contig&quot;</span><span class="p">,</span> <span class="s2">&quot;variant_position&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">variants</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)))</span>
 <span class="gh">Out[10]: </span>
 <span class="go">&lt;xarray.Dataset&gt; Size: 1kB</span>
@@ -697,7 +697,7 @@
 </section>
 <section id="subset-the-samples">
 <h2><a class="toc-backref" href="#id10" role="doc-backlink">Subset the samples?</a><a class="headerlink" href="#subset-the-samples" title="Permalink to this heading">#</a></h2>
-<p>Call <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.sel.html#xarray.Dataset.sel" title="(in xarray v2025.4.1.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.sel()</span></code></a> and <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.isin.html#xarray.DataArray.isin" title="(in xarray v2025.4.1.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.DataArray.isin()</span></code></a>:</p>
+<p>Call <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.sel.html#xarray.Dataset.sel" title="(in xarray v2025.6.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.sel()</span></code></a> and <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.isin.html#xarray.DataArray.isin" title="(in xarray v2025.6.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.DataArray.isin()</span></code></a>:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [12]: </span><span class="n">ds</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">samples</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s2">&quot;S30&quot;</span><span class="p">,</span> <span class="s2">&quot;S32&quot;</span><span class="p">]))</span>
 <span class="gh">Out[12]: </span>
 <span class="go">&lt;xarray.Dataset&gt; Size: 3kB</span>
@@ -720,7 +720,7 @@
 </section>
 <section id="define-a-new-variable-based-on-others">
 <h2><a class="toc-backref" href="#id11" role="doc-backlink">Define a new variable based on others?</a><a class="headerlink" href="#define-a-new-variable-based-on-others" title="Permalink to this heading">#</a></h2>
-<p>Use Xarray’s <a class="reference external" href="http://xarray.pydata.org/en/stable/user-guide/data-structures.html#dictionary-like-methods">dictionary like methods</a>, or <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.assign.html#xarray.Dataset.assign" title="(in xarray v2025.4.1.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.assign()</span></code></a>:</p>
+<p>Use Xarray’s <a class="reference external" href="http://xarray.pydata.org/en/stable/user-guide/data-structures.html#dictionary-like-methods">dictionary like methods</a>, or <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.assign.html#xarray.Dataset.assign" title="(in xarray v2025.6.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.assign()</span></code></a>:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [13]: </span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;pos0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span> <span class="o">-</span> <span class="mi">1</span>
 
 <span class="gp">In [14]: </span><span class="n">ds</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">pos0</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># alternative</span>
@@ -799,7 +799,7 @@
 </section>
 <section id="filter-variants">
 <h2><a class="toc-backref" href="#id13" role="doc-backlink">Filter variants?</a><a class="headerlink" href="#filter-variants" title="Permalink to this heading">#</a></h2>
-<p>Call <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.sel.html#xarray.Dataset.sel" title="(in xarray v2025.4.1.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.sel()</span></code></a> on the <code class="docutils literal notranslate"><span class="pre">variants</span></code> dimension:</p>
+<p>Call <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.sel.html#xarray.Dataset.sel" title="(in xarray v2025.6.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.Dataset.sel()</span></code></a> on the <code class="docutils literal notranslate"><span class="pre">variants</span></code> dimension:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [17]: </span><span class="n">ds2</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">hardy_weinberg_test</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 
 <span class="gp">In [18]: </span><span class="n">ds2</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">variants</span><span class="o">=</span><span class="p">(</span><span class="n">ds2</span><span class="o">.</span><span class="n">variant_hwe_p_value</span> <span class="o">&gt;</span> <span class="mf">1e-2</span><span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
@@ -834,7 +834,7 @@
 </section>
 <section id="find-which-new-variables-were-added-by-a-method">
 <h2><a class="toc-backref" href="#id14" role="doc-backlink">Find which new variables were added by a method?</a><a class="headerlink" href="#find-which-new-variables-were-added-by-a-method" title="Permalink to this heading">#</a></h2>
-<p>Use <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.data_vars.html#xarray.Dataset.data_vars" title="(in xarray v2025.4.1.dev0)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xarray.Dataset.data_vars</span></code></a> to compare the new dataset variables to the old:</p>
+<p>Use <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.data_vars.html#xarray.Dataset.data_vars" title="(in xarray v2025.6.2)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xarray.Dataset.data_vars</span></code></a> to compare the new dataset variables to the old:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [19]: </span><span class="n">ds2</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">sample_stats</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 
 <span class="gp">In [20]: </span><span class="nb">set</span><span class="p">(</span><span class="n">ds2</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
