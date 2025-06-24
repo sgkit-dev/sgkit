@@ -14,8 +14,12 @@ Changelog
 .. Breaking changes
 .. ~~~~~~~~~~~~~~~~
 
-.. Deprecations
-.. ~~~~~~~~~~~~
+Deprecations
+~~~~~~~~~~~~
+
+- Functions for reading and writing plink are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_
+  and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages.
+  (:user:`tomwhite`, :pr:`1324`, :issue:`1318`)
 
 .. Improvements
 .. ~~~~~~~~~~~~
