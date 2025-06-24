@@ -1,3 +1,11 @@
+import warnings
+
+warnings.warn(
+    "Functions for reading and writing plink are deprecated, please use the bio2zarr and vcztools packages.",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
 try:
     from .plink_reader import plink_to_zarr, read_plink
     from .plink_writer import write_plink, zarr_to_plink

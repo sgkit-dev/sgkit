@@ -147,6 +147,10 @@ def read_plink(
     Loads a single PLINK dataset as dask arrays within a Dataset
     from bed, bim, and fam files.
 
+    .. deprecated:: 0.11.0
+        Functions for reading and writing plink are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_
+        and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages.
+
     Parameters
     ----------
     path
@@ -327,6 +331,10 @@ def plink_to_zarr(
     A convenience for :func:`read_plink` followed by :func:`sgkit.save_dataset`.
 
     Refer to :func:`read_plink` for details and limitations.
+
+    .. deprecated:: 0.11.0
+        Functions for reading and writing plink are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_
+        and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages.
 
     Parameters
     ----------

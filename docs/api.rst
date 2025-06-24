@@ -23,6 +23,10 @@ BGEN
 PLINK
 -----
 
+.. deprecated:: 0.11.0
+   Functions for reading and writing plink are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_
+   and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages.
+
 .. currentmodule:: sgkit.io.plink
 .. autosummary::
    :toctree: generated/

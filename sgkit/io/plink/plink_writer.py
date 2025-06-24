@@ -49,6 +49,10 @@ def write_plink(
     - ``sample_phenotype``: Phenotype code equal to 1 for control, 2 for case,
         and -1 for missing
 
+    .. deprecated:: 0.11.0
+        Functions for reading and writing plink are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_
+        and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages.
+
     Parameters
     ----------
     ds
@@ -145,6 +149,10 @@ def zarr_to_plink(
     A convenience for :func:`sgkit.load_dataset` followed by :func:`write_plink`.
 
     Refer to :func:`write_plink` for details and limitations.
+
+    .. deprecated:: 0.11.0
+        Functions for reading and writing plink are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_
+        and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages.
 
     Parameters
     ----------
