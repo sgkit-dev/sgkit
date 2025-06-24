@@ -3,10 +3,11 @@ import warnings
 from itertools import product
 from typing import Any, Callable, Hashable, List, Mapping, Optional, Set, Tuple, Union
 
-import dask.array as da
 import numpy as np
 import xarray as xr
 from xarray import Dataset
+
+import sgkit.distarray as da
 
 from . import variables
 from .typing import ArrayLike, DType
@@ -433,3 +434,15 @@ def has_keyword(func, keyword):
         return keyword in inspect.signature(func).parameters
     except Exception:  # pragma: no cover
         return False
+
+
+# an implementation of numpy.swapaxes since it is not defined in the array API
+def swapaxes(a: ArrayLike, axis1: int, axis2: int) -> ArrayLike:
+    """Interchange two axes of an array."""
+    if axis1 < 0:
+        axis1 += a.ndim
+    if axis2 < 0:
+        axis2 += a.ndim
+    if axis1 == axis2:
+        return a
+    return da.moveaxis(a, [axis1, axis2], [axis2, axis1])

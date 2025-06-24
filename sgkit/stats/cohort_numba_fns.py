@@ -1,10 +1,11 @@
 from functools import wraps
 from typing import Callable
 
-import dask.array as da
 import numpy as np
 
+import sgkit.distarray as da
 from sgkit.accelerate import numba_guvectorize
+from sgkit.utils import swapaxes
 
 from ..typing import ArrayLike
 
@@ -43,19 +44,20 @@ def cohort_reduction(gufunc: Callable) -> Callable:
 
     @wraps(gufunc)
     def func(x: ArrayLike, cohort: ArrayLike, n: int, axis: int = -1) -> ArrayLike:
-        x = da.swapaxes(da.asarray(x), axis, -1)
+        x = swapaxes(da.asarray(x), axis, -1)
         replaced = len(x.shape) - 1
         chunks = x.chunks[0:-1] + (n,)
         out = da.map_blocks(
             gufunc,
             x,
             cohort,
-            np.empty(n, np.int8),
+            da.empty(n, dtype=np.int8),
+            dtype=x.dtype,  # TODO: is this right? Might need to be passed in.
             chunks=chunks,
             drop_axis=replaced,
             new_axis=replaced,
         )
-        return da.swapaxes(out, axis, -1)
+        return swapaxes(out, axis, -1)
 
     return func
 
