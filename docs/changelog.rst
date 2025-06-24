@@ -20,6 +20,10 @@ Deprecations
 - Functions for reading and writing plink are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_
   and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages.
   (:user:`tomwhite`, :pr:`1324`, :issue:`1318`)
+- Using rechunker for rechunking in sgkit is deprecated, please use the the
+  `Xarray chunk <https://docs.xarray.dev/en/stable/generated/xarray.Dataset.chunk.html#xarray.Dataset.chunk>`_
+  function directly.
+  (:user:`tomwhite`, :pr:`1325`)
 
 .. Improvements
 .. ~~~~~~~~~~~~
