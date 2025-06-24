@@ -14,6 +14,7 @@ import logging as pylogging
 #
 import os
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import dask.dataframe
@@ -33,7 +34,7 @@ import sgkit  # noqa: F401 isort:skip
 # -- Project information -----------------------------------------------------
 
 project = "sgkit"
-copyright = "2020, sgkit developers"
+copyright = "2020--{}, sgkit developers".format(datetime.utcnow().year)
 author = "sgkit developers"
 
 
