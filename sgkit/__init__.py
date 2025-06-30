@@ -1,5 +1,6 @@
 from .display import display_genotypes, display_pedigree
 from .distance.api import pairwise_distance
+from .filtering import bcftools_filter
 from .io.dataset import load_dataset, save_dataset
 from .model import (
     DIM_ALLELE,
@@ -78,6 +79,7 @@ __all__ = [
     "DIM_PLOIDY",
     "DIM_SAMPLE",
     "DIM_VARIANT",
+    "bcftools_filter",
     "call_allele_frequencies",
     "create_genotype_call_dataset",
     "cohort_allele_frequencies",
