@@ -29,7 +29,7 @@ def diversity(
     cohort_allele_count: Hashable = variables.cohort_allele_count,
     merge: bool = True,
 ) -> Dataset:
-    """Compute diversity from cohort allele counts.
+    """Compute diversity as the average number of differences between a pair of sequences from cohort allele counts.
 
     By default, values of this statistic are calculated per variant.
     To compute values in windows, call :func:`window_by_position` or :func:`window_by_variant` before calling
