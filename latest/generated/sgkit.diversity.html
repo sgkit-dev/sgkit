@@ -691,7 +691,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="sgkit.diversity">
 <span class="sig-prename descclassname"><span class="pre">sgkit.</span></span><span class="sig-name descname"><span class="pre">diversity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cohort_allele_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cohort_allele_count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sgkit.diversity" title="Permalink to this definition">#</a></dt>
-<dd><p>Compute diversity from cohort allele counts.</p>
+<dd><p>Compute diversity as the average number of differences between a pair of sequences from cohort allele counts.</p>
 <p>By default, values of this statistic are calculated per variant.
 To compute values in windows, call <a class="reference internal" href="sgkit.window_by_position.html#sgkit.window_by_position" title="sgkit.window_by_position"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_position()</span></code></a> or <a class="reference internal" href="sgkit.window_by_variant.html#sgkit.window_by_variant" title="sgkit.window_by_variant"><code class="xref py py-func docutils literal notranslate"><span class="pre">window_by_variant()</span></code></a> before calling
 this function.</p>
