@@ -28,8 +28,12 @@ Deprecations
 .. Improvements
 .. ~~~~~~~~~~~~
 
-.. Bug fixes
-.. ~~~~~~~~~
+Bug fixes
+~~~~~~~~~
+
+- Fixed bug causing high memory usage in :func:`pedigree_kinship` when
+  evaluating a chunked relationship matrix with the Hamilton-Kerr method.
+  (:user:`timothymillar`, :pr:`1335`, :issue:`1333`)
 
 .. Documentation
 .. ~~~~~~~~~~~~~
