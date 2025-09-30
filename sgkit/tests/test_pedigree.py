@@ -560,6 +560,29 @@ def test_pedigree_kinship__Hamilton_Kerr_compress_parent_dimension(
     np.testing.assert_array_almost_equal(actual, expect)
 
 
+def test_pedigree_kinship__Hamilton_Kerr_chunked_mem():
+    # tests fix for https://github.com/sgkit-dev/sgkit/issues/1333
+    # if chunking is not applied to the ploidy matrix correctly
+    # this will try to allocate > 7TB of RAM (and presumably fail)
+    ds = xr.Dataset()
+    ds["parent"] = ["samples", "parents"], np.full((1_000_000, 2), -1, int)
+    ds["stat_Hamilton_Kerr_tau"] = ["samples", "parents"], np.full(
+        (1_000_000, 2), 2, np.uint64
+    )
+    ds["stat_Hamilton_Kerr_lambda"] = ["samples", "parents"], np.full(
+        (1_000_000, 2), 0.0
+    )
+    matrix = sg.pedigree_kinship(
+        ds,
+        method="Hamilton-Kerr",
+        chunks=((10, 999990), (20, 999980)),
+        return_relationship=True,
+    ).stat_pedigree_relationship
+    expect = np.eye(10, 20)
+    actual = matrix[0:10, 0:20].compute()
+    np.testing.assert_array_almost_equal(actual, expect)
+
+
 @pytest.mark.parametrize("method", ["diploid", "Hamilton-Kerr"])
 def test_pedigree_kinship__half_founder(method):
     ds0 = sg.simulate_genotype_call_dataset(n_variant=1, n_sample=6)

@@ -1198,10 +1198,15 @@ def pedigree_kinship(
     # new dataset
     dims = ["samples_0", "samples_1"]
     if return_relationship:
-        relationship = kinship * 2
         if method == EST_HAMILTON_KERR:
             ploidy = tau.sum(axis=-1)
-            relationship *= np.sqrt(ploidy[None, :] / 2 * ploidy[:, None] / 2)
+            ploidy_0 = ploidy.rechunk((kinship.chunks[0],))
+            ploidy_1 = ploidy.rechunk((kinship.chunks[1],))
+            scale = da.sqrt(ploidy_0[:, None] * ploidy_1[None, :])
+            assert kinship.chunks == scale.chunks
+            relationship = kinship * scale
+        else:
+            relationship = kinship * 2
         arrays = {
             variables.stat_pedigree_kinship: xr.DataArray(kinship, dims=dims),
             variables.stat_pedigree_relationship: xr.DataArray(relationship, dims=dims),
