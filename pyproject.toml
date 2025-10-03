@@ -31,6 +31,7 @@ dependencies = [
   "fsspec != 2021.6.*",
   "scikit-learn",
   "pandas",
+  "vcztools",
   "setuptools >= 41.2",                                   # For pkg_resources
 ]
 dynamic = ["version"]
@@ -69,7 +70,7 @@ fail_under = 100
 
 [tool.pytest.ini_options]
 addopts = "--doctest-modules --ignore=validation --cov-fail-under=100"
-norecursedirs = [".eggs", "build", "docs"]
+norecursedirs = [".eggs", ".hypothesis", "build", "docs"]
 filterwarnings = ["error", "ignore::DeprecationWarning"]
 
 

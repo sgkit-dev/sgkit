@@ -140,6 +140,7 @@ Utilities
 .. autosummary::
    :toctree: generated/
 
+   bcftools_filter
    convert_call_to_index
    convert_probability_to_call
    display_genotypes
