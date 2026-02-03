@@ -1,4 +1,5 @@
-numpy < 2.2
+numpy < 2.3; python_version < "3.11"
+numpy >= 2.3.5, < 2.4; python_version >= "3.11"
 xarray < 2025.03.1
 dask[array,dataframe] >= 2023.01.0, <= 2024.8.0
 scipy < 1.16
@@ -6,4 +7,4 @@ numba
 zarr >= 2.10.0, != 2.11.0, != 2.11.1, != 2.11.2, < 3
 fsspec != 2021.6.*
 scikit-learn
-pandas
+pandas < 3.0

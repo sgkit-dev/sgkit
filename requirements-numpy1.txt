@@ -6,4 +6,4 @@ numba
 zarr >= 2.10.0, != 2.11.0, != 2.11.1, != 2.11.2, < 3
 fsspec != 2021.6.*
 scikit-learn
-pandas
+pandas < 3.0
