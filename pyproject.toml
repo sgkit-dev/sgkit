@@ -22,7 +22,8 @@ classifiers = [
 urls = { Homepage = "https://github.com/sgkit-dev/sgkit" }
 requires-python = ">=3.10"
 dependencies = [
-  "numpy < 2.2",
+  "numpy < 2.3; python_version < \"3.11\"",
+  "numpy >= 2.3.5, < 2.4; python_version >= \"3.11\"", # M4 chip error
   "xarray < 2025.03.1",
   "dask[array,dataframe] >= 2022.01.0, <= 2024.8.0",
   "scipy < 1.16",
@@ -30,7 +31,7 @@ dependencies = [
   "numba",
   "fsspec != 2021.6.*",
   "scikit-learn",
-  "pandas",
+  "pandas < 3.0",
   "setuptools >= 41.2",                                   # For pkg_resources
 ]
 dynamic = ["version"]
@@ -69,7 +70,7 @@ fail_under = 100
 
 [tool.pytest.ini_options]
 addopts = "--doctest-modules --ignore=validation --cov-fail-under=100"
-norecursedirs = [".eggs", "build", "docs"]
+norecursedirs = [".eggs", "build", "docs", ".hypothesis"]
 filterwarnings = ["error", "ignore::DeprecationWarning"]
 
 

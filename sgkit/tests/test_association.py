@@ -254,7 +254,11 @@ def test_gwas_linear_regression__multi_trait(ds):
 
     traits = [f"trait_{i}" for i in range(ds.attrs["n_trait"])]
     # Run regressions on individual traits and concatenate resulting statistics
-    dfr_single = xr.concat([run([t]) for t in traits], dim="traits").to_dataframe()
+    dfr_single = xr.concat(
+        [run([t]) for t in traits],
+        dim="traits",
+        data_vars="all",
+    ).to_dataframe()
     # Run regressions on all traits simulatenously
     dfr_multi: DataFrame = run(traits).to_dataframe()
     pd.testing.assert_frame_equal(dfr_single, dfr_multi)
