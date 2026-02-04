@@ -14,16 +14,15 @@ classifiers = [
   "Intended Audience :: Science/Research",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering",
 ]
 urls = { Homepage = "https://github.com/sgkit-dev/sgkit" }
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
-  "numpy < 2.3; python_version < \"3.11\"",
-  "numpy >= 2.3.5, < 2.4; python_version >= \"3.11\"", # M4 chip error
+  "numpy >= 2.3.5; sys_platform == \"darwin\"", # Apple ARM chip error
+  "numpy >= 2.0; sys_platform != \"darwin\"",
   "xarray < 2025.03.1",
   "dask[array,dataframe] >= 2022.01.0, <= 2024.8.0",
   "scipy < 1.16",
