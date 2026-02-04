@@ -123,7 +123,7 @@ dask.dataframe.DataFrame.__module__ = "dask.dataframe"
 
 intersphinx_mapping = dict(
     dask=("https://docs.dask.org/en/stable/", None),
-    xarray=("https://xarray.pydata.org/en/stable/", None),
+    xarray=("https://docs.xarray.dev/en/stable/", None),
     zarr=("https://zarr.readthedocs.io/en/stable", None),
     numpy=("https://numpy.org/doc/stable/", None),
     python=("https://docs.python.org/3", None),
