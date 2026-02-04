@@ -143,6 +143,9 @@ def test_distance_ndarray() -> None:
         pytest.param("correlation", correlation, "i8", "gpu", marks=pytest.mark.gpu),
     ],
 )
+@pytest.mark.filterwarnings(
+    "ignore:invalid value encountered in correlation_reduce_cpu:RuntimeWarning"
+)
 def test_missing_values(
     metric: MetricTypes,
     metric_func: typing.Callable[[ArrayLike, ArrayLike], np.float64],
