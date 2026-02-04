@@ -10,6 +10,9 @@ from sgkit.testing import simulate_genotype_call_dataset
 @pytest.mark.filterwarnings(
     "ignore::UserWarning"
 )  # codec `vlen-utf8` not in Zarr v3 spec`
+@pytest.mark.filterwarnings(
+    "ignore:The data type .* does not have a Zarr V3 specification.*"
+)
 def test_simulate_genotype_call_dataset__zarr(tmp_path):
     path = str(tmp_path / "ds.zarr")
     ds = simulate_genotype_call_dataset(n_variant=10, n_sample=10)
