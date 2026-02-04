@@ -30,8 +30,8 @@ jobs:
       shell: bash -l {0}
       # conda can't install all dev tools, so we need to split it between conda and pip
       run: |
-        conda install --file requirements.txt msprime
-        pip install -r requirements-dev.txt
+        conda install msprime
+        pip install -r requirements.txt -r requirements-dev.txt
     - name: Test with pytest
       # activate conda
       shell: bash -l {0}
