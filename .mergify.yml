@@ -1,6 +1,6 @@
 queue_rules:
   - name: default
-    conditions:
+    queue_conditions:
       - base=main
       - status-success=build (3.10)
       - status-success=build (3.11)
@@ -8,21 +8,17 @@ queue_rules:
       - approved-reviews-by=@sgkit-dev/committers
       - "#approved-reviews-by>=1"
       - label=auto-merge
+    merge_conditions:
+      - base=main
+      - status-success=build (3.10)
+      - status-success=build (3.11)
+      - status-success=win_build (3.10)
+      - approved-reviews-by=@sgkit-dev/committers
+      - "#approved-reviews-by>=1"
+      - label=auto-merge
+    merge_method: rebase
 
 pull_request_rules:
-  - name: automatic merge
-    conditions:
-      - base=main
-      - status-success=build (3.10)
-      - status-success=build (3.11)
-      - status-success=win_build (3.10)
-      - approved-reviews-by=@sgkit-dev/committers
-      - "#approved-reviews-by>=1"
-      - label=auto-merge
-    actions:
-      queue:
-        name: default
-        method: rebase
   - name: deleting merged branch
     conditions:
       - merged
@@ -44,3 +40,7 @@ pull_request_rules:
       label:
         remove:
           - conflict
+  - name: automatic merge
+    conditions: []
+    actions:
+      queue:
