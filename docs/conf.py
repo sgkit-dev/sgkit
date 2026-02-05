@@ -69,6 +69,10 @@ myst_enable_extensions = [
     "dollarmath",
 ]
 
+# Temporary disable notebook execution during docs build (see issue #1332):
+# https://github.com/sgkit-dev/sgkit/issues/1332
+nb_execution_mode = "off"
+
 extlinks = {
     "issue": ("https://github.com/sgkit-dev/sgkit/issues/%s", "GH %s"),
     "pr": ("https://github.com/sgkit-dev/sgkit/pull/%s", "PR %s"),
