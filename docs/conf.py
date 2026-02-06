@@ -60,6 +60,9 @@ extensions = [
     *[p.stem for p in (HERE / "extensions").glob("*.py")],
 ]
 
+# Prefer PEP 604 union syntax (X | Y) to avoid unresolved typing.Union references.
+always_use_bars_union = True
+
 # Enable math notation in mystnb
 myst_enable_extensions = [
     "amsmath",
