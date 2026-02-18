@@ -586,9 +586,9 @@ def test_Garud_g(
             # SelectionHapStats (unphased format):
             #   homozygous -> allele nucleotide, heterozygous -> '.'
             # and run with:
-            #   python /tmp/H12_H2H1_py3.py /tmp/sgkit_garud_g_ref_input.csv 5 \
-            #       -w 3 -j 3 -d 0 -o /tmp/sgkit_garud_g_ref_output.tsv
-            # where /tmp/H12_H2H1_py3.py is a Python 3 compatibility copy of
+            #   python H12_H2H1_py3.py sgkit_garud_g_ref_input.csv 5 \
+            #       -w 3 -j 3 -d 0 -o sgkit_garud_g_ref_output.tsv
+            # where H12_H2H1_py3.py is a Python 3 compatibility copy of
             # github.com/ngarud/SelectionHapStats/scripts/H12_H2H1.py with:
             #   - `.iterkeys()` -> `.keys()`
             #   - `window = int(windowTot)/2` -> `window = int(windowTot)//2`
@@ -627,7 +627,6 @@ def test_Garud_g__raise_on_no_windows():
     ds = simulate_genotype_call_dataset(n_variant=10, n_sample=10)
     with pytest.raises(ValueError, match="Dataset must be windowed for Garud_G"):
         Garud_G(ds)
-
 
 
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
