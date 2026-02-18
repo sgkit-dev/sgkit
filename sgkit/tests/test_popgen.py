@@ -13,6 +13,7 @@ from hypothesis import strategies as st
 
 from sgkit import (
     Fst,
+    Garud_G,
     Garud_H,
     Tajimas_D,
     count_cohort_alleles,
@@ -530,6 +531,103 @@ def test_Garud_h__raise_on_no_windows():
 
     with pytest.raises(ValueError, match="Dataset must be windowed for Garud_H"):
         Garud_H(ds)
+
+
+@pytest.mark.parametrize(
+    "n_variants, n_samples, n_contigs, n_cohorts, cohorts, cohort_indexes",
+    [
+        (9, 5, 1, 1, None, None),
+        (9, 5, 1, 2, None, None),
+        (9, 5, 1, 2, [1], [1]),
+        (9, 5, 1, 2, ["co_1"], [1]),
+    ],
+)
+@pytest.mark.parametrize("chunks", [(-1, -1), (5, -1)])
+def test_Garud_g(
+    n_variants, n_samples, n_contigs, n_cohorts, cohorts, cohort_indexes, chunks
+):
+    ds = simulate_genotype_call_dataset(
+        n_variant=n_variants, n_sample=n_samples, n_contig=n_contigs, seed=1
+    )
+    ds = ds.chunk(dict(zip(["variants", "samples"], chunks)))
+    subsets = np.array_split(ds.samples.values, n_cohorts)
+    sample_cohorts = np.concatenate(
+        [np.full_like(subset, i) for i, subset in enumerate(subsets)]
+    )
+    ds["sample_cohort"] = xr.DataArray(sample_cohorts, dims="samples")
+    cohort_names = [f"co_{i}" for i in range(n_cohorts)]
+    coords = {k: cohort_names for k in ["cohorts"]}
+    ds = ds.assign_coords(coords)
+    ds = window_by_variant(ds, size=3)
+
+    gg = Garud_G(ds, cohorts=cohorts)
+    g1 = gg.stat_Garud_g1.values
+    g12 = gg.stat_Garud_g12.values
+    g123 = gg.stat_Garud_g123.values
+    g2_g1 = gg.stat_Garud_g2_g1.values
+
+    for c in range(n_cohorts):
+        if cohort_indexes is not None and c not in cohort_indexes:
+            # cohorts that were not computed should be nan
+            np.testing.assert_array_equal(g1[:, c], np.full_like(g1[:, c], np.nan))
+            np.testing.assert_array_equal(g12[:, c], np.full_like(g12[:, c], np.nan))
+            np.testing.assert_array_equal(g123[:, c], np.full_like(g123[:, c], np.nan))
+            np.testing.assert_array_equal(
+                g2_g1[:, c], np.full_like(g2_g1[:, c], np.nan)
+            )
+        else:
+            # External validation reference for this deterministic case:
+            # simulated by:
+            #   ds = simulate_genotype_call_dataset(
+            #       n_variant=9, n_sample=5, n_contig=1, seed=1
+            #   )
+            # then converted into SelectionHapStats MLG input using a fixed
+            # diploid-unphased encoding per genotype, as documented in
+            # SelectionHapStats (unphased format):
+            #   homozygous -> allele nucleotide, heterozygous -> '.'
+            # and run with:
+            #   python /tmp/H12_H2H1_py3.py /tmp/sgkit_garud_g_ref_input.csv 5 \
+            #       -w 3 -j 3 -d 0 -o /tmp/sgkit_garud_g_ref_output.tsv
+            # where /tmp/H12_H2H1_py3.py is a Python 3 compatibility copy of
+            # github.com/ngarud/SelectionHapStats/scripts/H12_H2H1.py with:
+            #   - `.iterkeys()` -> `.keys()`
+            #   - `window = int(windowTot)/2` -> `window = int(windowTot)//2`
+            #   - Python 2 print statements converted to Python 3 print calls
+            #
+            # SelectionHapStats output (first two windows; this script does not
+            # emit the final partial/edge window):
+            #   H1=0.20000000000000004, H12=0.28, H2/H1=0.8, H123=0.44000000000000006
+            #   H1=0.20000000000000004, H12=0.28, H2/H1=0.8, H123=0.44000000000000006
+            if (
+                n_variants == 9
+                and n_samples == 5
+                and n_contigs == 1
+                and n_cohorts == 1
+                and cohorts is None
+            ):
+                np.testing.assert_allclose(
+                    g1[:2, c], np.array([0.20000000000000004, 0.20000000000000004])
+                )
+                np.testing.assert_allclose(g12[:2, c], np.array([0.28, 0.28]))
+                np.testing.assert_allclose(
+                    g123[:2, c], np.array([0.44000000000000006, 0.44000000000000006])
+                )
+                np.testing.assert_allclose(g2_g1[:2, c], np.array([0.8, 0.8]))
+
+
+def test_Garud_g__raise_on_non_diploid():
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=10, n_ploidy=3)
+    with pytest.raises(
+        NotImplementedError, match="Garud G only implemented for diploid genotypes"
+    ):
+        Garud_G(ds)
+
+
+def test_Garud_g__raise_on_no_windows():
+    ds = simulate_genotype_call_dataset(n_variant=10, n_sample=10)
+    with pytest.raises(ValueError, match="Dataset must be windowed for Garud_G"):
+        Garud_G(ds)
+
 
 
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
