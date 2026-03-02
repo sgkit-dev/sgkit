@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="./" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Getting Started &#8212; sgkit  documentation</title>
   
@@ -31,11 +30,10 @@
   <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/typehints.css" />
-    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="_static/docsearch.sbt.css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="_static/docsearch.sbt.css?v=0d82532d" />
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
   
   <!-- So that users can add custom icons -->
@@ -44,11 +42,12 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
-    <script src="_static/clipboard.min.js"></script>
-    <script src="_static/copybutton.js"></script>
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script defer="defer" src="_static/scripts/rtd-sphinx-search.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'getting_started';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -58,7 +57,7 @@
             false;
         </script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-    <script defer="defer" src="_static/docsearch.sbt.js"></script>
+    <script defer="defer" src="_static/docsearch.sbt.js?v=f2f54661"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -510,7 +509,7 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                    <section id="getting-started">
-<span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading">#</a></h1>
+<span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h1>
 <nav class="contents local" id="table-of-contents">
 <p class="topic-title">Table of contents:</p>
 <ul class="simple">
@@ -526,8 +525,8 @@
 </ul>
 </nav>
 <section id="installation">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Installation</a><a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h2>
-<p>You can install sgkit with pip. Python 3.10, 3.11, or 3.12 is required:</p>
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Installation</a><a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
+<p>You can install sgkit with pip. Python 3.11 or 3.12 is required:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install sgkit
 </pre></div>
 </div>
@@ -537,7 +536,7 @@
 </div>
 </section>
 <section id="overview">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Overview</a><a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Overview</a><a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
 <p>Sgkit is a general purpose toolkit for quantitative and population genetics.
 The primary goal of sgkit is to take advantage of powerful tools in the <a class="reference external" href="https://pydata.org/">PyData ecosystem</a>
 to facilitate interactive analysis of large-scale datasets. The main libraries we use are:</p>
@@ -551,14 +550,15 @@ to facilitate interactive analysis of large-scale datasets. The main libraries w
 </ul>
 </section>
 <section id="data-structures">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">Data structures</a><a class="headerlink" href="#data-structures" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Data structures</a><a class="headerlink" href="#data-structures" title="Link to this heading">#</a></h2>
 <p>Sgkit uses Xarray <a class="reference external" href="http://xarray.pydata.org/en/stable/data-structures.html#dataset">Dataset</a> objects to model genetic data.
 Users are free to manipulate quantities within these objects as they see fit and a set of conventions for variable names,
 dimensions and underlying data types is provided to aid in workflow standardization. The example below illustrates a
 <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> format that would result from an assay expressible as <a class="reference external" href="https://en.wikipedia.org/wiki/Variant_Call_Format">VCF</a>,
 <a class="reference external" href="https://www.cog-genomics.org/plink2">PLINK</a> or <a class="reference external" href="https://www.well.ox.ac.uk/~gav/bgen_format/">BGEN</a>.
 This is a guideline however, and a <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> seen in practice might include many more or fewer variables and dimensions.</p>
-<a class="reference internal image-reference" href="_images/data-structures-xarray.jpg"><img alt="_images/data-structures-xarray.jpg" class="align-center" src="_images/data-structures-xarray.jpg" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="_images/data-structures-xarray.jpg"><img alt="_images/data-structures-xarray.jpg" class="align-center" src="_images/data-structures-xarray.jpg" style="width: 600px;" />
+</a>
 <p>The worked examples below show how to access and visualize data like this using Xarray. They also demonstrate
 several of the sgkit conventions in place for representing common genetic quantities.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
@@ -762,11 +762,12 @@ sgkit utilities as well as the Pandas/Xarray integration:</p>
 <span class="gh">Out[22]: </span><span class="go">&lt;Axes: title={&#39;center&#39;: &#39;Call Rate Distribution&#39;}, ylabel=&#39;Frequency&#39;&gt;</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="_images/call_rate_example.png"><img alt="_images/call_rate_example.png" src="_images/call_rate_example.png" style="width: 6in; height: 3in;" /></a>
+<a class="reference internal image-reference" href="_images/call_rate_example.png"><img alt="_images/call_rate_example.png" src="_images/call_rate_example.png" style="width: 6in; height: 3in;" />
+</a>
 <p>This last example alludes to representations of missing data that are explained further in <a class="reference internal" href="#missing-data"><span class="std std-ref">Missing data</span></a>.</p>
 </section>
 <section id="genetic-methods">
-<span id="id2"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">Genetic methods</a><a class="headerlink" href="#genetic-methods" title="Permalink to this heading">#</a></h2>
+<span id="id2"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">Genetic methods</a><a class="headerlink" href="#genetic-methods" title="Link to this heading">#</a></h2>
 <p>Genetic methods in sgkit are nearly always applied to individual <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> objects.  For a full list of
 available methods, see <a class="reference internal" href="api.html#api-methods"><span class="std std-ref">Methods</span></a>.</p>
 <p>In this example, the <code class="docutils literal notranslate"><span class="pre">variant_stats</span></code> method is applied to a dataset to compute a number of statistics
@@ -796,7 +797,7 @@ across samples for each individual variant:</p>
 dataset or they are returned in a separate dataset.  See <a class="reference internal" href="user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
 </section>
 <section id="missing-data">
-<span id="id3"></span><h2><a class="toc-backref" href="#id9" role="doc-backlink">Missing data</a><a class="headerlink" href="#missing-data" title="Permalink to this heading">#</a></h2>
+<span id="id3"></span><h2><a class="toc-backref" href="#id9" role="doc-backlink">Missing data</a><a class="headerlink" href="#missing-data" title="Link to this heading">#</a></h2>
 <p>Missing data in sgkit is represented using a sentinel value within data arrays
 (<code class="docutils literal notranslate"><span class="pre">-1</span></code> in integer arrays and <code class="docutils literal notranslate"><span class="pre">NaN</span></code> in float arrays) as well as a companion boolean mask array
 (<code class="docutils literal notranslate"><span class="pre">True</span></code> where data is missing).  These sentinel values are handled transparently in
@@ -897,7 +898,7 @@ shows how it can be used in the context of doing something simple like counting 
 </div>
 </section>
 <section id="windowing">
-<h2><a class="toc-backref" href="#id10" role="doc-backlink">Windowing</a><a class="headerlink" href="#windowing" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">Windowing</a><a class="headerlink" href="#windowing" title="Link to this heading">#</a></h2>
 <p>It is common to compute statistics in windows along the genome. Some <a class="reference internal" href="api.html#api-methods"><span class="std std-ref">Methods</span></a> in sgkit
 are “windowing aware” and will compute values for windows defined in a dataset. If no windows
 are defined then the values will typically be computed for each variant. It is therefore
@@ -949,7 +950,7 @@ then with windows.</p>
 </div>
 </section>
 <section id="cohorts">
-<h2><a class="toc-backref" href="#id11" role="doc-backlink">Cohorts</a><a class="headerlink" href="#cohorts" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Cohorts</a><a class="headerlink" href="#cohorts" title="Link to this heading">#</a></h2>
 <p>During analysis we often want to be able to group samples into populations, and compute statistics
 based on these groups. Groups of samples are referred to as <em>cohorts</em> in sgkit.</p>
 <p>Cohorts are defined by a mapping from samples to cohort index. The following example creates
@@ -990,7 +991,7 @@ however you might only want to run the computation for a subset of cohorts, in w
 explicitly specify the cohorts when calling the function.</p>
 </section>
 <section id="chaining-operations">
-<h2><a class="toc-backref" href="#id12" role="doc-backlink">Chaining operations</a><a class="headerlink" href="#chaining-operations" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">Chaining operations</a><a class="headerlink" href="#chaining-operations" title="Link to this heading">#</a></h2>
 <p><a class="reference external" href="https://tomaugspurger.github.io/method-chaining.html">Method chaining</a> is a common practice with Python
 data tools that improves code readability and reduces the probability of introducing accidental namespace collisions.
 Sgkit functions are compatible with this idiom by default and this example shows to use it in conjunction with
@@ -1066,7 +1067,7 @@ variables, and then merge these new variables into a copy of the provided datase
 See <a class="reference internal" href="user_guide.html#dataset-merge"><span class="std std-ref">Dataset merge behavior</span></a> for more details.</p>
 </section>
 <section id="chunked-arrays">
-<h2><a class="toc-backref" href="#id13" role="doc-backlink">Chunked arrays</a><a class="headerlink" href="#chunked-arrays" title="Permalink to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id13" role="doc-backlink">Chunked arrays</a><a class="headerlink" href="#chunked-arrays" title="Link to this heading">#</a></h2>
 <p>Chunked arrays are required when working on large datasets. Libraries for managing chunked arrays such as <a class="reference external" href="https://docs.dask.org/en/latest/array.html">Dask Array</a>
 and <a class="reference external" href="https://zarr.readthedocs.io/en/stable/">Zarr</a> make it possible to implement blockwise algorithms that operate
 on subsets of arrays (in parallel) without ever requiring them to fit entirely in memory.</p>
@@ -1249,7 +1250,7 @@ for more examples and information, as well as the Dask tutorials on
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>

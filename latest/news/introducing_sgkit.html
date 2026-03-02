@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Introducing sgkit &#8212; sgkit  documentation</title>
   
@@ -31,11 +30,10 @@
   <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/typehints.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/docsearch.sbt.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/docsearch.sbt.css?v=0d82532d" />
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
   
   <!-- So that users can add custom icons -->
@@ -44,11 +42,12 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script defer="defer" src="../_static/scripts/rtd-sphinx-search.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'news/introducing_sgkit';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -58,7 +57,7 @@
             false;
         </script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-    <script defer="defer" src="../_static/docsearch.sbt.js"></script>
+    <script defer="defer" src="../_static/docsearch.sbt.js?v=f2f54661"></script>
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -501,7 +500,7 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                    <section class="tex2jax_ignore mathjax_ignore" id="introducing-sgkit">
-<h1>Introducing sgkit<a class="headerlink" href="#introducing-sgkit" title="Permalink to this heading">#</a></h1>
+<h1>Introducing sgkit<a class="headerlink" href="#introducing-sgkit" title="Link to this heading">#</a></h1>
 <p>The sgkit team is pleased to announce the release of <a class="reference external" href="https://github.com/sgkit-dev/sgkit/releases/tag/0.5.0">sgkit 0.5.0</a>! This release adds support for the <a class="reference external" href="https://github.com/sgkit-dev/vcf-zarr-spec">VCF Zarr specification</a>, which describes an encoding of VCF data in chunked-columnar form using the <a class="reference external" href="https://zarr.readthedocs.io/en/stable/">Zarr format</a>.</p>
 <p>With this release, we also introduce our news page, where we will announce future releases and provide other relevant updates for the <code class="docutils literal notranslate"><span class="pre">sgkit</span></code> project.</p>
 <p>Oxford and Related Sciences began collaborating in early 2020 on <code class="docutils literal notranslate"><span class="pre">sgkit</span></code> as a successor to the popular <a class="reference external" href="https://github.com/cggh/scikit-allel">scikit-allel</a> library. We’ve worked closely with third-party library authors to read and write data stored in VCF (<a class="reference external" href="https://github.com/brentp/cyvcf2">cyvcf2</a>), BGEN (<a class="reference external" href="https://github.com/limix/cbgen">cbgen</a>), and PLINK (<a class="reference external" href="https://github.com/fastlmm/bed-reader">bed_reader</a>) files. We’ve designed an <a class="reference external" href="https://github.com/pydata/xarray">Xarray</a>-based <a class="reference external" href="https://sgkit-dev.github.io/sgkit/latest/getting_started.html#data-structures">data model</a> and implemented many common methods from statistical and population genetics, including variant and sample <a class="reference external" href="https://sgkit-dev.github.io/sgkit/latest/examples/gwas_tutorial.html#quality-control">quality control</a>, <a class="reference external" href="https://sgkit-dev.github.io/sgkit/latest/generated/sgkit.pc_relate.html#sgkit-pc-relate">kinship analysis</a>, genome-wide <a class="reference external" href="https://sgkit-dev.github.io/sgkit/latest/generated/sgkit.Garud_H.html">selection scans</a>, and genome-wide <a class="reference external" href="https://sgkit-dev.github.io/sgkit/latest/generated/sgkit.gwas_linear_regression.html">association analyses</a>, as well as a <a class="reference external" href="https://sgkit-dev.github.io/sgkit/latest/generated/sgkit.regenie.html#sgkit-regenie">novel implementation</a> of the recently developed <a class="reference external" href="https://github.com/rgcgithub/regenie">REGENIE algorithm</a>.</p>
@@ -586,7 +585,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>

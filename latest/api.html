@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="./" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>API reference &#8212; sgkit  documentation</title>
   
@@ -31,11 +30,10 @@
   <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/typehints.css" />
-    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="_static/docsearch.sbt.css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="_static/docsearch.sbt.css?v=0d82532d" />
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
   
   <!-- So that users can add custom icons -->
@@ -44,11 +42,12 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
-    <script src="_static/clipboard.min.js"></script>
-    <script src="_static/copybutton.js"></script>
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script defer="defer" src="_static/scripts/rtd-sphinx-search.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -58,7 +57,7 @@
             false;
         </script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-    <script defer="defer" src="_static/docsearch.sbt.js"></script>
+    <script defer="defer" src="_static/docsearch.sbt.js?v=f2f54661"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -684,14 +683,14 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                    <section id="api-reference">
-<h1>API reference<a class="headerlink" href="#api-reference" title="Permalink to this heading">#</a></h1>
+<h1>API reference<a class="headerlink" href="#api-reference" title="Link to this heading">#</a></h1>
 <p>This page provides an auto-generated summary of sgkits’s API.</p>
 <section id="io-imports-and-exports">
-<h2>IO/imports and exports<a class="headerlink" href="#io-imports-and-exports" title="Permalink to this heading">#</a></h2>
+<h2>IO/imports and exports<a class="headerlink" href="#io-imports-and-exports" title="Link to this heading">#</a></h2>
 <p>See <a class="reference internal" href="user_guide.html#reading-and-writing-genetic-data"><span class="std std-ref">Reading and writing genetic data</span></a></p>
 <section id="bgen">
-<h3>BGEN<a class="headerlink" href="#bgen" title="Permalink to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<h3>BGEN<a class="headerlink" href="#bgen" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.bgen.bgen_to_zarr.html#sgkit.io.bgen.bgen_to_zarr" title="sgkit.io.bgen.bgen_to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bgen_to_zarr</span></code></a>(input, output[, region, ...])</p></td>
 <td><p>Convert a BGEN file to a Zarr on-disk store.</p></td>
@@ -707,12 +706,12 @@
 </div>
 </section>
 <section id="plink">
-<h3>PLINK<a class="headerlink" href="#plink" title="Permalink to this heading">#</a></h3>
+<h3>PLINK<a class="headerlink" href="#plink" title="Link to this heading">#</a></h3>
 <div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 0.11.0: </span>Functions for reading and writing plink are deprecated, please use the <a class="reference external" href="https://github.com/sgkit-dev/bio2zarr">bio2zarr</a>
 and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">vcztools</a> packages.</p>
 </div>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.plink.plink_to_zarr.html#sgkit.io.plink.plink_to_zarr" title="sgkit.io.plink.plink_to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plink_to_zarr</span></code></a>(*[, path, bed_path, bim_path, ...])</p></td>
 <td><p>Convert a PLINK file to a Zarr on-disk store.</p></td>
@@ -731,13 +730,13 @@ and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">v
 </div>
 </section>
 <section id="vcf">
-<h3>VCF<a class="headerlink" href="#vcf" title="Permalink to this heading">#</a></h3>
+<h3>VCF<a class="headerlink" href="#vcf" title="Link to this heading">#</a></h3>
 <p>Functions for reading and writing VCF were removed from sgkit, please use the <a class="reference external" href="https://github.com/sgkit-dev/bio2zarr">bio2zarr</a>
 and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">vcztools</a> packages.</p>
 </section>
 <section id="dataset">
-<h3>Dataset<a class="headerlink" href="#dataset" title="Permalink to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<h3>Dataset<a class="headerlink" href="#dataset" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.load_dataset.html#sgkit.load_dataset" title="sgkit.load_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_dataset</span></code></a>(store[, storage_options])</p></td>
 <td><p>Load a dataset from Zarr storage.</p></td>
@@ -751,10 +750,10 @@ and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">v
 </section>
 </section>
 <section id="methods">
-<span id="api-methods"></span><h2>Methods<a class="headerlink" href="#methods" title="Permalink to this heading">#</a></h2>
+<span id="api-methods"></span><h2>Methods<a class="headerlink" href="#methods" title="Link to this heading">#</a></h2>
 <section id="basic-genetics-statistics">
-<h3>Basic genetics statistics<a class="headerlink" href="#basic-genetics-statistics" title="Permalink to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<h3>Basic genetics statistics<a class="headerlink" href="#basic-genetics-statistics" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.call_allele_frequencies.html#sgkit.call_allele_frequencies" title="sgkit.call_allele_frequencies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call_allele_frequencies</span></code></a>(ds, *[, ...])</p></td>
 <td><p>Compute per sample allele frequencies from genotype calls.</p></td>
@@ -785,8 +784,8 @@ and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">v
 </div>
 </section>
 <section id="population-genetic-statistics">
-<h3>Population genetic statistics<a class="headerlink" href="#population-genetic-statistics" title="Permalink to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<h3>Population genetic statistics<a class="headerlink" href="#population-genetic-statistics" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.divergence.html#sgkit.divergence" title="sgkit.divergence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">divergence</span></code></a>(ds, *[, cohort_allele_count, merge])</p></td>
 <td><p>Compute divergence between pairs of cohorts.</p></td>
@@ -817,8 +816,8 @@ and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">v
 </div>
 </section>
 <section id="relatedness">
-<h3>Relatedness<a class="headerlink" href="#relatedness" title="Permalink to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<h3>Relatedness<a class="headerlink" href="#relatedness" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.Weir_Goudet_beta.html#sgkit.Weir_Goudet_beta" title="sgkit.Weir_Goudet_beta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Weir_Goudet_beta</span></code></a>(ds, *[, ...])</p></td>
 <td><p>Estimate pairwise beta between all pairs of samples as described in Weir and Goudet 2017 [1].</p></td>
@@ -855,8 +854,8 @@ and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">v
 </div>
 </section>
 <section id="linkage-disequilibrium">
-<h3>Linkage Disequilibrium<a class="headerlink" href="#linkage-disequilibrium" title="Permalink to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<h3>Linkage Disequilibrium<a class="headerlink" href="#linkage-disequilibrium" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.ld_matrix.html#sgkit.ld_matrix" title="sgkit.ld_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ld_matrix</span></code></a>(ds, *[, dosage, threshold, ...])</p></td>
 <td><p>Compute a sparse linkage disequilibrium (LD) matrix.</p></td>
@@ -869,8 +868,8 @@ and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">v
 </div>
 </section>
 <section id="genetic-association-and-regression">
-<h3>Genetic Association and Regression<a class="headerlink" href="#genetic-association-and-regression" title="Permalink to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<h3>Genetic Association and Regression<a class="headerlink" href="#genetic-association-and-regression" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.gwas_linear_regression.html#sgkit.gwas_linear_regression" title="sgkit.gwas_linear_regression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gwas_linear_regression</span></code></a>(ds, *, dosage, ...[, ...])</p></td>
 <td><p>Run linear regression to identify continuous trait associations with genetic variants.</p></td>
@@ -889,8 +888,8 @@ and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">v
 </div>
 </section>
 <section id="miscellaneous">
-<h3>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<h3>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.maximal_independent_set.html#sgkit.maximal_independent_set" title="sgkit.maximal_independent_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximal_independent_set</span></code></a>(df)</p></td>
 <td><p>Compute a maximal independent set of variants.</p></td>
@@ -904,8 +903,8 @@ and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">v
 </section>
 </section>
 <section id="utilities">
-<h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this heading">#</a></h2>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.convert_call_to_index.html#sgkit.convert_call_to_index" title="sgkit.convert_call_to_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_call_to_index</span></code></a>(ds, *[, ...])</p></td>
 <td><p>Convert each call genotype to a single integer value.</p></td>
@@ -963,9 +962,9 @@ and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">v
 </div>
 </section>
 <section id="variables">
-<span id="api-variables"></span><h2>Variables<a class="headerlink" href="#variables" title="Permalink to this heading">#</a></h2>
+<span id="api-variables"></span><h2>Variables<a class="headerlink" href="#variables" title="Link to this heading">#</a></h2>
 <p>By convention, variable names are singular in sgkit. For example, <code class="docutils literal notranslate"><span class="pre">genotype_count</span></code>, <em>not</em> <code class="docutils literal notranslate"><span class="pre">genotype_counts</span></code>.</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.variables.call_allele_count_spec.html#sgkit.variables.call_allele_count_spec" title="sgkit.variables.call_allele_count_spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variables.call_allele_count_spec</span></code></a></p></td>
 <td><p>Allele counts.</p></td>
@@ -1363,7 +1362,7 @@ and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">v
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>
