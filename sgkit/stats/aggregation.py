@@ -272,10 +272,8 @@ def count_cohort_alleles(
         ds, variables.call_allele_count, call_allele_count, count_call_alleles
     )
     variables.validate(ds, {call_allele_count: variables.call_allele_count_spec})
-    # ensure cohorts is a numpy array to minimize dask task
-    # dependencies between chunks in other dimensions
-    AC, SC = da.asarray(ds[call_allele_count]), ds[sample_cohort].values
-    n_cohorts = SC.max() + 1  # 0-based indexing
+    AC, SC = da.asarray(ds[call_allele_count]), da.asarray(ds[sample_cohort])
+    n_cohorts = ds[sample_cohort].values.max() + 1  # 0-based indexing
     AC = cohort_sum(AC, SC, n_cohorts, axis=1)
     new_ds = create_dataset(
         {variables.cohort_allele_count: (("variants", "cohorts", "alleles"), AC)}
@@ -1059,7 +1057,7 @@ def individual_heterozygosity(
     variables.validate(ds, {call_allele_count: variables.call_allele_count_spec})
 
     AC = da.asarray(ds.call_allele_count)
-    K = AC.sum(axis=-1)
+    K = da.sum(AC, axis=-1)
     # use nan denominator to avoid divide by zero with K - 1
     K2 = da.where(K > 1, K, np.nan)
     AF = AC / K2[..., None]

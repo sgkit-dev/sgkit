@@ -30,10 +30,11 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest -v sgkit/tests/test_{aggregation,association,hwe,pca,window}.py \
+        pytest -v sgkit/tests/test_{aggregation,association,hwe,pca,popgen,window}.py \
           -k "test_count_call_alleles or \
               test_gwas_linear_regression or \
               test_hwep or \
+              (test_popgen and diversity) or \
               test_sample_stats or \
               (test_count_variant_alleles and not test_count_variant_alleles__chunked[call_genotype]) or \
               (test_variant_stats and not test_variant_stats__chunks[chunks2-False]) or \
