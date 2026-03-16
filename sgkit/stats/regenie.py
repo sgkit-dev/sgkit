@@ -262,7 +262,7 @@ def _stage_1(G: Array, X: Array, Y: Array, alphas: Optional[NDArray] = None) -> 
     these predictions, a technique commonly referred to as stacking.
 
     For more details, see the level 0 regression model described in step 1
-    of [Mbatchou et al. 2020](https://www.biorxiv.org/content/10.1101/2020.06.19.162354v2).
+    of [Mbatchou et al. (2021) Nat Genet](https://doi.org/10.1038/s41588-021-00870-7).
     """
     assert G.ndim == 2
     assert X.ndim == 2
@@ -766,7 +766,7 @@ def regenie(
     tests. These estimates are subtracted from trait values and
     sampling statistics (p-values, standard errors, etc.) are evaluated
     against the residuals. See the REGENIE preprint [1] for more details.
-    For a simpler technical overview, see [2] for a detailed description
+    For a technical overview, see [2, 3] for a detailed description
     of the individual stages and separate regression models involved.
 
     Parameters
@@ -799,9 +799,11 @@ def regenie(
         Defaults to 10 sample blocks split roughly across all possible
         samples or the number of samples, if that number is < 10.
     alphas
-        List of alpha values to use for regularization, by default None.
+        List of ridge parameter values to use for regularization, by default None.
         If not provided, these will be set automatically based on
-        datasize and apriori heritability assumptions.
+        datasize and apriori heritability assumptions. See the description of
+        level 0 ridge regressions in the Supporting Information of [1] for more
+        details.
     add_intercept
         Whether or not to add intercept to covariates, by default True.
     normalize
@@ -870,11 +872,13 @@ def regenie(
 
     References
     ----------
-    [1] - Mbatchou, J., L. Barnard, J. Backman, and A. Marcketta. 2020.
-    “Computationally Efficient Whole Genome Regression for Quantitative and Binary
-    Traits.” bioRxiv. https://www.biorxiv.org/content/10.1101/2020.06.19.162354v2.abstract.
+    [1] - Mbatchou, J., Barnard, L., Backman, J. et al. Computationally efficient
+    whole-genome regression for quantitative and binary traits.
+    Nat Genet 53, 1097–1103 (2021). https://doi.org/10.1038/s41588-021-00870-7
 
     [2] - https://glow.readthedocs.io/en/latest/tertiary/whole-genome-regression.html
+
+    [3] - https://rgcgithub.github.io/regenie/overview/
     """
     if isinstance(covariates, Hashable):
         covariates = [covariates]
