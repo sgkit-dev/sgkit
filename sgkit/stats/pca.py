@@ -51,7 +51,7 @@ def pca_est(
         raise ValueError(
             "PCA can only be performed on arrays chunked in 2 dimensions if algorithm='randomized'. "
             "Consider using this algorithm instead or rechunking the alternate allele counts array "
-            "(e.g. ds.call_alternate_allele_count.chunk((None, -1)))."
+            "(e.g. ds.call_alternate_allele_count.chunk({'samples': -1}))."
         )
 
     return Pipeline(

@@ -36,7 +36,7 @@ def simulate_dataset(
     n_variant: int = 100,
     n_sample: int = 50,
     n_cohort: Optional[int] = None,
-    chunks: Any = (-1, -1),
+    chunks: Any = {"variants": -1, "samples": -1},
 ) -> Dataset:
     """Simulate dataset with optional population structure"""
     ds = simulate_genotype_call_dataset(n_variant, n_sample, seed=0)
@@ -48,7 +48,9 @@ def simulate_dataset(
             ac, dims=("variants", "samples")
         )
     else:
-        ds["call_genotype_mask"] = ds["call_genotype_mask"].chunk(chunks + (1,))
+        ds["call_genotype_mask"] = ds["call_genotype_mask"].chunk(
+            {**chunks, "ploidy": 1}
+        )
         ds = count_call_alternate_alleles(ds)
     ds["call_alternate_allele_count"] = ds["call_alternate_allele_count"].chunk(chunks)
     return ds
@@ -71,11 +73,19 @@ def allel_pca(gn: ArrayLike, randomized: bool = False, **kwargs: Any) -> Dataset
 
 
 @pytest.mark.parametrize("shape", [(100, 50), (50, 100), (50, 50)])
-@pytest.mark.parametrize("chunks", [(10, -1), (-1, 10), (-1, -1), (10, 10)])
+@pytest.mark.parametrize(
+    "chunks",
+    [
+        {"variants": 10, "samples": -1},
+        {"variants": -1, "samples": 10},
+        {"variants": -1, "samples": -1},
+        {"variants": 10, "samples": 10},
+    ],
+)
 @pytest.mark.parametrize("algorithm", ["tsqr", "randomized"])
 def test_pca__lazy_evaluation(shape, chunks, algorithm):
     # Ensure that all new variables are backed by lazy arrays
-    if algorithm == "tsqr" and all(c > 0 for c in chunks):
+    if algorithm == "tsqr" and all(c > 0 for c in chunks.values()):
         return
     ds = simulate_dataset(*shape, chunks=chunks)  # type: ignore[misc]
     ds = pca.pca(ds, n_components=2, algorithm=algorithm, merge=False)
@@ -139,7 +149,7 @@ def test_pca__raise_on_invalid_algorithm(sample_dataset):
 def test_pca__raise_on_incompatible_chunking(sample_dataset):
     ds = sample_dataset.assign(
         call_alternate_allele_count=lambda ds: ds["call_alternate_allele_count"].chunk(
-            (2, 2)
+            {"variants": 2, "samples": 2}
         )
     )
     with pytest.raises(
@@ -197,17 +207,19 @@ def test_pca__stats(sample_dataset):
 @pytest.fixture(scope="module", params=[(100, 50), (50, 100)])
 def stability_test_result(request):
     shape = request.param
-    ds = simulate_dataset(*shape, chunks=(-1, -1), n_cohort=3)  # type: ignore[misc]
+    ds = simulate_dataset(*shape, chunks={"variants": -1, "samples": -1}, n_cohort=3)  # type: ignore[misc]
     res = pca.pca(ds, n_components=2, algorithm="tsqr", merge=False)
     return shape, res
 
 
-@pytest.mark.parametrize("chunks", [(-1, -1), (25, 25)])
+@pytest.mark.parametrize(
+    "chunks", [{"variants": -1, "samples": -1}, {"variants": 25, "samples": 25}]
+)
 @pytest.mark.parametrize("algorithm", ["tsqr", "randomized"])
 def test_pca__stability(stability_test_result, chunks, algorithm):
     # Ensure that results are stable across algorithms and that sign flips
     # do not occur when chunking changes
-    if algorithm == "tsqr" and all(c > 0 for c in chunks):
+    if algorithm == "tsqr" and all(c > 0 for c in chunks.values()):
         return
     shape, expected = stability_test_result
     ds = simulate_dataset(*shape, chunks=chunks, n_cohort=3)  # type: ignore[misc]
@@ -220,7 +232,14 @@ def test_pca__stability(stability_test_result, chunks, algorithm):
 
 
 @pytest.mark.parametrize("shape", [(80, 30), (30, 80)])
-@pytest.mark.parametrize("chunks", [(10, -1), (-1, 10), (-1, -1)])
+@pytest.mark.parametrize(
+    "chunks",
+    [
+        {"variants": 10, "samples": -1},
+        {"variants": -1, "samples": 10},
+        {"variants": -1, "samples": -1},
+    ],
+)
 @pytest.mark.parametrize("n_components", [1, 2, 29])
 def test_pca__tsqr_allel_comparison(shape, chunks, n_components):
     # Validate chunked, non-random implementation vs scikit-allel single chunk results
@@ -238,7 +257,7 @@ def test_pca__tsqr_allel_comparison(shape, chunks, n_components):
 
 
 @pytest.mark.parametrize("shape", [(300, 200), (200, 300)])
-@pytest.mark.parametrize("chunks", [(50, 50)])
+@pytest.mark.parametrize("chunks", [{"variants": 50, "samples": 50}])
 @pytest.mark.parametrize("n_components", [1, 2])
 def test_pca__randomized_allel_comparison(shape, chunks, n_components):
     # Validate chunked, randomized implementation vs scikit-allel single chunk results --

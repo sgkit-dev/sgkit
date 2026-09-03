@@ -206,7 +206,7 @@ def test_max_str_len(dtype, chunks, backend, data):
     if dtype == "O":
         x = x.astype(object)
     if chunks is not None and backend is xr.DataArray:
-        x = x.chunk(chunks=(chunks,) * ndim)
+        x = x.chunk({dim: chunks for dim in x.dims})
     if chunks is not None and backend is da.array:
         x = x.rechunk((chunks,) * ndim)
     if x.size == 0:
