@@ -21,9 +21,9 @@ jobs:
         python-version: ["3.11"]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -35,7 +35,7 @@ jobs:
         python -m build --sdist --wheel
         python -m twine check --strict dist/*
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         path: dist
 
@@ -50,13 +50,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       # checkout repo to subdirectory to get access to scripts
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           path: sgkit-copy
       - name: Download artifacts
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v8
+        with:
+          name: artifact
+          path: artifact
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install wheel and test
@@ -79,13 +82,16 @@ jobs:
         python-version: ["3.11"]
     steps:
       # checkout repo to subdirectory to get access to scripts
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           path: sgkit-copy
       - name: Download artifacts
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v8
+        with:
+          name: artifact
+          path: artifact
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install wheel and test
@@ -105,7 +111,10 @@ jobs:
     needs: ['unix-test', 'windows-test']
     steps:
       - name: Download all
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v8
+        with:
+          name: artifact
+          path: artifact
       - name: Move to dist
         run: |
           mkdir dist
