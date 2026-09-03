@@ -17,9 +17,9 @@ jobs:
         python-version: ["3.11"]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -35,12 +35,12 @@ jobs:
       run: |
         cd docs
         make html SPHINXOPTS="-W --keep-going -n"
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       if: failure()
       with:
         name: gwas_tutorial
         path: /home/runner/work/sgkit/sgkit/docs/_build/html/reports/examples/gwas_tutorial.err.log
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       if: failure()
       with:
         name: relatedness_tutorial

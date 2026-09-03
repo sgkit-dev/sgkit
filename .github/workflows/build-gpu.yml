@@ -20,14 +20,14 @@ jobs:
         python-version: ["3.11"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Run Nvidia-smi
         run: |
           nvidia-smi
 
       - name: Set up Python
-        uses: conda-incubator/setup-miniconda@v2.2.0
+        uses: conda-incubator/setup-miniconda@v4
         env:
           CONDA: /home/runnerx/miniconda3
         with:
