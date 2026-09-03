@@ -17,24 +17,16 @@ jobs:
         python-version: ["3.11"]
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Miniconda with Python version ${{ matrix.python-version }}
-      uses: conda-incubator/setup-miniconda@v2
+    - uses: actions/checkout@v7
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v7
       with:
-        auto-update-conda: true
-        channels: conda-forge,numba
-        miniconda-version: "latest"
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      # activate conda
-      shell: bash -l {0}
-      # conda can't install all dev tools, so we need to split it between conda and pip
       run: |
-        conda install msprime
+        python -m pip install --upgrade pip
         pip install -r requirements.txt -r requirements-dev.txt
     - name: Test with pytest
-      # activate conda
-      shell: bash -l {0}
       # To avoid: 'UserWarning: KMeans is known to have a memory leak on Windows with MKL, when there are less chunks than available threads. You can avoid it by setting the environment variable OMP_NUM_THREADS=1'
       env:
         OMP_NUM_THREADS: 1
