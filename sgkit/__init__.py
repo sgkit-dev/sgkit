@@ -48,6 +48,7 @@ from .stats.pedigree import (
 )
 from .stats.popgen import (
     Fst,
+    Garud_G,
     Garud_H,
     Tajimas_D,
     divergence,
@@ -119,6 +120,7 @@ __all__ = [
     "diversity",
     "divergence",
     "Fst",
+    "Garud_G",
     "Garud_H",
     "Tajimas_D",
     "pbs",
