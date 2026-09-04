@@ -28,7 +28,7 @@ jobs:
         run: |
           sudo apt update -y
           python -m pip install --upgrade pip
-          pip install asv
+          pip install asv==0.6.6
 
       - name: Set and log asv machine configuration
         run: |
