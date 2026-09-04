@@ -19,7 +19,7 @@ class TimeSuite:
             n_variant=100_000, n_sample=1000
         )
         sample_cohort = np.repeat(
-            [0, 1], self.count_cohort_alleles_ds.dims["samples"] // 2
+            [0, 1], self.count_cohort_alleles_ds.sizes["samples"] // 2
         )
         self.count_cohort_alleles_ds["sample_cohort"] = xr.DataArray(
             sample_cohort, dims="samples"
