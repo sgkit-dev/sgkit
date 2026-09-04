@@ -308,8 +308,8 @@ def test_count_cohort_alleles__multi_variant_multi_sample():
 @pytest.mark.parametrize(
     "chunks",
     [
-        (5, -1, -1),
-        (5, 5, -1),
+        {"variants": 5, "samples": -1, "ploidy": -1},
+        {"variants": 5, "samples": 5, "ploidy": -1},
     ],
 )
 def test_count_cohort_alleles__chunked(chunks):
@@ -401,11 +401,11 @@ def test_count_variant_genotypes__biallelic(
     expect = count_biallelic_genotypes(calls, ploidy)
     if chunked:
         # chunk each dim
-        chunks = (
-            (n_variant // 2, n_variant - n_variant // 2),
-            (n_sample // 2, n_sample - n_sample // 2),
-            (ploidy // 2, ploidy - ploidy // 2),
-        )
+        chunks = {
+            "variants": (n_variant // 2, n_variant - n_variant // 2),
+            "samples": (n_sample // 2, n_sample - n_sample // 2),
+            "ploidy": (ploidy // 2, ploidy - ploidy // 2),
+        }
         ds["call_genotype"] = ds["call_genotype"].chunk(chunks)
     actual = count_variant_genotypes(ds)["variant_genotype_count"].data
     np.testing.assert_array_equal(expect, actual)
@@ -571,8 +571,8 @@ def test_count_variant_genotypes__raise_on_mixed_ploidy():
 @pytest.mark.parametrize(
     "chunks",
     [
-        ((4,), (2,), (2,)),
-        ((2, 2), (1, 1), (1, 1)),
+        {"variants": (4,), "cohorts": (2,), "alleles": (2,)},
+        {"variants": (2, 2), "cohorts": (1, 1), "alleles": (1, 1)},
     ],
 )
 def test_cohort_allele_frequencies__diploid(chunks):
@@ -605,8 +605,8 @@ def test_cohort_allele_frequencies__diploid(chunks):
 @pytest.mark.parametrize(
     "chunks",
     [
-        ((4,), (2,), (3,)),
-        ((2, 2), (1, 1), (2, 1)),
+        {"variants": (4,), "cohorts": (2,), "alleles": (3,)},
+        {"variants": (2, 2), "cohorts": (1, 1), "alleles": (2, 1)},
     ],
 )
 def test_cohort_allele_frequencies__polyploid(chunks):
@@ -787,7 +787,14 @@ def test_variant_stats__tetraploid():
 
 
 @pytest.mark.parametrize("precompute_variant_allele_count", [False, True])
-@pytest.mark.parametrize("chunks", [(-1, -1, -1), (100, -1, -1), (100, 10, -1)])
+@pytest.mark.parametrize(
+    "chunks",
+    [
+        {"variants": -1, "samples": -1, "ploidy": -1},
+        {"variants": 100, "samples": -1, "ploidy": -1},
+        {"variants": 100, "samples": 10, "ploidy": -1},
+    ],
+)
 def test_variant_stats__chunks(precompute_variant_allele_count, chunks):
     ds = simulate_genotype_call_dataset(
         n_variant=1000, n_sample=30, missing_pct=0.01, seed=0
@@ -857,7 +864,14 @@ def test_sample_stats__raise_on_mixed_ploidy():
         sample_stats(ds)
 
 
-@pytest.mark.parametrize("chunks", [(-1, -1, -1), (100, -1, -1), (100, 10, -1)])
+@pytest.mark.parametrize(
+    "chunks",
+    [
+        {"variants": -1, "samples": -1, "ploidy": -1},
+        {"variants": 100, "samples": -1, "ploidy": -1},
+        {"variants": 100, "samples": 10, "ploidy": -1},
+    ],
+)
 def test_sample_stats__chunks(chunks):
     ds = simulate_genotype_call_dataset(
         n_variant=1000, n_sample=30, missing_pct=0.01, seed=0

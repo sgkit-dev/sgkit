@@ -122,8 +122,8 @@ def test_genomic_relationship__rrBLUP_diploid(estimator, chunks):
     "chunks",
     [
         None,
-        (200, 50),
-        (50, 25),
+        {"variants": 200, "samples": 50},
+        {"variants": 50, "samples": 25},
     ],
 )
 def test_genomic_relationship__tetraploid(estimator, chunks):
