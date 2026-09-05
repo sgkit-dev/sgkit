@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.12", "3.13"]
 
     steps:
     - uses: actions/checkout@v7
@@ -25,10 +25,8 @@ jobs:
 
     - name: Install deps and sgkit
       run: |
-        sudo apt update -y
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip packaging
         python .github/scripts/upstream_install.py
-        python -m pip install -r requirements-dev.txt
 
     - name: Test with pytest
       run: |
