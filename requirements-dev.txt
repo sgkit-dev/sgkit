@@ -16,7 +16,6 @@ cbgen > 1.0.5
 bio2zarr[vcf]; platform_system != "Windows"
 yarl
 matplotlib
-asv >= 0.6.6
 networkx
 aiohttp
 requests

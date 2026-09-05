@@ -1,4 +1,4 @@
-collect_ignore_glob = ["benchmarks/**", ".github/scripts/*.py"]
+collect_ignore_glob = [".github/scripts/*.py"]
 
 
 def pytest_addoption(parser):
