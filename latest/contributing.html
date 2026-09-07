@@ -561,17 +561,16 @@
 </ul>
 </li>
 <li><p><a class="reference internal" href="#contributing-to-documentation" id="id15">Contributing to documentation</a></p></li>
-<li><p><a class="reference internal" href="#benchmarks" id="id16">Benchmarks</a></p></li>
-<li><p><a class="reference internal" href="#review-process" id="id17">Review process</a></p></li>
-<li><p><a class="reference internal" href="#design-discussions" id="id18">Design discussions</a></p>
+<li><p><a class="reference internal" href="#review-process" id="id16">Review process</a></p></li>
+<li><p><a class="reference internal" href="#design-discussions" id="id17">Design discussions</a></p>
 <ul>
-<li><p><a class="reference internal" href="#dataset-subclassing" id="id19">Dataset subclassing</a></p></li>
-<li><p><a class="reference internal" href="#dataset-api-typing" id="id20">Dataset API typing</a></p></li>
-<li><p><a class="reference internal" href="#dataset-variables" id="id21">Dataset variables</a></p></li>
-<li><p><a class="reference internal" href="#delayed-invariant-checks" id="id22">Delayed invariant checks</a></p></li>
-<li><p><a class="reference internal" href="#mixed-ploidy" id="id23">Mixed ploidy</a></p></li>
-<li><p><a class="reference internal" href="#numba-guvectorize-usage" id="id24">Numba guvectorize usage</a></p></li>
-<li><p><a class="reference internal" href="#api-namespace" id="id25">API namespace</a></p></li>
+<li><p><a class="reference internal" href="#dataset-subclassing" id="id18">Dataset subclassing</a></p></li>
+<li><p><a class="reference internal" href="#dataset-api-typing" id="id19">Dataset API typing</a></p></li>
+<li><p><a class="reference internal" href="#dataset-variables" id="id20">Dataset variables</a></p></li>
+<li><p><a class="reference internal" href="#delayed-invariant-checks" id="id21">Delayed invariant checks</a></p></li>
+<li><p><a class="reference internal" href="#mixed-ploidy" id="id22">Mixed ploidy</a></p></li>
+<li><p><a class="reference internal" href="#numba-guvectorize-usage" id="id23">Numba guvectorize usage</a></p></li>
+<li><p><a class="reference internal" href="#api-namespace" id="id24">API namespace</a></p></li>
 </ul>
 </li>
 </ul>
@@ -788,58 +787,8 @@ without warnings. You can do that locally with:</p>
 </pre></div>
 </div>
 </section>
-<section id="benchmarks">
-<h2><a class="toc-backref" href="#id16" role="doc-backlink">Benchmarks</a><a class="headerlink" href="#benchmarks" title="Link to this heading">#</a></h2>
-<p><em>sgkit</em> uses <a class="reference external" href="https://www.sphinx-doc.org/">asv</a> (Airspeed Velocity) for micro benchmarking.
-Airspeed Velocity manages building the environment via conda itself. The
-recipe for the same is defined in the <code class="docutils literal notranslate"><span class="pre">benchmarks/asv.conf.json</span></code>
-configuration file. The benchmarks should be written in the <code class="docutils literal notranslate"><span class="pre">benchmarks/</span></code>
-directory. For more information on different types of benchmarks have a look
-at the <code class="docutils literal notranslate"><span class="pre">asv</span></code> documentation here: <a class="reference external" href="https://asv.readthedocs.io/en/stable/writing_benchmarks.html#writing-benchmarks">https://asv.readthedocs.io/en/stable/writing_benchmarks.html#writing-benchmarks</a></p>
-<p>The results of benchmarks are uploaded to benchmarks repository: <a class="github reference external" href="https://github.com/sgkit-dev/sgkit-benchmarks-asv">sgkit-dev/sgkit-benchmarks-asv</a>
-via Github Actions. They can be seen on the static site here: <a class="reference external" href="https://sgkit-dev.github.io/sgkit-benchmarks-asv">https://sgkit-dev.github.io/sgkit-benchmarks-asv</a></p>
-<p>You can run the benchmark suite locally with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">asv</span> <span class="n">run</span> <span class="o">--</span><span class="n">config</span> <span class="n">benchmarks</span><span class="o">/</span><span class="n">asv</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">json</span>
-</pre></div>
-</div>
-<p>You can generate the html of the results via:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">asv</span> <span class="n">publish</span> <span class="o">--</span><span class="n">config</span> <span class="n">benchmarks</span><span class="o">/</span><span class="n">asv</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">v</span>
-</pre></div>
-</div>
-<p>The resulting HTML files end up in the <code class="docutils literal notranslate"><span class="pre">benchmarks/html</span></code> directory and the
-results in <code class="docutils literal notranslate"><span class="pre">benchmarks/results</span></code> directory.</p>
-<p>You can see the results of the benchmarks in the browser by running a local
-server:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">asv</span> <span class="n">preview</span> <span class="o">--</span><span class="n">config</span> <span class="n">benchmarks</span><span class="o">/</span><span class="n">asv</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">json</span> <span class="o">-</span><span class="n">v</span>
-</pre></div>
-</div>
-<p>The benchmark machine is the Github Actions machine, which has roughly the
-following configurations:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s2">"arch"</span><span class="p">:</span> <span class="s2">"x86_64"</span><span class="p">,</span>
-    <span class="s2">"cpu"</span><span class="p">:</span> <span class="s2">"Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz"</span><span class="p">,</span>
-    <span class="s2">"machine"</span><span class="p">:</span> <span class="s2">"fv-az183-669"</span><span class="p">,</span>
-    <span class="s2">"num_cpu"</span><span class="p">:</span> <span class="s2">"2"</span><span class="p">,</span>
-    <span class="s2">"os"</span><span class="p">:</span> <span class="s2">"Linux 5.4.0-1039-azure"</span><span class="p">,</span>
-    <span class="s2">"ram"</span><span class="p">:</span> <span class="s2">"7121276"</span><span class="p">,</span>
-    <span class="s2">"version"</span><span class="p">:</span> <span class="mi">1</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The above configuration was determined by running the following command on
-Github Actions, on one of the runs:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">asv</span> <span class="n">machine</span> <span class="o">--</span><span class="n">yes</span>
-</pre></div>
-</div>
-<p>The configuration above does changes slightly in every run, for example we
-could get a machine with different cpu like say the one with 2.30GHz or the one
-with slightly less RAM (not a huge deviation from above though). As of now it
-is not possible to fix this, unless we use a custom machine for benchmarking,
-hence minor deviation in benchmarks performance should be consumed with a pinch
-of salt.</p>
-</section>
 <section id="review-process">
-<h2><a class="toc-backref" href="#id17" role="doc-backlink">Review process</a><a class="headerlink" href="#review-process" title="Link to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id16" role="doc-backlink">Review process</a><a class="headerlink" href="#review-process" title="Link to this heading">#</a></h2>
 <p>Pull requests will be reviewed by a project maintainer. All changes to <em>sgkit</em> require
 approval by at least one maintainer.</p>
 <p>We use <a class="reference external" href="https://mergify.io/">mergify</a> to automate PR flow. A project
@@ -848,11 +797,11 @@ to automatically merge a PR by labeling it with <code class="docutils literal no
 at least one approval from a committer and a clean build it will get merged automatically.</p>
 </section>
 <section id="design-discussions">
-<h2><a class="toc-backref" href="#id18" role="doc-backlink">Design discussions</a><a class="headerlink" href="#design-discussions" title="Link to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id17" role="doc-backlink">Design discussions</a><a class="headerlink" href="#design-discussions" title="Link to this heading">#</a></h2>
 <p>The information on these topics may be useful for developers in understanding the
 history behind the design choices that have been made within the project so far.</p>
 <section id="dataset-subclassing">
-<h3><a class="toc-backref" href="#id19" role="doc-backlink">Dataset subclassing</a><a class="headerlink" href="#dataset-subclassing" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id18" role="doc-backlink">Dataset subclassing</a><a class="headerlink" href="#dataset-subclassing" title="Link to this heading">#</a></h3>
 <p>Debates on whether or not we should use Xarray objects directly or
 put them behind a layer of encapsulation:</p>
 <ul class="simple">
@@ -861,7 +810,7 @@ put them behind a layer of encapsulation:</p>
 </ul>
 </section>
 <section id="dataset-api-typing">
-<h3><a class="toc-backref" href="#id20" role="doc-backlink">Dataset API typing</a><a class="headerlink" href="#dataset-api-typing" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id19" role="doc-backlink">Dataset API typing</a><a class="headerlink" href="#dataset-api-typing" title="Link to this heading">#</a></h3>
 <p>Discussions around bringing stricter array type enforcement into the API:</p>
 <ul class="simple">
 <li><p><a class="github reference external" href="https://github.com/sgkit-dev/sgkit/issues/43">sgkit-dev/sgkit#43</a></p></li>
@@ -870,11 +819,11 @@ put them behind a layer of encapsulation:</p>
 </ul>
 </section>
 <section id="dataset-variables">
-<h3><a class="toc-backref" href="#id21" role="doc-backlink">Dataset variables</a><a class="headerlink" href="#dataset-variables" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id20" role="doc-backlink">Dataset variables</a><a class="headerlink" href="#dataset-variables" title="Link to this heading">#</a></h3>
 <p>Naming conventions for variables: <a class="github reference external" href="https://github.com/sgkit-dev/sgkit/issues/295">sgkit-dev/sgkit#295</a></p>
 </section>
 <section id="delayed-invariant-checks">
-<h3><a class="toc-backref" href="#id22" role="doc-backlink">Delayed invariant checks</a><a class="headerlink" href="#delayed-invariant-checks" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id21" role="doc-backlink">Delayed invariant checks</a><a class="headerlink" href="#delayed-invariant-checks" title="Link to this heading">#</a></h3>
 <p>Discussions on how to run sanity checks on arrays efficiently and why those checks would be
 useful if they were possible (they are not possible currently w/ Dask):</p>
 <ul class="simple">
@@ -883,11 +832,11 @@ useful if they were possible (they are not possible currently w/ Dask):</p>
 </ul>
 </section>
 <section id="mixed-ploidy">
-<h3><a class="toc-backref" href="#id23" role="doc-backlink">Mixed ploidy</a><a class="headerlink" href="#mixed-ploidy" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id22" role="doc-backlink">Mixed ploidy</a><a class="headerlink" href="#mixed-ploidy" title="Link to this heading">#</a></h3>
 <p>Proposal for handling mixed ploidy: <a class="github reference external" href="https://github.com/sgkit-dev/sgkit/issues/243">sgkit-dev/sgkit#243</a></p>
 </section>
 <section id="numba-guvectorize-usage">
-<h3><a class="toc-backref" href="#id24" role="doc-backlink">Numba guvectorize usage</a><a class="headerlink" href="#numba-guvectorize-usage" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id23" role="doc-backlink">Numba guvectorize usage</a><a class="headerlink" href="#numba-guvectorize-usage" title="Link to this heading">#</a></h3>
 <p>Learning how to use <code class="docutils literal notranslate"><span class="pre">guvectorize</span></code> effectively:</p>
 <ul class="simple">
 <li><p><a class="github reference external" href="https://github.com/sgkit-dev/sgkit/pull/114">sgkit-dev/sgkit#114</a></p></li>
@@ -895,7 +844,7 @@ useful if they were possible (they are not possible currently w/ Dask):</p>
 </ul>
 </section>
 <section id="api-namespace">
-<h3><a class="toc-backref" href="#id25" role="doc-backlink">API namespace</a><a class="headerlink" href="#api-namespace" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id24" role="doc-backlink">API namespace</a><a class="headerlink" href="#api-namespace" title="Link to this heading">#</a></h3>
 <p>Sgkit controls API namespace via init files. To accommodate for mypy and docstrings
 we include both imports and <code class="docutils literal notranslate"><span class="pre">__all__</span></code> declaration. More on this decision in the issue:
 <a class="github reference external" href="https://github.com/sgkit-dev/sgkit/issues/251">sgkit-dev/sgkit#251</a></p>
@@ -972,7 +921,6 @@ we include both imports and <code class="docutils literal notranslate"><span cla
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing-to-documentation">Contributing to documentation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#benchmarks">Benchmarks</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#review-process">Review process</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#design-discussions">Design discussions</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-subclassing">Dataset subclassing</a></li>
