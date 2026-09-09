@@ -56,6 +56,61 @@ content-type = "text/x-rst"
 plink = ["partd", "bed-reader"]
 bgen = ["rechunker", "cbgen > 1.0.5"]
 
+[dependency-groups]
+test = [
+  "packaging",
+  "callee",
+  "pytest",
+  "pytest-cov",
+  "pytest-datadir",
+  "pytest-mock",
+  "hypothesis",
+  "scikit-allel",
+  "statsmodels",
+  "msprime>=1.0",
+  "bio2zarr[vcf]; platform_system != \"Windows\"",
+  "yarl",
+  "matplotlib",
+  "networkx",
+  "aiohttp",
+  "requests",
+  "graphviz",
+  # Exercise both optional I/O formats with `uv run pytest`.
+  "partd",
+  "bed-reader",
+  "rechunker",
+  "cbgen > 1.0.5",
+]
+docs = [
+  "graphviz",
+  "myst_nb",
+  "pydata-sphinx-theme",
+  "sphinx < 9.0.0",
+  "sphinx_autodoc_typehints",
+  "sphinx-copybutton",
+  "scanpydoc",
+  "ipython",
+  "matplotlib",
+  "seaborn",
+  "ablog!=0.10.27",
+  "pickleshare",
+]
+lint = [
+  "pre-commit",
+]
+packaging = [
+  "twine",
+]
+dev = [
+  { include-group = "test" },
+  { include-group = "docs" },
+  { include-group = "lint" },
+  { include-group = "packaging" },
+]
+
+[tool.uv]
+required-version = ">=0.12.10"
+
 [tool.setuptools]
 packages = ["sgkit"]
 zip-safe = false            # https://mypy.readthedocs.io/en/latest/installed_packages.html

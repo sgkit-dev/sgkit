@@ -22,15 +22,20 @@ jobs:
       uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v10.0.1
+      with:
+        version: "0.12.10"
+        python-version: ${{ matrix.python-version }}
+        enable-cache: true
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt -r requirements-dev.txt
+        uv sync --locked --all-extras --group test --group lint --no-default-groups --python "${{ matrix.python-version }}"
     - name: Run pre-commit
-      uses: pre-commit/action@v3.0.1
+      run: uv run --no-sync pre-commit run --all-files
     - name: Test with pytest and coverage
       run: |
-        pytest -v --cov=sgkit --cov-report=term-missing
+        uv run --no-sync pytest -v --cov=sgkit --cov-report=term-missing
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v7
       with:
@@ -49,14 +54,19 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.11'
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          version: "0.12.10"
+          python-version: '3.11'
+          enable-cache: true
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt -r requirements-dev.txt
+          uv sync --locked --all-extras --group test --no-default-groups --python 3.11
       - name: Install zarr${{ matrix.zarr }}
         run: |
-          python -m pip install --pre 'zarr${{ matrix.zarr }}'
-          python -m pip uninstall -y bio2zarr  # TODO: remove when bio2zarr supports Zarr Python 3
+          uv pip install --python .venv/bin/python --pre 'zarr${{ matrix.zarr }}'
+          uv pip uninstall --python .venv/bin/python bio2zarr  # TODO: remove when bio2zarr supports Zarr Python 3
       - name: Run tests
         run: |
-          pytest
+          uv run --no-sync pytest

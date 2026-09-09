@@ -88,15 +88,15 @@ Contributions to *sgkit* can then be made by submitting pull requests on GitHub.
 Install
 ~~~~~~~
 
-You can install the necessary requirements using pip::
+Install `uv <https://docs.astral.sh/uv/getting-started/installation/>`_
+(version 0.12.10 or newer), then create the development environment::
 
   cd sgkit
-  pip install -r requirements.txt -r requirements-dev.txt -r requirements-doc.txt
+  uv sync
 
-
-Then install the `sgkit` in [editable mode](https://pip.pypa.io/en/stable/cli/pip_install/#editable-installs)
-
-  pip install -e .
+This installs sgkit in editable mode with the ``dev`` dependency group, including
+the dependencies needed to test its optional I/O formats. Use ``uv run`` to run
+commands in this environment without activating it.
 
 
 If you have a Nvidia GPU you will need to make sure that it is configured properly,
@@ -104,9 +104,9 @@ as in you have cudatoolkit installed, the instructions for the same can be found
 `nvidia docs. <https://developer.nvidia.com/cuda-toolkit>`_
 
 
-Also install pre-commit, which is used to enforce coding standards::
+Install the pre-commit hook, which is used to enforce coding standards::
 
-   pre-commit install
+   uv run pre-commit install
 
 
 Run tests
@@ -115,7 +115,7 @@ Run tests
 *sgkit* uses pytest_ for testing.  You can run tests from the main ``sgkit`` directory
 as follows::
 
-   pytest
+   uv run pytest
 
 .. _pytest: https://docs.pytest.org/en/latest/
 
@@ -143,7 +143,7 @@ and for the future.
 Test coverage must be 100% for code to be accepted. You can measure the coverage
 on your local machine by running::
 
-   pytest --cov=sgkit --cov-report=html
+   uv run pytest --cov=sgkit --cov-report=html
 
 A report will be written in the ``htmlcov`` directory that will show any lines that
 are not covered by tests.
@@ -186,8 +186,8 @@ after the line.
 .. _numpydoc: https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
 
 Docstrings are tested by CI. You can test them locally
-by running ``pytest`` (this works because the ``--doctest-modules`` option is automatically added
-in the *setup.cfg* file).
+by running ``uv run pytest`` (this works because the ``--doctest-modules`` option is automatically added
+in the *pyproject.toml* file).
 
 
 Coding standards
@@ -207,11 +207,11 @@ if the change passes all the checks. It is also run for pull requests using CI.
 To manually enforce (or check) the source code adheres to our coding standards without
 doing a git commit, run::
 
-   pre-commit run --all-files
+   uv run pre-commit run --all-files
 
 To run a specific tool (``black``/``flake8``/``isort``/``mypy`` etc)::
 
-   pre-commit run black --all-files
+   uv run pre-commit run black --all-files
 
 You can omit ``--all-files`` to only check changed files.
 
@@ -241,14 +241,22 @@ and specifically a very handy `interactive rebase doc <https://git-scm.com/book/
 Python dependencies
 ~~~~~~~~~~~~~~~~~~~
 
-Python runtime dependencies are listed in ``requirements.txt`` and ``setup.cfg``, so if you update a
-dependency, or add a new one, then don't forget to change both files. We try to keep the use of pinning
+Python runtime dependencies are listed in ``pyproject.toml``. After updating or adding a
+dependency, run ``uv lock`` and include both ``pyproject.toml`` and ``uv.lock`` in the change.
+Refresh locked dependencies periodically (approximately every six months) with
+``uv lock --upgrade``, then review and test the resulting changes.
+We try to keep the use of pinning
 (to exclude particular version numbers) to a minimum, but sometimes this is unavoidable due to bugs or conflicts.
 
 After a release, the release manager will update the corresponding dependencies in the
 `conda-forge feedstock <https://github.com/conda-forge/sgkit-feedstock>`_.
 
-Build dependencies are listed in ``requirements-dev.txt`` and ``requirements-doc.txt``.
+Dependencies for tests, documentation, linting, and packaging checks are listed in
+the ``test``, ``docs``, ``lint``, and ``packaging`` groups in ``pyproject.toml``.
+The ``dev`` group includes all four for local development. Build-system dependencies
+are listed separately in ``[build-system].requires``.
+
+.. _contributing_docs:
 
 
 Contributing to documentation
@@ -262,20 +270,32 @@ and API documentation.
 Building the documentation requires the Graphviz ``dot`` executable, which you
 can install by following `these instructions <https://graphviz.org/download/#executable-packages>`_.
 
-You can build the documentation locally with ``make``::
+Documentation builds use the same ``.venv`` as development. Task-graph
+visualization with NumPy 2 needs a newer Dask than the current runtime bound.
+From the repository root, on macOS or Linux, prepare the environment and build
+with ``make``::
 
+   uv sync --locked
+   uv pip uninstall --python .venv/bin/python dask-expr
+   uv pip install --python .venv/bin/python 'dask==2026.8.0'
    cd docs
    make html
 
-The resulting HTML files end up in the ``_build/html`` directory.
+The old ``dask-expr`` package is removed because it pins the runtime Dask version.
+The Makefile uses ``uv run --no-sync`` to preserve the Dask override during builds.
+Docs CI applies the same override.
 
-You can now make edits to ``.rst`` files and run ``make html`` again to update
-the affected pages.
+The resulting HTML files are in ``_build/html``. After editing documentation,
+run ``make html`` again.
 
-The documentation build is checked by CI to ensure that it builds
-without warnings. You can do that locally with::
+CI checks documentation with warnings treated as errors. Run the same check
+locally with::
 
    make clean html SPHINXOPTS="-W --keep-going -n"
+
+Before running tests, restore the locked development dependencies with
+``uv sync --locked`` from the repository root. Repeat the Dask setup above when
+you next build the documentation.
 
 .. _Sphinx: https://www.sphinx-doc.org/
 

@@ -22,18 +22,25 @@ jobs:
 
     steps:
     - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v10.0.1
+      with:
+        version: "0.12.10"
+        python-version: ${{ matrix.python-version }}
+        enable-cache: true
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install setuptools twine wheel build
+        uv sync --locked --only-group packaging --python "${{ matrix.python-version }}"
     - name: Build a source distribution and a wheel
       run: |
-        python -m build --sdist --wheel
-        python -m twine check --strict dist/*
+        uv build --no-sources --python "${{ matrix.python-version }}"
+        uv run --locked --only-group packaging twine check --strict dist/*
     - name: Upload artifacts
       uses: actions/upload-artifact@v7
       with:
@@ -62,15 +69,22 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          version: "0.12.10"
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
       - name: Install wheel and test
         run: |
           python -VV
-          # Install the local wheel
+          # Avoid building SciPy from source in CI.
           wheel=$(ls artifact/sgkit-*.whl)
-          pip install ${wheel} ${wheel}[bgen] ${wheel}[plink]
-          python sgkit-copy/.github/scripts/test_sgkit.py
-          python sgkit-copy/.github/scripts/test_sgkit_bgen.py
-          python sgkit-copy/.github/scripts/test_sgkit_plink.py
+          uv venv --python "${{ matrix.python-version }}"
+          uv pip install --python .venv/bin/python --only-binary scipy "${wheel}[bgen,plink]"
+          .venv/bin/python sgkit-copy/.github/scripts/test_sgkit.py
+          .venv/bin/python sgkit-copy/.github/scripts/test_sgkit_bgen.py
+          .venv/bin/python sgkit-copy/.github/scripts/test_sgkit_plink.py
 
   windows-test:
     # This workflow only runs on the origin org
@@ -94,15 +108,22 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          version: "0.12.10"
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
       - name: Install wheel and test
         run: |
           python -VV
-          # Install the local wheel
-          $env:wheel = $(ls artifact/sgkit-*.whl)
-          pip install $env:wheel "$env:wheel[bgen]" "$env:wheel[plink]"
-          python sgkit-copy/.github/scripts/test_sgkit.py
-          python sgkit-copy/.github/scripts/test_sgkit_bgen.py
-          python sgkit-copy/.github/scripts/test_sgkit_plink.py
+          # Avoid building SciPy from source in CI.
+          $wheel = (Get-ChildItem artifact/sgkit-*.whl).FullName
+          uv venv --python "${{ matrix.python-version }}"
+          uv pip install --python .venv/Scripts/python.exe --only-binary scipy "${wheel}[bgen,plink]"
+          .venv/Scripts/python.exe sgkit-copy/.github/scripts/test_sgkit.py
+          .venv/Scripts/python.exe sgkit-copy/.github/scripts/test_sgkit_bgen.py
+          .venv/Scripts/python.exe sgkit-copy/.github/scripts/test_sgkit_plink.py
 
 
   pypi-upload:
@@ -118,14 +139,14 @@ jobs:
       - name: Move to dist
         run: |
           mkdir dist
-          cp */*.{whl,gz} dist/.
+          cp ./*/*.{whl,gz} dist/.
       - name: Publish package to TestPyPI
         if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          repository_url: https://test.pypi.org/legacy/
+          repository-url: https://test.pypi.org/legacy/
       - name: Publish package to PyPI
         if: github.event_name == 'release'
         uses: pypa/gh-action-pypi-publish@release/v1

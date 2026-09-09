@@ -22,13 +22,18 @@ jobs:
       uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v10.0.1
+      with:
+        version: "0.12.10"
+        python-version: ${{ matrix.python-version }}
+        enable-cache: true
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt -r requirements-dev.txt
+        uv sync --locked --all-extras --group test --no-default-groups --python "${{ matrix.python-version }}"
     - name: Test with pytest
       # To avoid: 'UserWarning: KMeans is known to have a memory leak on Windows with MKL, when there are less chunks than available threads. You can avoid it by setting the environment variable OMP_NUM_THREADS=1'
       env:
         OMP_NUM_THREADS: 1
       run: |
-        pytest -v
+        uv run --no-sync pytest -v

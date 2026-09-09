@@ -34,6 +34,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
           miniconda-version: "latest"
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          version: "0.12.10"
+          enable-cache: true
+
       - name: Conda info
         run: |
           conda info
@@ -42,7 +48,8 @@ jobs:
       - name: Installing cudatoolkit and dependencies
         run: |
           conda install -c nvidia cudatoolkit
-          pip install -r requirements.txt -r requirements-dev.txt
+          # Avoid building SciPy from source in CI.
+          uv pip install --only-binary scipy --python "$CONDA_PREFIX/bin/python" -e ".[bgen,plink]" --group test
 
       - name: Numba Information
         run: |

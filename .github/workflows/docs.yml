@@ -12,21 +12,27 @@ jobs:
 
     steps:
     - uses: actions/checkout@v7
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.11
       uses: actions/setup-python@v7
       with:
         python-version: "3.11"
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v10.0.1
+      with:
+        version: "0.12.10"
+        python-version: "3.11"
+        enable-cache: true
     - name: Install dependencies
       run: |
         sudo apt update -y
         sudo apt install graphviz  # Needed for documentation
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt -r requirements-dev.txt -r requirements-doc.txt
-        pip install -U dask distributed  # need latest versions to successully build docs
+        uv sync --locked --all-extras --group docs --no-default-groups --python "3.11"
+        # Use newer Dask for task-graph rendering with NumPy 2.
+        uv pip uninstall --python .venv/bin/python dask-expr
+        uv pip install --python .venv/bin/python 'dask==2026.8.0'
     - name: Build Sphinx documentation
       run: |
-        cd docs
-        make html SPHINXOPTS="-W --keep-going -n"
+        make -C docs html SPHINXOPTS="-W --keep-going -n"
     - name: Commit documentation changes to gh-pages branch
       run: |
         git clone https://github.com/sgkit-dev/sgkit.git --branch gh-pages --single-branch gh-pages
