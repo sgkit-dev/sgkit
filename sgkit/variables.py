@@ -826,6 +826,42 @@ stat_Garud_h2_h1, stat_Garud_h2_h1_spec = SgkitVariables.register_variable(
     )
 )
 
+stat_Garud_g1, stat_Garud_g1_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_Garud_g1",
+        dims=("windows", "cohorts"),
+        kind="f",
+        __doc__="""Garud G1 statistic for cohorts.""",
+    )
+)
+
+stat_Garud_g12, stat_Garud_g12_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_Garud_g12",
+        dims=("windows", "cohorts"),
+        kind="f",
+        __doc__="""Garud G12 statistic for cohorts.""",
+    )
+)
+
+stat_Garud_g123, stat_Garud_g123_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_Garud_g123",
+        dims=("windows", "cohorts"),
+        kind="f",
+        __doc__="""Garud G123 statistic for cohorts.""",
+    )
+)
+
+stat_Garud_g2_g1, stat_Garud_g2_g1_spec = SgkitVariables.register_variable(
+    ArrayLikeSpec(
+        "stat_Garud_g2_g1",
+        dims=("windows", "cohorts"),
+        kind="f",
+        __doc__="""Garud G2/G1 statistic for cohorts.""",
+    )
+)
+
 stat_genomic_kinship, stat_genomic_kinship_spec = SgkitVariables.register_variable(
     ArrayLikeSpec(
         "stat_genomic_kinship",

@@ -81,6 +81,7 @@ Population genetic statistics
    divergence
    diversity
    Fst
+   Garud_G
    Garud_H
    individual_heterozygosity
    observed_heterozygosity
@@ -214,6 +215,10 @@ By convention, variable names are singular in sgkit. For example, ``genotype_cou
     variables.stat_divergence_spec
     variables.stat_diversity_spec
     variables.stat_Fst_spec
+    variables.stat_Garud_g1_spec
+    variables.stat_Garud_g12_spec
+    variables.stat_Garud_g123_spec
+    variables.stat_Garud_g2_g1_spec
     variables.stat_Garud_h1_spec
     variables.stat_Garud_h12_spec
     variables.stat_Garud_h123_spec
