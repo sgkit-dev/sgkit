@@ -2,8 +2,8 @@ name: Upstream
 
 on:
   push:
-  schedule:
-    - cron: "0 1 * * *"
+  # schedule:
+  #  - cron: "0 1 * * *"
   # manual trigger
   workflow_dispatch:
 
