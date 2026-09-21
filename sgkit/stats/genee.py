@@ -1,3 +1,5 @@
+import warnings
+
 import dask.array as da
 import numpy as np
 import pandas as pd
@@ -16,9 +18,11 @@ def genee(ds: Dataset, ld: ArrayLike, *, reg_covar: float = 0.000001) -> DataFra
     Parameters
     ----------
     ds
-        Dataset containing beta values (OLS betas or regularized betas).
+        Dataset containing marginal variant effect values in the variable "beta"
+        (OLS betas or regularized betas), and window definitions corresponding to
+        genomic regions of interest, e.g. genes.
     ld
-        2D array of LD values.
+        Dense 2D array corresponding to the LD matrix.
     reg_covar
         Non-negative regularization added to the diagonal of covariance.
         Passed to scikit-learn ``GaussianMixture``.
@@ -30,6 +34,41 @@ def genee(ds: Dataset, ld: ArrayLike, *, reg_covar: float = 0.000001) -> DataFra
     the first mixture component with the largest variance if it is composed
     of more than 50% of the SNPs.
 
+        Examples
+    --------
+
+    >>> import numpy as np
+    >>> import xarray as xr
+    >>> from sgkit.stats.genee import genee
+    >>> from sgkit.stats.association import gwas_linear_regression
+    >>> from sgkit.stats.ld import ld_matrix
+    >>> from sgkit.testing import simulate_genotype_call_dataset
+    >>> n_variant, n_sample, n_contig, n_covariate, n_trait, seed = 100, 50, 2, 3, 5, 0
+    >>> rs = np.random.RandomState(seed)
+    >>> ds = simulate_genotype_call_dataset(n_variant=n_variant, n_sample=n_sample, n_contig=n_contig, seed=seed)
+    >>> ds_pheno = xr.DataArray(np.random.rand(n_sample), dims=['samples'], name='phenotype')
+    >>> ds = ds.assign(phenotype=ds_pheno)
+    >>> ds["call_dosage"] = ds.call_genotype.sum(dim="ploidy")
+    >>> ds = gwas_linear_regression(ds, dosage="call_dosage", add_intercept=True, traits=["phenotype"], covariates=[])
+    >>> ds = ds.rename({"variant_linreg_beta": "beta"})
+    # genee cannot handle the return value of gwas_linear_regression, we need to
+    # convert it to a dataset with a single variant dimension
+    >>> ds_beta = xr.DataArray(np.random.rand(n_variant), dims=['variants'], name='beta')
+    >>> ds = ds.assign(beta=ds_beta)
+    >>> gene_start = np.array([0, 30])
+    >>> gene_stop = np.array([20, 40])
+    >>> gene_contig = np.array([0, 1])
+    # genes are windows in this simple example
+    >>> ds["window_contig"] = (["windows"], gene_contig)
+    >>> ds["window_start"] = (["windows"], gene_start)
+    >>> ds["window_stop"] = (["windows"], gene_stop)
+    # this only works as long as the windows on different chromosomes are non-overlapping
+    # ld_matrix looses all information about contigs
+    # is there a way to do this properly in chunks and have genee work with the chunks?
+    >>> ld_temp = ld_matrix(ds).compute().pivot(index="i", columns="j", values="value").fillna(-1).to_numpy()
+    >>> ld = (ld_temp + ld_temp.T) / 2
+    >>> df = genee(ds, ld).compute()
+
     Returns
     -------
     A dataframe containing the following fields:
@@ -37,6 +76,8 @@ def genee(ds: Dataset, ld: ArrayLike, *, reg_covar: float = 0.000001) -> DataFra
     - ``test_q``: test statistic
     - ``q_var``: test variance
     - ``pval``: p-value
+
+    Each value corresponds to a window in the input dataset.
 
     References
     ----------
@@ -83,7 +124,7 @@ def genee_EM(betas, reg_covar=0.000001):
 
     covars = best_gmm.covariances_.squeeze()
     if best_gmm.n_components == 1:  # pragma: no cover
-        epsilon_effect = covars[0]
+        epsilon_effect = covars[0] if (covars.ndim > 0) else covars
     else:
         # TODO: handle case where first component composed more than 50% SNPs
         # https://github.com/ramachandran-lab/genee/blob/a357a956241df93f16e07664e24f3aeac65f4177/genee/R/genee_EM.R#L28-L29
@@ -132,8 +173,13 @@ def genee_test(gene, ld, betas, epsilon_effect):
     test_statistics = betas_g.T @ betas_g
     t_var = np.diag((ld_g * epsilon_effect) @ (ld_g * epsilon_effect)).sum()
 
-    p_value_g = compute_p_values(e_values, test_statistics)
-    p_value_g = ensure_positive_real(p_value_g)
+    if all(e_values == 0.0):
+        warnings.warn("All eigenvalues of the given gene LD matrix are zero. Cannot compute p-value.",
+                      UserWarning)
+        p_value_g = np.real_if_close(np.nan)
+    else:
+        p_value_g = compute_p_values(e_values, test_statistics)
+        p_value_g = ensure_positive_real(p_value_g)
 
     return test_statistics.squeeze().item(), t_var, p_value_g.squeeze().item()
 
