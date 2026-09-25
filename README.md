@@ -2,7 +2,6 @@
 [![Build](https://github.com/sgkit-dev/sgkit/actions/workflows/build.yml/badge.svg)](https://github.com/sgkit-dev/sgkit/actions/workflows/build.yml)
 [![Windows](https://github.com/sgkit-dev/sgkit/actions/workflows/windows.yml/badge.svg)](https://github.com/sgkit-dev/sgkit/actions/workflows/windows.yml)
 [![Docs](https://github.com/sgkit-dev/sgkit/actions/workflows/docs.yml/badge.svg)](https://sgkit-dev.github.io/sgkit/)
-[![Upstream](https://github.com/sgkit-dev/sgkit/actions/workflows/upstream.yml/badge.svg)](https://github.com/sgkit-dev/sgkit/actions/workflows/upstream.yml)
 [![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A)](http://numfocus.org)
 
 Sgkit is a Python package that provides a variety of analytical genetics methods through the use of
