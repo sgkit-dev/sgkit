@@ -21,6 +21,17 @@ def test_simulate_genotype_call_dataset__zarr(tmp_path):
     xr.testing.assert_equal(ds, xr.open_zarr(path, concat_characters=False))
 
 
+def test_simulate_genotype_call_dataset__unique_alleles():
+    # Alleles are drawn without replacement so a variant cannot repeat
+    # the same allele (sgkit-dev/sgkit#1221). seed=1 produced duplicate
+    # "T" alleles at sites 6 and 7 before the fix.
+    ds = simulate_genotype_call_dataset(
+        n_variant=10, n_sample=4, missing_pct=0, phased=True, seed=1
+    )
+    for alleles in ds["variant_allele"].values:
+        assert len(np.unique(alleles)) == len(alleles)
+
+
 def test_simulate_genotype_call_dataset__invalid_missing_pct():
     with pytest.raises(
         ValueError, match=re.escape("missing_pct must be within [0.0, 1.0]")
