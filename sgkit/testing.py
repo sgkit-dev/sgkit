@@ -88,9 +88,16 @@ def simulate_genotype_call_dataset(
     contig_names = np.unique(contig).astype(str).tolist()  # type: ignore[no-untyped-call]
     position = np.concatenate([np.arange(contig_size[i]) for i in range(n_contig)])  # type: ignore[no-untyped-call]
     assert position.size == contig.size
-    alleles: ArrayLike = rs.choice(
-        ["A", "C", "G", "T"], size=(n_variant, n_allele)
-    ).astype("S")
+    bases = np.array(list("ACGT"))
+    if n_allele <= len(bases):
+        # Sample without replacement so a variant never gets the same
+        # allele twice (sgkit-dev/sgkit#1221).
+        order = np.argsort(rs.rand(n_variant, len(bases)), axis=1)
+        alleles: ArrayLike = bases[order[:, :n_allele]].astype("S")
+    else:
+        alleles = rs.choice(["A", "C", "G", "T"], size=(n_variant, n_allele)).astype(
+            "S"
+        )
     sample_id = np.array([f"S{i}" for i in range(n_sample)])
     ds = create_genotype_call_dataset(
         variant_contig_names=contig_names,
