@@ -9,6 +9,7 @@ import io
 import logging
 import logging.config
 import shutil
+from importlib.metadata import version
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -16,7 +17,6 @@ import fire
 import glow
 import numpy as np
 import pandas as pd
-import pkg_resources
 import pyspark.sql.functions as F
 import yaml
 from glow import expand_struct, genotype_states, linear_regression_gwas, mean_substitute
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 HR = "-" * 50
 
-glow_version = pkg_resources.get_distribution("glow.py").version
+glow_version = version("glow.py")
 
 
 def _info(df):
