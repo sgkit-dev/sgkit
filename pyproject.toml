@@ -147,19 +147,11 @@ use_parentheses = true
 line_length = 88
 
 [[tool.mypy.overrides]]
-module = ["callee.*"]
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
 module = ["dask.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = ["fsspec.*"]
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = ["dask_ml.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
@@ -192,10 +184,6 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = ["numcodecs.*"]
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = ["setuptools"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
