@@ -75,11 +75,7 @@ test = [
   "aiohttp",
   "requests",
   "graphviz",
-  # Exercise both optional I/O formats with `uv run pytest`.
-  "partd",
-  "bed-reader",
-  "rechunker",
-  "cbgen > 1.0.5",
+  "sgkit[plink,bgen]",
 ]
 docs = [
   "graphviz",
