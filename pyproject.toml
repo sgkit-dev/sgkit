@@ -107,9 +107,14 @@ dev = [
 required-version = ">=0.12.10"
 
 [tool.setuptools]
-packages = ["sgkit"]
 zip-safe = false            # https://mypy.readthedocs.io/en/latest/installed_packages.html
 include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sgkit", "sgkit.*"]
+exclude = ["sgkit.tests", "sgkit.tests.*"]
+namespaces = false
 
 [tool.setuptools_scm]
 version_file = "sgkit/_version.py"
