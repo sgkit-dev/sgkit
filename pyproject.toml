@@ -136,7 +136,6 @@ known_third_party = [
   "pyspark",
   "pytest",
   "setuptools",
-  "sgkit_plink",
   "sklearn",
   "sphinx",
   "xarray",

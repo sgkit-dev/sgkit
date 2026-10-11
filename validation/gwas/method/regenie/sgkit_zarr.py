@@ -8,7 +8,8 @@ from pathlib import Path
 import fire
 import yaml
 import zarr
-from sgkit_plink import read_plink
+
+from sgkit.io.plink import read_plink
 
 logging.config.fileConfig("logging.ini")
 logger = logging.getLogger(__name__)
@@ -18,6 +19,7 @@ def run(dataset: str, dataset_dir="data/dataset"):
     dataset_dir = Path(dataset_dir)
     plink_path = dataset_dir / dataset / "genotypes"
     zarr_path = dataset_dir / dataset / "genotypes.zarr.zip"
+    # TODO: Update this when migrating PLINK I/O to bio2zarr/vcztools.
     ds = read_plink(path=plink_path, bim_sep="\t", fam_sep="\t")
     # Pre-compute string lengths until this is done:
     # https://github.com/sgkit-dev/sgkit-plink/issues/12
