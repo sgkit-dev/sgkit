@@ -95,7 +95,6 @@ dev = [
 required-version = ">=0.12.10"
 
 [tool.setuptools]
-zip-safe = false            # https://mypy.readthedocs.io/en/latest/installed_packages.html
 include-package-data = true
 
 [tool.setuptools.packages.find]
