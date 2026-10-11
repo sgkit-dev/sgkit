@@ -40,17 +40,6 @@ variation data."""
 content-type = "text/x-rst"
 
 [project.optional-dependencies]
-# For plink we need dask[dataframe], we already have
-# dask[array] in install_requires, and since
-# https://github.com/pypa/pip/issues/4957, pip
-# will essentially ignore dask[dataframe] in the extras.
-# We can workaround this by either adding pip flag
-# --use-feature 2020-resolver, or installing
-# dask[dataframe] in the install_requires, or just listing
-# the 2 missing dependencies from dataframe, the way we do
-# here, when pip finally gets a resolver, this won't be
-# a problem. Here we opt for listing the 2 dependencies
-# since this is the least user invasive solution.
 plink = ["partd", "bed-reader"]
 bgen = ["rechunker", "cbgen > 1.0.5"]
 
