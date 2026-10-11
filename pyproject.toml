@@ -31,7 +31,6 @@ dependencies = [
   "fsspec != 2021.6.*",
   "scikit-learn",
   "pandas < 3.0",
-  "setuptools >= 41.2",                                   # For pkg_resources
 ]
 dynamic = ["version"]
 
