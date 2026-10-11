@@ -1,15 +1,14 @@
 [build-system]
-requires = ["setuptools >= 69", "setuptools_scm[toml] >= 8"]
+requires = ["setuptools >= 77", "setuptools_scm[toml] >= 8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "sgkit"
 authors = [{ name = "sgkit Developers", email = "project@sgkit.dev" }]
-license = { text = "Apache" }
+license = "Apache-2.0"
 description = "Statistical genetics toolkit"
 classifiers = [
   "Development Status :: 3 - Alpha",
-  "License :: OSI Approved :: Apache Software License",
   "Operating System :: OS Independent",
   "Intended Audience :: Science/Research",
   "Programming Language :: Python",
