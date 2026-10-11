@@ -135,6 +135,7 @@ dmypy.json
 .DS_Store
 
 # sgkit
+/sgkit/_version.py
 docs/generated
 docs/mydask.png
 docs/order.png
