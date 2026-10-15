@@ -11,8 +11,14 @@ Changelog
 .. New Features
 .. ~~~~~~~~~~~~
 
-.. Breaking changes
-.. ~~~~~~~~~~~~~~~~
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- Require Zarr Python >= 3 and Xarray >= 2026.9.0. The default on-disk Zarr
+  format remains 2. (:issue:`1355`)
+- Remove the incompatible rechunker dependency from the BGEN extra. The
+  deprecated BGEN conversion functions now use Xarray and Dask; ``max_mem``
+  and ``tempdir`` no longer control rechunking.
 
 Deprecations
 ~~~~~~~~~~~~

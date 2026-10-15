@@ -1,16 +1,13 @@
 from pathlib import Path
 from typing import Any, Tuple
 
+import numcodecs
 import numpy as np
 import numpy.testing as npt
 import pytest
 import xarray as xr
 import zarr
-from packaging.version import Version
-
-pytestmark = pytest.mark.skipif(
-    Version(zarr.__version__).major >= 3, reason="Rechunking fails for Zarr Python 3"
-)
+from zarr.storage import MemoryStore
 
 from sgkit.io.bgen.bgen_reader import (
     GT_DATA_VARS,
@@ -230,6 +227,26 @@ def test_rechunk_bgen__target_chunks(shared_datadir, tmp_path, target_chunks):
     )
     for v in GT_DATA_VARS:
         assert dsr[v].data.chunksize[:2] == target_chunks
+    assert zarr.open_group(store, mode="r").metadata.zarr_format == 2
+
+
+@pytest.mark.parametrize("compressor", [None, numcodecs.Blosc(cname="zstd", clevel=7)])
+def test_rechunk_bgen__compressor(shared_datadir, tmp_path, compressor):
+    _, _, store = _rechunk_bgen(shared_datadir, tmp_path, compressor=compressor)
+    array = zarr.open_group(store, mode="r")["call_genotype_probability"]
+    assert array.compressors == (() if compressor is None else (compressor,))
+
+
+def test_rechunk_bgen__memory_store(shared_datadir):
+    ds = read_bgen(shared_datadir / "example.bgen")
+    store = MemoryStore()
+    dsr = rechunk_bgen(ds, store, probability_dtype=None, pack=False)
+    xr.testing.assert_allclose(ds.compute(), dsr.compute())
+
+
+def test_rechunk_bgen__legacy_memory_options(shared_datadir, tmp_path):
+    with pytest.warns(FutureWarning, match="max_mem and tempdir no longer control"):
+        _rechunk_bgen(shared_datadir, tmp_path, max_mem="1MB", tempdir=tmp_path)
 
 
 def test_rechunk_from_zarr__self_consistent(shared_datadir, tmp_path):

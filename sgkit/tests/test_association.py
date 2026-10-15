@@ -8,11 +8,7 @@ import pytest
 import xarray as xr
 from pandas import DataFrame
 from xarray import Dataset
-
-try:
-    from zarr.storage import ZipStore  # v3
-except ImportError:  # pragma: no cover
-    from zarr import ZipStore
+from zarr.storage import ZipStore
 
 import sgkit.distarray as da
 from sgkit.stats.association import (

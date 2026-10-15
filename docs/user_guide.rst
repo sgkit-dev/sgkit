@@ -58,7 +58,15 @@ Similarly, the function :func:`sgkit.save_dataset` can be used to save the datas
 This can be used to save a newly-loaded dataset, or a dataset with new variables that are the
 result of running genetic methods on the data, so it can be loaded again later.
 
-By default, Zarr datasets created by sgkit (and Xarray) have `consolidated metadata <http://xarray.pydata.org/en/stable/user-guide/io.html#consolidated-metadata>`_,
+Sgkit requires Zarr Python >= 3 and Xarray >= 2026.9.0, but
+:func:`sgkit.save_dataset` continues to write **Zarr format 2** by default.
+The Python package version does not determine the on-disk format.
+Pass ``zarr_format=3`` to opt into format 3; :func:`sgkit.load_dataset`
+can read either format.
+The Xarray minimum includes support for the native NumPy string dtype returned
+by recent Zarr releases, preserving string-array chunking on load.
+
+By default, Zarr format 2 datasets created by sgkit have `consolidated metadata <http://xarray.pydata.org/en/stable/user-guide/io.html#consolidated-metadata>`_,
 which makes opening the dataset faster.
 
 BGEN
@@ -70,6 +78,12 @@ arrays within an :class:`xarray.Dataset` from a ``bgen`` file.
 The :func:`sgkit.io.bgen.bgen_to_zarr` function converts a ``bgen`` file to Zarr
 files stored in sgkit's Xarray data representation, which can then be opened
 as a :class:`xarray.Dataset`.
+
+The deprecated BGEN conversion functions now rechunk with Xarray and Dask,
+without the Zarr Python 2-only rechunker package. They still write Zarr format 2
+and preserve probability encoding and packing. The ``max_mem`` and ``tempdir``
+parameters are retained for compatibility but no longer have an effect; configure
+chunk sizes and the Dask scheduler to control memory use.
 
 PLINK
 -----
