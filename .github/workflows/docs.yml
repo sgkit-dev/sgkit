@@ -28,8 +28,8 @@ jobs:
         sudo apt install graphviz  # Needed for documentation
         uv sync --locked --all-extras --group docs --no-default-groups --python "3.11"
         # Use newer Dask for task-graph rendering with NumPy 2.
-        uv pip uninstall --python .venv/bin/python dask-expr
-        uv pip install --python .venv/bin/python 'dask==2026.8.0'
+        uv pip uninstall --python .venv dask-expr
+        uv pip install --python .venv 'dask==2026.8.0'
     - name: Build Sphinx documentation
       run: |
         make -C docs html SPHINXOPTS="-W --keep-going -n"

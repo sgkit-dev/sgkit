@@ -65,8 +65,8 @@ jobs:
           uv sync --locked --all-extras --group test --no-default-groups --python 3.11
       - name: Install zarr${{ matrix.zarr }}
         run: |
-          uv pip install --python .venv/bin/python --pre 'zarr${{ matrix.zarr }}'
-          uv pip uninstall --python .venv/bin/python bio2zarr  # TODO: remove when bio2zarr supports Zarr Python 3
+          uv pip install --python .venv --pre 'zarr${{ matrix.zarr }}'
+          uv pip uninstall --python .venv bio2zarr  # TODO: remove when bio2zarr supports Zarr Python 3
       - name: Run tests
         run: |
           uv run --no-sync pytest
