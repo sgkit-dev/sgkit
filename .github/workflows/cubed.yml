@@ -32,7 +32,7 @@ jobs:
       run: |
         uv sync --locked --all-extras --group test --no-default-groups --python "${{ matrix.python-version }}"
         # Update the experimental packages without upgrading unrelated dependencies.
-        uv pip install --python .venv/bin/python \
+        uv pip install --python .venv \
           --upgrade-package cubed --upgrade-package cubed-xarray --upgrade-package xarray \
           git+https://github.com/cubed-dev/cubed.git git+https://github.com/cubed-dev/cubed-xarray.git git+https://github.com/pydata/xarray.git
 

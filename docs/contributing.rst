@@ -276,8 +276,8 @@ From the repository root, on macOS or Linux, prepare the environment and build
 with ``make``::
 
    uv sync --locked
-   uv pip uninstall --python .venv/bin/python dask-expr
-   uv pip install --python .venv/bin/python 'dask==2026.8.0'
+   uv pip uninstall --python .venv dask-expr
+   uv pip install --python .venv 'dask==2026.8.0'
    cd docs
    make html
 
