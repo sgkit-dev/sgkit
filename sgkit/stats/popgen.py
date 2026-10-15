@@ -604,32 +604,39 @@ def pbs(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
-N_GARUD_H_STATS = 4  # H1, H12, H123, H2/H1
+N_GARUD_STATS = 4  # H1, H12, H123, H2/H1 or G1, G12, G123, G2/G1
 
 
-def _Garud_h(haplotypes: np.ndarray) -> np.ndarray:
-    # find haplotype counts (sorted in descending order)
-    counts = sorted(collections.Counter(haplotypes.tolist()).values(), reverse=True)
+def _Garud_stat(hashed_genotypes: np.ndarray) -> np.ndarray:
+    """Compute the Garud H or G statistics (H1, H12, H123, H2/H1 or G1, G12, G123, G2/G1).
+
+    This helper is used by both :func:`Garud_H` and :func:`Garud_G` after
+    genotypes are encoded into hashable units:
+    - haplotypes for ``Garud_H``
+    - diplotypes (MLGs) for ``Garud_G``
+    """
+    # find encoded genotype counts (sorted in descending order)
+    counts = sorted(collections.Counter(hashed_genotypes.tolist()).values(), reverse=True)
     counts = np.array(counts)  # type: ignore
 
-    # find haplotype frequencies
-    n = haplotypes.shape[0]
-    f = counts / n  # type: ignore[operator]
+    # find encoded genotype frequencies
+    n = hashed_genotypes.shape[0]
+    p = counts / n  # type: ignore[operator]
 
-    # compute H1
-    h1 = np.sum(f**2)
+    # compute H1 or G1
+    x1 = np.sum(p**2)
 
-    # compute H12
-    h12 = np.sum(f[:2]) ** 2 + np.sum(f[2:] ** 2)  # type: ignore[index]
+    # compute H12 or G12
+    x12 = np.sum(p[:2]) ** 2 + np.sum(p[2:] ** 2)  # type: ignore[index]
 
-    # compute H123
-    h123 = np.sum(f[:3]) ** 2 + np.sum(f[3:] ** 2)  # type: ignore[index]
+    # compute H123 or G123
+    x123 = np.sum(p[:3]) ** 2 + np.sum(p[3:] ** 2)  # type: ignore[index]
 
-    # compute H2/H1
-    h2 = h1 - f[0] ** 2  # type: ignore[index]
-    h2_h1 = h2 / h1
+    # compute H2/H1 or G2/G1
+    x2 = x1 - p[0] ** 2  # type: ignore[index]
+    x2_x1 = x2 / x1
 
-    return np.array([h1, h12, h123, h2_h1])
+    return np.array([x1, x12, x123, x2_x1])
 
 
 def _Garud_h_cohorts(
@@ -639,9 +646,9 @@ def _Garud_h_cohorts(
     from .popgen_numba_fns import hash_array
 
     haplotypes = hash_array(gt.transpose()).transpose().flatten()
-    arr = np.full((n_cohorts, N_GARUD_H_STATS), np.nan)
+    arr = np.full((n_cohorts, N_GARUD_STATS), np.nan)
     for c in np.nditer(ct):
-        arr[c, :] = _Garud_h(haplotypes[sample_cohort == c])
+        arr[c, :] = _Garud_stat(haplotypes[sample_cohort == c])
     return arr
 
 
@@ -762,10 +769,10 @@ def Garud_H(
         ds.window_stop.values,
         dtype=np.float64,
         # first chunks dimension is windows, computed in window_statistic
-        chunks=(-1, n_cohorts, N_GARUD_H_STATS),
+        chunks=(-1, n_cohorts, N_GARUD_STATS),
     )
     n_windows = ds.window_start.shape[0]
-    assert_array_shape(gh, n_windows, n_cohorts, N_GARUD_H_STATS)
+    assert_array_shape(gh, n_windows, n_cohorts, N_GARUD_STATS)
     new_ds = create_dataset(
         {
             variables.stat_Garud_h1: (
@@ -783,6 +790,133 @@ def Garud_H(
             variables.stat_Garud_h2_h1: (
                 ("windows", "cohorts"),
                 gh[:, :, 3],
+            ),
+        }
+    )
+
+    return conditional_merge_datasets(ds, new_ds, merge)
+
+def _Garud_g_cohorts(
+    gt: np.ndarray, sample_cohort: np.ndarray, n_cohorts: int, ct: np.ndarray
+) -> np.ndarray:
+    # transpose to hash columns (unphased diplotypes)
+    from .popgen_numba_fns import hash_array
+
+    gt = np.sort(gt, axis=2)
+    diplotypes = hash_array(gt.transpose(1, 2, 0).reshape(gt.shape[1], -1))
+    arr = np.full((n_cohorts, N_GARUD_STATS), np.nan)
+    for c in np.nditer(ct):
+        arr[c, :] = _Garud_stat(diplotypes[sample_cohort == c])
+    return arr
+
+
+def Garud_G(
+    ds: Dataset,
+    *,
+    call_genotype: Hashable = variables.call_genotype,
+    sample_cohort: Hashable = variables.sample_cohort,
+    cohorts: Optional[Sequence[Union[int, str]]] = None,
+    merge: bool = True,
+) -> Dataset:
+    """Compute the G1, G12, G123 and G2/G1 statistics for detecting signatures
+    of soft sweeps in diploid genotypes, as defined in Harris et al. (2018).
+
+    This method requires a windowed dataset.
+    To window a dataset, call :func:`window_by_position` or :func:`window_by_variant` before calling
+    this function.
+
+    Parameters
+    ----------
+    ds
+        Genotype call dataset.
+    call_genotype
+        Input variable name holding call_genotype as defined by
+        :data:`sgkit.variables.call_genotype_spec`.
+        Must be present in ``ds``.
+    sample_cohort
+        Input variable name holding sample_cohort as defined by
+        :data:`sgkit.variables.sample_cohort_spec`.
+    cohorts
+        The cohorts to compute statistics for, specified as a sequence of
+        cohort indexes or IDs. None (the default) means compute statistics
+        for all cohorts.
+    merge
+        If True (the default), merge the input dataset and the computed
+        output variables into a single dataset, otherwise return only
+        the computed output variables.
+        See :ref:`dataset_merge` for more details.
+
+    Returns
+    -------
+    A dataset containing the following variables:
+
+    - `stat_Garud_g1` (windows, cohorts): Garud G1 statistic.
+        Defined by :data:`sgkit.variables.stat_Garud_g1_spec`.
+
+    - `stat_Garud_g12` (windows, cohorts): Garud G12 statistic.
+        Defined by :data:`sgkit.variables.stat_Garud_g12_spec`.
+
+    - `stat_Garud_g123` (windows, cohorts): Garud G123 statistic.
+        Defined by :data:`sgkit.variables.stat_Garud_g123_spec`.
+
+    - `stat_Garud_g2_g1` (windows, cohorts): Garud G2/G1 statistic.
+        Defined by :data:`sgkit.variables.stat_Garud_g2_g1_spec`.
+
+    Raises
+    ------
+    NotImplementedError
+        If the dataset is not diploid.
+    ValueError
+        If the dataset is not windowed.
+
+    Warnings
+    --------
+    This function is currently only implemented for diploid datasets.
+    """
+
+    if ds.sizes["ploidy"] != 2:
+        raise NotImplementedError("Garud G only implemented for diploid genotypes")
+
+    if not has_windows(ds):
+        raise ValueError("Dataset must be windowed for Garud_G")
+
+    variables.validate(ds, {call_genotype: variables.call_genotype_spec})
+
+    gt = da.asarray(ds[call_genotype])
+
+    sc = ds[sample_cohort].values
+    n_cohorts = sc.max() + 1  # 0-based indexing
+    cohorts = cohorts or range(n_cohorts)
+    ct = _cohorts_to_array(cohorts, ds.indexes.get("cohorts", None))
+
+    gg = window_statistic(
+        gt,
+        lambda gt: _Garud_g_cohorts(gt, sc, n_cohorts, ct),
+        ds.window_start.values,
+        ds.window_stop.values,
+        dtype=np.float64,
+        # first chunks dimension is windows, computed in window_statistic
+        chunks=(-1, n_cohorts, N_GARUD_STATS),
+    )
+    n_windows = ds.window_start.shape[0]
+    assert_array_shape(gg, n_windows, n_cohorts, N_GARUD_STATS)
+    new_ds = create_dataset(
+        {
+            variables.stat_Garud_g1: (
+                ("windows", "cohorts"),
+                gg[:, :, 0],
+            ),
+            variables.stat_Garud_g12: (
+                ("windows", "cohorts"),
+                gg[:, :, 1],
+            ),
+            variables.stat_Garud_g123: (
+                ("windows", "cohorts"),
+                gg[:, :, 2],
+            ),
+            variables.stat_Garud_g2_g1: (
+                ("windows", "cohorts"),
+                gg[:, :, 3],
             ),
         }
     )
