@@ -16,11 +16,7 @@ from hypothesis.extra.numpy import arrays as st_arrays
 from hypothesis.strategies import data as st_data
 from pandas import DataFrame
 from xarray import Dataset
-
-try:
-    from zarr.storage import ZipStore  # v3
-except ImportError:  # pragma: no cover
-    from zarr import ZipStore
+from zarr.storage import ZipStore
 
 from sgkit.stats.association import LinearRegressionResult, linear_regression
 from sgkit.stats.regenie import (

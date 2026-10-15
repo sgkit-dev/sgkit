@@ -1,16 +1,14 @@
-from typing import Any, Dict, MutableMapping, Optional, Union
+from typing import Any, Dict, Optional
 
 import numcodecs
 import xarray as xr
 from xarray import Dataset
-
-from sgkit.typing import PathType
-from sgkit.utils import has_keyword
+from zarr.storage import StoreLike
 
 
 def save_dataset(
     ds: Dataset,
-    store: Union[PathType, MutableMapping[str, bytes]],
+    store: StoreLike,
     storage_options: Optional[Dict[str, str]] = None,
     auto_rechunk: Optional[bool] = None,
     zarr_format: int = 2,
@@ -32,6 +30,9 @@ def save_dataset(
     auto_rechunk:
         If True, automatically rechunk the dataset to uniform chunks before saving,
         if necessary. This is required for Zarr, but can be expensive. Defaults to False.
+    zarr_format:
+        On-disk Zarr format, either 2 or 3. Defaults to 2 for compatibility with
+        existing datasets, even though sgkit requires Zarr Python 3.
     kwargs
         Additional arguments to pass to :meth:`xarray.Dataset.to_zarr`.
     """
@@ -41,13 +42,14 @@ def save_dataset(
         # Workaround for https://github.com/pydata/xarray/issues/4380
         ds[v].encoding.pop("chunks", None)
 
-        # Remove VLenUTF8 from filters to avoid double encoding error https://github.com/pydata/xarray/issues/3476
-        filters = ds[v].encoding.get("filters", None)
-        var_len_str_codec = numcodecs.VLenUTF8()
-        if filters is not None and var_len_str_codec in filters:
-            filters = list(filters)
-            filters.remove(var_len_str_codec)
-            ds[v].encoding["filters"] = filters
+        # Xarray writes native NumPy strings as fixed-width Unicode in format 2.
+        # A VLenUTF8 filter inherited from a variable-length array is then invalid.
+        dtype = ds[v].encoding.get("dtype", ds[v].dtype)
+        filters = ds[v].encoding.get("filters")
+        if getattr(dtype, "kind", None) == "T" and filters is not None:
+            ds[v].encoding["filters"] = [
+                f for f in filters if f != numcodecs.VLenUTF8()
+            ]
 
     if auto_rechunk:
         # This logic for checking if rechunking is necessary is
@@ -66,9 +68,9 @@ def save_dataset(
 
     # Catch unequal chunking errors to provide a more helpful error message
     try:
-        if has_keyword(ds.to_zarr, "zarr_format"):  # from xarray v2024.10.0
-            kwargs["zarr_format"] = zarr_format
-        ds.to_zarr(store, storage_options=storage_options, **kwargs)
+        ds.to_zarr(
+            store, storage_options=storage_options, zarr_format=zarr_format, **kwargs
+        )
     except ValueError as e:
         if "Zarr requires uniform chunk sizes" in str(
             e
@@ -82,7 +84,7 @@ def save_dataset(
 
 
 def load_dataset(
-    store: Union[PathType, MutableMapping[str, bytes]],
+    store: StoreLike,
     storage_options: Optional[Dict[str, str]] = None,
     **kwargs: Any,
 ) -> Dataset:

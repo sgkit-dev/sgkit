@@ -41,14 +41,11 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
-  test-zarr-version:
-    name: Test Zarr Python v3
+  test-xarray-minimum:
+    name: Test minimum Xarray
     # Scheduled runs only on the origin org
     if: (github.event_name == 'schedule' && github.repository_owner == 'sgkit-dev') || (github.event_name != 'schedule')
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        zarr: [">=3"]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -63,10 +60,9 @@ jobs:
       - name: Install dependencies
         run: |
           uv sync --locked --all-extras --group test --no-default-groups --python 3.11
-      - name: Install zarr${{ matrix.zarr }}
+      - name: Install minimum supported Xarray
         run: |
-          uv pip install --python .venv --pre 'zarr${{ matrix.zarr }}'
-          uv pip uninstall --python .venv bio2zarr  # TODO: remove when bio2zarr supports Zarr Python 3
+          uv pip install --python .venv 'xarray==2026.9.0'
       - name: Run tests
         run: |
           uv run --no-sync pytest

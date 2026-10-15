@@ -1,20 +1,9 @@
 """BGEN reader implementation (using bgen_reader)"""
 import logging
-import tempfile
 import time
 import warnings
 from pathlib import Path
-from typing import (
-    Any,
-    Dict,
-    Hashable,
-    List,
-    Mapping,
-    MutableMapping,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Any, Dict, Hashable, List, Mapping, Optional, Tuple, Union
 
 import dask
 import dask.array as da
@@ -23,10 +12,9 @@ import numcodecs
 import numpy as np
 import pandas as pd
 import xarray as xr
-import zarr
 from cbgen import bgen_file, bgen_metafile
-from rechunker import api as rechunker_api
 from xarray import Dataset
+from zarr.storage import StoreLike
 
 from sgkit import create_genotype_dosage_dataset, variables
 from sgkit.io.utils import dataframe_to_dict, encode_contigs
@@ -355,9 +343,7 @@ def encode_variables(
 ) -> Dict[Hashable, Dict[str, Any]]:
     encoding = {}
     for v in ds:
-        e = {}
-        if compressor is not None:
-            e.update({"compressor": compressor})
+        e = {"compressors": compressor}
         if v in GT_DATA_VARS:
             e.update({"chunks": (chunk_length, chunk_width) + ds[v].shape[2:]})
         if probability_dtype is not None and v == "call_genotype_probability":
@@ -422,7 +408,7 @@ def unpack_variables(ds: Dataset, dtype: DType = "float32") -> Dataset:
 
 def rechunk_bgen(
     ds: Dataset,
-    output: Union[PathType, MutableMapping[str, bytes]],
+    output: StoreLike,
     *,
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
@@ -434,12 +420,11 @@ def rechunk_bgen(
 ) -> Dataset:
     """Rechunk BGEN dataset as Zarr.
 
-    This function will use the algorithm https://rechunker.readthedocs.io/en/latest/
-    to rechunk certain fields in a provided Dataset for better downstream performance.
-    Depending on the system memory available (and the `max_mem` setting) this
-    rechunking may occur without the need of any intermediate data store. Otherwise,
-    approximately as much disk space is required as was needed to store the original
-    BGEN data. Experiments show that this Zarr representation is ~20% larger even
+    This function uses Xarray and Dask to rechunk a Dataset for better downstream
+    performance and writes Zarr format 2. It no longer uses rechunker, which does
+    not support Zarr Python 3. Memory usage depends on the input and output chunks
+    and the Dask scheduler; no intermediate store is created.
+    Experiments show that this Zarr representation is ~20% larger even
     with all available optimizations and fairly aggressive compression (i.e. the
     default `clevel` 7).
 
@@ -448,7 +433,7 @@ def rechunk_bgen(
     generated based on the final, serialized Zarr data.
 
     .. deprecated:: 0.11.0
-       Using rechunker for rechunking in sgkit is deprecated, please use the the
+       This conversion helper is deprecated, please use the
        `Xarray chunk <https://docs.xarray.dev/en/stable/generated/xarray.Dataset.chunk.html#xarray.Dataset.chunk>`_
        function directly.
 
@@ -469,8 +454,7 @@ def rechunk_bgen(
         Setting this parameter results in a loss of precision. If None, probabilities
         will not be altered when stored.
     max_mem
-        The amount of memory (in bytes) that workers are allowed to use. A string
-        (e.g. 100MB) can also be used.
+        Deprecated and no longer used. Memory is managed by Dask.
     pack
         Whether or not to optimize variable representations by removing unnecessary
         dimensions and elements. This includes storing 2 genotypes instead of 3, omitting
@@ -478,8 +462,7 @@ def rechunk_bgen(
         the above are restored in the resulting Dataset at the expense of extra
         computations on read.
     tempdir
-        Temporary directory where intermediate files are stored. The default None means
-        use the system default temporary directory.
+        Deprecated and no longer used. No intermediate store is created.
 
     Warnings
     --------
@@ -493,10 +476,17 @@ def rechunk_bgen(
         The rechunked dataset.
     """
     warnings.warn(
-        "Using rechunker for rechunking in sgkit is deprecated, please use the the Xarray 'chunk' function directly.",
+        "rechunk_bgen is deprecated, please use Xarray 'chunk' and sgkit.save_dataset directly.",
         DeprecationWarning,
         stacklevel=2,
     )
+    if max_mem != "4GB" or tempdir is not None:
+        warnings.warn(
+            "max_mem and tempdir no longer control BGEN rechunking; "
+            "memory is managed by Dask and no intermediate store is created.",
+            FutureWarning,
+            stacklevel=2,
+        )
 
     if isinstance(output, Path):
         output = str(output)
@@ -514,28 +504,8 @@ def rechunk_bgen(
         compressor=compressor,
         probability_dtype=probability_dtype,
     )
-    target_chunks = {
-        var: encoding[var]["chunks"] for var in encoding if "chunks" in encoding[var]
-    }
-    target_options = {
-        var: {k: v for k, v in encoding[var].items() if k != "chunks"}
-        for var in encoding
-    }
-    with tempfile.TemporaryDirectory(
-        prefix="bgen_to_zarr_", suffix=".zarr", dir=tempdir
-    ) as tmpdir:
-        rechunked = rechunker_api.rechunk(
-            ds,
-            max_mem=max_mem,
-            target_chunks=target_chunks,
-            target_store=output,
-            target_options=target_options,
-            temp_store=tmpdir,
-            executor="dask",
-        )
-        rechunked.execute()
-
-    zarr.consolidate_metadata(output)
+    ds = ds.chunk({"variants": chunk_length, "samples": chunk_width})
+    ds.to_zarr(output, encoding=encoding, zarr_format=2, consolidated=True, mode="w-")
 
     ds = xr.open_zarr(output, concat_characters=False)  # type: ignore[no-untyped-call]
     if pack:
@@ -546,7 +516,7 @@ def rechunk_bgen(
 
 def bgen_to_zarr(
     input: PathType,
-    output: Union[PathType, MutableMapping[str, bytes]],
+    output: StoreLike,
     region: Optional[Mapping[Hashable, Any]] = None,
     chunk_length: int = 10_000,
     chunk_width: int = 1_000,
@@ -590,8 +560,7 @@ def bgen_to_zarr(
         Setting this parameter results in a loss of precision. If None, probabilities
         will not be altered when stored.
     max_mem
-        The amount of memory (in bytes) that workers are allowed to use. A string
-        (e.g. 100MB) can also be used.
+        Deprecated and no longer used. Memory is managed by Dask.
     pack
         Whether or not to optimize variable representations by removing unnecessary
         dimensions and elements. This includes storing 2 genotypes instead of 3, omitting
@@ -599,8 +568,7 @@ def bgen_to_zarr(
         the above are restored in the resulting Dataset at the expense of extra
         computations on read.
     tempdir
-        Temporary directory where intermediate files are stored. The default None means
-        use the system default temporary directory.
+        Deprecated and no longer used. No intermediate store is created.
 
     Warnings
     --------
