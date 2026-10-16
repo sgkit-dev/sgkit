@@ -30,6 +30,14 @@ Breaking changes
 Deprecations
 ~~~~~~~~~~~~
 
+- BGEN reading and conversion have moved out of sgkit. Use
+  `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ for BGEN-to-Zarr conversion
+  and :func:`load_dataset` for analysis. Unlike the deprecated PLINK functions
+  below, ``read_bgen``, ``bgen_to_zarr`` and ``rechunk_bgen`` are already removed
+  in this release; see Breaking changes above and
+  :ref:`bgen_conversion_migration`. Only the dependency-free
+  :func:`sgkit.io.bgen.unpack_variables` helper remains for legacy packed stores.
+  (:pr:`1325`, :issue:`1331`, :issue:`1355`)
 - Functions for reading and writing plink are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_
   and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages.
   (:user:`tomwhite`, :pr:`1324`, :issue:`1318`)
