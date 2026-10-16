@@ -117,7 +117,11 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 autosummary_generate = True
 
-nitpick_ignore = [("py:class", "sgkit.display.GenotypeDisplay")]
+nitpick_ignore = [
+    ("py:class", "sgkit.display.GenotypeDisplay"),
+    # Zarr's StoreLike alias is rendered as an undocumented TypeAliasType.
+    ("py:class", "zarr.storage._common.TypeAliasType"),
+]
 
 
 # FIXME: Workaround for linking xarray module
@@ -130,6 +134,7 @@ dask.dataframe.DataFrame.__module__ = "dask.dataframe"
 
 intersphinx_mapping = dict(
     dask=("https://docs.dask.org/en/stable/", None),
+    fsspec=("https://filesystem-spec.readthedocs.io/en/latest/", None),
     xarray=("https://docs.xarray.dev/en/stable/", None),
     zarr=("https://zarr.readthedocs.io/en/stable", None),
     numpy=("https://numpy.org/doc/stable/", None),

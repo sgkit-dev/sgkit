@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import xarray as xr
 
 pytest.importorskip("bio2zarr")
 from bio2zarr import vcf
@@ -15,7 +16,6 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 from sgkit import load_dataset, save_dataset
 from sgkit.model import get_contigs, get_filters, num_contigs
-from sgkit.tests.io.test_dataset import assert_identical
 
 
 @pytest.mark.filterwarnings("ignore::xarray.coding.variables.SerializationWarning")
@@ -29,9 +29,10 @@ def test_vcf2zarr_compat(shared_datadir, tmp_path):
         variants_chunk_size=5,
         samples_chunk_size=2,
         worker_processes=0,
+        zarr_format=2,
     )
 
-    ds = load_dataset(vcz_path)
+    ds = load_dataset(vcz_path, consolidated=False)
 
     assert_array_equal(ds["filter_id"], ["PASS", "s50", "q10"])
     assert_array_equal(get_filters(ds), ["PASS", "s50", "q10"])  # utility function
@@ -164,13 +165,13 @@ def test_vcf2zarr_compat(shared_datadir, tmp_path):
         ],
     )
     assert ds["variant_allele"].chunks[0][0] == 5
-    assert ds["variant_allele"].dtype == "O"
+    assert ds["variant_allele"].dtype.kind in ("O", "T")
     assert_array_equal(
         ds["variant_id"].values.tolist(),
         [sm, sm, "rs6054257", sm, "rs6040355", sm, "microsat1", sm, "rsTest"],
     )
     assert ds["variant_id"].chunks[0][0] == 5
-    assert ds["variant_id"].dtype == "O"
+    assert ds["variant_id"].dtype.kind in ("O", "T")
     assert_array_equal(
         ds["variant_id_mask"],
         [True, True, False, True, False, True, False, True, False],
@@ -246,4 +247,11 @@ def test_vcf2zarr_compat(shared_datadir, tmp_path):
     # save and load again to test https://github.com/pydata/xarray/issues/3476
     path2 = tmp_path / "ds2.zarr"
     save_dataset(ds, path2)
-    assert_identical(ds, load_dataset(path2))
+    ds2 = load_dataset(path2)
+    xr.testing.assert_identical(ds, ds2)
+    for name in ds:
+        if ds[name].dtype.kind == "T":
+            # Recent Xarray writes NumPy StringDType as fixed-width Unicode.
+            assert ds2[name].dtype.kind in ("T", "U")
+        else:
+            assert ds[name].dtype == ds2[name].dtype

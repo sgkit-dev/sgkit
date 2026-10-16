@@ -1,6 +1,6 @@
 """PLINK 1.9 reader implementation"""
 from pathlib import Path
-from typing import Any, Dict, List, MutableMapping, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import dask
 import dask.array as da
@@ -9,6 +9,7 @@ import numpy as np
 from bed_reader import open_bed
 from dask.dataframe import DataFrame
 from xarray import Dataset
+from zarr.storage import StoreLike
 
 from sgkit import create_genotype_call_dataset, save_dataset
 from sgkit.io.utils import dataframe_to_dict
@@ -317,7 +318,7 @@ def plink_to_zarr(
     bed_path: Optional[PathType] = None,
     bim_path: Optional[PathType] = None,
     fam_path: Optional[PathType] = None,
-    output: Union[PathType, MutableMapping[str, bytes]],
+    output: StoreLike,
     chunks: Union[str, int, tuple] = "auto",
     fam_sep: str = " ",
     bim_sep: str = "\t",

@@ -11,19 +11,36 @@ Changelog
 .. New Features
 .. ~~~~~~~~~~~~
 
-.. Breaking changes
-.. ~~~~~~~~~~~~~~~~
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- Require Zarr Python >= 3 and Xarray >= 2026.9.0. The default on-disk Zarr
+  format remains 2. (:issue:`1355`)
+- **Remove BGEN reading and conversion**: ``sgkit.io.bgen.read_bgen``,
+  ``sgkit.io.bgen.bgen_to_zarr`` and ``sgkit.io.bgen.rechunk_bgen``, along with
+  the ``bgen`` extra and the cbgen and rechunker dependencies.
+  **Use bio2zarr for genetic file format conversion to Zarr**, and load the
+  result with :func:`load_dataset`. BGEN input requires a bio2zarr version
+  with BGEN support
+  (`bio2zarr issue 417 <https://github.com/sgkit-dev/bio2zarr/issues/417>`_).
+  The dependency-free :func:`sgkit.io.bgen.unpack_variables` helper remains
+  for existing legacy packed stores. See :ref:`bgen_conversion_migration`.
+  (:pr:`1325`, :issue:`1355`)
 
 Deprecations
 ~~~~~~~~~~~~
 
+- BGEN reading and conversion have moved out of sgkit. Use
+  `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ for BGEN-to-Zarr conversion
+  and :func:`load_dataset` for analysis. Unlike the deprecated PLINK functions
+  below, ``read_bgen``, ``bgen_to_zarr`` and ``rechunk_bgen`` are already removed
+  in this release; see Breaking changes above and
+  :ref:`bgen_conversion_migration`. Only the dependency-free
+  :func:`sgkit.io.bgen.unpack_variables` helper remains for legacy packed stores.
+  (:pr:`1325`, :issue:`1331`, :issue:`1355`)
 - Functions for reading and writing plink are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_
   and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages.
   (:user:`tomwhite`, :pr:`1324`, :issue:`1318`)
-- Using rechunker for rechunking in sgkit is deprecated, please use the the
-  `Xarray chunk <https://docs.xarray.dev/en/stable/generated/xarray.Dataset.chunk.html#xarray.Dataset.chunk>`_
-  function directly.
-  (:user:`tomwhite`, :pr:`1325`)
 
 .. Improvements
 .. ~~~~~~~~~~~~
@@ -31,6 +48,12 @@ Deprecations
 Bug fixes
 ~~~~~~~~~
 
+- Unpacking legacy BGEN-derived Zarr datasets no longer imports or requires
+  cbgen. Use :func:`sgkit.io.bgen.unpack_variables`; the original
+  ``sgkit.io.bgen.bgen_reader.unpack_variables`` import is also preserved.
+  Its documentation explains the legacy packing convention and when unpacking
+  is needed; ordinary unpacked datasets and new bio2zarr output do not need it.
+  (:issue:`1331`)
 - Fixed bug causing high memory usage in :func:`pedigree_kinship` when
   evaluating a chunked relationship matrix with the Hamilton-Kerr method.
   (:user:`timothymillar`, :pr:`1335`, :issue:`1333`)

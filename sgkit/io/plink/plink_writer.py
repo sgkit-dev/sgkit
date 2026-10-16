@@ -1,8 +1,9 @@
-from typing import MutableMapping, Optional, Union
+from typing import Optional
 
 import numpy as np
 from bed_reader import to_bed
 from xarray import Dataset
+from zarr.storage import StoreLike
 
 from sgkit import load_dataset
 from sgkit.accelerate import numba_guvectorize
@@ -137,7 +138,7 @@ def write_plink(
 
 
 def zarr_to_plink(
-    input: Union[PathType, MutableMapping[str, bytes]],
+    input: StoreLike,
     *,
     path: Optional[PathType] = None,
     bed_path: Optional[PathType] = None,

@@ -137,7 +137,8 @@ def convert_probability_to_call(
     Parameters
     ----------
     ds
-        Dataset containing genotype probabilities, such as from :func:`sgkit.io.bgen.read_bgen`.
+        Dataset containing diploid biallelic genotype probabilities. For legacy
+        packed BGEN-derived stores, first use :func:`sgkit.io.bgen.unpack_variables`.
     call_genotype_probability
         Genotype probability variable to be converted as defined by
         :data:`sgkit.variables.call_genotype_probability_spec`.

@@ -1,4 +1,3 @@
-import inspect
 import warnings
 from itertools import product
 from typing import Any, Callable, Hashable, List, Mapping, Optional, Set, Tuple, Union
@@ -426,10 +425,3 @@ def smallest_numpy_int_dtype(value: int) -> Optional[DType]:
         if np.iinfo(dtype).min <= value <= np.iinfo(dtype).max:
             return dtype
     raise OverflowError(f"Value {value} cannot be stored in np.int64")
-
-
-def has_keyword(func, keyword):
-    try:
-        return keyword in inspect.signature(func).parameters
-    except Exception:  # pragma: no cover
-        return False

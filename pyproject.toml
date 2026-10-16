@@ -22,10 +22,10 @@ requires-python = ">=3.11"
 dependencies = [
   "numpy >= 2.3.5; sys_platform == \"darwin\"", # Apple ARM chip error
   "numpy >= 2.0; sys_platform != \"darwin\"",
-  "xarray < 2025.03.1",
+  "xarray >= 2026.9.0",
   "dask[array,dataframe] >= 2022.01.0, <= 2024.8.0",
   "scipy < 1.16",
-  "zarr >= 2.10.0, != 2.11.0, != 2.11.1, != 2.11.2, < 3",
+  "zarr >= 3",
   "numba",
   "fsspec != 2021.6.*",
   "scikit-learn",
@@ -41,7 +41,6 @@ content-type = "text/x-rst"
 
 [project.optional-dependencies]
 plink = ["partd", "bed-reader"]
-bgen = ["rechunker", "cbgen > 1.0.5"]
 
 [dependency-groups]
 test = [
@@ -55,14 +54,14 @@ test = [
   "scikit-allel",
   "statsmodels",
   "msprime>=1.0",
-  "bio2zarr[vcf]; platform_system != \"Windows\"",
+  "bio2zarr[vcf] >= 0.2; platform_system != \"Windows\"",
   "yarl",
   "matplotlib",
   "networkx",
   "aiohttp",
   "requests",
   "graphviz",
-  "sgkit[plink,bgen]",
+  "sgkit[plink]",
 ]
 docs = [
   "graphviz",
@@ -187,14 +186,6 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = ["sklearn.*"]
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = ["cbgen.*"]
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = ["rechunker.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
