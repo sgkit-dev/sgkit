@@ -49,7 +49,7 @@ jobs:
         run: |
           conda install -c nvidia cudatoolkit
           # Avoid building SciPy from source in CI.
-          uv pip install --only-binary scipy --python "$CONDA_PREFIX/bin/python" -e ".[bgen,plink]" --group test
+          uv pip install --only-binary scipy --python "$CONDA_PREFIX/bin/python" -e ".[plink]" --group test
 
       - name: Numba Information
         run: |

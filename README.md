@@ -12,10 +12,11 @@ For more information on using sgkit, see the [documentation](https://sgkit-dev.g
 
 **Genetic file conversion:** Use [bio2zarr](https://sgkit-dev.github.io/bio2zarr/)
 to convert genetic file formats to Zarr, then load them with `sgkit.load_dataset`.
-The deprecated `bgen_to_zarr` and `rechunk_bgen` functions have been removed.
-Bio2zarr's BGEN support is [still pending](https://github.com/sgkit-dev/bio2zarr/issues/417);
-see the [BGEN migration guide](docs/user_guide.rst#bgen) for the interim
-`read_bgen` / Xarray `chunk` / `save_dataset` workflow.
+The BGEN reader, conversion functions and `bgen` extra have been removed;
+sgkit no longer depends on cbgen. Use a bio2zarr version with BGEN support
+(tracked in [bio2zarr issue 417](https://github.com/sgkit-dev/bio2zarr/issues/417)).
+See the [BGEN migration guide](docs/user_guide.rst#bgen) for details and
+`unpack_variables`, retained only for existing legacy packed Zarr stores.
 
 [//]: # (numfocus-fiscal-sponsor-attribution)
 

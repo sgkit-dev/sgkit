@@ -1,10 +1,10 @@
-from typing import Mapping, Optional, Tuple
+from typing import Mapping, Optional
 
 import dask.dataframe as dd
 import numpy as np
 
 from ..typing import ArrayLike, DType
-from ..utils import encode_array, max_str_len
+from ..utils import max_str_len
 
 INT_MISSING, INT_FILL = -1, -2
 
@@ -37,16 +37,3 @@ def dataframe_to_dict(
             dt = f"{kind}{max_len}"
         arrs[c] = a.astype(dt)
     return arrs
-
-
-def encode_contigs(contig: ArrayLike) -> Tuple[ArrayLike, ArrayLike]:
-    # TODO: test preservation of int16
-    # If contigs are already integers, use them as-is
-    if np.issubdtype(contig.dtype, np.integer):
-        ids = contig
-        names = np.unique(np.asarray(ids)).astype(str)  # type: ignore[no-untyped-call]
-    # Otherwise create index for contig names based
-    # on order of appearance in underlying file
-    else:
-        ids, names = encode_array(np.asarray(contig, dtype=str))
-    return ids, names

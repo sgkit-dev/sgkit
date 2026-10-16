@@ -16,15 +16,15 @@ Breaking changes
 
 - Require Zarr Python >= 3 and Xarray >= 2026.9.0. The default on-disk Zarr
   format remains 2. (:issue:`1355`)
-- **Remove the deprecated BGEN conversion functions** ``sgkit.io.bgen.bgen_to_zarr``
-  and ``sgkit.io.bgen.rechunk_bgen``, along with their rechunker dependency.
+- **Remove BGEN reading and conversion**: ``sgkit.io.bgen.read_bgen``,
+  ``sgkit.io.bgen.bgen_to_zarr`` and ``sgkit.io.bgen.rechunk_bgen``, along with
+  the ``bgen`` extra and the cbgen and rechunker dependencies.
   **Use bio2zarr for genetic file format conversion to Zarr**, and load the
-  result with :func:`load_dataset`. BGEN support in bio2zarr is still pending
+  result with :func:`load_dataset`. BGEN input requires a bio2zarr version
+  with BGEN support
   (`bio2zarr issue 417 <https://github.com/sgkit-dev/bio2zarr/issues/417>`_).
-  Until then, BGEN users can call :func:`sgkit.io.bgen.read_bgen`,
-  :meth:`xarray.Dataset.chunk`, and :func:`save_dataset` explicitly; this does
-  not reproduce the old probability quantization, packing, or ``max_mem``/
-  ``tempdir`` controls. See :ref:`bgen_conversion_migration`.
+  The dependency-free :func:`sgkit.io.bgen.unpack_variables` helper remains
+  for existing legacy packed stores. See :ref:`bgen_conversion_migration`.
   (:pr:`1325`, :issue:`1355`)
 
 Deprecations
@@ -43,7 +43,8 @@ Bug fixes
 - Unpacking legacy BGEN-derived Zarr datasets no longer imports or requires
   cbgen. Use :func:`sgkit.io.bgen.unpack_variables`; the original
   ``sgkit.io.bgen.bgen_reader.unpack_variables`` import is also preserved.
-  The optional native dependency is loaded only when reading BGEN files.
+  Its documentation explains the legacy packing convention and when unpacking
+  is needed; ordinary unpacked datasets and new bio2zarr output do not need it.
   (:issue:`1331`)
 - Fixed bug causing high memory usage in :func:`pedigree_kinship` when
   evaluating a chunked relationship matrix with the Hamilton-Kerr method.

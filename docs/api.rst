@@ -12,19 +12,20 @@ See :ref:`reading_and_writing_genetic_data`
 .. important::
 
    **Use bio2zarr for genetic file format conversion to Zarr**, then load the
-   converted dataset with :func:`sgkit.load_dataset`. The deprecated BGEN
-   conversion functions ``bgen_to_zarr`` and ``rechunk_bgen`` have been removed.
-   BGEN support in bio2zarr is still pending; see :ref:`bgen_conversion_migration`
-   for the interim read/chunk/save workflow.
+   converted dataset with :func:`sgkit.load_dataset`. The BGEN reader and
+   conversion functions have been removed. See :ref:`bgen_conversion_migration`
+   for migration and legacy-store unpacking guidance.
 
 BGEN
 -----
+
+Only the helper for existing legacy packed stores remains; it does not read
+BGEN files or require an optional backend.
 
 .. currentmodule:: sgkit.io.bgen
 .. autosummary::
    :toctree: generated/
 
-   read_bgen
    unpack_variables
 
 PLINK
