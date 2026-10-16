@@ -192,15 +192,6 @@ wheels = [
 ]
 
 [[package]]
-name = "appdirs"
-version = "1.4.4"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/d7/d8/05696357e0311f5b5c316d7b95f46c669dd9c15aaeecbb48c7d0aeb88c40/appdirs-1.4.4.tar.gz", hash = "sha256:7d5d0167b2b1ba821647616af46a749d1c653740dd0d2415100fe26e27afdf41", size = 13470, upload-time = "2020-05-11T07:59:51.037Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/00/2344469e2084fb287c2e0b57b72910309874c3245463acd6cf5e3db69324/appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128", size = 9566, upload-time = "2020-05-11T07:59:49.499Z" },
-]
-
-[[package]]
 name = "appnope"
 version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -319,34 +310,6 @@ name = "callee"
 version = "0.3.1"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/7c/a9/cc2ee5fb2686292610e743324854059a6da6780479fa38999d725bd729ab/callee-0.3.1.tar.gz", hash = "sha256:056f95d7760c87ce470aa4ab83bab5f9bdf090d4ecf77d52efe9c4559c0aefd3", size = 19824, upload-time = "2019-12-24T14:58:38.579Z" }
-
-[[package]]
-name = "cbgen"
-version = "1.0.6"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "appdirs" },
-    { name = "cffi" },
-    { name = "numpy" },
-    { name = "pooch" },
-    { name = "pytest" },
-    { name = "urllib3" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/a0/97/cc69e0d0accb46965332ae247f3289832e546f8d30cb77218d6eb0f47b48/cbgen-1.0.6.tar.gz", hash = "sha256:edcf856c9b0cafae7f6e999ed5d08aacdf1e09dadec766b79990fe5861e8cf7e", size = 12387, upload-time = "2024-06-17T15:27:30.503Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ff/05/360448e10fbe7bed04450d2e2f9df6c8ddfa6e86beb367e426eb6b06fb49/cbgen-1.0.6-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:b97ab995397d56fa007dfd4e3d01f0ee7bc02ee5685b4e174161615af6a1dad0", size = 419458, upload-time = "2024-06-17T15:27:02.719Z" },
-    { url = "https://files.pythonhosted.org/packages/81/71/260966997bdad39615e3430375fbca020ca103c1f601ec95f969e0b02296/cbgen-1.0.6-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:a0ddcaa25f19ea383931605d4627da06339662d0ef5bc07fda706d2592a11b31", size = 288999, upload-time = "2024-06-17T15:27:04.516Z" },
-    { url = "https://files.pythonhosted.org/packages/ad/cc/0a735cc723989189177d00a57937e44184b57ca42245570b0b8e86720d57/cbgen-1.0.6-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:85560c53ea769902e9516b86d6bd2f3e6718dcac8ce4c3d7c0ac9fb43863b19f", size = 180643, upload-time = "2024-06-17T15:27:06.253Z" },
-    { url = "https://files.pythonhosted.org/packages/1a/aa/7b37e68dda0f95b5fde96d20aab5163c61f35268914d4df110923953fbb4/cbgen-1.0.6-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9c04f5860e7c35296777af14b0749c3b0c0210825644ac98cae9f169822a40bd", size = 578915, upload-time = "2024-06-17T15:27:08.26Z" },
-    { url = "https://files.pythonhosted.org/packages/b8/7b/10cff399b0255d1426a1498aeb2eda7a94167a034fbd9f0bca5da2c66fdd/cbgen-1.0.6-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:9beb0fe67968020344b47c0f5f648418202ead39b1cc599adc481a49daace99b", size = 345395, upload-time = "2024-06-17T15:27:09.476Z" },
-    { url = "https://files.pythonhosted.org/packages/c4/bb/fa9ed88dca04be210707e00bf329a337b78cbfc154c4cfa0250a7f589b0b/cbgen-1.0.6-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:fc40d9e917155125057adbad5477537a3974a7908080b60715449298f5c686d7", size = 729100, upload-time = "2024-06-17T15:27:10.633Z" },
-    { url = "https://files.pythonhosted.org/packages/40/84/f0660542361cfe3a97e553d61e91d92bb26ea04a87cdd7d06522f1852dcf/cbgen-1.0.6-cp311-cp311-win_amd64.whl", hash = "sha256:733a11d2eb2b06adf4ef0dd7675ce18e011c12df99e42fea93b3222efad5293b", size = 243941, upload-time = "2024-06-17T15:27:12.426Z" },
-    { url = "https://files.pythonhosted.org/packages/09/ce/6abc744f0b17d24ce47fd177b81aafc0a8afe005439b18e57db6caa564f3/cbgen-1.0.6-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:e05037fabfd12711836b0cd26da961fc271b56080871e3508177c6c08b1247b1", size = 554262, upload-time = "2024-06-17T15:27:14.2Z" },
-    { url = "https://files.pythonhosted.org/packages/c0/15/7c42414b690d937ca6c4c75d08964e1e7bb19d9bb2fc06b5698ee18e53b8/cbgen-1.0.6-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:07d8d9209d24005f8f492b82f3793ac4ac8596263b07c5f68b7ab3e57eb0bc83", size = 380328, upload-time = "2024-06-17T15:27:15.918Z" },
-    { url = "https://files.pythonhosted.org/packages/a5/36/3e8550e6d05baea8eb2eae8c27887e81ea0085f8246d13e030d73f9f87fd/cbgen-1.0.6-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8e95a3b83d58343f5a7026dcee9dfce7ab9845406feb8b1c065151636b9fbefc", size = 767497, upload-time = "2024-06-17T15:27:17.117Z" },
-    { url = "https://files.pythonhosted.org/packages/a9/24/6613c31e2346bd583ebbd4f32eccca4cd894364daf751ed0b632665013b3/cbgen-1.0.6-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:e1279d9881844018d27d6cd3ec8475e08d68136a1862c8eadf41745b373393d1", size = 914945, upload-time = "2024-06-17T15:27:18.309Z" },
-    { url = "https://files.pythonhosted.org/packages/ec/eb/493f97d94704a5078770477d03924c6bd74c2d98d041d25848f4b735034d/cbgen-1.0.6-cp312-cp312-win_amd64.whl", hash = "sha256:e56d6a01fb71d5c7fbf7039cc23089edd7a749fafb9f2898efffeacbd14a2bba", size = 319686, upload-time = "2024-06-17T15:27:20.306Z" },
-]
 
 [[package]]
 name = "certifi"
@@ -3085,20 +3048,6 @@ wheels = [
 ]
 
 [[package]]
-name = "pooch"
-version = "1.9.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "packaging" },
-    { name = "platformdirs" },
-    { name = "requests" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/83/43/85ef45e8b36c6a48546af7b266592dc32d7f67837a6514d111bced6d7d75/pooch-1.9.0.tar.gz", hash = "sha256:de46729579b9857ffd3e741987a2f6d5e0e03219892c167c6578c0091fb511ed", size = 61788, upload-time = "2026-01-30T19:15:09.649Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2a/2d/d4bf65e47cea8ff2c794a600c4fd1273a7902f268757c531e0ee9f18aa58/pooch-1.9.0-py3-none-any.whl", hash = "sha256:f265597baa9f760d25ceb29d0beb8186c243d6607b0f60b83ecf14078dbc703b", size = 67175, upload-time = "2026-01-30T19:15:08.36Z" },
-]
-
-[[package]]
 name = "pre-commit"
 version = "4.6.2"
 source = { registry = "https://pypi.org/simple" }
@@ -4013,9 +3962,6 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-bgen = [
-    { name = "cbgen" },
-]
 plink = [
     { name = "bed-reader" },
     { name = "partd" },
@@ -4047,7 +3993,7 @@ dev = [
     { name = "scanpydoc", version = "0.17.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "scikit-allel" },
     { name = "seaborn" },
-    { name = "sgkit", extra = ["bgen", "plink"] },
+    { name = "sgkit", extra = ["plink"] },
     { name = "sphinx" },
     { name = "sphinx-autodoc-typehints" },
     { name = "sphinx-copybutton" },
@@ -4092,7 +4038,7 @@ test = [
     { name = "pytest-mock" },
     { name = "requests" },
     { name = "scikit-allel" },
-    { name = "sgkit", extra = ["bgen", "plink"] },
+    { name = "sgkit", extra = ["plink"] },
     { name = "statsmodels" },
     { name = "yarl" },
 ]
@@ -4100,7 +4046,6 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "bed-reader", marker = "extra == 'plink'" },
-    { name = "cbgen", marker = "extra == 'bgen'", specifier = ">1.0.5" },
     { name = "dask", extras = ["array", "dataframe"], specifier = ">=2022.1.0,<=2024.8.0" },
     { name = "fsspec", specifier = "!=2021.6.*" },
     { name = "numba" },
@@ -4113,7 +4058,7 @@ requires-dist = [
     { name = "xarray", specifier = ">=2026.9.0" },
     { name = "zarr", specifier = ">=3" },
 ]
-provides-extras = ["plink", "bgen"]
+provides-extras = ["plink"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -4140,7 +4085,7 @@ dev = [
     { name = "scanpydoc" },
     { name = "scikit-allel" },
     { name = "seaborn" },
-    { name = "sgkit", extras = ["plink", "bgen"] },
+    { name = "sgkit", extras = ["plink"] },
     { name = "sphinx", specifier = "<9.0.0" },
     { name = "sphinx-autodoc-typehints" },
     { name = "sphinx-copybutton" },
@@ -4180,7 +4125,7 @@ test = [
     { name = "pytest-mock" },
     { name = "requests" },
     { name = "scikit-allel" },
-    { name = "sgkit", extras = ["plink", "bgen"] },
+    { name = "sgkit", extras = ["plink"] },
     { name = "statsmodels" },
     { name = "yarl" },
 ]

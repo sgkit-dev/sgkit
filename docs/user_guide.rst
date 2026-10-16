@@ -20,27 +20,24 @@ Reading and writing genetic data
    `bio2zarr documentation <https://sgkit-dev.github.io/bio2zarr/>`_ for
    installation and conversion instructions.
 
-   The deprecated BGEN conversion functions ``bgen_to_zarr`` and ``rechunk_bgen``
-   have been removed. BGEN conversion in bio2zarr is still pending; BGEN users
-   should follow :ref:`bgen_conversion_migration` in the meantime.
+   BGEN reading and conversion have been removed from sgkit, along with the
+   optional cbgen dependency. See :ref:`bgen_conversion_migration` for conversion
+   guidance and support for existing legacy packed stores.
 
 .. _installation:
 
 Installation
 ------------
 
-Sgkit can read standard genetic file formats, including PLINK and BGEN. For reading VCF,
-please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ package.
+Sgkit reads Zarr datasets directly. For VCF, BGEN and PLINK conversion, use
+`bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_. The deprecated direct PLINK
+reader remains available with optional dependencies.
 
-If sgkit has been installed using conda, support for reading BGEN and PLINK is included.
+If sgkit has been installed using conda, support for reading PLINK is included.
 
-If sgkit has been installed using pip, then support for reading these formats is
+If sgkit has been installed using pip, then support for reading PLINK is
 not included, and requires additional dependencies, which can be installed
 as an "extra" feature using pip, as follows.
-
-To install sgkit with BGEN support::
-
-    $ pip install 'sgkit[bgen]'
 
 To install sgkit with PLINK support::
 
@@ -51,10 +48,10 @@ Converting genetic data to Zarr
 
 Genetic file format conversion belongs in
 `bio2zarr <https://sgkit-dev.github.io/bio2zarr/>`__, rather than sgkit.
-Convert VCF and PLINK inputs with bio2zarr before analysis, so the expensive
-conversion step need only be paid once. The direct ``read_X`` functions are
-convenience functions for small inputs or cases where the cost of reading is small;
-the PLINK functions are deprecated.
+Convert inputs with bio2zarr before analysis, so the expensive conversion step
+need only be paid once. BGEN input requires a bio2zarr version with BGEN support
+(see :ref:`bgen_conversion_migration`). The remaining direct PLINK functions
+are deprecated convenience functions for small inputs.
 
 After converting a file to Zarr format, it can be loaded with sgkit's :func:`sgkit.load_dataset`.
 This is like Xarray's :func:`xarray.open_zarr` function, with some useful defaults applied for you.
@@ -79,43 +76,52 @@ which makes opening the dataset faster.
 BGEN
 ----
 
-The :func:`sgkit.io.bgen.read_bgen` function loads a single BGEN dataset as Dask
-arrays within an :class:`xarray.Dataset` from a ``bgen`` file.
-
 .. warning::
 
-   ``sgkit.io.bgen.bgen_to_zarr`` and ``sgkit.io.bgen.rechunk_bgen`` have been
-   removed. New format-conversion workflows should use bio2zarr, but
-   **bio2zarr does not yet support BGEN input**. Progress is tracked in
-   `bio2zarr issue 417 <https://github.com/sgkit-dev/bio2zarr/issues/417>`_.
+   ``sgkit.io.bgen.read_bgen``, ``sgkit.io.bgen.bgen_to_zarr`` and
+   ``sgkit.io.bgen.rechunk_bgen`` have been removed, together with the ``bgen``
+   extra. Sgkit no longer reads BGEN files or depends on cbgen.
 
-Until BGEN support is available in bio2zarr, the equivalent read/chunk/save
-steps can be performed explicitly::
+Use bio2zarr for BGEN conversion, then load the resulting Zarr dataset with
+:func:`sgkit.load_dataset`. Install a bio2zarr version that includes BGEN support;
+availability is tracked in
+`bio2zarr issue 417 <https://github.com/sgkit-dev/bio2zarr/issues/417>`_.
+An older bio2zarr release without BGEN support cannot replace the removed reader.
+Sgkit does not provide an alternative BGEN conversion path.
+
+Legacy packed stores
+~~~~~~~~~~~~~~~~~~~~
+
+Some older sgkit BGEN converters packed variables to reduce storage size:
+they saved only the heterozygous and homozygous-alternate probabilities,
+omitted dosage, and used one missingness flag per variant/sample pair.
+For these **known legacy packed stores only**, use
+:func:`sgkit.io.bgen.unpack_variables` after loading and before methods that
+expect complete genotype probabilities or dosage. This helper operates on an
+existing Xarray dataset and needs no BGEN backend::
 
     import sgkit as sg
-    from sgkit.io.bgen import read_bgen
-
-    ds = read_bgen("input.bgen")
-    ds = ds.chunk({"variants": 10000, "samples": 1000})
-    sg.save_dataset(ds, "output.zarr")
-
-Choose chunk sizes and Dask scheduler settings appropriate to the available
-memory. This example retains the reader's floating-point genotype probabilities
-and dosages; it does not perform the removed converters' lossy integer
-quantization or variable packing. There are no ``max_mem`` or ``tempdir``
-arguments; those belonged to the removed rechunker-based conversion API.
-To restore probabilities and dosages from an existing legacy packed store,
-use :func:`sgkit.io.bgen.unpack_variables`. **This does not require cbgen or
-the BGEN extra**, because it operates only on the converted Xarray dataset::
-
     from sgkit.io.bgen import unpack_variables
 
-    ds = sg.load_dataset("legacy-packed.zarr")
-    ds = unpack_variables(ds)
+    packed = sg.load_dataset("legacy-packed.zarr")
+    ds = unpack_variables(packed)
 
+The expected signature is ``call_genotype_probability`` with dimensions
+``(variants, samples, genotypes)`` and **two** stored probabilities, plus
+``call_genotype_probability_mask`` with dimensions ``(variants, samples)``.
+Unpacking restores three diploid, biallelic genotype probabilities, computes
+alternate-allele dosage, and expands the probability mask. For example,
+``[0.25, 0.5]`` becomes ``[0.25, 0.25, 0.5]`` with dosage ``1.25``.
+Missing probabilities remain NaN. The input is unchanged and Dask arrays
+remain lazy; lost quantization precision cannot be recovered.
+
+**Do not unpack ordinary datasets, new bio2zarr output, or an already-unpacked
+store.** A two-state probability array alone is not evidence of legacy packing:
+other ploidies or allele counts can also produce two states. The helper is not
+a general BGEN decoder or schema adapter. :func:`sgkit.load_dataset` does not
+automatically detect or unpack legacy stores.
 The original ``sgkit.io.bgen.bgen_reader.unpack_variables`` import remains
-supported without optional BGEN dependencies as well. Only reading a BGEN
-file with ``read_bgen`` needs the optional native reader.
+supported as a compatibility alias; that module no longer contains a reader.
 
 PLINK
 -----
