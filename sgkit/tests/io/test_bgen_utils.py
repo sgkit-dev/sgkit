@@ -79,21 +79,24 @@ def test_unpack_variables_without_cbgen():
 
 @pytest.fixture
 def packed_dataset():
-    return xr.Dataset(
-        {
-            "call_genotype_probability": (
-                ("variants", "samples", "genotypes"),
-                [[[0.25, 0.5], [np.nan, np.nan]], [[0.0, 1.0], [0.0, 0.0]]],
-            ),
-            "call_genotype_probability_mask": (
-                ("variants", "samples"),
-                [[False, True], [False, False]],
-            ),
-            "variant_position": ("variants", [10, 20]),
-            "sample_id": ("samples", ["a", "b"]),
-        },
-        attrs={"source": "legacy packed BGEN store"},
-    ).chunk({"variants": 1, "samples": 1})
+    return (
+        xr.Dataset(
+            {
+                "call_genotype_probability": (
+                    ("variants", "samples", "genotypes"),
+                    [[[0.25, 0.5], [np.nan, np.nan]], [[0.0, 1.0], [0.0, 0.0]]],
+                ),
+                "call_genotype_probability_mask": (
+                    ("variants", "samples"),
+                    [[False, True], [False, False]],
+                ),
+                "variant_position": ("variants", [10, 20]),
+            },
+            attrs={"source": "legacy packed BGEN store"},
+        )
+        .chunk({"variants": 1, "samples": 1})
+        .assign(sample_id=("samples", np.array(["a", "b"], dtype=object)))
+    )
 
 
 @pytest.mark.parametrize("dtype", ["float32", "float64"])
