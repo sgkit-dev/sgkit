@@ -25,6 +25,7 @@ BGEN
    :toctree: generated/
 
    read_bgen
+   unpack_variables
 
 PLINK
 -----

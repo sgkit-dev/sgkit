@@ -197,7 +197,7 @@ def test_read_bgen__invalid_chunks(shared_datadir):
 
 
 def test_legacy_conversion_removed():
-    assert bgen.__all__ == ["read_bgen"]
+    assert bgen.__all__ == ["read_bgen", "unpack_variables"]
     for name in ("bgen_to_zarr", "rechunk_bgen"):
         assert not hasattr(bgen, name)
         assert not hasattr(bgen.bgen_reader, name)

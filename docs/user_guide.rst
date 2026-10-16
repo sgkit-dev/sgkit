@@ -104,8 +104,18 @@ memory. This example retains the reader's floating-point genotype probabilities
 and dosages; it does not perform the removed converters' lossy integer
 quantization or variable packing. There are no ``max_mem`` or ``tempdir``
 arguments; those belonged to the removed rechunker-based conversion API.
-The ``unpack_variables`` helper in ``sgkit.io.bgen.bgen_reader`` remains
-available to restore probabilities and dosages from existing packed stores.
+To restore probabilities and dosages from an existing legacy packed store,
+use :func:`sgkit.io.bgen.unpack_variables`. **This does not require cbgen or
+the BGEN extra**, because it operates only on the converted Xarray dataset::
+
+    from sgkit.io.bgen import unpack_variables
+
+    ds = sg.load_dataset("legacy-packed.zarr")
+    ds = unpack_variables(ds)
+
+The original ``sgkit.io.bgen.bgen_reader.unpack_variables`` import remains
+supported without optional BGEN dependencies as well. Only reading a BGEN
+file with ``read_bgen`` needs the optional native reader.
 
 PLINK
 -----
