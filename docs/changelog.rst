@@ -16,9 +16,16 @@ Breaking changes
 
 - Require Zarr Python >= 3 and Xarray >= 2026.9.0. The default on-disk Zarr
   format remains 2. (:issue:`1355`)
-- Remove the incompatible rechunker dependency from the BGEN extra. The
-  deprecated BGEN conversion functions now use Xarray and Dask; ``max_mem``
-  and ``tempdir`` no longer control rechunking.
+- **Remove the deprecated BGEN conversion functions** ``sgkit.io.bgen.bgen_to_zarr``
+  and ``sgkit.io.bgen.rechunk_bgen``, along with their rechunker dependency.
+  **Use bio2zarr for genetic file format conversion to Zarr**, and load the
+  result with :func:`load_dataset`. BGEN support in bio2zarr is still pending
+  (`bio2zarr issue 417 <https://github.com/sgkit-dev/bio2zarr/issues/417>`_).
+  Until then, BGEN users can call :func:`sgkit.io.bgen.read_bgen`,
+  :meth:`xarray.Dataset.chunk`, and :func:`save_dataset` explicitly; this does
+  not reproduce the old probability quantization, packing, or ``max_mem``/
+  ``tempdir`` controls. See :ref:`bgen_conversion_migration`.
+  (:pr:`1325`, :issue:`1355`)
 
 Deprecations
 ~~~~~~~~~~~~
@@ -26,10 +33,6 @@ Deprecations
 - Functions for reading and writing plink are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_
   and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages.
   (:user:`tomwhite`, :pr:`1324`, :issue:`1318`)
-- Using rechunker for rechunking in sgkit is deprecated, please use the the
-  `Xarray chunk <https://docs.xarray.dev/en/stable/generated/xarray.Dataset.chunk.html#xarray.Dataset.chunk>`_
-  function directly.
-  (:user:`tomwhite`, :pr:`1325`)
 
 .. Improvements
 .. ~~~~~~~~~~~~

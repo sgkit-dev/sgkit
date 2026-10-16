@@ -1,7 +1,7 @@
 try:
-    from .bgen_reader import bgen_to_zarr, read_bgen, rechunk_bgen
+    from .bgen_reader import read_bgen
 
-    __all__ = ["read_bgen", "bgen_to_zarr", "rechunk_bgen"]
+    __all__ = ["read_bgen"]
 except ImportError as e:  # pragma: no cover
     msg = (
         "sgkit bgen requirements are not installed.\n\n"

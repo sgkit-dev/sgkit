@@ -1,33 +1,23 @@
 """BGEN reader implementation (using bgen_reader)"""
 import logging
 import time
-import warnings
 from pathlib import Path
-from typing import Any, Dict, Hashable, List, Mapping, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 import dask
 import dask.array as da
 import dask.dataframe as dd
-import numcodecs
 import numpy as np
 import pandas as pd
 import xarray as xr
 from cbgen import bgen_file, bgen_metafile
 from xarray import Dataset
-from zarr.storage import StoreLike
 
-from sgkit import create_genotype_dosage_dataset, variables
+from sgkit import create_genotype_dosage_dataset
 from sgkit.io.utils import dataframe_to_dict, encode_contigs
 from sgkit.typing import ArrayLike, DType, NDArray, PathType
 
 logger = logging.getLogger(__name__)
-
-GT_DATA_VARS = [
-    variables.call_genotype_probability,
-    variables.call_genotype_probability_mask,
-    variables.call_dosage,
-    variables.call_dosage_mask,
-]
 
 METAFILE_DTYPE = dict(
     [
@@ -329,62 +319,8 @@ def _to_dosage(probs: ArrayLike) -> ArrayLike:
     return probs[..., 1] + 2 * probs[..., 2]
 
 
-########################
-# Rechunking Functions #
-########################
-
-
-def encode_variables(
-    ds: Dataset,
-    chunk_length: int,
-    chunk_width: int,
-    compressor: Optional[Any] = numcodecs.Blosc(cname="zstd", clevel=7, shuffle=2),
-    probability_dtype: Optional[Any] = "uint8",
-) -> Dict[Hashable, Dict[str, Any]]:
-    encoding = {}
-    for v in ds:
-        e = {"compressors": compressor}
-        if v in GT_DATA_VARS:
-            e.update({"chunks": (chunk_length, chunk_width) + ds[v].shape[2:]})
-        if probability_dtype is not None and v == "call_genotype_probability":
-            dtype = np.dtype(probability_dtype)
-            # Xarray will decode into float32 so any int greater than
-            # 16 bits will cause overflow/underflow
-            # See https://en.wikipedia.org/wiki/Floating-point_arithmetic#Internal_representation
-            # *bits precision column for single precision floats
-            if dtype not in [np.uint8, np.uint16]:  # type: ignore[comparison-overlap]
-                raise ValueError(
-                    "Probability integer dtype invalid, must "
-                    f"be uint8 or uint16 not {probability_dtype}"
-                )
-            divisor = np.iinfo(dtype).max - 1
-            e.update(
-                {
-                    "dtype": probability_dtype,
-                    "add_offset": -1.0 / divisor,
-                    "scale_factor": 1.0 / divisor,
-                    "_FillValue": 0,
-                }
-            )
-        if e:
-            encoding[v] = e
-    return encoding
-
-
-def pack_variables(ds: Dataset) -> Dataset:
-    # Remove dosage as it is unnecessary and should be redefined
-    # based on encoded probabilities later (w/ reduced precision)
-    ds = ds.drop_vars(["call_dosage", "call_dosage_mask"], errors="ignore")
-
-    # Remove homozygous reference GP and redefine mask
-    gp = ds["call_genotype_probability"][..., 1:]
-    gp_mask = ds["call_genotype_probability_mask"].any(dim="genotypes")
-    ds = ds.drop_vars(["call_genotype_probability", "call_genotype_probability_mask"])
-    ds = ds.assign(call_genotype_probability=gp, call_genotype_probability_mask=gp_mask)
-    return ds
-
-
 def unpack_variables(ds: Dataset, dtype: DType = "float32") -> Dataset:
+    """Restore probabilities and dosages from legacy packed BGEN-derived stores."""
     # Restore homozygous reference GP
     gp = ds["call_genotype_probability"].astype(dtype)
     if gp.sizes["genotypes"] != 2:
@@ -404,194 +340,3 @@ def unpack_variables(ds: Dataset, dtype: DType = "float32") -> Dataset:
         "call_genotype_probability_mask"
     ].broadcast_like(ds["call_genotype_probability"])
     return ds
-
-
-def rechunk_bgen(
-    ds: Dataset,
-    output: StoreLike,
-    *,
-    chunk_length: int = 10_000,
-    chunk_width: int = 1_000,
-    compressor: Optional[Any] = numcodecs.Blosc(cname="zstd", clevel=7, shuffle=2),
-    probability_dtype: Optional[DType] = "uint8",
-    max_mem: str = "4GB",
-    pack: bool = True,
-    tempdir: Optional[PathType] = None,
-) -> Dataset:
-    """Rechunk BGEN dataset as Zarr.
-
-    This function uses Xarray and Dask to rechunk a Dataset for better downstream
-    performance and writes Zarr format 2. It no longer uses rechunker, which does
-    not support Zarr Python 3. Memory usage depends on the input and output chunks
-    and the Dask scheduler; no intermediate store is created.
-    Experiments show that this Zarr representation is ~20% larger even
-    with all available optimizations and fairly aggressive compression (i.e. the
-    default `clevel` 7).
-
-    Note that this function is not evaluated lazily. The rechunking algorithm
-    will run inline so calls to it may be slow. The resulting Dataset is
-    generated based on the final, serialized Zarr data.
-
-    .. deprecated:: 0.11.0
-       This conversion helper is deprecated, please use the
-       `Xarray chunk <https://docs.xarray.dev/en/stable/generated/xarray.Dataset.chunk.html#xarray.Dataset.chunk>`_
-       function directly.
-
-    Parameters
-    ----------
-    ds
-        Dataset to rechunk, typically the result from `read_bgen`.
-    output
-        Zarr store or path to directory in file system.
-    chunk_length
-        Length (number of variants) of chunks in which data are stored, by default 10_000.
-    chunk_width
-        Width (number of samples) to use when storing chunks in output, by default 1_000.
-    compressor
-        Zarr compressor, no compression is used when set as None.
-    probability_dtype
-        Data type used to encode genotype probabilities, must be either uint8 or uint16.
-        Setting this parameter results in a loss of precision. If None, probabilities
-        will not be altered when stored.
-    max_mem
-        Deprecated and no longer used. Memory is managed by Dask.
-    pack
-        Whether or not to optimize variable representations by removing unnecessary
-        dimensions and elements. This includes storing 2 genotypes instead of 3, omitting
-        dosage and collapsing the genotype probability mask to 2 dimensions. All of
-        the above are restored in the resulting Dataset at the expense of extra
-        computations on read.
-    tempdir
-        Deprecated and no longer used. No intermediate store is created.
-
-    Warnings
-    --------
-
-    This functional is only applicable to diploid, bi-allelic BGEN datasets.
-
-    Returns
-    -------
-
-    Dataset
-        The rechunked dataset.
-    """
-    warnings.warn(
-        "rechunk_bgen is deprecated, please use Xarray 'chunk' and sgkit.save_dataset directly.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    if max_mem != "4GB" or tempdir is not None:
-        warnings.warn(
-            "max_mem and tempdir no longer control BGEN rechunking; "
-            "memory is managed by Dask and no intermediate store is created.",
-            FutureWarning,
-            stacklevel=2,
-        )
-
-    if isinstance(output, Path):
-        output = str(output)
-
-    chunk_length = min(chunk_length, ds.sizes["variants"])
-    chunk_width = min(chunk_width, ds.sizes["samples"])
-
-    if pack:
-        ds = pack_variables(ds)
-
-    encoding = encode_variables(
-        ds,
-        chunk_length=chunk_length,
-        chunk_width=chunk_width,
-        compressor=compressor,
-        probability_dtype=probability_dtype,
-    )
-    ds = ds.chunk({"variants": chunk_length, "samples": chunk_width})
-    ds.to_zarr(output, encoding=encoding, zarr_format=2, consolidated=True, mode="w-")
-
-    ds = xr.open_zarr(output, concat_characters=False)  # type: ignore[no-untyped-call]
-    if pack:
-        ds = unpack_variables(ds)
-
-    return ds
-
-
-def bgen_to_zarr(
-    input: PathType,
-    output: StoreLike,
-    region: Optional[Mapping[Hashable, Any]] = None,
-    chunk_length: int = 10_000,
-    chunk_width: int = 1_000,
-    temp_chunk_length: int = 100,
-    compressor: Optional[Any] = numcodecs.Blosc(cname="zstd", clevel=7, shuffle=2),
-    probability_dtype: Optional[DType] = "uint8",
-    max_mem: str = "4GB",
-    pack: bool = True,
-    tempdir: Optional[PathType] = None,
-) -> Dataset:
-    """Convert a BGEN file to a Zarr on-disk store.
-
-    This function is a convenience for calling :func:`read_bgen` followed by
-    :func:`rechunk_bgen`.
-
-    Parameters
-    ----------
-    input
-        Path to local BGEN dataset.
-    output
-        Zarr store or path to directory in file system.
-    region
-        Indexers on dataset dimensions used to define a subset of data to convert.
-        Must be None or a dict with keys matching dimension names and values
-        equal to integers or slice objects. This is passed directly to `Dataset.isel`
-        so it has the same semantics.
-    chunk_length
-        Length (number of variants) of chunks in which data are stored, by default 10_000.
-    chunk_width
-        Width (number of samples) to use when storing chunks in output, by default 1_000.
-    temp_chunk_length
-        Length of chunks used in raw BGEN read, by default 100. This defines the vertical
-        chunking (i.e. in the variants dimension) used when reading the raw data and because
-        there is no horizontal chunking at this phase (i.e. in the samples dimension), this
-        value should be much smaller than the target `chunk_length`.
-    compressor
-        Zarr compressor, by default Blosc + zstd with compression level 7. No compression
-        is used when set as None.
-    probability_dtype
-        Data type used to encode genotype probabilities, must be either uint8 or uint16.
-        Setting this parameter results in a loss of precision. If None, probabilities
-        will not be altered when stored.
-    max_mem
-        Deprecated and no longer used. Memory is managed by Dask.
-    pack
-        Whether or not to optimize variable representations by removing unnecessary
-        dimensions and elements. This includes storing 2 genotypes instead of 3, omitting
-        dosage and collapsing the genotype probability mask to 2 dimensions. All of
-        the above are restored in the resulting Dataset at the expense of extra
-        computations on read.
-    tempdir
-        Deprecated and no longer used. No intermediate store is created.
-
-    Warnings
-    --------
-
-    This functional is only applicable to diploid, bi-allelic BGEN datasets.
-
-    Returns
-    -------
-
-    Dataset
-        The rechunked dataset.
-    """
-    ds = read_bgen(input, chunks=(temp_chunk_length, -1, -1))
-    if region is not None:
-        ds = ds.isel(indexers=region)
-    return rechunk_bgen(
-        ds,
-        output,
-        chunk_length=chunk_length,
-        chunk_width=chunk_width,
-        compressor=compressor,
-        probability_dtype=probability_dtype,
-        max_mem=max_mem,
-        pack=pack,
-        tempdir=tempdir,
-    )
