@@ -40,6 +40,11 @@ Deprecations
 Bug fixes
 ~~~~~~~~~
 
+- Unpacking legacy BGEN-derived Zarr datasets no longer imports or requires
+  cbgen. Use :func:`sgkit.io.bgen.unpack_variables`; the original
+  ``sgkit.io.bgen.bgen_reader.unpack_variables`` import is also preserved.
+  The optional native dependency is loaded only when reading BGEN files.
+  (:issue:`1331`)
 - Fixed bug causing high memory usage in :func:`pedigree_kinship` when
   evaluating a chunked relationship matrix with the Hamilton-Kerr method.
   (:user:`timothymillar`, :pr:`1335`, :issue:`1333`)

@@ -1,7 +1,9 @@
 """BGEN reader implementation (using bgen_reader)"""
+import importlib
 import logging
 import time
 from pathlib import Path
+from types import ModuleType
 from typing import Any, List, Optional, Tuple, Union
 
 import dask
@@ -9,15 +11,28 @@ import dask.array as da
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
-import xarray as xr
-from cbgen import bgen_file, bgen_metafile
 from xarray import Dataset
 
 from sgkit import create_genotype_dosage_dataset
+from sgkit.io.bgen.utils import unpack_variables  # noqa: F401
 from sgkit.io.utils import dataframe_to_dict, encode_contigs
 from sgkit.typing import ArrayLike, DType, NDArray, PathType
 
 logger = logging.getLogger(__name__)
+
+
+def _require_cbgen() -> ModuleType:
+    try:
+        return importlib.import_module("cbgen")
+    except ModuleNotFoundError as e:
+        if e.name != "cbgen":
+            raise
+        raise ImportError(
+            "Reading BGEN files requires the optional sgkit bgen dependencies.\n"
+            "Install them with: pip install 'sgkit[bgen]'\n"
+            "Unpacking an existing dataset does not require these dependencies."
+        ) from e
+
 
 METAFILE_DTYPE = dict(
     [
@@ -41,12 +56,13 @@ class BgenReader:
         metafile_path: Optional[PathType] = None,
         dtype: DType = "float32",
     ) -> None:
+        cbgen = _require_cbgen()
         self.path = Path(path)
         self.metafile_path = (
             Path(metafile_path) if metafile_path else self.path.with_suffix(".metafile")
         )
 
-        with bgen_file(self.path) as bgen:
+        with cbgen.bgen_file(self.path) as bgen:
             self.n_variants = bgen.nvariants
             self.n_samples = bgen.nsamples
 
@@ -61,7 +77,7 @@ class BgenReader:
                     f"BGEN metafile generation complete ({stop - start:.0f} seconds)"
                 )
 
-            with bgen_metafile(self.metafile_path) as mf:
+            with cbgen.bgen_metafile(self.metafile_path) as mf:
                 assert self.n_variants == mf.nvariants
                 self.npartitions = mf.npartitions
                 self.partition_size = mf.partition_size
@@ -100,7 +116,8 @@ class BgenReader:
         # Create a list of all offsets into the underlying file at which
         # data for each variant begins
         all_vaddr = []
-        with bgen_metafile(self.metafile_path) as mf:
+        cbgen = _require_cbgen()
+        with cbgen.bgen_metafile(self.metafile_path) as mf:
             for i in range(start_partition, end_partition + 1):
                 partition = mf.read_partition(i)
                 start_offset = start_partition_offset if i == start_partition else 0
@@ -115,7 +132,7 @@ class BgenReader:
         # Read the probabilities for each variant, apply indexer for
         # samples dimension to give probabilities for all genotypes,
         # and then apply final genotype dimension indexer
-        with bgen_file(self.path) as bgen:
+        with cbgen.bgen_file(self.path) as bgen:
             res = None
             for i, vaddr in enumerate(all_vaddr):
                 probs = bgen.read_probability(vaddr, precision=self.precision)[idx[1]]
@@ -137,7 +154,8 @@ def _split_alleles(allele_ids: bytes) -> List[bytes]:
 
 
 def _read_metafile_partition(path: Path, partition: int) -> pd.DataFrame:
-    with bgen_metafile(path) as mf:
+    cbgen = _require_cbgen()
+    with cbgen.bgen_metafile(path) as mf:
         part = mf.read_partition(partition)
     v = part.variants
     allele_ids = np.array([_split_alleles(aid) for aid in v.allele_ids])
@@ -155,7 +173,8 @@ def _read_metafile_partition(path: Path, partition: int) -> pd.DataFrame:
 
 def read_metafile(path: PathType) -> dd.DataFrame:
     """Read cbgen metafile containing partitioned variant info"""
-    with bgen_metafile(path) as mf:
+    cbgen = _require_cbgen()
+    with cbgen.bgen_metafile(path) as mf:
         divisions = [mf.partition_size * i for i in range(mf.npartitions)] + [
             mf.nvariants - 1
         ]
@@ -304,7 +323,8 @@ def read_bgen(
 
 def _default_sample_ids(path: PathType) -> ArrayLike:
     """Fetch or generate sample ids"""
-    with bgen_file(path) as bgen:
+    cbgen = _require_cbgen()
+    with cbgen.bgen_file(path) as bgen:
         if bgen.contain_samples:
             return bgen.read_samples()
         else:
@@ -317,26 +337,3 @@ def _to_dosage(probs: ArrayLike) -> ArrayLike:
         probs.shape[-1] == 3
     ), f"Expecting genotype (trailing) dimension of size 3, got array of shape {probs.shape}"
     return probs[..., 1] + 2 * probs[..., 2]
-
-
-def unpack_variables(ds: Dataset, dtype: DType = "float32") -> Dataset:
-    """Restore probabilities and dosages from legacy packed BGEN-derived stores."""
-    # Restore homozygous reference GP
-    gp = ds["call_genotype_probability"].astype(dtype)
-    if gp.sizes["genotypes"] != 2:
-        raise ValueError(
-            "Expecting variable 'call_genotype_probability' to have genotypes "
-            f"dimension of size 2 (received sizes = {dict(gp.sizes)})"
-        )
-    ds = ds.drop_vars("call_genotype_probability")
-    ds["call_genotype_probability"] = xr.concat(
-        [1 - gp.sum(dim="genotypes", skipna=False), gp], dim="genotypes"
-    )
-
-    # Restore dosage
-    ds["call_dosage"] = gp[..., 0] + 2 * gp[..., 1]
-    ds["call_dosage_mask"] = ds["call_genotype_probability_mask"]
-    ds["call_genotype_probability_mask"] = ds[
-        "call_genotype_probability_mask"
-    ].broadcast_like(ds["call_genotype_probability"])
-    return ds
