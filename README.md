@@ -10,6 +10,13 @@ general-purpose frameworks such as [Xarray](http://xarray.pydata.org/en/stable/)
 
 For more information on using sgkit, see the [documentation](https://sgkit-dev.github.io/sgkit/).
 
+**Genetic file conversion:** Use [bio2zarr](https://sgkit-dev.github.io/bio2zarr/)
+to convert genetic file formats to Zarr, then load them with `sgkit.load_dataset`.
+The deprecated `bgen_to_zarr` and `rechunk_bgen` functions have been removed.
+Bio2zarr's BGEN support is [still pending](https://github.com/sgkit-dev/bio2zarr/issues/417);
+see the [BGEN migration guide](docs/user_guide.rst#bgen) for the interim
+`read_bgen` / Xarray `chunk` / `save_dataset` workflow.
+
 [//]: # (numfocus-fiscal-sponsor-attribution)
 
 The sgkit project uses a [custom governance model](./GOVERNANCE.md) 

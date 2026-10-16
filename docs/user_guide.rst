@@ -13,6 +13,17 @@ User Guide
 Reading and writing genetic data
 ================================
 
+.. important::
+
+   **Use bio2zarr for genetic file format conversion to Zarr**, then use
+   :func:`sgkit.load_dataset` for analysis in sgkit. See the
+   `bio2zarr documentation <https://sgkit-dev.github.io/bio2zarr/>`_ for
+   installation and conversion instructions.
+
+   The deprecated BGEN conversion functions ``bgen_to_zarr`` and ``rechunk_bgen``
+   have been removed. BGEN conversion in bio2zarr is still pending; BGEN users
+   should follow :ref:`bgen_conversion_migration` in the meantime.
+
 .. _installation:
 
 Installation
@@ -38,18 +49,12 @@ To install sgkit with PLINK support::
 Converting genetic data to Zarr
 -------------------------------
 
-There are broadly two ways of loading genetic file format ``X`` for use in sgkit:
-
-1. a ``read_X`` function to read the file directly
-2. a ``X_to_zarr`` function to convert to Zarr first
-
-Which one to use depends on the size of the input, as well as the file format (not all file
-formats have both options).
-
-Generally speaking, the ``read_X`` functions are convenience functions that are suitable
-for small input files, or where the cost of conversion is small. The ``X_to_zarr`` functions
-are more appropriate for large datasets, since the expensive conversion step need only be
-paid once.
+Genetic file format conversion belongs in
+`bio2zarr <https://sgkit-dev.github.io/bio2zarr/>`__, rather than sgkit.
+Convert VCF and PLINK inputs with bio2zarr before analysis, so the expensive
+conversion step need only be paid once. The direct ``read_X`` functions are
+convenience functions for small inputs or cases where the cost of reading is small;
+the PLINK functions are deprecated.
 
 After converting a file to Zarr format, it can be loaded with sgkit's :func:`sgkit.load_dataset`.
 This is like Xarray's :func:`xarray.open_zarr` function, with some useful defaults applied for you.
@@ -69,24 +74,45 @@ by recent Zarr releases, preserving string-array chunking on load.
 By default, Zarr format 2 datasets created by sgkit have `consolidated metadata <http://xarray.pydata.org/en/stable/user-guide/io.html#consolidated-metadata>`_,
 which makes opening the dataset faster.
 
+.. _bgen_conversion_migration:
+
 BGEN
 ----
 
 The :func:`sgkit.io.bgen.read_bgen` function loads a single BGEN dataset as Dask
 arrays within an :class:`xarray.Dataset` from a ``bgen`` file.
 
-The :func:`sgkit.io.bgen.bgen_to_zarr` function converts a ``bgen`` file to Zarr
-files stored in sgkit's Xarray data representation, which can then be opened
-as a :class:`xarray.Dataset`.
+.. warning::
 
-The deprecated BGEN conversion functions now rechunk with Xarray and Dask,
-without the Zarr Python 2-only rechunker package. They still write Zarr format 2
-and preserve probability encoding and packing. The ``max_mem`` and ``tempdir``
-parameters are retained for compatibility but no longer have an effect; configure
-chunk sizes and the Dask scheduler to control memory use.
+   ``sgkit.io.bgen.bgen_to_zarr`` and ``sgkit.io.bgen.rechunk_bgen`` have been
+   removed. New format-conversion workflows should use bio2zarr, but
+   **bio2zarr does not yet support BGEN input**. Progress is tracked in
+   `bio2zarr issue 417 <https://github.com/sgkit-dev/bio2zarr/issues/417>`_.
+
+Until BGEN support is available in bio2zarr, the equivalent read/chunk/save
+steps can be performed explicitly::
+
+    import sgkit as sg
+    from sgkit.io.bgen import read_bgen
+
+    ds = read_bgen("input.bgen")
+    ds = ds.chunk({"variants": 10000, "samples": 1000})
+    sg.save_dataset(ds, "output.zarr")
+
+Choose chunk sizes and Dask scheduler settings appropriate to the available
+memory. This example retains the reader's floating-point genotype probabilities
+and dosages; it does not perform the removed converters' lossy integer
+quantization or variable packing. There are no ``max_mem`` or ``tempdir``
+arguments; those belonged to the removed rechunker-based conversion API.
+The ``unpack_variables`` helper in ``sgkit.io.bgen.bgen_reader`` remains
+available to restore probabilities and dosages from existing packed stores.
 
 PLINK
 -----
+
+Use `bio2zarr <https://sgkit-dev.github.io/bio2zarr/>`__ for PLINK-to-Zarr
+conversion and `vcztools <https://github.com/sgkit-dev/vcztools>`_ for export.
+The following sgkit PLINK functions are deprecated.
 
 The :func:`sgkit.io.plink.read_plink` function loads a single PLINK dataset as Dask
 arrays within an :class:`xarray.Dataset` from ``bed``, ``bim``, and ``fam`` files.

@@ -9,6 +9,14 @@ IO/imports and exports
 
 See :ref:`reading_and_writing_genetic_data`
 
+.. important::
+
+   **Use bio2zarr for genetic file format conversion to Zarr**, then load the
+   converted dataset with :func:`sgkit.load_dataset`. The deprecated BGEN
+   conversion functions ``bgen_to_zarr`` and ``rechunk_bgen`` have been removed.
+   BGEN support in bio2zarr is still pending; see :ref:`bgen_conversion_migration`
+   for the interim read/chunk/save workflow.
+
 BGEN
 -----
 
@@ -16,9 +24,7 @@ BGEN
 .. autosummary::
    :toctree: generated/
 
-   bgen_to_zarr
    read_bgen
-   rechunk_bgen
 
 PLINK
 -----

@@ -117,7 +117,11 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 autosummary_generate = True
 
-nitpick_ignore = [("py:class", "sgkit.display.GenotypeDisplay")]
+nitpick_ignore = [
+    ("py:class", "sgkit.display.GenotypeDisplay"),
+    # Zarr's StoreLike alias is rendered as an undocumented TypeAliasType.
+    ("py:class", "zarr.storage._common.TypeAliasType"),
+]
 
 
 # FIXME: Workaround for linking xarray module
