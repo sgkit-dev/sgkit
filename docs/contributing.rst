@@ -95,7 +95,7 @@ Install `uv <https://docs.astral.sh/uv/getting-started/installation/>`_
   uv sync
 
 This installs sgkit in editable mode with the ``dev`` dependency group, including
-the dependencies needed to test its optional I/O formats. Use ``uv run`` to run
+the dependencies needed to test compatibility with bio2zarr. Use ``uv run`` to run
 commands in this environment without activating it.
 
 

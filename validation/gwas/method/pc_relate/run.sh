@@ -36,6 +36,6 @@ else
   /work/convert_plink_to_gds.R hapmap_JPT_CHB_r23a_filtered hapmap_JPT_CHB_r23a_filtered.gds
   /work/pc_relate.R hapmap_JPT_CHB_r23a_filtered.gds
   cp /work/validate_pc_relate.py .
-  pip3 install --upgrade '/code[plink]' pytest
+  pip3 install --upgrade /code bio2zarr pytest
   PYTHONPATH=/code:$PYTHONPATH pytest ./validate_pc_relate.py
 fi

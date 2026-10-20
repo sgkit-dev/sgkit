@@ -4,20 +4,22 @@ import dask.array as da
 import numpy as np
 import pandas as pd
 import xarray as xr
+from bio2zarr import plink
 
-from sgkit import pc_relate
-from sgkit.io.plink import read_plink
+from sgkit import load_dataset, pc_relate
 from sgkit.variables import sample_pca_projection
 
 
-def test_same_as_the_reference_implementation() -> None:
+def test_same_as_the_reference_implementation(tmp_path: Path) -> None:
     """
     This test validates that our implementation gets exactly
     the same results as the reference R implementation.
     """
 
     d = Path(__file__).parent
-    ds = read_plink(path="hapmap_JPT_CHB_r23a_filtered")
+    zarr_path = tmp_path / "hapmap.zarr"
+    plink.convert("hapmap_JPT_CHB_r23a_filtered", zarr_path)
+    ds = load_dataset(zarr_path)
 
     pcs = da.from_array(
         pd.read_csv(d.joinpath("pcs.csv").as_posix(), usecols=[1, 2]).to_numpy()

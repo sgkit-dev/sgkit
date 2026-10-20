@@ -14,6 +14,7 @@ dependencies:
 - pytest-cov
 - hypothesis
 # Validation/visualization dependencies
+- bio2zarr
 - statsmodels
 - python-dotenv
 - matplotlib

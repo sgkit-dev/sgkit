@@ -23,25 +23,17 @@ Reading and writing genetic data
    BGEN reading and conversion have been removed from sgkit, along with the
    optional cbgen dependency. See :ref:`bgen_conversion_migration` for conversion
    guidance and support for existing legacy packed stores.
+   PLINK reading and writing have also been removed; see
+   :ref:`plink_conversion_migration`.
 
 .. _installation:
 
 Installation
 ------------
 
-Sgkit reads Zarr datasets directly. For VCF, BGEN and PLINK conversion, use
-`bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_. The deprecated direct PLINK
-reader remains available with optional dependencies.
-
-If sgkit has been installed using conda, support for reading PLINK is included.
-
-If sgkit has been installed using pip, then support for reading PLINK is
-not included, and requires additional dependencies, which can be installed
-as an "extra" feature using pip, as follows.
-
-To install sgkit with PLINK support::
-
-    $ pip install 'sgkit[plink]'
+Sgkit reads Zarr datasets directly. For VCF, BGEN and PLINK conversion, install
+`bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ separately. The ``bgen`` and
+``plink`` extras and their direct readers have been removed.
 
 Converting genetic data to Zarr
 -------------------------------
@@ -50,8 +42,7 @@ Genetic file format conversion belongs in
 `bio2zarr <https://sgkit-dev.github.io/bio2zarr/>`__, rather than sgkit.
 Convert inputs with bio2zarr before analysis, so the expensive conversion step
 need only be paid once. BGEN input requires a bio2zarr version with BGEN support
-(see :ref:`bgen_conversion_migration`). The remaining direct PLINK functions
-are deprecated convenience functions for small inputs.
+(see :ref:`bgen_conversion_migration`).
 
 After converting a file to Zarr format, it can be loaded with sgkit's :func:`sgkit.load_dataset`.
 This is like Xarray's :func:`xarray.open_zarr` function, with some useful defaults applied for you.
@@ -123,18 +114,32 @@ automatically detect or unpack legacy stores.
 The original ``sgkit.io.bgen.bgen_reader.unpack_variables`` import remains
 supported as a compatibility alias; that module no longer contains a reader.
 
+.. _plink_conversion_migration:
+
 PLINK
 -----
 
 Use `bio2zarr <https://sgkit-dev.github.io/bio2zarr/>`__ for PLINK-to-Zarr
 conversion and `vcztools <https://github.com/sgkit-dev/vcztools>`_ for export.
-The following sgkit PLINK functions are deprecated.
+The ``sgkit.io.plink`` module, including ``read_plink``, ``plink_to_zarr``,
+``write_plink`` and ``zarr_to_plink``, has been removed, along with the
+``plink`` extra and the bed-reader dependency.
 
-The :func:`sgkit.io.plink.read_plink` function loads a single PLINK dataset as Dask
-arrays within an :class:`xarray.Dataset` from ``bed``, ``bim``, and ``fam`` files.
+For a PLINK 1 fileset named ``input.bed``, ``input.bim`` and ``input.fam``,
+convert using the shared path prefix::
 
-The :func:`sgkit.io.plink.write_plink` and :func:`sgkit.io.plink.zarr_to_plink`
-functions convert sgkit's Xarray data representation to PLINK.
+    plink2zarr convert input output.zarr
+
+Then load the result for analysis::
+
+    import sgkit as sg
+
+    ds = sg.load_dataset("output.zarr")
+
+This conversion preserves hard calls and variant/sample identifiers; it is not
+a complete archival copy of the companion files. In particular, bio2zarr does
+not import FAM family/parent IDs, sex or phenotype, or BIM genetic-map positions.
+Consult the converter documentation when migrating code that used those fields.
 
 Working with cloud-native data
 ------------------------------

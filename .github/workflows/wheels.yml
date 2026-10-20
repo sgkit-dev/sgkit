@@ -81,9 +81,8 @@ jobs:
           # Avoid building SciPy from source in CI.
           wheel=$(ls artifact/sgkit-*.whl)
           uv venv --python "${{ matrix.python-version }}"
-          uv pip install --python .venv --only-binary scipy "${wheel}[plink]"
+          uv pip install --python .venv --only-binary scipy "${wheel}"
           uv run --no-sync python sgkit-copy/.github/scripts/test_sgkit.py
-          uv run --no-sync python sgkit-copy/.github/scripts/test_sgkit_plink.py
 
   windows-test:
     # This workflow only runs on the origin org
@@ -119,9 +118,8 @@ jobs:
           # Avoid building SciPy from source in CI.
           $wheel = (Get-ChildItem artifact/sgkit-*.whl).FullName
           uv venv --python "${{ matrix.python-version }}"
-          uv pip install --python .venv --only-binary scipy "${wheel}[plink]"
+          uv pip install --python .venv --only-binary scipy "${wheel}"
           uv run --no-sync python sgkit-copy/.github/scripts/test_sgkit.py
-          uv run --no-sync python sgkit-copy/.github/scripts/test_sgkit_plink.py
 
 
   pypi-upload:
