@@ -39,9 +39,6 @@ text = """
 variation data."""
 content-type = "text/x-rst"
 
-[project.optional-dependencies]
-plink = ["partd", "bed-reader"]
-
 [dependency-groups]
 test = [
   "packaging",
@@ -61,7 +58,6 @@ test = [
   "aiohttp",
   "requests",
   "graphviz",
-  "sgkit[plink]",
 ]
 docs = [
   "graphviz",
@@ -186,10 +182,6 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = ["sklearn.*"]
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = ["bed_reader.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]

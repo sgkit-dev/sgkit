@@ -26,20 +26,28 @@ Breaking changes
   The dependency-free :func:`sgkit.io.bgen.unpack_variables` helper remains
   for existing legacy packed stores. See :ref:`bgen_conversion_migration`.
   (:pr:`1325`, :issue:`1355`)
+- **Remove PLINK reading and writing**: the ``sgkit.io.plink`` module and its
+  ``read_plink``, ``plink_to_zarr``, ``write_plink`` and ``zarr_to_plink``
+  functions, along with the ``plink`` extra and bed-reader dependency.
+  Use bio2zarr for conversion to Zarr and vcztools for export.
+  See :ref:`plink_conversion_migration`, including companion-file metadata
+  differences. (:pr:`1324`, :pr:`1362`, :issue:`1318`)
 
 Deprecations
 ~~~~~~~~~~~~
 
 - BGEN reading and conversion have moved out of sgkit. Use
   `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ for BGEN-to-Zarr conversion
-  and :func:`load_dataset` for analysis. Unlike the deprecated PLINK functions
-  below, ``read_bgen``, ``bgen_to_zarr`` and ``rechunk_bgen`` are already removed
+  and :func:`load_dataset` for analysis. ``read_bgen``, ``bgen_to_zarr`` and
+  ``rechunk_bgen`` are already removed
   in this release; see Breaking changes above and
   :ref:`bgen_conversion_migration`. Only the dependency-free
   :func:`sgkit.io.bgen.unpack_variables` helper remains for legacy packed stores.
   (:pr:`1325`, :issue:`1331`, :issue:`1355`)
-- Functions for reading and writing plink are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_
-  and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages.
+- Previously deprecated PLINK reading and writing functions are now removed;
+  see Breaking changes above and :ref:`plink_conversion_migration`.
+  Use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ and
+  `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages instead.
   (:user:`tomwhite`, :pr:`1324`, :issue:`1318`)
 
 .. Improvements
@@ -210,14 +218,14 @@ Documentation
 New Features
 ~~~~~~~~~~~~
 
-- Add :func:`sgkit.io.plink.write_plink` function.
+- Add ``sgkit.io.plink.write_plink`` function.
   (:user:`tomwhite`, :pr:`1003`, :issue:`926`)
 
 - Add ``phased`` option to :func:`simulate_genotype_call_dataset` function.
   (:user:`tomwhite`, :pr:`1022`, :issue:`973`)
 
-- Add :func:`sgkit.io.plink.plink_to_zarr` and
-  :func:`sgkit.io.plink.zarr_to_plink` convenience functions
+- Add ``sgkit.io.plink.plink_to_zarr`` and
+  ``sgkit.io.plink.zarr_to_plink`` convenience functions
   (:user:`tomwhite`, :pr:`1047`, :issue:`1004`)
 
 - Add :func:`sgkit.convert_call_to_index` method.
@@ -338,7 +346,7 @@ Breaking changes
 
 - Remove support for Python 3.7.
   (:user:`tomwhite`, :pr:`927`, :issue:`802`)
-- The ``count_a1`` parameter to :func:`sgkit.io.plink.read_plink` previously
+- The ``count_a1`` parameter to ``sgkit.io.plink.read_plink`` previously
   defaulted to ``True`` but now defaults to ``False``. Furthermore, ``True``
   is no longer supported since it is not clear how it should behave.
   (:user:`tomwhite`, :pr:`952`, :issue:`947`)
