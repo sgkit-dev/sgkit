@@ -60,9 +60,9 @@ jobs:
       - name: Install dependencies
         run: |
           uv sync --locked --all-extras --group test --no-default-groups --python 3.12
-      - name: Install minimum supported Xarray and SciPy
+      - name: Install minimum supported Xarray, SciPy and Dask
         run: |
-          uv pip install --python .venv 'xarray==2026.9.0' 'scipy==1.16.2'
+          uv pip install --python .venv 'xarray==2026.9.0' 'scipy==1.16.2' 'dask[array,dataframe]==2025.2.0'
       - name: Run tests
         run: |
           uv run --no-sync pytest

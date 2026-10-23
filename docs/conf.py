@@ -117,10 +117,12 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 autosummary_generate = True
 
+# sphinx-autodoc-typehints refers to Zarr's StoreLike type alias as
+# zarr.core.group.StoreLike, but Zarr documents it as zarr.storage.StoreLike.
+qualname_overrides = {"zarr.core.group.StoreLike": "zarr.storage.StoreLike"}
+
 nitpick_ignore = [
     ("py:class", "sgkit.display.GenotypeDisplay"),
-    # Zarr's StoreLike alias is rendered as an undocumented TypeAliasType.
-    ("py:class", "zarr.storage._common.TypeAliasType"),
 ]
 
 

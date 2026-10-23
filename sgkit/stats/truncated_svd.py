@@ -159,9 +159,10 @@ class TruncatedSVD(BaseEstimator, TransformerMixin):
             )
         if self.algorithm == "tsqr":
             if has_keyword(da.linalg.svd, "full_matrices"):
-                u, s, v = da.linalg.svd(X, full_matrices=False)  # pragma: no cover
+                u, s, v = da.linalg.svd(X, full_matrices=False)
             else:
-                u, s, v = da.linalg.svd(X)
+                # Dask versions before 2026.3.0 have no full_matrices argument
+                u, s, v = da.linalg.svd(X)  # pragma: no cover
             u = u[:, : self.n_components]
             s = s[: self.n_components]
             v = v[: self.n_components]
