@@ -18,6 +18,7 @@ Breaking changes
   Require SciPy >= 1.16.2. (:issue:`1360`)
 - Require Zarr Python >= 3 and Xarray >= 2026.9.0. The default on-disk Zarr
   format remains 2. (:issue:`1355`)
+- Require Dask >= 2025.2.0 and remove the upper bound on Dask. (:issue:`1267`)
 - **Remove BGEN reading and conversion**: ``sgkit.io.bgen.read_bgen``,
   ``sgkit.io.bgen.bgen_to_zarr`` and ``sgkit.io.bgen.rechunk_bgen``, along with
   the ``bgen`` extra and the cbgen and rechunker dependencies.

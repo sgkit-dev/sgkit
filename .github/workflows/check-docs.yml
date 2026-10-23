@@ -33,9 +33,6 @@ jobs:
         sudo apt update -y
         sudo apt install graphviz  # Needed for documentation
         uv sync --locked --all-extras --group docs --group lint --no-default-groups --python "${{ matrix.python-version }}"
-        # Use newer Dask for task-graph rendering with NumPy 2.
-        uv pip uninstall --python .venv dask-expr
-        uv pip install --python .venv 'dask==2026.8.0'
     - name: Run pre-commit
       run: uv run --no-sync pre-commit run --all-files
     - name: Check for Sphinx doc warnings

@@ -270,20 +270,12 @@ and API documentation.
 Building the documentation requires the Graphviz ``dot`` executable, which you
 can install by following `these instructions <https://graphviz.org/download/#executable-packages>`_.
 
-Documentation builds use the same ``.venv`` as development. Task-graph
-visualization with NumPy 2 needs a newer Dask than the current runtime bound.
-From the repository root, on macOS or Linux, prepare the environment and build
-with ``make``::
+Documentation builds use the same ``.venv`` as development. From the repository
+root, on macOS or Linux, prepare the environment and build with ``make``::
 
    uv sync --locked
-   uv pip uninstall --python .venv dask-expr
-   uv pip install --python .venv 'dask==2026.8.0'
    cd docs
    make html
-
-The old ``dask-expr`` package is removed because it pins the runtime Dask version.
-The Makefile uses ``uv run --no-sync`` to preserve the Dask override during builds.
-Docs CI applies the same override.
 
 The resulting HTML files are in ``_build/html``. After editing documentation,
 run ``make html`` again.
@@ -292,10 +284,6 @@ CI checks documentation with warnings treated as errors. Run the same check
 locally with::
 
    make clean html SPHINXOPTS="-W --keep-going -n"
-
-Before running tests, restore the locked development dependencies with
-``uv sync --locked`` from the repository root. Repeat the Dask setup above when
-you next build the documentation.
 
 .. _Sphinx: https://www.sphinx-doc.org/
 
