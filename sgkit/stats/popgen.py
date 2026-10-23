@@ -361,6 +361,11 @@ def Fst(
     return conditional_merge_datasets(ds, new_ds, merge)
 
 
+def _harmonic_sum(n: np.ndarray, power: int) -> np.ndarray:
+    # sum of 1 / k**power for k = 1, ..., n - 1
+    return np.asarray((1 / np.arange(1, n) ** power).sum())
+
+
 def Tajimas_D(
     ds: Dataset,
     *,
@@ -470,8 +475,9 @@ def Tajimas_D(
     #       because the computation below requires floats
     n = ac.sum(axis=1, dtype="float").max()
 
-    # (n-1)th harmonic number
-    a1 = (1 / da.arange(1, n)).sum()
+    # (n-1)th harmonic number. n is a lazy scalar, so compute the sum
+    # blockwise rather than passing it to da.arange as a stop value.
+    a1 = da.map_blocks(_harmonic_sum, n, 1, dtype=np.float64)
 
     # calculate Watterson's theta (absolute value)
     theta = S / a1
@@ -484,7 +490,7 @@ def Tajimas_D(
     d = div - theta[:, np.newaxis]
 
     # calculate the denominator (standard deviation)
-    a2 = (1 / (da.arange(1, n) ** 2)).sum()
+    a2 = da.map_blocks(_harmonic_sum, n, 2, dtype=np.float64)
     b1 = (n + 1) / (3 * (n - 1))
     b2 = 2 * (n**2 + n + 3) / (9 * n * (n - 1))
     c1 = b1 - (1 / a1)
