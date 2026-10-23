@@ -38,6 +38,11 @@ def test_comb(n, k):
     assert _comb(n, k) == comb(n, k, exact=True)
 
 
+def _expected_comb_with_replacement(n, k):
+    # There is one empty combination; SciPy < 1.17 returns 0 for n = k = 0.
+    return 1 if k == 0 else comb(n, k, exact=True, repetition=True)
+
+
 @pytest.mark.parametrize(
     "n, k",
     [
@@ -54,14 +59,14 @@ def test_comb(n, k):
     ],
 )
 def test_comb_with_replacement(n, k):
-    assert _comb_with_replacement(n, k) == comb(n, k, exact=True, repetition=True)
+    assert _comb_with_replacement(n, k) == _expected_comb_with_replacement(n, k)
 
 
 def test__COMB_REP_LOOKUP():
     ns, ks = _COMB_REP_LOOKUP.shape
     for n in range(ns):
         for k in range(ks):
-            assert _COMB_REP_LOOKUP[n, k] == comb(n, k, exact=True, repetition=True)
+            assert _COMB_REP_LOOKUP[n, k] == _expected_comb_with_replacement(n, k)
 
 
 @pytest.mark.parametrize(

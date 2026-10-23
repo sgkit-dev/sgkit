@@ -14,6 +14,8 @@ Changelog
 Breaking changes
 ~~~~~~~~~~~~~~~~
 
+- Support Python 3.12, 3.13, and 3.14, and drop Python 3.11 support.
+  Require SciPy >= 1.16.2. (:issue:`1360`)
 - Require Zarr Python >= 3 and Xarray >= 2026.9.0. The default on-disk Zarr
   format remains 2. (:issue:`1355`)
 - **Remove BGEN reading and conversion**: ``sgkit.io.bgen.read_bgen``,

@@ -12,21 +12,21 @@ jobs:
 
     steps:
     - uses: actions/checkout@v7
-    - name: Set up Python 3.11
+    - name: Set up Python 3.12
       uses: actions/setup-python@v7
       with:
-        python-version: "3.11"
+        python-version: "3.12"
     - name: Set up uv
       uses: astral-sh/setup-uv@v10.0.1
       with:
         version: "0.12.10"
-        python-version: "3.11"
+        python-version: "3.12"
         enable-cache: true
     - name: Install dependencies
       run: |
         sudo apt update -y
         sudo apt install graphviz  # Needed for documentation
-        uv sync --locked --all-extras --group docs --no-default-groups --python "3.11"
+        uv sync --locked --all-extras --group docs --no-default-groups --python "3.12"
         # Use newer Dask for task-graph rendering with NumPy 2.
         uv pip uninstall --python .venv dask-expr
         uv pip install --python .venv 'dask==2026.8.0'
