@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11"]
+        python-version: ["3.12"]
 
     steps:
     - uses: actions/checkout@v7
@@ -53,7 +53,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.12", "3.13", "3.14"]
     runs-on: ${{ matrix.os }}
     steps:
       # checkout repo to subdirectory to get access to scripts
@@ -91,7 +91,7 @@ jobs:
     needs: ['build']
     strategy:
       matrix:
-        python-version: ["3.11"]
+        python-version: ["3.12", "3.13", "3.14"]
     steps:
       # checkout repo to subdirectory to get access to scripts
       - uses: actions/checkout@v7
