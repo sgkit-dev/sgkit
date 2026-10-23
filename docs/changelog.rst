@@ -67,6 +67,8 @@ Bug fixes
 - Fixed bug causing high memory usage in :func:`pedigree_kinship` when
   evaluating a chunked relationship matrix with the Hamilton-Kerr method.
   (:user:`timothymillar`, :pr:`1335`, :issue:`1333`)
+- :func:`Tajimas_D` now works with newer versions of Dask, and no longer
+  computes allele counts when it is called.
 
 .. Documentation
 .. ~~~~~~~~~~~~~
