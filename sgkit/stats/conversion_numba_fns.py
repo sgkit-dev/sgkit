@@ -131,7 +131,6 @@ def _comb(n: int, k: int) -> int:  # pragma: no cover
 _COMB_REP_LOOKUP = np.array(
     [[math.comb(max(0, n + k - 1), k) for k in range(11)] for n in range(11)]
 )
-_COMB_REP_LOOKUP[0, 0] = 0  # special case
 
 
 @numba_jit(nogil=True)
