@@ -544,105 +544,166 @@
 <ul>
 <li><p><a class="reference internal" href="#installation" id="id6">Installation</a></p></li>
 <li><p><a class="reference internal" href="#converting-genetic-data-to-zarr" id="id7">Converting genetic data to Zarr</a></p></li>
-<li><p><a class="reference internal" href="#bgen" id="id8">BGEN</a></p></li>
-<li><p><a class="reference internal" href="#plink" id="id9">PLINK</a></p></li>
-<li><p><a class="reference internal" href="#working-with-cloud-native-data" id="id10">Working with cloud-native data</a></p></li>
+<li><p><a class="reference internal" href="#bgen" id="id8">BGEN</a></p>
+<ul>
+<li><p><a class="reference internal" href="#legacy-packed-stores" id="id9">Legacy packed stores</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#datasets" id="id11">Datasets</a></p>
-<ul>
-<li><p><a class="reference internal" href="#genetic-variables" id="id12">Genetic variables</a></p></li>
-<li><p><a class="reference internal" href="#dataset-merge-behavior" id="id13">Dataset merge behavior</a></p></li>
-<li><p><a class="reference internal" href="#interop-with-other-python-libraries" id="id14">Interop with other Python libraries</a></p></li>
-<li><p><a class="reference internal" href="#custom-naming-conventions" id="id15">Custom naming conventions</a></p></li>
-<li><p><a class="reference internal" href="#adding-custom-data-to-a-dataset" id="id16">Adding custom data to a Dataset</a></p></li>
+<li><p><a class="reference internal" href="#plink" id="id10">PLINK</a></p></li>
+<li><p><a class="reference internal" href="#working-with-cloud-native-data" id="id11">Working with cloud-native data</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#methods" id="id17">Methods</a></p>
+<li><p><a class="reference internal" href="#datasets" id="id12">Datasets</a></p>
 <ul>
-<li><p><a class="reference internal" href="#custom-computations" id="id18">Custom Computations</a></p></li>
-<li><p><a class="reference internal" href="#pca" id="id19">PCA</a></p></li>
+<li><p><a class="reference internal" href="#genetic-variables" id="id13">Genetic variables</a></p></li>
+<li><p><a class="reference internal" href="#dataset-merge-behavior" id="id14">Dataset merge behavior</a></p></li>
+<li><p><a class="reference internal" href="#interop-with-other-python-libraries" id="id15">Interop with other Python libraries</a></p></li>
+<li><p><a class="reference internal" href="#custom-naming-conventions" id="id16">Custom naming conventions</a></p></li>
+<li><p><a class="reference internal" href="#adding-custom-data-to-a-dataset" id="id17">Adding custom data to a Dataset</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#deployment" id="id20">Deployment</a></p>
+<li><p><a class="reference internal" href="#methods" id="id18">Methods</a></p>
 <ul>
-<li><p><a class="reference internal" href="#deploying-sgkit-on-a-cluster" id="id21">Deploying sgkit on a cluster</a></p></li>
-<li><p><a class="reference internal" href="#using-gpus" id="id22">Using GPUs</a></p></li>
+<li><p><a class="reference internal" href="#custom-computations" id="id19">Custom Computations</a></p></li>
+<li><p><a class="reference internal" href="#pca" id="id20">PCA</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#troubleshooting" id="id23">Troubleshooting</a></p>
+<li><p><a class="reference internal" href="#deployment" id="id21">Deployment</a></p>
 <ul>
-<li><p><a class="reference internal" href="#monitoring-operations" id="id24">Monitoring operations</a></p></li>
-<li><p><a class="reference internal" href="#visualizing-computations" id="id25">Visualizing computations</a></p></li>
-<li><p><a class="reference internal" href="#disabling-the-numba-cache" id="id26">Disabling the Numba cache</a></p></li>
+<li><p><a class="reference internal" href="#deploying-sgkit-on-a-cluster" id="id22">Deploying sgkit on a cluster</a></p></li>
+<li><p><a class="reference internal" href="#using-gpus" id="id23">Using GPUs</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#troubleshooting" id="id24">Troubleshooting</a></p>
+<ul>
+<li><p><a class="reference internal" href="#monitoring-operations" id="id25">Monitoring operations</a></p></li>
+<li><p><a class="reference internal" href="#visualizing-computations" id="id26">Visualizing computations</a></p></li>
+<li><p><a class="reference internal" href="#disabling-the-numba-cache" id="id27">Disabling the Numba cache</a></p></li>
 </ul>
 </li>
 </ul>
 </nav>
 <section id="reading-and-writing-genetic-data">
 <span id="id1"></span><h2><a class="toc-backref" href="#id5" role="doc-backlink">Reading and writing genetic data</a><a class="headerlink" href="#reading-and-writing-genetic-data" title="Link to this heading">#</a></h2>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><strong>Use bio2zarr for genetic file format conversion to Zarr</strong>, then use
+<a class="reference internal" href="generated/sgkit.load_dataset.html#sgkit.load_dataset" title="sgkit.load_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.load_dataset()</span></code></a> for analysis in sgkit. See the
+<a class="reference external" href="https://sgkit-dev.github.io/bio2zarr/">bio2zarr documentation</a> for
+installation and conversion instructions.</p>
+<p>BGEN reading and conversion have been removed from sgkit, along with the
+optional cbgen dependency. See <a class="reference internal" href="#bgen-conversion-migration"><span class="std std-ref">BGEN</span></a> for conversion
+guidance and support for existing legacy packed stores.
+PLINK reading and writing have also been removed; see
+<a class="reference internal" href="#plink-conversion-migration"><span class="std std-ref">PLINK</span></a>.</p>
+</div>
 <section id="installation">
 <span id="id2"></span><h3><a class="toc-backref" href="#id6" role="doc-backlink">Installation</a><a class="headerlink" href="#installation" title="Link to this heading">#</a></h3>
-<p>Sgkit can read standard genetic file formats, including PLINK and BGEN. For reading VCF,
-please use the <a class="reference external" href="https://github.com/sgkit-dev/bio2zarr">bio2zarr</a> package.</p>
-<p>If sgkit has been installed using conda, support for reading BGEN and PLINK is included.</p>
-<p>If sgkit has been installed using pip, then support for reading these formats is
-not included, and requires additional dependencies, which can be installed
-as an “extra” feature using pip, as follows.</p>
-<p>To install sgkit with BGEN support:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install 'sgkit[bgen]'
-</pre></div>
-</div>
-<p>To install sgkit with PLINK support:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install 'sgkit[plink]'
-</pre></div>
-</div>
+<p>Sgkit reads Zarr datasets directly. For VCF, BGEN and PLINK conversion, install
+<a class="reference external" href="https://github.com/sgkit-dev/bio2zarr">bio2zarr</a> separately. The <code class="docutils literal notranslate"><span class="pre">bgen</span></code> and
+<code class="docutils literal notranslate"><span class="pre">plink</span></code> extras and their direct readers have been removed.</p>
 </section>
 <section id="converting-genetic-data-to-zarr">
 <h3><a class="toc-backref" href="#id7" role="doc-backlink">Converting genetic data to Zarr</a><a class="headerlink" href="#converting-genetic-data-to-zarr" title="Link to this heading">#</a></h3>
-<p>There are broadly two ways of loading genetic file format <code class="docutils literal notranslate"><span class="pre">X</span></code> for use in sgkit:</p>
-<ol class="arabic simple">
-<li><p>a <code class="docutils literal notranslate"><span class="pre">read_X</span></code> function to read the file directly</p></li>
-<li><p>a <code class="docutils literal notranslate"><span class="pre">X_to_zarr</span></code> function to convert to Zarr first</p></li>
-</ol>
-<p>Which one to use depends on the size of the input, as well as the file format (not all file
-formats have both options).</p>
-<p>Generally speaking, the <code class="docutils literal notranslate"><span class="pre">read_X</span></code> functions are convenience functions that are suitable
-for small input files, or where the cost of conversion is small. The <code class="docutils literal notranslate"><span class="pre">X_to_zarr</span></code> functions
-are more appropriate for large datasets, since the expensive conversion step need only be
-paid once.</p>
+<p>Genetic file format conversion belongs in
+<a class="reference external" href="https://sgkit-dev.github.io/bio2zarr/">bio2zarr</a>, rather than sgkit.
+Convert inputs with bio2zarr before analysis, so the expensive conversion step
+need only be paid once. BGEN input requires a bio2zarr version with BGEN support
+(see <a class="reference internal" href="#bgen-conversion-migration"><span class="std std-ref">BGEN</span></a>).</p>
 <p>After converting a file to Zarr format, it can be loaded with sgkit’s <a class="reference internal" href="generated/sgkit.load_dataset.html#sgkit.load_dataset" title="sgkit.load_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.load_dataset()</span></code></a>.
 This is like Xarray’s <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.open_zarr.html#xarray.open_zarr" title="(in xarray v2026.9.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">xarray.open_zarr()</span></code></a> function, with some useful defaults applied for you.</p>
 <p>Similarly, the function <a class="reference internal" href="generated/sgkit.save_dataset.html#sgkit.save_dataset" title="sgkit.save_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.save_dataset()</span></code></a> can be used to save the dataset in Zarr format.
 This can be used to save a newly-loaded dataset, or a dataset with new variables that are the
 result of running genetic methods on the data, so it can be loaded again later.</p>
-<p>By default, Zarr datasets created by sgkit (and Xarray) have <a class="reference external" href="http://xarray.pydata.org/en/stable/user-guide/io.html#consolidated-metadata">consolidated metadata</a>,
+<p>Sgkit requires Zarr Python &gt;= 3 and Xarray &gt;= 2026.9.0, but
+<a class="reference internal" href="generated/sgkit.save_dataset.html#sgkit.save_dataset" title="sgkit.save_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.save_dataset()</span></code></a> continues to write <strong>Zarr format 2</strong> by default.
+The Python package version does not determine the on-disk format.
+Pass <code class="docutils literal notranslate"><span class="pre">zarr_format=3</span></code> to opt into format 3; <a class="reference internal" href="generated/sgkit.load_dataset.html#sgkit.load_dataset" title="sgkit.load_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.load_dataset()</span></code></a>
+can read either format.
+The Xarray minimum includes support for the native NumPy string dtype returned
+by recent Zarr releases, preserving string-array chunking on load.</p>
+<p>By default, Zarr format 2 datasets created by sgkit have <a class="reference external" href="http://xarray.pydata.org/en/stable/user-guide/io.html#consolidated-metadata">consolidated metadata</a>,
 which makes opening the dataset faster.</p>
 </section>
 <section id="bgen">
-<h3><a class="toc-backref" href="#id8" role="doc-backlink">BGEN</a><a class="headerlink" href="#bgen" title="Link to this heading">#</a></h3>
-<p>The <a class="reference internal" href="generated/sgkit.io.bgen.read_bgen.html#sgkit.io.bgen.read_bgen" title="sgkit.io.bgen.read_bgen"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.bgen.read_bgen()</span></code></a> function loads a single BGEN dataset as Dask
-arrays within an <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2026.9.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a> from a <code class="docutils literal notranslate"><span class="pre">bgen</span></code> file.</p>
-<p>The <a class="reference internal" href="generated/sgkit.io.bgen.bgen_to_zarr.html#sgkit.io.bgen.bgen_to_zarr" title="sgkit.io.bgen.bgen_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.bgen.bgen_to_zarr()</span></code></a> function converts a <code class="docutils literal notranslate"><span class="pre">bgen</span></code> file to Zarr
-files stored in sgkit’s Xarray data representation, which can then be opened
-as a <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2026.9.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a>.</p>
+<span id="bgen-conversion-migration"></span><h3><a class="toc-backref" href="#id8" role="doc-backlink">BGEN</a><a class="headerlink" href="#bgen" title="Link to this heading">#</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">sgkit.io.bgen.read_bgen</span></code>, <code class="docutils literal notranslate"><span class="pre">sgkit.io.bgen.bgen_to_zarr</span></code> and
+<code class="docutils literal notranslate"><span class="pre">sgkit.io.bgen.rechunk_bgen</span></code> have been removed, together with the <code class="docutils literal notranslate"><span class="pre">bgen</span></code>
+extra. Sgkit no longer reads BGEN files or depends on cbgen.</p>
+</div>
+<p>Use bio2zarr for BGEN conversion, then load the resulting Zarr dataset with
+<a class="reference internal" href="generated/sgkit.load_dataset.html#sgkit.load_dataset" title="sgkit.load_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.load_dataset()</span></code></a>. Install a bio2zarr version that includes BGEN support;
+availability is tracked in
+<a class="reference external" href="https://github.com/sgkit-dev/bio2zarr/issues/417">bio2zarr issue 417</a>.
+An older bio2zarr release without BGEN support cannot replace the removed reader.
+Sgkit does not provide an alternative BGEN conversion path.</p>
+<section id="legacy-packed-stores">
+<h4><a class="toc-backref" href="#id9" role="doc-backlink">Legacy packed stores</a><a class="headerlink" href="#legacy-packed-stores" title="Link to this heading">#</a></h4>
+<p>Some older sgkit BGEN converters packed variables to reduce storage size:
+they saved only the heterozygous and homozygous-alternate probabilities,
+omitted dosage, and used one missingness flag per variant/sample pair.
+For these <strong>known legacy packed stores only</strong>, use
+<a class="reference internal" href="generated/sgkit.io.bgen.unpack_variables.html#sgkit.io.bgen.unpack_variables" title="sgkit.io.bgen.unpack_variables"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.bgen.unpack_variables()</span></code></a> after loading and before methods that
+expect complete genotype probabilities or dosage. This helper operates on an
+existing Xarray dataset and needs no BGEN backend:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sgkit.io.bgen</span><span class="w"> </span><span class="kn">import</span> <span class="n">unpack_variables</span>
+
+<span class="n">packed</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">"legacy-packed.zarr"</span><span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">unpack_variables</span><span class="p">(</span><span class="n">packed</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The expected signature is <code class="docutils literal notranslate"><span class="pre">call_genotype_probability</span></code> with dimensions
+<code class="docutils literal notranslate"><span class="pre">(variants,</span> <span class="pre">samples,</span> <span class="pre">genotypes)</span></code> and <strong>two</strong> stored probabilities, plus
+<code class="docutils literal notranslate"><span class="pre">call_genotype_probability_mask</span></code> with dimensions <code class="docutils literal notranslate"><span class="pre">(variants,</span> <span class="pre">samples)</span></code>.
+Unpacking restores three diploid, biallelic genotype probabilities, computes
+alternate-allele dosage, and expands the probability mask. For example,
+<code class="docutils literal notranslate"><span class="pre">[0.25,</span> <span class="pre">0.5]</span></code> becomes <code class="docutils literal notranslate"><span class="pre">[0.25,</span> <span class="pre">0.25,</span> <span class="pre">0.5]</span></code> with dosage <code class="docutils literal notranslate"><span class="pre">1.25</span></code>.
+Missing probabilities remain NaN. The input is unchanged and Dask arrays
+remain lazy; lost quantization precision cannot be recovered.</p>
+<p><strong>Do not unpack ordinary datasets, new bio2zarr output, or an already-unpacked
+store.</strong> A two-state probability array alone is not evidence of legacy packing:
+other ploidies or allele counts can also produce two states. The helper is not
+a general BGEN decoder or schema adapter. <a class="reference internal" href="generated/sgkit.load_dataset.html#sgkit.load_dataset" title="sgkit.load_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.load_dataset()</span></code></a> does not
+automatically detect or unpack legacy stores.
+The original <code class="docutils literal notranslate"><span class="pre">sgkit.io.bgen.bgen_reader.unpack_variables</span></code> import remains
+supported as a compatibility alias; that module no longer contains a reader.</p>
+</section>
 </section>
 <section id="plink">
-<h3><a class="toc-backref" href="#id9" role="doc-backlink">PLINK</a><a class="headerlink" href="#plink" title="Link to this heading">#</a></h3>
-<p>The <a class="reference internal" href="generated/sgkit.io.plink.read_plink.html#sgkit.io.plink.read_plink" title="sgkit.io.plink.read_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.read_plink()</span></code></a> function loads a single PLINK dataset as Dask
-arrays within an <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2026.9.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></a> from <code class="docutils literal notranslate"><span class="pre">bed</span></code>, <code class="docutils literal notranslate"><span class="pre">bim</span></code>, and <code class="docutils literal notranslate"><span class="pre">fam</span></code> files.</p>
-<p>The <a class="reference internal" href="generated/sgkit.io.plink.write_plink.html#sgkit.io.plink.write_plink" title="sgkit.io.plink.write_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.write_plink()</span></code></a> and <a class="reference internal" href="generated/sgkit.io.plink.zarr_to_plink.html#sgkit.io.plink.zarr_to_plink" title="sgkit.io.plink.zarr_to_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.zarr_to_plink()</span></code></a>
-functions convert sgkit’s Xarray data representation to PLINK.</p>
+<span id="plink-conversion-migration"></span><h3><a class="toc-backref" href="#id10" role="doc-backlink">PLINK</a><a class="headerlink" href="#plink" title="Link to this heading">#</a></h3>
+<p>Use <a class="reference external" href="https://sgkit-dev.github.io/bio2zarr/">bio2zarr</a> for PLINK-to-Zarr
+conversion and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">vcztools</a> for export.
+The <code class="docutils literal notranslate"><span class="pre">sgkit.io.plink</span></code> module, including <code class="docutils literal notranslate"><span class="pre">read_plink</span></code>, <code class="docutils literal notranslate"><span class="pre">plink_to_zarr</span></code>,
+<code class="docutils literal notranslate"><span class="pre">write_plink</span></code> and <code class="docutils literal notranslate"><span class="pre">zarr_to_plink</span></code>, has been removed, along with the
+<code class="docutils literal notranslate"><span class="pre">plink</span></code> extra and the bed-reader dependency.</p>
+<p>For a PLINK 1 fileset named <code class="docutils literal notranslate"><span class="pre">input.bed</span></code>, <code class="docutils literal notranslate"><span class="pre">input.bim</span></code> and <code class="docutils literal notranslate"><span class="pre">input.fam</span></code>,
+convert using the shared path prefix:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plink2zarr</span> <span class="n">convert</span> <span class="nb">input</span> <span class="n">output</span><span class="o">.</span><span class="n">zarr</span>
+</pre></div>
+</div>
+<p>Then load the result for analysis:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">"output.zarr"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This conversion preserves hard calls and variant/sample identifiers; it is not
+a complete archival copy of the companion files. In particular, bio2zarr does
+not import FAM family/parent IDs, sex or phenotype, or BIM genetic-map positions.
+Consult the converter documentation when migrating code that used those fields.</p>
 </section>
 <section id="working-with-cloud-native-data">
-<h3><a class="toc-backref" href="#id10" role="doc-backlink">Working with cloud-native data</a><a class="headerlink" href="#working-with-cloud-native-data" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id11" role="doc-backlink">Working with cloud-native data</a><a class="headerlink" href="#working-with-cloud-native-data" title="Link to this heading">#</a></h3>
 <p>TODO: Show how to read/write Zarr data in cloud storage</p>
 </section>
 </section>
 <section id="datasets">
-<h2><a class="toc-backref" href="#id11" role="doc-backlink">Datasets</a><a class="headerlink" href="#datasets" title="Link to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">Datasets</a><a class="headerlink" href="#datasets" title="Link to this heading">#</a></h2>
 <section id="genetic-variables">
-<span id="id3"></span><h3><a class="toc-backref" href="#id12" role="doc-backlink">Genetic variables</a><a class="headerlink" href="#genetic-variables" title="Link to this heading">#</a></h3>
+<span id="id3"></span><h3><a class="toc-backref" href="#id13" role="doc-backlink">Genetic variables</a><a class="headerlink" href="#genetic-variables" title="Link to this heading">#</a></h3>
 <p>Most <a class="reference internal" href="getting_started.html#genetic-methods"><span class="std std-ref">Genetic methods</span></a> in sgkit operate on a few variables in an Xarray dataset. Variables have
 default names, so you can usually just pass in the dataset, but it’s also possible to use different
 variable names.</p>
@@ -662,7 +723,7 @@ variable names.</p>
 <span class="go">    call_genotype   (variants, samples, ploidy) int8 10kB 0 0 1 0 1 ... 0 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0']</span>
-<span class="go">    source:   sgkit-0.1.dev1+gb73c37b2c</span>
+<span class="go">    source:   sgkit-0.1.dev1+g3f6b67973</span>
 
 <span class="go"># Use the default variable (call_genotype)</span>
 <span class="gp">In [5]: </span><span class="n">sg</span><span class="o">.</span><span class="n">count_call_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">call_allele_count</span>
@@ -708,7 +769,7 @@ call <a class="reference internal" href="generated/sgkit.count_call_alleles.html
 <span class="go">    my_call_genotype      (variants, samples, ploidy) int8 10kB 0 0 1 ... 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0']</span>
-<span class="go">    source:   sgkit-0.1.dev1+gb73c37b2c</span>
+<span class="go">    source:   sgkit-0.1.dev1+g3f6b67973</span>
 </pre></div>
 </div>
 <p>If however a non-default variable name is used and it doesn’t exist in the dataset, then the
@@ -733,13 +794,13 @@ to have created the variable in that case.</p>
 <span class="g g-Whitespace">    </span><span class="mi">177</span>     <span class="n">variables</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">{</span><span class="n">call_allele_count</span><span class="p">:</span> <span class="n">variables</span><span class="o">.</span><span class="n">call_allele_count_spec</span><span class="p">})</span>
 <span class="g g-Whitespace">    </span><span class="mi">178</span>     <span class="n">AC</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">call_allele_count</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">"samples"</span><span class="p">)</span>
 
-<span class="nn">File ~/work/sgkit/sgkit/sgkit/utils.py:280,</span> in <span class="ni">define_variable_if_absent</span><span class="nt">(ds, default_variable_name, variable_name, func, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">278</span>     <span class="k">return</span> <span class="n">ds</span>
-<span class="g g-Whitespace">    </span><span class="mi">279</span> <span class="k">if</span> <span class="n">variable_name</span> <span class="o">!=</span> <span class="n">default_variable_name</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">280</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">281</span>         <span class="sa">f</span><span class="s2">"Variable '</span><span class="si">{</span><span class="n">variable_name</span><span class="si">}</span><span class="s2">' with non-default name is missing and will not be automatically defined."</span>
-<span class="g g-Whitespace">    </span><span class="mi">282</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">283</span> <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="nn">File ~/work/sgkit/sgkit/sgkit/utils.py:279,</span> in <span class="ni">define_variable_if_absent</span><span class="nt">(ds, default_variable_name, variable_name, func, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">277</span>     <span class="k">return</span> <span class="n">ds</span>
+<span class="g g-Whitespace">    </span><span class="mi">278</span> <span class="k">if</span> <span class="n">variable_name</span> <span class="o">!=</span> <span class="n">default_variable_name</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">279</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">280</span>         <span class="sa">f</span><span class="s2">"Variable '</span><span class="si">{</span><span class="n">variable_name</span><span class="si">}</span><span class="s2">' with non-default name is missing and will not be automatically defined."</span>
+<span class="g g-Whitespace">    </span><span class="mi">281</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">282</span> <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <span class="ne">ValueError</span>: Variable 'my_call_allele_count' with non-default name is missing and will not be automatically defined.
 </pre></div>
@@ -748,7 +809,7 @@ to have created the variable in that case.</p>
 since it can’t be computed from other data.</p>
 </section>
 <section id="dataset-merge-behavior">
-<span id="dataset-merge"></span><h3><a class="toc-backref" href="#id13" role="doc-backlink">Dataset merge behavior</a><a class="headerlink" href="#dataset-merge-behavior" title="Link to this heading">#</a></h3>
+<span id="dataset-merge"></span><h3><a class="toc-backref" href="#id14" role="doc-backlink">Dataset merge behavior</a><a class="headerlink" href="#dataset-merge-behavior" title="Link to this heading">#</a></h3>
 <p>Generally, method functions in sgkit compute some new variables based on the
 input dataset, then return a new output dataset that consists of the input
 dataset plus the new computed variables. The input dataset is unchanged.</p>
@@ -774,7 +835,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">    call_genotype   (variants, samples, ploidy) int8 10kB 0 0 1 0 1 ... 0 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0']</span>
-<span class="go">    source:   sgkit-0.1.dev1+gb73c37b2c</span>
+<span class="go">    source:   sgkit-0.1.dev1+g3f6b67973</span>
 
 <span class="go"># By default, new variables are merged into a copy of the provided dataset</span>
 <span class="gp">In [14]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
@@ -791,7 +852,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">    call_genotype         (variants, samples, ploidy) int8 10kB 0 0 1 ... 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0']</span>
-<span class="go">    source:   sgkit-0.1.dev1+gb73c37b2c</span>
+<span class="go">    source:   sgkit-0.1.dev1+g3f6b67973</span>
 
 <span class="go"># If an existing variable would be re-defined, a warning is thrown</span>
 <span class="gp">In [16]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
@@ -826,7 +887,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">    call_genotype         (variants, samples, ploidy) int8 10kB 0 0 1 ... 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0']</span>
-<span class="go">    source:   sgkit-0.1.dev1+gb73c37b2c</span>
+<span class="go">    source:   sgkit-0.1.dev1+g3f6b67973</span>
 </pre></div>
 </div>
 <p>Merge can be used to rename output variables too.</p>
@@ -847,14 +908,14 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">    my_variant_allele_count  (variants, alleles) uint64 2kB dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0']</span>
-<span class="go">    source:   sgkit-0.1.dev1+gb73c37b2c</span>
+<span class="go">    source:   sgkit-0.1.dev1+g3f6b67973</span>
 </pre></div>
 </div>
 <p>Note that there is a limitation where intermediate variables (<code class="docutils literal notranslate"><span class="pre">call_allele_count</span></code> in this case)
 are not returned if <code class="docutils literal notranslate"><span class="pre">merge=False</span></code>. See <a class="github reference external" href="https://github.com/sgkit-dev/sgkit/issues/405">sgkit-dev/sgkit#405</a>.</p>
 </section>
 <section id="interop-with-other-python-libraries">
-<span id="python-interop"></span><h3><a class="toc-backref" href="#id14" role="doc-backlink">Interop with other Python libraries</a><a class="headerlink" href="#interop-with-other-python-libraries" title="Link to this heading">#</a></h3>
+<span id="python-interop"></span><h3><a class="toc-backref" href="#id15" role="doc-backlink">Interop with other Python libraries</a><a class="headerlink" href="#interop-with-other-python-libraries" title="Link to this heading">#</a></h3>
 <p>It’s usually easier to pass genetic data between Python libraries as simple NumPy arrays,
 rather than saving them in files. In sgkit, any data variable can be computed and extracted
 as a NumPy array using the <code class="docutils literal notranslate"><span class="pre">.values</span></code> property.</p>
@@ -903,19 +964,19 @@ will be converted to a <code class="docutils literal notranslate"><span class="p
 </div>
 </section>
 <section id="custom-naming-conventions">
-<h3><a class="toc-backref" href="#id15" role="doc-backlink">Custom naming conventions</a><a class="headerlink" href="#custom-naming-conventions" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id16" role="doc-backlink">Custom naming conventions</a><a class="headerlink" href="#custom-naming-conventions" title="Link to this heading">#</a></h3>
 <p>TODO: Show to use a custom naming convention via Xarray renaming features.</p>
 </section>
 <section id="adding-custom-data-to-a-dataset">
-<h3><a class="toc-backref" href="#id16" role="doc-backlink">Adding custom data to a Dataset</a><a class="headerlink" href="#adding-custom-data-to-a-dataset" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id17" role="doc-backlink">Adding custom data to a Dataset</a><a class="headerlink" href="#adding-custom-data-to-a-dataset" title="Link to this heading">#</a></h3>
 <p>TODO:  Show how something like sample metadata can be joined to an existing Xarray dataset. Also briefly explain
 indexing and uniqueness within Xarray/Pandas, since this is critical for understanding joins.</p>
 </section>
 </section>
 <section id="methods">
-<h2><a class="toc-backref" href="#id17" role="doc-backlink">Methods</a><a class="headerlink" href="#methods" title="Link to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id18" role="doc-backlink">Methods</a><a class="headerlink" href="#methods" title="Link to this heading">#</a></h2>
 <section id="custom-computations">
-<span id="id4"></span><h3><a class="toc-backref" href="#id18" role="doc-backlink">Custom Computations</a><a class="headerlink" href="#custom-computations" title="Link to this heading">#</a></h3>
+<span id="id4"></span><h3><a class="toc-backref" href="#id19" role="doc-backlink">Custom Computations</a><a class="headerlink" href="#custom-computations" title="Link to this heading">#</a></h3>
 <p>TODO: Finish explaining how Numba works and how users might apply it</p>
 <p>Here is an example that demonstrates an alt allele count:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [29]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">numba</span>
@@ -945,14 +1006,14 @@ indexing and uniqueness within Xarray/Pandas, since this is critical for underst
 </div>
 </section>
 <section id="pca">
-<h3><a class="toc-backref" href="#id19" role="doc-backlink">PCA</a><a class="headerlink" href="#pca" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id20" role="doc-backlink">PCA</a><a class="headerlink" href="#pca" title="Link to this heading">#</a></h3>
 <p>TODO: Describe the upstream tools for PCA (i.e. those in dask-ml/scikit-learn)</p>
 </section>
 </section>
 <section id="deployment">
-<h2><a class="toc-backref" href="#id20" role="doc-backlink">Deployment</a><a class="headerlink" href="#deployment" title="Link to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id21" role="doc-backlink">Deployment</a><a class="headerlink" href="#deployment" title="Link to this heading">#</a></h2>
 <section id="deploying-sgkit-on-a-cluster">
-<h3><a class="toc-backref" href="#id21" role="doc-backlink">Deploying sgkit on a cluster</a><a class="headerlink" href="#deploying-sgkit-on-a-cluster" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id22" role="doc-backlink">Deploying sgkit on a cluster</a><a class="headerlink" href="#deploying-sgkit-on-a-cluster" title="Link to this heading">#</a></h3>
 <p>For parallelism sgkit uses <a class="reference external" href="https://dask.org/">Dask</a> to distribute work across workers.
 These workers can either be local processes or remote processes running on a cluster.
 By default, dask creates a local cluster with one worker thread per CPU core on the machine.
@@ -1026,14 +1087,14 @@ value to the dask <code class="docutils literal notranslate"><span class="pre">C
 </div>
 </section>
 <section id="using-gpus">
-<h3><a class="toc-backref" href="#id22" role="doc-backlink">Using GPUs</a><a class="headerlink" href="#using-gpus" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id23" role="doc-backlink">Using GPUs</a><a class="headerlink" href="#using-gpus" title="Link to this heading">#</a></h3>
 <p>TODO: Show CuPy examples</p>
 </section>
 </section>
 <section id="troubleshooting">
-<h2><a class="toc-backref" href="#id23" role="doc-backlink">Troubleshooting</a><a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id24" role="doc-backlink">Troubleshooting</a><a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h2>
 <section id="monitoring-operations">
-<h3><a class="toc-backref" href="#id24" role="doc-backlink">Monitoring operations</a><a class="headerlink" href="#monitoring-operations" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id25" role="doc-backlink">Monitoring operations</a><a class="headerlink" href="#monitoring-operations" title="Link to this heading">#</a></h3>
 <p>The simplest way to monitor operations when running sgkit on a single host is to use <a class="reference external" href="https://docs.dask.org/en/latest/diagnostics-local.html">Dask local diagnostics</a>.</p>
 <p>As an example, this code shows how to track the progress of a single sgkit function:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [35]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">sgkit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
@@ -1046,8 +1107,8 @@ value to the dask <code class="docutils literal notranslate"><span class="pre">C
 <span class="gp">   ....: </span>    <span class="n">ac</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 <span class="gp">   ....: </span>
 
-<span class="go">[                                        ] | 0% Completed | 248.96 us</span>
-<span class="go">[########################################] | 100% Completed | 100.54 ms</span>
+<span class="go">[                                        ] | 0% Completed | 233.86 us</span>
+<span class="go">[########################################] | 100% Completed | 100.49 ms</span>
 
 <span class="gp">In [39]: </span><span class="n">ac</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 <span class="gh">Out[39]: </span>
@@ -1068,7 +1129,7 @@ commonly used local diagnostics.</p>
 <p>For similar monitoring in a distributed cluster, see <a class="reference external" href="https://docs.dask.org/en/latest/diagnostics-distributed.html">Dask distributed diagnostics</a>.</p>
 </section>
 <section id="visualizing-computations">
-<h3><a class="toc-backref" href="#id25" role="doc-backlink">Visualizing computations</a><a class="headerlink" href="#visualizing-computations" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id26" role="doc-backlink">Visualizing computations</a><a class="headerlink" href="#visualizing-computations" title="Link to this heading">#</a></h3>
 <p>Dask allows you to <a class="reference external" href="https://docs.dask.org/en/latest/graphviz.html">visualize the task graph</a> of a computation
 before running it, which can be handy when trying to understand where the bottlenecks are.</p>
 <p>In most cases the number of tasks is too large to visualize, so it’s useful to restrict
@@ -1102,7 +1163,7 @@ the graph just a few chunks, as shown in this example.</p>
 <p>Task order number is shown in circular boxes, colored from red to yellow.</p>
 </section>
 <section id="disabling-the-numba-cache">
-<h3><a class="toc-backref" href="#id26" role="doc-backlink">Disabling the Numba cache</a><a class="headerlink" href="#disabling-the-numba-cache" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id27" role="doc-backlink">Disabling the Numba cache</a><a class="headerlink" href="#disabling-the-numba-cache" title="Link to this heading">#</a></h3>
 <p>Internally, sgkit uses the <a class="reference external" href="https://numba.pydata.org/">Numba JIT compiler</a> to accelerate some methods.
 These methods will be compiled the first time that they are used following a new installation.
 The compiled methods are automatically cached so that recompilation is not required in future sessions.
@@ -1175,7 +1236,10 @@ Refer to the <a class="reference external" href="https://numba.readthedocs.io/en
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reading-and-writing-genetic-data">Reading and writing genetic data</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#converting-genetic-data-to-zarr">Converting genetic data to Zarr</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bgen">BGEN</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bgen">BGEN</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#legacy-packed-stores">Legacy packed stores</a></li>
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plink">PLINK</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#working-with-cloud-native-data">Working with cloud-native data</a></li>
 </ul>

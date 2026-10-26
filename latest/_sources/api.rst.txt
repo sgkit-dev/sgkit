@@ -9,32 +9,33 @@ IO/imports and exports
 
 See :ref:`reading_and_writing_genetic_data`
 
+.. important::
+
+   **Use bio2zarr for genetic file format conversion to Zarr**, then load the
+   converted dataset with :func:`sgkit.load_dataset`. The BGEN and PLINK
+   readers and conversion functions have been removed. See
+   :ref:`bgen_conversion_migration` and :ref:`plink_conversion_migration`
+   for migration guidance.
+
 BGEN
 -----
+
+Only the helper for existing legacy packed stores remains; it does not read
+BGEN files or require an optional backend.
 
 .. currentmodule:: sgkit.io.bgen
 .. autosummary::
    :toctree: generated/
 
-   bgen_to_zarr
-   read_bgen
-   rechunk_bgen
+   unpack_variables
 
 PLINK
 -----
 
-.. deprecated:: 0.11.0
-   Functions for reading and writing plink are deprecated, please use the `bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_
-   and `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages.
-
-.. currentmodule:: sgkit.io.plink
-.. autosummary::
-   :toctree: generated/
-
-   plink_to_zarr
-   read_plink
-   write_plink
-   zarr_to_plink
+Functions for reading and writing PLINK have been removed from sgkit. Use
+`bio2zarr <https://github.com/sgkit-dev/bio2zarr>`_ for conversion to Zarr and
+`vcztools <https://github.com/sgkit-dev/vcztools>`_ for export.
+See :ref:`plink_conversion_migration`.
 
 VCF
 -------------

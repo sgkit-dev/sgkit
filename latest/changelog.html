@@ -538,21 +538,58 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h1>
 <section id="unreleased">
 <span id="changelog-0-11-0"></span><h2>0.11.0 (unreleased)<a class="headerlink" href="#unreleased" title="Link to this heading">#</a></h2>
+<section id="breaking-changes">
+<h3>Breaking changes<a class="headerlink" href="#breaking-changes" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Support Python 3.12, 3.13, and 3.14, and drop Python 3.11 support.
+Require SciPy &gt;= 1.16.2. (<a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1360">GH 1360</a>)</p></li>
+<li><p>Require Zarr Python &gt;= 3 and Xarray &gt;= 2026.9.0. The default on-disk Zarr
+format remains 2. (<a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1355">GH 1355</a>)</p></li>
+<li><p><strong>Remove BGEN reading and conversion</strong>: <code class="docutils literal notranslate"><span class="pre">sgkit.io.bgen.read_bgen</span></code>,
+<code class="docutils literal notranslate"><span class="pre">sgkit.io.bgen.bgen_to_zarr</span></code> and <code class="docutils literal notranslate"><span class="pre">sgkit.io.bgen.rechunk_bgen</span></code>, along with
+the <code class="docutils literal notranslate"><span class="pre">bgen</span></code> extra and the cbgen and rechunker dependencies.
+<strong>Use bio2zarr for genetic file format conversion to Zarr</strong>, and load the
+result with <a class="reference internal" href="generated/sgkit.load_dataset.html#sgkit.load_dataset" title="sgkit.load_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_dataset()</span></code></a>. BGEN input requires a bio2zarr version
+with BGEN support
+(<a class="reference external" href="https://github.com/sgkit-dev/bio2zarr/issues/417">bio2zarr issue 417</a>).
+The dependency-free <a class="reference internal" href="generated/sgkit.io.bgen.unpack_variables.html#sgkit.io.bgen.unpack_variables" title="sgkit.io.bgen.unpack_variables"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.bgen.unpack_variables()</span></code></a> helper remains
+for existing legacy packed stores. See <a class="reference internal" href="user_guide.html#bgen-conversion-migration"><span class="std std-ref">BGEN</span></a>.
+(<a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1325">PR 1325</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1355">GH 1355</a>)</p></li>
+<li><p><strong>Remove PLINK reading and writing</strong>: the <code class="docutils literal notranslate"><span class="pre">sgkit.io.plink</span></code> module and its
+<code class="docutils literal notranslate"><span class="pre">read_plink</span></code>, <code class="docutils literal notranslate"><span class="pre">plink_to_zarr</span></code>, <code class="docutils literal notranslate"><span class="pre">write_plink</span></code> and <code class="docutils literal notranslate"><span class="pre">zarr_to_plink</span></code>
+functions, along with the <code class="docutils literal notranslate"><span class="pre">plink</span></code> extra and bed-reader dependency.
+Use bio2zarr for conversion to Zarr and vcztools for export.
+See <a class="reference internal" href="user_guide.html#plink-conversion-migration"><span class="std std-ref">PLINK</span></a>, including companion-file metadata
+differences. (<a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1324">PR 1324</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1362">PR 1362</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1318">GH 1318</a>)</p></li>
+</ul>
+</section>
 <section id="deprecations">
 <h3>Deprecations<a class="headerlink" href="#deprecations" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p>Functions for reading and writing plink are deprecated, please use the <a class="reference external" href="https://github.com/sgkit-dev/bio2zarr">bio2zarr</a>
-and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">vcztools</a> packages.
+<li><p>BGEN reading and conversion have moved out of sgkit. Use
+<a class="reference external" href="https://github.com/sgkit-dev/bio2zarr">bio2zarr</a> for BGEN-to-Zarr conversion
+and <a class="reference internal" href="generated/sgkit.load_dataset.html#sgkit.load_dataset" title="sgkit.load_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_dataset()</span></code></a> for analysis. <code class="docutils literal notranslate"><span class="pre">read_bgen</span></code>, <code class="docutils literal notranslate"><span class="pre">bgen_to_zarr</span></code> and
+<code class="docutils literal notranslate"><span class="pre">rechunk_bgen</span></code> are already removed
+in this release; see Breaking changes above and
+<a class="reference internal" href="user_guide.html#bgen-conversion-migration"><span class="std std-ref">BGEN</span></a>. Only the dependency-free
+<a class="reference internal" href="generated/sgkit.io.bgen.unpack_variables.html#sgkit.io.bgen.unpack_variables" title="sgkit.io.bgen.unpack_variables"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.bgen.unpack_variables()</span></code></a> helper remains for legacy packed stores.
+(<a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1325">PR 1325</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1331">GH 1331</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1355">GH 1355</a>)</p></li>
+<li><p>Previously deprecated PLINK reading and writing functions are now removed;
+see Breaking changes above and <a class="reference internal" href="user_guide.html#plink-conversion-migration"><span class="std std-ref">PLINK</span></a>.
+Use the <a class="reference external" href="https://github.com/sgkit-dev/bio2zarr">bio2zarr</a> and
+<a class="reference external" href="https://github.com/sgkit-dev/vcztools">vcztools</a> packages instead.
 (<a class="extlink-user reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1324">PR 1324</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1318">GH 1318</a>)</p></li>
-<li><p>Using rechunker for rechunking in sgkit is deprecated, please use the the
-<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.chunk.html#xarray.Dataset.chunk">Xarray chunk</a>
-function directly.
-(<a class="extlink-user reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1325">PR 1325</a>)</p></li>
 </ul>
 </section>
 <section id="bug-fixes">
 <h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">#</a></h3>
 <ul class="simple">
+<li><p>Unpacking legacy BGEN-derived Zarr datasets no longer imports or requires
+cbgen. Use <a class="reference internal" href="generated/sgkit.io.bgen.unpack_variables.html#sgkit.io.bgen.unpack_variables" title="sgkit.io.bgen.unpack_variables"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.bgen.unpack_variables()</span></code></a>; the original
+<code class="docutils literal notranslate"><span class="pre">sgkit.io.bgen.bgen_reader.unpack_variables</span></code> import is also preserved.
+Its documentation explains the legacy packing convention and when unpacking
+is needed; ordinary unpacked datasets and new bio2zarr output do not need it.
+(<a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1331">GH 1331</a>)</p></li>
 <li><p>Fixed bug causing high memory usage in <a class="reference internal" href="generated/sgkit.pedigree_kinship.html#sgkit.pedigree_kinship" title="sgkit.pedigree_kinship"><code class="xref py py-func docutils literal notranslate"><span class="pre">pedigree_kinship()</span></code></a> when
 evaluating a chunked relationship matrix with the Hamilton-Kerr method.
 (<a class="extlink-user reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1335">PR 1335</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1333">GH 1333</a>)</p></li>
@@ -570,8 +607,8 @@ evaluating a chunked relationship matrix with the Hamilton-Kerr method.
 (<a class="extlink-user reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1282">PR 1282</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1280">GH 1280</a>)</p></li>
 </ul>
 </section>
-<section id="breaking-changes">
-<h3>Breaking changes<a class="headerlink" href="#breaking-changes" title="Link to this heading">#</a></h3>
+<section id="id2">
+<h3>Breaking changes<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Functions for reading and writing VCF were removed from sgkit, please use the <a class="reference external" href="https://github.com/sgkit-dev/bio2zarr">bio2zarr</a>
 and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">vcztools</a> packages instead.
@@ -601,15 +638,15 @@ and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">v
 </section>
 <section id="june-2024">
 <span id="changelog-0-9-0"></span><h2>0.9.0 (24 June 2024)<a class="headerlink" href="#june-2024" title="Link to this heading">#</a></h2>
-<section id="id3">
-<h3>Deprecations<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<section id="id5">
+<h3>Deprecations<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Deprecate functions for reading VCF, in favour of <a class="reference external" href="https://github.com/sgkit-dev/bio2zarr">bio2zarr</a>.
 (<a class="extlink-user reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1233">PR 1233</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1232">GH 1232</a>)</p></li>
 </ul>
 </section>
-<section id="id5">
-<h3>Improvements<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<section id="id7">
+<h3>Improvements<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Pin to Zarr &lt; 3.
 (<a class="extlink-user reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1230">PR 1230</a>)</p></li>
@@ -620,8 +657,8 @@ and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">v
 </section>
 <section id="may-2024">
 <span id="changelog-0-8-0"></span><h2>0.8.0 (1 May 2024)<a class="headerlink" href="#may-2024" title="Link to this heading">#</a></h2>
-<section id="id6">
-<h3>New Features<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<section id="id8">
+<h3>New Features<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add <a class="reference internal" href="generated/sgkit.pedigree_contribution.html#sgkit.pedigree_contribution" title="sgkit.pedigree_contribution"><code class="xref py py-func docutils literal notranslate"><span class="pre">pedigree_contribution()</span></code></a> function.
 (<a class="extlink-user reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1093">PR 1093</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/963">GH 963</a>)</p></li>
@@ -637,15 +674,15 @@ and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">v
 (<a class="extlink-user reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1139">PR 1139</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1107">GH 1107</a>)</p></li>
 </ul>
 </section>
-<section id="id7">
-<h3>Improvements<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<section id="id9">
+<h3>Improvements<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Improve performance of <a class="reference internal" href="generated/sgkit.variant_stats.html#sgkit.variant_stats" title="sgkit.variant_stats"><code class="xref py py-func docutils literal notranslate"><span class="pre">variant_stats()</span></code></a> and <a class="reference internal" href="generated/sgkit.sample_stats.html#sgkit.sample_stats" title="sgkit.sample_stats"><code class="xref py py-func docutils literal notranslate"><span class="pre">sample_stats()</span></code></a> functions.
 (<a class="extlink-user reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1119">PR 1119</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1116">GH 1116</a>)</p></li>
 </ul>
 </section>
-<section id="id8">
-<h3>Bug fixes<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
+<section id="id10">
+<h3>Bug fixes<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fix error in missing data handling for VCF. Missing values for most
 fields were marked as the corresponding “fill” value. For example, missing
@@ -664,8 +701,8 @@ an array scalar.
 (<a class="extlink-user reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1199">PR 1199</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1194">GH 1194</a>)</p></li>
 </ul>
 </section>
-<section id="id9">
-<h3>Documentation<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
+<section id="id11">
+<h3>Documentation<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add tutorial on relationship matrices.
 (<a class="extlink-user reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1072">PR 1072</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/956">GH 956</a>)</p></li>
@@ -678,15 +715,15 @@ an array scalar.
 </section>
 <section id="may-2023">
 <span id="changelog-0-7-0"></span><h2>0.7.0 (2 May 2023)<a class="headerlink" href="#may-2023" title="Link to this heading">#</a></h2>
-<section id="id10">
-<h3>New Features<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
+<section id="id12">
+<h3>New Features<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p>Add <a class="reference internal" href="generated/sgkit.io.plink.write_plink.html#sgkit.io.plink.write_plink" title="sgkit.io.plink.write_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.write_plink()</span></code></a> function.
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">sgkit.io.plink.write_plink</span></code> function.
 (<a class="extlink-user reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1003">PR 1003</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/926">GH 926</a>)</p></li>
 <li><p>Add <code class="docutils literal notranslate"><span class="pre">phased</span></code> option to <a class="reference internal" href="generated/sgkit.simulate_genotype_call_dataset.html#sgkit.simulate_genotype_call_dataset" title="sgkit.simulate_genotype_call_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_genotype_call_dataset()</span></code></a> function.
 (<a class="extlink-user reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1022">PR 1022</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/973">GH 973</a>)</p></li>
-<li><p>Add <a class="reference internal" href="generated/sgkit.io.plink.plink_to_zarr.html#sgkit.io.plink.plink_to_zarr" title="sgkit.io.plink.plink_to_zarr"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.plink_to_zarr()</span></code></a> and
-<a class="reference internal" href="generated/sgkit.io.plink.zarr_to_plink.html#sgkit.io.plink.zarr_to_plink" title="sgkit.io.plink.zarr_to_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.zarr_to_plink()</span></code></a> convenience functions
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">sgkit.io.plink.plink_to_zarr</span></code> and
+<code class="docutils literal notranslate"><span class="pre">sgkit.io.plink.zarr_to_plink</span></code> convenience functions
 (<a class="extlink-user reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1047">PR 1047</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1004">GH 1004</a>)</p></li>
 <li><p>Add <a class="reference internal" href="generated/sgkit.convert_call_to_index.html#sgkit.convert_call_to_index" title="sgkit.convert_call_to_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.convert_call_to_index()</span></code></a> method.
 (<a class="extlink-user reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1050">PR 1050</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1048">GH 1048</a>)</p></li>
@@ -709,16 +746,16 @@ and <a class="reference internal" href="generated/sgkit.invert_relationship_matr
 (<a class="extlink-user reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1056">PR 1056</a>)</p></li>
 </ul>
 </section>
-<section id="id11">
-<h3>Breaking changes<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
+<section id="id13">
+<h3>Breaking changes<a class="headerlink" href="#id13" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Generate VCF header by default when writing VCF using <code class="docutils literal notranslate"><span class="pre">sgkit.io.vcf.write_vcf</span></code> or <code class="docutils literal notranslate"><span class="pre">sgkit.io.vcf.zarr_to_vcf</span></code>.
 Previously, the dataset had to contain a <code class="docutils literal notranslate"><span class="pre">vcf_header</span></code> attribute.
 (<a class="extlink-user reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1021">PR 1021</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1020">GH 1020</a>)</p></li>
 </ul>
 </section>
-<section id="id12">
-<h3>Deprecations<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
+<section id="id14">
+<h3>Deprecations<a class="headerlink" href="#id14" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Store contig names in a <code class="docutils literal notranslate"><span class="pre">contig_id</span></code> array, and filters in a <code class="docutils literal notranslate"><span class="pre">filter_id</span></code> array.
 This change duplicates the information stored in dataset attributes, which should
@@ -731,8 +768,8 @@ ignored.
 (<a class="extlink-user reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1075">PR 1075</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/1061">GH 1061</a>)</p></li>
 </ul>
 </section>
-<section id="id13">
-<h3>Improvements<a class="headerlink" href="#id13" title="Link to this heading">#</a></h3>
+<section id="id15">
+<h3>Improvements<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Improve performance scaling of method <a class="reference internal" href="generated/sgkit.identity_by_state.html#sgkit.identity_by_state" title="sgkit.identity_by_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.identity_by_state()</span></code></a>
 with number of samples.
@@ -743,8 +780,8 @@ with number of samples.
 (<a class="extlink-user reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1039">PR 1039</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/939">GH 939</a>)</p></li>
 </ul>
 </section>
-<section id="id14">
-<h3>Bug fixes<a class="headerlink" href="#id14" title="Link to this heading">#</a></h3>
+<section id="id16">
+<h3>Bug fixes<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">vcf_to_zarrs</span></code> was outputting zarr files with <code class="docutils literal notranslate"><span class="pre">temp_chunk_length</span></code> sized chunks. This has now been fixed
 so that the chunks are <code class="docutils literal notranslate"><span class="pre">chunk_length</span></code> sized.
@@ -758,8 +795,8 @@ so that the chunks are <code class="docutils literal notranslate"><span class="p
 </section>
 <section id="february-2023">
 <span id="changelog-0-6-0"></span><h2>0.6.0 (1 February 2023)<a class="headerlink" href="#february-2023" title="Link to this heading">#</a></h2>
-<section id="id15">
-<h3>New Features<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
+<section id="id17">
+<h3>New Features<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add support for Python 3.10.
 (<a class="extlink-user reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/813">PR 813</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/801">GH 801</a>)</p></li>
@@ -793,12 +830,12 @@ genotype.
 (<a class="extlink-user reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/911">GH 911</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1002">PR 1002</a>)</p></li>
 </ul>
 </section>
-<section id="id16">
-<h3>Breaking changes<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
+<section id="id18">
+<h3>Breaking changes<a class="headerlink" href="#id18" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Remove support for Python 3.7.
 (<a class="extlink-user reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/927">PR 927</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/802">GH 802</a>)</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">count_a1</span></code> parameter to <a class="reference internal" href="generated/sgkit.io.plink.read_plink.html#sgkit.io.plink.read_plink" title="sgkit.io.plink.read_plink"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.io.plink.read_plink()</span></code></a> previously
+<li><p>The <code class="docutils literal notranslate"><span class="pre">count_a1</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">sgkit.io.plink.read_plink</span></code> previously
 defaulted to <code class="docutils literal notranslate"><span class="pre">True</span></code> but now defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>. Furthermore, <code class="docutils literal notranslate"><span class="pre">True</span></code>
 is no longer supported since it is not clear how it should behave.
 (<a class="extlink-user reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/952">PR 952</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/947">GH 947</a>)</p></li>
@@ -817,8 +854,8 @@ diploid genotypes).
 parameter. (<a class="extlink-user reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/911">GH 911</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/1002">PR 1002</a>)</p></li>
 </ul>
 </section>
-<section id="id17">
-<h3>Improvements<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
+<section id="id19">
+<h3>Improvements<a class="headerlink" href="#id19" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Improvements to VCF parsing performance.
 (<a class="extlink-user reference external" href="https://github.com/benjeffery">benjeffery</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/933">PR 933</a>)</p></li>
@@ -832,8 +869,8 @@ parameter. (<a class="extlink-user reference external" href="https://github.com/
 (<a class="extlink-user reference external" href="https://github.com/tomwhite">tomwhite</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/978">PR 978</a>)</p></li>
 </ul>
 </section>
-<section id="id18">
-<h3>Bug fixes<a class="headerlink" href="#id18" title="Link to this heading">#</a></h3>
+<section id="id20">
+<h3>Bug fixes<a class="headerlink" href="#id20" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Allow chunking in the samples dimension for <a class="reference internal" href="generated/sgkit.identity_by_state.html#sgkit.identity_by_state" title="sgkit.identity_by_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">identity_by_state()</span></code></a>.
 (<a class="extlink-user reference external" href="https://github.com/timothymillar">timothymillar</a>, <a class="extlink-pr reference external" href="https://github.com/sgkit-dev/sgkit/pull/837">PR 837</a>, <a class="extlink-issue reference external" href="https://github.com/sgkit-dev/sgkit/issues/836">GH 836</a>)</p></li>
@@ -892,42 +929,43 @@ parameter. (<a class="extlink-user reference external" href="https://github.com/
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unreleased">0.11.0 (unreleased)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#breaking-changes">Breaking changes</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deprecations">Deprecations</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-fixes">Bug fixes</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#april-2025">0.10.0 (7 April 2025)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new-features">New Features</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#breaking-changes">Breaking changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Breaking changes</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">Improvements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#june-2024">0.9.0 (24 June 2024)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Deprecations</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Deprecations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Improvements</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#may-2024">0.8.0 (1 May 2024)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">New Features</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Improvements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">Bug fixes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Documentation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">New Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Bug fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Documentation</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#may-2023">0.7.0 (2 May 2023)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">New Features</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Breaking changes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Deprecations</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">Improvements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Bug fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">New Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">Breaking changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Deprecations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">Bug fixes</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#february-2023">0.6.0 (1 February 2023)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">New Features</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">Breaking changes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">Improvements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">Bug fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">New Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">Breaking changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">Bug fixes</a></li>
 </ul>
 </li>
 </ul>

@@ -62,7 +62,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="sgkit.io.bgen.bgen_to_zarr" href="generated/sgkit.io.bgen.bgen_to_zarr.html" />
+    <link rel="next" title="sgkit.io.bgen.unpack_variables" href="generated/sgkit.io.bgen.unpack_variables.html" />
     <link rel="prev" title="Relatedness Tutorial" href="examples/relatedness_tutorial.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -481,15 +481,7 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="generated/sgkit.io.bgen.bgen_to_zarr.html">sgkit.io.bgen.bgen_to_zarr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="generated/sgkit.io.bgen.read_bgen.html">sgkit.io.bgen.read_bgen</a></li>
-<li class="toctree-l1"><a class="reference internal" href="generated/sgkit.io.bgen.rechunk_bgen.html">sgkit.io.bgen.rechunk_bgen</a></li>
-</ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="generated/sgkit.io.plink.plink_to_zarr.html">sgkit.io.plink.plink_to_zarr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="generated/sgkit.io.plink.read_plink.html">sgkit.io.plink.read_plink</a></li>
-<li class="toctree-l1"><a class="reference internal" href="generated/sgkit.io.plink.write_plink.html">sgkit.io.plink.write_plink</a></li>
-<li class="toctree-l1"><a class="reference internal" href="generated/sgkit.io.plink.zarr_to_plink.html">sgkit.io.plink.zarr_to_plink</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sgkit.io.bgen.unpack_variables.html">sgkit.io.bgen.unpack_variables</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="generated/sgkit.load_dataset.html">sgkit.load_dataset</a></li>
@@ -715,18 +707,22 @@
 <section id="io-imports-and-exports">
 <h2>IO/imports and exports<a class="headerlink" href="#io-imports-and-exports" title="Link to this heading">#</a></h2>
 <p>See <a class="reference internal" href="user_guide.html#reading-and-writing-genetic-data"><span class="std std-ref">Reading and writing genetic data</span></a></p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><strong>Use bio2zarr for genetic file format conversion to Zarr</strong>, then load the
+converted dataset with <a class="reference internal" href="generated/sgkit.load_dataset.html#sgkit.load_dataset" title="sgkit.load_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgkit.load_dataset()</span></code></a>. The BGEN and PLINK
+readers and conversion functions have been removed. See
+<a class="reference internal" href="user_guide.html#bgen-conversion-migration"><span class="std std-ref">BGEN</span></a> and <a class="reference internal" href="user_guide.html#plink-conversion-migration"><span class="std std-ref">PLINK</span></a>
+for migration guidance.</p>
+</div>
 <section id="bgen">
 <h3>BGEN<a class="headerlink" href="#bgen" title="Link to this heading">#</a></h3>
+<p>Only the helper for existing legacy packed stores remains; it does not read
+BGEN files or require an optional backend.</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.bgen.bgen_to_zarr.html#sgkit.io.bgen.bgen_to_zarr" title="sgkit.io.bgen.bgen_to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bgen_to_zarr</span></code></a>(input, output[, region, ...])</p></td>
-<td><p>Convert a BGEN file to a Zarr on-disk store.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.io.bgen.read_bgen.html#sgkit.io.bgen.read_bgen" title="sgkit.io.bgen.read_bgen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_bgen</span></code></a>(path[, metafile_path, ...])</p></td>
-<td><p>Read BGEN dataset.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.bgen.rechunk_bgen.html#sgkit.io.bgen.rechunk_bgen" title="sgkit.io.bgen.rechunk_bgen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rechunk_bgen</span></code></a>(ds, output, *[, chunk_length, ...])</p></td>
-<td><p>Rechunk BGEN dataset as Zarr.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.bgen.unpack_variables.html#sgkit.io.bgen.unpack_variables" title="sgkit.io.bgen.unpack_variables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unpack_variables</span></code></a>(ds[, dtype])</p></td>
+<td><p>Restore probabilities and dosages from a legacy packed BGEN-derived dataset.</p></td>
 </tr>
 </tbody>
 </table>
@@ -734,27 +730,10 @@
 </section>
 <section id="plink">
 <h3>PLINK<a class="headerlink" href="#plink" title="Link to this heading">#</a></h3>
-<div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version 0.11.0: </span>Functions for reading and writing plink are deprecated, please use the <a class="reference external" href="https://github.com/sgkit-dev/bio2zarr">bio2zarr</a>
-and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">vcztools</a> packages.</p>
-</div>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.plink.plink_to_zarr.html#sgkit.io.plink.plink_to_zarr" title="sgkit.io.plink.plink_to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plink_to_zarr</span></code></a>(*[, path, bed_path, bim_path, ...])</p></td>
-<td><p>Convert a PLINK file to a Zarr on-disk store.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.io.plink.read_plink.html#sgkit.io.plink.read_plink" title="sgkit.io.plink.read_plink"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_plink</span></code></a>(*[, path, bed_path, bim_path, ...])</p></td>
-<td><p>Read PLINK dataset.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sgkit.io.plink.write_plink.html#sgkit.io.plink.write_plink" title="sgkit.io.plink.write_plink"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_plink</span></code></a>(ds, *[, path, bed_path, ...])</p></td>
-<td><p>Convert a dataset to a PLINK file.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sgkit.io.plink.zarr_to_plink.html#sgkit.io.plink.zarr_to_plink" title="sgkit.io.plink.zarr_to_plink"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zarr_to_plink</span></code></a>(input, *[, path, bed_path, ...])</p></td>
-<td><p>Convert a Zarr on-disk store to a PLINK file.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<p>Functions for reading and writing PLINK have been removed from sgkit. Use
+<a class="reference external" href="https://github.com/sgkit-dev/bio2zarr">bio2zarr</a> for conversion to Zarr and
+<a class="reference external" href="https://github.com/sgkit-dev/vcztools">vcztools</a> for export.
+See <a class="reference internal" href="user_guide.html#plink-conversion-migration"><span class="std std-ref">PLINK</span></a>.</p>
 </section>
 <section id="vcf">
 <h3>VCF<a class="headerlink" href="#vcf" title="Link to this heading">#</a></h3>
@@ -1298,11 +1277,11 @@ and <a class="reference external" href="https://github.com/sgkit-dev/vcztools">v
       </div>
     </a>
     <a class="right-next"
-       href="generated/sgkit.io.bgen.bgen_to_zarr.html"
+       href="generated/sgkit.io.bgen.unpack_variables.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">sgkit.io.bgen.bgen_to_zarr</p>
+        <p class="prev-next-title">sgkit.io.bgen.unpack_variables</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

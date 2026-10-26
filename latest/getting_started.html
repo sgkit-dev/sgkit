@@ -553,7 +553,7 @@
 </nav>
 <section id="installation">
 <h2><a class="toc-backref" href="#id5" role="doc-backlink">Installation</a><a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
-<p>You can install sgkit with pip. Python 3.11 or 3.12 is required:</p>
+<p>You can install sgkit with pip. Python 3.12, 3.13, or 3.14 is required:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install sgkit
 </pre></div>
 </div>
@@ -608,7 +608,7 @@ several of the sgkit conventions in place for representing common genetic quanti
 <span class="go">    call_genotype_mask  (variants, samples, ploidy) bool 500kB False ... False</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', ...</span>
-<span class="go">    source:   sgkit-0.1.dev1+gb73c37b2c</span>
+<span class="go">    source:   sgkit-0.1.dev1+g3f6b67973</span>
 </pre></div>
 </div>
 <p>The presence of a single-nucleotide variant (SNV) is indicated above by the <code class="docutils literal notranslate"><span class="pre">call_genotype</span></code> variable, which contains
@@ -638,7 +638,7 @@ information on this specific variable and any others, see <a class="reference in
 <span class="go">    call_genotype_mask  (variants, samples, ploidy) bool 200B False ... False</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', ...</span>
-<span class="go">    source:   sgkit-0.1.dev1+gb73c37b2c</span>
+<span class="go">    source:   sgkit-0.1.dev1+g3f6b67973</span>
 
 <span class="go"># Subset to a specific set of variables</span>
 <span class="gp">In [7]: </span><span class="n">ds</span><span class="p">[[</span><span class="s1">'variant_allele'</span><span class="p">,</span> <span class="s1">'call_genotype'</span><span class="p">]]</span>
@@ -651,7 +651,7 @@ information on this specific variable and any others, see <a class="reference in
 <span class="go">    call_genotype   (variants, samples, ploidy) int8 10kB 0 0 1 0 1 ... 0 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', ...</span>
-<span class="go">    source:   sgkit-0.1.dev1+gb73c37b2c</span>
+<span class="go">    source:   sgkit-0.1.dev1+g3f6b67973</span>
 
 <span class="go"># Extract a single variable</span>
 <span class="gp">In [8]: </span><span class="n">ds</span><span class="o">.</span><span class="n">call_genotype</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
@@ -906,6 +906,9 @@ shows how it can be used in the context of doing something simple like counting 
 <span class="go">&lt;xarray.DataArray 'call_genotype' (variants: 1, samples: 4)&gt; Size: 4B</span>
 <span class="go">array([[ True, False,  True, False]])</span>
 <span class="go">Dimensions without coordinates: variants, samples</span>
+<span class="go">Attributes:</span>
+<span class="go">    mixed_ploidy:  False</span>
+<span class="go">    comment:       Call genotype. Encoded as allele values (0 for the referen...</span>
 
 <span class="go"># Count the number of heterozygous samples for the lone variant</span>
 <span class="gp">In [37]: </span><span class="n">is_heterozygous</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -1051,7 +1054,7 @@ Xarray and Pandas operations in a single pipeline:</p>
 <span class="go">    variant_allele            (variants, alleles) |S1 200B b'T' b'C' ... b'G'</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0']</span>
-<span class="go">    source:   sgkit-0.1.dev1+gb73c37b2c</span>
+<span class="go">    source:   sgkit-0.1.dev1+g3f6b67973</span>
 
 <span class="go"># Show statistics for one of the arrays to be used as a filter</span>
 <span class="gp">In [60]: </span><span class="n">ds_qc</span><span class="o">.</span><span class="n">variant_call_rate</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
@@ -1132,7 +1135,7 @@ until one of the following occurs:</p>
 <span class="go">    call_genotype_mask  (variants, samples, ploidy) bool 10kB dask.array&lt;chunksize=(50, 50, 2), meta=np.ndarray&gt;</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0']</span>
-<span class="go">    source:   sgkit-0.1.dev1+gb73c37b2c</span>
+<span class="go">    source:   sgkit-0.1.dev1+g3f6b67973</span>
 
 <span class="go"># Show the chunked array representing base pair position</span>
 <span class="gp">In [66]: </span><span class="n">ds</span><span class="o">.</span><span class="n">variant_position</span>

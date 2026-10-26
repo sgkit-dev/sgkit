@@ -1,0 +1,6 @@
+﻿sgkit.io.bgen.unpack\_variables
+===============================
+
+.. currentmodule:: sgkit.io.bgen
+
+.. autofunction:: unpack_variables
