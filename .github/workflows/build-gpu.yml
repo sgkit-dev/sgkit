@@ -12,9 +12,6 @@ jobs:
   build:
 
     runs-on: "cirun-gpu-runner--${{ github.run_id }}"
-    defaults:
-      run:
-        shell: bash -l {0}
     strategy:
       matrix:
         python-version: ["3.12"]
@@ -26,35 +23,24 @@ jobs:
         run: |
           nvidia-smi
 
-      - name: Set up Python
-        uses: conda-incubator/setup-miniconda@v4
-        env:
-          CONDA: /home/runnerx/miniconda3
-        with:
-          python-version: ${{ matrix.python-version }}
-          miniconda-version: "latest"
-
       - name: Set up uv
         uses: astral-sh/setup-uv@v10.0.1
         with:
           version: "0.12.10"
+          python-version: ${{ matrix.python-version }}
           enable-cache: true
 
-      - name: Conda info
+      - name: Install dependencies
         run: |
-          conda info
-          conda list
+          uv sync --locked --group test --no-default-groups --python "${{ matrix.python-version }}"
+          # Install the CUDA libraries that CuPy uses with its ctk extra.
+          uv pip install --python .venv "cupy-cuda12x[ctk]"
 
-      - name: Installing cudatoolkit and dependencies
+      - name: CuPy information
+        # Fail here if CuPy can't use the GPU, since the GPU tests would be skipped.
         run: |
-          conda install -c nvidia cudatoolkit
-          # Avoid building SciPy from source in CI.
-          uv pip install --only-binary scipy --python "$CONDA_PREFIX/bin/python" -e . --group test
-
-      - name: Numba Information
-        run: |
-          numba -s
+          uv run --no-sync python -c "import cupy; cupy.show_config(); print(cupy.ones((2, 2)) @ cupy.ones((2, 2)))"
 
       - name: Run GPU tagged tests
         run: |
-          pytest -m gpu -v
+          uv run --no-sync pytest -m gpu -v
