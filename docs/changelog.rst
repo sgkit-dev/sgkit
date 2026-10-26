@@ -35,6 +35,10 @@ Breaking changes
   Use bio2zarr for conversion to Zarr and vcztools for export.
   See :ref:`plink_conversion_migration`, including companion-file metadata
   differences. (:pr:`1324`, :pr:`1362`, :issue:`1318`)
+- :func:`pairwise_distance` with ``device="gpu"`` now requires CuPy instead of
+  Numba's CUDA support.
+- :func:`pairwise_distance` treats infinite values as missing, like negative
+  and nan values.
 
 Deprecations
 ~~~~~~~~~~~~
@@ -53,8 +57,12 @@ Deprecations
   `vcztools <https://github.com/sgkit-dev/vcztools>`_ packages instead.
   (:user:`tomwhite`, :pr:`1324`, :issue:`1318`)
 
-.. Improvements
-.. ~~~~~~~~~~~~
+Improvements
+~~~~~~~~~~~~
+
+- :func:`pairwise_distance` is computed with matrix multiplications in float64
+  instead of Numba functions, which is several times faster on the CPU, and
+  arrays with CuPy chunks are computed on the GPU. (:issue:`1267`)
 
 Bug fixes
 ~~~~~~~~~
@@ -70,6 +78,10 @@ Bug fixes
   (:user:`timothymillar`, :pr:`1335`, :issue:`1333`)
 - :func:`Tajimas_D` now works with newer versions of Dask, and no longer
   computes allele counts when it is called.
+- :func:`pairwise_distance` no longer gives wrong results for int8 input with
+  ``device="gpu"``, the dtype it reports for integer and float16 input now
+  matches the computed result, and correlation distances are no longer
+  slightly negative.
 
 .. Documentation
 .. ~~~~~~~~~~~~~

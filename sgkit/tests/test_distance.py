@@ -3,23 +3,24 @@ import typing
 import dask.array as da
 import numpy as np
 import pytest
-from numba import cuda
 from scipy.spatial.distance import correlation, euclidean, pdist, squareform
 
 from sgkit.distance.api import DeviceTypes, MetricTypes, pairwise_distance
 from sgkit.typing import ArrayLike
 
 
-def detect_cuda_driver() -> bool:
+def detect_gpu() -> bool:
     try:
-        return len(cuda.list_devices()) > 0
-    except cuda.CudaSupportError:
+        import cupy
+
+        return cupy.cuda.runtime.getDeviceCount() > 0
+    except (ImportError, RuntimeError):
         return False
 
 
 def skip_gpu_tests_if_no_gpu(device: DeviceTypes) -> None:
-    if device == "gpu" and not detect_cuda_driver():
-        pytest.skip("Cuda driver not found")
+    if device == "gpu" and not detect_gpu():
+        pytest.skip("CuPy or a GPU not found")
 
 
 def get_vectors(
@@ -143,9 +144,6 @@ def test_distance_ndarray() -> None:
         pytest.param("correlation", correlation, "i8", "gpu", marks=pytest.mark.gpu),
     ],
 )
-@pytest.mark.filterwarnings(
-    "ignore:invalid value encountered in correlation_reduce_cpu:RuntimeWarning"
-)
 def test_missing_values(
     metric: MetricTypes,
     metric_func: typing.Callable[[ArrayLike, ArrayLike], np.float64],
@@ -170,14 +168,139 @@ def test_missing_values(
 
 
 @pytest.mark.parametrize(
+    "metric, metric_func",
+    [("euclidean", euclidean), ("correlation", correlation)],
+)
+@pytest.mark.parametrize("device", ["cpu", pytest.param("gpu", marks=pytest.mark.gpu)])
+def test_genotype_calls(
+    metric: MetricTypes,
+    metric_func: typing.Callable[[ArrayLike, ArrayLike], np.float64],
+    device: DeviceTypes,
+) -> None:
+    skip_gpu_tests_if_no_gpu(device)
+    # int8 calls with -1 for missing values, as in call_genotype
+    rs = np.random.RandomState(0)
+    x = rs.randint(0, 3, size=(30, 300)).astype(np.int8)
+    x[rs.rand(*x.shape) < 0.1] = -1
+    x[0] = -1  # no observed values
+    x[1] = 1  # constant
+    x[2, 2:] = -1  # two observed values
+
+    distance_matrix = pairwise_distance(
+        da.from_array(x, chunks=(10, 150)), metric=metric, device=device
+    )
+    expected_matrix = create_distance_matrix(x, metric_func)
+    np.testing.assert_almost_equal(distance_matrix, expected_matrix)
+
+
+@pytest.mark.parametrize("metric", ["euclidean", "correlation"])
+@pytest.mark.parametrize("device", ["cpu", pytest.param("gpu", marks=pytest.mark.gpu)])
+def test_identical_genotype_calls(metric: MetricTypes, device: DeviceTypes) -> None:
+    skip_gpu_tests_if_no_gpu(device)
+    # the sums of squares and products of integers are exact, so copies of a
+    # row, in the same chunk or in another one, are exactly zero apart
+    rs = np.random.RandomState(0)
+    x = rs.randint(0, 3, size=(4, 100_000)).astype(np.int8)
+    x[rs.rand(*x.shape) < 0.05] = -1
+    x[1] = x[0]
+    x[3] = x[0]
+
+    distance_matrix = pairwise_distance(
+        da.from_array(x, chunks=(2, 25_000)), metric=metric, device=device
+    ).compute()
+    assert distance_matrix[0, 1] == distance_matrix[0, 3] == 0
+    assert distance_matrix[1, 3] == 0
+
+
+@pytest.mark.parametrize(
+    "metric, metric_func, atol",
+    [("euclidean", euclidean, 1e-3), ("correlation", correlation, 1e-6)],
+)
+@pytest.mark.parametrize("device", ["cpu", pytest.param("gpu", marks=pytest.mark.gpu)])
+def test_nearly_identical_float32_rows(
+    metric: MetricTypes,
+    metric_func: typing.Callable[[ArrayLike, ArrayLike], np.float64],
+    atol: float,
+    device: DeviceTypes,
+) -> None:
+    skip_gpu_tests_if_no_gpu(device)
+    # float32 dosages, where the second row is a copy of the first and the third
+    # differs from it in five entries. When the sums of squares and products
+    # were subtracted in float32, these distances were lost.
+    rs = np.random.RandomState(0)
+    x = rs.uniform(0, 2, size=(4, 100_000)).round(3).astype(np.float32)
+    x[rs.rand(*x.shape) < 0.05] = np.nan
+    x[1] = x[0]
+    x[2] = x[0]
+    x[2, :5] += 0.05
+
+    distance_matrix = pairwise_distance(
+        da.from_array(x, chunks=(2, 25_000)), metric=metric, device=device
+    ).compute()
+    expected_matrix = create_distance_matrix(x.astype(np.float64), metric_func)
+    np.testing.assert_allclose(distance_matrix, expected_matrix, rtol=1e-6, atol=atol)
+    assert distance_matrix.min() >= 0
+
+
+@pytest.mark.parametrize("metric", ["euclidean", "correlation"])
+@pytest.mark.parametrize("device", ["cpu", pytest.param("gpu", marks=pytest.mark.gpu)])
+def test_float16(metric: MetricTypes, device: DeviceTypes) -> None:
+    skip_gpu_tests_if_no_gpu(device)
+    # the sums of squares and products are larger than the float16 maximum
+    x = np.array([[0, 2] * 10_000, [2, 0] * 10_000, [0, 2] * 10_000], dtype="f2")
+
+    distance_matrix = pairwise_distance(x, metric=metric, device=device)
+    assert distance_matrix.dtype == np.float16
+    expected_matrix = squareform(pdist(x.astype(np.float64), metric=metric))
+    np.testing.assert_allclose(distance_matrix, expected_matrix, rtol=1e-3)
+
+
+@pytest.mark.parametrize(
+    "metric, expected_matrix",
+    [
+        ("euclidean", np.sqrt([[0, 2, 2], [2, 0, 0], [2, 0, 0]])),
+        ("correlation", [[0, 2, 2], [2, 0, 0], [2, 0, 0]]),
+    ],
+)
+@pytest.mark.parametrize("device", ["cpu", pytest.param("gpu", marks=pytest.mark.gpu)])
+def test_infinite_values(
+    metric: MetricTypes, expected_matrix: ArrayLike, device: DeviceTypes
+) -> None:
+    skip_gpu_tests_if_no_gpu(device)
+    # infinite values are missing, like negative and nan values, so the first
+    # column is only observed in the last row. In the matrix products, the
+    # infinite value made every distance of the first row nan.
+    x = np.array([[np.inf, 0, 1], [-1, 1, 0], [2, 1, 0]])
+
+    distance_matrix = pairwise_distance(x, metric=metric, device=device)
+    np.testing.assert_allclose(distance_matrix, expected_matrix)
+
+
+@pytest.mark.gpu
+@pytest.mark.parametrize("metric", ["euclidean", "correlation"])
+def test_cupy_backed_array(metric: MetricTypes) -> None:
+    cupy = pytest.importorskip("cupy")
+    skip_gpu_tests_if_no_gpu("gpu")
+    x = get_vectors()
+    distance_matrix = pairwise_distance(x.map_blocks(cupy.asarray), metric=metric)
+    assert isinstance(distance_matrix._meta, cupy.ndarray)
+    expected_matrix = squareform(pdist(x, metric=metric))
+    np.testing.assert_almost_equal(
+        cupy.asnumpy(distance_matrix.compute()), expected_matrix
+    )
+
+
+@pytest.mark.parametrize(
     "metric, dtype, expected, device",
     [
+        ("euclidean", "i1", "float64", "cpu"),
         ("euclidean", "i8", "float64", "cpu"),
         ("euclidean", "f4", "float32", "cpu"),
         ("euclidean", "f8", "float64", "cpu"),
         pytest.param("euclidean", "i8", "float64", "gpu", marks=pytest.mark.gpu),
         pytest.param("euclidean", "f4", "float32", "gpu", marks=pytest.mark.gpu),
         pytest.param("euclidean", "f8", "float64", "gpu", marks=pytest.mark.gpu),
+        ("correlation", "i1", "float64", "cpu"),
         ("correlation", "i8", "float64", "cpu"),
         ("correlation", "f4", "float32", "cpu"),
         ("correlation", "f8", "float64", "cpu"),
@@ -191,8 +314,9 @@ def test_data_types(
 ) -> None:
     skip_gpu_tests_if_no_gpu(device)
     x = get_vectors(dtype=dtype)
-    distance_matrix = pairwise_distance(x, metric=metric, device=device).compute()
+    distance_matrix = pairwise_distance(x, metric=metric, device=device)
     assert distance_matrix.dtype.name == expected
+    assert distance_matrix.compute().dtype.name == expected
 
 
 def test_undefined_metric() -> None:

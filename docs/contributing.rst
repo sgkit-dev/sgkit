@@ -99,9 +99,10 @@ the dependencies needed to test compatibility with bio2zarr. Use ``uv run`` to r
 commands in this environment without activating it.
 
 
-If you have a Nvidia GPU you will need to make sure that it is configured properly,
-as in you have cudatoolkit installed, the instructions for the same can be found on
-`nvidia docs. <https://developer.nvidia.com/cuda-toolkit>`_
+The tests marked ``gpu`` run on an NVIDIA GPU with CuPy, and are skipped if CuPy
+or a GPU is not available. To run them, install the CuPy package that matches
+your CUDA version, as described in the
+`CuPy installation guide <https://docs.cupy.dev/en/stable/install.html>`_.
 
 
 Install the pre-commit hook, which is used to enforce coding standards::
