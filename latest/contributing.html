@@ -645,9 +645,10 @@ clone the fork:</p>
 <p>This installs sgkit in editable mode with the <code class="docutils literal notranslate"><span class="pre">dev</span></code> dependency group, including
 the dependencies needed to test compatibility with bio2zarr. Use <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span></code> to run
 commands in this environment without activating it.</p>
-<p>If you have a Nvidia GPU you will need to make sure that it is configured properly,
-as in you have cudatoolkit installed, the instructions for the same can be found on
-<a class="reference external" href="https://developer.nvidia.com/cuda-toolkit">nvidia docs.</a></p>
+<p>The tests marked <code class="docutils literal notranslate"><span class="pre">gpu</span></code> run on an NVIDIA GPU with CuPy, and are skipped if CuPy
+or a GPU is not available. To run them, install the CuPy package that matches
+your CUDA version, as described in the
+<a class="reference external" href="https://docs.cupy.dev/en/stable/install.html">CuPy installation guide</a>.</p>
 <p>Install the pre-commit hook, which is used to enforce coding standards:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">pre</span><span class="o">-</span><span class="n">commit</span> <span class="n">install</span>
 </pre></div>

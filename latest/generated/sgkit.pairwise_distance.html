@@ -733,8 +733,16 @@ distances and the resultant array will be of size (4, 4) as follows:</p>
 </div>
 <p>The (i, j) position in the resulting array (matrix) denotes the distance
 between vi and vj vectors.</p>
-<p>Negative and nan values are considered as missing values. They are ignored
-for all distance metric calculations.</p>
+<p>Negative, nan and infinite values are considered as missing values. They
+are ignored for all distance metric calculations.</p>
+<p>The distances are computed with matrix multiplications in float64, and
+returned in the floating point type of <code class="docutils literal notranslate"><span class="pre">x</span></code>, or in float64 if <code class="docutils literal notranslate"><span class="pre">x</span></code> has
+another type. They are computed from sums of squares and products, which
+are exact for small integers such as allele counts. For other values, a
+distance much smaller than the values it is computed from, such as between
+two nearly identical rows, can be inaccurate. Arrays with CuPy chunks are
+computed on the GPU, where float64 is much slower than float32 on many
+GPUs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -746,13 +754,14 @@ vectors used for comparison, i.e. for pairwise distance.</p>
 ‘euclidean’ or ‘correlation’.</p>
 </dd>
 <dt><strong>split_every</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span> (default: <span class="highlight sphinx_autodoc_typehints-value"><code class="docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></span>)</span></dt></dt><dd><p><p>Determines the depth of the recursive aggregation in the reduction
-step. This argument is directly passed to the call to``dask.reduction``
-function in the reduce step of the map reduce.</p>
+step over the chunks of the second dimension of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
 <p>Omit to let dask heuristically decide a good default. A default can
 also be set globally with the split_every key in dask.config.</p>
 </p>
 </dd>
-<dt><strong>device</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<span class="highlight sphinx_autodoc_typehints-value"><code class="docutils literal notranslate"><span class="s1"><span class="pre">'cpu'</span></span></code></span>, <span class="highlight sphinx_autodoc_typehints-value"><code class="docutils literal notranslate"><span class="s1"><span class="pre">'gpu'</span></span></code></span>]</span> (default: <span class="highlight sphinx_autodoc_typehints-value"><code class="docutils literal notranslate"><span class="s1"><span class="pre">'cpu'</span></span></code></span>)</span></dt></dt><dd><p>The architecture to run the calculation on, either of “cpu” or “gpu”</p>
+<dt><strong>device</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<span class="highlight sphinx_autodoc_typehints-value"><code class="docutils literal notranslate"><span class="s1"><span class="pre">'cpu'</span></span></code></span>, <span class="highlight sphinx_autodoc_typehints-value"><code class="docutils literal notranslate"><span class="s1"><span class="pre">'gpu'</span></span></code></span>]</span> (default: <span class="highlight sphinx_autodoc_typehints-value"><code class="docutils literal notranslate"><span class="s1"><span class="pre">'cpu'</span></span></code></span>)</span></dt></dt><dd><p>The architecture to run the calculation on, either of “cpu” or “gpu”.
+With “gpu”, the chunks of <code class="docutils literal notranslate"><span class="pre">x</span></code> are moved to the GPU with CuPy, and
+the result is moved back to NumPy, so this requires CuPy.</p>
 </dd>
 </dl>
 </dd>
@@ -787,9 +796,9 @@ in the input array.</p>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pairwise_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">'correlation'</span><span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-<span class="go">array([[-4.44089210e-16,  2.62956526e-01,  2.82353505e-03],</span>
-<span class="go">       [ 2.62956526e-01,  0.00000000e+00,  2.14285714e-01],</span>
-<span class="go">       [ 2.82353505e-03,  2.14285714e-01,  0.00000000e+00]])</span>
+<span class="go">array([[0.        , 0.26295653, 0.00282354],</span>
+<span class="go">       [0.26295653, 0.        , 0.21428571],</span>
+<span class="go">       [0.00282354, 0.21428571, 0.        ]])</span>
 </pre></div>
 </div>
 </dd></dl>

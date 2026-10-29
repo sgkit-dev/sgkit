@@ -724,7 +724,7 @@ variable names.</p>
 <span class="go">    call_genotype   (variants, samples, ploidy) int8 10kB 0 0 1 0 1 ... 0 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0']</span>
-<span class="go">    source:   sgkit-0.1.dev1+gf50577ce9</span>
+<span class="go">    source:   sgkit-0.1.dev1+ge18c2066e</span>
 
 <span class="go"># Use the default variable (call_genotype)</span>
 <span class="gp">In [5]: </span><span class="n">sg</span><span class="o">.</span><span class="n">count_call_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">call_allele_count</span>
@@ -770,7 +770,7 @@ call <a class="reference internal" href="generated/sgkit.count_call_alleles.html
 <span class="go">    my_call_genotype      (variants, samples, ploidy) int8 10kB 0 0 1 ... 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0']</span>
-<span class="go">    source:   sgkit-0.1.dev1+gf50577ce9</span>
+<span class="go">    source:   sgkit-0.1.dev1+ge18c2066e</span>
 </pre></div>
 </div>
 <p>If however a non-default variable name is used and it doesn’t exist in the dataset, then the
@@ -836,7 +836,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">    call_genotype   (variants, samples, ploidy) int8 10kB 0 0 1 0 1 ... 0 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0']</span>
-<span class="go">    source:   sgkit-0.1.dev1+gf50577ce9</span>
+<span class="go">    source:   sgkit-0.1.dev1+ge18c2066e</span>
 
 <span class="go"># By default, new variables are merged into a copy of the provided dataset</span>
 <span class="gp">In [14]: </span><span class="n">ds</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
@@ -853,7 +853,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">    call_genotype         (variants, samples, ploidy) int8 10kB 0 0 1 ... 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0']</span>
-<span class="go">    source:   sgkit-0.1.dev1+gf50577ce9</span>
+<span class="go">    source:   sgkit-0.1.dev1+ge18c2066e</span>
 
 <span class="go"># If an existing variable would be re-defined, a warning is thrown</span>
 <span class="gp">In [16]: </span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
@@ -888,7 +888,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">    call_genotype         (variants, samples, ploidy) int8 10kB 0 0 1 ... 1 0 0</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0']</span>
-<span class="go">    source:   sgkit-0.1.dev1+gf50577ce9</span>
+<span class="go">    source:   sgkit-0.1.dev1+ge18c2066e</span>
 </pre></div>
 </div>
 <p>Merge can be used to rename output variables too.</p>
@@ -909,7 +909,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="go">    my_variant_allele_count  (variants, alleles) uint64 2kB dask.array&lt;chunksize=(100, 2), meta=np.ndarray&gt;</span>
 <span class="go">Attributes:</span>
 <span class="go">    contigs:  ['0']</span>
-<span class="go">    source:   sgkit-0.1.dev1+gf50577ce9</span>
+<span class="go">    source:   sgkit-0.1.dev1+ge18c2066e</span>
 </pre></div>
 </div>
 <p>Note that there is a limitation where intermediate variables (<code class="docutils literal notranslate"><span class="pre">call_allele_count</span></code> in this case)
@@ -1108,8 +1108,8 @@ value to the dask <code class="docutils literal notranslate"><span class="pre">C
 <span class="gp">   ....: </span>    <span class="n">ac</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">count_variant_alleles</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">variant_allele_count</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 <span class="gp">   ....: </span>
 
-<span class="go">[                                        ] | 0% Completed | 208.53 us</span>
-<span class="go">[########################################] | 100% Completed | 100.46 ms</span>
+<span class="go">[                                        ] | 0% Completed | 271.51 us</span>
+<span class="go">[########################################] | 100% Completed | 100.56 ms</span>
 
 <span class="gp">In [39]: </span><span class="n">ac</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 <span class="gh">Out[39]: </span>
