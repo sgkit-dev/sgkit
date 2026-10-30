@@ -524,13 +524,10 @@ def window_statistic(
     window_lengths = window_stops - window_starts
     depth = np.max(window_lengths)  # type: ignore[no-untyped-call]
 
-    # Dask will raise an error if the last chunk size is smaller than the depth
-    # Workaround by rechunking to combine the last two chunks in first axis
+    # Dask needs every chunk to be at least as long as the overlap depth
     # See https://github.com/dask/dask/issues/6597
-    if depth > values.chunks[0][-1]:
-        chunk0 = values.chunks[0]
-        new_chunk0 = tuple(list(chunk0[:-2]) + [chunk0[-2] + chunk0[-1]])
-        values = values.rechunk({0: new_chunk0})
+    if depth > min(values.chunks[0]):
+        values = values.rechunk({0: _merge_small_chunks(values.chunks[0], depth)})
 
     chunks = values.chunks[0]
 
@@ -577,6 +574,23 @@ def window_statistic(
         trim=False,
         new_axis=new_axis,
     )
+
+
+def _merge_small_chunks(chunks: Tuple[int, ...], size: int) -> Tuple[int, ...]:
+    """Merge consecutive chunks so that every chunk is at least ``size`` long."""
+    merged: list = []
+    current = 0
+    for c in chunks:
+        current += c
+        if current >= size:
+            merged.append(current)
+            current = 0
+    if current > 0:
+        if merged:
+            merged[-1] += current
+        else:
+            merged.append(current)
+    return tuple(merged)
 
 
 def _sizes_to_start_offsets(sizes: ArrayLike) -> ArrayLike:

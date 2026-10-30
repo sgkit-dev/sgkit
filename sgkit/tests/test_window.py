@@ -20,6 +20,7 @@ from sgkit.window import (
     _get_windows,
     has_windows,
     moving_statistic,
+    window_statistic,
 )
 
 
@@ -75,6 +76,37 @@ def test_moving_statistic__min_chunksize_smaller_than_size():
         match=re.escape("Minimum chunk size (2) must not be smaller than size (3)."),
     ):
         moving_statistic(values, np.sum, size=3, step=3, dtype=values.dtype)
+
+
+@pytest.mark.parametrize(
+    "chunks, window_starts, window_stops",
+    [
+        # window spanning several chunks
+        (10, [0, 3, 6, 40, 45], [3, 6, 40, 45, 50]),
+        # window longer than the last chunk but not the others
+        ((20, 20, 10), [0, 15, 35], [15, 35, 50]),
+        # irregular chunks, the long window is not in the first chunk
+        ((30, 5, 5, 10), [0, 10, 12, 40], [10, 12, 40, 50]),
+    ],
+)
+def test_window_statistic__window_longer_than_chunk(
+    chunks, window_starts, window_stops
+):
+    arr = np.arange(50 * 3).reshape(50, 3)
+    values = da.from_array(arr, chunks=(chunks, 3))
+    window_starts = np.array(window_starts)
+    window_stops = np.array(window_stops)
+
+    stat = window_statistic(
+        values,
+        lambda x: np.sum(x, axis=0),
+        window_starts,
+        window_stops,
+        dtype=values.dtype,
+    ).compute()
+
+    expected = [arr[i:j].sum(axis=0) for i, j in zip(window_starts, window_stops)]
+    np.testing.assert_equal(stat, expected)
 
 
 def test_window_by_variant():
