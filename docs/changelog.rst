@@ -73,6 +73,9 @@ Bug fixes
   Its documentation explains the legacy packing convention and when unpacking
   is needed; ordinary unpacked datasets and new bio2zarr output do not need it.
   (:issue:`1331`)
+- Windowed statistics no longer fail on chunked data when a window spans
+  more variants than a chunk, for example with :func:`window_by_position`.
+  (:issue:`1343`)
 - Fixed bug causing high memory usage in :func:`pedigree_kinship` when
   evaluating a chunked relationship matrix with the Hamilton-Kerr method.
   (:user:`timothymillar`, :pr:`1335`, :issue:`1333`)
